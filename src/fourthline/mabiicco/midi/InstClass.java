@@ -2,7 +2,7 @@
  * Copyright (C) 2013 たんらる
  */
 
-package fourthline.dls_proto1;
+package fourthline.mabiicco.midi;
 
 public class InstClass {
 	private String name;
