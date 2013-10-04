@@ -96,7 +96,7 @@ public class MMLTrack {
 				velocity = ((MMLVelocityEvent) event).getVelocity();
 			} else if (event instanceof MMLTempoEvent) {
 				byte tempo[] = ((MMLTempoEvent) event).getMetaData();
-				MidiMessage message = new MetaMessage(0x51, 
+				MidiMessage message = new MetaMessage(MMLTempoEvent.META, 
 						tempo, tempo.length);
 				track.add(new MidiEvent(message, totalTick));
 			}

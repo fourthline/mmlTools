@@ -5,13 +5,14 @@
 package fourthline.mabiicco.midi;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Properties;
 
 import javax.sound.midi.*;
+
+import fourthline.mmlTools.parser.MMLTempoEvent;
 
 public final class MabiDLS {
 	private static final MabiDLS instance = new MabiDLS();
@@ -41,7 +42,7 @@ public final class MabiDLS {
 		this.sequencer.addMetaEventListener(new MetaEventListener() {
 			@Override
 			public void meta(MetaMessage meta) {
-				if (meta.getType() == 0x51) {
+				if (meta.getType() == MMLTempoEvent.META) {
 					byte metaData[] = meta.getData();
 					int tempo = metaData[0] & 0xff;
 					sequencer.setTempoInBPM(tempo);
@@ -58,7 +59,7 @@ public final class MabiDLS {
 		// 楽器名の読み込み
 		try {
 			instProperties = new Properties();
-			instProperties.load(new InputStreamReader(new FileInputStream(INST_PROPERTIESFILE), "UTF-8"));
+			instProperties.load(new InputStreamReader(MabiDLS.class.getClassLoader().getResourceAsStream(INST_PROPERTIESFILE), "UTF-8"));
 		} catch (IOException e) {
 			System.err.println(e.getMessage());
 		}
