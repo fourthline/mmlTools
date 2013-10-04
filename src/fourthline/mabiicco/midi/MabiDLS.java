@@ -38,6 +38,17 @@ public final class MabiDLS {
 
 		this.sequencer = MidiSystem.getSequencer();
 		this.sequencer.open();
+		this.sequencer.addMetaEventListener(new MetaEventListener() {
+			@Override
+			public void meta(MetaMessage meta) {
+				if (meta.getType() == 0x51) {
+					byte metaData[] = meta.getData();
+					int tempo = metaData[0] & 0xff;
+					sequencer.setTempoInBPM(tempo);
+					System.out.println(" [midi-event] tempo: " + tempo);
+				}
+			}
+		});
 
 		// シーケンサとシンセサイザの接続
 		Receiver receiver = this.synthesizer.getReceiver();
