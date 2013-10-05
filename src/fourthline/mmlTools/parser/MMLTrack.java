@@ -43,17 +43,19 @@ public class MMLTrack {
 		return (mml_note + 12);
 	}
 
-	public void convertMidiTrack(Track track) throws InvalidMidiDataException {
+	public void convertMidiTrack(Track track, int channel) throws InvalidMidiDataException {
 		MidiMessage message1 = new ShortMessage(ShortMessage.PROGRAM_CHANGE, 
-				program, 0);
+				channel,
+				program,
+				0);
 		track.add(new MidiEvent(message1, 0));
 
-		convertMidiTrack_part(track, 0);
-		convertMidiTrack_part(track, 1);
-		convertMidiTrack_part(track, 2);
+		convertMidiTrack_part(track, channel, 0);
+		convertMidiTrack_part(track, channel, 1);
+		convertMidiTrack_part(track, channel, 2);
 	}
 
-	protected void convertMidiTrack_part(Track track, int index) throws InvalidMidiDataException {
+	protected void convertMidiTrack_part(Track track, int channel, int index) throws InvalidMidiDataException {
 		int totalTick = 0;
 		int velocity = 8;
 
@@ -72,6 +74,7 @@ public class MMLTrack {
 				if (!isTie) {
 					if (note >= 0) {
 						MidiMessage message1 = new ShortMessage(ShortMessage.NOTE_ON, 
+								channel,
 								convertNoteMML2Midi(note), 
 								convertVelocityMML2Midi(velocity));
 						track.add(new MidiEvent(message1, totalTick));
@@ -85,6 +88,7 @@ public class MMLTrack {
 					isTie = false;
 					if (note >= 0) {
 						MidiMessage message2 = new ShortMessage(ShortMessage.NOTE_OFF,
+								channel, 
 								convertNoteMML2Midi(note),
 								0);
 						track.add(new MidiEvent(message2, totalTick+tick-1));
