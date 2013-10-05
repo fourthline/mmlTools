@@ -87,7 +87,7 @@ public class MMLTrack {
 						MidiMessage message2 = new ShortMessage(ShortMessage.NOTE_OFF,
 								convertNoteMML2Midi(note),
 								0);
-						track.add(new MidiEvent(message2, totalTick+tick));
+						track.add(new MidiEvent(message2, totalTick+tick-1));
 					}
 				}
 
