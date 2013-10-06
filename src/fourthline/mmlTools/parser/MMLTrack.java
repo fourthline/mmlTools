@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2013 たんらる
+ */
+
 package fourthline.mmlTools.parser;
 
 import java.util.ArrayList;
@@ -11,11 +15,16 @@ import javax.sound.midi.MidiMessage;
 import javax.sound.midi.ShortMessage;
 import javax.sound.midi.Track;
 
-public class MMLTrack {
+import fourthline.mmlTools.core.MMLTools;
+
+public class MMLTrack extends MMLTools {
 	private List<List<MMLEvent>> mmlParts;
 	private int program = 0;
+	private String name;
 
 	public MMLTrack(String mml1, String mml2, String mml3) {
+		super(mml1, mml2, mml3);
+		
 		mmlParts = new ArrayList<List<MMLEvent>>();
 
 		MMLEventParser parser = new MMLEventParser("");
@@ -34,6 +43,14 @@ public class MMLTrack {
 	public int getProgram() {
 		return this.program;
 	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public String getName() {
+		return this.name;
+	}
 
 
 	private int convertVelocityMML2Midi(int mml_velocity) {
@@ -44,11 +61,24 @@ public class MMLTrack {
 	}
 
 	public void convertMidiTrack(Track track, int channel) throws InvalidMidiDataException {
-		MidiMessage message1 = new ShortMessage(ShortMessage.PROGRAM_CHANGE, 
+		ShortMessage message = new ShortMessage(ShortMessage.PROGRAM_CHANGE, 
 				channel,
 				program,
 				0);
-		track.add(new MidiEvent(message1, 0));
+		track.add(new MidiEvent(message, 0));
+
+		/* TODO: ctrl 10 パンポット */
+		message = new ShortMessage(ShortMessage.CONTROL_CHANGE, 
+				channel,
+				10,
+				64);
+		
+		/* ctrl 91 汎用エフェクト 1(リバーブ) */
+		message = new ShortMessage(ShortMessage.CONTROL_CHANGE, 
+				channel,
+				91,
+				0);
+		track.add(new MidiEvent(message, 0));
 
 		convertMidiTrack_part(track, channel, 0);
 		convertMidiTrack_part(track, channel, 1);

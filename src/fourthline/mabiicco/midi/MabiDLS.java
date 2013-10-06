@@ -119,6 +119,10 @@ public final class MabiDLS {
 	private int play_note = -1;
 	/** 単音再生 */
 	public void playNote(int note) {
+		/* シーケンサによる再生中は鳴らさない */
+		if (sequencer.isRunning()) {
+			return;
+		}
 		MidiChannel ch0 = this.getChannel(0);
 		
 		if (note < 0) {

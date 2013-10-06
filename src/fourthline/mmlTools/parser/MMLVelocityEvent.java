@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2013 たんらる
+ */
+
 package fourthline.mmlTools.parser;
 
 public class MMLVelocityEvent extends MMLEvent {
