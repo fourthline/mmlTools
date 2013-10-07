@@ -46,7 +46,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.InputEvent;
 
 
-public class MainFrame extends JFrame {
+public class MainFrame extends JFrame implements INotifyMMLTrackProperty {
 
 	/**
 	 * 
@@ -58,10 +58,8 @@ public class MainFrame extends JFrame {
 	private KeyboardView keyboardView;
 	
 	private final String DEFAULT_TITLE = " * MabiIcco *";
-
-
-//	private MMLTrackView track1;
-//	private MMLTrackView selectedTrack;
+	
+	private File openedFile = null;
 
 	/**
 	 * Create the frame.
@@ -75,6 +73,7 @@ public class MainFrame extends JFrame {
 		setJMenuBar(menuBar);
 		
 		JMenu fileMenu = new JMenu("ファイル");
+		fileMenu.setMnemonic('F');
 		menuBar.add(fileMenu);
 		
 		JMenuItem fileOpenMenuItem = new JMenuItem("開く");
@@ -84,6 +83,15 @@ public class MainFrame extends JFrame {
 				openMMLFileAction();
 			}
 		});
+		
+		JMenuItem menuItem = new JMenuItem("新規作成");
+		menuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				newMMLFileAction();
+			}
+		});
+		menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK));
+		fileMenu.add(menuItem);
 		fileMenu.add(fileOpenMenuItem);
 		
 		JMenuItem reloadMenuItem = new JMenuItem("再読み込み");
@@ -104,6 +112,38 @@ public class MainFrame extends JFrame {
 			}
 		});
 		fileMenu.add(exitMenuItem);
+		
+		JMenu trackMenu = new JMenu("トラック");
+		menuBar.add(trackMenu);
+		
+		JMenuItem addTrackMenu = new JMenuItem("トラック追加");
+		addTrackMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_MASK));
+		addTrackMenu.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				tabbedPane.add("New Track", new MMLTrackView());
+			}
+		});
+		trackMenu.add(addTrackMenu);
+		
+		JMenuItem removeTrackMenu = new JMenuItem("トラック削除");
+		removeTrackMenu.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				tabbedPane.remove( tabbedPane.getSelectedComponent() );
+			}
+		});
+		trackMenu.add(removeTrackMenu);
+		
+		JSeparator separator_1 = new JSeparator();
+		trackMenu.add(separator_1);
+		
+		JMenuItem menuItem_1 = new JMenuItem("トラックプロパティ");
+		menuItem_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				trackPropertyAction();
+			}
+		});
+		menuItem_1.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.ALT_MASK));
+		trackMenu.add(menuItem_1);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -118,9 +158,6 @@ public class MainFrame extends JFrame {
 				try {
 					Sequencer sequencer = MabiDLS.getInstance().getSequencer();
 					Sequence sequence = new Sequence(Sequence.PPQ, 96);
-//					MMLTrack mmlTrack = track1.getMMLTrack();
-//					MMLTrack mmlTrack = ((MMLTrackView)(tabbedPane.getComponentAt(0))).getMMLTrack();
-//					mmlTrack.convertMidiTrack(sequence.createTrack());
 
 					/* TODO: ここでいいのかなぁ */
 					int count = tabbedPane.getTabCount();
@@ -188,17 +225,19 @@ public class MainFrame extends JFrame {
 				keyboardView.setInstSource(selectedView);
 			}
 		});
-		tabbedPane.add("Track1", new MMLTrackView());
-		tabbedPane.add("Track2", new MMLTrackView());
-		tabbedPane.add("Track3", new MMLTrackView());
-		tabbedPane.add("Track4", new MMLTrackView());
-		tabbedPane.add("Track5", new MMLTrackView());
 		southPanel.add(tabbedPane, BorderLayout.CENTER);
 		southPanel.setPreferredSize(new Dimension(0, 200));
+		
+		newMMLFileAction();
 	}
 
 	private void setTitleAndFile(File file) {
-		setTitle(DEFAULT_TITLE + " [" + file.getName() + "]");
+		String fileTitle = "";
+		
+		if (file != null) {
+			fileTitle = file.getName();
+		}
+		setTitle(DEFAULT_TITLE + " [" + fileTitle + "]");
 	}
 	
 	private void openMMLFile(File file) {
@@ -213,7 +252,21 @@ public class MainFrame extends JFrame {
 			if (name == null) {
 				name = "Track"+(i+1);
 			}
-			tabbedPane.add(name, new MMLTrackView(track[i]));
+			tabbedPane.add(new MMLTrackView(track[i]));
+		}
+	}
+
+	private void newMMLFileAction() {
+		setTitleAndFile(null);
+		openedFile = null;
+		tabbedPane.removeAll();
+
+		for (int i = 0; i < 5; i++) {
+			MMLTrackView trackView = new MMLTrackView();
+			MMLTrack track = new MMLTrack("");
+			track.setName("Track"+(i+1));;
+			trackView.setMMLTrack( track );
+			tabbedPane.add( trackView );
 		}
 	}
 	
@@ -222,8 +275,9 @@ public class MainFrame extends JFrame {
 			MabiDLS.getInstance().getSequencer().stop();
 		}
 		
-		File file = new File(MabiIccoProperties.getInstance().getRecentFile());
-		openMMLFile(file);
+		if (openedFile != null) {
+			openMMLFile(openedFile);
+		}
 	}
 	
 	private void openMMLFileAction() {
@@ -241,7 +295,16 @@ public class MainFrame extends JFrame {
 		if (status == JFileChooser.APPROVE_OPTION) {
 			File file = fileChooser.getSelectedFile();
 			openMMLFile(file);
+			openedFile = file;
 		}
+	}
+	
+	private void trackPropertyAction() {
+		TrackPropertyDialog dialog = new TrackPropertyDialog(
+				this,
+				this,
+				(MMLTrackView)(tabbedPane.getSelectedComponent()) );
+		dialog.setVisible(true);
 	}
 
 	public static String getClipboardString() {
@@ -257,5 +320,12 @@ public class MainFrame extends JFrame {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	@Override
+	public void setTrackProperty(MMLTrack track) {
+		int index = tabbedPane.getSelectedIndex();
+		
+		tabbedPane.setTitleAt(index, track.getName());
 	}
 }

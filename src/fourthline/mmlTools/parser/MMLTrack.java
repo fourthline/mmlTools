@@ -21,18 +21,28 @@ public class MMLTrack extends MMLTools {
 	private List<List<MMLEvent>> mmlParts;
 	private int program = 0;
 	private String name;
+	private int panpot = 64;
+	
+	public MMLTrack(String mml) {
+		super(mml);
 
+		mmlParse();
+	}
+	
 	public MMLTrack(String mml1, String mml2, String mml3) {
 		super(mml1, mml2, mml3);
 		
+		mmlParse();
+	}
+	private void mmlParse() {
 		mmlParts = new ArrayList<List<MMLEvent>>();
-
+		
 		MMLEventParser parser = new MMLEventParser("");
-		mmlParts.add( parser.parseMML(mml1) );
+		mmlParts.add( parser.parseMML(this.getMelody()) );
 		parser = new MMLEventParser("");
-		mmlParts.add( parser.parseMML(mml2) );
+		mmlParts.add( parser.parseMML(this.getChord1()) );
 		parser = new MMLEventParser("");
-		mmlParts.add( parser.parseMML(mml3) );
+		mmlParts.add( parser.parseMML(this.getChord2()) );
 	}
 
 
@@ -52,6 +62,18 @@ public class MMLTrack extends MMLTools {
 		return this.name;
 	}
 
+	public void setPanpot(int panpot) {
+		if (panpot > 127) {
+			panpot = 127;
+		} else if (panpot < 0) {
+			panpot = 0;
+		}
+		this.panpot = panpot;
+	}
+	
+	public int getPanpot() {
+		return this.panpot;
+	}
 
 	private int convertVelocityMML2Midi(int mml_velocity) {
 		return (mml_velocity * 8);
@@ -71,7 +93,8 @@ public class MMLTrack extends MMLTools {
 		message = new ShortMessage(ShortMessage.CONTROL_CHANGE, 
 				channel,
 				10,
-				64);
+				panpot);
+		track.add(new MidiEvent(message, 0));
 		
 		/* ctrl 91 汎用エフェクト 1(リバーブ) */
 		message = new ShortMessage(ShortMessage.CONTROL_CHANGE, 

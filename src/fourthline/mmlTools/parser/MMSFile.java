@@ -91,6 +91,7 @@ public class MMSFile implements IMMLFileParser {
 		String mml2 = null;
 		String mml3 = null;
 		int program = 0;
+		int panpot = 64;
 		
 		String s;
 		while ( (s = reader.readLine()) != null ) {
@@ -98,6 +99,11 @@ public class MMSFile implements IMMLFileParser {
 				String str = s.substring("instrument=".length());
 				program = Integer.parseInt(str);
 				program = convertInstProgram(program);
+			}
+			else if ( s.startsWith("panpot=") ) {
+				String str = s.substring("panpot=".length());
+				panpot = Integer.parseInt(str);
+				panpot += 64;
 			}
 			else if ( s.startsWith("name=") ) {
 				name = s.substring("name=".length());
@@ -117,6 +123,7 @@ public class MMSFile implements IMMLFileParser {
 		MMLTrack track = new MMLTrack(mml1, mml2, mml3);
 		track.setProgram(program);
 		track.setName(name);
+		track.setPanpot(panpot);
 		return track;
 	}
 	

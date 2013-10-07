@@ -20,7 +20,6 @@ import javax.swing.event.DocumentListener;
 
 import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.MabiDLS;
-import fourthline.mmlTools.core.MMLTools;
 import fourthline.mmlTools.parser.MMLTrack;
 
 import java.awt.Font;
@@ -37,6 +36,8 @@ public class MMLTrackView extends JPanel implements IInstSource {
 	private JComboBox comboBox;
 
 	private JLabel trackComposeLabel;
+	
+	private MMLTrack mmlTrack;
 	
 	/**
 	 * Create the panel.
@@ -183,13 +184,12 @@ public class MMLTrackView extends JPanel implements IInstSource {
 	}
 	
 	private void updateComposeRank() {
-		/* TODO: オブジェクトを has しててもいいかも */
 		String melody = mmlText1.getText();
 		String chord1 = mmlText2.getText();
 		String chord2 = mmlText3.getText();
+		mmlTrack = new MMLTrack(melody, chord1, chord2);
 		
-		MMLTools mmlTools = new MMLTools(melody, chord1, chord2);
-		String rank = mmlTools.mmlRankFormat();
+		String rank = mmlTrack.mmlRankFormat();
 		trackComposeLabel.setText(rank);
 		System.out.println(rank);
 	}
@@ -214,10 +214,10 @@ public class MMLTrackView extends JPanel implements IInstSource {
 	}
 	
 	public void setMML(String mml) {
-		MMLTools mmlTools = new MMLTools(mml);
-		mmlText1.setText(mmlTools.getMelody());
-		mmlText2.setText(mmlTools.getChord1());
-		mmlText3.setText(mmlTools.getChord2());
+		this.mmlTrack = new MMLTrack(mml);
+		mmlText1.setText(this.mmlTrack.getMelody());
+		mmlText2.setText(this.mmlTrack.getChord1());
+		mmlText3.setText(this.mmlTrack.getChord2());
 	}
 	
 	public void setMMLTrack(MMLTrack track) {
@@ -226,17 +226,30 @@ public class MMLTrackView extends JPanel implements IInstSource {
 		mmlText3.setText( track.getChord2() );
 		
 		setInstProgram( track.getProgram() );
+		
+		this.mmlTrack = track;
 	}
 	
 	public MMLTrack getMMLTrack() {
-		MMLTrack track = new MMLTrack(
-				mmlText1.getText(),
-				mmlText2.getText(),
-				mmlText3.getText()
-				);
-		track.setProgram( getInstProgram() );
+		if (mmlTrack == null) {
+			this.mmlTrack = new MMLTrack(
+					mmlText1.getText(),
+					mmlText2.getText(),
+					mmlText3.getText()
+					);
+		}
 		
-		return track;
+		this.mmlTrack.setProgram( getInstProgram() );
+		
+		return this.mmlTrack;
+	}
+	
+	public String getName() {
+		if (mmlTrack != null) {
+			return mmlTrack.getName();
+		}
+		
+		return "";
 	}
 
 }
