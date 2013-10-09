@@ -54,7 +54,7 @@ public final class MabiDLS {
 		});
 	}
 	
-	public void initializeSound() throws MidiUnavailableException, InvalidMidiDataException, IOException {
+	public void initializeSound(File dlsFile) throws MidiUnavailableException, InvalidMidiDataException, IOException {
 		// 楽器名の読み込み
 		try {
 			instProperties = new Properties();
@@ -64,7 +64,7 @@ public final class MabiDLS {
 		}
 		
 		// シーケンサとシンセサイザの初期化
-		Soundbank sb = loadDLS();
+		Soundbank sb = loadDLS(dlsFile);
 		Receiver receiver = initializeSynthesizer(sb);
 		Transmitter transmitter = this.sequencer.getTransmitters().get(0);
 		transmitter.setReceiver(receiver);
@@ -88,8 +88,7 @@ public final class MabiDLS {
 		return name;
 	}
 	
-	private Soundbank loadDLS() throws InvalidMidiDataException, IOException {
-		File dlsFile = new File(DEFALUT_DLS_PATH);
+	private Soundbank loadDLS(File dlsFile) throws InvalidMidiDataException, IOException {
 		Soundbank sb = MidiSystem.getSoundbank(dlsFile);
 		
 		Instrument inst[] = sb.getInstruments();
