@@ -18,7 +18,6 @@ public final class MabiDLS {
 	private static final MabiDLS instance = new MabiDLS();
 	private Synthesizer synthesizer;
 	private Sequencer sequencer;
-	private Soundbank sb;
 	private MidiChannel[] channel;
 	private InstClass[] insts;
 	private Properties instProperties;
@@ -30,10 +29,13 @@ public final class MabiDLS {
 		return instance;
 	}
 	
+	/**
+	 * initializeMIDI() -> initializeSound() 
+	 */
 	private MabiDLS() {
 	}
 	
-	public void initialize(String dls_filename) throws MidiUnavailableException, InvalidMidiDataException, IOException {
+	public void initializeMIDI() throws MidiUnavailableException, InvalidMidiDataException, IOException {
 		this.synthesizer = MidiSystem.getSynthesizer();
 		this.synthesizer.open();
 
@@ -50,12 +52,9 @@ public final class MabiDLS {
 				}
 			}
 		});
-
-		// シーケンサとシンセサイザの接続
-		Receiver receiver = this.synthesizer.getReceiver();
-		Transmitter transmitter = this.sequencer.getTransmitters().get(0);
-		transmitter.setReceiver(receiver);
-		
+	}
+	
+	public void initializeSound() throws MidiUnavailableException, InvalidMidiDataException, IOException {
 		// 楽器名の読み込み
 		try {
 			instProperties = new Properties();
@@ -63,10 +62,12 @@ public final class MabiDLS {
 		} catch (IOException e) {
 			System.err.println(e.getMessage());
 		}
-
-		this.sb = loadDLS();
-		this.synthesizer.loadAllInstruments(sb);
-		this.channel = this.synthesizer.getChannels();
+		
+		// シーケンサとシンセサイザの初期化
+		Soundbank sb = loadDLS();
+		Receiver receiver = initializeSynthesizer(sb);
+		Transmitter transmitter = this.sequencer.getTransmitters().get(0);
+		transmitter.setReceiver(receiver);
 	}
 
 	public Sequencer getSequencer() {
@@ -89,7 +90,7 @@ public final class MabiDLS {
 	
 	private Soundbank loadDLS() throws InvalidMidiDataException, IOException {
 		File dlsFile = new File(DEFALUT_DLS_PATH);
-		sb = MidiSystem.getSoundbank(dlsFile);
+		Soundbank sb = MidiSystem.getSoundbank(dlsFile);
 		
 		Instrument inst[] = sb.getInstruments();
 		ArrayList<InstClass> instArray = new ArrayList<InstClass>();
@@ -109,6 +110,26 @@ public final class MabiDLS {
 		insts = instArray.toArray(insts);
 
 		return sb;
+	}
+	
+	
+	private Receiver initializeSynthesizer(Soundbank sb) throws InvalidMidiDataException, IOException, MidiUnavailableException {
+		this.synthesizer.loadAllInstruments(sb);
+		this.channel = this.synthesizer.getChannels();
+		Receiver receiver = this.synthesizer.getReceiver();
+		
+		// リバーブ設定
+		for (int i = 0; i < this.channel.length; i++) {
+			/* ctrl 91 汎用エフェクト 1(リバーブ) */
+			ShortMessage message = new ShortMessage(ShortMessage.CONTROL_CHANGE, 
+					i,
+					91,
+					0);
+			
+			receiver.send(message, 0);
+		}
+		
+		return receiver;
 	}
 	
 	

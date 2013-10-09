@@ -12,5 +12,5 @@ import java.io.File;
  *
  */
 public interface IMMLFileParser {
-	public MMLTrack[] parse(File file);
+	public MMLTrack[] parse(File file) throws MMLParseException;
 }

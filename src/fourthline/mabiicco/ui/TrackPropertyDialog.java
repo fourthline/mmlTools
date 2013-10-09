@@ -8,9 +8,13 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Window;
 
+import javax.swing.AbstractAction;
+import javax.swing.InputMap;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -20,6 +24,7 @@ import fourthline.mmlTools.parser.MMLTrack;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 public class TrackPropertyDialog extends JDialog {
 
@@ -112,6 +117,16 @@ public class TrackPropertyDialog extends JDialog {
 				});
 				cancelButton.setActionCommand("Cancel");
 				buttonPane.add(cancelButton);
+				InputMap imap = getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+				imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "escape");
+				getRootPane().getActionMap().put("escape", new AbstractAction(){
+					private static final long serialVersionUID = 8365149917383455221L;
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						dispose();
+					}
+				}); 
 			}
 		}
 	}

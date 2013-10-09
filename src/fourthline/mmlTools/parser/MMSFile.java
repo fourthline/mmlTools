@@ -20,7 +20,7 @@ import java.util.ArrayList;
 public class MMSFile implements IMMLFileParser {
 
 	@Override
-	public MMLTrack[] parse(File file) {
+	public MMLTrack[] parse(File file) throws MMLParseException {
 		ArrayList<MMLTrack> array = new ArrayList<MMLTrack>();
 		BufferedReader reader = null;
 		try {
@@ -28,16 +28,17 @@ public class MMSFile implements IMMLFileParser {
 			InputStreamReader isReader = new InputStreamReader(fisFile, "Shift_JIS");
 			reader = new BufferedReader(isReader);
 			
-			String s = reader.readLine();
+			String s= reader.readLine();
+			
 			/* ヘッダチェック */
 			if ( (s == null) || !(s.equals("[mms-file]")) ) {
-				throw(new IOException("invalid MMS format"));
+				throw(new MMLParseException());
 			}
 			
 			/* バージョン */
 			s = reader.readLine();
 			if ( s == null ) {
-				throw(new IOException("invalid MMS format"));
+				throw(new MMLParseException());
 			}
 			
 			while ( (s = reader.readLine()) != null ) {
@@ -63,7 +64,13 @@ public class MMSFile implements IMMLFileParser {
 			}
 		}
 		
-		MMLTrack tracks[] = new MMLTrack[array.size()];
+		/* トラック数のチェック */
+		int trackCount = array.size();
+		if ( (trackCount <= 0) || (trackCount > 16) ) {
+			throw(new MMLParseException());
+		}
+		
+		MMLTrack tracks[] = new MMLTrack[trackCount];
 		array.toArray(tracks);
 		return tracks;
 	}
@@ -128,8 +135,12 @@ public class MMSFile implements IMMLFileParser {
 	}
 	
 	public static void main(String args[]) {
-		MMSFile mmsFile = new MMSFile();
-		MMLTrack track[] = mmsFile.parse(new File("sample.mms"));
-		System.out.println(track[0].getName());
+		try {
+			MMSFile mmsFile = new MMSFile();
+			MMLTrack track[] = mmsFile.parse(new File("sample.mms"));
+			System.out.println(track[0].getName());
+		} catch (MMLParseException e) {
+			e.printStackTrace();
+		}
 	}
 }

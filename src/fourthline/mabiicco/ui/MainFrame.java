@@ -14,6 +14,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.JTextField;
@@ -244,15 +245,19 @@ public class MainFrame extends JFrame implements INotifyMMLTrackProperty {
 		setTitleAndFile(file);
 		MabiIccoProperties.getInstance().setRecentFile(file.getPath());
 		IMMLFileParser fileParser = new MMSFile();
-		MMLTrack track[] = fileParser.parse(file);
-		
-		tabbedPane.removeAll();
-		for (int i = 0; i < track.length; i++) {
-			String name = track[i].getName();
-			if (name == null) {
-				name = "Track"+(i+1);
+		try {
+			MMLTrack track[] = fileParser.parse(file);
+
+			tabbedPane.removeAll();
+			for (int i = 0; i < track.length; i++) {
+				String name = track[i].getName();
+				if (name == null) {
+					name = "Track"+(i+1);
+				}
+				tabbedPane.add(new MMLTrackView(track[i]));
 			}
-			tabbedPane.add(new MMLTrackView(track[i]));
+		} catch (MMLParseException e) {
+			JOptionPane.showMessageDialog(this, "読み込みに失敗しました", "ファイル形式が不正です", JOptionPane.WARNING_MESSAGE);
 		}
 	}
 
@@ -262,11 +267,11 @@ public class MainFrame extends JFrame implements INotifyMMLTrackProperty {
 		tabbedPane.removeAll();
 
 		for (int i = 0; i < 5; i++) {
+			String name = "Track"+(i+1);
 			MMLTrackView trackView = new MMLTrackView();
-			MMLTrack track = new MMLTrack("");
-			track.setName("Track"+(i+1));;
-			trackView.setMMLTrack( track );
-			tabbedPane.add( trackView );
+			MMLTrack track = new MMLTrack(name);
+			trackView.setMMLTrack(track);
+			tabbedPane.add(name, trackView);
 		}
 	}
 	

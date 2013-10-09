@@ -95,13 +95,6 @@ public class MMLTrack extends MMLTools {
 				10,
 				panpot);
 		track.add(new MidiEvent(message, 0));
-		
-		/* ctrl 91 汎用エフェクト 1(リバーブ) */
-		message = new ShortMessage(ShortMessage.CONTROL_CHANGE, 
-				channel,
-				91,
-				0);
-		track.add(new MidiEvent(message, 0));
 
 		convertMidiTrack_part(track, channel, 0);
 		convertMidiTrack_part(track, channel, 1);

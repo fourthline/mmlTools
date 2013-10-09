@@ -17,7 +17,7 @@ import javax.swing.JPanel;
 
 import fourthline.mabiicco.midi.MabiDLS;
 
-public class KeyboardView extends JPanel {
+public class KeyboardView extends JPanel implements IMMLView {
 
 	/**
 	 * 
@@ -67,52 +67,60 @@ public class KeyboardView extends JPanel {
 		super.paintComponent(g);
 
 		Graphics2D g2 = (Graphics2D)g.create();
-		for (int i = 0; i <= 9; i++) {
-			paintOctPianoLine(g2, i, (char)('0'+8-i));
+		for (int i = 0; i <= OCTNUM; i++) {
+			paintOctPianoLine(g2, i, (char)('0'+OCTNUM-i-1));
 		}
 
 		g2.dispose();
 	}
 
 
-	private void paintOctPianoLine(Graphics g, int pos, char posText) {
+	private void paintOctPianoLine(Graphics2D g, int pos, char posText) {
 
 		int white_wigth[] = { 10, 10, 10, 11, 10, 10, 11 };
 		// ド～シのしろ鍵盤
 		g.setColor(new Color(0.3f, 0.3f, 0.3f));
 
-		int startY = 12*6*pos;
+		int startY = 12 * IMMLView.HEIGHT * pos;
 		int y = startY;
 		for (int i = 0; i < white_wigth.length; i++) {
 			g.drawRect(0, y, 40, white_wigth[i]);
 			y += white_wigth[i];
 		}
 		// 黒鍵盤
-		g.setColor(new Color(0.0f, 0.0f, 0.0f));
-		g.fillRect(0, (0*10+5)+1+startY, 20, 6);
-		g.fillRect(0, (1*10+5)+2+startY, 20, 6);
-		g.fillRect(0, (2*10+5)+3+startY, 20, 6);
-		g.fillRect(0, (4*10+5)+1+startY, 20, 6);
-		g.fillRect(0, (5*10+5)+3+startY, 20, 6);
-		g.setColor(new Color(0.3f, 0.3f, 0.3f));
-		g.drawRect(0, (0*10+5)+1+startY, 20, 6);
-		g.drawRect(0, (1*10+5)+2+startY, 20, 6);
-		g.drawRect(0, (2*10+5)+3+startY, 20, 6);
-		g.drawRect(0, (4*10+5)+1+startY, 20, 6);
-		g.drawRect(0, (5*10+5)+3+startY, 20, 6);
+		int black_posIndex[] = { 
+				0, // A#
+				1, // G#
+				2, // F#
+				4, // D#
+				5  // C#
+				};
+		int posOffset[] = { 1, 2, 3, 1, 3 };
+		
+		for (int i = 0; i < black_posIndex.length; i++) {
+			y = (black_posIndex[i]*10+5)+startY+posOffset[i];
+			
+			g.setColor(new Color(0.0f, 0.0f, 0.0f));
+			g.fillRect(0, y, 20, IMMLView.HEIGHT);
+			
+			g.setColor(new Color(0.3f, 0.3f, 0.3f));
+			g.drawRect(0, y, 20, IMMLView.HEIGHT);
+		}
 
 		// グリッド
 		y = startY;
 		g.setColor(new Color(0.3f, 0.3f, 0.6f));
 		g.drawLine(40, y, 100, y);
 		for (int i = 1; i < 12; i++) {
-			g.drawLine(60, i*6+y, 100, i*6+y);
+			y += IMMLView.HEIGHT;
+			g.drawLine(60, y, 100, y);
 		}
 
 		// drawChars(char[] data, int offset, int length, int x, int y)
 		char o_char[] = { 'o', posText };
 		g.setFont(new Font("Arial", Font.PLAIN, 12));
-		g.drawChars(o_char, 0, o_char.length, 42, startY+(12*6));
+		y = startY + (12 * IMMLView.HEIGHT);
+		g.drawChars(o_char, 0, o_char.length, 42, y);
 	}
 	
 	private int convertY2Note(int y) {
