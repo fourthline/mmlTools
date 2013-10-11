@@ -191,7 +191,7 @@ public class MainFrame extends JFrame implements INotifyMMLTrackProperty {
 			public void actionPerformed(ActionEvent arg0) {
 				String clipMML = getClipboardString();
 				MMLTrackView selectedTrack = (MMLTrackView)(tabbedPane.getSelectedComponent());
-				selectedTrack.setMML(clipMML);
+				selectedTrack.setMMLTrack(new MMLTrack(clipMML));
 			}
 		});
 		northPanel.add(inputClipButton);
