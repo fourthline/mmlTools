@@ -19,6 +19,7 @@ import fourthline.mmlTools.core.MMLTools;
 
 public class MMLTrack extends MMLTools {
 	private List<List<MMLEvent>> mmlParts;
+	private int totalTick[];
 	private int program = 0;
 	private String name;
 	private int panpot = 64;
@@ -36,13 +37,19 @@ public class MMLTrack extends MMLTools {
 	}
 	private void mmlParse() {
 		mmlParts = new ArrayList<List<MMLEvent>>();
+
+		totalTick = new int[3];
+		String mml[] = {
+				getMelody(),
+				getChord1(),
+				getChord2()
+		};
 		
-		MMLEventParser parser = new MMLEventParser("");
-		mmlParts.add( parser.parseMML(this.getMelody()) );
-		parser = new MMLEventParser("");
-		mmlParts.add( parser.parseMML(this.getChord1()) );
-		parser = new MMLEventParser("");
-		mmlParts.add( parser.parseMML(this.getChord2()) );
+		for (int i = 0; i < mml.length; i++) {
+			MMLEventParser parser = new MMLEventParser("");
+			mmlParts.add( parser.parseMML(mml[i]) );
+			totalTick[i] = parser.getTotalTick();
+		}
 	}
 
 
@@ -73,6 +80,21 @@ public class MMLTrack extends MMLTools {
 	
 	public int getPanpot() {
 		return this.panpot;
+	}
+	
+	public List<MMLEvent> getMMLEvent(int index) {
+		return mmlParts.get(index);
+	}
+	
+	public int getMaxTickLength() {
+		int max = 0;
+		for (int i = 0; i < totalTick.length; i++) {
+			if (max < totalTick[i]) {
+				max = totalTick[i];
+			}
+		}
+		
+		return max;
 	}
 
 	private int convertVelocityMML2Midi(int mml_velocity) {

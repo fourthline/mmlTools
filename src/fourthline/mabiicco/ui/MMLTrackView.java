@@ -23,8 +23,10 @@ import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mmlTools.parser.MMLTrack;
 
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-public class MMLTrackView extends JPanel implements IInstSource {
+public class MMLTrackView extends JPanel implements ActionListener {
 	/**
 	 * 
 	 */
@@ -78,6 +80,7 @@ public class MMLTrackView extends JPanel implements IInstSource {
 			comboBox = new JComboBox(insts);
 		}
 		northPanel.add(comboBox);
+		comboBox.addActionListener(this);
 		
 		JLabel label = new JLabel("メロディー");
 		GridBagConstraints gbc_label = new GridBagConstraints();
@@ -207,11 +210,6 @@ public class MMLTrackView extends JPanel implements IInstSource {
 		comboBox.setSelectedItem(selectedInst);
 	}
 	
-	public int getInstProgram() {
-		InstClass inst = (InstClass) comboBox.getSelectedItem();
-		
-		return inst.getProgram();
-	}
 	
 	public void setMML(String mml) {
 		this.mmlTrack = new MMLTrack(mml);
@@ -239,8 +237,6 @@ public class MMLTrackView extends JPanel implements IInstSource {
 					);
 		}
 		
-		this.mmlTrack.setProgram( getInstProgram() );
-		
 		return this.mmlTrack;
 	}
 	
@@ -250,6 +246,14 @@ public class MMLTrackView extends JPanel implements IInstSource {
 		}
 		
 		return "";
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == comboBox) {
+			InstClass inst = (InstClass) comboBox.getSelectedItem();
+			mmlTrack.setProgram(inst.getProgram());
+		}
 	}
 
 }

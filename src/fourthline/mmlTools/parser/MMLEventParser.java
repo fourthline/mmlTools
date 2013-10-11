@@ -19,7 +19,12 @@ public class MMLEventParser extends MelodyParser {
 	public MMLEventParser(String mml) {
 		super(mml);
 	}
+	
+	private int totalTick;
 
+	public int getTotalTick() {
+		return totalTick;
+	}
 
 	public List<MMLEvent> parseMML(String mml) {
 		ArrayList<MMLEvent> list = new ArrayList<MMLEvent>();
@@ -28,6 +33,7 @@ public class MMLEventParser extends MelodyParser {
 		MMLNoteEvent prevNoteEvent = null;
 		
 		boolean hasTie = false;
+		totalTick = 0;
 		
 		while (tokenizer.hasNext()) {
 			String token = tokenizer.next();
@@ -58,6 +64,8 @@ public class MMLEventParser extends MelodyParser {
 					list.add(newEvent);
 					prevNoteEvent = newEvent;
 					hasTie = false;
+					
+					totalTick += tick;
 				} 
 			} catch (UndefinedTickException e) {
 				e.printStackTrace();

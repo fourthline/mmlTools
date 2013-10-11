@@ -6,6 +6,7 @@ package fourthline.mabiicco.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.Toolkit;
 
 import javax.sound.midi.Sequence;
@@ -210,6 +211,8 @@ public class MainFrame extends JFrame implements INotifyMMLTrackProperty {
 
 		subScrollPane.setRowHeaderView(keyboardView);
 		centerPanel.add(subScrollPane, BorderLayout.CENTER);
+		// TODO: スクロールの追従
+		subScrollPane.getViewport().setViewPosition(new Point(0, 250));
 
 		JPanel southPanel = new JPanel();
 		contentPane.add(southPanel, BorderLayout.SOUTH);
@@ -227,8 +230,11 @@ public class MainFrame extends JFrame implements INotifyMMLTrackProperty {
 				MMLTrackView selectedView = (MMLTrackView)(tabbedPane.getSelectedComponent());
 				System.out.println("tabbedPane change: " + tabbedPane.getSelectedIndex());
 
-				pianoRollView.setInstSource(selectedView);
-				keyboardView.setInstSource(selectedView);
+				if (selectedView != null) {
+					MMLTrack selectedTrack = selectedView.getMMLTrack();
+					pianoRollView.setMMLTrack(selectedTrack);
+					keyboardView.setMMLTrack(selectedTrack);
+				}
 			}
 		});
 		southPanel.add(tabbedPane, BorderLayout.CENTER);
