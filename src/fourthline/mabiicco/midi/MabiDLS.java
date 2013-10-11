@@ -38,6 +38,10 @@ public final class MabiDLS {
 	public void initializeMIDI() throws MidiUnavailableException, InvalidMidiDataException, IOException {
 		this.synthesizer = MidiSystem.getSynthesizer();
 		this.synthesizer.open();
+		
+		long latency = this.synthesizer.getLatency();
+		int maxPolyphony = this.synthesizer.getMaxPolyphony();
+		System.out.printf("Latency: %d\nMaxPolyphony: %d\n", latency, maxPolyphony);
 
 		this.sequencer = MidiSystem.getSequencer();
 		this.sequencer.open();
@@ -95,14 +99,17 @@ public final class MabiDLS {
 		ArrayList<InstClass> instArray = new ArrayList<InstClass>();
 		for (int i = 0; i < inst.length; i++) {
 			String name = instName(inst[i]);
+			String originalName = inst[i].getName();
 			int bank = inst[i].getPatch().getBank();
 			int program = inst[i].getPatch().getProgram();
-			if (name != null) {
-				instArray.add(new InstClass( instName(inst[i]),
-						bank,
-						program ));
+			if (name == null) {
+				name = "*" + originalName;
 			}
-			System.out.printf("%d=%s\n", program, name);
+			name = ""+program+": "+name;
+			instArray.add(new InstClass( name,
+					bank,
+					program ));
+			System.out.printf("%d=%s \"%s\"\n", program,  originalName, name);
 		}
 		
 		insts = new InstClass[instArray.size()];

@@ -57,6 +57,7 @@ public class MainFrame extends JFrame implements INotifyMMLTrackProperty {
 	private JTextField statusField;
 	private JTabbedPane tabbedPane;
 	private KeyboardView keyboardView;
+	private PianoRollView pianoRollView;
 	
 	private final String DEFAULT_TITLE = " * MabiIcco *";
 	
@@ -198,13 +199,16 @@ public class MainFrame extends JFrame implements INotifyMMLTrackProperty {
 		contentPane.add(centerPanel, BorderLayout.CENTER);
 		centerPanel.setLayout(new BorderLayout(0, 0));
 
+		// TODO: ピアノロールビュー
+		pianoRollView = new PianoRollView();
 		keyboardView = new KeyboardView();
 
-		JScrollPane subScrollPane = new JScrollPane(keyboardView);
+		JScrollPane subScrollPane = new JScrollPane(pianoRollView);
 		subScrollPane.setPreferredSize(new Dimension(150, 0));
 		subScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		subScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 
+		subScrollPane.setRowHeaderView(keyboardView);
 		centerPanel.add(subScrollPane, BorderLayout.CENTER);
 
 		JPanel southPanel = new JPanel();
@@ -222,7 +226,8 @@ public class MainFrame extends JFrame implements INotifyMMLTrackProperty {
 			public void stateChanged(ChangeEvent e) {
 				MMLTrackView selectedView = (MMLTrackView)(tabbedPane.getSelectedComponent());
 				System.out.println("tabbedPane change: " + tabbedPane.getSelectedIndex());
-				
+
+				pianoRollView.setInstSource(selectedView);
 				keyboardView.setInstSource(selectedView);
 			}
 		});
