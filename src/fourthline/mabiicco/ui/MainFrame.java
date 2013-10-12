@@ -5,8 +5,6 @@
 package fourthline.mabiicco.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Point;
 import java.awt.Toolkit;
 
 import javax.sound.midi.Sequence;
@@ -16,10 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.JTextField;
-import javax.swing.JTabbedPane;
 import javax.swing.JButton;
 
 import fourthline.mabiicco.MabiIccoProperties;
@@ -34,8 +29,6 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.JMenuBar;
@@ -48,7 +41,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.InputEvent;
 
 
-public class MainFrame extends JFrame implements INotifyMMLTrackProperty {
+public class MainFrame extends JFrame {
 
 	/**
 	 * 
@@ -56,9 +49,7 @@ public class MainFrame extends JFrame implements INotifyMMLTrackProperty {
 	private static final long serialVersionUID = -7484797594534384422L;
 	private JPanel contentPane;
 	private JTextField statusField;
-	private JTabbedPane tabbedPane;
-	private KeyboardView keyboardView;
-	private PianoRollView pianoRollView;
+	private MMLSeqView mmlSeqView;
 	
 	private final String DEFAULT_TITLE = " * MabiIcco *";
 	
@@ -123,7 +114,7 @@ public class MainFrame extends JFrame implements INotifyMMLTrackProperty {
 		addTrackMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_MASK));
 		addTrackMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				tabbedPane.add("New Track", new MMLTrackView());
+				mmlSeqView.addMMLTrack("New Track");
 			}
 		});
 		trackMenu.add(addTrackMenu);
@@ -131,7 +122,7 @@ public class MainFrame extends JFrame implements INotifyMMLTrackProperty {
 		JMenuItem removeTrackMenu = new JMenuItem("トラック削除");
 		removeTrackMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				tabbedPane.remove( tabbedPane.getSelectedComponent() );
+				mmlSeqView.removeMMLTrack();
 			}
 		});
 		trackMenu.add(removeTrackMenu);
@@ -158,22 +149,19 @@ public class MainFrame extends JFrame implements INotifyMMLTrackProperty {
 		JButton playButton = new JButton("再生");
 		playButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				try {
-					Sequencer sequencer = MabiDLS.getInstance().getSequencer();
-					Sequence sequence = new Sequence(Sequence.PPQ, 96);
+				new Thread(new Runnable() {
+					public void run() {
+						try {
+							Sequencer sequencer = MabiDLS.getInstance().getSequencer();
+							Sequence sequence = mmlSeqView.createSequence();
 
-					/* TODO: ここでいいのかなぁ */
-					int count = tabbedPane.getTabCount();
-					for (int i = 0; i < count; i++) {
-						MMLTrack mmlTrack = ((MMLTrackView)(tabbedPane.getComponentAt(i))).getMMLTrack();
-						mmlTrack.convertMidiTrack(sequence.createTrack(), i);
+							sequencer.setSequence(sequence);
+							sequencer.start();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
-					
-					sequencer.setSequence(sequence);
-					sequencer.start();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				}).start();
 			}
 		});
 		northPanel.add(playButton);
@@ -190,57 +178,22 @@ public class MainFrame extends JFrame implements INotifyMMLTrackProperty {
 		inputClipButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				String clipMML = getClipboardString();
-				MMLTrackView selectedTrack = (MMLTrackView)(tabbedPane.getSelectedComponent());
-				selectedTrack.setMMLTrack(new MMLTrack(clipMML));
+				mmlSeqView.addMMLTrack("新規トラック", clipMML);
 			}
 		});
 		northPanel.add(inputClipButton);
 
-		JPanel centerPanel = new JPanel();
-		contentPane.add(centerPanel, BorderLayout.CENTER);
-		centerPanel.setLayout(new BorderLayout(0, 0));
-
-		// TODO: ピアノロールビュー
-		pianoRollView = new PianoRollView();
-		keyboardView = new KeyboardView();
-
-		JScrollPane subScrollPane = new JScrollPane(pianoRollView);
-		subScrollPane.setPreferredSize(new Dimension(150, 0));
-		subScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		subScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-
-		subScrollPane.setRowHeaderView(keyboardView);
-		centerPanel.add(subScrollPane, BorderLayout.CENTER);
-		// TODO: スクロールの追従
-		subScrollPane.getViewport().setViewPosition(new Point(0, 250));
+		mmlSeqView = new MMLSeqView();
+		contentPane.add(mmlSeqView, BorderLayout.CENTER);
 
 		JPanel southPanel = new JPanel();
 		contentPane.add(southPanel, BorderLayout.SOUTH);
 		southPanel.setLayout(new BorderLayout(0, 0));
-		southPanel.setPreferredSize(new Dimension(50, 50));
 
 		statusField = new JTextField();
 		statusField.setEditable(false);
 		southPanel.add(statusField, BorderLayout.SOUTH);
 		statusField.setColumns(10);
-
-		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		tabbedPane.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				MMLTrackView selectedView = (MMLTrackView)(tabbedPane.getSelectedComponent());
-				System.out.println("tabbedPane change: " + tabbedPane.getSelectedIndex());
-
-				if (selectedView != null) {
-					MMLTrack selectedTrack = selectedView.getMMLTrack();
-					pianoRollView.setMMLTrack(selectedTrack);
-					keyboardView.setMMLTrack(selectedTrack);
-				}
-			}
-		});
-		southPanel.add(tabbedPane, BorderLayout.CENTER);
-		southPanel.setPreferredSize(new Dimension(0, 200));
-		
-		newMMLFileAction();
 	}
 
 	private void setTitleAndFile(File file) {
@@ -258,15 +211,8 @@ public class MainFrame extends JFrame implements INotifyMMLTrackProperty {
 		IMMLFileParser fileParser = new MMSFile();
 		try {
 			MMLTrack track[] = fileParser.parse(file);
-
-			tabbedPane.removeAll();
-			for (int i = 0; i < track.length; i++) {
-				String name = track[i].getName();
-				if (name == null) {
-					name = "Track"+(i+1);
-				}
-				tabbedPane.add(new MMLTrackView(track[i]));
-			}
+			
+			mmlSeqView.setMMLTracks(track);
 		} catch (MMLParseException e) {
 			JOptionPane.showMessageDialog(this, "読み込みに失敗しました", "ファイル形式が不正です", JOptionPane.WARNING_MESSAGE);
 		}
@@ -275,15 +221,14 @@ public class MainFrame extends JFrame implements INotifyMMLTrackProperty {
 	private void newMMLFileAction() {
 		setTitleAndFile(null);
 		openedFile = null;
-		tabbedPane.removeAll();
+		MMLTrack track[] = new MMLTrack[5];
 
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < track.length; i++) {
 			String name = "Track"+(i+1);
-			MMLTrackView trackView = new MMLTrackView();
-			MMLTrack track = new MMLTrack(name);
-			trackView.setMMLTrack(track);
-			tabbedPane.add(name, trackView);
+			track[i] = new MMLTrack(name);
 		}
+		
+		mmlSeqView.setMMLTracks(track);
 	}
 	
 	private void reloadMMLFileAction() {
@@ -318,8 +263,8 @@ public class MainFrame extends JFrame implements INotifyMMLTrackProperty {
 	private void trackPropertyAction() {
 		TrackPropertyDialog dialog = new TrackPropertyDialog(
 				this,
-				this,
-				(MMLTrackView)(tabbedPane.getSelectedComponent()) );
+				mmlSeqView, 
+				mmlSeqView.getSelectedTrack() );
 		dialog.setVisible(true);
 	}
 
@@ -338,10 +283,4 @@ public class MainFrame extends JFrame implements INotifyMMLTrackProperty {
 		}
 	}
 
-	@Override
-	public void setTrackProperty(MMLTrack track) {
-		int index = tabbedPane.getSelectedIndex();
-		
-		tabbedPane.setTitleAt(index, track.getName());
-	}
 }

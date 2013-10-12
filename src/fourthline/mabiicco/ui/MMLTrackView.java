@@ -17,6 +17,7 @@ import javax.swing.JTextField;
 import javax.swing.JComboBox;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.Document;
 
 import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.MabiDLS;
@@ -26,7 +27,7 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class MMLTrackView extends JPanel implements ActionListener {
+public class MMLTrackView extends JPanel implements ActionListener, DocumentListener {
 	/**
 	 * 
 	 */
@@ -91,20 +92,7 @@ public class MMLTrackView extends JPanel implements ActionListener {
 
 		mmlText1 = new JTextField();
 		mmlText1.setFont(new Font("Monospaced", Font.PLAIN, 12));
-		mmlText1.getDocument().addDocumentListener(new DocumentListener() {
-			@Override
-			public void removeUpdate(DocumentEvent arg0) {
-				updateComposeRank();
-			}
-			@Override
-			public void insertUpdate(DocumentEvent arg0) {
-				updateComposeRank();
-			}
-			@Override
-			public void changedUpdate(DocumentEvent arg0) {
-				updateComposeRank();
-			}
-		});
+		mmlText1.getDocument().addDocumentListener(this);
 
 		GridBagConstraints gbc_mmlText1 = new GridBagConstraints();
 		gbc_mmlText1.insets = new Insets(0, 0, 5, 5);
@@ -123,20 +111,8 @@ public class MMLTrackView extends JPanel implements ActionListener {
 
 		mmlText2 = new JTextField();
 		mmlText2.setFont(new Font("Monospaced", Font.PLAIN, 12));
-		mmlText2.getDocument().addDocumentListener(new DocumentListener() {
-			@Override
-			public void removeUpdate(DocumentEvent arg0) {
-				updateComposeRank();
-			}
-			@Override
-			public void insertUpdate(DocumentEvent arg0) {
-				updateComposeRank();
-			}
-			@Override
-			public void changedUpdate(DocumentEvent arg0) {
-				updateComposeRank();
-			}
-		});
+		mmlText2.getDocument().addDocumentListener(this);
+
 		GridBagConstraints gbc_mmlText2 = new GridBagConstraints();
 		gbc_mmlText2.insets = new Insets(0, 0, 5, 5);
 		gbc_mmlText2.fill = GridBagConstraints.HORIZONTAL;
@@ -154,20 +130,8 @@ public class MMLTrackView extends JPanel implements ActionListener {
 
 		mmlText3 = new JTextField();
 		mmlText3.setFont(new Font("Monospaced", Font.PLAIN, 12));
-		mmlText3.getDocument().addDocumentListener(new DocumentListener() {
-			@Override
-			public void removeUpdate(DocumentEvent arg0) {
-				updateComposeRank();
-			}
-			@Override
-			public void insertUpdate(DocumentEvent arg0) {
-				updateComposeRank();
-			}
-			@Override
-			public void changedUpdate(DocumentEvent arg0) {
-				updateComposeRank();
-			}
-		});
+		mmlText3.getDocument().addDocumentListener(this);
+
 		GridBagConstraints gbc_mmlText3 = new GridBagConstraints();
 		gbc_mmlText3.insets = new Insets(0, 0, 5, 5);
 		gbc_mmlText3.fill = GridBagConstraints.HORIZONTAL;
@@ -176,7 +140,7 @@ public class MMLTrackView extends JPanel implements ActionListener {
 		centerPanel.add(mmlText3, gbc_mmlText3);
 		mmlText3.setColumns(10);
 
-		updateComposeRank();
+		updateComposeRank(null);
 	}
 
 	public MMLTrackView(MMLTrack track) {
@@ -186,11 +150,40 @@ public class MMLTrackView extends JPanel implements ActionListener {
 		trackComposeLabel.setText(track.mmlRankFormat());
 	}
 
-	private void updateComposeRank() {
-		String melody = mmlText1.getText();
-		String chord1 = mmlText2.getText();
-		String chord2 = mmlText3.getText();
-		mmlTrack = new MMLTrack(melody, chord1, chord2);
+	@Override
+	public void removeUpdate(DocumentEvent event) {
+		updateComposeRank(event);
+	}
+	@Override
+	public void insertUpdate(DocumentEvent event) {
+		updateComposeRank(event);
+	}
+	@Override
+	public void changedUpdate(DocumentEvent event) {
+		updateComposeRank(event);
+	}
+
+	private void updateComposeRank(DocumentEvent event) {
+		if (mmlTrack == null) {
+			return;
+		}
+		
+		if (event != null) {
+			Document source = event.getDocument();
+
+			if (source == mmlText1.getDocument()) {
+				String s = mmlText1.getText();
+				mmlTrack.setMelody(s);
+			} else if (source == mmlText2.getDocument()) {
+				String s = mmlText2.getText();
+				mmlTrack.setChord1(s);
+			} else if (source == mmlText3.getDocument()) {
+				String s = mmlText3.getText();
+				mmlTrack.setChord2(s);
+			}
+			
+			// TODO: MML直接文字列更新→ピアノロールビューをRepaintする。
+		}
 
 		String rank = mmlTrack.mmlRankFormat();
 		trackComposeLabel.setText(rank);
@@ -219,32 +212,18 @@ public class MMLTrackView extends JPanel implements ActionListener {
 
 		this.mmlTrack = track;
 	}
-
+	
 	public MMLTrack getMMLTrack() {
-		if (mmlTrack == null) {
-			this.mmlTrack = new MMLTrack(
-					mmlText1.getText(),
-					mmlText2.getText(),
-					mmlText3.getText()
-					);
-		}
-
 		return this.mmlTrack;
 	}
-
-	public String getName() {
-		if (mmlTrack != null) {
-			return mmlTrack.getName();
-		}
-
-		return "";
-	}
-
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == comboBox) {
 			InstClass inst = (InstClass) comboBox.getSelectedItem();
-			mmlTrack.setProgram(inst.getProgram());
+			if (mmlTrack != null) {
+				mmlTrack.setProgram(inst.getProgram());
+			}
 		}
 	}
 

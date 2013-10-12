@@ -35,6 +35,7 @@ public class MMLTrack extends MMLTools {
 		
 		mmlParse();
 	}
+	
 	private void mmlParse() {
 		mmlParts = new ArrayList<List<MMLEvent>>();
 
@@ -52,6 +53,23 @@ public class MMLTrack extends MMLTools {
 		}
 	}
 
+	public void setMelody(String mml) {
+		MMLEventParser parser = new MMLEventParser("");
+		mmlParts.set(0, parser.parseMML(mml));
+		this.mml_melody = mml;
+	}
+	
+	public void setChord1(String mml) {
+		MMLEventParser parser = new MMLEventParser("");
+		mmlParts.set(1, parser.parseMML(mml));
+		this.mml_chord1 = mml;
+	}
+	
+	public void setChord2(String mml) {
+		MMLEventParser parser = new MMLEventParser("");
+		mmlParts.set(2, parser.parseMML(mml));
+		this.mml_chord2 = mml;
+	}
 
 	public void setProgram(int program) {
 		this.program = program;
@@ -111,7 +129,7 @@ public class MMLTrack extends MMLTools {
 				0);
 		track.add(new MidiEvent(message, 0));
 
-		/* TODO: ctrl 10 パンポット */
+		/* ctrl 10 パンポット */
 		message = new ShortMessage(ShortMessage.CONTROL_CHANGE, 
 				channel,
 				10,

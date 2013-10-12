@@ -36,8 +36,8 @@ public class TrackPropertyDialog extends JDialog {
 	private JTextField trackNameField;
 	private JSlider panpotSlider;
 	
+	MMLTrack track;
 	INotifyMMLTrackProperty notify;
-	private MMLTrackView trackView;
 
 	/**
 	 * Launch the application.
@@ -132,20 +132,17 @@ public class TrackPropertyDialog extends JDialog {
 	}
 	
 	private void saveProperty() {
-		MMLTrack track = this.trackView.getMMLTrack();
 		track.setName( trackNameField.getText() );
 		track.setPanpot( panpotSlider.getValue() );
-
 		notify.setTrackProperty(track);
 	}
 
-	public TrackPropertyDialog(Window owner, INotifyMMLTrackProperty notify, MMLTrackView trackView) {
+	public TrackPropertyDialog(Window owner, INotifyMMLTrackProperty notify, MMLTrack track) {
 		super(owner);
 		initialize();
 		
-		this.trackView = trackView;
+		this.track = track;
 		this.notify = notify;
-		MMLTrack track = trackView.getMMLTrack();
 		trackNameField.setText(track.getName());
 		panpotSlider.setValue(track.getPanpot());
 	}
