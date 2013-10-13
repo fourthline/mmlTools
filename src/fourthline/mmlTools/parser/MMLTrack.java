@@ -47,27 +47,32 @@ public class MMLTrack extends MMLTools {
 		};
 		
 		for (int i = 0; i < mml.length; i++) {
-			MMLEventParser parser = new MMLEventParser("");
-			mmlParts.add( parser.parseMML(mml[i]) );
-			totalTick[i] = parser.getTotalTick();
+			parseMMLPart(mml[i], i);
 		}
+	}
+	
+	private void parseMMLPart(String mml, int index) {
+		MMLEventParser parser = new MMLEventParser("");
+		if (index < mmlParts.size()) {
+			mmlParts.set( index, parser.parseMML(mml) );
+		} else {
+			mmlParts.add( parser.parseMML(mml) );
+		}
+		totalTick[index] = parser.getTotalTick();
 	}
 
 	public void setMelody(String mml) {
-		MMLEventParser parser = new MMLEventParser("");
-		mmlParts.set(0, parser.parseMML(mml));
+		parseMMLPart(mml, 0);
 		this.mml_melody = mml;
 	}
 	
 	public void setChord1(String mml) {
-		MMLEventParser parser = new MMLEventParser("");
-		mmlParts.set(1, parser.parseMML(mml));
+		parseMMLPart(mml, 1);
 		this.mml_chord1 = mml;
 	}
 	
 	public void setChord2(String mml) {
-		MMLEventParser parser = new MMLEventParser("");
-		mmlParts.set(2, parser.parseMML(mml));
+		parseMMLPart(mml, 2);
 		this.mml_chord2 = mml;
 	}
 

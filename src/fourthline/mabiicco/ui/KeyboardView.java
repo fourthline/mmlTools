@@ -16,7 +16,6 @@ import java.awt.event.MouseMotionAdapter;
 import javax.swing.JPanel;
 
 import fourthline.mabiicco.midi.MabiDLS;
-import fourthline.mmlTools.parser.MMLTrack;
 
 public class KeyboardView extends JPanel implements IMMLView {
 
@@ -25,7 +24,7 @@ public class KeyboardView extends JPanel implements IMMLView {
 	 */
 	private static final long serialVersionUID = -3850112420986284800L;
 
-	private MMLTrack track = null;
+	private int channel = 0;
 	private int playNote = -1;
 	
 	private final int width = 60;
@@ -54,10 +53,6 @@ public class KeyboardView extends JPanel implements IMMLView {
 		});
 	}
 
-	public void setMMLTrack(MMLTrack track) {
-		this.track = track;
-	}
-
 
 
 	/**
@@ -78,6 +73,10 @@ public class KeyboardView extends JPanel implements IMMLView {
 		paintPlayNote(g2);
 
 		g2.dispose();
+	}
+	
+	public void setChannel(int channel) {
+		this.channel = channel;
 	}
 
 	private boolean isWhiteKey(int note) {
@@ -165,18 +164,14 @@ public class KeyboardView extends JPanel implements IMMLView {
 	private void playNote(int y) {
 		playNote = convertY2Note( y );
 
-		if (track != null) {
-			int program = track.getProgram();
-			MabiDLS.getInstance().changeProgram(program);
-		}
-		MabiDLS.getInstance().playNote(playNote);
+		MabiDLS.getInstance().playNote(playNote, channel);
 		
 		repaint();
 	}
 
 	private void offNote() {
 		playNote = -1;
-		MabiDLS.getInstance().playNote(playNote);
+		MabiDLS.getInstance().playNote(playNote, channel);
 		
 		repaint();
 	}

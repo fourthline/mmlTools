@@ -14,6 +14,7 @@ import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mabiicco.midi.MabiDLS;
 
 import java.awt.Color;
+import java.awt.EventQueue;
 
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
@@ -88,9 +89,13 @@ public class Startup extends JDialog {
 			System.exit(1);
 		}
 
-		MainFrame mainFrame = new MainFrame();
-		mainFrame.setVisible(true);
-		window.setVisible(false);
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				MainFrame mainFrame = new MainFrame();
+				mainFrame.setVisible(true);
+				window.setVisible(false);
+			}
+		});
 	}
 
 	/**

@@ -33,7 +33,6 @@ public class PianoRollView extends JPanel implements IMMLView {
 	private static final long serialVersionUID = -7229093886476553295L;
 
 
-	private MMLTrack track;
 	private MMLTrack trackArray[];
 	private int wideScale = 3;
 	private int width;
@@ -58,10 +57,6 @@ public class PianoRollView extends JPanel implements IMMLView {
 	public void setWidth(int width) {
 		this.width = width;
 		super.setPreferredSize(new Dimension(width, 649));
-	}
-
-	public void setMMLTrack(MMLTrack track) {
-		this.track = track;
 	}
 
 	public void setMMLTrack(MMLTrack track[]) {
@@ -245,10 +240,6 @@ public class PianoRollView extends JPanel implements IMMLView {
 	 * @param g
 	 */
 	private void paintMusicScore(Graphics2D g, int index) {
-		if (track == null) {
-			return;
-		}
-
 		int maxLength = 0;
 		Color color[] = {
 				new Color(0.7f, 0.0f, 0.0f),

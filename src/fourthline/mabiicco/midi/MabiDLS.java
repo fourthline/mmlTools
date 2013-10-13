@@ -145,27 +145,27 @@ public final class MabiDLS {
 	
 	private int play_note = -1;
 	/** 単音再生 */
-	public void playNote(int note) {
+	public void playNote(int note, int channel) {
 		/* シーケンサによる再生中は鳴らさない */
 		if (sequencer.isRunning()) {
 			return;
 		}
-		MidiChannel ch0 = this.getChannel(0);
+		MidiChannel midiChannel = this.getChannel(channel);
 		
 		if (note < 0) {
-			ch0.allNotesOff();
+			midiChannel.allNotesOff();
 			play_note = -1;
 		} else if (note != play_note) {
-			ch0.noteOff(play_note);
-			ch0.noteOn(note, 100);
+			midiChannel.noteOff(play_note);
+			midiChannel.noteOn(note, 100);
 			play_note = note;
 		}
 	}
 	
-	public void changeProgram(int program) {
-		MidiChannel ch0 = this.getChannel(0);
-		if (ch0.getProgram() != program) {
-			ch0.programChange(program);
+	public void changeProgram(int program, int channel) {
+		MidiChannel midiChannel = this.getChannel(channel);
+		if (midiChannel.getProgram() != program) {
+			midiChannel.programChange(program);
 		}
 	}
 

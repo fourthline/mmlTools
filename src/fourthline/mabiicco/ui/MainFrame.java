@@ -50,9 +50,9 @@ public class MainFrame extends JFrame {
 	private JPanel contentPane;
 	private JTextField statusField;
 	private MMLSeqView mmlSeqView;
-	
+
 	private final String DEFAULT_TITLE = " * MabiIcco *";
-	
+
 	private File openedFile = null;
 
 	/**
@@ -62,14 +62,14 @@ public class MainFrame extends JFrame {
 		setTitle(DEFAULT_TITLE);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 613, 450);
-		
+
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
-		
+
 		JMenu fileMenu = new JMenu("ファイル");
 		fileMenu.setMnemonic('F');
 		menuBar.add(fileMenu);
-		
+
 		JMenuItem fileOpenMenuItem = new JMenuItem("開く");
 		fileOpenMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
 		fileOpenMenuItem.addActionListener(new ActionListener() {
@@ -77,7 +77,7 @@ public class MainFrame extends JFrame {
 				openMMLFileAction();
 			}
 		});
-		
+
 		JMenuItem menuItem = new JMenuItem("新規作成");
 		menuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -87,7 +87,7 @@ public class MainFrame extends JFrame {
 		menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK));
 		fileMenu.add(menuItem);
 		fileMenu.add(fileOpenMenuItem);
-		
+
 		JMenuItem reloadMenuItem = new JMenuItem("再読み込み");
 		reloadMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -95,10 +95,10 @@ public class MainFrame extends JFrame {
 			}
 		});
 		fileMenu.add(reloadMenuItem);
-		
+
 		JSeparator separator = new JSeparator();
 		fileMenu.add(separator);
-		
+
 		JMenuItem exitMenuItem = new JMenuItem("終了");
 		exitMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -106,10 +106,10 @@ public class MainFrame extends JFrame {
 			}
 		});
 		fileMenu.add(exitMenuItem);
-		
+
 		JMenu trackMenu = new JMenu("トラック");
 		menuBar.add(trackMenu);
-		
+
 		JMenuItem addTrackMenu = new JMenuItem("トラック追加");
 		addTrackMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_MASK));
 		addTrackMenu.addActionListener(new ActionListener() {
@@ -118,7 +118,7 @@ public class MainFrame extends JFrame {
 			}
 		});
 		trackMenu.add(addTrackMenu);
-		
+
 		JMenuItem removeTrackMenu = new JMenuItem("トラック削除");
 		removeTrackMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -126,10 +126,10 @@ public class MainFrame extends JFrame {
 			}
 		});
 		trackMenu.add(removeTrackMenu);
-		
+
 		JSeparator separator_1 = new JSeparator();
 		trackMenu.add(separator_1);
-		
+
 		JMenuItem menuItem_1 = new JMenuItem("トラックプロパティ");
 		menuItem_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -173,12 +173,13 @@ public class MainFrame extends JFrame {
 			}
 		});
 		northPanel.add(stopButton);
-		
+
 		JButton inputClipButton = new JButton("クリップボードから入力");
 		inputClipButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				String clipMML = getClipboardString();
-				mmlSeqView.addMMLTrack("新規トラック", clipMML);
+				// 現在のトラックにMMLを設定する。
+				mmlSeqView.setMMLselectedTrack(clipMML);
 			}
 		});
 		northPanel.add(inputClipButton);
@@ -198,20 +199,20 @@ public class MainFrame extends JFrame {
 
 	private void setTitleAndFile(File file) {
 		String fileTitle = "";
-		
+
 		if (file != null) {
 			fileTitle = file.getName();
 		}
 		setTitle(DEFAULT_TITLE + " [" + fileTitle + "]");
 	}
-	
+
 	private void openMMLFile(File file) {
 		setTitleAndFile(file);
 		MabiIccoProperties.getInstance().setRecentFile(file.getPath());
 		IMMLFileParser fileParser = new MMSFile();
 		try {
 			MMLTrack track[] = fileParser.parse(file);
-			
+
 			mmlSeqView.setMMLTracks(track);
 		} catch (MMLParseException e) {
 			JOptionPane.showMessageDialog(this, "読み込みに失敗しました", "ファイル形式が不正です", JOptionPane.WARNING_MESSAGE);
@@ -227,25 +228,25 @@ public class MainFrame extends JFrame {
 			String name = "Track"+(i+1);
 			track[i] = new MMLTrack(name);
 		}
-		
+
 		mmlSeqView.setMMLTracks(track);
 	}
-	
+
 	private void reloadMMLFileAction() {
 		if (MabiDLS.getInstance().getSequencer().isRunning()) {
 			MabiDLS.getInstance().getSequencer().stop();
 		}
-		
+
 		if (openedFile != null) {
 			openMMLFile(openedFile);
 		}
 	}
-	
+
 	private void openMMLFileAction() {
 		if (MabiDLS.getInstance().getSequencer().isRunning()) {
 			MabiDLS.getInstance().getSequencer().stop();
 		}
-			
+
 		String recentPath = MabiIccoProperties.getInstance().getRecentFile();
 		JFileChooser fileChooser = new JFileChooser(new File(recentPath));
 		FileFilter mmsFilter = new FileNameExtensionFilter("まきまびしーく形式 (*.mms)", "mms");
@@ -259,7 +260,7 @@ public class MainFrame extends JFrame {
 			openedFile = file;
 		}
 	}
-	
+
 	private void trackPropertyAction() {
 		TrackPropertyDialog dialog = new TrackPropertyDialog(
 				this,
