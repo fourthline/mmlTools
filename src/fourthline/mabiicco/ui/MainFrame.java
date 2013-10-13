@@ -5,6 +5,7 @@
 package fourthline.mabiicco.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 
 import javax.sound.midi.Sequence;
@@ -26,6 +27,8 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.io.File;
 import java.io.IOException;
 
@@ -41,7 +44,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.InputEvent;
 
 
-public class MainFrame extends JFrame {
+public class MainFrame extends JFrame implements ComponentListener {
 
 	/**
 	 * 
@@ -61,7 +64,8 @@ public class MainFrame extends JFrame {
 	public MainFrame() {
 		setTitle(DEFAULT_TITLE);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 613, 450);
+		loadWindowPeoperties();
+		addComponentListener(this);
 
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -283,5 +287,52 @@ public class MainFrame extends JFrame {
 			return null;
 		}
 	}
+
+	private void loadWindowPeoperties() {
+		MabiIccoProperties properties = MabiIccoProperties.getInstance();
+		
+		Rectangle rect = properties.getWindowRect();
+		if (rect.getX() < 0.0) {
+			setSize(640, 480);
+			setLocationRelativeTo(null);
+		} else {
+			setBounds(rect);
+		}
+		
+		if (properties.getWindowMaximize()) {
+			this.setExtendedState(MAXIMIZED_BOTH);
+		}
+		
+	}
+	
+	private void updateWindowProperties() {
+		int extendedState = this.getExtendedState();
+		MabiIccoProperties properties = MabiIccoProperties.getInstance();
+		
+		if ( extendedState == MAXIMIZED_BOTH ) {
+			properties.setWindowMaximize(true);
+		} else {
+			properties.setWindowMaximize(false);
+			properties.setWindowRect(this.getBounds());
+		}
+	}
+	
+
+	// JFrameのイベント
+	@Override
+	public void componentHidden(ComponentEvent e) {}
+
+	@Override
+	public void componentMoved(ComponentEvent e) {
+		updateWindowProperties();
+	}
+
+	@Override
+	public void componentResized(ComponentEvent e) {
+		updateWindowProperties();
+	}
+
+	@Override
+	public void componentShown(ComponentEvent e) {}
 
 }

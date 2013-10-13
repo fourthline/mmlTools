@@ -46,7 +46,7 @@ public class PianoRollView extends JPanel implements IMMLView {
 	 */
 	public PianoRollView() {
 		super();
-		setPreferredSize(new Dimension(1000, 649));
+		setPreferredSize(new Dimension(0, 649));
 
 		createSequenceThread();
 	}
