@@ -16,6 +16,7 @@ import fourthline.mmlTools.parser.MMLTrack;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -69,8 +70,16 @@ public class MMLSeqView extends JPanel implements INotifyMMLTrackProperty {
 	}
 
 	private void initialSetView() {
-		// TODO: 初期のView位置
-		scrollPane.getViewport().setViewPosition(new Point(0, 250));
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				// (ピアノロール全体の高さ / 2) - （表示領域 / 2）＝真ん中の座標。
+				int y = (pianoRollView.getHeight() / 2) - (scrollPane.getHeight() / 2);
+
+				// 初期のView位置
+				scrollPane.getViewport().setViewPosition(new Point(0, y));
+			}
+		});
 	}
 
 

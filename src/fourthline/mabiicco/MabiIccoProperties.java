@@ -26,7 +26,7 @@ public class MabiIccoProperties {
 	
 	private MabiIccoProperties() {
 		try {
-			properties.loadFromXML(new FileInputStream(configFile));
+			properties.load(new FileInputStream(configFile));
 		} catch (InvalidPropertiesFormatException e) {
 		} catch (FileNotFoundException e) {
 		} catch (IOException e) {
@@ -46,7 +46,7 @@ public class MabiIccoProperties {
 	public void setRecentFile(String path) {
 		properties.setProperty("RECENT_FILE", path);
 		try {
-			properties.storeToXML(new FileOutputStream(configFile), "");
+			properties.store(new FileOutputStream(configFile), "");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -68,7 +68,7 @@ public class MabiIccoProperties {
 	public void setDlsFile(String path) {
 		properties.setProperty("DLS_FILE", path);
 		try {
-			properties.storeToXML(new FileOutputStream(configFile), "");
+			properties.store(new FileOutputStream(configFile), "");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

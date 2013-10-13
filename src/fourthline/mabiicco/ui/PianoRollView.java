@@ -6,6 +6,7 @@ package fourthline.mabiicco.ui;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -34,9 +35,9 @@ public class PianoRollView extends JPanel implements IMMLView {
 
 
 	private MMLTrack trackArray[];
-	private int wideScale = 3;
+	private int wideScale = 6; // ピアノロールの拡大/縮小率 (1~6)
 	private int width;
-	
+
 	private JViewport viewport;
 	private JComponent parent;
 
@@ -44,11 +45,12 @@ public class PianoRollView extends JPanel implements IMMLView {
 	 * Create the panel.
 	 */
 	public PianoRollView() {
+		super();
 		setPreferredSize(new Dimension(1000, 649));
 
 		createSequenceThread();
 	}
-	
+
 	public void setViewportAndParent(JViewport viewport, JComponent parent) {
 		this.viewport = viewport;
 		this.parent = parent;
@@ -126,25 +128,31 @@ public class PianoRollView extends JPanel implements IMMLView {
 		Thread thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				Sequencer sequencer = MabiDLS.getInstance().getSequencer();
 				while (true) {
 					try {
 						Thread.sleep(20);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
+					Sequencer sequencer = MabiDLS.getInstance().getSequencer();
 					if (sequencer.isRunning()) {
-						long position = sequencer.getTickPosition() / wideScale;
-						Point point = viewport.getViewPosition();
-						Dimension dim = viewport.getExtentSize();
-						double x1 = point.getX();
-						double x2 = x1 + dim.getWidth();
-						if ( (position < x1) || (position > x2) ) {
-							/* ビュー外にあるので、現在のポジションにあわせる */
-							point.setLocation(position, point.getY());
-							viewport.setViewPosition(point);
-						}
-						parent.repaint();
+						EventQueue.invokeLater(new Runnable() {
+							@Override
+							public void run() {
+								Sequencer sequencer = MabiDLS.getInstance().getSequencer();
+								long position = sequencer.getTickPosition() / wideScale;
+								Point point = viewport.getViewPosition();
+								Dimension dim = viewport.getExtentSize();
+								double x1 = point.getX();
+								double x2 = x1 + dim.getWidth();
+								if ( (position < x1) || (position > x2) ) {
+									/* ビュー外にあるので、現在のポジションにあわせる */
+									point.setLocation(position, point.getY());
+									viewport.setViewPosition(point);
+								}
+								parent.repaint();
+							}
+						});
 					}
 				}
 			}
@@ -218,6 +226,7 @@ public class PianoRollView extends JPanel implements IMMLView {
 	 */
 	private int paintMMLPart(Graphics2D g, List<MMLEvent> mmlPart, Color color) {
 		int totalTick = 0;
+		int tickStack = 0;
 		for (Iterator<MMLEvent> i = mmlPart.iterator(); i.hasNext(); ) {
 			MMLEvent event = i.next();
 
@@ -226,9 +235,15 @@ public class PianoRollView extends JPanel implements IMMLView {
 				int note = noteEvent.getNote();
 				int tick = noteEvent.getTick();
 
-				// TODO: tie判定
-				drawNote(g, note, tick, totalTick, color);
-				totalTick += tick;
+				// tie判定
+				if (noteEvent.getTie()) {
+					tickStack += tick;
+				} else {
+					tick += tickStack;
+					tickStack = 0;
+					drawNote(g, note, tick, totalTick, color);
+					totalTick += tick;
+				}
 			}
 		}
 
