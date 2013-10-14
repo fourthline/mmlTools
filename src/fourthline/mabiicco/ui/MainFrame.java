@@ -5,11 +5,10 @@
 package fourthline.mabiicco.ui;
 
 import java.awt.BorderLayout;
+import java.awt.EventQueue;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 
-import javax.sound.midi.Sequence;
-import javax.sound.midi.Sequencer;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -19,6 +18,7 @@ import javax.swing.JTextField;
 import javax.swing.JButton;
 
 import fourthline.mabiicco.MabiIccoProperties;
+import fourthline.mabiicco.midi.INotifyTrackEnd;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mmlTools.parser.*;
 
@@ -31,9 +31,12 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.JComponent;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -44,7 +47,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.InputEvent;
 
 
-public class MainFrame extends JFrame implements ComponentListener {
+public class MainFrame extends JFrame implements ComponentListener, INotifyTrackEnd {
 
 	/**
 	 * 
@@ -57,6 +60,9 @@ public class MainFrame extends JFrame implements ComponentListener {
 	private final String DEFAULT_TITLE = " * MabiIcco *";
 
 	private File openedFile = null;
+	
+	/** シーケンス再生中に無効化する機能のリスト */
+	ArrayList<JComponent> noplayFunctions = new ArrayList<JComponent>();
 
 	/**
 	 * Create the frame.
@@ -75,6 +81,7 @@ public class MainFrame extends JFrame implements ComponentListener {
 		menuBar.add(fileMenu);
 
 		JMenuItem fileOpenMenuItem = new JMenuItem("開く");
+		noplayFunctions.add(fileOpenMenuItem);
 		fileOpenMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
 		fileOpenMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -83,6 +90,7 @@ public class MainFrame extends JFrame implements ComponentListener {
 		});
 
 		JMenuItem menuItem = new JMenuItem("新規作成");
+		noplayFunctions.add(menuItem);
 		menuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				newMMLFileAction();
@@ -93,6 +101,7 @@ public class MainFrame extends JFrame implements ComponentListener {
 		fileMenu.add(fileOpenMenuItem);
 
 		JMenuItem reloadMenuItem = new JMenuItem("再読み込み");
+		noplayFunctions.add(reloadMenuItem);
 		reloadMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				reloadMMLFileAction();
@@ -115,6 +124,7 @@ public class MainFrame extends JFrame implements ComponentListener {
 		menuBar.add(trackMenu);
 
 		JMenuItem addTrackMenu = new JMenuItem("トラック追加");
+		noplayFunctions.add(addTrackMenu);
 		addTrackMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_MASK));
 		addTrackMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -124,6 +134,7 @@ public class MainFrame extends JFrame implements ComponentListener {
 		trackMenu.add(addTrackMenu);
 
 		JMenuItem removeTrackMenu = new JMenuItem("トラック削除");
+		noplayFunctions.add(removeTrackMenu);
 		removeTrackMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				mmlSeqView.removeMMLTrack();
@@ -135,6 +146,7 @@ public class MainFrame extends JFrame implements ComponentListener {
 		trackMenu.add(separator_1);
 
 		JMenuItem menuItem_1 = new JMenuItem("トラックプロパティ");
+		noplayFunctions.add(menuItem_1);
 		menuItem_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				trackPropertyAction();
@@ -153,32 +165,32 @@ public class MainFrame extends JFrame implements ComponentListener {
 		JButton playButton = new JButton("再生");
 		playButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				new Thread(new Runnable() {
-					public void run() {
-						try {
-							Sequencer sequencer = MabiDLS.getInstance().getSequencer();
-							Sequence sequence = mmlSeqView.createSequence();
-
-							sequencer.setSequence(sequence);
-							sequencer.start();
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-				}).start();
+				mmlSeqView.startSequence();
+				disableNoplayItems();
 			}
 		});
+		
+		JButton startPositionButton = new JButton("先頭へ戻す");
+		startPositionButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				mmlSeqView.setStartPosition();
+			}
+		});
+		northPanel.add(startPositionButton);
 		northPanel.add(playButton);
 
 		JButton stopButton = new JButton("停止");
 		stopButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				MabiDLS.getInstance().getSequencer().stop();
+				enableNoplayItems();
 			}
 		});
 		northPanel.add(stopButton);
 
+
 		JButton inputClipButton = new JButton("クリップボードから入力");
+		noplayFunctions.add(inputClipButton);
 		inputClipButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				String clipMML = getClipboardString();
@@ -199,6 +211,8 @@ public class MainFrame extends JFrame implements ComponentListener {
 		statusField.setEditable(false);
 		southPanel.add(statusField, BorderLayout.SOUTH);
 		statusField.setColumns(10);
+		
+		MabiDLS.getInstance().setTrackEndNotifier(this);
 	}
 
 	private void setTitleAndFile(File file) {
@@ -334,5 +348,39 @@ public class MainFrame extends JFrame implements ComponentListener {
 
 	@Override
 	public void componentShown(ComponentEvent e) {}
+
+	@Override
+	public void trackEndNotify() {
+		enableNoplayItems();
+	}
+	
+
+	/**
+	 * 再生中に各機能を無効化する。
+	 */
+	private void disableNoplayItems() {
+		for (Iterator<JComponent> i = noplayFunctions.iterator(); i.hasNext(); ) {
+			JComponent component = i.next();
+			component.setEnabled(false);
+		}
+	}
+	
+	/**
+	 * 再生中に無効化されている機能を有効にする。
+	 */
+	private void enableNoplayItems() {
+		for (Iterator<JComponent> i = noplayFunctions.iterator(); i.hasNext(); ) {
+			JComponent component = i.next();
+			component.setEnabled(true);
+		}
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				mmlSeqView.resetViewPosition();
+				mmlSeqView.repaint();
+			}
+		});
+	}
+	
 
 }

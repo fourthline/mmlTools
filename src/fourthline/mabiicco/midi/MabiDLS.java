@@ -25,6 +25,8 @@ public final class MabiDLS {
 	private static final String INST_PROPERTIESFILE = "instrument.properties";
 	public static final String DEFALUT_DLS_PATH = "C:/Nexon/Mabinogi/mp3/MSXspirit.dls";
 	
+	private INotifyTrackEnd notifier = null;
+	
 	public static MabiDLS getInstance() {
 		return instance;
 	}
@@ -48,14 +50,25 @@ public final class MabiDLS {
 		this.sequencer.addMetaEventListener(new MetaEventListener() {
 			@Override
 			public void meta(MetaMessage meta) {
-				if (meta.getType() == MMLTempoEvent.META) {
+				int type = meta.getType();
+				if (type == MMLTempoEvent.META) {
+					// テンポイベントを処理します.
 					byte metaData[] = meta.getData();
 					int tempo = metaData[0] & 0xff;
 					sequencer.setTempoInBPM(tempo);
 					System.out.println(" [midi-event] tempo: " + tempo);
+				} else if (type == 0x2f) {
+					// トラック終端
+					if (notifier != null) {
+						notifier.trackEndNotify();
+					}
 				}
 			}
 		});
+	}
+	
+	public void setTrackEndNotifier(INotifyTrackEnd n) {
+		notifier = n;
 	}
 	
 	public void initializeSound(File dlsFile) throws MidiUnavailableException, InvalidMidiDataException, IOException {

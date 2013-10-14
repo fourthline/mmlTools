@@ -41,6 +41,8 @@ public class PianoRollView extends JPanel implements IMMLView {
 	private JViewport viewport;
 	private JComponent parent;
 
+	private long sequencePosition;
+
 	/**
 	 * Create the panel.
 	 */
@@ -48,6 +50,7 @@ public class PianoRollView extends JPanel implements IMMLView {
 		super();
 		setPreferredSize(new Dimension(0, 649));
 
+		setSequenceX(0);
 		createSequenceThread();
 	}
 
@@ -72,6 +75,30 @@ public class PianoRollView extends JPanel implements IMMLView {
 			}
 		}
 		setWidth(tickLength / wideScale);
+	}
+
+	public long convertXtoTick(int x) {
+		return (x * wideScale);
+	}
+	
+	public long getSequencePossition() {
+		return sequencePosition;
+	}
+	
+	public int getSequenceX() {
+		return (int)sequencePosition / wideScale;
+	}
+
+	public void setSequenceX(int x) {
+		long tick = x * wideScale;
+		
+		if (!MabiDLS.getInstance().getSequencer().isRunning()) {
+			sequencePosition = tick;
+
+			if (parent != null) {
+				parent.repaint();
+			}
+		}
 	}
 
 
@@ -130,7 +157,7 @@ public class PianoRollView extends JPanel implements IMMLView {
 			public void run() {
 				while (true) {
 					try {
-						Thread.sleep(20);
+						Thread.sleep(25);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -162,7 +189,10 @@ public class PianoRollView extends JPanel implements IMMLView {
 	}
 
 	private void paintSequenceLine(Graphics2D g) {
-		long position = MabiDLS.getInstance().getSequencer().getTickPosition();
+		long position = sequencePosition;
+		if (MabiDLS.getInstance().getSequencer().isRunning()) {
+			position = MabiDLS.getInstance().getSequencer().getTickPosition();
+		}
 
 		Color color = Color.RED;
 		int x1 = (int)(position / wideScale);
@@ -288,6 +318,7 @@ public class PianoRollView extends JPanel implements IMMLView {
 				 * メジャーを表示します。
 				 */
 				paintRuler(g2);
+				paintSequenceLine(g2);
 
 				g2.dispose();
 			}
