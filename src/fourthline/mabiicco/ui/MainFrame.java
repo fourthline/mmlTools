@@ -50,6 +50,7 @@ import java.awt.event.InputEvent;
 
 import javax.swing.ImageIcon;
 import javax.swing.JToolBar;
+
 import java.awt.Color;
 
 
@@ -161,6 +162,38 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		});
 		menuItem_1.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.ALT_MASK));
 		trackMenu.add(menuItem_1);
+		
+		JMenu playMenu = new JMenu("操作");
+		menuBar.add(playMenu);
+		
+		JMenuItem headPlayPositionMenuItem = new JMenuItem("先頭へ戻す");
+		headPlayPositionMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				mmlSeqView.setStartPosition();
+			}
+		});
+		headPlayPositionMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0));
+		playMenu.add(headPlayPositionMenuItem);
+		
+		JMenuItem playMenuItem = new JMenuItem("再生");
+		playMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				mmlSeqView.startSequence();
+				disableNoplayItems();
+			}
+		});
+		playMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
+		playMenu.add(playMenuItem);
+		
+		JMenuItem stopMenuItem = new JMenuItem("停止");
+		stopMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				MabiDLS.getInstance().getSequencer().stop();
+				enableNoplayItems();
+			}
+		});
+		stopMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
+		playMenu.add(stopMenuItem);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);

@@ -336,7 +336,13 @@ public class MMLSeqView extends JPanel implements INotifyMMLTrackProperty {
 	 * シーケンスの現在位置を先頭に戻す
 	 */
 	public void setStartPosition() {
-		setViewPosition(0);
-		pianoRollView.setSequenceX(0);
+		Sequencer sequencer = MabiDLS.getInstance().getSequencer();
+		if (!sequencer.isRunning()) {
+			setViewPosition(0);
+			pianoRollView.setSequenceX(0);
+		} else {
+			sequencer.setTickPosition(0);
+			sequencer.setTempoInBPM(120);
+		}
 	}
 }
