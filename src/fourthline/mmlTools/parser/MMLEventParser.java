@@ -19,7 +19,7 @@ public class MMLEventParser extends MelodyParser {
 	public MMLEventParser(String mml) {
 		super(mml);
 	}
-	
+
 	private int totalTick;
 
 	public int getTotalTick() {
@@ -28,13 +28,13 @@ public class MMLEventParser extends MelodyParser {
 
 	public List<MMLEvent> parseMML(String mml) {
 		ArrayList<MMLEvent> list = new ArrayList<MMLEvent>();
-		
+
 		MMLTokenizer tokenizer = new MMLTokenizer(mml);
 		MMLNoteEvent prevNoteEvent = null;
-		
+
 		boolean hasTie = false;
 		totalTick = 0;
-		
+
 		while (tokenizer.hasNext()) {
 			String token = tokenizer.next();
 			char firstC = token.charAt(0);
@@ -56,15 +56,16 @@ public class MMLEventParser extends MelodyParser {
 			try {
 				int tick = this.noteGT(token);
 				if (MMLTokenizer.isNote(firstC)) {
-					/* tie でかつ、同じノートであれば、tieイベントでつなげる */
+					/* tie でかつ、同じノートであれば、前のNoteEventにTickを加算する */
 					if ( (hasTie) && (prevNoteEvent != null) && (prevNoteEvent.getNote() == this.noteNumber)) {
-						prevNoteEvent.setTie(true);
+						prevNoteEvent.addTick(tick);
+					} else {
+						MMLNoteEvent newEvent = new MMLNoteEvent(this.noteNumber, tick);
+						list.add(newEvent);
+						prevNoteEvent = newEvent;
 					}
-					MMLNoteEvent newEvent = new MMLNoteEvent(this.noteNumber, tick);
-					list.add(newEvent);
-					prevNoteEvent = newEvent;
 					hasTie = false;
-					
+
 					totalTick += tick;
 				} 
 			} catch (UndefinedTickException e) {
@@ -72,15 +73,15 @@ public class MMLEventParser extends MelodyParser {
 			} catch (ParserWarn3ML e) {
 				e.printStackTrace();
 			}
-			
+
 		}
-		
+
 		return list;
 	}
-	
+
 	public static void main(String[] args) {
 		MMLEventParser parser = new MMLEventParser("c4v10d8t120e16r2");
-		
+
 		List<MMLEvent> list = parser.parseMML("a&a&b");
 		for ( Iterator<MMLEvent> i = list.iterator(); i.hasNext(); ) {
 			MMLEvent event = i.next();

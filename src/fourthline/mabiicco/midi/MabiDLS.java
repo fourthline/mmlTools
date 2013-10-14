@@ -25,6 +25,8 @@ public final class MabiDLS {
 	private static final String INST_PROPERTIESFILE = "instrument.properties";
 	public static final String DEFALUT_DLS_PATH = "C:/Nexon/Mabinogi/mp3/MSXspirit.dls";
 	
+	private INotifyTrackEnd notifier = null;
+	
 	public static MabiDLS getInstance() {
 		return instance;
 	}
@@ -48,21 +50,32 @@ public final class MabiDLS {
 		this.sequencer.addMetaEventListener(new MetaEventListener() {
 			@Override
 			public void meta(MetaMessage meta) {
-				if (meta.getType() == MMLTempoEvent.META) {
+				int type = meta.getType();
+				if (type == MMLTempoEvent.META) {
+					// テンポイベントを処理します.
 					byte metaData[] = meta.getData();
 					int tempo = metaData[0] & 0xff;
 					sequencer.setTempoInBPM(tempo);
 					System.out.println(" [midi-event] tempo: " + tempo);
+				} else if (type == 0x2f) {
+					// トラック終端
+					if (notifier != null) {
+						notifier.trackEndNotify();
+					}
 				}
 			}
 		});
+	}
+	
+	public void setTrackEndNotifier(INotifyTrackEnd n) {
+		notifier = n;
 	}
 	
 	public void initializeSound(File dlsFile) throws MidiUnavailableException, InvalidMidiDataException, IOException {
 		// 楽器名の読み込み
 		try {
 			instProperties = new Properties();
-			instProperties.load(new InputStreamReader(MabiDLS.class.getClassLoader().getResourceAsStream(INST_PROPERTIESFILE), "UTF-8"));
+			instProperties.load(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream(INST_PROPERTIESFILE), "UTF-8"));
 		} catch (IOException e) {
 			System.err.println(e.getMessage());
 		}
@@ -145,27 +158,27 @@ public final class MabiDLS {
 	
 	private int play_note = -1;
 	/** 単音再生 */
-	public void playNote(int note) {
+	public void playNote(int note, int channel) {
 		/* シーケンサによる再生中は鳴らさない */
 		if (sequencer.isRunning()) {
 			return;
 		}
-		MidiChannel ch0 = this.getChannel(0);
+		MidiChannel midiChannel = this.getChannel(channel);
 		
 		if (note < 0) {
-			ch0.allNotesOff();
+			midiChannel.allNotesOff();
 			play_note = -1;
 		} else if (note != play_note) {
-			ch0.noteOff(play_note);
-			ch0.noteOn(note, 100);
+			midiChannel.noteOff(play_note);
+			midiChannel.noteOn(note, 100);
 			play_note = note;
 		}
 	}
 	
-	public void changeProgram(int program) {
-		MidiChannel ch0 = this.getChannel(0);
-		if (ch0.getProgram() != program) {
-			ch0.programChange(program);
+	public void changeProgram(int program, int channel) {
+		MidiChannel midiChannel = this.getChannel(channel);
+		if (midiChannel.getProgram() != program) {
+			midiChannel.programChange(program);
 		}
 	}
 

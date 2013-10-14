@@ -47,27 +47,32 @@ public class MMLTrack extends MMLTools {
 		};
 		
 		for (int i = 0; i < mml.length; i++) {
-			MMLEventParser parser = new MMLEventParser("");
-			mmlParts.add( parser.parseMML(mml[i]) );
-			totalTick[i] = parser.getTotalTick();
+			parseMMLPart(mml[i], i);
 		}
+	}
+	
+	private void parseMMLPart(String mml, int index) {
+		MMLEventParser parser = new MMLEventParser("");
+		if (index < mmlParts.size()) {
+			mmlParts.set( index, parser.parseMML(mml) );
+		} else {
+			mmlParts.add( parser.parseMML(mml) );
+		}
+		totalTick[index] = parser.getTotalTick();
 	}
 
 	public void setMelody(String mml) {
-		MMLEventParser parser = new MMLEventParser("");
-		mmlParts.set(0, parser.parseMML(mml));
+		parseMMLPart(mml, 0);
 		this.mml_melody = mml;
 	}
 	
 	public void setChord1(String mml) {
-		MMLEventParser parser = new MMLEventParser("");
-		mmlParts.set(1, parser.parseMML(mml));
+		parseMMLPart(mml, 1);
 		this.mml_chord1 = mml;
 	}
 	
 	public void setChord2(String mml) {
-		MMLEventParser parser = new MMLEventParser("");
-		mmlParts.set(2, parser.parseMML(mml));
+		parseMMLPart(mml, 2);
 		this.mml_chord2 = mml;
 	}
 
@@ -146,7 +151,6 @@ public class MMLTrack extends MMLTools {
 		int velocity = 8;
 
 		List<MMLEvent> part = mmlParts.get(index);
-		boolean isTie = false;
 
 		for ( Iterator<MMLEvent> i = part.iterator(); i.hasNext(); ) {
 			MMLEvent event = i.next();
@@ -156,29 +160,20 @@ public class MMLTrack extends MMLTools {
 				int note = ((MMLNoteEvent) event).getNote();
 				int tick = ((MMLNoteEvent) event).getTick();
 
-				/* 前の音が tie のときは、onのイベントを作成しない */
-				if (!isTie) {
-					if (note >= 0) {
-						MidiMessage message1 = new ShortMessage(ShortMessage.NOTE_ON, 
-								channel,
-								convertNoteMML2Midi(note), 
-								convertVelocityMML2Midi(velocity));
-						track.add(new MidiEvent(message1, totalTick));
-					}
-				}
+				if (note >= 0) {
+					// ON イベント作成
+					MidiMessage message1 = new ShortMessage(ShortMessage.NOTE_ON, 
+							channel,
+							convertNoteMML2Midi(note), 
+							convertVelocityMML2Midi(velocity));
+					track.add(new MidiEvent(message1, totalTick));
 
-				/* 今の音が tie のときは、末offのイベントを作成しない */
-				if (((MMLNoteEvent) event).getTie() == true) {
-					isTie = true;
-				} else {
-					isTie = false;
-					if (note >= 0) {
-						MidiMessage message2 = new ShortMessage(ShortMessage.NOTE_OFF,
-								channel, 
-								convertNoteMML2Midi(note),
-								0);
-						track.add(new MidiEvent(message2, totalTick+tick-1));
-					}
+					// Off イベント作成
+					MidiMessage message2 = new ShortMessage(ShortMessage.NOTE_OFF,
+							channel, 
+							convertNoteMML2Midi(note),
+							0);
+					track.add(new MidiEvent(message2, totalTick+tick-1));
 				}
 
 				totalTick += tick;
@@ -192,5 +187,4 @@ public class MMLTrack extends MMLTools {
 			}
 		}
 	}
-
 }

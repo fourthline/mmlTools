@@ -41,6 +41,7 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 	private JLabel trackComposeLabel;
 
 	private MMLTrack mmlTrack;
+	private int channel;
 
 	/**
 	 * Create the panel.
@@ -91,6 +92,7 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		centerPanel.add(label, gbc_label);
 
 		mmlText1 = new JTextField();
+		mmlText1.setEditable(false);
 		mmlText1.setFont(new Font("Monospaced", Font.PLAIN, 12));
 		mmlText1.getDocument().addDocumentListener(this);
 
@@ -110,6 +112,7 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		centerPanel.add(label_1, gbc_label_1);
 
 		mmlText2 = new JTextField();
+		mmlText2.setEditable(false);
 		mmlText2.setFont(new Font("Monospaced", Font.PLAIN, 12));
 		mmlText2.getDocument().addDocumentListener(this);
 
@@ -129,6 +132,7 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		centerPanel.add(label_2, gbc_label_2);
 
 		mmlText3 = new JTextField();
+		mmlText3.setEditable(false);
 		mmlText3.setFont(new Font("Monospaced", Font.PLAIN, 12));
 		mmlText3.getDocument().addDocumentListener(this);
 
@@ -143,11 +147,23 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		updateComposeRank(null);
 	}
 
-	public MMLTrackView(MMLTrack track) {
+	public MMLTrackView(MMLTrack track, int channel) {
 		this();
 
+		this.channel = channel;
 		this.setMMLTrack(track);
 		trackComposeLabel.setText(track.mmlRankFormat());
+		
+		MabiDLS.getInstance().changeProgram(track.getProgram(), channel);
+	}
+	
+	public void setChannel(int channel) {
+		this.channel = channel;
+	}
+	
+	public int getChannel() {
+		// TODO: 歌パートのときは、チャンネルを変える。
+		return this.channel;
 	}
 
 	@Override
@@ -213,16 +229,19 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		this.mmlTrack = track;
 	}
 	
-	public MMLTrack getMMLTrack() {
-		return this.mmlTrack;
-	}
 	
+	/**
+	 * コンボボックスによる楽器の変更。
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == comboBox) {
 			InstClass inst = (InstClass) comboBox.getSelectedItem();
+			int program = inst.getProgram();
+			
+			MabiDLS.getInstance().changeProgram(program, this.channel);
 			if (mmlTrack != null) {
-				mmlTrack.setProgram(inst.getProgram());
+				mmlTrack.setProgram(program);
 			}
 		}
 	}
