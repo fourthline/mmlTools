@@ -226,7 +226,6 @@ public class PianoRollView extends JPanel implements IMMLView {
 	 */
 	private int paintMMLPart(Graphics2D g, List<MMLEvent> mmlPart, Color color) {
 		int totalTick = 0;
-		int tickStack = 0;
 		for (Iterator<MMLEvent> i = mmlPart.iterator(); i.hasNext(); ) {
 			MMLEvent event = i.next();
 
@@ -235,15 +234,8 @@ public class PianoRollView extends JPanel implements IMMLView {
 				int note = noteEvent.getNote();
 				int tick = noteEvent.getTick();
 
-				// tie判定
-				if (noteEvent.getTie()) {
-					tickStack += tick;
-				} else {
-					tick += tickStack;
-					tickStack = 0;
-					drawNote(g, note, tick, totalTick, color);
-					totalTick += tick;
-				}
+				drawNote(g, note, tick, totalTick, color);
+				totalTick += tick;
 			}
 		}
 
