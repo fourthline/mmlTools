@@ -75,7 +75,7 @@ public final class MabiDLS {
 		// 楽器名の読み込み
 		try {
 			instProperties = new Properties();
-			instProperties.load(new InputStreamReader(MabiDLS.class.getClassLoader().getResourceAsStream(INST_PROPERTIESFILE), "UTF-8"));
+			instProperties.load(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream(INST_PROPERTIESFILE), "UTF-8"));
 		} catch (IOException e) {
 			System.err.println(e.getMessage());
 		}

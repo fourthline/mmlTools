@@ -6,6 +6,7 @@ package fourthline.mabiicco.ui;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
+import java.awt.FlowLayout;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 
@@ -42,9 +43,14 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.InputEvent;
+
+import javax.swing.ImageIcon;
+import javax.swing.JToolBar;
+import java.awt.Color;
 
 
 public class MainFrame extends JFrame implements ComponentListener, INotifyTrackEnd {
@@ -60,7 +66,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 	private final String DEFAULT_TITLE = " * MabiIcco *";
 
 	private File openedFile = null;
-	
+
 	/** シーケンス再生中に無効化する機能のリスト */
 	ArrayList<JComponent> noplayFunctions = new ArrayList<JComponent>();
 
@@ -68,10 +74,11 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 	 * Create the frame.
 	 */
 	public MainFrame() {
-		setTitle(DEFAULT_TITLE);
+		setTitleAndFile(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		loadWindowPeoperties();
 		addComponentListener(this);
+		ClassLoader cl = this.getClass().getClassLoader();
 
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -159,38 +166,80 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		setContentPane(contentPane);
 		contentPane.setLayout(new BorderLayout(0, 0));
 
-		JPanel northPanel = new JPanel();
+		JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		contentPane.add(northPanel, BorderLayout.NORTH);
 
-		JButton playButton = new JButton("再生");
-		playButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				mmlSeqView.startSequence();
-				disableNoplayItems();
-			}
-		});
-		
-		JButton startPositionButton = new JButton("先頭へ戻す");
-		startPositionButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				mmlSeqView.setStartPosition();
-			}
-		});
-		northPanel.add(startPositionButton);
-		northPanel.add(playButton);
+		JToolBar toolBar = new JToolBar();
+		toolBar.setFloatable(false);
+		northPanel.add(toolBar);
 
-		JButton stopButton = new JButton("停止");
+		JButton newFileButton = new JButton("新規");
+		noplayFunctions.add(newFileButton);
+		newFileButton.setFocusable(false);
+		newFileButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				newMMLFileAction();
+			}
+		});
+		toolBar.add(newFileButton);
+
+		JButton openFileButton = new JButton("開く");
+		noplayFunctions.add(openFileButton);
+		openFileButton.setFocusable(false);
+		openFileButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				openMMLFileAction();
+			}
+		});
+		toolBar.add(openFileButton);
+
+		JSeparator separatorT1 = new JToolBar.Separator();
+		separatorT1.setForeground(Color.DARK_GRAY);
+		toolBar.add(separatorT1);
+
+		JButton startPositionButton = new JButton("");
+		toolBar.add(startPositionButton);
+		startPositionButton.setToolTipText("先頭へ戻す");
+		startPositionButton.setIcon(new ImageIcon(cl.getResource("img/head.png")));
+		startPositionButton.setFocusable(false);
+
+		JButton playButton = new JButton("");
+		toolBar.add(playButton);
+		playButton.setToolTipText("再生");
+		playButton.setIcon(new ImageIcon(cl.getResource("img/playButton.png")));
+		playButton.setFocusable(false);
+
+		JButton stopButton = new JButton("");
+		toolBar.add(stopButton);
+		stopButton.setIcon(new ImageIcon(cl.getResource("img/stop.png")));
+		stopButton.setToolTipText("停止");
+		stopButton.setFocusable(false);
+
 		stopButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				MabiDLS.getInstance().getSequencer().stop();
 				enableNoplayItems();
 			}
 		});
-		northPanel.add(stopButton);
+		playButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				mmlSeqView.startSequence();
+				disableNoplayItems();
+			}
+		});
+		startPositionButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				mmlSeqView.setStartPosition();
+			}
+		});
 
+		JSeparator separatorT2 = new JToolBar.Separator();
+		separatorT2.setForeground(Color.DARK_GRAY);
+		toolBar.add(separatorT2);
 
 		JButton inputClipButton = new JButton("クリップボードから入力");
 		noplayFunctions.add(inputClipButton);
+		inputClipButton.setFocusable(false);
 		inputClipButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				String clipMML = getClipboardString();
@@ -198,7 +247,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 				mmlSeqView.setMMLselectedTrack(clipMML);
 			}
 		});
-		northPanel.add(inputClipButton);
+		toolBar.add(inputClipButton);
 
 		mmlSeqView = new MMLSeqView();
 		contentPane.add(mmlSeqView, BorderLayout.CENTER);
@@ -211,7 +260,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		statusField.setEditable(false);
 		southPanel.add(statusField, BorderLayout.SOUTH);
 		statusField.setColumns(10);
-		
+
 		MabiDLS.getInstance().setTrackEndNotifier(this);
 	}
 
@@ -265,18 +314,23 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 			MabiDLS.getInstance().getSequencer().stop();
 		}
 
-		String recentPath = MabiIccoProperties.getInstance().getRecentFile();
-		JFileChooser fileChooser = new JFileChooser(new File(recentPath));
-		FileFilter mmsFilter = new FileNameExtensionFilter("まきまびしーく形式 (*.mms)", "mms");
-		fileChooser.addChoosableFileFilter(mmsFilter);
-		fileChooser.setFileFilter(mmsFilter);
-		fileChooser.setAcceptAllFileFilterUsed(false);
-		int status = fileChooser.showOpenDialog(this);
-		if (status == JFileChooser.APPROVE_OPTION) {
-			File file = fileChooser.getSelectedFile();
-			openMMLFile(file);
-			openedFile = file;
-		}
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				String recentPath = MabiIccoProperties.getInstance().getRecentFile();
+				JFileChooser fileChooser = new JFileChooser(new File(recentPath));
+				FileFilter mmsFilter = new FileNameExtensionFilter("まきまびしーく形式 (*.mms)", "mms");
+				fileChooser.addChoosableFileFilter(mmsFilter);
+				fileChooser.setFileFilter(mmsFilter);
+				fileChooser.setAcceptAllFileFilterUsed(false);
+				int status = fileChooser.showOpenDialog(null);
+				if (status == JFileChooser.APPROVE_OPTION) {
+					File file = fileChooser.getSelectedFile();
+					openMMLFile(file);
+					openedFile = file;
+				}
+			}
+		});
 	}
 
 	private void trackPropertyAction() {
@@ -304,7 +358,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 
 	private void loadWindowPeoperties() {
 		MabiIccoProperties properties = MabiIccoProperties.getInstance();
-		
+
 		Rectangle rect = properties.getWindowRect();
 		if (rect.getX() < 0.0) {
 			setSize(640, 480);
@@ -312,17 +366,17 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		} else {
 			setBounds(rect);
 		}
-		
+
 		if (properties.getWindowMaximize()) {
 			this.setExtendedState(MAXIMIZED_BOTH);
 		}
-		
+
 	}
-	
+
 	private void updateWindowProperties() {
 		int extendedState = this.getExtendedState();
 		MabiIccoProperties properties = MabiIccoProperties.getInstance();
-		
+
 		if ( extendedState == MAXIMIZED_BOTH ) {
 			properties.setWindowMaximize(true);
 		} else {
@@ -330,7 +384,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 			properties.setWindowRect(this.getBounds());
 		}
 	}
-	
+
 
 	// JFrameのイベント
 	@Override
@@ -353,7 +407,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 	public void trackEndNotify() {
 		enableNoplayItems();
 	}
-	
+
 
 	/**
 	 * 再生中に各機能を無効化する。
@@ -364,7 +418,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 			component.setEnabled(false);
 		}
 	}
-	
+
 	/**
 	 * 再生中に無効化されている機能を有効にする。
 	 */
@@ -381,6 +435,6 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 			}
 		});
 	}
-	
+
 
 }
