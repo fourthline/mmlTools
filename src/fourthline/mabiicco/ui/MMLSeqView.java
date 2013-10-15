@@ -279,14 +279,7 @@ public class MMLSeqView extends JPanel implements INotifyMMLTrackProperty {
 	public void setMMLselectedTrack(MMLTrack mml) {
 		int index = tabbedPane.getSelectedIndex();
 
-		MMLTrack selectedTrack = track[index];
-
-		selectedTrack.setMelody(mml.getMelody());
-		selectedTrack.setChord1(mml.getChord1());
-		selectedTrack.setChord2(mml.getChord2());
-		
-		selectedTrack.setProgram(mml.getProgram());
-		selectedTrack.setName(mml.getName());
+		track[index] = mml;
 		
 		tabbedPane.setTitleAt(index, mml.getName());
 

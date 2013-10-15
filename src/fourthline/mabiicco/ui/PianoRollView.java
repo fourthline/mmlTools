@@ -254,8 +254,17 @@ public class PianoRollView extends JPanel implements IMMLView {
 	 * @param mmlPart
 	 * @return
 	 */
-	private int paintMMLPart(Graphics2D g, List<MMLEvent> mmlPart, Color color) {
+	private void paintMMLPart(Graphics2D g, List<MMLEvent> mmlPart, Color color) {
 		int totalTick = 0;
+		
+		// 現在のView範囲のみを描画する.
+		Point point = viewport.getViewPosition();
+		Dimension dim = viewport.getExtentSize();
+		double x1 = point.getX();
+		double x2 = x1 + dim.getWidth();
+		x1 *= wideScale; // base tick
+		x2 *= wideScale; // base tick		
+		
 		for (Iterator<MMLEvent> i = mmlPart.iterator(); i.hasNext(); ) {
 			MMLEvent event = i.next();
 
@@ -264,12 +273,15 @@ public class PianoRollView extends JPanel implements IMMLView {
 				int note = noteEvent.getNote();
 				int tick = noteEvent.getTick();
 
-				drawNote(g, note, tick, totalTick, color);
+				if (x1 <= totalTick) {
+					drawNote(g, note, tick, totalTick, color);
+				}
 				totalTick += tick;
+				if (totalTick >= x2) {
+					break;
+				}
 			}
 		}
-
-		return totalTick;
 	}
 
 	/**
@@ -277,7 +289,6 @@ public class PianoRollView extends JPanel implements IMMLView {
 	 * @param g
 	 */
 	private void paintMusicScore(Graphics2D g, int index) {
-		int maxLength = 0;
 		Color color[] = {
 				new Color(0.7f, 0.0f, 0.0f),
 				new Color(0.0f, 0.7f, 0.0f),
@@ -289,10 +300,7 @@ public class PianoRollView extends JPanel implements IMMLView {
 
 		for (int i = 0; i < 3; i++) {
 			List<MMLEvent> mmlPart = trackArray[index].getMMLEvent(i);
-			int length = paintMMLPart(g, mmlPart, color[index%color.length]);
-			if (maxLength < length) {
-				maxLength = length;
-			}
+			paintMMLPart(g, mmlPart, color[index%color.length]);
 		}
 	}
 
