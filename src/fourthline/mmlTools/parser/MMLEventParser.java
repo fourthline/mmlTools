@@ -44,13 +44,21 @@ public class MMLEventParser extends MelodyParser {
 				continue;
 			}
 			if ( (firstC == 'v') || (firstC == 'V') ) {
-				MMLEvent newEvent = new MMLVelocityEvent(Integer.parseInt( token.substring(1) ));
-				list.add(newEvent);
+				try {
+					MMLEvent newEvent = new MMLVelocityEvent(Integer.parseInt( token.substring(1) ));
+					list.add(newEvent);
+				} catch (NumberFormatException e) {
+					break;
+				}
 				continue;
 			}
 			if ( (firstC == 't') || (firstC == 'T') ) {
-				MMLEvent newEvent = new MMLTempoEvent(Integer.parseInt( token.substring(1) ));
-				list.add(newEvent);
+				try {
+					MMLEvent newEvent = new MMLTempoEvent(Integer.parseInt( token.substring(1) ));
+					list.add(newEvent);
+				} catch (NumberFormatException e) {
+					break;
+				}
 				continue;
 			}
 			try {

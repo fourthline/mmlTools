@@ -74,7 +74,6 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		loadWindowPeoperties();
 		addComponentListener(this);
-		ClassLoader cl = this.getClass().getClassLoader();
 
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -84,6 +83,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		menuBar.add(fileMenu);
 
 		JMenuItem fileOpenMenuItem = new JMenuItem("開く");
+		fileOpenMenuItem.setIcon(new ImageIcon(MainFrame.class.getResource("/img/open.png")));
 		noplayFunctions.add(fileOpenMenuItem);
 		fileOpenMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
 		fileOpenMenuItem.addActionListener(new ActionListener() {
@@ -93,6 +93,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		});
 
 		JMenuItem menuItem = new JMenuItem("新規作成");
+		menuItem.setIcon(new ImageIcon(MainFrame.class.getResource("/img/file.png")));
 		noplayFunctions.add(menuItem);
 		menuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -162,6 +163,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		menuBar.add(playMenu);
 		
 		JMenuItem headPlayPositionMenuItem = new JMenuItem("先頭へ戻す");
+		headPlayPositionMenuItem.setIcon(new ImageIcon(MainFrame.class.getResource("/img/head.png")));
 		headPlayPositionMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				mmlSeqView.setStartPosition();
@@ -171,6 +173,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		playMenu.add(headPlayPositionMenuItem);
 		
 		JMenuItem playMenuItem = new JMenuItem("再生");
+		playMenuItem.setIcon(new ImageIcon(MainFrame.class.getResource("/img/playButton.png")));
 		playMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				mmlSeqView.startSequence();
@@ -181,6 +184,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		playMenu.add(playMenuItem);
 		
 		JMenuItem stopMenuItem = new JMenuItem("停止");
+		stopMenuItem.setIcon(new ImageIcon(MainFrame.class.getResource("/img/stop.png")));
 		stopMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				MabiDLS.getInstance().getSequencer().stop();
@@ -201,7 +205,9 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		toolBar.setFloatable(false);
 		northPanel.add(toolBar);
 
-		JButton newFileButton = new JButton("新規");
+		JButton newFileButton = new JButton("");
+		newFileButton.setToolTipText("新規作成");
+		newFileButton.setIcon(new ImageIcon(MainFrame.class.getResource("/img/file.png")));
 		noplayFunctions.add(newFileButton);
 		newFileButton.setFocusable(false);
 		newFileButton.addActionListener(new ActionListener() {
@@ -211,7 +217,9 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		});
 		toolBar.add(newFileButton);
 
-		JButton openFileButton = new JButton("開く");
+		JButton openFileButton = new JButton("");
+		openFileButton.setToolTipText("開く");
+		openFileButton.setIcon(new ImageIcon(MainFrame.class.getResource("/img/open.png")));
 		noplayFunctions.add(openFileButton);
 		openFileButton.setFocusable(false);
 		openFileButton.addActionListener(new ActionListener() {
@@ -228,18 +236,18 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		JButton startPositionButton = new JButton("");
 		toolBar.add(startPositionButton);
 		startPositionButton.setToolTipText("先頭へ戻す");
-		startPositionButton.setIcon(new ImageIcon(cl.getResource("img/head.png")));
+		startPositionButton.setIcon(new ImageIcon(MainFrame.class.getResource("/img/head.png")));
 		startPositionButton.setFocusable(false);
 
 		JButton playButton = new JButton("");
 		toolBar.add(playButton);
 		playButton.setToolTipText("再生");
-		playButton.setIcon(new ImageIcon(cl.getResource("img/playButton.png")));
+		playButton.setIcon(new ImageIcon(MainFrame.class.getResource("/img/playButton.png")));
 		playButton.setFocusable(false);
 
 		JButton stopButton = new JButton("");
 		toolBar.add(stopButton);
-		stopButton.setIcon(new ImageIcon(cl.getResource("img/stop.png")));
+		stopButton.setIcon(new ImageIcon(MainFrame.class.getResource("/img/stop.png")));
 		stopButton.setToolTipText("停止");
 		stopButton.setFocusable(false);
 
@@ -301,13 +309,13 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 	}
 
 	private void openMMLFile(File file) {
-		setTitleAndFile(file);
-		MabiIccoProperties.getInstance().setRecentFile(file.getPath());
-		IMMLFileParser fileParser = new MMSFile();
 		try {
+			IMMLFileParser fileParser = new MMSFile();
 			MMLTrack track[] = fileParser.parse(file);
-
 			mmlSeqView.setMMLTracks(track);
+			
+			setTitleAndFile(file);
+			MabiIccoProperties.getInstance().setRecentFile(file.getPath());
 		} catch (MMLParseException e) {
 			JOptionPane.showMessageDialog(this, "読み込みに失敗しました", "ファイル形式が不正です", JOptionPane.WARNING_MESSAGE);
 		}
