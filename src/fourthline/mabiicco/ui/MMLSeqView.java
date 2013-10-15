@@ -18,7 +18,6 @@ import javax.swing.JViewport;
 import javax.swing.ScrollPaneConstants;
 
 import fourthline.mabiicco.midi.MabiDLS;
-import fourthline.mmlTools.core.MMLTools;
 import fourthline.mmlTools.parser.MMLTempoEvent;
 import fourthline.mmlTools.parser.MMLTrack;
 
@@ -39,6 +38,7 @@ public class MMLSeqView extends JPanel implements INotifyMMLTrackProperty {
 	private static final long serialVersionUID = -479890612015524747L;
 
 	private static final int MAX_TRACK = 8;
+	private static final int INITIAL_TRACK_COUNT = 1;
 
 	private JScrollPane scrollPane;
 	private PianoRollView pianoRollView;
@@ -61,6 +61,7 @@ public class MMLSeqView extends JPanel implements INotifyMMLTrackProperty {
 		scrollPane = new JScrollPane(pianoRollView);
 		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		scrollPane.getVerticalScrollBar().setUnitIncrement(IMMLView.HEIGHT);
 
 		scrollPane.setRowHeaderView(keyboardView);
 		JPanel columnView = pianoRollView.getRulerPanel();
@@ -113,8 +114,8 @@ public class MMLSeqView extends JPanel implements INotifyMMLTrackProperty {
 
 
 	public void initializeMMLTrack() {
-		MMLTrack newTrack[] = new MMLTrack[5];
-		for (int i = 0; i < 5; i++) {
+		MMLTrack newTrack[] = new MMLTrack[INITIAL_TRACK_COUNT];
+		for (int i = 0; i < INITIAL_TRACK_COUNT; i++) {
 			String name = "Track"+(i+1);
 			newTrack[i] = new MMLTrack("");
 			newTrack[i].setName(name);
@@ -125,30 +126,23 @@ public class MMLSeqView extends JPanel implements INotifyMMLTrackProperty {
 
 
 	/**
-	 * トラックの追加
+	 * トラックの追加。作成したトラックを選択状態にします。
 	 */
 	public void addMMLTrack(String title) {
-		addMMLTrack(title, "");
-	}
-
-
-	/**
-	 * トラックの追加, MML書式
-	 */
-	private void addMMLTrack(String title, String mml) {
-		MMLTrack newTrack = new MMLTrack(mml);
+		MMLTrack newTrack = new MMLTrack("");
 		newTrack.setName(title);
 		if (track.length >= MAX_TRACK) {
 			return;
 		}
 
+		// トラックリストの末尾に追加
 		ArrayList<MMLTrack> list = new ArrayList<MMLTrack>( Arrays.asList(track) );
 		list.add(newTrack);
 
 		track = new MMLTrack[list.size()];
 		list.toArray(track);
 
-		// トラックの追加
+		// トラックビューの追加
 		tabbedPane.add(title, new MMLTrackView(newTrack, track.length-1));
 		tabbedPane.setSelectedIndex(track.length-1);
 
@@ -282,20 +276,26 @@ public class MMLSeqView extends JPanel implements INotifyMMLTrackProperty {
 	/**
 	 * 現在のトラックにMMLを設定する。
 	 */
-	public void setMMLselectedTrack(String mml) {
+	public void setMMLselectedTrack(MMLTrack mml) {
 		int index = tabbedPane.getSelectedIndex();
 
 		MMLTrack selectedTrack = track[index];
 
-		MMLTools tools = new MMLTools(mml);
-		selectedTrack.setMelody(tools.getMelody());
-		selectedTrack.setChord1(tools.getChord1());
-		selectedTrack.setChord2(tools.getChord2());
+		selectedTrack.setMelody(mml.getMelody());
+		selectedTrack.setChord1(mml.getChord1());
+		selectedTrack.setChord2(mml.getChord2());
+		
+		selectedTrack.setProgram(mml.getProgram());
+		selectedTrack.setName(mml.getName());
+		
+		tabbedPane.setTitleAt(index, mml.getName());
 
 		// 表示を更新
 		pianoRollView.setMMLTrack(track);
 		MMLTrackView view = (MMLTrackView)tabbedPane.getComponentAt(index);
 		view.setMMLTrack(track[index]);
+		
+		repaint();
 	}
 
 	/**
@@ -344,5 +344,13 @@ public class MMLSeqView extends JPanel implements INotifyMMLTrackProperty {
 			sequencer.setTickPosition(0);
 			sequencer.setTempoInBPM(120);
 		}
+	}
+	
+	public void inputClipBoardAction() {
+		int index = tabbedPane.getSelectedIndex();
+		
+		MMLInputDialog dialog = new MMLInputDialog(this, track[index]);
+		dialog.setLocationRelativeTo(null);
+		dialog.setVisible(true);
 	}
 }

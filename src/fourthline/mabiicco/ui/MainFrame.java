@@ -8,7 +8,6 @@ import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Rectangle;
-import java.awt.Toolkit;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -23,15 +22,11 @@ import fourthline.mabiicco.midi.INotifyTrackEnd;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mmlTools.parser.*;
 
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -275,9 +270,8 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		inputClipButton.setFocusable(false);
 		inputClipButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				String clipMML = getClipboardString();
 				// 現在のトラックにMMLを設定する。
-				mmlSeqView.setMMLselectedTrack(clipMML);
+				mmlSeqView.inputClipBoardAction();
 			}
 		});
 		toolBar.add(inputClipButton);
@@ -322,14 +316,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 	private void newMMLFileAction() {
 		setTitleAndFile(null);
 		openedFile = null;
-		MMLTrack track[] = new MMLTrack[5];
-
-		for (int i = 0; i < track.length; i++) {
-			String name = "Track"+(i+1);
-			track[i] = new MMLTrack(name);
-		}
-
-		mmlSeqView.setMMLTracks(track);
+		mmlSeqView.initializeMMLTrack();
 	}
 
 	private void reloadMMLFileAction() {
@@ -371,23 +358,10 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 				this,
 				mmlSeqView, 
 				mmlSeqView.getSelectedTrack() );
+		dialog.setLocationRelativeTo(null);
 		dialog.setVisible(true);
 	}
 
-	public static String getClipboardString() {
-		Toolkit kit = Toolkit.getDefaultToolkit();
-		Clipboard clip = kit.getSystemClipboard();
-
-		try {
-			return (String) clip.getData(DataFlavor.stringFlavor);
-		} catch (UnsupportedFlavorException e) {
-			e.printStackTrace();
-			return null;
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
 
 	private void loadWindowPeoperties() {
 		MabiIccoProperties properties = MabiIccoProperties.getInstance();
