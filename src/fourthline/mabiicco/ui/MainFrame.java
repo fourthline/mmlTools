@@ -303,7 +303,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		String fileTitle = "";
 
 		if (file != null) {
-			fileTitle = file.getName();
+			fileTitle = file.getName() + " (read only)";
 		}
 		setTitle(DEFAULT_TITLE + " [" + fileTitle + "]");
 	}

@@ -67,6 +67,7 @@ public class MMLInputDialog extends JDialog {
 	public MMLInputDialog(MMLSeqView parent, MMLTrack track) {
 		this.parent = parent;
 		setModal(true);
+		setResizable(false);
 
 		setTitle("クリップボードからのMML入力");
 		setBounds(100, 100, 352, 417);
@@ -82,17 +83,17 @@ public class MMLInputDialog extends JDialog {
 		panel1.setLayout(null);
 
 		overrideButton = new JRadioButton("現在のトラックに上書き");
-		overrideButton.setBounds(8, 23, 174, 21);
+		overrideButton.setBounds(8, 51, 174, 21);
 		panel1.add(overrideButton);
 
 		newTrackButton = new JRadioButton("新しいトラックを作成");
-		newTrackButton.setBounds(8, 51, 144, 21);
+		newTrackButton.setBounds(8, 23, 144, 21);
 		panel1.add(newTrackButton);
 
 		ButtonGroup buttonGroup = new ButtonGroup();
 		buttonGroup.add(overrideButton);
 		buttonGroup.add(newTrackButton);
-		overrideButton.setSelected(true);
+		newTrackButton.setSelected(true);
 
 		JPanel panel2 = new JPanel();
 		panel2.setBorder(new TitledBorder(new LineBorder(new Color(128, 128, 128), 1, true), "\u697D\u5668\u8A2D\u5B9A", TitledBorder.LEADING, TitledBorder.TOP, null, null));
