@@ -47,6 +47,8 @@ public class MMLSeqView extends JPanel implements INotifyMMLTrackProperty {
 
 	private MMLTrack track[];
 
+	private MMLInputDialog dialog = new MMLInputDialog(this);
+
 
 	/**
 	 * Create the panel.
@@ -342,8 +344,6 @@ public class MMLSeqView extends JPanel implements INotifyMMLTrackProperty {
 	public void inputClipBoardAction() {
 		int index = tabbedPane.getSelectedIndex();
 		
-		MMLInputDialog dialog = new MMLInputDialog(this, track[index]);
-		dialog.setLocationRelativeTo(null);
-		dialog.setVisible(true);
+		dialog.showDialog(track[index]);
 	}
 }

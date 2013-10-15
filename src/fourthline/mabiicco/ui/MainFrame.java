@@ -62,6 +62,8 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 	private final String DEFAULT_TITLE = " * MabiIcco *";
 
 	private File openedFile = null;
+	
+	private TrackPropertyDialog trackPropertyDialog;
 
 	/** シーケンス再生中に無効化する機能のリスト */
 	ArrayList<JComponent> noplayFunctions = new ArrayList<JComponent>();
@@ -297,6 +299,10 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		statusField.setColumns(10);
 
 		MabiDLS.getInstance().setTrackEndNotifier(this);
+
+		trackPropertyDialog = new TrackPropertyDialog(
+				this,
+				mmlSeqView);
 	}
 
 	private void setTitleAndFile(File file) {
@@ -362,12 +368,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 	}
 
 	private void trackPropertyAction() {
-		TrackPropertyDialog dialog = new TrackPropertyDialog(
-				this,
-				mmlSeqView, 
-				mmlSeqView.getSelectedTrack() );
-		dialog.setLocationRelativeTo(null);
-		dialog.setVisible(true);
+		trackPropertyDialog.showDialog(mmlSeqView.getSelectedTrack());
 	}
 
 

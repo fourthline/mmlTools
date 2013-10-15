@@ -83,6 +83,7 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		}
 		northPanel.add(comboBox);
 		comboBox.addActionListener(this);
+		comboBox.setMaximumRowCount(30);
 
 		JLabel label = new JLabel("メロディー");
 		GridBagConstraints gbc_label = new GridBagConstraints();

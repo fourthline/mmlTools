@@ -50,21 +50,20 @@ public class MMLInputDialog extends JDialog {
 	JRadioButton overrideButton;
 	JRadioButton newTrackButton;
 
-	MMLTrack track;
-
 	MMLSeqView parent;
+	MMLTrack track;
 
 
 
 	public MMLInputDialog() {
-		this(null, null);
+		this(null);
 	}
 
 	/**
 	 * 現在のトラック名を指定してダイアログを作成する。
 	 * @param trackName
 	 */
-	public MMLInputDialog(MMLSeqView parent, MMLTrack track) {
+	public MMLInputDialog(MMLSeqView parent) {
 		this.parent = parent;
 		setModal(true);
 		setResizable(false);
@@ -111,6 +110,7 @@ public class MMLInputDialog extends JDialog {
 			comboBox = new JComboBox<InstClass>(insts);
 		}
 		comboBox.setBounds(25, 33, 193, 19);
+		comboBox.setMaximumRowCount(30);
 		panel2.add(comboBox);
 
 
@@ -122,9 +122,6 @@ public class MMLInputDialog extends JDialog {
 		panel3.setLayout(null);
 
 		textField = new JTextField();
-		if (track != null) {
-			textField.setText(track.getName());
-		}
 		textField.setBounds(27, 35, 193, 19);
 		panel3.add(textField);
 		textField.setColumns(10);
@@ -160,16 +157,17 @@ public class MMLInputDialog extends JDialog {
 
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						dispose();
+						setVisible(false);
 					}
 				}); 
 			}
 		}
 	}
 
-
-	@Override
-	public void setVisible(boolean visible) {
+	
+	public void showDialog(MMLTrack oldTrack) {
+		textField.setText(oldTrack.getName());
+		
 		String mml = getClipboardString();
 
 		track = new MMLTrack(mml);
@@ -179,8 +177,9 @@ public class MMLInputDialog extends JDialog {
 				(track.getChord2().length() == 0) ) {
 			return;
 		}
-
-		super.setVisible(visible);
+		
+		setLocationRelativeTo(null);
+		setVisible(true);
 	}
 
 

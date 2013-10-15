@@ -10,7 +10,6 @@ import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -44,6 +43,8 @@ public class PianoRollView extends JPanel implements IMMLView {
 
 	private long sequencePosition;
 
+	private boolean donePaint = true;
+
 
 	// ピアノロール上に表示する各トラックの色リスト（枠線）
 	private static final Color trackRectColor[] = {
@@ -63,8 +64,29 @@ public class PianoRollView extends JPanel implements IMMLView {
 		new Color(0.35f, 0.0f, 0.35f, 0.4f),
 		new Color(0.0f, 0.35f, 0.35f, 0.4f)
 	};
-	
-	
+
+	private static final Color wKeyColor = new Color(0.9f, 0.9f, 0.9f); // 白鍵盤用
+	private static final Color bKeyColor = new Color(0.8f, 0.8f, 0.8f); // 黒鍵盤用
+	private static final Color borderColor = new Color(0.6f, 0.6f, 0.6f); // 境界線用
+	private static final Color keyColors[] = new Color[] {
+		wKeyColor, 
+		bKeyColor, 
+		wKeyColor, 
+		bKeyColor, 
+		wKeyColor, 
+		bKeyColor, 
+		wKeyColor, 
+		wKeyColor, 
+		bKeyColor, 
+		wKeyColor, 
+		bKeyColor, 
+		wKeyColor
+	};
+
+	private static final Color barBorder = new Color(0.5f, 0.5f, 0.5f);
+	private static final Color beatBorder = new Color(0.4f, 0.4f, 0.4f);
+
+
 
 	/**
 	 * Create the panel.
@@ -103,18 +125,18 @@ public class PianoRollView extends JPanel implements IMMLView {
 	public long convertXtoTick(int x) {
 		return (x * wideScale);
 	}
-	
+
 	public long getSequencePossition() {
 		return sequencePosition;
 	}
-	
+
 	public int getSequenceX() {
 		return (int)sequencePosition / wideScale;
 	}
 
 	public void setSequenceX(int x) {
 		long tick = x * wideScale;
-		
+
 		if (!MabiDLS.getInstance().getSequencer().isRunning()) {
 			sequencePosition = tick;
 
@@ -148,26 +170,23 @@ public class PianoRollView extends JPanel implements IMMLView {
 		paintSequenceLine(g2);
 
 		g2.dispose();
+
+		donePaint = true;
 	}
 
 
 	private void paintOctPianoLine(Graphics2D g, int pos, char posText) {
 		int startY = 12 * IMMLView.HEIGHT * pos;
-		Color c1 = new Color(0.9f, 0.9f, 0.9f); // 白鍵盤用
-		Color c2 = new Color(0.8f, 0.8f, 0.8f); // 黒鍵盤用
-		Color c3 = new Color(0.6f, 0.6f, 0.6f); // 境界線用
-		Color colors[] = new Color[] {
-				c1, c2, c1, c2, c1, c2, c1, c1, c2, c1, c2, c1
-		};
+
 
 		// グリッド
 		int y = startY;
 		int width = getWidth();
 		g.drawLine(0, y, width, y);
 		for (int i = 0; i < 12; i++) {
-			g.setColor(colors[i]);
+			g.setColor(keyColors[i]);
 			g.fillRect(0, i*6+y, width, IMMLView.HEIGHT);
-			g.setColor(c3);
+			g.setColor(borderColor);
 			g.drawLine(0, i*6+y, width, i*6+y);
 		}
 	}
@@ -186,34 +205,33 @@ public class PianoRollView extends JPanel implements IMMLView {
 					}
 					Sequencer sequencer = MabiDLS.getInstance().getSequencer();
 					if (sequencer.isRunning()) {
-						try {
-							EventQueue.invokeAndWait(new Runnable() {
-								@Override
-								public void run() {
-									Sequencer sequencer = MabiDLS.getInstance().getSequencer();
-									long position = sequencer.getTickPosition() / wideScale;
-									Point point = viewport.getViewPosition();
-									Dimension dim = viewport.getExtentSize();
-									double x1 = point.getX();
-									double x2 = x1 + dim.getWidth();
-									if ( (position < x1) || (position > x2) ) {
-										/* ビュー外にあるので、現在のポジションにあわせる */
-										point.setLocation(position, point.getY());
-										viewport.setViewPosition(point);
-									}
-									parent.repaint();
-								}
-							});
-						} catch (InvocationTargetException e) {
-							e.printStackTrace();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
+						if (!donePaint) {
+							continue;
 						}
+						donePaint = false;
+						EventQueue.invokeLater(new Runnable() {
+							@Override
+							public void run() {
+								Sequencer sequencer = MabiDLS.getInstance().getSequencer();
+								long position = sequencer.getTickPosition() / wideScale;
+								Point point = viewport.getViewPosition();
+								Dimension dim = viewport.getExtentSize();
+								double x1 = point.getX();
+								double x2 = x1 + dim.getWidth();
+								if ( (position < x1) || (position > x2) ) {
+									/* ビュー外にあるので、現在のポジションにあわせる */
+									point.setLocation(position, point.getY());
+									viewport.setViewPosition(point);
+								}
+								parent.repaint();
+							}
+						});
 					}
 				}
 			}
 		});
 
+		thread.setPriority(Thread.MIN_PRIORITY);
 		thread.start();
 	}
 
@@ -240,7 +258,7 @@ public class PianoRollView extends JPanel implements IMMLView {
 		int width = getWidth() * wideScale;
 		int sect = 96;
 
-		g.setColor(new Color(0.5f, 0.5f, 0.5f));
+		g.setColor(barBorder);
 
 		for (int i = 0; i < width; i += sect) {
 			int x1 = i / wideScale;
@@ -273,7 +291,7 @@ public class PianoRollView extends JPanel implements IMMLView {
 	 */
 	private void paintMMLPart(Graphics2D g, List<MMLEvent> mmlPart, Color rectColor, Color fillColor) {
 		int totalTick = 0;
-		
+
 		// 現在のView範囲のみを描画する.
 		Point point = viewport.getViewPosition();
 		Dimension dim = viewport.getExtentSize();
@@ -281,7 +299,7 @@ public class PianoRollView extends JPanel implements IMMLView {
 		double x2 = x1 + dim.getWidth();
 		x1 *= wideScale; // base tick
 		x2 *= wideScale; // base tick		
-		
+
 		for (Iterator<MMLEvent> i = mmlPart.iterator(); i.hasNext(); ) {
 			MMLEvent event = i.next();
 
@@ -349,7 +367,7 @@ public class PianoRollView extends JPanel implements IMMLView {
 				int width = getWidth();
 				int sect = 96 * 4;
 
-				g.setColor(new Color(0.4f, 0.4f, 0.4f));
+				g.setColor(beatBorder);
 
 				int count = 0;
 				for (int i = 0; i < (width*wideScale); i += sect) {
