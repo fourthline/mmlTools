@@ -153,6 +153,8 @@ public class PianoRollView extends JPanel implements IMMLView {
 	 */
 	@Override
 	public void paint(Graphics g) {
+		int oldPri = Thread.currentThread().getPriority();
+		Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 		super.paint(g);
 
 		Graphics2D g2 = (Graphics2D)g.create();
@@ -172,6 +174,7 @@ public class PianoRollView extends JPanel implements IMMLView {
 		g2.dispose();
 
 		donePaint = true;
+		Thread.currentThread().setPriority(oldPri);
 	}
 
 
