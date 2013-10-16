@@ -107,6 +107,7 @@ public class PianoRollView extends JPanel implements IMMLView {
 	public void setWidth(int width) {
 		this.width = width;
 		super.setPreferredSize(new Dimension(width, 649));
+		revalidate();
 	}
 
 	public void setMMLTrack(MMLTrack track[]) {
@@ -311,7 +312,7 @@ public class PianoRollView extends JPanel implements IMMLView {
 				int note = noteEvent.getNote();
 				int tick = noteEvent.getTick();
 
-				if (x1 <= totalTick) {
+				if ( x1 <= (totalTick+tick) ) {
 					drawNote(g, note, tick, totalTick, rectColor, fillColor);
 				}
 				totalTick += tick;

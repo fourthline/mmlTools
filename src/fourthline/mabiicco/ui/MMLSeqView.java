@@ -259,7 +259,6 @@ public class MMLSeqView extends JPanel implements INotifyMMLTrackProperty {
 
 		tabbedPane.removeAll();
 		pianoRollView.setMMLTrack(track);
-		pianoRollView.repaint();
 		this.track = track;
 
 		for (int i = 0; i < track.length; i++) {
@@ -273,6 +272,7 @@ public class MMLSeqView extends JPanel implements INotifyMMLTrackProperty {
 
 		initialSetView();
 		pianoRollView.setSequenceX(0);
+		repaint();
 	}
 
 	/**
@@ -289,7 +289,6 @@ public class MMLSeqView extends JPanel implements INotifyMMLTrackProperty {
 		pianoRollView.setMMLTrack(track);
 		MMLTrackView view = (MMLTrackView)tabbedPane.getComponentAt(index);
 		view.setMMLTrack(track[index]);
-		
 		repaint();
 	}
 
