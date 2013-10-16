@@ -28,11 +28,17 @@ public class MMSFile implements IMMLFileParser {
 			InputStreamReader isReader = new InputStreamReader(fisFile, "Shift_JIS");
 			reader = new BufferedReader(isReader);
 			
-			String s= reader.readLine();
+			String s;
+			while (true) {
+				s = reader.readLine();
+				if (s == null) {
+					throw(new MMLParseException());
+				}
 			
-			/* ヘッダチェック */
-			if ( (s == null) || !(s.equals("[mms-file]")) ) {
-				throw(new MMLParseException());
+				/* ヘッダチェック */
+				if (s.equals("[mms-file]")) {
+					break;
+				}
 			}
 			
 			/* バージョン */

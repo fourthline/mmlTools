@@ -40,19 +40,6 @@ public class TrackPropertyDialog extends JDialog {
 	INotifyMMLTrackProperty notify;
 
 	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		try {
-			TrackPropertyDialog dialog = new TrackPropertyDialog();
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.setVisible(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
 	 * Create the dialog.
 	 */
 	public TrackPropertyDialog() {
@@ -124,7 +111,7 @@ public class TrackPropertyDialog extends JDialog {
 
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						dispose();
+						setVisible(false);
 					}
 				}); 
 			}
@@ -137,13 +124,18 @@ public class TrackPropertyDialog extends JDialog {
 		notify.setTrackProperty(track);
 	}
 
-	public TrackPropertyDialog(Window owner, INotifyMMLTrackProperty notify, MMLTrack track) {
+	public TrackPropertyDialog(Window owner, INotifyMMLTrackProperty notify) {
 		super(owner);
 		initialize();
-		
-		this.track = track;
 		this.notify = notify;
+	}
+	
+	
+	public void showDialog(MMLTrack track) { 
+		this.track = track;
 		trackNameField.setText(track.getName());
 		panpotSlider.setValue(track.getPanpot());
+		setLocationRelativeTo(null);
+		setVisible(true);
 	}
 }
