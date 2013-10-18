@@ -135,7 +135,7 @@ public class MMSFile implements IMMLFileParser {
 		
 		MMLTrack track = new MMLTrack(mml1, mml2, mml3);
 		track.setProgram(program);
-		track.setName(name);
+		track.setTrackName(name);
 		track.setPanpot(panpot);
 		return track;
 	}
@@ -144,7 +144,7 @@ public class MMSFile implements IMMLFileParser {
 		try {
 			MMSFile mmsFile = new MMSFile();
 			MMLTrack track[] = mmsFile.parse(new File("sample.mms"));
-			System.out.println(track[0].getName());
+			System.out.println(track[0].getTrackName());
 		} catch (MMLParseException e) {
 			e.printStackTrace();
 		}

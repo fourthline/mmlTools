@@ -17,7 +17,6 @@ import javax.swing.JTextField;
 import javax.swing.JComboBox;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.Document;
 
 import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.MabiDLS;
@@ -185,22 +184,6 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 			return;
 		}
 		
-		if (event != null) {
-			Document source = event.getDocument();
-
-			if (source == mmlText1.getDocument()) {
-				String s = mmlText1.getText();
-				mmlTrack.setMelody(s);
-			} else if (source == mmlText2.getDocument()) {
-				String s = mmlText2.getText();
-				mmlTrack.setChord1(s);
-			} else if (source == mmlText3.getDocument()) {
-				String s = mmlText3.getText();
-				mmlTrack.setChord2(s);
-			}
-			
-			// TODO: MML直接文字列更新→ピアノロールビューをRepaintする。
-		}
 
 		String rank = mmlTrack.mmlRankFormat();
 		trackComposeLabel.setText(rank);

@@ -134,7 +134,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		addTrackMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_MASK));
 		addTrackMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				mmlSeqView.addMMLTrack("New Track");
+				mmlSeqView.addMMLTrack(null);
 			}
 		});
 		trackMenu.add(addTrackMenu);

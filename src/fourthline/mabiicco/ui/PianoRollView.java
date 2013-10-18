@@ -34,7 +34,7 @@ public class PianoRollView extends JPanel implements IMMLView {
 	private static final long serialVersionUID = -7229093886476553295L;
 
 
-	private MMLTrack trackArray[];
+	private List<MMLTrack> trackList;
 	private int wideScale = 6; // ピアノロールの拡大/縮小率 (1~6)
 	private int width;
 
@@ -110,17 +110,18 @@ public class PianoRollView extends JPanel implements IMMLView {
 		revalidate();
 	}
 
-	public void setMMLTrack(MMLTrack track[]) {
-		this.trackArray = track;
+	public void setMMLTrack(List<MMLTrack> trackList) {
+		this.trackList = trackList;
 
 		int tickLength = 0;
-		for (int i = 0; i < track.length; i++) {
-			int length = track[i].getMaxTickLength();
+		for (int i = 0; i < trackList.size(); i++) {
+			int length = trackList.get(i).getMaxTickLength();
 			if (tickLength < length) {
 				tickLength = length;
 			}
 		}
 		setWidth(tickLength / wideScale);
+		repaint();
 	}
 
 	public long convertXtoTick(int x) {
@@ -164,8 +165,8 @@ public class PianoRollView extends JPanel implements IMMLView {
 		}
 
 		paintMeasure(g2);
-		if (trackArray != null) {
-			for (int i = 0; i < trackArray.length; i++) {
+		if (trackList != null) {
+			for (int i = 0; i < trackList.size(); i++) {
 				paintMusicScore(g2, i);
 			}
 		}
@@ -302,7 +303,7 @@ public class PianoRollView extends JPanel implements IMMLView {
 		double x1 = point.getX();
 		double x2 = x1 + dim.getWidth();
 		x1 *= wideScale; // base tick
-		x2 *= wideScale; // base tick		
+		x2 *= wideScale; // base tick
 
 		for (Iterator<MMLEvent> i = mmlPart.iterator(); i.hasNext(); ) {
 			MMLEvent event = i.next();
@@ -329,7 +330,7 @@ public class PianoRollView extends JPanel implements IMMLView {
 	 */
 	private void paintMusicScore(Graphics2D g, int index) {
 		for (int i = 0; i < 3; i++) {
-			List<MMLEvent> mmlPart = trackArray[index].getMMLEvent(i);
+			List<MMLEvent> mmlPart = trackList.get(index).getMMLEvent(i);
 			paintMMLPart(g, mmlPart, 
 					trackRectColor[index%trackRectColor.length], 
 					trackFillColor[index%trackFillColor.length]);

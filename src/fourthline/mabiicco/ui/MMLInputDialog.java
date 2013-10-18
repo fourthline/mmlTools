@@ -121,10 +121,11 @@ public class MMLInputDialog extends JDialog {
 		contentPanel.add(panel3);
 		panel3.setLayout(null);
 
-		textField = new JTextField();
+		textField = new JTextField(20);
 		textField.setBounds(27, 35, 193, 19);
+		// TODO: 日本語を入力したとき、再生時にCPU負荷がかかる問題あり.
+		textField.setEditable(false);
 		panel3.add(textField);
-		textField.setColumns(10);
 		{
 			JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -134,7 +135,7 @@ public class MMLInputDialog extends JDialog {
 				okButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						applyMMLTrack();
-						setVisible(false);
+						dispose();
 					}
 				});
 				okButton.setActionCommand("OK");
@@ -146,7 +147,7 @@ public class MMLInputDialog extends JDialog {
 				cancelButton.setActionCommand("Cancel");
 				cancelButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						setVisible(false);
+						dispose();
 					}
 				});
 				buttonPane.add(cancelButton);
@@ -165,8 +166,8 @@ public class MMLInputDialog extends JDialog {
 	}
 
 	
-	public void showDialog(MMLTrack oldTrack) {
-		textField.setText(oldTrack.getName());
+	public void showDialog(String title) {
+		textField.setText(title);
 		
 		String mml = getClipboardString();
 
@@ -184,15 +185,14 @@ public class MMLInputDialog extends JDialog {
 
 
 	private void applyMMLTrack() {
-		track.setName(textField.getText());
 		InstClass inst = (InstClass)comboBox.getSelectedItem();
 		track.setProgram(inst.getProgram());
+		track.setTrackName(textField.getText());
 
 		if (overrideButton.isSelected()) {
 			parent.setMMLselectedTrack(track);
 		} else {
-			parent.addMMLTrack("");
-			parent.setMMLselectedTrack(track);
+			parent.addMMLTrack(track);
 		}
 	}
 

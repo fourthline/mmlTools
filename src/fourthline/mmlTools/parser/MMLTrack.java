@@ -21,7 +21,7 @@ public class MMLTrack extends MMLTools {
 	private List<List<MMLEvent>> mmlParts;
 	private int totalTick[];
 	private int program = 0;
-	private String name;
+	private String trackName;
 	private int panpot = 64;
 	
 	public MMLTrack(String mml) {
@@ -47,33 +47,10 @@ public class MMLTrack extends MMLTools {
 		};
 		
 		for (int i = 0; i < mml.length; i++) {
-			parseMMLPart(mml[i], i);
+			MMLEventParser parser = new MMLEventParser("");
+			mmlParts.add( parser.parseMML(mml[i]) );
+			totalTick[i] = parser.getTotalTick();
 		}
-	}
-	
-	private void parseMMLPart(String mml, int index) {
-		MMLEventParser parser = new MMLEventParser("");
-		if (index < mmlParts.size()) {
-			mmlParts.set( index, parser.parseMML(mml) );
-		} else {
-			mmlParts.add( parser.parseMML(mml) );
-		}
-		totalTick[index] = parser.getTotalTick();
-	}
-
-	public void setMelody(String mml) {
-		parseMMLPart(mml, 0);
-		this.mml_melody = mml;
-	}
-	
-	public void setChord1(String mml) {
-		parseMMLPart(mml, 1);
-		this.mml_chord1 = mml;
-	}
-	
-	public void setChord2(String mml) {
-		parseMMLPart(mml, 2);
-		this.mml_chord2 = mml;
 	}
 
 	public void setProgram(int program) {
@@ -84,12 +61,12 @@ public class MMLTrack extends MMLTools {
 		return this.program;
 	}
 	
-	public void setName(String name) {
-		this.name = name;
+	public void setTrackName(String name) {
+		this.trackName = name;
 	}
 	
-	public String getName() {
-		return this.name;
+	public String getTrackName() {
+		return this.trackName;
 	}
 
 	public void setPanpot(int panpot) {

@@ -63,6 +63,8 @@ public class TrackPropertyDialog extends JDialog {
 		
 		trackNameField = new JTextField();
 		trackNameField.setBounds(100, 36, 200, 19);
+		// TODO: 日本語を入力したとき、再生時にCPU負荷がかかる問題あり.
+		trackNameField.setEditable(false);
 		contentPanel.add(trackNameField);
 		trackNameField.setColumns(10);
 		
@@ -119,7 +121,7 @@ public class TrackPropertyDialog extends JDialog {
 	}
 	
 	private void saveProperty() {
-		track.setName( trackNameField.getText() );
+		track.setTrackName( trackNameField.getText() );
 		track.setPanpot( panpotSlider.getValue() );
 		notify.setTrackProperty(track);
 	}
@@ -133,7 +135,7 @@ public class TrackPropertyDialog extends JDialog {
 	
 	public void showDialog(MMLTrack track) { 
 		this.track = track;
-		trackNameField.setText(track.getName());
+		trackNameField.setText(track.getTrackName());
 		panpotSlider.setValue(track.getPanpot());
 		setLocationRelativeTo(null);
 		setVisible(true);
