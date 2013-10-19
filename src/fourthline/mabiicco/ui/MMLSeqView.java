@@ -16,6 +16,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JViewport;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mmlTools.parser.MMLTempoEvent;
@@ -30,7 +32,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class MMLSeqView extends JPanel implements INotifyMMLTrackProperty {
+public class MMLSeqView extends JPanel implements INotifyMMLTrackProperty, ChangeListener {
 
 	/**
 	 * 
@@ -95,7 +97,7 @@ public class MMLSeqView extends JPanel implements INotifyMMLTrackProperty {
 
 		// MMLTrackView (tab) - SOUTH
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-
+		tabbedPane.addChangeListener(this);
 		tabbedPane.setPreferredSize(new Dimension(0, 180));
 		add(tabbedPane, BorderLayout.SOUTH);
 
@@ -368,5 +370,16 @@ public class MMLSeqView extends JPanel implements INotifyMMLTrackProperty {
 	
 	public void inputClipBoardAction() {
 		dialog.showDialog(getNewTrackName());
+	}
+
+	@Override
+	public void stateChanged(ChangeEvent e) {
+		if (e.getSource() == tabbedPane) {
+			MMLTrackView view = (MMLTrackView) tabbedPane.getSelectedComponent();
+			if (view != null) {
+				int channel = view.getChannel();
+				keyboardView.setChannel(channel);
+			}
+		}
 	}
 }
