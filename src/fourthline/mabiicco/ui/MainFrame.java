@@ -193,6 +193,17 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 				enableNoplayItems();
 			}
 		});
+		
+		JMenuItem menuItem_2 = new JMenuItem("一時停止");
+		menuItem_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				MabiDLS.getInstance().getSequencer().stop();
+				mmlSeqView.pauseTickPosition();
+				enableNoplayItems();
+			}
+		});
+		menuItem_2.setIcon(new ImageIcon(MainFrame.class.getResource("/img/pause.png")));
+		playMenu.add(menuItem_2);
 		stopMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
 		playMenu.add(stopMenuItem);
 		contentPane = new JPanel();
@@ -246,6 +257,12 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		playButton.setToolTipText("再生");
 		playButton.setIcon(new ImageIcon(MainFrame.class.getResource("/img/playButton.png")));
 		playButton.setFocusable(false);
+		
+		JButton pauseButton = new JButton("");
+		pauseButton.setIcon(new ImageIcon(MainFrame.class.getResource("/img/pause.png")));
+		pauseButton.setToolTipText("一時停止");
+		pauseButton.setFocusable(false);
+		toolBar.add(pauseButton);
 
 		JButton stopButton = new JButton("");
 		toolBar.add(stopButton);
@@ -263,6 +280,13 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 			public void actionPerformed(ActionEvent arg0) {
 				mmlSeqView.startSequence();
 				disableNoplayItems();
+			}
+		});
+		pauseButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				MabiDLS.getInstance().getSequencer().stop();
+				mmlSeqView.pauseTickPosition();
+				enableNoplayItems();
 			}
 		});
 		startPositionButton.addActionListener(new ActionListener() {

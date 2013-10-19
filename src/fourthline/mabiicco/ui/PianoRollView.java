@@ -127,6 +127,10 @@ public class PianoRollView extends JPanel implements IMMLView {
 	public long convertXtoTick(int x) {
 		return (x * wideScale);
 	}
+	
+	public int convertTicktoX(long tick) {
+		return (int)(tick / wideScale);
+	}
 
 	public long getSequencePossition() {
 		return sequencePosition;

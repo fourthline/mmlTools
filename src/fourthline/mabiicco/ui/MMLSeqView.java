@@ -326,9 +326,14 @@ public class MMLSeqView extends JPanel implements INotifyMMLTrackProperty {
 	private void setViewPosition(int x) {
 		JViewport viewport = scrollPane.getViewport();
 		Point point = viewport.getViewPosition();
+		Dimension dim = viewport.getExtentSize();
+		double x1 = point.getX();
+		double x2 = x1 + dim.getWidth();
 
-		point.setLocation(x, point.getY());
-		viewport.setViewPosition(point);
+		if ( (x < x1) || (x > x2) ) {
+			point.setLocation(x, point.getY());
+			viewport.setViewPosition(point);
+		}
 	}
 	
 	/**
@@ -337,7 +342,7 @@ public class MMLSeqView extends JPanel implements INotifyMMLTrackProperty {
 	public void resetViewPosition() {
 		setViewPosition(pianoRollView.getSequenceX());
 	}
-	
+
 	/**
 	 * シーケンスの現在位置を先頭に戻す
 	 */
@@ -350,6 +355,15 @@ public class MMLSeqView extends JPanel implements INotifyMMLTrackProperty {
 			sequencer.setTickPosition(0);
 			sequencer.setTempoInBPM(120);
 		}
+	}
+	
+	/**
+	 * 現在のTickにシーケンスを設定する。（一時停止用）
+	 */
+	public void pauseTickPosition() {
+		Sequencer sequencer = MabiDLS.getInstance().getSequencer();
+		int x = pianoRollView.convertTicktoX( sequencer.getTickPosition() );
+		pianoRollView.setSequenceX(x);
 	}
 	
 	public void inputClipBoardAction() {
