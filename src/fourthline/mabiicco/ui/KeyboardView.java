@@ -13,11 +13,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 
-import javax.swing.JPanel;
-
 import fourthline.mabiicco.midi.MabiDLS;
 
-public class KeyboardView extends JPanel implements IMMLView {
+public class KeyboardView extends AbstractMMLView {
 
 	/**
 	 * 
@@ -38,7 +36,8 @@ public class KeyboardView extends JPanel implements IMMLView {
 		this.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				playNote( e.getY() );
+				int note = convertY2Note( e.getY() );
+				playNote( note );
 			}
 			@Override
 			public void mouseReleased(MouseEvent e) {
@@ -48,7 +47,8 @@ public class KeyboardView extends JPanel implements IMMLView {
 		this.addMouseMotionListener(new MouseMotionAdapter() {
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				playNote( e.getY() );
+				int note = convertY2Note( e.getY() );
+				playNote( note );
 			}
 		});
 	}
@@ -104,7 +104,7 @@ public class KeyboardView extends JPanel implements IMMLView {
 		if ( isWhiteKey(playNote) ) {
 			x += 20;
 		}
-		int y = getHeight() - ((playNote -11) * IMMLView.HEIGHT) + yAdd[playNote%12];
+		int y = getHeight() - ((playNote -11) * AbstractMMLView.HEIGHT) + yAdd[playNote%12];
 		g.setColor(Color.RED);
 		g.fillOval(x, y, 4, 4);
 	}
@@ -114,7 +114,7 @@ public class KeyboardView extends JPanel implements IMMLView {
 		// ド～シのしろ鍵盤
 		g.setColor(new Color(0.3f, 0.3f, 0.3f));
 
-		int startY = 12 * IMMLView.HEIGHT * pos;
+		int startY = 12 * AbstractMMLView.HEIGHT * pos;
 		int y = startY;
 		for (int i = 0; i < white_wigth.length; i++) {
 			g.drawRect(0, y, 40, white_wigth[i]);
@@ -134,10 +134,10 @@ public class KeyboardView extends JPanel implements IMMLView {
 			y = (black_posIndex[i]*10+5)+startY+posOffset[i];
 
 			g.setColor(new Color(0.0f, 0.0f, 0.0f));
-			g.fillRect(0, y, 20, IMMLView.HEIGHT);
+			g.fillRect(0, y, 20, AbstractMMLView.HEIGHT);
 
 			g.setColor(new Color(0.3f, 0.3f, 0.3f));
-			g.drawRect(0, y, 20, IMMLView.HEIGHT);
+			g.drawRect(0, y, 20, AbstractMMLView.HEIGHT);
 		}
 
 		// グリッド
@@ -148,28 +148,20 @@ public class KeyboardView extends JPanel implements IMMLView {
 		// オクターブ
 		char o_char[] = { 'o', posText };
 		g.setFont(new Font("Arial", Font.PLAIN, 12));
-		y = startY + (12 * IMMLView.HEIGHT);
+		y = startY + (12 * AbstractMMLView.HEIGHT);
 		g.drawChars(o_char, 0, o_char.length, 42, y);
 	}
 
-	private int convertY2Note(int y) {
-		int note = -1;
-		if (y >= 0) {
-			note = (9*12-(y/6)) -1 +12;
-		}
 
-		return note;
-	}
-
-	private void playNote(int y) {
-		playNote = convertY2Note( y );
+	public void playNote(int note) {
+		playNote = note + 12;
 
 		MabiDLS.getInstance().playNote(playNote, channel);
 		
 		repaint();
 	}
 
-	private void offNote() {
+	public void offNote() {
 		playNote = -1;
 		MabiDLS.getInstance().playNote(playNote, channel);
 		

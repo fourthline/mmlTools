@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
+import fourthline.mmlTools.MMLTrack;
+
 /**
  * まきまびしーくさんのファイルフォーマットを扱います.
  * @author fourthline

@@ -20,7 +20,7 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JSlider;
 
-import fourthline.mmlTools.parser.MMLTrack;
+import fourthline.mmlTools.MMLTrack;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;

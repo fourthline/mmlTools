@@ -2,15 +2,15 @@
  * Copyright (C) 2013 たんらる
  */
 
-package fourthline.mmlTools.parser;
+package fourthline.mmlTools;
 
 public class MMLTempoEvent extends MMLEvent {
 
 	private int tempo;
 	public static final int META = 0x51;  /* MIDI meta: tempo */
 	
-	public MMLTempoEvent(int tempo) {
-		super(MMLEvent.TEMPO);
+	public MMLTempoEvent(int tempo, int tickOffset) {
+		super(tickOffset);
 		
 		this.tempo = tempo;
 	}

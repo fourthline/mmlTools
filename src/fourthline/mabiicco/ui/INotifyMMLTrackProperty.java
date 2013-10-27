@@ -4,7 +4,7 @@
 
 package fourthline.mabiicco.ui;
 
-import fourthline.mmlTools.parser.MMLTrack;
+import fourthline.mmlTools.MMLTrack;
 
 public interface INotifyMMLTrackProperty {
 	public void setTrackProperty(MMLTrack track);

@@ -35,7 +35,7 @@ import javax.swing.JTextField;
 
 import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.MabiDLS;
-import fourthline.mmlTools.parser.MMLTrack;
+import fourthline.mmlTools.MMLTrack;
 
 public class MMLInputDialog extends JDialog {
 

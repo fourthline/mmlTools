@@ -12,14 +12,14 @@ import java.util.Properties;
 
 import javax.sound.midi.*;
 
-import fourthline.mmlTools.parser.MMLTempoEvent;
+import fourthline.mmlTools.MMLTempoEvent;
 
 public final class MabiDLS {
 	private static final MabiDLS instance = new MabiDLS();
 	private Synthesizer synthesizer;
 	private Sequencer sequencer;
-	private MidiChannel[] channel;
-	private InstClass[] insts;
+	private MidiChannel channel[];
+	private InstClass insts[];
 	private Properties instProperties;
 	
 	private static final String INST_PROPERTIESFILE = "instrument.properties";
@@ -181,7 +181,24 @@ public final class MabiDLS {
 			midiChannel.programChange(program);
 		}
 	}
+	
+	/**
+	 * すべてのチャンネルのパンポット設定を中央に戻します. 
+	 */
+	public void clearAllChannelPanpot() {
+		for (int i = 0; i < channel.length; i++) {
+			channel[i].controlChange(10, 64);
+		}
+	}
 
+	/**
+	 * 指定したチャンネルのパンポットを設定します.
+	 * @param channel
+	 * @param panpot
+	 */
+	public void setChannelPanpot(int ch_num, int panpot) {
+		channel[ch_num].controlChange(10, panpot);
+	}
 }
 
 

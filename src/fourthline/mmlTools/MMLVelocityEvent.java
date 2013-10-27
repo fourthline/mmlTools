@@ -2,24 +2,26 @@
  * Copyright (C) 2013 たんらる
  */
 
-package fourthline.mmlTools.parser;
+package fourthline.mmlTools;
 
 public class MMLVelocityEvent extends MMLEvent {
+	
 
 	private int velocity;
 	
-	public MMLVelocityEvent(int velocity) {
-		super(MMLEvent.VELOCITY);
+	public MMLVelocityEvent(int volumn, int tickOffset) {
+		super(tickOffset);
 		
-		this.velocity = velocity;
+		this.velocity = volumn;
 	}
-
+	
 	public int getVelocity() {
 		return this.velocity;
 	}
 
 	@Override
 	public String toString() {
-		return "[Velocity] " + velocity;
+		return "[Velocity] " + this.velocity;
 	}
+
 }

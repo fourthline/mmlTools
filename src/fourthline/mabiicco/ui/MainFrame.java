@@ -20,6 +20,9 @@ import javax.swing.JButton;
 import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mabiicco.midi.INotifyTrackEnd;
 import fourthline.mabiicco.midi.MabiDLS;
+import fourthline.mabiicco.ui.editor.MMLEditor;
+import fourthline.mabiicco.ui.editor.NoteAlign;
+import fourthline.mmlTools.MMLTrack;
 import fourthline.mmlTools.parser.*;
 
 import java.awt.event.ActionListener;
@@ -48,16 +51,37 @@ import javax.swing.JToolBar;
 
 import java.awt.Color;
 
+import javax.swing.JComboBox;
 
-public class MainFrame extends JFrame implements ComponentListener, INotifyTrackEnd {
+
+public class MainFrame extends JFrame implements ComponentListener, INotifyTrackEnd, ActionListener {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -7484797594534384422L;
+	
+	// action commands
+	private static final String VIEW_EXPAND = "viewExpand";
+	private static final String VIEW_REDUCE = "viewReduce";
+	private static final String PLAY = "play";
+	private static final String STOP = "stop";
+	private static final String PAUSE = "pause";
+	private static final String FILE_OPEN = "fileOpen";
+	private static final String NEW_FILE = "newFile";
+	private static final String RELOAD_FILE = "reloadFile";
+	private static final String QUIT = "quit";
+	private static final String ADD_TRACK = "addTrack";
+	private static final String REMOVE_TRACK = "removeTrack";
+	private static final String TRACK_PROPERTY = "trackProperty";
+	private static final String SET_START_POSITION = "setStartPosition";
+	private static final String INPUT_FROM_CLIPBOARD = "inputFromClipboard";
+	
 	private JPanel contentPane;
 	private JTextField statusField;
 	private MMLSeqView mmlSeqView;
+	@SuppressWarnings("rawtypes")
+	private JComboBox noteTypeSelect;
 
 	private final String DEFAULT_TITLE = " * MabiIcco *";
 
@@ -71,6 +95,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 	/**
 	 * Create the frame.
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public MainFrame() {
 		setTitleAndFile(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -83,47 +108,34 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		JMenu fileMenu = new JMenu("ファイル");
 		fileMenu.setMnemonic('F');
 		menuBar.add(fileMenu);
+		
+		JMenuItem newFileMenuItem = new JMenuItem("新規作成");
+		newFileMenuItem.setIcon(new ImageIcon(MainFrame.class.getResource("/img/file.png")));
+		noplayFunctions.add(newFileMenuItem);
+		newFileMenuItem.addActionListener(this);
+		newFileMenuItem.setActionCommand(NEW_FILE);
+		newFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK));
+		fileMenu.add(newFileMenuItem);
 
 		JMenuItem fileOpenMenuItem = new JMenuItem("開く");
 		fileOpenMenuItem.setIcon(new ImageIcon(MainFrame.class.getResource("/img/open.png")));
 		noplayFunctions.add(fileOpenMenuItem);
 		fileOpenMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
-		fileOpenMenuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				openMMLFileAction();
-			}
-		});
-
-		JMenuItem menuItem = new JMenuItem("新規作成");
-		menuItem.setIcon(new ImageIcon(MainFrame.class.getResource("/img/file.png")));
-		noplayFunctions.add(menuItem);
-		menuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				newMMLFileAction();
-			}
-		});
-		menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK));
-		fileMenu.add(menuItem);
+		fileOpenMenuItem.addActionListener(this);
+		fileOpenMenuItem.setActionCommand(FILE_OPEN);
 		fileMenu.add(fileOpenMenuItem);
 
 		JMenuItem reloadMenuItem = new JMenuItem("再読み込み");
 		noplayFunctions.add(reloadMenuItem);
-		reloadMenuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				reloadMMLFileAction();
-			}
-		});
+		reloadMenuItem.addActionListener(this);
+		reloadMenuItem.setActionCommand(RELOAD_FILE);
 		fileMenu.add(reloadMenuItem);
 
-		JSeparator separator = new JSeparator();
-		fileMenu.add(separator);
+		fileMenu.add(new JSeparator());
 
 		JMenuItem exitMenuItem = new JMenuItem("終了");
-		exitMenuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				System.exit(0);
-			}
-		});
+		exitMenuItem.addActionListener(this);
+		exitMenuItem.setActionCommand(QUIT);
 		fileMenu.add(exitMenuItem);
 
 		JMenu trackMenu = new JMenu("トラック");
@@ -132,78 +144,53 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		JMenuItem addTrackMenu = new JMenuItem("トラック追加");
 		noplayFunctions.add(addTrackMenu);
 		addTrackMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_MASK));
-		addTrackMenu.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				mmlSeqView.addMMLTrack(null);
-			}
-		});
+		addTrackMenu.addActionListener(this);
+		addTrackMenu.setActionCommand(ADD_TRACK);
 		trackMenu.add(addTrackMenu);
 
 		JMenuItem removeTrackMenu = new JMenuItem("トラック削除");
 		noplayFunctions.add(removeTrackMenu);
-		removeTrackMenu.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				mmlSeqView.removeMMLTrack();
-			}
-		});
+		removeTrackMenu.addActionListener(this);
+		removeTrackMenu.setActionCommand(REMOVE_TRACK);
 		trackMenu.add(removeTrackMenu);
 
-		JSeparator separator_1 = new JSeparator();
-		trackMenu.add(separator_1);
+		trackMenu.add(new JSeparator());
 
-		JMenuItem menuItem_1 = new JMenuItem("トラックプロパティ");
-		noplayFunctions.add(menuItem_1);
-		menuItem_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				trackPropertyAction();
-			}
-		});
-		menuItem_1.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.ALT_MASK));
-		trackMenu.add(menuItem_1);
+		JMenuItem trackPropertyMenu = new JMenuItem("トラックプロパティ");
+		noplayFunctions.add(trackPropertyMenu);
+		trackPropertyMenu.addActionListener(this);
+		trackPropertyMenu.setActionCommand(TRACK_PROPERTY);
+		trackPropertyMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.ALT_MASK));
+		trackMenu.add(trackPropertyMenu);
 		
 		JMenu playMenu = new JMenu("操作");
 		menuBar.add(playMenu);
 		
 		JMenuItem headPlayPositionMenuItem = new JMenuItem("先頭へ戻す");
 		headPlayPositionMenuItem.setIcon(new ImageIcon(MainFrame.class.getResource("/img/head.png")));
-		headPlayPositionMenuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				mmlSeqView.setStartPosition();
-			}
-		});
+		headPlayPositionMenuItem.addActionListener(this);
+		headPlayPositionMenuItem.setActionCommand(SET_START_POSITION);
 		headPlayPositionMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0));
 		playMenu.add(headPlayPositionMenuItem);
 		
 		JMenuItem playMenuItem = new JMenuItem("再生");
 		playMenuItem.setIcon(new ImageIcon(MainFrame.class.getResource("/img/playButton.png")));
-		playMenuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				mmlSeqView.startSequence();
-				disableNoplayItems();
-			}
-		});
+		playMenuItem.addActionListener(this);
+		playMenuItem.setActionCommand(PLAY);
 		playMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
 		playMenu.add(playMenuItem);
 		
 		JMenuItem stopMenuItem = new JMenuItem("停止");
 		stopMenuItem.setIcon(new ImageIcon(MainFrame.class.getResource("/img/stop.png")));
-		stopMenuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				MabiDLS.getInstance().getSequencer().stop();
-				enableNoplayItems();
-			}
-		});
+		stopMenuItem.addActionListener(this);
+		stopMenuItem.setActionCommand(STOP);
 		
-		JMenuItem menuItem_2 = new JMenuItem("一時停止");
-		menuItem_2.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				MabiDLS.getInstance().getSequencer().stop();
-				mmlSeqView.pauseTickPosition();
-				enableNoplayItems();
-			}
-		});
-		menuItem_2.setIcon(new ImageIcon(MainFrame.class.getResource("/img/pause.png")));
-		playMenu.add(menuItem_2);
+		JMenuItem pauseMenuItem = new JMenuItem("一時停止");
+		pauseMenuItem.addActionListener(this);
+		pauseMenuItem.setActionCommand(PAUSE);
+		pauseMenuItem.setIcon(new ImageIcon(MainFrame.class.getResource("/img/pause.png")));
+		playMenu.add(pauseMenuItem);
+		
 		stopMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
 		playMenu.add(stopMenuItem);
 		contentPane = new JPanel();
@@ -223,11 +210,8 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		newFileButton.setIcon(new ImageIcon(MainFrame.class.getResource("/img/file.png")));
 		noplayFunctions.add(newFileButton);
 		newFileButton.setFocusable(false);
-		newFileButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				newMMLFileAction();
-			}
-		});
+		newFileButton.addActionListener(this);
+		newFileButton.setActionCommand(NEW_FILE);
 		toolBar.add(newFileButton);
 
 		JButton openFileButton = new JButton("");
@@ -235,11 +219,8 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		openFileButton.setIcon(new ImageIcon(MainFrame.class.getResource("/img/open.png")));
 		noplayFunctions.add(openFileButton);
 		openFileButton.setFocusable(false);
-		openFileButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				openMMLFileAction();
-			}
-		});
+		openFileButton.addActionListener(this);
+		openFileButton.setActionCommand(FILE_OPEN);
 		toolBar.add(openFileButton);
 
 		JSeparator separatorT1 = new JToolBar.Separator();
@@ -251,17 +232,23 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		startPositionButton.setToolTipText("先頭へ戻す");
 		startPositionButton.setIcon(new ImageIcon(MainFrame.class.getResource("/img/head.png")));
 		startPositionButton.setFocusable(false);
+		startPositionButton.addActionListener(this);
+		startPositionButton.setActionCommand(SET_START_POSITION);
 
 		JButton playButton = new JButton("");
 		toolBar.add(playButton);
 		playButton.setToolTipText("再生");
 		playButton.setIcon(new ImageIcon(MainFrame.class.getResource("/img/playButton.png")));
 		playButton.setFocusable(false);
+		playButton.addActionListener(this);
+		playButton.setActionCommand(PLAY);
 		
 		JButton pauseButton = new JButton("");
 		pauseButton.setIcon(new ImageIcon(MainFrame.class.getResource("/img/pause.png")));
 		pauseButton.setToolTipText("一時停止");
 		pauseButton.setFocusable(false);
+		pauseButton.addActionListener(this);
+		pauseButton.setActionCommand(PAUSE);
 		toolBar.add(pauseButton);
 
 		JButton stopButton = new JButton("");
@@ -269,31 +256,8 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		stopButton.setIcon(new ImageIcon(MainFrame.class.getResource("/img/stop.png")));
 		stopButton.setToolTipText("停止");
 		stopButton.setFocusable(false);
-
-		stopButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				MabiDLS.getInstance().getSequencer().stop();
-				enableNoplayItems();
-			}
-		});
-		playButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				mmlSeqView.startSequence();
-				disableNoplayItems();
-			}
-		});
-		pauseButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				MabiDLS.getInstance().getSequencer().stop();
-				mmlSeqView.pauseTickPosition();
-				enableNoplayItems();
-			}
-		});
-		startPositionButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				mmlSeqView.setStartPosition();
-			}
-		});
+		stopButton.addActionListener(this);
+		stopButton.setActionCommand(STOP);
 
 		JSeparator separatorT2 = new JToolBar.Separator();
 		separatorT2.setForeground(Color.DARK_GRAY);
@@ -302,13 +266,30 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		JButton inputClipButton = new JButton("クリップボードから入力");
 		noplayFunctions.add(inputClipButton);
 		inputClipButton.setFocusable(false);
-		inputClipButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				// 現在のトラックにMMLを設定する。
-				mmlSeqView.inputClipBoardAction();
-			}
-		});
+		inputClipButton.addActionListener(this);
+		inputClipButton.setActionCommand(INPUT_FROM_CLIPBOARD);
 		toolBar.add(inputClipButton);
+
+		JSeparator separatorT3 = new JToolBar.Separator();
+		separatorT3.setForeground(Color.DARK_GRAY);
+		toolBar.add(separatorT3);
+
+		// ビューの拡大/縮小ツールボタン
+		JButton expandButton = new JButton("拡大");
+		expandButton.setFocusable(false);
+		expandButton.addActionListener(this);
+		expandButton.setActionCommand("viewExpand");
+		toolBar.add(expandButton);
+
+		JButton reduceButton = new JButton("縮小");
+		reduceButton.setFocusable(false);
+		reduceButton.addActionListener(this);
+		reduceButton.setActionCommand("viewReduce");
+		toolBar.add(reduceButton);
+
+		noteTypeSelect = new JComboBox(MMLEditor.createAlignList());
+		noteTypeSelect.setFocusable(false);
+		toolBar.add(noteTypeSelect);
 
 		mmlSeqView = new MMLSeqView();
 		contentPane.add(mmlSeqView, BorderLayout.CENTER);
@@ -327,6 +308,10 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		trackPropertyDialog = new TrackPropertyDialog(
 				this,
 				mmlSeqView);
+		
+		noteTypeSelect.addActionListener(this);
+		noteTypeSelect.setSelectedIndex(MMLEditor.DEFAULT_ALIGN_INDEX);
+		setEditAlign();
 	}
 
 	private void setTitleAndFile(File file) {
@@ -445,6 +430,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 
 	@Override
 	public void trackEndNotify() {
+		MabiDLS.getInstance().clearAllChannelPanpot();
 		enableNoplayItems();
 	}
 
@@ -475,6 +461,58 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 			}
 		});
 	}
+	
+	private void setEditAlign() {
+		NoteAlign noteAlign = (NoteAlign) noteTypeSelect.getSelectedItem();
+		int alignTick = noteAlign.getAlign();
+		mmlSeqView.setEditAlign(alignTick);
+	}
 
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		Object source = e.getSource();
+		String command = e.getActionCommand();
+		
+		if (source.equals(noteTypeSelect)) {
+			setEditAlign();
+		} else if (command.equals(VIEW_EXPAND)) {
+			mmlSeqView.expandPianoViewWide();
+			mmlSeqView.repaint();
+		} else if (command.equals(VIEW_REDUCE)) {
+			mmlSeqView.reducePianoViewWide();
+			mmlSeqView.repaint();
+		} else if (command.equals(STOP)) {
+			MabiDLS.getInstance().getSequencer().stop();
+			MabiDLS.getInstance().clearAllChannelPanpot();
+			enableNoplayItems();
+		} else if (command.equals(PAUSE)) {
+			MabiDLS.getInstance().getSequencer().stop();
+			MabiDLS.getInstance().clearAllChannelPanpot();
+			mmlSeqView.pauseTickPosition();
+			enableNoplayItems();
+		} else if (command.equals(FILE_OPEN)) {
+			openMMLFileAction();
+		} else if (command.equals(NEW_FILE)) {
+			newMMLFileAction();
+		} else if (command.equals(RELOAD_FILE)) {
+			reloadMMLFileAction();
+		} else if (command.equals(QUIT)) {
+			System.exit(0);
+		} else if (command.equals(ADD_TRACK)) {
+			mmlSeqView.addMMLTrack(null);
+		} else if (command.equals(REMOVE_TRACK)) {
+			mmlSeqView.removeMMLTrack();
+		} else if (command.equals(TRACK_PROPERTY)) {
+			trackPropertyAction();
+		} else if (command.equals(SET_START_POSITION)) {
+			mmlSeqView.setStartPosition();
+		} else if (command.equals(PLAY)) {
+			mmlSeqView.startSequence();
+			disableNoplayItems();
+		} else if (command.equals(INPUT_FROM_CLIPBOARD)) {
+			// 現在のトラックにMMLを設定する。
+			mmlSeqView.inputClipBoardAction();
+		}
+	}
 
 }

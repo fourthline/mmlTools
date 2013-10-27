@@ -4,8 +4,10 @@
 
 package fourthline.mabiicco.ui;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
+import javax.swing.JToggleButton;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -20,7 +22,7 @@ import javax.swing.event.DocumentListener;
 
 import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.MabiDLS;
-import fourthline.mmlTools.parser.MMLTrack;
+import fourthline.mmlTools.MMLTrack;
 
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -41,6 +43,10 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 
 	private MMLTrack mmlTrack;
 	private int channel;
+
+	private JToggleButton partButton1;
+	private JToggleButton partButton2;
+	private JToggleButton partButton3;
 
 	/**
 	 * Create the panel.
@@ -84,12 +90,12 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		comboBox.addActionListener(this);
 		comboBox.setMaximumRowCount(30);
 
-		JLabel label = new JLabel("メロディー");
+		partButton1 = new JToggleButton("メロディー");
 		GridBagConstraints gbc_label = new GridBagConstraints();
 		gbc_label.insets = new Insets(0, 0, 5, 5);
 		gbc_label.gridx = 1;
 		gbc_label.gridy = 1;
-		centerPanel.add(label, gbc_label);
+		centerPanel.add(partButton1, gbc_label);
 
 		mmlText1 = new JTextField();
 		mmlText1.setEditable(false);
@@ -104,12 +110,12 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		centerPanel.add(mmlText1, gbc_mmlText1);
 		mmlText1.setColumns(10);
 
-		JLabel label_1 = new JLabel("和音1");
+		partButton2 = new JToggleButton("和音1");
 		GridBagConstraints gbc_label_1 = new GridBagConstraints();
 		gbc_label_1.insets = new Insets(0, 0, 5, 5);
 		gbc_label_1.gridx = 1;
 		gbc_label_1.gridy = 3;
-		centerPanel.add(label_1, gbc_label_1);
+		centerPanel.add(partButton2, gbc_label_1);
 
 		mmlText2 = new JTextField();
 		mmlText2.setEditable(false);
@@ -124,12 +130,12 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		centerPanel.add(mmlText2, gbc_mmlText2);
 		mmlText2.setColumns(10);
 
-		JLabel label_2 = new JLabel("和音2");
+		partButton3 = new JToggleButton("和音2");
 		GridBagConstraints gbc_label_2 = new GridBagConstraints();
 		gbc_label_2.insets = new Insets(0, 0, 5, 5);
 		gbc_label_2.gridx = 1;
 		gbc_label_2.gridy = 5;
-		centerPanel.add(label_2, gbc_label_2);
+		centerPanel.add(partButton3, gbc_label_2);
 
 		mmlText3 = new JTextField();
 		mmlText3.setEditable(false);
@@ -143,16 +149,26 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		gbc_mmlText3.gridy = 5;
 		centerPanel.add(mmlText3, gbc_mmlText3);
 		mmlText3.setColumns(10);
+		
+		ButtonGroup bGroup = new ButtonGroup();
+		bGroup.add(partButton1);
+		bGroup.add(partButton2);
+		bGroup.add(partButton3);
+		partButton1.setSelected(true);
 
 		updateComposeRank(null);
 	}
 
-	public MMLTrackView(MMLTrack track, int channel) {
+	public MMLTrackView(MMLTrack track, int channel, ActionListener actionListener) {
 		this();
 
 		this.channel = channel;
 		this.setMMLTrack(track);
 		trackComposeLabel.setText(track.mmlRankFormat());
+
+		partButton1.addActionListener(actionListener);
+		partButton2.addActionListener(actionListener);
+		partButton3.addActionListener(actionListener);
 		
 		MabiDLS.getInstance().changeProgram(track.getProgram(), channel);
 	}
@@ -164,6 +180,24 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 	public int getChannel() {
 		// TODO: 歌パートのときは、チャンネルを変える。
 		return this.channel;
+	}
+	
+	/**
+	 * 選択中のMMLパートのindex値を返します.
+	 * @return
+	 */
+	public int getSelectedMMLPartIndex() {
+		int index = 0;
+		
+		if (partButton1.isSelected()) {
+			index = 0;
+		} else if (partButton2.isSelected()) {
+			index = 1;
+		} else if (partButton3.isSelected()) {
+			index = 2;
+		}
+		
+		return index;
 	}
 
 	@Override

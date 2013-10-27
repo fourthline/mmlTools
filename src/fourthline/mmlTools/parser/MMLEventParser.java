@@ -4,77 +4,81 @@
 
 package fourthline.mmlTools.parser;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
-
+import fourthline.mmlTools.MMLEvent;
+import fourthline.mmlTools.MMLNoteEvent;
+import fourthline.mmlTools.MMLTempoEvent;
+import fourthline.mmlTools.MMLVelocityEvent;
 import fourthline.mmlTools.UndefinedTickException;
 import fourthline.mmlTools.core.MMLTokenizer;
 import fourthline.mmlTools.core.MelodyParser;
 import fourthline.mmlTools.core.ParserWarn3ML;
 
-public class MMLEventParser extends MelodyParser {
+public class MMLEventParser extends MelodyParser implements Iterator<MMLEvent> {
+
+	private MMLTokenizer tokenizer;
 
 	public MMLEventParser(String mml) {
 		super(mml);
-	}
+		tokenizer = new MMLTokenizer(mml);
+	}		
 
-	private int totalTick;
 
-	public int getTotalTick() {
-		return totalTick;
-	}
+	private MMLEvent nextItem = null;
 
-	public List<MMLEvent> parseMML(String mml) {
-		ArrayList<MMLEvent> list = new ArrayList<MMLEvent>();
+	// MMLパース用
+	private boolean hasTie = false;
+	private int totalTick = 0;
+	private MMLNoteEvent prevNoteEvent = null;
 
-		MMLTokenizer tokenizer = new MMLTokenizer(mml);
-		MMLNoteEvent prevNoteEvent = null;
-
-		boolean hasTie = false;
-		totalTick = 0;
-
+	/**
+	 * @return すべてMMLパースが終っているときは、nullを返す.
+	 */
+	private MMLEvent parseNextEvent() {
 		while (tokenizer.hasNext()) {
 			String token = tokenizer.next();
 			char firstC = token.charAt(0);
 			if ( firstC == '&' ) {
-				/* flag ? */
 				hasTie = true;
 				continue;
 			}
 			if ( (firstC == 'v') || (firstC == 'V') ) {
 				try {
-					MMLEvent newEvent = new MMLVelocityEvent(Integer.parseInt( token.substring(1) ));
-					list.add(newEvent);
+					int volumn = Integer.parseInt( token.substring(1) );
+					nextItem = new MMLVelocityEvent(volumn, totalTick);
 				} catch (NumberFormatException e) {
-					break;
+					e.printStackTrace();
 				}
-				continue;
+
+				return nextItem;
 			}
 			if ( (firstC == 't') || (firstC == 'T') ) {
 				try {
-					MMLEvent newEvent = new MMLTempoEvent(Integer.parseInt( token.substring(1) ));
-					list.add(newEvent);
+					int tempo = Integer.parseInt( token.substring(1) );
+					nextItem = new MMLTempoEvent(tempo, totalTick);
 				} catch (NumberFormatException e) {
-					break;
+					e.printStackTrace();
 				}
-				continue;
+
+				return nextItem;
 			}
 			try {
 				int tick = this.noteGT(token);
 				if (MMLTokenizer.isNote(firstC)) {
 					/* tie でかつ、同じノートであれば、前のNoteEventにTickを加算する */
 					if ( (hasTie) && (prevNoteEvent != null) && (prevNoteEvent.getNote() == this.noteNumber)) {
-						prevNoteEvent.addTick(tick);
+						prevNoteEvent.setTick( prevNoteEvent.getTick() + tick);
 					} else {
-						MMLNoteEvent newEvent = new MMLNoteEvent(this.noteNumber, tick);
-						list.add(newEvent);
-						prevNoteEvent = newEvent;
+						nextItem = prevNoteEvent;
+						prevNoteEvent = new MMLNoteEvent(this.noteNumber, tick, totalTick);
 					}
-					hasTie = false;
 
+					hasTie = false;
 					totalTick += tick;
+					if (nextItem != null) {
+						return nextItem;
+					}
 				} 
 			} catch (UndefinedTickException e) {
 				e.printStackTrace();
@@ -84,16 +88,48 @@ public class MMLEventParser extends MelodyParser {
 
 		}
 
-		return list;
+		nextItem = prevNoteEvent;
+		prevNoteEvent = null;
+
+		return nextItem;
 	}
 
-	public static void main(String[] args) {
-		MMLEventParser parser = new MMLEventParser("c4v10d8t120e16r2");
 
-		List<MMLEvent> list = parser.parseMML("a&a&b");
-		for ( Iterator<MMLEvent> i = list.iterator(); i.hasNext(); ) {
-			MMLEvent event = i.next();
-			System.out.println(" * " + event.toString());
+
+	@Override
+	public boolean hasNext() {
+		if (nextItem == null) {
+			parseNextEvent();
 		}
+
+		if (nextItem == null) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	@Override
+	public MMLEvent next() {
+		if (nextItem == null) {
+			return parseNextEvent();
+		}
+
+		if (nextItem != null) {
+			System.out.println(nextItem);
+		} else {
+
+			System.out.println("null");
+		}
+
+		MMLEvent returnEvent = nextItem;
+		nextItem = null;
+
+		return returnEvent;
+	}
+
+	@Override
+	public void remove() {
+		tokenizer.remove();
 	}
 }

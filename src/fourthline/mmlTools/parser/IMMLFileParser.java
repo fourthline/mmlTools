@@ -6,6 +6,8 @@ package fourthline.mmlTools.parser;
 
 import java.io.File;
 
+import fourthline.mmlTools.MMLTrack;
+
 /**
  * MMLファイルのparser
  * @author fourthline
