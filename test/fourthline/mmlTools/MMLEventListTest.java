@@ -2,7 +2,7 @@
 　* Copyright (C) 2013 たんらる
 　*/
 
-package fourthline.mabiicco.mml;
+package fourthline.mmlTools;
 
 import static org.junit.Assert.*;
 
@@ -11,9 +11,6 @@ import java.util.List;
 
 import org.junit.Test;
 
-import fourthline.mmlTools.MMLEventList;
-import fourthline.mmlTools.MMLNoteEvent;
-import fourthline.mmlTools.UndefinedTickException;
 import fourthline.mmlTools.core.MMLTicks;
 
 /**

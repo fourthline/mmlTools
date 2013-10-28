@@ -115,13 +115,6 @@ public class MMLEventParser extends MelodyParser implements Iterator<MMLEvent> {
 			return parseNextEvent();
 		}
 
-		if (nextItem != null) {
-			System.out.println(nextItem);
-		} else {
-
-			System.out.println("null");
-		}
-
 		MMLEvent returnEvent = nextItem;
 		nextItem = null;
 

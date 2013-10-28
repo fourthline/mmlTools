@@ -8,6 +8,7 @@ package fourthline.mabiicco.ui.editor;
 import java.awt.Cursor;
 import java.awt.event.MouseEvent;
 
+import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputListener;
 
 import fourthline.mabiicco.ui.KeyboardView;
@@ -21,8 +22,8 @@ public class MMLEditor implements MouseInputListener {
 
 	// ノートの編集モード
 	private final int EDIT_NONE = 0;
-	private final int EDIT_NOTE_INSERT = 1;      // ノート挿入
-	private final int EDIT_NOTE_SLIDE = 2;  // ノート移動
+	private final int EDIT_NOTE_INSERT = 1; // ノート挿入
+	private final int EDIT_NOTE_SLIDE  = 2; // ノート移動
 	private final int EDIT_NOTE_LENGTH = 3; // ノートの長さ変更
 	private int editMode = EDIT_NONE;
 
@@ -99,7 +100,7 @@ public class MMLEditor implements MouseInputListener {
 	 * @param note
 	 * @param tickOffset
 	 */
-	public void startEditAction(int note, int tickOffset) {
+	private void startEditAction(int note, int tickOffset) {
 		int alignedTickOffset = tickOffset - (tickOffset % editAlign);
 
 		MMLNoteEvent noteEvent = eventList.searchOnTickOffset( tickOffset );
@@ -128,7 +129,7 @@ public class MMLEditor implements MouseInputListener {
 	 * @param note
 	 * @param tickOffset
 	 */
-	public void updateEditAction(int note, int tickOffset) {
+	private void updateEditAction(int note, int tickOffset) {
 		MMLNoteEvent editNote = pianoRollView.getEditNote();
 
 		if (editNote == null) {
@@ -164,7 +165,7 @@ public class MMLEditor implements MouseInputListener {
 		pianoRollView.repaint();
 	}
 
-	public void editApply() {
+	private void editApply() {
 		MMLNoteEvent editNote = pianoRollView.getEditNote();
 
 		if (editNote == null) {
@@ -188,7 +189,7 @@ public class MMLEditor implements MouseInputListener {
 		pianoRollView.repaint();
 	}
 
-	public void updatePretarget(int note, int tickOffset) {
+	private void updatePretarget(int note, int tickOffset) {
 		Cursor cursor;
 
 		int preEditMode = decisionEditMode(note, tickOffset);
@@ -218,7 +219,7 @@ public class MMLEditor implements MouseInputListener {
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		if (javax.swing.SwingUtilities.isLeftMouseButton(e)) {
+		if (SwingUtilities.isLeftMouseButton(e)) {
 			int note = pianoRollView.convertY2Note( e.getY() );
 			int tickOffset = (int)pianoRollView.convertXtoTick( e.getX() );
 			startEditAction(note, tickOffset);
@@ -227,14 +228,14 @@ public class MMLEditor implements MouseInputListener {
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		if (javax.swing.SwingUtilities.isLeftMouseButton(e)) {
+		if (SwingUtilities.isLeftMouseButton(e)) {
 			editApply();
 		}
 	}
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		if (javax.swing.SwingUtilities.isLeftMouseButton(e)) {
+		if (SwingUtilities.isLeftMouseButton(e)) {
 			int note = pianoRollView.convertY2Note( e.getY() );
 			int tickOffset = (int)pianoRollView.convertXtoTick( e.getX() );
 			updateEditAction(note, tickOffset);
