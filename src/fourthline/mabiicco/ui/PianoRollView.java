@@ -51,7 +51,7 @@ public class PianoRollView extends AbstractMMLView {
 	// 描画位置判定用 (tick base)
 	private double startViewTick;
 	private double endViewTick;
-	
+
 	// 編集中のノートイベント
 	private MMLNoteEvent editNote;
 
@@ -111,7 +111,7 @@ public class PianoRollView extends AbstractMMLView {
 		setSequenceX(0);
 		createSequenceThread();
 	}
-	
+
 	/**
 	 * ピアノロール上で編集を行うためのマウス入力のイベントリスナーを登録します.
 	 * @param listener  編集時処理を行うMMLEditor.
@@ -131,15 +131,15 @@ public class PianoRollView extends AbstractMMLView {
 		super.setPreferredSize(new Dimension(width, 649));
 		revalidate();
 	}
-	
+
 	public void setEditNote(MMLNoteEvent note) {
 		editNote = note;
 	}
-	
+
 	public MMLNoteEvent getEditNote() {
 		return editNote;
 	}
-	
+
 	/**
 	 * 現在のトラックの内容に合わせた幅に設定します.
 	 */
@@ -179,11 +179,11 @@ public class PianoRollView extends AbstractMMLView {
 		// 拡大/縮小したときの表示位置を調整します.
 		Point p = viewport.getViewPosition();
 		p.setLocation(p.getX() * (this.wideScale / scale), p.getY());
-		
+
 		// 拡大/縮小したときの表示幅を調整します.
 		this.wideScale = scale;
 		updateViewWidthTrackLength();
-		
+
 		viewport.setViewPosition(p);
 	}
 
@@ -224,10 +224,10 @@ public class PianoRollView extends AbstractMMLView {
 	 * 現在の描画位置 tick値を更新します.
 	 */
 	private void updateViewTick() {
-		Point point = viewport.getViewPosition();
-		Dimension dim = viewport.getExtentSize();
-		startViewTick = point.getX() * wideScale;
-		endViewTick = startViewTick + (dim.getWidth() * wideScale);
+		double x = viewport.getViewPosition().getX();
+		double width = viewport.getExtentSize().getWidth();
+		startViewTick = convertXtoTick((int)x);
+		endViewTick = convertXtoTick((int)(x + width));
 	}
 
 	/**
@@ -239,7 +239,7 @@ public class PianoRollView extends AbstractMMLView {
 		super.paint(g);
 
 		updateViewTick();
-		
+
 		// FIXME: しぼったほうがいいかも？
 		updateViewWidthTrackLength();
 
@@ -333,13 +333,12 @@ public class PianoRollView extends AbstractMMLView {
 		}
 
 		Color color = Color.RED;
-		int x1 = (int)(position / wideScale);
-		int x2 = (int)(position / wideScale);
+		int x = convertTicktoX(position);
 		int y1 = 0;
 		int y2 = getHeight();
 
 		g.setColor(color);
-		g.drawLine(x1, y1, x2, y2);
+		g.drawLine(x, y1, x, y2);
 	}
 
 	/**
@@ -347,15 +346,18 @@ public class PianoRollView extends AbstractMMLView {
 	 */
 	private void paintMeasure(Graphics2D g) {
 		int width = (int)convertXtoTick(getWidth());
-		int sect = 96;
+		try {
+			int sect = MMLTicks.getTick("4");
+			g.setColor(barBorder);
 
-		g.setColor(barBorder);
-
-		for (int i = 0; i < width; i += sect) {
-			int x = convertTicktoX(i);
-			int y1 = 0;
-			int y2 = getHeight();
-			g.drawLine(x, y1, x, y2);
+			for (int i = 0; i < width; i += sect) {
+				int x = convertTicktoX(i);
+				int y1 = 0;
+				int y2 = getHeight();
+				g.drawLine(x, y1, x, y2);
+			}
+		} catch (UndefinedTickException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -482,19 +484,23 @@ public class PianoRollView extends AbstractMMLView {
 			 */
 			private void paintRuler(Graphics2D g) {
 				int width = getWidth();
-				int sect = 96 * 4;
+				try {
+					g.setColor(beatBorder);
+					int sect = convertTicktoX( MMLTicks.getTick("1") );
+					int count = 0;
+					for (int i = 0; i < width; i += sect) {
+						int x = i;
+						int y1 = 0;
+						int y2 = getHeight();
+						g.drawLine(x, y1, x, y2);
 
-				g.setColor(beatBorder);
+						String s = "" + (count++);
+						g.drawChars( s.toCharArray(), 0, s.length(), x+2, y1+10);
+					}
 
-				int count = 0;
-				for (int i = 0; i < (width*wideScale); i += sect) {
-					int x = convertTicktoX(i);
-					int y1 = 0;
-					int y2 = getHeight();
-					g.drawLine(x, y1, x, y2);
-
-					String s = "" + (count++);
-					g.drawChars( s.toCharArray(), 0, s.length(), x+2, y1+10);
+				} catch (UndefinedTickException e) {
+					e.printStackTrace();
+					return;
 				}
 			}
 

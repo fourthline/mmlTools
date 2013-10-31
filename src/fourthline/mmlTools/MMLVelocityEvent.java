@@ -9,10 +9,10 @@ public class MMLVelocityEvent extends MMLEvent {
 
 	private int velocity;
 	
-	public MMLVelocityEvent(int volumn, int tickOffset) {
+	public MMLVelocityEvent(int velocity, int tickOffset) {
 		super(tickOffset);
 		
-		this.velocity = volumn;
+		this.velocity = velocity;
 	}
 	
 	public int getVelocity() {
@@ -22,6 +22,11 @@ public class MMLVelocityEvent extends MMLEvent {
 	@Override
 	public String toString() {
 		return "[Velocity] " + this.velocity;
+	}
+
+	@Override
+	public String toMMLString() {
+		return "v" + velocity;
 	}
 
 }

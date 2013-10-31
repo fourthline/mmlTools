@@ -15,142 +15,158 @@ import fourthline.mmlTools.UndefinedTickException;
  * @author たんらる
  */
 public class MMLTicks {
-//	private static String resourceName = "tick";
+	
+	/**
+	 * For MML text -> tick
+	 */
 	private static HashMap<String, Integer> tickTable = new HashMap<String, Integer>();
+
+	/**
+	 * For tick -> MML text
+	 */
+	private static HashMap<Integer, String> tickInvTable = new HashMap<Integer, String>();
 	
 	
 	static {
-		tickTable.put("1", 384);
-		tickTable.put("2", 192);
-		tickTable.put("3", 128);
-		tickTable.put("4", 96);
-		tickTable.put("5", 76);
-		tickTable.put("6", 64);
-		tickTable.put("7", 54);
-		tickTable.put("8", 48);
-		tickTable.put("9", 42);
-		tickTable.put("10", 38);
-		tickTable.put("11", 34);
-		tickTable.put("12", 32);
-		tickTable.put("13", 29);
-		tickTable.put("14", 27);
-		tickTable.put("15", 25);
-		tickTable.put("16", 24);
-		tickTable.put("17", 22);
-		tickTable.put("18", 21);
-		tickTable.put("19", 20);
-		tickTable.put("20", 19);
-		tickTable.put("21", 18);
-		tickTable.put("22", 17);
-		tickTable.put("23", 16);
-		tickTable.put("24", 16);
-		tickTable.put("25", 15);
-		tickTable.put("26", 14);
-		tickTable.put("27", 14);
-		tickTable.put("28", 13);
-		tickTable.put("29", 13);
-		tickTable.put("30", 12);
-		tickTable.put("31", 12);
-		tickTable.put("32", 12);
-		tickTable.put("33", 11);
-		tickTable.put("34", 11);
-		tickTable.put("35", 10);
-		tickTable.put("36", 10);
-		tickTable.put("37", 10);
-		tickTable.put("38", 10);
-		tickTable.put("39", 9);
-		tickTable.put("40", 9);
-		tickTable.put("41", 9);
-		tickTable.put("42", 9);
-		tickTable.put("43", 8);
-		tickTable.put("44", 8);
-		tickTable.put("45", 8);
-		tickTable.put("46", 8);
-		tickTable.put("47", 8);
-		tickTable.put("48", 8);
-		tickTable.put("49", 7);
-		tickTable.put("50", 7);
-		tickTable.put("51", 7);
-		tickTable.put("52", 7);
-		tickTable.put("53", 7);
-		tickTable.put("54", 7);
-		tickTable.put("55", 6);
-		tickTable.put("56", 6);
-		tickTable.put("57", 6);
-		tickTable.put("58", 6);
-		tickTable.put("59", 6);
-		tickTable.put("60", 6);
-		tickTable.put("61", 6);
-		tickTable.put("62", 6);
-		tickTable.put("63", 6);
-		tickTable.put("64", 6);
+		add("1", 384);
+		add("2", 192);
+		add("3", 128);
+		add("4", 96);
+		add("5", 76);
+		add("6", 64);
+		add("7", 54);
+		add("8", 48);
+		add("9", 42);
+		add("10", 38);
+		add("11", 34);
+		add("12", 32);
+		add("13", 29);
+		add("14", 27);
+		add("15", 25);
+		add("16", 24);
+		add("17", 22);
+		add("18", 21);
+		add("19", 20);
+		add("20", 19);
+		add("21", 18);
+		add("22", 17);
+		add("23", 16);
+		add("24", 16);
+		add("25", 15);
+		add("26", 14);
+		add("27", 14);
+		add("28", 13);
+		add("29", 13);
+		add("30", 12);
+		add("31", 12);
+		add("32", 12);
+		add("33", 11);
+		add("34", 11);
+		add("35", 10);
+		add("36", 10);
+		add("37", 10);
+		add("38", 10);
+		add("39", 9);
+		add("40", 9);
+		add("41", 9);
+		add("42", 9);
+		add("43", 8);
+		add("44", 8);
+		add("45", 8);
+		add("46", 8);
+		add("47", 8);
+		add("48", 8);
+		add("49", 7);
+		add("50", 7);
+		add("51", 7);
+		add("52", 7);
+		add("53", 7);
+		add("54", 7);
+		add("55", 6);
+		add("56", 6);
+		add("57", 6);
+		add("58", 6);
+		add("59", 6);
+		add("60", 6);
+		add("61", 6);
+		add("62", 6);
+		add("63", 6);
+		add("64", 6);
 
-		tickTable.put("1.", 576);
-		tickTable.put("2.", 288);
-		tickTable.put("3.", 192);
-		tickTable.put("4.", 144);
-		tickTable.put("5.", 114);
-		tickTable.put("6.", 96);
-		tickTable.put("7.", 81);
-		tickTable.put("8.", 72);
-		tickTable.put("9.", 63);
-		tickTable.put("10.", 57);
-		tickTable.put("11.", 51);
-		tickTable.put("12.", 48);
-		tickTable.put("13.", 43);
-		tickTable.put("14.", 40);
-		tickTable.put("15.", 37);
-		tickTable.put("16.", 36);
-		tickTable.put("17.", 33);
-		tickTable.put("18.", 31);
-		tickTable.put("19.", 30);
-		tickTable.put("20.", 28);
-		tickTable.put("21.", 27);
-		tickTable.put("22.", 25);
-		tickTable.put("23.", 24);
-		tickTable.put("24.", 24);
-		tickTable.put("25.", 22);
-		tickTable.put("26.", 21);
-		tickTable.put("27.", 21);
-		tickTable.put("28.", 19);
-		tickTable.put("29.", 19);
-		tickTable.put("30.", 18);
-		tickTable.put("31.", 18);
-		tickTable.put("32.", 18);
-		tickTable.put("33.", 16);
-		tickTable.put("34.", 16);
-		tickTable.put("35.", 15);
-		tickTable.put("36.", 15);
-		tickTable.put("37.", 15);
-		tickTable.put("38.", 15);
-		tickTable.put("39.", 13);
-		tickTable.put("40.", 13);
-		tickTable.put("41.", 13);
-		tickTable.put("42.", 13);
-		tickTable.put("43.", 12);
-		tickTable.put("44.", 12);
-		tickTable.put("45.", 12);
-		tickTable.put("46.", 12);
-		tickTable.put("47.", 12);
-		tickTable.put("48.", 12);
-		tickTable.put("49.", 10);
-		tickTable.put("50.", 10);
-		tickTable.put("51.", 10);
-		tickTable.put("52.", 10);
-		tickTable.put("53.", 10);
-		tickTable.put("54.", 10);
-		tickTable.put("55.", 9);
-		tickTable.put("56.", 9);
-		tickTable.put("57.", 9);
-		tickTable.put("58.", 9);
-		tickTable.put("59.", 9);
-		tickTable.put("60.", 9);
-		tickTable.put("61.", 9);
-		tickTable.put("62.", 9);
-		tickTable.put("63.", 9);
-		tickTable.put("64.", 9);
+		add("1.", 576);
+		add("2.", 288);
+		add("3.", 192);
+		add("4.", 144);
+		add("5.", 114);
+		add("6.", 96);
+		add("7.", 81);
+		add("8.", 72);
+		add("9.", 63);
+		add("10.", 57);
+		add("11.", 51);
+		add("12.", 48);
+		add("13.", 43);
+		add("14.", 40);
+		add("15.", 37);
+		add("16.", 36);
+		add("17.", 33);
+		add("18.", 31);
+		add("19.", 30);
+		add("20.", 28);
+		add("21.", 27);
+		add("22.", 25);
+		add("23.", 24);
+		add("24.", 24);
+		add("25.", 22);
+		add("26.", 21);
+		add("27.", 21);
+		add("28.", 19);
+		add("29.", 19);
+		add("30.", 18);
+		add("31.", 18);
+		add("32.", 18);
+		add("33.", 16);
+		add("34.", 16);
+		add("35.", 15);
+		add("36.", 15);
+		add("37.", 15);
+		add("38.", 15);
+		add("39.", 13);
+		add("40.", 13);
+		add("41.", 13);
+		add("42.", 13);
+		add("43.", 12);
+		add("44.", 12);
+		add("45.", 12);
+		add("46.", 12);
+		add("47.", 12);
+		add("48.", 12);
+		add("49.", 10);
+		add("50.", 10);
+		add("51.", 10);
+		add("52.", 10);
+		add("53.", 10);
+		add("54.", 10);
+		add("55.", 9);
+		add("56.", 9);
+		add("57.", 9);
+		add("58.", 9);
+		add("59.", 9);
+		add("60.", 9);
+		add("61.", 9);
+		add("62.", 9);
+		add("63.", 9);
+		add("64.", 9);
 	}
 	
+	static private void add(String s, Integer value) {
+		tickTable.put(s, value);
+		
+		String invText = tickInvTable.get(value);
+		if ( (invText == null) || (s.length() < invText.length()) ) {
+			tickInvTable.put(value, s);
+		}
+	}
 	
 	static public int getTick(String gt) throws UndefinedTickException {
 		try {
@@ -159,5 +175,37 @@ public class MMLTicks {
 		} catch (NullPointerException e) {
 			throw new UndefinedTickException(gt);
 		}
+	}
+	
+	
+	private String noteName;
+	int tick;
+	boolean needTie;
+
+	/**
+	 * tick長をMML文字列に変換します.
+	 * @param noteName
+	 * @param tick
+	 */
+	public MMLTicks(String noteName, int tick) {
+		this(noteName, tick, true);
+	}
+	
+	/**
+	 * tick長をMML文字列に変換します.
+	 * @param noteName
+	 * @param tick
+	 * @param needTie noteNameを連結するときに tie が必要かどうかを指定します. 休符 or 音量ゼロのときは, falseを指定してください.
+	 */
+	public MMLTicks(String noteName, int tick, boolean needTie) {
+		this.noteName = noteName;
+		this.tick = tick;
+		this.needTie = needTie;
+	}
+	
+	public String toString() {
+		return noteName + tickInvTable.get(tick).toString();
+		
+		// TODO: リストにない場合は、& による連結が必要. ただし、休符の場合は & 連結は不要です.
 	}
 }

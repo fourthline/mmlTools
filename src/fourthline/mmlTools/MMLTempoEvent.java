@@ -29,4 +29,9 @@ public class MMLTempoEvent extends MMLEvent {
 	public String toString() {
 		return "[Tempo] " + tempo;
 	}
+
+	@Override
+	public String toMMLString() {
+		return "t" + tempo;
+	}
 }

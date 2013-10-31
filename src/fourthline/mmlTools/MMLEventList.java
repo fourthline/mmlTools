@@ -25,7 +25,7 @@ public class MMLEventList {
 
 	private List<MMLNoteEvent>   noteList   = new ArrayList<MMLNoteEvent>();
 	private List<MMLTempoEvent>  tempoList  = new ArrayList<MMLTempoEvent>();
-	private List<MMLVelocityEvent> volumnList = new ArrayList<MMLVelocityEvent>();
+	private List<MMLVelocityEvent> velocityList = new ArrayList<MMLVelocityEvent>();
 
 
 	/**
@@ -45,7 +45,7 @@ public class MMLEventList {
 			if (event instanceof MMLTempoEvent) {
 				tempoList.add((MMLTempoEvent) event);
 			} else if (event instanceof MMLVelocityEvent) {
-				volumnList.add((MMLVelocityEvent) event);
+				velocityList.add((MMLVelocityEvent) event);
 			} else if (event instanceof MMLNoteEvent) {
 				if (((MMLNoteEvent) event).getNote() >= 0) {
 					noteList.add((MMLNoteEvent) event);
@@ -105,7 +105,7 @@ public class MMLEventList {
 		}
 
 		//　ボリューム
-		Iterator<MMLVelocityEvent> volumnIterator = volumnList.iterator();
+		Iterator<MMLVelocityEvent> volumnIterator = velocityList.iterator();
 		MMLVelocityEvent volumnEvent = null;
 		if (volumnIterator.hasNext()) {
 			volumnEvent = volumnIterator.next();
@@ -248,5 +248,29 @@ public class MMLEventList {
 	 */
 	public void deleteMMLEvent(MMLEvent deleteItem) {
 		noteList.remove(deleteItem);
+	}
+	
+	public String toMMLString() {
+//		MMLTempoEvent tempoEvent = tempoList.get(0);
+//		MMLVelocityEvent velocityEvent = velocityList.get(0);
+		
+		StringBuilder sb = new StringBuilder();
+		int noteCount = noteList.size();
+		
+		// initial note: octave 4, tick 0, offset 0
+		MMLNoteEvent prevNoteEvent = new MMLNoteEvent(12*4, 0, 0);
+		
+		for (int i = 0; i < noteCount; i++) {
+			MMLNoteEvent noteEvent = noteList.get(i);
+			sb.append( noteEvent.toMMLString(prevNoteEvent) );
+			prevNoteEvent = noteEvent;
+		}
+		
+		return sb.toString();
+	}
+	
+	@Override
+	public String toString() {
+		return tempoList.toString() + velocityList.toString() + noteList.toString();
 	}
 }
