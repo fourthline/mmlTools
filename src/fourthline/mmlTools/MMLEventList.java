@@ -88,6 +88,14 @@ public class MMLEventList {
 	private int convertNoteMML2Midi(int mml_note) {
 		return (mml_note + 12);
 	}
+	
+	private Object nextEvent(Iterator<? extends MMLEvent> iterator) {
+		if (iterator.hasNext()) {
+			return iterator.next();
+		} else {
+			return null;
+		}
+	}
 
 	private static final int INITIAL_VOLEUMN = 8;
 	public void convertMidiTrack(Track track, int channel) throws InvalidMidiDataException {
@@ -105,13 +113,10 @@ public class MMLEventList {
 		}
 
 		//　ボリューム
-		Iterator<MMLVelocityEvent> volumnIterator = velocityList.iterator();
-		MMLVelocityEvent volumnEvent = null;
-		if (volumnIterator.hasNext()) {
-			volumnEvent = volumnIterator.next();
-		} else {
-			volumnEvent = null;
-		}
+		Iterator<MMLVelocityEvent> velocityIterator = velocityList.iterator();
+		MMLVelocityEvent velocityEvent = null;
+		velocityEvent = (MMLVelocityEvent) nextEvent(velocityIterator);
+		
 		// Noteイベントの変換
 		for ( Iterator<MMLNoteEvent> i = noteList.iterator(); i.hasNext(); ) {
 			MMLNoteEvent noteEvent = i.next();
@@ -122,14 +127,10 @@ public class MMLEventList {
 			int endTickOffset = tickOffset + tick - 1;
 
 			// ボリュームの変更
-			if ( (volumnEvent != null) && (volumnEvent.getTickOffset() <= tickOffset) ) {
-				volumn = volumnEvent.getVelocity();
-				System.out.println(" [to midi] " + volumnEvent.toString());
-				if (volumnIterator.hasNext()) {
-					volumnEvent = volumnIterator.next();
-				} else {
-					volumnEvent = null;
-				}
+			if ( (velocityEvent != null) && (velocityEvent.getTickOffset() <= tickOffset) ) {
+				volumn = velocityEvent.getVelocity();
+				System.out.println(" [to midi] " + velocityEvent.toString());
+				velocityEvent = (MMLVelocityEvent) nextEvent(velocityIterator);
 			}
 
 			// ON イベント作成
@@ -251,8 +252,15 @@ public class MMLEventList {
 	}
 	
 	public String toMMLString() {
-//		MMLTempoEvent tempoEvent = tempoList.get(0);
-//		MMLVelocityEvent velocityEvent = velocityList.get(0);
+		//　テンポ
+		Iterator<MMLTempoEvent> tempoIterator = tempoList.iterator();
+		MMLTempoEvent tempoEvent = null;
+		tempoEvent = (MMLTempoEvent) nextEvent(tempoIterator);
+
+		//　ボリューム
+		Iterator<MMLVelocityEvent> velocityIterator = velocityList.iterator();
+		MMLVelocityEvent velocityEvent = null;
+		velocityEvent = (MMLVelocityEvent) nextEvent(velocityIterator);
 		
 		StringBuilder sb = new StringBuilder();
 		int noteCount = noteList.size();
@@ -262,6 +270,18 @@ public class MMLEventList {
 		
 		for (int i = 0; i < noteCount; i++) {
 			MMLNoteEvent noteEvent = noteList.get(i);
+			
+			// テンポのMML挿入判定
+			if ( (tempoEvent != null) && (tempoEvent.getTickOffset() <= noteEvent.getTickOffset()) ) {
+				sb.append(tempoEvent.toMMLString());
+				tempoEvent = (MMLTempoEvent) nextEvent(tempoIterator);
+			}
+			// 音量のMML挿入判定
+			if ( (velocityEvent != null) && (velocityEvent.getTickOffset() <= noteEvent.getTickOffset()) ) {
+				sb.append(velocityEvent.toMMLString());
+				velocityEvent = (MMLVelocityEvent) nextEvent(velocityIterator);
+			}
+			
 			sb.append( noteEvent.toMMLString(prevNoteEvent) );
 			prevNoteEvent = noteEvent;
 		}

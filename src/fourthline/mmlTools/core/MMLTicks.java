@@ -203,9 +203,46 @@ public class MMLTicks {
 		this.needTie = needTie;
 	}
 	
-	public String toString() {
-		return noteName + tickInvTable.get(tick).toString();
+	private String mmlNotePart(String phoneticString) {
+		StringBuilder sb = new StringBuilder();
+		if (needTie) {
+			sb.append('&');
+		}
+		sb.append(noteName).append(phoneticString);
 		
-		// TODO: リストにない場合は、& による連結が必要. ただし、休符の場合は & 連結は不要です.
+		return sb.toString();
+	}
+	
+	/**
+	 * noteNameとtickをMMLの文字列に変換します.
+	 * needTieがtrueのときは、'&'による連結を行います.
+	 */
+	public String toString() {
+		try {
+			int remTick = tick;
+			StringBuilder sb = new StringBuilder();
+			
+			for (int base = 1; base <= 64; base *= 2) {
+				int baseTick = getTick(""+base);
+				if (tickInvTable.containsKey(remTick)) {
+					sb.append( mmlNotePart(tickInvTable.get(remTick)) );
+					break;
+				}
+				while (remTick >= baseTick) {
+					sb.append( mmlNotePart(""+base) );
+					remTick -= baseTick;
+				}
+			}
+			
+			if (needTie) {
+				return sb.substring(1);
+			} else {
+				return sb.toString();
+			}
+		} catch (UndefinedTickException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 }
