@@ -184,4 +184,54 @@ public class MMLEventListTest {
 		assertEquals(58, noteEvent.getNote());
 
 	}
+	
+
+	@Test
+	public void testToMMLString_0() {
+		MMLEventList eventList = new MMLEventList("ara");
+		
+		String mml = eventList.toMMLString();
+		System.out.println(mml);
+
+		assertEquals(eventList.toString(), new MMLEventList(mml).toString());
+	}
+	
+	/**
+	 * オクターブ変化を付けたMMLの双方向変換のテスト.
+	 */
+	@Test
+	public void testToMMLString_1() {
+		MMLEventList eventList = new MMLEventList("cdef-gab>cdef+gab+<c1");
+		
+		String mml = eventList.toMMLString();
+		System.out.println(mml);
+
+		assertEquals(eventList.toString(), new MMLEventList(mml).toString());
+	}
+
+	/**
+	 * tieによる連結が必要な音価さん.
+	 */
+	@Test
+	public void testToMMLString_2() {
+		MMLEventList eventList = new MMLEventList("c4&c16g2&g8d1.&d1.&d1.&d24");
+		
+		String mml = eventList.toMMLString();
+		System.out.println(mml);
+
+		assertEquals(eventList.toString(), new MMLEventList(mml).toString());
+	}
+	
+	/**
+	 * tempo, velocity を含むMML.
+	 */
+	@Test
+	public void testToMMLString_3() {
+		MMLEventList eventList = new MMLEventList("T150v10c8.g16e4v8g-<at120<b-");
+		
+		String mml = eventList.toMMLString();
+		System.out.println(mml);
+
+		assertEquals(eventList.toString(), new MMLEventList(mml).toString());
+	}
 }

@@ -28,4 +28,6 @@ public abstract class MMLEvent {
 	}
 	
 	public abstract String toString();
+	
+	public abstract String toMMLString();
 }
