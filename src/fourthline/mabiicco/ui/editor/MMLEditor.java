@@ -215,7 +215,7 @@ public class MMLEditor implements MouseInputListener {
 				int tickOffset = (int)pianoRollView.convertXtoTick( e.getX() );
 				MMLNoteEvent noteEvent = eventList.searchOnTickOffset( tickOffset );
 				if ( (noteEvent != null) && (noteEvent.getNote() == note) ) {
-					MMLNotePropertyPanel.showDialog(noteEvent);
+					new MMLNotePropertyPanel(noteEvent).showDialog();
 				}
 			}
 		}

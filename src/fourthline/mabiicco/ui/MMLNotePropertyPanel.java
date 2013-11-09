@@ -29,17 +29,15 @@ public class MMLNotePropertyPanel extends JPanel {
 	private JCheckBox tuningNoteCheckBox;
 	private MMLNoteEvent noteEvent;
 
-	public static void showDialog(MMLNoteEvent noteEvent) {
-		MMLNotePropertyPanel panel = new MMLNotePropertyPanel(noteEvent);
-
+	public void showDialog() {
 		int status = JOptionPane.showConfirmDialog(null, 
-				panel,
+				this,
 				"ノートのプロパティ", 
 				JOptionPane.OK_CANCEL_OPTION,
 				JOptionPane.PLAIN_MESSAGE);
 
 		if (status == JOptionPane.OK_OPTION) {
-			panel.applyProperty();
+			applyProperty();
 		}
 	}
 
@@ -54,6 +52,7 @@ public class MMLNotePropertyPanel extends JPanel {
 	 * Create the panel.
 	 */
 	public MMLNotePropertyPanel(MMLNoteEvent noteEvent) {
+		super();
 		setLayout(null);
 
 		formattedTextField = new JFormattedTextField();
