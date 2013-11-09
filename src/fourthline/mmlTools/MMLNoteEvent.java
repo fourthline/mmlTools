@@ -60,7 +60,7 @@ public class MMLNoteEvent extends MMLEvent {
 	public String toMMLString(MMLNoteEvent prevNoteEvent) {
 		StringBuilder sb = new StringBuilder();
 		
-		//  前のノートとの差を見て、休符を挿入する.
+		// 前のノートとの差を見て、休符を挿入する.
 		sb.append( createMMLSpaceString(prevNoteEvent) );
 		
 		// 前のノートとのオクターブ差分をみて、オクターブ変化を挿入する.

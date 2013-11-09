@@ -49,4 +49,13 @@ public class MMLNoteEventTest {
 		assertEquals("<<", changedOctave);
 	}
 
+	@Test
+	public void testParse_0() {
+		MMLEventList eventList1 = new MMLEventList("v14l16o5aa");
+		MMLEventList eventList2 = new MMLEventList("V14L16O5aa");
+		
+		assertEquals(eventList1.toString(), eventList2.toString());
+	}
+
+
 }
