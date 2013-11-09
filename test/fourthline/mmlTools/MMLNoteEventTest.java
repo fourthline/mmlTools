@@ -50,6 +50,17 @@ public class MMLNoteEventTest {
 	}
 
 	@Test
+	public void testTuningNote() {
+		MMLEventList eventList = new MMLEventList("c1");
+		String expected = "c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64";
+		MMLNoteEvent noteEvent = eventList.getMMLNoteEventList().get(0);
+		noteEvent.setTuningNote(true);
+		
+		System.out.println(noteEvent.toMMLString());
+		assertEquals(expected, noteEvent.toMMLString());
+	}
+	
+	@Test
 	public void testParse_0() {
 		MMLEventList eventList1 = new MMLEventList("v14l16o5aa");
 		MMLEventList eventList2 = new MMLEventList("V14L16O5aa");

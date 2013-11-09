@@ -10,6 +10,7 @@ public class MMLNoteEvent extends MMLEvent {
 
 	private int note;
 	private int tick;
+	private boolean isTuningNote = false;
 
 	public MMLNoteEvent(int note, int tickLength, int tickOffset) {
 		super(tickOffset);
@@ -21,7 +22,7 @@ public class MMLNoteEvent extends MMLEvent {
 	public int getNote() {
 		return this.note;
 	}
-	
+
 	public void setNote(int note) {
 		this.note = note;
 	}
@@ -29,7 +30,7 @@ public class MMLNoteEvent extends MMLEvent {
 	public int getTick() {
 		return this.tick;
 	}
-	
+
 	public int getEndTick() {
 		return getTickOffset() + getTick();
 	}
@@ -38,13 +39,21 @@ public class MMLNoteEvent extends MMLEvent {
 		this.tick = tick;
 	}
 
+	public boolean isTuningNote() {
+		return isTuningNote;
+	}
+
+	public void setTuningNote(boolean isTuningNote) {
+		this.isTuningNote = isTuningNote;
+	}
+
 	@Override
 	public String toString() {
 		return "[Note] note: " + note + ", tick: " + tick + ", offset: " + getTickOffset();
 	}
-	
+
 	private final String noteNameTable[] = {
-		"c", "c+", "d", "d+", "e", "f", "f+", "g", "g+", "a", "a+", "b"
+			"c", "c+", "d", "d+", "e", "f", "f+", "g", "g+", "a", "a+", "b"
 	};
 	private String getNoteName() {
 		return noteNameTable[ note%noteNameTable.length ];
@@ -54,23 +63,27 @@ public class MMLNoteEvent extends MMLEvent {
 	public String toMMLString() {
 		String noteName = getNoteName();
 		MMLTicks mmlTick = new MMLTicks(noteName, tick);
-		return mmlTick.toString();
+		if (isTuningNote) {
+			return mmlTick.toStringByL64();
+		} else {
+			return mmlTick.toString();
+		}
 	}
-	
+
 	public String toMMLString(MMLNoteEvent prevNoteEvent) {
 		StringBuilder sb = new StringBuilder();
-		
+
 		// 前のノートとの差を見て、休符を挿入する.
 		sb.append( createMMLSpaceString(prevNoteEvent) );
-		
+
 		// 前のノートとのオクターブ差分をみて、オクターブ変化を挿入する.
 		sb.append( changeOctaveinMMLString(prevNoteEvent.getOctave()) );
 
 		sb.append( toMMLString() );
-		
+
 		return sb.toString();
 	}
-	
+
 	/**
 	 * 前のNoteEvent間にある休符のMML文字列を生成します.
 	 * @param prevNoteEvent
@@ -82,10 +95,10 @@ public class MMLNoteEvent extends MMLEvent {
 			MMLTicks mmlTick = new MMLTicks("r", noteSpaceTick, false);
 			return mmlTick.toString();
 		}
-		
+
 		return "";
 	}
-	
+
 	/**
 	 * ノートの高さにあわせて、MMLテキスト上でのオクターブ変更を行います.
 	 * @param prevOctave
@@ -101,10 +114,10 @@ public class MMLNoteEvent extends MMLEvent {
 		} else if (changeOctave < 0) {
 			s = increaseOctave.substring(0, -changeOctave);
 		}
-		
+
 		return s;
 	}
-	
+
 	public int getOctave() {
 		return (note /12);
 	}

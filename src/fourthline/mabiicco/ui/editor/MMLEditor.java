@@ -12,6 +12,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputListener;
 
 import fourthline.mabiicco.ui.KeyboardView;
+import fourthline.mabiicco.ui.MMLNotePropertyPanel;
 import fourthline.mabiicco.ui.PianoRollView;
 import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLNoteEvent;
@@ -207,6 +208,17 @@ public class MMLEditor implements MouseInputListener {
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
+		if (SwingUtilities.isRightMouseButton(e)) {
+			if (e.getClickCount() == 2) {
+				// 右ダブルクリック: 音符上なら、その音符のプロパティ画面を表示します.
+				int note = pianoRollView.convertY2Note( e.getY() );
+				int tickOffset = (int)pianoRollView.convertXtoTick( e.getX() );
+				MMLNoteEvent noteEvent = eventList.searchOnTickOffset( tickOffset );
+				if ( (noteEvent != null) && (noteEvent.getNote() == note) ) {
+					MMLNotePropertyPanel.showDialog(noteEvent);
+				}
+			}
+		}
 	}
 
 	@Override

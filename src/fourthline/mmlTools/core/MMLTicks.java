@@ -245,4 +245,32 @@ public class MMLTicks {
 		
 		return null;
 	}
+	
+	/**
+	 * L64を使って変換します.　（調律用）
+	 * @return
+	 */
+	public String toStringByL64() {
+		try {
+			int remTick = tick;
+			StringBuilder sb = new StringBuilder();
+			
+			int base = 64;
+			int baseTick = getTick(""+base);
+			while (remTick >= baseTick) {
+				sb.append( mmlNotePart(""+base) );
+				remTick -= baseTick;
+			}
+			
+			if (needTie) {
+				return sb.substring(1);
+			} else {
+				return sb.toString();
+			}
+		} catch (UndefinedTickException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
 }
