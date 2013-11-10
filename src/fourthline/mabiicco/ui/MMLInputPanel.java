@@ -4,19 +4,12 @@
 
 package fourthline.mabiicco.ui;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
+import java.awt.Dimension;
 import java.awt.Toolkit;
 
-import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.KeyStroke;
-import javax.swing.border.EmptyBorder;
 import javax.swing.JRadioButton;
 import javax.swing.border.TitledBorder;
 import javax.swing.border.LineBorder;
@@ -25,9 +18,6 @@ import java.awt.Color;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.io.IOException;
 
 import javax.swing.JComboBox;
@@ -37,13 +27,12 @@ import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mmlTools.MMLTrack;
 
-public class MMLInputDialog extends JDialog {
+public class MMLInputPanel extends JPanel {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -2517820687250637949L;
-	private final JPanel contentPanel = new JPanel();
 	private JTextField textField;
 	private JComboBox<InstClass> comboBox;
 
@@ -55,30 +44,22 @@ public class MMLInputDialog extends JDialog {
 
 
 
-	public MMLInputDialog() {
+	public MMLInputPanel() {
 		this(null);
 	}
 
 	/**
-	 * 現在のトラック名を指定してダイアログを作成する。
-	 * @param trackName
+	 * @param parent
 	 */
-	public MMLInputDialog(MMLSeqView parent) {
+	public MMLInputPanel(MMLSeqView parent) {
 		this.parent = parent;
-		setModal(true);
-		setResizable(false);
 
-		setTitle("クリップボードからのMML入力");
-		setBounds(100, 100, 352, 417);
-		getContentPane().setLayout(new BorderLayout());
-		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-		getContentPane().add(contentPanel, BorderLayout.CENTER);
-		contentPanel.setLayout(null);
+		setLayout(null);
 
 		JPanel panel1 = new JPanel();
 		panel1.setBorder(new TitledBorder(new LineBorder(new Color(128, 128, 128), 1, true), "\u5165\u529B\u65B9\u6CD5", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel1.setBounds(26, 28, 275, 87);
-		contentPanel.add(panel1);
+		add(panel1);
 		panel1.setLayout(null);
 
 		overrideButton = new JRadioButton("現在のトラックに上書き");
@@ -97,7 +78,7 @@ public class MMLInputDialog extends JDialog {
 		JPanel panel2 = new JPanel();
 		panel2.setBorder(new TitledBorder(new LineBorder(new Color(128, 128, 128), 1, true), "\u697D\u5668\u8A2D\u5B9A", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel2.setBounds(26, 140, 275, 75);
-		contentPanel.add(panel2);
+		add(panel2);
 		panel2.setLayout(null);
 
 		InstClass insts[] = null;
@@ -118,7 +99,7 @@ public class MMLInputDialog extends JDialog {
 		JPanel panel3 = new JPanel();
 		panel3.setBorder(new TitledBorder(new LineBorder(new Color(128, 128, 128), 1, true), "\u30C8\u30E9\u30C3\u30AF\u540D", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel3.setBounds(26, 249, 275, 75);
-		contentPanel.add(panel3);
+		add(panel3);
 		panel3.setLayout(null);
 
 		textField = new JTextField(20);
@@ -126,49 +107,21 @@ public class MMLInputDialog extends JDialog {
 		// TODO: 日本語を入力したとき、再生時にCPU負荷がかかる問題あり.
 		textField.setEditable(false);
 		panel3.add(textField);
-		{
-			JPanel buttonPane = new JPanel();
-			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
-			getContentPane().add(buttonPane, BorderLayout.SOUTH);
-			{
-				JButton okButton = new JButton("OK");
-				okButton.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						applyMMLTrack();
-						dispose();
-					}
-				});
-				okButton.setActionCommand("OK");
-				buttonPane.add(okButton);
-				getRootPane().setDefaultButton(okButton);
-			}
-			{
-				JButton cancelButton = new JButton("Cancel");
-				cancelButton.setActionCommand("Cancel");
-				cancelButton.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						dispose();
-					}
-				});
-				buttonPane.add(cancelButton);
-				InputMap imap = getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-				imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "escape");
-				getRootPane().getActionMap().put("escape", new AbstractAction(){
-					private static final long serialVersionUID = 8365149917383455221L;
-
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						setVisible(false);
-					}
-				}); 
-			}
-		}
 	}
 
-	
-	public void showDialog(String title) {
-		textField.setText(title);
-		
+	@Override
+	public Dimension getPreferredSize() {
+		return new Dimension(350, 350);
+	}
+
+
+	/**
+	 * トラック名を指定して、ダイアログを表示する.
+	 * @param trackName トラック名
+	 */
+	public void showDialog(String trackName) {
+		textField.setText(trackName);
+
 		String mml = getClipboardString();
 
 		track = new MMLTrack(mml);
@@ -178,9 +131,16 @@ public class MMLInputDialog extends JDialog {
 				(track.getChord2().length() == 0) ) {
 			return;
 		}
-		
-		setLocationRelativeTo(null);
-		setVisible(true);
+
+		int status = JOptionPane.showConfirmDialog(null, 
+				this,
+				"クリップボードからのMML入力", 
+				JOptionPane.OK_CANCEL_OPTION,
+				JOptionPane.PLAIN_MESSAGE);
+
+		if (status == JOptionPane.OK_OPTION) {
+			applyMMLTrack();
+		}
 	}
 
 

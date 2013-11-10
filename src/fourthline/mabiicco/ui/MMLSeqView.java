@@ -50,7 +50,7 @@ public class MMLSeqView extends JPanel implements ChangeListener, ActionListener
 
 	private ArrayList<MMLTrack> trackList = new ArrayList<MMLTrack>();
 
-	private MMLInputDialog dialog = new MMLInputDialog(this);
+	private MMLInputPanel dialog = new MMLInputPanel(this);
 
 	private MMLEditor editor;
 
