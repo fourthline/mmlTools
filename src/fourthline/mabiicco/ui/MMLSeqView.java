@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MMLSeqView extends JPanel implements ChangeListener, ActionListener {
+public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, ActionListener {
 
 	/**
 	 * 
@@ -95,7 +95,7 @@ public class MMLSeqView extends JPanel implements ChangeListener, ActionListener
 		scrollPane.setColumnHeaderView(columnView);
 
 		add(scrollPane, BorderLayout.CENTER);
-		pianoRollView.setViewportAndParent(scrollPane.getViewport(), this);
+		pianoRollView.setViewportAndParent(scrollPane.getViewport(), this, this);
 
 
 		// MMLTrackView (tab) - SOUTH
@@ -105,7 +105,7 @@ public class MMLSeqView extends JPanel implements ChangeListener, ActionListener
 		add(tabbedPane, BorderLayout.SOUTH);
 
 		// create mml editor
-		editor = new MMLEditor(keyboardView, pianoRollView);
+		editor = new MMLEditor(keyboardView, pianoRollView, this);
 		pianoRollView.addMouseInputListener(editor);
 
 		initialSetView();
@@ -158,7 +158,7 @@ public class MMLSeqView extends JPanel implements ChangeListener, ActionListener
 		int trackIndex = trackList.size() - 1;
 
 		// トラックビューの追加
-		tabbedPane.add(newTrack.getTrackName(), new MMLTrackView(newTrack, trackIndex, this));
+		tabbedPane.add(newTrack.getTrackName(), new MMLTrackView(newTrack, trackIndex, this, this));
 		tabbedPane.setSelectedIndex(trackIndex);
 
 		// ピアノロール更新
@@ -282,7 +282,7 @@ public class MMLSeqView extends JPanel implements ChangeListener, ActionListener
 				name = "Track"+(i+1);
 			}
 
-			tabbedPane.add(name, new MMLTrackView(track[i], i, this));
+			tabbedPane.add(name, new MMLTrackView(track[i], i, this, this));
 		}
 
 		initialSetView();
@@ -318,7 +318,8 @@ public class MMLSeqView extends JPanel implements ChangeListener, ActionListener
 
 		return trackList.get(index);
 	}
-	
+
+	@Override
 	public List<MMLTrack> getTrackList() {
 		return trackList;
 	}
@@ -390,12 +391,19 @@ public class MMLSeqView extends JPanel implements ChangeListener, ActionListener
 			System.out.printf("stateChanged(): %d, %d\n", channel, mmlPartIndex);
 		}
 	}
-	
+
+	@Override
 	public MMLEventList getActiveMMLPart() {
 		int trackIndex = tabbedPane.getSelectedIndex();
 		MMLTrackView view = (MMLTrackView) tabbedPane.getSelectedComponent();
 		int mmlPartIndex = view.getSelectedMMLPartIndex();
 		return trackList.get(trackIndex).getMMLEventList(mmlPartIndex);
+	}
+
+	private void setActiveMMLPartString(String mml) {
+		int index = tabbedPane.getSelectedIndex();
+		MMLTrackView view = (MMLTrackView)tabbedPane.getComponentAt(index);
+		view.setActivePartMMLString(mml);
 	}
 
 	/**
@@ -450,5 +458,17 @@ public class MMLSeqView extends JPanel implements ChangeListener, ActionListener
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		updateSelectedTrackAndMMLPart();
+	}
+
+	@Override
+	public void updateActivePart() {
+		MMLEventList eventList = getActiveMMLPart();
+		String mml = eventList.toMMLString();
+		setActiveMMLPartString(mml);
+	}
+
+	@Override
+	public void updateActiveTrackProgram(int program) {
+		getSelectedTrack().setProgram(program);
 	}
 }

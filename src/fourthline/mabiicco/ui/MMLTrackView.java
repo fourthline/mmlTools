@@ -23,6 +23,7 @@ import javax.swing.event.DocumentListener;
 import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mmlTools.MMLTrack;
+import fourthline.mmlTools.core.MMLTools;
 
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -44,8 +45,10 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 
 	private JLabel trackComposeLabel;
 
-	private MMLTrack mmlTrack;
 	private int channel;
+
+	private IMMLManager mmlManager;
+
 
 
 	/**
@@ -124,14 +127,15 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		// 一番上のパートが初期の選択パート.
 		partButton[0].setSelected(true);
 
-		updateComposeRank(null);
+		updateComposeRank();
 	}
 
-	public MMLTrackView(MMLTrack track, int channel, ActionListener actionListener) {
+	public MMLTrackView(MMLTrack track, int channel, ActionListener actionListener, IMMLManager mmlManager) {
 		this();
 
 		this.channel = channel;
 		this.setMMLTrack(track);
+		this.mmlManager = mmlManager;
 		trackComposeLabel.setText(track.mmlRankFormat());
 
 		for (int i = 0; i < MMLPART_NAME.length; i++) {
@@ -169,24 +173,25 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 
 	@Override
 	public void removeUpdate(DocumentEvent event) {
-		updateComposeRank(event);
+		updateComposeRank();
 	}
 	@Override
 	public void insertUpdate(DocumentEvent event) {
-		updateComposeRank(event);
+		updateComposeRank();
 	}
 	@Override
 	public void changedUpdate(DocumentEvent event) {
-		updateComposeRank(event);
+		updateComposeRank();
 	}
 
-	private void updateComposeRank(DocumentEvent event) {
-		if (mmlTrack == null) {
-			return;
-		}
+	private void updateComposeRank() {
+		MMLTools tools = new MMLTools(
+				mmlText[0].getText(),
+				mmlText[1].getText(),
+				mmlText[2].getText()
+				);
 
-
-		String rank = mmlTrack.mmlRankFormat();
+		String rank = tools.mmlRankFormat();
 		trackComposeLabel.setText(rank);
 		System.out.println(rank);
 	}
@@ -210,25 +215,30 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		mmlText[2].setText( track.getChord2() );
 
 		setInstProgram( track.getProgram() );
+	}
 
-		this.mmlTrack = track;
+	public void setActivePartMMLString(String mml) {
+		int index = getSelectedMMLPartIndex();
+
+		mmlText[index].setText(mml);
+		updateComposeRank();
 	}
 
 
 	/**
 	 * コンボボックスによる楽器の変更。
 	 */
-	 @Override
-	 public void actionPerformed(ActionEvent e) {
-		 if (e.getSource() == comboBox) {
-			 InstClass inst = (InstClass) comboBox.getSelectedItem();
-			 int program = inst.getProgram();
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == comboBox) {
+			InstClass inst = (InstClass) comboBox.getSelectedItem();
+			int program = inst.getProgram();
 
-			 MabiDLS.getInstance().changeProgram(program, this.channel);
-			 if (mmlTrack != null) {
-				 mmlTrack.setProgram(program);
-			 }
-		 }
-	 }
+			MabiDLS.getInstance().changeProgram(program, this.channel);
+			if (mmlManager != null) {
+				mmlManager.updateActiveTrackProgram(program);
+			}
+		}
+	}
 
 }

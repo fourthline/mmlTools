@@ -13,6 +13,7 @@ import java.awt.Point;
 import java.util.List;
 
 import javax.sound.midi.Sequencer;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JViewport;
 import javax.swing.event.MouseInputListener;
@@ -40,7 +41,8 @@ public class PianoRollView extends AbstractMMLView {
 	private int width;
 
 	private JViewport viewport;
-	private MMLSeqView parent;
+	private JComponent parentComponent;
+	private IMMLManager mmlManager;
 
 	private long sequencePosition;
 	private long playPosition;
@@ -110,9 +112,10 @@ public class PianoRollView extends AbstractMMLView {
 		this.addMouseMotionListener(listener);
 	}
 
-	public void setViewportAndParent(JViewport viewport, MMLSeqView parent) {
+	public void setViewportAndParent(JViewport viewport, JComponent parent, IMMLManager mmlManager) {
 		this.viewport = viewport;
-		this.parent = parent;
+		this.parentComponent = parent;
+		this.mmlManager = mmlManager;
 	}
 
 	public void setWidth(int width) {
@@ -134,7 +137,7 @@ public class PianoRollView extends AbstractMMLView {
 	 */
 	private void updateViewWidthTrackLength() {
 		long tickLength = 0;
-		List<MMLTrack> trackList = parent.getTrackList();
+		List<MMLTrack> trackList = mmlManager.getTrackList();
 
 		for (int i = 0; i < trackList.size(); i++) {
 			long length = trackList.get(i).getMaxTickLength();
@@ -195,8 +198,8 @@ public class PianoRollView extends AbstractMMLView {
 		if (!MabiDLS.getInstance().getSequencer().isRunning()) {
 			sequencePosition = tick;
 
-			if (parent != null) {
-				parent.repaint();
+			if (mmlManager != null) {
+				mmlManager.updateActivePart();
 			}
 		}
 	}
@@ -221,7 +224,7 @@ public class PianoRollView extends AbstractMMLView {
 		super.paint(g);
 
 		updateViewTick();
-		List<MMLTrack> trackList = parent.getTrackList();
+		List<MMLTrack> trackList = mmlManager.getTrackList();
 
 		// FIXME: しぼったほうがいいかも？
 		updateViewWidthTrackLength();
@@ -298,7 +301,7 @@ public class PianoRollView extends AbstractMMLView {
 									point.setLocation(position, point.getY());
 									viewport.setViewPosition(point);
 								}
-								parent.repaint();
+								parentComponent.repaint();
 							}
 						});
 					}
@@ -403,7 +406,7 @@ public class PianoRollView extends AbstractMMLView {
 				50
 				);
 
-		MMLEventList activePart = parent.getActiveMMLPart();
+		MMLEventList activePart = mmlManager.getActiveMMLPart();
 
 		for (int i = 0; i < 3; i++) {
 			MMLEventList targetPart = track.getMMLEventList(i);
@@ -432,7 +435,7 @@ public class PianoRollView extends AbstractMMLView {
 				200
 				);
 
-		MMLEventList activePart = parent.getActiveMMLPart();
+		MMLEventList activePart = mmlManager.getActiveMMLPart();
 		paintMMLPart(g, activePart.getMMLNoteEventList(), rectColor, fillColor);
 	}
 

@@ -11,6 +11,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputListener;
 
+import fourthline.mabiicco.ui.IMMLManager;
 import fourthline.mabiicco.ui.KeyboardView;
 import fourthline.mabiicco.ui.MMLNotePropertyPanel;
 import fourthline.mabiicco.ui.PianoRollView;
@@ -35,6 +36,7 @@ public class MMLEditor implements MouseInputListener {
 
 	private PianoRollView pianoRollView;
 	private KeyboardView keyboardView;
+	private IMMLManager mmlManager;
 
 	public static int DEFAULT_ALIGN_INDEX = 2;
 
@@ -58,9 +60,10 @@ public class MMLEditor implements MouseInputListener {
 		return null;
 	}
 
-	public MMLEditor(KeyboardView keyboard, PianoRollView pianoRoll) {
+	public MMLEditor(KeyboardView keyboard, PianoRollView pianoRoll, IMMLManager mmlManager) {
 		this.keyboardView = keyboard;
 		this.pianoRollView = pianoRoll;
+		this.mmlManager = mmlManager;
 	}
 
 	public void setEditAlign(int alignTick) {
@@ -188,6 +191,7 @@ public class MMLEditor implements MouseInputListener {
 		editMode = EDIT_NONE;
 
 		pianoRollView.repaint();
+		mmlManager.updateActivePart();
 	}
 
 	private void updatePretarget(int note, int tickOffset) {
@@ -216,6 +220,7 @@ public class MMLEditor implements MouseInputListener {
 				MMLNoteEvent noteEvent = eventList.searchOnTickOffset( tickOffset );
 				if ( (noteEvent != null) && (noteEvent.getNote() == note) ) {
 					new MMLNotePropertyPanel(noteEvent).showDialog();
+					mmlManager.updateActivePart();
 				}
 			}
 		}
