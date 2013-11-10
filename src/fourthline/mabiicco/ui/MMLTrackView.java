@@ -33,9 +33,12 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 	 * 
 	 */
 	private static final long serialVersionUID = 4955513242349170508L;
-	private JTextField mmlText1;
-	private JTextField mmlText2;
-	private JTextField mmlText3;
+	private final String MMLPART_NAME[] = {
+			"メロディー", "和音1", "和音2"
+	};
+	private JToggleButton partButton[];
+	private JTextField mmlText[];
+
 	@SuppressWarnings("rawtypes")
 	private JComboBox comboBox;
 
@@ -44,9 +47,6 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 	private MMLTrack mmlTrack;
 	private int channel;
 
-	private JToggleButton partButton1;
-	private JToggleButton partButton2;
-	private JToggleButton partButton3;
 
 	/**
 	 * Create the panel.
@@ -90,71 +90,39 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		comboBox.addActionListener(this);
 		comboBox.setMaximumRowCount(30);
 
-		partButton1 = new JToggleButton("メロディー");
-		GridBagConstraints gbc_label = new GridBagConstraints();
-		gbc_label.insets = new Insets(0, 0, 5, 5);
-		gbc_label.gridx = 1;
-		gbc_label.gridy = 1;
-		centerPanel.add(partButton1, gbc_label);
-
-		mmlText1 = new JTextField();
-		mmlText1.setEditable(false);
-		mmlText1.setFont(new Font("Monospaced", Font.PLAIN, 12));
-		mmlText1.getDocument().addDocumentListener(this);
-
-		GridBagConstraints gbc_mmlText1 = new GridBagConstraints();
-		gbc_mmlText1.insets = new Insets(0, 0, 5, 5);
-		gbc_mmlText1.fill = GridBagConstraints.HORIZONTAL;
-		gbc_mmlText1.gridx = 3;
-		gbc_mmlText1.gridy = 1;
-		centerPanel.add(mmlText1, gbc_mmlText1);
-		mmlText1.setColumns(10);
-
-		partButton2 = new JToggleButton("和音1");
-		GridBagConstraints gbc_label_1 = new GridBagConstraints();
-		gbc_label_1.insets = new Insets(0, 0, 5, 5);
-		gbc_label_1.gridx = 1;
-		gbc_label_1.gridy = 3;
-		centerPanel.add(partButton2, gbc_label_1);
-
-		mmlText2 = new JTextField();
-		mmlText2.setEditable(false);
-		mmlText2.setFont(new Font("Monospaced", Font.PLAIN, 12));
-		mmlText2.getDocument().addDocumentListener(this);
-
-		GridBagConstraints gbc_mmlText2 = new GridBagConstraints();
-		gbc_mmlText2.insets = new Insets(0, 0, 5, 5);
-		gbc_mmlText2.fill = GridBagConstraints.HORIZONTAL;
-		gbc_mmlText2.gridx = 3;
-		gbc_mmlText2.gridy = 3;
-		centerPanel.add(mmlText2, gbc_mmlText2);
-		mmlText2.setColumns(10);
-
-		partButton3 = new JToggleButton("和音2");
-		GridBagConstraints gbc_label_2 = new GridBagConstraints();
-		gbc_label_2.insets = new Insets(0, 0, 5, 5);
-		gbc_label_2.gridx = 1;
-		gbc_label_2.gridy = 5;
-		centerPanel.add(partButton3, gbc_label_2);
-
-		mmlText3 = new JTextField();
-		mmlText3.setEditable(false);
-		mmlText3.setFont(new Font("Monospaced", Font.PLAIN, 12));
-		mmlText3.getDocument().addDocumentListener(this);
-
-		GridBagConstraints gbc_mmlText3 = new GridBagConstraints();
-		gbc_mmlText3.insets = new Insets(0, 0, 5, 5);
-		gbc_mmlText3.fill = GridBagConstraints.HORIZONTAL;
-		gbc_mmlText3.gridx = 3;
-		gbc_mmlText3.gridy = 5;
-		centerPanel.add(mmlText3, gbc_mmlText3);
-		mmlText3.setColumns(10);
-		
+		// 各パートのボタンとテキストフィールドを作成します.
 		ButtonGroup bGroup = new ButtonGroup();
-		bGroup.add(partButton1);
-		bGroup.add(partButton2);
-		bGroup.add(partButton3);
-		partButton1.setSelected(true);
+		partButton = new JToggleButton[MMLPART_NAME.length];
+		mmlText = new JTextField[MMLPART_NAME.length];
+		for (int i = 0; i < MMLPART_NAME.length; i++) {
+			int gridy = 2*i + 1;
+
+			// パートタイトル
+			partButton[i] = new JToggleButton( MMLPART_NAME[i] );
+			GridBagConstraints gbc_label = new GridBagConstraints();
+			gbc_label.insets = new Insets(0, 0, 5, 5);
+			gbc_label.gridx = 1;
+			gbc_label.gridy = gridy;
+			centerPanel.add(partButton[i], gbc_label);
+			bGroup.add(partButton[i]);
+
+			// パートのテキストフィールド
+			mmlText[i] = new JTextField();
+			mmlText[i].setEditable(false);
+			mmlText[i].setFont(new Font("Monospaced", Font.PLAIN, 12));
+			mmlText[i].getDocument().addDocumentListener(this);
+			mmlText[i].setColumns(10);
+
+			GridBagConstraints gbc_mmlText = new GridBagConstraints();
+			gbc_mmlText.insets = new Insets(0, 0, 5, 5);
+			gbc_mmlText.fill = GridBagConstraints.HORIZONTAL;
+			gbc_mmlText.gridx = 3;
+			gbc_mmlText.gridy = gridy;
+			centerPanel.add(mmlText[i], gbc_mmlText);
+		}
+
+		// 一番上のパートが初期の選択パート.
+		partButton[0].setSelected(true);
 
 		updateComposeRank(null);
 	}
@@ -166,37 +134,36 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		this.setMMLTrack(track);
 		trackComposeLabel.setText(track.mmlRankFormat());
 
-		partButton1.addActionListener(actionListener);
-		partButton2.addActionListener(actionListener);
-		partButton3.addActionListener(actionListener);
-		
+		for (int i = 0; i < MMLPART_NAME.length; i++) {
+			partButton[i].addActionListener(actionListener);
+		}
+
 		MabiDLS.getInstance().changeProgram(track.getProgram(), channel);
 	}
-	
+
 	public void setChannel(int channel) {
 		this.channel = channel;
 	}
-	
+
 	public int getChannel() {
 		// TODO: 歌パートのときは、チャンネルを変える。
 		return this.channel;
 	}
-	
+
 	/**
 	 * 選択中のMMLパートのindex値を返します.
 	 * @return
 	 */
 	public int getSelectedMMLPartIndex() {
 		int index = 0;
-		
-		if (partButton1.isSelected()) {
-			index = 0;
-		} else if (partButton2.isSelected()) {
-			index = 1;
-		} else if (partButton3.isSelected()) {
-			index = 2;
+
+		for (int i = 0; i < MMLPART_NAME.length; i++) {
+			if (partButton[i].isSelected()) {
+				index = i;
+				break;
+			}
 		}
-		
+
 		return index;
 	}
 
@@ -217,7 +184,7 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		if (mmlTrack == null) {
 			return;
 		}
-		
+
 
 		String rank = mmlTrack.mmlRankFormat();
 		trackComposeLabel.setText(rank);
@@ -238,30 +205,30 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 	}
 
 	public void setMMLTrack(MMLTrack track) {
-		mmlText1.setText( track.getMelody() );
-		mmlText2.setText( track.getChord1() );
-		mmlText3.setText( track.getChord2() );
+		mmlText[0].setText( track.getMelody() );
+		mmlText[1].setText( track.getChord1() );
+		mmlText[2].setText( track.getChord2() );
 
 		setInstProgram( track.getProgram() );
 
 		this.mmlTrack = track;
 	}
-	
-	
+
+
 	/**
 	 * コンボボックスによる楽器の変更。
 	 */
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == comboBox) {
-			InstClass inst = (InstClass) comboBox.getSelectedItem();
-			int program = inst.getProgram();
-			
-			MabiDLS.getInstance().changeProgram(program, this.channel);
-			if (mmlTrack != null) {
-				mmlTrack.setProgram(program);
-			}
-		}
-	}
+	 @Override
+	 public void actionPerformed(ActionEvent e) {
+		 if (e.getSource() == comboBox) {
+			 InstClass inst = (InstClass) comboBox.getSelectedItem();
+			 int program = inst.getProgram();
+
+			 MabiDLS.getInstance().changeProgram(program, this.channel);
+			 if (mmlTrack != null) {
+				 mmlTrack.setProgram(program);
+			 }
+		 }
+	 }
 
 }
