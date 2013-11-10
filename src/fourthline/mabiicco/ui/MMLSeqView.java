@@ -20,6 +20,7 @@ import fourthline.mabiicco.ui.editor.MMLEditor;
 import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLTempoEvent;
 import fourthline.mmlTools.MMLTrack;
+import fourthline.mmlTools.optimizer.MMLStringOptimizer;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -464,7 +465,8 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	public void updateActivePart() {
 		MMLEventList eventList = getActiveMMLPart();
 		String mml = eventList.toMMLString();
-		setActiveMMLPartString(mml);
+		String optimizedMML = new MMLStringOptimizer(mml).toString();
+		setActiveMMLPartString(optimizedMML);
 	}
 
 	@Override

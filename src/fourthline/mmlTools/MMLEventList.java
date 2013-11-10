@@ -88,7 +88,7 @@ public class MMLEventList {
 	private int convertNoteMML2Midi(int mml_note) {
 		return (mml_note + 12);
 	}
-	
+
 	private Object nextEvent(Iterator<? extends MMLEvent> iterator) {
 		if (iterator.hasNext()) {
 			return iterator.next();
@@ -116,7 +116,7 @@ public class MMLEventList {
 		Iterator<MMLVelocityEvent> velocityIterator = velocityList.iterator();
 		MMLVelocityEvent velocityEvent = null;
 		velocityEvent = (MMLVelocityEvent) nextEvent(velocityIterator);
-		
+
 		// Noteイベントの変換
 		for ( Iterator<MMLNoteEvent> i = noteList.iterator(); i.hasNext(); ) {
 			MMLNoteEvent noteEvent = i.next();
@@ -250,7 +250,7 @@ public class MMLEventList {
 	public void deleteMMLEvent(MMLEvent deleteItem) {
 		noteList.remove(deleteItem);
 	}
-	
+
 	public String toMMLString() {
 		//　テンポ
 		Iterator<MMLTempoEvent> tempoIterator = tempoList.iterator();
@@ -261,16 +261,16 @@ public class MMLEventList {
 		Iterator<MMLVelocityEvent> velocityIterator = velocityList.iterator();
 		MMLVelocityEvent velocityEvent = null;
 		velocityEvent = (MMLVelocityEvent) nextEvent(velocityIterator);
-		
+
 		StringBuilder sb = new StringBuilder();
 		int noteCount = noteList.size();
-		
+
 		// initial note: octave 4, tick 0, offset 0
 		MMLNoteEvent prevNoteEvent = new MMLNoteEvent(12*4, 0, 0);
-		
+
 		for (int i = 0; i < noteCount; i++) {
 			MMLNoteEvent noteEvent = noteList.get(i);
-			
+
 			// テンポのMML挿入判定
 			if ( (tempoEvent != null) && (tempoEvent.getTickOffset() <= noteEvent.getTickOffset()) ) {
 				sb.append(tempoEvent.toMMLString());
@@ -281,14 +281,14 @@ public class MMLEventList {
 				sb.append(velocityEvent.toMMLString());
 				velocityEvent = (MMLVelocityEvent) nextEvent(velocityIterator);
 			}
-			
+
 			sb.append( noteEvent.toMMLString(prevNoteEvent) );
 			prevNoteEvent = noteEvent;
 		}
-		
+
 		return sb.toString();
 	}
-	
+
 	@Override
 	public String toString() {
 		return tempoList.toString() + velocityList.toString() + noteList.toString();
