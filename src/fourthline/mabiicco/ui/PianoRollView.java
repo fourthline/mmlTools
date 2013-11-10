@@ -347,8 +347,7 @@ public class PianoRollView extends AbstractMMLView {
 		}
 	}
 
-
-
+	private boolean drawOption = false;
 	private void drawNote(Graphics2D g, MMLNoteEvent noteEvent, Color rectColor, Color fillColor) {
 		int note = noteEvent.getNote();
 		int tick = noteEvent.getTick();
@@ -362,6 +361,15 @@ public class PianoRollView extends AbstractMMLView {
 		g.fillRect(x, y, width, height);
 		g.setColor(rectColor);
 		g.drawRect(x, y, width, height);
+
+		if (drawOption) {
+			// velocityの描画.
+			int velocity = noteEvent.getVelocity();
+			if (velocity > 0) {
+				String s = "V" + velocity;
+				g.drawChars(s.toCharArray(), 0, s.length(), x, y);
+			}
+		}
 	}
 
 	/**
@@ -436,7 +444,9 @@ public class PianoRollView extends AbstractMMLView {
 				);
 
 		MMLEventList activePart = mmlManager.getActiveMMLPart();
+		drawOption = true;
 		paintMMLPart(g, activePart.getMMLNoteEventList(), rectColor, fillColor);
+		drawOption = false;
 	}
 
 

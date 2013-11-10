@@ -5,27 +5,31 @@
 package fourthline.mabiicco.ui;
 
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JFormattedTextField;
 import javax.swing.JCheckBox;
 
 import fourthline.mmlTools.MMLNoteEvent;
+
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 
 
 /**
  * ノートプロパティを編集するためのダイアログ表示で用いるPanelです.
  */
-public class MMLNotePropertyPanel extends JPanel {
+public class MMLNotePropertyPanel extends JPanel implements ActionListener {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 646262293010195918L;
 
-	private JFormattedTextField formattedTextField;
-	private JCheckBox checkBox;
+	private JSpinner velocityValueField;
+	private JCheckBox velocityCheckBox;
 	private JCheckBox tuningNoteCheckBox;
 	private MMLNoteEvent noteEvent;
 
@@ -55,15 +59,15 @@ public class MMLNotePropertyPanel extends JPanel {
 		super();
 		setLayout(null);
 
-		formattedTextField = new JFormattedTextField();
-		formattedTextField.setEnabled(false);
-		formattedTextField.setBounds(209, 37, 72, 19);
-		add(formattedTextField);
+		velocityValueField = new JSpinner();
+		velocityValueField.setModel(new SpinnerNumberModel(8, 0, 15, 1));
+		velocityValueField.setBounds(209, 37, 72, 19);
+		add(velocityValueField);
 
-		checkBox = new JCheckBox("音量コマンド（0～15）");
-		checkBox.setEnabled(false);
-		checkBox.setBounds(42, 36, 127, 21);
-		add(checkBox);
+		velocityCheckBox = new JCheckBox("音量コマンド（0～15）");
+		velocityCheckBox.setBounds(42, 36, 127, 21);
+		velocityCheckBox.addActionListener(this);
+		add(velocityCheckBox);
 
 		tuningNoteCheckBox = new JCheckBox("調律音符（L64を使って連結します）");
 		tuningNoteCheckBox.setBounds(43, 99, 207, 21);
@@ -79,6 +83,16 @@ public class MMLNotePropertyPanel extends JPanel {
 		}
 
 		tuningNoteCheckBox.setSelected( noteEvent.isTuningNote() );
+
+		int velocity = noteEvent.getVelocity();
+		if (velocity >= 0) {
+			velocityCheckBox.setSelected(true);
+			velocityValueField.setEnabled(true);
+			velocityValueField.setValue(velocity);
+		} else {
+			velocityCheckBox.setSelected(false);
+			velocityValueField.setEnabled(false);
+		}
 	}
 
 	/**
@@ -90,10 +104,24 @@ public class MMLNotePropertyPanel extends JPanel {
 		} else {
 			noteEvent.setTuningNote(false);
 		}
+
+		if (velocityCheckBox.isSelected()) {
+			Integer value = (Integer) velocityValueField.getValue();
+			noteEvent.setVelocity(value.intValue());
+		} else {
+			noteEvent.setVelocity(MMLNoteEvent.NO_VEL);
+		}
 	}
 
 	@Override
 	public Dimension getPreferredSize() {
 		return new Dimension(350, 150);
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == velocityCheckBox) {
+			velocityValueField.setEnabled( velocityCheckBox.isSelected() );
+		}
 	}
 }

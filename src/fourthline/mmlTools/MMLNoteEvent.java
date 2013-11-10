@@ -8,9 +8,11 @@ import fourthline.mmlTools.core.MMLTicks;
 
 public class MMLNoteEvent extends MMLEvent {
 
+	public static final int NO_VEL = -1;
 	private int note;
 	private int tick;
 	private boolean isTuningNote = false;
+	private int velocity = NO_VEL; // 0以上であれば、このノートから音量を変更する.
 
 	public MMLNoteEvent(int note, int tickLength, int tickOffset) {
 		super(tickOffset);
@@ -47,9 +49,21 @@ public class MMLNoteEvent extends MMLEvent {
 		this.isTuningNote = isTuningNote;
 	}
 
+	public int getVelocity() {
+		return velocity;
+	}
+
+	public String getVelocityString() {
+		return "v" + velocity;
+	}
+
+	public void setVelocity(int velocity) {
+		this.velocity = velocity;
+	}
+
 	@Override
 	public String toString() {
-		return "[Note] note: " + note + ", tick: " + tick + ", offset: " + getTickOffset();
+		return "[Note] note: " + note + ", tick: " + tick + ", offset: " + getTickOffset() + ", velocity: " + velocity;
 	}
 
 	private final String noteNameTable[] = {

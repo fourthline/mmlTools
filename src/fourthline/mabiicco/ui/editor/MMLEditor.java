@@ -221,6 +221,7 @@ public class MMLEditor implements MouseInputListener {
 				if ( (noteEvent != null) && (noteEvent.getNote() == note) ) {
 					new MMLNotePropertyPanel(noteEvent).showDialog();
 					mmlManager.updateActivePart();
+					pianoRollView.repaint();
 				}
 			}
 		}

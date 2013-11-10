@@ -24,7 +24,7 @@ public class KeyboardView extends AbstractMMLView {
 
 	private int channel = 0;
 	private int playNote = -1;
-	
+
 	private final int width = 60;
 
 	/**
@@ -66,15 +66,15 @@ public class KeyboardView extends AbstractMMLView {
 		for (int i = 0; i <= OCTNUM; i++) {
 			paintOctPianoLine(g2, i, (char)('0'+OCTNUM-i-1));
 		}
-		
+
 		g2.setColor(Color.BLUE);
 		g2.drawLine(width-1, 0, width-1, getHeight());
-		
+
 		paintPlayNote(g2);
 
 		g2.dispose();
 	}
-	
+
 	public void setChannel(int channel) {
 		this.channel = channel;
 	}
@@ -93,13 +93,13 @@ public class KeyboardView extends AbstractMMLView {
 			return false;
 		}
 	}
-	
+
 	private void paintPlayNote(Graphics2D g) {
 		int yAdd[] = { -2, -2, -1, -2, 1, -3, -2, -2, -1, 0, 0, 2 }; // 補正値
 		if (playNote < 0) {
 			return;
 		}
-		
+
 		int x = 15;
 		if ( isWhiteKey(playNote) ) {
 			x += 20;
@@ -144,7 +144,7 @@ public class KeyboardView extends AbstractMMLView {
 		y = startY;
 		g.setColor(new Color(0.3f, 0.3f, 0.6f));
 		g.drawLine(40, y, width, y);
-		
+
 		// オクターブ
 		char o_char[] = { 'o', posText };
 		g.setFont(new Font("Arial", Font.PLAIN, 12));
@@ -157,14 +157,14 @@ public class KeyboardView extends AbstractMMLView {
 		playNote = note + 12;
 
 		MabiDLS.getInstance().playNote(playNote, channel);
-		
+
 		repaint();
 	}
 
 	public void offNote() {
 		playNote = -1;
 		MabiDLS.getInstance().playNote(playNote, channel);
-		
+
 		repaint();
 	}
 }

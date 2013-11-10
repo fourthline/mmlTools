@@ -9,7 +9,6 @@ import java.util.Iterator;
 import fourthline.mmlTools.MMLEvent;
 import fourthline.mmlTools.MMLNoteEvent;
 import fourthline.mmlTools.MMLTempoEvent;
-import fourthline.mmlTools.MMLVelocityEvent;
 import fourthline.mmlTools.UndefinedTickException;
 import fourthline.mmlTools.core.MMLTokenizer;
 import fourthline.mmlTools.core.MelodyParser;
@@ -31,6 +30,7 @@ public class MMLEventParser extends MelodyParser implements Iterator<MMLEvent> {
 	private boolean hasTie = false;
 	private int totalTick = 0;
 	private MMLNoteEvent prevNoteEvent = null;
+	int volumn = MMLNoteEvent.NO_VEL;
 
 	/**
 	 * @return すべてMMLパースが終っているときは、nullを返す.
@@ -45,13 +45,11 @@ public class MMLEventParser extends MelodyParser implements Iterator<MMLEvent> {
 			}
 			if ( (firstC == 'v') || (firstC == 'V') ) {
 				try {
-					int volumn = Integer.parseInt( token.substring(1) );
-					nextItem = new MMLVelocityEvent(volumn, totalTick);
+					volumn = Integer.parseInt( token.substring(1) );
+					continue;
 				} catch (NumberFormatException e) {
 					e.printStackTrace();
 				}
-
-				return nextItem;
 			}
 			if ( (firstC == 't') || (firstC == 'T') ) {
 				try {
@@ -72,6 +70,8 @@ public class MMLEventParser extends MelodyParser implements Iterator<MMLEvent> {
 					} else {
 						nextItem = prevNoteEvent;
 						prevNoteEvent = new MMLNoteEvent(this.noteNumber, tick, totalTick);
+						prevNoteEvent.setVelocity(volumn);
+						volumn = MMLNoteEvent.NO_VEL;
 					}
 
 					hasTie = false;
