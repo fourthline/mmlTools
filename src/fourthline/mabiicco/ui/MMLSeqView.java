@@ -17,6 +17,7 @@ import javax.swing.event.ChangeListener;
 
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.editor.MMLEditor;
+import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLTempoEvent;
 import fourthline.mmlTools.MMLTrack;
 
@@ -30,6 +31,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class MMLSeqView extends JPanel implements ChangeListener, ActionListener {
 
@@ -139,7 +141,6 @@ public class MMLSeqView extends JPanel implements ChangeListener, ActionListener
 		return "Track" + trackCounter;
 	}
 
-
 	/**
 	 * トラックの追加。作成したトラックを選択状態にします。
 	 */
@@ -161,7 +162,7 @@ public class MMLSeqView extends JPanel implements ChangeListener, ActionListener
 		tabbedPane.setSelectedIndex(trackIndex);
 
 		// ピアノロール更新
-		pianoRollView.setMMLTrack(trackList);
+		pianoRollView.repaint();
 
 		// エディタ更新
 		updateSelectedTrackAndMMLPart();
@@ -192,7 +193,7 @@ public class MMLSeqView extends JPanel implements ChangeListener, ActionListener
 			addMMLTrack(null);
 		} else {
 			// ピアノロール更新
-			pianoRollView.setMMLTrack(trackList);
+			pianoRollView.repaint();
 			// エディタ更新
 			updateSelectedTrackAndMMLPart();
 		}
@@ -273,7 +274,7 @@ public class MMLSeqView extends JPanel implements ChangeListener, ActionListener
 
 		removeAllMMLTrack();
 		trackList.addAll(Arrays.asList(track));
-		pianoRollView.setMMLTrack(trackList);
+		pianoRollView.repaint();
 
 		for (int i = 0; i < track.length; i++) {
 			String name = track[i].getTrackName();
@@ -299,7 +300,6 @@ public class MMLSeqView extends JPanel implements ChangeListener, ActionListener
 		tabbedPane.setTitleAt(index, mml.getTrackName());
 
 		// 表示を更新
-		pianoRollView.setMMLTrack(trackList);
 		MMLTrackView view = (MMLTrackView)tabbedPane.getComponentAt(index);
 		view.setMMLTrack(mml);
 		updateSelectedTrackAndMMLPart();
@@ -309,7 +309,6 @@ public class MMLSeqView extends JPanel implements ChangeListener, ActionListener
 	/**
 	 * 現在選択中のトラックを取得する。
 	 */
-
 	public MMLTrack getSelectedTrack() {
 		int index = tabbedPane.getSelectedIndex();
 
@@ -318,6 +317,10 @@ public class MMLSeqView extends JPanel implements ChangeListener, ActionListener
 		}
 
 		return trackList.get(index);
+	}
+	
+	public List<MMLTrack> getTrackList() {
+		return trackList;
 	}
 
 	public void editTrackPropertyAction() {
@@ -383,10 +386,16 @@ public class MMLSeqView extends JPanel implements ChangeListener, ActionListener
 
 			// ピアノロールビューにアクティブトラックとアクティブパートを設定します.
 			editor.setMMLEventList(trackList.get(trackIndex).getMMLEventList(mmlPartIndex));
-			pianoRollView.setActiveTrackIndexAndMMLPartIndex(trackIndex, mmlPartIndex);
 			pianoRollView.repaint();
 			System.out.printf("stateChanged(): %d, %d\n", channel, mmlPartIndex);
 		}
+	}
+	
+	public MMLEventList getActiveMMLPart() {
+		int trackIndex = tabbedPane.getSelectedIndex();
+		MMLTrackView view = (MMLTrackView) tabbedPane.getSelectedComponent();
+		int mmlPartIndex = view.getSelectedMMLPartIndex();
+		return trackList.get(trackIndex).getMMLEventList(mmlPartIndex);
 	}
 
 	/**

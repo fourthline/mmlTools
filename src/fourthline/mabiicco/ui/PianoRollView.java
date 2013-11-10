@@ -13,12 +13,12 @@ import java.awt.Point;
 import java.util.List;
 
 import javax.sound.midi.Sequencer;
-import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JViewport;
 import javax.swing.event.MouseInputListener;
 
 import fourthline.mabiicco.midi.MabiDLS;
+import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLNoteEvent;
 import fourthline.mmlTools.MMLTrack;
 import fourthline.mmlTools.UndefinedTickException;
@@ -36,12 +36,11 @@ public class PianoRollView extends AbstractMMLView {
 	 */
 	private static final long serialVersionUID = -7229093886476553295L;
 
-	private List<MMLTrack> trackList;
 	private double wideScale = 6; // ピアノロールの拡大/縮小率 (1~6)
 	private int width;
 
 	private JViewport viewport;
-	private JComponent parent;
+	private MMLSeqView parent;
 
 	private long sequencePosition;
 	private long playPosition;
@@ -55,17 +54,7 @@ public class PianoRollView extends AbstractMMLView {
 	// 編集中のノートイベント
 	private MMLNoteEvent editNote;
 
-	private int activeTrackIndex;
-	private int activeMMLPartIndex;
-	/**
-	 * アクティブになっているMMLTrackとMMLPartのインデックス値を設定します.
-	 * @param trackIndex
-	 * @param mmlPartIndex
-	 */
-	public void setActiveTrackIndexAndMMLPartIndex(int trackIndex, int mmlPartIndex) {
-		activeTrackIndex = trackIndex;
-		activeMMLPartIndex = mmlPartIndex;
-	}
+	private int activeTrackIndex   = 0;
 
 
 	// ピアノロール上に表示する各トラックの色リスト
@@ -121,7 +110,7 @@ public class PianoRollView extends AbstractMMLView {
 		this.addMouseMotionListener(listener);
 	}
 
-	public void setViewportAndParent(JViewport viewport, JComponent parent) {
+	public void setViewportAndParent(JViewport viewport, MMLSeqView parent) {
 		this.viewport = viewport;
 		this.parent = parent;
 	}
@@ -145,6 +134,8 @@ public class PianoRollView extends AbstractMMLView {
 	 */
 	private void updateViewWidthTrackLength() {
 		long tickLength = 0;
+		List<MMLTrack> trackList = parent.getTrackList();
+
 		for (int i = 0; i < trackList.size(); i++) {
 			long length = trackList.get(i).getMaxTickLength();
 			if (tickLength < length) {
@@ -160,15 +151,6 @@ public class PianoRollView extends AbstractMMLView {
 			e.printStackTrace();
 		}
 		setWidth( convertTicktoX(tickLength) );
-	}
-
-	public void setMMLTrack(List<MMLTrack> trackList) {
-		this.trackList = trackList;
-
-		setActiveTrackIndexAndMMLPartIndex(0, 0);
-		updateViewWidthTrackLength();
-
-		repaint();
 	}
 
 	/**
@@ -239,6 +221,7 @@ public class PianoRollView extends AbstractMMLView {
 		super.paint(g);
 
 		updateViewTick();
+		List<MMLTrack> trackList = parent.getTrackList();
 
 		// FIXME: しぼったほうがいいかも？
 		updateViewWidthTrackLength();
@@ -251,7 +234,7 @@ public class PianoRollView extends AbstractMMLView {
 		paintMeasure(g2);
 		if (trackList != null) {
 			for (int i = 0; i < trackList.size(); i++) {
-				paintMusicScore(g2, i);
+				paintMusicScore(g2, i, trackList.get(i));
 			}
 		}
 
@@ -405,7 +388,7 @@ public class PianoRollView extends AbstractMMLView {
 	 * @param g
 	 * @param index トラックindex
 	 */
-	private void paintMusicScore(Graphics2D g, int index) {
+	private void paintMusicScore(Graphics2D g, int index, MMLTrack track) {
 		Color baseColor = trackBaseColor[index%trackBaseColor.length];
 		Color rectColor = new Color(
 				baseColor.getRed(),
@@ -420,13 +403,16 @@ public class PianoRollView extends AbstractMMLView {
 				50
 				);
 
+		MMLEventList activePart = parent.getActiveMMLPart();
+
 		for (int i = 0; i < 3; i++) {
-			List<MMLNoteEvent> mmlPart = trackList.get(index).getMMLEventList(i).getMMLNoteEventList();
-			if ( (index == activeTrackIndex) && (i == activeMMLPartIndex) ) {
+			MMLEventList targetPart = track.getMMLEventList(i);
+			if ( targetPart != activePart ) {
 				// アクティブトラック中のアクティブパートはここでは描画しない.
-				continue;
+				paintMMLPart(g, targetPart.getMMLNoteEventList(), rectColor, fillColor);
+			} else {
+				activeTrackIndex = index;
 			}
-			paintMMLPart(g, mmlPart, rectColor, fillColor);
 		}
 	}
 
@@ -446,9 +432,8 @@ public class PianoRollView extends AbstractMMLView {
 				200
 				);
 
-		List<MMLNoteEvent> mmlPart = trackList.get(index).getMMLEventList(activeMMLPartIndex).getMMLNoteEventList();
-
-		paintMMLPart(g, mmlPart, rectColor, fillColor);
+		MMLEventList activePart = parent.getActiveMMLPart();
+		paintMMLPart(g, activePart.getMMLNoteEventList(), rectColor, fillColor);
 	}
 
 
