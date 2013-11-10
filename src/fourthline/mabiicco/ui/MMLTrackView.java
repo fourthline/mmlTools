@@ -154,6 +154,15 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		return this.channel;
 	}
 
+	public String getMMLText() {
+		MMLTools tools = new MMLTools(
+				mmlText[0].getText(),
+				mmlText[1].getText(),
+				mmlText[2].getText()
+				);
+		return tools.getMML();
+	}
+
 	/**
 	 * 選択中のMMLパートのindex値を返します.
 	 * @return
@@ -173,15 +182,12 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 
 	@Override
 	public void removeUpdate(DocumentEvent event) {
-		updateComposeRank();
 	}
 	@Override
 	public void insertUpdate(DocumentEvent event) {
-		updateComposeRank();
 	}
 	@Override
 	public void changedUpdate(DocumentEvent event) {
-		updateComposeRank();
 	}
 
 	private void updateComposeRank() {

@@ -60,7 +60,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 	 * 
 	 */
 	private static final long serialVersionUID = -7484797594534384422L;
-	
+
 	// action commands
 	private static final String VIEW_EXPAND = "viewExpand";
 	private static final String VIEW_REDUCE = "viewReduce";
@@ -76,7 +76,8 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 	private static final String TRACK_PROPERTY = "trackProperty";
 	private static final String SET_START_POSITION = "setStartPosition";
 	private static final String INPUT_FROM_CLIPBOARD = "inputFromClipboard";
-	
+	private static final String OUTPUT_TO_CLIPBOARD = "outputToClipboard";
+
 	private JPanel contentPane;
 	private JTextField statusField;
 	private MMLSeqView mmlSeqView;
@@ -106,7 +107,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		JMenu fileMenu = new JMenu("ファイル");
 		fileMenu.setMnemonic('F');
 		menuBar.add(fileMenu);
-		
+
 		JMenuItem newFileMenuItem = new JMenuItem("新規作成");
 		newFileMenuItem.setIcon(new ImageIcon(MainFrame.class.getResource("/img/file.png")));
 		noplayFunctions.add(newFileMenuItem);
@@ -160,35 +161,35 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		trackPropertyMenu.setActionCommand(TRACK_PROPERTY);
 		trackPropertyMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.ALT_MASK));
 		trackMenu.add(trackPropertyMenu);
-		
+
 		JMenu playMenu = new JMenu("操作");
 		menuBar.add(playMenu);
-		
+
 		JMenuItem headPlayPositionMenuItem = new JMenuItem("先頭へ戻す");
 		headPlayPositionMenuItem.setIcon(new ImageIcon(MainFrame.class.getResource("/img/head.png")));
 		headPlayPositionMenuItem.addActionListener(this);
 		headPlayPositionMenuItem.setActionCommand(SET_START_POSITION);
 		headPlayPositionMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0));
 		playMenu.add(headPlayPositionMenuItem);
-		
+
 		JMenuItem playMenuItem = new JMenuItem("再生");
 		playMenuItem.setIcon(new ImageIcon(MainFrame.class.getResource("/img/playButton.png")));
 		playMenuItem.addActionListener(this);
 		playMenuItem.setActionCommand(PLAY);
 		playMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
 		playMenu.add(playMenuItem);
-		
+
 		JMenuItem stopMenuItem = new JMenuItem("停止");
 		stopMenuItem.setIcon(new ImageIcon(MainFrame.class.getResource("/img/stop.png")));
 		stopMenuItem.addActionListener(this);
 		stopMenuItem.setActionCommand(STOP);
-		
+
 		JMenuItem pauseMenuItem = new JMenuItem("一時停止");
 		pauseMenuItem.addActionListener(this);
 		pauseMenuItem.setActionCommand(PAUSE);
 		pauseMenuItem.setIcon(new ImageIcon(MainFrame.class.getResource("/img/pause.png")));
 		playMenu.add(pauseMenuItem);
-		
+
 		stopMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
 		playMenu.add(stopMenuItem);
 		contentPane = new JPanel();
@@ -240,7 +241,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		playButton.setFocusable(false);
 		playButton.addActionListener(this);
 		playButton.setActionCommand(PLAY);
-		
+
 		JButton pauseButton = new JButton("");
 		pauseButton.setIcon(new ImageIcon(MainFrame.class.getResource("/img/pause.png")));
 		pauseButton.setToolTipText("一時停止");
@@ -267,6 +268,13 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		inputClipButton.addActionListener(this);
 		inputClipButton.setActionCommand(INPUT_FROM_CLIPBOARD);
 		toolBar.add(inputClipButton);
+
+		JButton outputClipButton = new JButton("クリップボードへ出力");
+		noplayFunctions.add(outputClipButton);
+		outputClipButton.setFocusable(false);
+		outputClipButton.addActionListener(this);
+		outputClipButton.setActionCommand(OUTPUT_TO_CLIPBOARD);
+		toolBar.add(outputClipButton);
 
 		JSeparator separatorT3 = new JToolBar.Separator();
 		separatorT3.setForeground(Color.DARK_GRAY);
@@ -322,7 +330,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 			IMMLFileParser fileParser = new MMSFile();
 			MMLTrack track[] = fileParser.parse(file);
 			mmlSeqView.setMMLTracks(track);
-			
+
 			setTitleAndFile(file);
 			MabiIccoProperties.getInstance().setRecentFile(file.getPath());
 		} catch (MMLParseException e) {
@@ -451,7 +459,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 			}
 		});
 	}
-	
+
 	private void setEditAlign() {
 		NoteAlign noteAlign = (NoteAlign) noteTypeSelect.getSelectedItem();
 		int alignTick = noteAlign.getAlign();
@@ -462,7 +470,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 	public void actionPerformed(ActionEvent e) {
 		Object source = e.getSource();
 		String command = e.getActionCommand();
-		
+
 		if (source.equals(noteTypeSelect)) {
 			setEditAlign();
 		} else if (command.equals(VIEW_EXPAND)) {
@@ -500,8 +508,10 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 			mmlSeqView.startSequence();
 			disableNoplayItems();
 		} else if (command.equals(INPUT_FROM_CLIPBOARD)) {
-			// 現在のトラックにMMLを設定する。
 			mmlSeqView.inputClipBoardAction();
+		} else if (command.equals(OUTPUT_TO_CLIPBOARD)) {
+			mmlSeqView.outputClipBoardAction();
+			JOptionPane.showMessageDialog(this, "クリップボードにコピーしました.");
 		}
 	}
 
