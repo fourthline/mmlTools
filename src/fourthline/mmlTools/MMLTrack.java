@@ -16,6 +16,7 @@ import fourthline.mmlTools.core.MMLTools;
 
 public class MMLTrack extends MMLTools {
 	private List<MMLEventList> mmlParts;
+	private List<MMLTempoEvent> globalTempoList = new ArrayList<MMLTempoEvent>();
 
 	private int program = 0;
 	private String trackName;
@@ -44,8 +45,16 @@ public class MMLTrack extends MMLTools {
 		};
 
 		for (int i = 0; i < mml.length; i++) {
-			mmlParts.add( new MMLEventList(mml[i]) );
+			mmlParts.add( new MMLEventList(mml[i], globalTempoList) );
 		}
+	}
+	
+	public void setGlobalTempoList(List<MMLTempoEvent> globalTempoList) {
+		this.globalTempoList = globalTempoList;
+	}
+	
+	public List<MMLTempoEvent> getGlobalTempoList() {
+		return this.globalTempoList;
 	}
 
 	public void setProgram(int program) {
@@ -93,20 +102,6 @@ public class MMLTrack extends MMLTools {
 		return max;
 	}
 
-	public MMLTempoEvent getTempoOnTick(long tick) {
-		MMLTempoEvent retTempo = null;
-		for (int i = 0; i < mmlParts.size(); i++) {
-			MMLTempoEvent tempoEvent = mmlParts.get(i).getTempoOnTick(tick);
-			if (retTempo == null) {
-				retTempo = tempoEvent;
-			} else if (retTempo.getTickOffset() < tempoEvent.getTickOffset()) {
-				retTempo = tempoEvent;
-			}
-		}
-
-		return retTempo;
-	}
-
 	/**
 	 * トラックに含まれるすべてのMMLEventListを1つのMIDIトラックに変換します.
 	 * @param track
@@ -114,11 +109,11 @@ public class MMLTrack extends MMLTools {
 	 * @throws InvalidMidiDataException
 	 */
 	public void convertMidiTrack(Track track, int channel) throws InvalidMidiDataException {
-		ShortMessage message = new ShortMessage(ShortMessage.PROGRAM_CHANGE, 
+		ShortMessage pcMessage = new ShortMessage(ShortMessage.PROGRAM_CHANGE, 
 				channel,
 				program,
 				0);
-		track.add(new MidiEvent(message, 0));
+		track.add(new MidiEvent(pcMessage, 0));
 
 		for (int i = 0; i < mmlParts.size(); i++) {
 			mmlParts.get(i).convertMidiTrack(track, channel);

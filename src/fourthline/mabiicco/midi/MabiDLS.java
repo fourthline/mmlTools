@@ -21,26 +21,26 @@ public final class MabiDLS {
 	private MidiChannel channel[];
 	private InstClass insts[];
 	private Properties instProperties;
-	
+
 	private static final String INST_PROPERTIESFILE = "instrument.properties";
 	public static final String DEFALUT_DLS_PATH = "C:/Nexon/Mabinogi/mp3/MSXspirit.dls";
-	
+
 	private INotifyTrackEnd notifier = null;
-	
+
 	public static MabiDLS getInstance() {
 		return instance;
 	}
-	
+
 	/**
 	 * initializeMIDI() -> initializeSound() 
 	 */
 	private MabiDLS() {
 	}
-	
+
 	public void initializeMIDI() throws MidiUnavailableException, InvalidMidiDataException, IOException {
 		this.synthesizer = MidiSystem.getSynthesizer();
 		this.synthesizer.open();
-		
+
 		long latency = this.synthesizer.getLatency();
 		int maxPolyphony = this.synthesizer.getMaxPolyphony();
 		System.out.printf("Latency: %d\nMaxPolyphony: %d\n", latency, maxPolyphony);
@@ -66,11 +66,11 @@ public final class MabiDLS {
 			}
 		});
 	}
-	
+
 	public void setTrackEndNotifier(INotifyTrackEnd n) {
 		notifier = n;
 	}
-	
+
 	public void initializeSound(File dlsFile) throws MidiUnavailableException, InvalidMidiDataException, IOException {
 		// 楽器名の読み込み
 		try {
@@ -79,7 +79,7 @@ public final class MabiDLS {
 		} catch (IOException e) {
 			System.err.println(e.getMessage());
 		}
-		
+
 		// シーケンサとシンセサイザの初期化
 		Soundbank sb = loadDLS(dlsFile);
 		Receiver receiver = initializeSynthesizer(sb);
@@ -90,24 +90,24 @@ public final class MabiDLS {
 	public Sequencer getSequencer() {
 		return sequencer;
 	}
-	
+
 	public Synthesizer getSynthesizer() {
 		return synthesizer;
 	}
-	
+
 	public MidiChannel getChannel(int ch) {
 		return channel[ch];
 	}
-	
+
 	private String instName(Instrument inst) {
 		String name = instProperties.getProperty(""+inst.getPatch().getProgram());
-		
+
 		return name;
 	}
-	
+
 	private Soundbank loadDLS(File dlsFile) throws InvalidMidiDataException, IOException {
 		Soundbank sb = MidiSystem.getSoundbank(dlsFile);
-		
+
 		Instrument inst[] = sb.getInstruments();
 		ArrayList<InstClass> instArray = new ArrayList<InstClass>();
 		for (int i = 0; i < inst.length; i++) {
@@ -124,38 +124,69 @@ public final class MabiDLS {
 					program ));
 			System.out.printf("%d=%s \"%s\"\n", program,  originalName, name);
 		}
-		
+
 		insts = new InstClass[instArray.size()];
 		insts = instArray.toArray(insts);
 
 		return sb;
 	}
-	
-	
+
+
 	private Receiver initializeSynthesizer(Soundbank sb) throws InvalidMidiDataException, IOException, MidiUnavailableException {
 		this.synthesizer.loadAllInstruments(sb);
 		this.channel = this.synthesizer.getChannels();
 		Receiver receiver = this.synthesizer.getReceiver();
-		
+
 		// リバーブ設定
 		for (int i = 0; i < this.channel.length; i++) {
 			/* ctrl 91 汎用エフェクト 1(リバーブ) */
 			ShortMessage message = new ShortMessage(ShortMessage.CONTROL_CHANGE, 
 					i,
 					91,
-					0);
-			
+					0);			
 			receiver.send(message, 0);
 		}
-		
+		channel[9].resetAllControllers();
+		// TODO: ch10のドラムパートを解除する.
+		/* ドラムパート設定解除 */
+		byte b[] = {
+				(byte)0xF0,
+				0x41, // Maker ID
+				0x10, // Device ID
+				0x42, // Model ID
+				0x12, // Command ID
+				0x40, 
+				0x00, // part11
+				0x7F, 
+				0x00, // part
+				0x41, // sum
+		};
+		byte b2[] = {
+				(byte)0xF0,
+				0x41, // Maker ID
+				0x10, // Device ID
+				0x42, // Model ID
+				0x12, // Command ID
+				0x40, 
+				0x1A, // part11
+				0x15, 
+				0x02, // part
+				0x0F, // sum
+		};
+		SysexMessage sysexMessage;
+		sysexMessage = new SysexMessage(b, b.length);
+		receiver.send(sysexMessage, 0);
+		sysexMessage = new SysexMessage(b2, b2.length);
+		receiver.send(sysexMessage, 0);
+
 		return receiver;
 	}
-	
-	
+
+
 	public InstClass[] getInsts() {
 		return insts;
 	}
-	
+
 	private int play_note = -1;
 	/** 単音再生 */
 	public void playNote(int note, int channel) {
@@ -164,7 +195,7 @@ public final class MabiDLS {
 			return;
 		}
 		MidiChannel midiChannel = this.getChannel(channel);
-		
+
 		if (note < 0) {
 			midiChannel.allNotesOff();
 			play_note = -1;
@@ -174,14 +205,14 @@ public final class MabiDLS {
 			play_note = note;
 		}
 	}
-	
+
 	public void changeProgram(int program, int channel) {
 		MidiChannel midiChannel = this.getChannel(channel);
 		if (midiChannel.getProgram() != program) {
-			midiChannel.programChange(program);
+			midiChannel.programChange(0, program);
 		}
 	}
-	
+
 	/**
 	 * すべてのチャンネルのパンポット設定を中央に戻します. 
 	 */
@@ -198,6 +229,26 @@ public final class MabiDLS {
 	 */
 	public void setChannelPanpot(int ch_num, int panpot) {
 		channel[ch_num].controlChange(10, panpot);
+	}
+
+	public static void main(String args[]) {
+		try {
+			MabiDLS midi = MabiDLS.getInstance();
+			midi.initializeMIDI();
+			MidiChannel channel[] = midi.getSynthesizer().getChannels();
+
+			for (int i = 0; i < MidiSystem.getMidiDeviceInfo().length; i++) {
+				System.out.println(MidiSystem.getMidiDeviceInfo()[i]);
+			}
+
+			for (int i = 0; i > 128; i++) {
+				System.out.printf("%d\n", channel[10].getController(i));
+			}
+
+			System.exit(0);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }
 

@@ -21,6 +21,8 @@ import javax.swing.event.MouseInputListener;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLNoteEvent;
+import fourthline.mmlTools.MMLScore;
+import fourthline.mmlTools.MMLTempoEvent;
 import fourthline.mmlTools.MMLTrack;
 import fourthline.mmlTools.UndefinedTickException;
 import fourthline.mmlTools.core.MMLTicks;
@@ -137,10 +139,11 @@ public class PianoRollView extends AbstractMMLView {
 	 */
 	private void updateViewWidthTrackLength() {
 		long tickLength = 0;
-		List<MMLTrack> trackList = mmlManager.getTrackList();
+		MMLScore mmlScore = mmlManager.getMMLScore();
+		int trackCount = mmlScore.getTrackCount();
 
-		for (int i = 0; i < trackList.size(); i++) {
-			long length = trackList.get(i).getMaxTickLength();
+		for (int i = 0; i < trackCount; i++) {
+			long length = mmlScore.getTrack(i).getMaxTickLength();
 			if (tickLength < length) {
 				tickLength = length;
 			}
@@ -222,9 +225,9 @@ public class PianoRollView extends AbstractMMLView {
 	@Override
 	public void paint(Graphics g) {
 		super.paint(g);
-
 		updateViewTick();
-		List<MMLTrack> trackList = mmlManager.getTrackList();
+
+		MMLScore mmlScore = mmlManager.getMMLScore();
 
 		// FIXME: しぼったほうがいいかも？
 		updateViewWidthTrackLength();
@@ -235,9 +238,10 @@ public class PianoRollView extends AbstractMMLView {
 		}
 
 		paintMeasure(g2);
-		if (trackList != null) {
-			for (int i = 0; i < trackList.size(); i++) {
-				paintMusicScore(g2, i, trackList.get(i));
+		if (mmlScore != null) {
+			int trackCount = mmlScore.getTrackCount();
+			for (int i = 0; i < trackCount; i++) {
+				paintMusicScore(g2, i, mmlScore.getTrack(i));
 			}
 		}
 
@@ -459,7 +463,7 @@ public class PianoRollView extends AbstractMMLView {
 
 			@Override
 			public Dimension getPreferredSize() {
-				return new Dimension(width, 12);
+				return new Dimension(width, 26);
 			}
 
 			@Override
@@ -471,11 +475,11 @@ public class PianoRollView extends AbstractMMLView {
 				 * メジャーを表示します。
 				 */
 				paintRuler(g2);
+				paintTempoEvents(g2);
 				paintSequenceLine(g2);
 
 				g2.dispose();
 			}
-
 
 			/**
 			 * ルーラを表示します。
@@ -502,6 +506,20 @@ public class PianoRollView extends AbstractMMLView {
 				}
 			}
 
+			/**
+			 * テンポを表示します.
+			 */
+			private void paintTempoEvents(Graphics2D g) {
+				MMLScore score = mmlManager.getMMLScore();
+				Iterable<MMLTempoEvent> tempoIterator = score.getTempoEventIterable();
+
+				for (MMLTempoEvent tempoEvent : tempoIterator) {
+					int tick = tempoEvent.getTickOffset();
+					int x = convertTicktoX(tick);
+					String s = "t" + tempoEvent.getTempo();
+					g.drawChars( s.toCharArray(), 0, s.length(), x+2, 24);
+				}
+			}
 		};
 	}
 

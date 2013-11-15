@@ -22,7 +22,7 @@ import fourthline.mabiicco.midi.INotifyTrackEnd;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.editor.MMLEditor;
 import fourthline.mabiicco.ui.editor.NoteAlign;
-import fourthline.mmlTools.MMLTrack;
+import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.parser.*;
 
 import java.awt.event.ActionListener;
@@ -328,8 +328,8 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 	private void openMMLFile(File file) {
 		try {
 			IMMLFileParser fileParser = new MMSFile();
-			MMLTrack track[] = fileParser.parse(file);
-			mmlSeqView.setMMLTracks(track);
+			MMLScore score = fileParser.parse(file);
+			mmlSeqView.setMMLScore(score);
 
 			setTitleAndFile(file);
 			MabiIccoProperties.getInstance().setRecentFile(file.getPath());

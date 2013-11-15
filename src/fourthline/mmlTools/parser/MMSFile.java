@@ -10,8 +10,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 
+import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTrack;
 
 /**
@@ -22,8 +22,8 @@ import fourthline.mmlTools.MMLTrack;
 public class MMSFile implements IMMLFileParser {
 
 	@Override
-	public MMLTrack[] parse(File file) throws MMLParseException {
-		ArrayList<MMLTrack> array = new ArrayList<MMLTrack>();
+	public MMLScore parse(File file) throws MMLParseException {
+		MMLScore score = new MMLScore();
 		BufferedReader reader = null;
 		try {
 			FileInputStream fisFile = new FileInputStream(file);
@@ -56,7 +56,7 @@ public class MMSFile implements IMMLFileParser {
 					MMLTrack track = parseMMSPart(reader);
 					System.out.println(track.getMML());
 					System.out.println(track.getProgram());
-					array.add(track);
+					score.addTrack(track);
 				}
 			}
 			
@@ -72,15 +72,7 @@ public class MMSFile implements IMMLFileParser {
 			}
 		}
 		
-		/* トラック数のチェック */
-		int trackCount = array.size();
-		if ( (trackCount <= 0) || (trackCount > 16) ) {
-			throw(new MMLParseException());
-		}
-		
-		MMLTrack tracks[] = new MMLTrack[trackCount];
-		array.toArray(tracks);
-		return tracks;
+		return score;
 	}
 
 	/**
@@ -140,15 +132,5 @@ public class MMSFile implements IMMLFileParser {
 		track.setTrackName(name);
 		track.setPanpot(panpot);
 		return track;
-	}
-	
-	public static void main(String args[]) {
-		try {
-			MMSFile mmsFile = new MMSFile();
-			MMLTrack track[] = mmsFile.parse(new File("sample.mms"));
-			System.out.println(track[0].getTrackName());
-		} catch (MMLParseException e) {
-			e.printStackTrace();
-		}
 	}
 }

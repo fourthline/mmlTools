@@ -9,7 +9,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.sound.midi.InvalidMidiDataException;
-import javax.sound.midi.MetaMessage;
 import javax.sound.midi.MidiEvent;
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.ShortMessage;
@@ -24,14 +23,23 @@ import fourthline.mmlTools.parser.MMLEventParser;
 public class MMLEventList {
 
 	private List<MMLNoteEvent>   noteList   = new ArrayList<MMLNoteEvent>();
-	private List<MMLTempoEvent>  tempoList  = new ArrayList<MMLTempoEvent>();
-
+	private List<MMLTempoEvent>  tempoList;
 
 	/**
 	 * 
 	 * @param mml
 	 */
 	public MMLEventList(String mml) {
+		this(mml, null);
+	}
+	
+	public MMLEventList(String mml, List<MMLTempoEvent> globalTempoList) {
+		if (globalTempoList != null) {
+			tempoList = globalTempoList;
+		} else {
+			tempoList = new ArrayList<MMLTempoEvent>();
+		}
+
 		parseMML(mml);
 	}
 
@@ -42,7 +50,7 @@ public class MMLEventList {
 			MMLEvent event = parser.next();
 
 			if (event instanceof MMLTempoEvent) {
-				tempoList.add((MMLTempoEvent) event);
+				((MMLTempoEvent) event).appendToListElement(tempoList);
 			} else if (event instanceof MMLNoteEvent) {
 				if (((MMLNoteEvent) event).getNote() >= 0) {
 					noteList.add((MMLNoteEvent) event);
@@ -66,19 +74,6 @@ public class MMLEventList {
 		return noteList;
 	}
 
-	private static final int INITIAL_TEMPO = 120;
-	public MMLTempoEvent getTempoOnTick(long tick) {
-		for (int i = 0; i < tempoList.size(); i++) {
-			MMLTempoEvent tempoEvent = tempoList.get(i);
-			if (tempoEvent.getTickOffset() <= tick) {
-				return tempoEvent;
-			}
-		}
-
-		return new MMLTempoEvent(INITIAL_TEMPO, 0);
-	}
-
-
 	private int convertVelocityMML2Midi(int mml_velocity) {
 		return (mml_velocity * 8);
 	}
@@ -98,21 +93,8 @@ public class MMLEventList {
 	public void convertMidiTrack(Track track, int channel) throws InvalidMidiDataException {
 		int volumn = INITIAL_VOLUMN;
 
-		// テンポ
-		for ( Iterator<MMLTempoEvent> i = tempoList.iterator(); i.hasNext(); ) {
-			MMLTempoEvent tempoEvent = i.next();
-			byte tempo[] = tempoEvent.getMetaData();
-			int tickOffset = tempoEvent.getTickOffset();
-
-			MidiMessage message = new MetaMessage(MMLTempoEvent.META, 
-					tempo, tempo.length);
-			track.add(new MidiEvent(message, tickOffset));
-		}
-
 		// Noteイベントの変換
-		for ( Iterator<MMLNoteEvent> i = noteList.iterator(); i.hasNext(); ) {
-			MMLNoteEvent noteEvent = i.next();
-			System.out.println(" [to midi] " + noteEvent.toString());
+		for (MMLNoteEvent noteEvent : noteList) {
 			int note = noteEvent.getNote();
 			int tick = noteEvent.getTick();
 			int tickOffset = noteEvent.getTickOffset();
@@ -121,7 +103,6 @@ public class MMLEventList {
 			// ボリュームの変更
 			if (noteEvent.getVelocity() >= 0) {
 				volumn = noteEvent.getVelocity();
-				System.out.println(" [to midi] " + noteEvent.getVelocityString());
 			}
 
 			// ON イベント作成
@@ -163,10 +144,8 @@ public class MMLEventList {
 
 	/**
 	 * ノートイベントを追加します.
-	 * @param addItem
-	 * @param tickOffset
-	 * @param editTick
-	 * @param editIndex
+	 * TODO: MMLNoteEvent のメソッドのほうがいいかな？Listを引数として渡す.
+	 * @param addNoteEvent
 	 */
 	public void addMMLNoteEvent(MMLNoteEvent addNoteEvent) {
 		int i;
@@ -209,17 +188,6 @@ public class MMLEventList {
 				break;
 			}
 		}
-	}
-
-	/**
-	 * テンポイベントを追加します.
-	 * @param addItem
-	 * @param tickOffset
-	 * @param editTick
-	 * @param editIndex
-	 */
-	public void addMMLTempoEvent(MMLTempoEvent addTempoEvent) {
-		// TODO: イベントが重複しないよう注意すること!!!
 	}
 
 	/**

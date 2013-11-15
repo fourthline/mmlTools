@@ -4,7 +4,6 @@
 
 package fourthline.mabiicco.ui;
 
-import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.Sequence;
 import javax.sound.midi.Sequencer;
 import javax.swing.JPanel;
@@ -18,7 +17,7 @@ import javax.swing.event.ChangeListener;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.editor.MMLEditor;
 import fourthline.mmlTools.MMLEventList;
-import fourthline.mmlTools.MMLTempoEvent;
+import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTrack;
 import fourthline.mmlTools.optimizer.MMLStringOptimizer;
 
@@ -33,9 +32,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, ActionListener {
 
@@ -44,7 +40,6 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	 */
 	private static final long serialVersionUID = -479890612015524747L;
 
-	private static final int MAX_TRACK = 8;
 	private static final int INITIAL_TRACK_COUNT = 1;
 
 	private int trackCounter;
@@ -54,7 +49,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	private KeyboardView keyboardView;
 	private JTabbedPane tabbedPane;
 
-	private ArrayList<MMLTrack> trackList = new ArrayList<MMLTrack>();
+	private MMLScore mmlScore = new MMLScore();
 
 	private MMLInputPanel dialog = new MMLInputPanel(this);
 
@@ -88,11 +83,11 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 					pianoRollView.setSequenceX(x);
 				} else {
 					long tick = pianoRollView.convertXtoTick(x);
-					Sequence sequence = sequencer.getSequence();
 					// 移動先のテンポに設定する.
-					int tempo = getTempoInSequenceAtTick(sequence, tick);
+					int tempo = getTempoInSequenceAtTick(tick);
 					sequencer.setTickPosition(tick);
 					sequencer.setTempoInBPM(tempo);
+					System.out.printf("Sequence update: tick(%d), tempo(%d)\n", tick, tempo);
 				}
 			}
 		});
@@ -149,17 +144,15 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	 * トラックの追加。作成したトラックを選択状態にします。
 	 */
 	public void addMMLTrack(MMLTrack newTrack) {
-		if (trackList.size() >= MAX_TRACK) {
-			return;
-		}
 		if (newTrack == null) {
 			newTrack = new MMLTrack("");
 			newTrack.setTrackName( getNewTrackName() );
 		}
 
-		// トラックリストの末尾に追加
-		trackList.add(newTrack);
-		int trackIndex = trackList.size() - 1;
+		int trackIndex = mmlScore.addTrack(newTrack);
+		if (trackIndex < 0) {
+			return;
+		}
 
 		// トラックビューの追加
 		tabbedPane.add(newTrack.getTrackName(), new MMLTrackView(newTrack, trackIndex, this, this));
@@ -173,7 +166,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	}
 
 	private void removeAllMMLTrack() {
-		trackList.clear();
+		mmlScore.removeAllTrack();
 		tabbedPane.removeAll();
 	}
 
@@ -184,7 +177,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	public void removeMMLTrack() {
 		int index = tabbedPane.getSelectedIndex();
 
-		trackList.remove(index);
+		mmlScore.removeTrack(index);
 		tabbedPane.remove(index);
 
 		// MMLTrackViewのチャンネルを更新する.
@@ -193,7 +186,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 			view.setChannel(i);
 		}
 
-		if (trackList.size() == 0) {
+		if (mmlScore.getTrackCount() == 0) {
 			addMMLTrack(null);
 		} else {
 			// ピアノロール更新
@@ -207,39 +200,10 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 
 
 	/**
-	 * MIDIシーケンスを作成します。
-	 * @throws InvalidMidiDataException 
-	 */
-	private Sequence createSequence() throws InvalidMidiDataException {
-		Sequence sequence = new Sequence(Sequence.PPQ, 96);
-
-		for (int i = 0; i < trackList.size(); i++) {
-			MMLTrack mmlTrack = trackList.get(i);
-			mmlTrack.convertMidiTrack(sequence.createTrack(), i);
-			int panpot = mmlTrack.getPanpot();
-			MabiDLS.getInstance().setChannelPanpot(i, panpot);
-		}
-
-		System.out.println("trackList.size(): "+trackList.size());
-
-		return sequence;
-	}
-
-	/**
 	 * 全トラックにおける、指定Tick位置のテンポを取得する。
 	 */
-	private int getTempoInSequenceAtTick(Sequence sequence, long tick) {
-		MMLTempoEvent retTempo = null;
-		for (int i = 0; i < trackList.size(); i++) {
-			MMLTempoEvent tempoEvent = trackList.get(i).getTempoOnTick(tick);
-			if (retTempo == null) {
-				retTempo = tempoEvent;
-			} else if (retTempo.getTickOffset() < tempoEvent.getTickOffset()) {
-				retTempo = tempoEvent;
-			}
-		}
-
-		return retTempo.getTempo();
+	private int getTempoInSequenceAtTick(long tick) {
+		return mmlScore.getTempoOnTick(tick);
 	}
 
 	/**
@@ -250,11 +214,11 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 			public void run() {
 				try {
 					Sequencer sequencer = MabiDLS.getInstance().getSequencer();
-					Sequence sequence = createSequence();
+					Sequence sequence = mmlScore.createSequence();
 
 					// 再生開始が先頭でない場合、そこのテンポに設定する必要がある。
 					long startTick = pianoRollView.getSequencePossition();
-					int tempo = getTempoInSequenceAtTick(sequence, startTick);
+					int tempo = getTempoInSequenceAtTick(startTick);
 					System.out.printf("Sequence start: tick(%d), tempo(%d)\n", startTick, tempo);
 					sequencer.setSequence(sequence);
 					sequencer.setTickPosition(startTick);
@@ -271,22 +235,21 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	/**
 	 * 新規で複数のトラックをセットする。
 	 */
-	public void setMMLTracks(MMLTrack track[]) {
-		if (track.length > MAX_TRACK) {
-			return;
-		}
+	public void setMMLScore(MMLScore score) {
+		mmlScore = score;
 
-		removeAllMMLTrack();
-		trackList.addAll(Arrays.asList(track));
 		pianoRollView.repaint();
+		tabbedPane.removeAll();
 
-		for (int i = 0; i < track.length; i++) {
-			String name = track[i].getTrackName();
+		int trackCount = score.getTrackCount();
+		for (int i = 0; i < trackCount; i++) {
+			MMLTrack track = score.getTrack(i);
+			String name = track.getTrackName();
 			if (name == null) {
 				name = "Track"+(i+1);
 			}
 
-			tabbedPane.add(name, new MMLTrackView(track[i], i, this, this));
+			tabbedPane.add(name, new MMLTrackView(track, i, this, this));
 		}
 
 		initialSetView();
@@ -300,7 +263,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	public void setMMLselectedTrack(MMLTrack mml) {
 		int index = tabbedPane.getSelectedIndex();
 
-		trackList.set(index, mml);		
+		mmlScore.setTrack(index, mml);
 		tabbedPane.setTitleAt(index, mml.getTrackName());
 
 		// 表示を更新
@@ -320,12 +283,12 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 			index = 0;
 		}
 
-		return trackList.get(index);
+		return mmlScore.getTrack(index);
 	}
 
 	@Override
-	public List<MMLTrack> getTrackList() {
-		return trackList;
+	public MMLScore getMMLScore() {
+		return mmlScore;
 	}
 
 	public void editTrackPropertyAction() {
@@ -399,7 +362,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 			int mmlPartIndex = view.getSelectedMMLPartIndex();
 
 			// ピアノロールビューにアクティブトラックとアクティブパートを設定します.
-			editor.setMMLEventList(trackList.get(trackIndex).getMMLEventList(mmlPartIndex));
+			editor.setMMLEventList(mmlScore.getTrack(trackIndex).getMMLEventList(mmlPartIndex));
 			pianoRollView.repaint();
 			System.out.printf("stateChanged(): %d, %d\n", channel, mmlPartIndex);
 		}
@@ -410,7 +373,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		int trackIndex = tabbedPane.getSelectedIndex();
 		MMLTrackView view = (MMLTrackView) tabbedPane.getSelectedComponent();
 		int mmlPartIndex = view.getSelectedMMLPartIndex();
-		return trackList.get(trackIndex).getMMLEventList(mmlPartIndex);
+		return mmlScore.getTrack(trackIndex).getMMLEventList(mmlPartIndex);
 	}
 
 	private void setActiveMMLPartString(String mml) {

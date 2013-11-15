@@ -4,16 +4,14 @@
 
 package fourthline.mabiicco.ui;
 
-import java.util.List;
-
 import fourthline.mmlTools.MMLEventList;
-import fourthline.mmlTools.MMLTrack;
+import fourthline.mmlTools.MMLScore;
 
 /**
  *
  */
 public interface IMMLManager {
-	public List<MMLTrack> getTrackList();
+	public MMLScore getMMLScore();
 	public MMLEventList getActiveMMLPart();
 	public void updateActivePart();
 	public void updateActiveTrackProgram(int program);
