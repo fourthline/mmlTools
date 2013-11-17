@@ -278,7 +278,7 @@ public class MMLEventListTest {
 		MMLEventList eventList = new MMLEventList("c4d4");
 		String expectMML = "c4d4r1r1";
 
-		String mml = eventList.toMMLString(false, 96+96+(96*8));
+		String mml = eventList.toMMLString(true, 96+96+(96*8));
 		System.out.println(mml);
 
 		assertEquals(expectMML, mml);

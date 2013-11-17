@@ -190,6 +190,15 @@ public class PianoRollView extends AbstractMMLView {
 		return convertTicktoX( sequencePosition );
 	}
 
+	public long getSequencePlayPosition() {
+		long position = sequencePosition;
+		if (MabiDLS.getInstance().getSequencer().isRunning()) {
+			position = playPosition;
+		}
+
+		return position;
+	}
+
 	public void setSequenceX(int x) {
 		long tick = convertXtoTick(x);
 
@@ -364,7 +373,7 @@ public class PianoRollView extends AbstractMMLView {
 			int velocity = noteEvent.getVelocity();
 			if (velocity > 0) {
 				String s = "V" + velocity;
-				g.drawChars(s.toCharArray(), 0, s.length(), x, y);
+				g.drawString(s, x, y);
 			}
 		}
 	}

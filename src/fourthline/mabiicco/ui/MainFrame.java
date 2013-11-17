@@ -7,6 +7,7 @@ package fourthline.mabiicco.ui;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Rectangle;
 
 import javax.swing.JFrame;
@@ -36,6 +37,7 @@ import java.util.Iterator;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -83,6 +85,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 	private MMLSeqView mmlSeqView;
 	@SuppressWarnings("rawtypes")
 	private JComboBox noteTypeSelect;
+	private JLabel timeView;
 
 	private final String DEFAULT_TITLE = " * MabiIcco *";
 
@@ -222,9 +225,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		openFileButton.setActionCommand(FILE_OPEN);
 		toolBar.add(openFileButton);
 
-		JSeparator separatorT1 = new JToolBar.Separator();
-		separatorT1.setForeground(Color.DARK_GRAY);
-		toolBar.add(separatorT1);
+		toolBar.add(newToolBarSeparator());
 
 		JButton startPositionButton = new JButton("");
 		toolBar.add(startPositionButton);
@@ -258,9 +259,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		stopButton.addActionListener(this);
 		stopButton.setActionCommand(STOP);
 
-		JSeparator separatorT2 = new JToolBar.Separator();
-		separatorT2.setForeground(Color.DARK_GRAY);
-		toolBar.add(separatorT2);
+		toolBar.add(newToolBarSeparator());
 
 		JButton inputClipButton = new JButton("クリップボードから入力");
 		noplayFunctions.add(inputClipButton);
@@ -276,9 +275,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		outputClipButton.setActionCommand(OUTPUT_TO_CLIPBOARD);
 		toolBar.add(outputClipButton);
 
-		JSeparator separatorT3 = new JToolBar.Separator();
-		separatorT3.setForeground(Color.DARK_GRAY);
-		toolBar.add(separatorT3);
+		toolBar.add(newToolBarSeparator());
 
 		// ビューの拡大/縮小ツールボタン
 		JButton expandButton = new JButton("拡大");
@@ -297,7 +294,13 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		noteTypeSelect.setFocusable(false);
 		toolBar.add(noteTypeSelect);
 
+		toolBar.add(newToolBarSeparator());
+		timeView = new JLabel("time MM:SS/MM:SS (120)");
+		timeView.setFont(new Font("Monospaced", Font.BOLD, 12));
+		toolBar.add(timeView);
+
 		mmlSeqView = new MMLSeqView();
+		mmlSeqView.setTimeView(timeView);
 		contentPane.add(mmlSeqView, BorderLayout.CENTER);
 
 		JPanel southPanel = new JPanel();
@@ -314,6 +317,13 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		noteTypeSelect.addActionListener(this);
 		noteTypeSelect.setSelectedIndex(MMLEditor.DEFAULT_ALIGN_INDEX);
 		setEditAlign();
+	}
+
+
+	private JSeparator newToolBarSeparator() {
+		JSeparator separator = new JToolBar.Separator();
+		separator.setForeground(Color.DARK_GRAY);
+		return separator;
 	}
 
 	private void setTitleAndFile(File file) {

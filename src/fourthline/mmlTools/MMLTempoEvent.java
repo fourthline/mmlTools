@@ -6,6 +6,7 @@ package fourthline.mmlTools;
 
 import java.util.List;
 
+
 public class MMLTempoEvent extends MMLEvent {
 
 	private int tempo;
@@ -83,5 +84,36 @@ public class MMLTempoEvent extends MMLEvent {
 		}
 
 		return tempo;
+	}
+
+	/**
+	 * 指定したtickオフセット位置の先頭からの時間を返します.
+	 * @param tempoList
+	 * @param tickOffset
+	 * @return 先頭からの時間（秒）
+	 */
+	public static double getTimeOnTickOffset(List<MMLTempoEvent> tempoList, int tickOffset) {
+		double totalTime = 0.0;
+
+		int tempo = INITIAL_TEMPO;
+		int currentTick = 0;
+		for (MMLTempoEvent tempoEvent : tempoList) {
+			int currentTempoTick = tempoEvent.getTickOffset();
+			if (tickOffset < currentTempoTick) {
+				break;
+			}
+
+			int currentTempo = tempoEvent.getTempo();
+			if (tempo != currentTempo) {
+				totalTime += (currentTempoTick - currentTick) * 60 / tempo;
+				currentTick = currentTempoTick;
+			}
+
+			tempo = currentTempo;
+		}
+
+		totalTime += (tickOffset - currentTick) * 60 / tempo;
+		totalTime /= 96.0;
+		return totalTime;
 	}
 }

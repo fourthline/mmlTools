@@ -1,6 +1,6 @@
 /*
-　* Copyright (C) 2013 たんらる
-　*/
+ * Copyright (C) 2013 たんらる
+ */
 
 package fourthline.mmlTools;
 
@@ -28,11 +28,52 @@ public class MMLTempoEventTest {
 
 		tempoEvent1.appendToListElement(tempoList);
 		tempoEvent2.appendToListElement(tempoList);
-		
+
 		tempoEvent2.appendToListElement(expectList);
 		System.out.println(tempoList);
-		
+
 		assertEquals(expectList.toString(), tempoList.toString());
+	}
+
+	private void checkGetTimeOnTickTest(String mml, double expect) {
+		ArrayList<MMLTempoEvent> tempoList = new ArrayList<MMLTempoEvent>();
+		MMLEventList eventList = new MMLEventList(mml, tempoList);
+
+		int tick = (int) eventList.getTickLength();
+		System.out.println("tick: " + tick);
+		assertEquals(expect, MMLTempoEvent.getTimeOnTickOffset(tempoList, tick), 0.0001);
+	}
+
+	@Test
+	public void testGetTimeOnTickOffset_0() {
+		String mml = "t60cccccccccct120cccccccccc";
+		double expect = 15.0;
+
+		checkGetTimeOnTickTest(mml, expect);
+	}
+
+	@Test
+	public void testGetTimeOnTickOffset_1() {
+		String mml = "cccccccccct60cccccccccc";
+		double expect = 15.0;
+
+		checkGetTimeOnTickTest(mml, expect);
+	}
+
+	@Test
+	public void testGetTimeOnTickOffset_2() {
+		String mml = "t32l1.c";
+		double expect = 11.25;
+
+		checkGetTimeOnTickTest(mml, expect);
+	}
+
+	@Test
+	public void testGetTimeOnTickOffset_3() {
+		String mml = "";
+		double expect = 0.0;
+
+		checkGetTimeOnTickTest(mml, expect);
 	}
 
 }

@@ -6,6 +6,7 @@ package fourthline.mabiicco.ui;
 
 import javax.sound.midi.Sequence;
 import javax.sound.midi.Sequencer;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -46,12 +47,14 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	private PianoRollView pianoRollView;
 	private KeyboardView keyboardView;
 	private JTabbedPane tabbedPane;
+	private ColumnPanel columnView;
 
 	private MMLScore mmlScore = new MMLScore();
 
 	private MMLInputPanel dialog = new MMLInputPanel(this);
 
 	private MMLEditor editor;
+
 
 
 	/**
@@ -71,7 +74,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		scrollPane.getVerticalScrollBar().setUnitIncrement(AbstractMMLView.HEIGHT);
 
 		scrollPane.setRowHeaderView(keyboardView);
-		JPanel columnView = new ColumnPanel(pianoRollView, this);
+		columnView = new ColumnPanel(pianoRollView, this);
 		scrollPane.setColumnHeaderView(columnView);
 
 		add(scrollPane, BorderLayout.CENTER);
@@ -452,5 +455,9 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	@Override
 	public void updateActiveTrackProgram(int program) {
 		getSelectedTrack().setProgram(program);
+	}
+
+	public void setTimeView(JLabel timeView) {
+		columnView.setTimeView(timeView);
 	}
 }

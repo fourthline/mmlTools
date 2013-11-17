@@ -93,8 +93,8 @@ public class MMLTools {
 	protected void parsePlayMode(boolean drumMode) throws UndefinedTickException {
 		if (drumMode) {
 			String s = mml_melody
-			+ "T"+melodyParser.getTempo() + mml_chord1
-			+ "T"+chord1Parser.getTempo() + mml_chord2;
+					+ "T"+melodyParser.getTempo() + mml_chord1
+					+ "T"+chord1Parser.getTempo() + mml_chord2;
 			playParser = new MelodyParser(s);
 		} else {
 			playParser = new MelodyParser(mml_melody);
@@ -151,9 +151,9 @@ public class MMLTools {
 	 */
 	public String getMML() {
 		String mml = "MML@"
-			+ mml_melody + ","
-			+ mml_chord1 + ","
-			+ mml_chord2 + ";";
+				+ mml_melody + ","
+				+ mml_chord1 + ","
+				+ mml_chord2 + ";";
 
 		return mml;
 	}
@@ -164,11 +164,11 @@ public class MMLTools {
 
 	public String mmlRankFormat() {
 		String str = "Rank "
-			+ this.mmlRank() + " "
-			+ "( " + this.mml_melody.length()
-			+ ", " + this.mml_chord1.length()
-			+ ", " + this.mml_chord2.length()
-			+ " )";
+				+ this.mmlRank() + " "
+				+ "( " + this.mml_melody.length()
+				+ ", " + this.mml_chord1.length()
+				+ ", " + this.mml_chord2.length()
+				+ " )";
 
 		return str;
 	}
@@ -195,7 +195,7 @@ public class MMLTools {
 	public boolean checkPitch(int min, int max) throws UndefinedTickException {
 		parseMMLforMabinogi();
 		parsePlayMode(false);
-		
+
 		if (
 				melodyParser.checkPitch(min, max) &&
 				chord1Parser.checkPitch(min, max) && 

@@ -88,6 +88,18 @@ public class MMLScore {
 		return globalTempoList;
 	}
 
+	public int getTotalTickLength() {
+		long tick = 0;
+		for (MMLTrack track : trackList) {
+			long currentTick = track.getMaxTickLength();
+			if (tick < currentTick) {
+				tick = currentTick;
+			}
+		}
+
+		return (int)tick;
+	}
+
 	/**
 	 * MIDIシーケンスを作成します。
 	 * @throws InvalidMidiDataException 
