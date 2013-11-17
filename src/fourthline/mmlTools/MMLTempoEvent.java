@@ -22,6 +22,10 @@ public class MMLTempoEvent extends MMLEvent {
 		return this.tempo;
 	}
 
+	public void setTempo(int tempo) {
+		this.tempo = tempo;
+	}
+
 	public byte[] getMetaData() {
 		byte[] retVal = { (byte)tempo };
 

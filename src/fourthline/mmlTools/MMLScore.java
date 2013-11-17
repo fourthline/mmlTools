@@ -47,13 +47,6 @@ public class MMLScore {
 	}
 
 	/**
-	 * すべてのトラックを削除します.
-	 */
-	public void removeAllTrack() {
-		trackList.clear();
-	}
-
-	/**
 	 * 指定したindexのトラックを削除します.
 	 * @param index
 	 */
@@ -91,7 +84,7 @@ public class MMLScore {
 		return MMLTempoEvent.searchOnTick(globalTempoList, tickOffset);
 	}
 
-	public Iterable<MMLTempoEvent> getTempoEventIterable() {
+	public List<MMLTempoEvent> getTempoEventList() {
 		return globalTempoList;
 	}
 

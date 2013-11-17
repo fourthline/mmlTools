@@ -15,4 +15,5 @@ public interface IMMLManager {
 	public MMLEventList getActiveMMLPart();
 	public void updateActivePart();
 	public void updateActiveTrackProgram(int program);
+	public void updateTempoRoll();
 }

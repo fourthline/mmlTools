@@ -14,6 +14,7 @@ import javax.sound.midi.MidiMessage;
 import javax.sound.midi.ShortMessage;
 import javax.sound.midi.Track;
 
+import fourthline.mmlTools.core.MMLTicks;
 import fourthline.mmlTools.parser.MMLEventParser;
 
 
@@ -32,7 +33,7 @@ public class MMLEventList {
 	public MMLEventList(String mml) {
 		this(mml, null);
 	}
-	
+
 	public MMLEventList(String mml, List<MMLTempoEvent> globalTempoList) {
 		if (globalTempoList != null) {
 			tempoList = globalTempoList;
@@ -57,6 +58,10 @@ public class MMLEventList {
 				}
 			}
 		}
+	}
+
+	public void setGlobalTempoList(List<MMLTempoEvent> globalTempoList) {
+		tempoList = globalTempoList;
 	}
 
 	public long getTickLength() {
@@ -200,6 +205,36 @@ public class MMLEventList {
 	}
 
 	public String toMMLString() {
+		return toMMLString(false, 0);
+	}
+
+	public String toMMLString(boolean withTempo) {
+		return toMMLString(withTempo, 0);
+	}
+
+	private MMLNoteEvent insertTempoMML(StringBuilder sb, MMLNoteEvent prevNoteEvent, MMLTempoEvent tempoEvent, int volumn) {
+		// rrrT***N の処理
+		if (prevNoteEvent.getEndTick() != tempoEvent.getTickOffset()) {
+			int tickLength = tempoEvent.getTickOffset() - prevNoteEvent.getEndTick();
+			int tickOffset = prevNoteEvent.getEndTick();
+			int note = prevNoteEvent.getNote();
+			prevNoteEvent = new MMLNoteEvent(note, tickLength, tickOffset);
+			MMLTicks ticks = new MMLTicks("c", tickLength, false);
+			sb.append("v0").append(ticks.toString()).append("v"+volumn);
+		}
+		sb.append(tempoEvent.toMMLString());
+
+		return prevNoteEvent;
+	}
+
+	/**
+	 * テンポ出力を行うかどうかを指定してMML文字列を作成する.
+	 * TODO: 長いなぁ。
+	 * @param withTempo trueを指定すると、tempo指定を含むMMLを返します.
+	 * @param totalTick 最大tick長. これに満たない場合は、末尾を休符分で埋めます.
+	 * @return
+	 */
+	public String toMMLString(boolean withTempo, int totalTick) {
 		//　テンポ
 		Iterator<MMLTempoEvent> tempoIterator = tempoList.iterator();
 		MMLTempoEvent tempoEvent = null;
@@ -212,16 +247,20 @@ public class MMLEventList {
 		int noteCount = noteList.size();
 
 		// initial note: octave 4, tick 0, offset 0
-		MMLNoteEvent prevNoteEvent = new MMLNoteEvent(12*4, 0, 0);
-
+		MMLNoteEvent noteEvent = new MMLNoteEvent(12*4, 0, 0);
+		MMLNoteEvent prevNoteEvent = noteEvent;
 		for (int i = 0; i < noteCount; i++) {
-			MMLNoteEvent noteEvent = noteList.get(i);
+			noteEvent = noteList.get(i);
 
 			// テンポのMML挿入判定
 			if ( (tempoEvent != null) && (tempoEvent.getTickOffset() <= noteEvent.getTickOffset()) ) {
-				sb.append(tempoEvent.toMMLString());
+				if (withTempo) {
+					// tempo挿入 (rrrT***N の処理)
+					prevNoteEvent = insertTempoMML(sb, prevNoteEvent, tempoEvent, volumn);
+				}
 				tempoEvent = (MMLTempoEvent) nextEvent(tempoIterator);
 			}
+
 			// 音量のMML挿入判定
 			int noteVelocity = noteEvent.getVelocity();
 			if ( (noteVelocity >= 0) && (noteVelocity != volumn) ) {
@@ -229,8 +268,32 @@ public class MMLEventList {
 				sb.append(noteEvent.getVelocityString());
 			}
 
+			// endTickOffsetがTempoを跨いでいたら、そこで切る.
+			if ( (tempoEvent != null) && (tempoEvent.getTickOffset() < noteEvent.getEndTick()) ) {
+				int tick = tempoEvent.getTickOffset() - noteEvent.getTickOffset();
+				noteEvent = new MMLNoteEvent(noteEvent.getNote(), tick, noteEvent.getTickOffset());
+			}
 			sb.append( noteEvent.toMMLString(prevNoteEvent) );
 			prevNoteEvent = noteEvent;
+		}
+
+		// テンポがまだ残っていれば、その分をつなげる.
+		if ( (withTempo) && (tempoEvent != null) && (noteEvent != null) ) {
+			int endTick = noteEvent.getEndTick();
+			int tickOffset = tempoEvent.getTickOffset();
+			int tick = tickOffset - endTick;
+			if (tick > 0) {
+				sb.append("v0");
+				sb.append( new MMLTicks("c", tick, false).toString() );
+			}
+			sb.append(tempoEvent.toMMLString());
+			noteEvent = new MMLNoteEvent(noteEvent.getNote(), noteEvent.getTick() + tick, noteEvent.getTickOffset());
+		}
+
+		// 全体のtickに達していなければ、さらに休符をつなげる
+		if ( (withTempo) && (noteEvent != null) && (noteEvent.getEndTick() < totalTick) ) {
+			int tick = totalTick - noteEvent.getEndTick();
+			sb.append( new MMLTicks("r", tick, false).toString() );
 		}
 
 		return sb.toString();

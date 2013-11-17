@@ -15,7 +15,7 @@ import fourthline.mmlTools.UndefinedTickException;
  * @author たんらる
  */
 public class MMLTicks {
-	
+
 	/**
 	 * For MML text -> tick
 	 */
@@ -25,8 +25,8 @@ public class MMLTicks {
 	 * For tick -> MML text
 	 */
 	private static HashMap<Integer, String> tickInvTable = new HashMap<Integer, String>();
-	
-	
+
+
 	static {
 		add("1.", 576);
 		add("2.", 288);
@@ -92,7 +92,7 @@ public class MMLTicks {
 		add("62.", 9);
 		add("63.", 9);
 		add("64.", 9);
-		
+
 		add("1", 384);
 		add("2", 192);
 		add("3", 128);
@@ -158,16 +158,16 @@ public class MMLTicks {
 		add("63", 6);
 		add("64", 6);
 	}
-	
+
 	static private void add(String s, Integer value) {
 		tickTable.put(s, value);
-		
+
 		String invText = tickInvTable.get(value);
 		if ( (invText == null) || (s.length() <= invText.length()) ) {
 			tickInvTable.put(value, s);
 		}
 	}
-	
+
 	static public int getTick(String gt) throws UndefinedTickException {
 		try {
 			int tick = tickTable.get(gt);
@@ -176,8 +176,8 @@ public class MMLTicks {
 			throw new UndefinedTickException(gt);
 		}
 	}
-	
-	
+
+
 	private String noteName;
 	int tick;
 	boolean needTie;
@@ -190,7 +190,7 @@ public class MMLTicks {
 	public MMLTicks(String noteName, int tick) {
 		this(noteName, tick, true);
 	}
-	
+
 	/**
 	 * tick長をMML文字列に変換します.
 	 * @param noteName
@@ -202,17 +202,17 @@ public class MMLTicks {
 		this.tick = tick;
 		this.needTie = needTie;
 	}
-	
+
 	private String mmlNotePart(String phoneticString) {
 		StringBuilder sb = new StringBuilder();
 		if (needTie) {
 			sb.append('&');
 		}
 		sb.append(noteName).append(phoneticString);
-		
+
 		return sb.toString();
 	}
-	
+
 	/**
 	 * noteNameとtickをMMLの文字列に変換します.
 	 * needTieがtrueのときは、'&'による連結を行います.
@@ -221,7 +221,16 @@ public class MMLTicks {
 		try {
 			int remTick = tick;
 			StringBuilder sb = new StringBuilder();
-			
+
+			// "1."
+			int mTick = getTick("1.");
+			int tick1 = getTick("1");
+			while (remTick > (tick1*2)) {
+				sb.append( mmlNotePart("1.") );
+				remTick -= mTick;
+			}
+
+			// 1~64の分割
 			for (int base = 1; base <= 64; base *= 2) {
 				int baseTick = getTick(""+base);
 				if (tickInvTable.containsKey(remTick)) {
@@ -233,7 +242,7 @@ public class MMLTicks {
 					remTick -= baseTick;
 				}
 			}
-			
+
 			if (needTie) {
 				return sb.substring(1);
 			} else {
@@ -242,10 +251,10 @@ public class MMLTicks {
 		} catch (UndefinedTickException e) {
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
-	
+
 	/**
 	 * L64を使って変換します.　（調律用）
 	 * @return
@@ -254,14 +263,14 @@ public class MMLTicks {
 		try {
 			int remTick = tick;
 			StringBuilder sb = new StringBuilder();
-			
+
 			int base = 64;
 			int baseTick = getTick(""+base);
 			while (remTick >= baseTick) {
 				sb.append( mmlNotePart(""+base) );
 				remTick -= baseTick;
 			}
-			
+
 			if (needTie) {
 				return sb.substring(1);
 			} else {
@@ -270,7 +279,7 @@ public class MMLTicks {
 		} catch (UndefinedTickException e) {
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
 }

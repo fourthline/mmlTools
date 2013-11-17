@@ -226,6 +226,10 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 	public void setActivePartMMLString(String mml) {
 		int index = getSelectedMMLPartIndex();
 
+		setPartMMLString(index, mml);
+	}
+
+	public void setPartMMLString(int index, String mml) {
 		mmlText[index].setText(mml);
 		updateComposeRank();
 	}

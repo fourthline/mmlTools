@@ -167,8 +167,6 @@ public class MelodyParser {
 	
 	private int mmlGT(String gt) throws UndefinedTickException {
 		int tick = MMLTicks.getTick(gt);
-		System.out.println("["+gt+"] -> "+tick);
-		
 		return tick;
 	}
 	

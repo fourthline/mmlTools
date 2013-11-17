@@ -14,7 +14,6 @@ import java.util.List;
 
 import javax.sound.midi.Sequencer;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 import javax.swing.JViewport;
 import javax.swing.event.MouseInputListener;
 
@@ -22,7 +21,6 @@ import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLNoteEvent;
 import fourthline.mmlTools.MMLScore;
-import fourthline.mmlTools.MMLTempoEvent;
 import fourthline.mmlTools.MMLTrack;
 import fourthline.mmlTools.UndefinedTickException;
 import fourthline.mmlTools.core.MMLTicks;
@@ -40,7 +38,6 @@ public class PianoRollView extends AbstractMMLView {
 	private static final long serialVersionUID = -7229093886476553295L;
 
 	private double wideScale = 6; // ピアノロールの拡大/縮小率 (1~6)
-	private int width;
 
 	private JViewport viewport;
 	private JComponent parentComponent;
@@ -90,7 +87,6 @@ public class PianoRollView extends AbstractMMLView {
 	};
 
 	private static final Color barBorder = new Color(0.5f, 0.5f, 0.5f);
-	private static final Color beatBorder = new Color(0.4f, 0.4f, 0.4f);
 
 
 
@@ -121,7 +117,6 @@ public class PianoRollView extends AbstractMMLView {
 	}
 
 	public void setWidth(int width) {
-		this.width = width;
 		super.setPreferredSize(new Dimension(width, 649));
 		revalidate();
 	}
@@ -248,7 +243,7 @@ public class PianoRollView extends AbstractMMLView {
 		paintActivePart(g2);
 		paintEditNote(g2);
 
-		paintSequenceLine(g2);
+		paintSequenceLine(g2, getHeight());
 
 		g2.dispose();
 
@@ -316,7 +311,7 @@ public class PianoRollView extends AbstractMMLView {
 		thread.start();
 	}
 
-	private void paintSequenceLine(Graphics2D g) {
+	public void paintSequenceLine(Graphics2D g, int height) {
 		long position = sequencePosition;
 		if (MabiDLS.getInstance().getSequencer().isRunning()) {
 			position = playPosition;
@@ -324,11 +319,9 @@ public class PianoRollView extends AbstractMMLView {
 
 		Color color = Color.RED;
 		int x = convertTicktoX(position);
-		int y1 = 0;
-		int y2 = getHeight();
 
 		g.setColor(color);
-		g.drawLine(x, y1, x, y2);
+		g.drawLine(x, 0, x, height);
 	}
 
 	/**
@@ -452,78 +445,6 @@ public class PianoRollView extends AbstractMMLView {
 		paintMMLPart(g, activePart.getMMLNoteEventList(), rectColor, fillColor);
 		drawOption = false;
 	}
-
-
-	public JPanel getRulerPanel() {
-		return new JPanel() {
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = -4391191253349838837L;
-
-			@Override
-			public Dimension getPreferredSize() {
-				return new Dimension(width, 26);
-			}
-
-			@Override
-			public void paint(Graphics g) {
-				super.paint(g);
-
-				Graphics2D g2 = (Graphics2D)g.create();
-				/**
-				 * メジャーを表示します。
-				 */
-				paintRuler(g2);
-				paintTempoEvents(g2);
-				paintSequenceLine(g2);
-
-				g2.dispose();
-			}
-
-			/**
-			 * ルーラを表示します。
-			 */
-			private void paintRuler(Graphics2D g) {
-				int width = getWidth();
-				try {
-					g.setColor(beatBorder);
-					int sect = convertTicktoX( MMLTicks.getTick("1") );
-					int count = 0;
-					for (int i = 0; i < width; i += sect) {
-						int x = i;
-						int y1 = 0;
-						int y2 = getHeight();
-						g.drawLine(x, y1, x, y2);
-
-						String s = "" + (count++);
-						g.drawChars( s.toCharArray(), 0, s.length(), x+2, y1+10);
-					}
-
-				} catch (UndefinedTickException e) {
-					e.printStackTrace();
-					return;
-				}
-			}
-
-			/**
-			 * テンポを表示します.
-			 */
-			private void paintTempoEvents(Graphics2D g) {
-				MMLScore score = mmlManager.getMMLScore();
-				Iterable<MMLTempoEvent> tempoIterator = score.getTempoEventIterable();
-
-				for (MMLTempoEvent tempoEvent : tempoIterator) {
-					int tick = tempoEvent.getTickOffset();
-					int x = convertTicktoX(tick);
-					String s = "t" + tempoEvent.getTempo();
-					g.drawChars( s.toCharArray(), 0, s.length(), x+2, 24);
-				}
-			}
-		};
-	}
-
-
 
 	private void paintEditNote(Graphics2D g) {
 		if (editNote != null) {

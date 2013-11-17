@@ -48,11 +48,14 @@ public class MMLTrack extends MMLTools {
 			mmlParts.add( new MMLEventList(mml[i], globalTempoList) );
 		}
 	}
-	
+
 	public void setGlobalTempoList(List<MMLTempoEvent> globalTempoList) {
 		this.globalTempoList = globalTempoList;
+		for (MMLEventList eventList : mmlParts) {
+			eventList.setGlobalTempoList(globalTempoList);
+		}
 	}
-	
+
 	public List<MMLTempoEvent> getGlobalTempoList() {
 		return this.globalTempoList;
 	}
