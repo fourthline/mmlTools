@@ -51,7 +51,6 @@ public class ColumnPanel extends AbstractMMLView implements MouseListener, Actio
 	private JMenuItem insertTempoMenu;
 	private JMenuItem editTempoMenu;
 	private JMenuItem deleteTempoMenu;
-	private JLabel timeView;
 
 	private final String INSERT_TEMPO = "insert_tempo";
 	private final String EDIT_TEMPO   = "edit_tempo";
@@ -78,10 +77,6 @@ public class ColumnPanel extends AbstractMMLView implements MouseListener, Actio
 		return menu;
 	}
 
-	public void setTimeView(JLabel timeView) {
-		this.timeView = timeView;
-	}
-
 	@Override
 	public Dimension getPreferredSize() {
 		return new Dimension(getWidth(), 26);
@@ -104,7 +99,6 @@ public class ColumnPanel extends AbstractMMLView implements MouseListener, Actio
 		paintRuler(g2);
 		paintTempoEvents(g2);
 		pianoRollView.paintSequenceLine(g2, getHeight());
-		paintSequenceTime();
 
 		g2.dispose();
 	}
@@ -158,21 +152,6 @@ public class ColumnPanel extends AbstractMMLView implements MouseListener, Actio
 		g.fillPolygon(xPoints, yPoints, xPoints.length);
 		g.setColor(BEAT_BORDER_COLOR);
 		g.drawPolygon(xPoints, yPoints, xPoints.length);
-	}
-
-	private void paintSequenceTime() {
-		long position = pianoRollView.getSequencePlayPosition();
-		List<MMLTempoEvent> tempoList = mmlManager.getMMLScore().getTempoEventList();
-		double time = MMLTempoEvent.getTimeOnTickOffset(tempoList, (int)position);
-		int totalTick = mmlManager.getMMLScore().getTotalTickLength();
-		double totalTime = MMLTempoEvent.getTimeOnTickOffset(tempoList, totalTick);
-		int tempo = MMLTempoEvent.searchOnTick(tempoList, (int)position);
-
-		String str = String.format("time %d:%d/%d:%d (t%d)", 
-				(int)(time/60), (int)(time%60),
-				(int)(totalTime/60), (int)(totalTime%60),
-				tempo);
-		timeView.setText(str);
 	}
 
 	private void setSequenceBar(int x) {

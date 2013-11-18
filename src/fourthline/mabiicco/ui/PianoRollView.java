@@ -6,14 +6,11 @@ package fourthline.mabiicco.ui;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.util.List;
 
-import javax.sound.midi.Sequencer;
-import javax.swing.JComponent;
 import javax.swing.JViewport;
 import javax.swing.event.MouseInputListener;
 
@@ -40,13 +37,9 @@ public class PianoRollView extends AbstractMMLView {
 	private double wideScale = 6; // ピアノロールの拡大/縮小率 (1~6)
 
 	private JViewport viewport;
-	private JComponent parentComponent;
 	private IMMLManager mmlManager;
 
 	private long sequencePosition;
-	private long playPosition;
-
-	private boolean donePaint = true;
 
 	// 描画位置判定用 (tick base)
 	private double startViewTick;
@@ -55,8 +48,7 @@ public class PianoRollView extends AbstractMMLView {
 	// 編集中のノートイベント
 	private MMLNoteEvent editNote;
 
-	private int activeTrackIndex   = 0;
-
+	private int activeTrackIndex = 0;
 
 	// ピアノロール上に表示する各トラックの色リスト
 	private static final Color trackBaseColor[] = {
@@ -98,7 +90,6 @@ public class PianoRollView extends AbstractMMLView {
 		setPreferredSize(new Dimension(0, 649));
 
 		setSequenceX(0);
-		createSequenceThread();
 	}
 
 	/**
@@ -110,9 +101,8 @@ public class PianoRollView extends AbstractMMLView {
 		this.addMouseMotionListener(listener);
 	}
 
-	public void setViewportAndParent(JViewport viewport, JComponent parent, IMMLManager mmlManager) {
+	public void setViewportAndParent(JViewport viewport, IMMLManager mmlManager) {
 		this.viewport = viewport;
-		this.parentComponent = parent;
 		this.mmlManager = mmlManager;
 	}
 
@@ -193,7 +183,7 @@ public class PianoRollView extends AbstractMMLView {
 	public long getSequencePlayPosition() {
 		long position = sequencePosition;
 		if (MabiDLS.getInstance().getSequencer().isRunning()) {
-			position = playPosition;
+			position = MabiDLS.getInstance().getSequencer().getTickPosition();
 		}
 
 		return position;
@@ -255,8 +245,6 @@ public class PianoRollView extends AbstractMMLView {
 		paintSequenceLine(g2, getHeight());
 
 		g2.dispose();
-
-		donePaint = true;
 	}
 
 
@@ -275,56 +263,8 @@ public class PianoRollView extends AbstractMMLView {
 		}
 	}
 
-
-	// TODO: 重いかなぁ・・・
-	private void createSequenceThread() {
-		Thread thread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				while (true) {
-					try {
-						Thread.sleep(25);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					Sequencer sequencer = MabiDLS.getInstance().getSequencer();
-					if (sequencer.isRunning()) {
-						if (!donePaint) {
-							continue;
-						}
-						donePaint = false;
-						EventQueue.invokeLater(new Runnable() {
-							@Override
-							public void run() {
-								Sequencer sequencer = MabiDLS.getInstance().getSequencer();
-								long position = sequencer.getTickPosition();
-								playPosition = position;
-								position = convertTicktoX(position);
-								Point point = viewport.getViewPosition();
-								Dimension dim = viewport.getExtentSize();
-								double x1 = point.getX();
-								double x2 = x1 + dim.getWidth();
-								if ( (position < x1) || (position > x2) ) {
-									/* ビュー外にあるので、現在のポジションにあわせる */
-									point.setLocation(position, point.getY());
-									viewport.setViewPosition(point);
-								}
-								parentComponent.repaint();
-							}
-						});
-					}
-				}
-			}
-		});
-
-		thread.start();
-	}
-
 	public void paintSequenceLine(Graphics2D g, int height) {
-		long position = sequencePosition;
-		if (MabiDLS.getInstance().getSequencer().isRunning()) {
-			position = playPosition;
-		}
+		long position = getSequencePlayPosition();
 
 		Color color = Color.RED;
 		int x = convertTicktoX(position);

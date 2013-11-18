@@ -19,6 +19,7 @@ import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.editor.MMLEditor;
 import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLScore;
+import fourthline.mmlTools.MMLTempoEvent;
 import fourthline.mmlTools.MMLTrack;
 import fourthline.mmlTools.optimizer.MMLStringOptimizer;
 
@@ -31,6 +32,7 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, ActionListener {
 
@@ -55,6 +57,9 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 
 	private MMLEditor editor;
 
+	private JLabel timeView;
+	private Thread timeViewUpdateThread;
+
 
 
 	/**
@@ -78,7 +83,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		scrollPane.setColumnHeaderView(columnView);
 
 		add(scrollPane, BorderLayout.CENTER);
-		pianoRollView.setViewportAndParent(scrollPane.getViewport(), this, this);
+		pianoRollView.setViewportAndParent(scrollPane.getViewport(), this);
 
 
 		// MMLTrackView (tab) - SOUTH
@@ -93,6 +98,9 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 
 		initialSetView();
 		initializeMMLTrack();
+
+		startSequenceThread();
+		startTimeViewUpdateThread();
 	}
 
 	private void initialSetView() {
@@ -312,6 +320,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		if (!sequencer.isRunning()) {
 			setViewPosition(0);
 			pianoRollView.setSequenceX(0);
+			repaint();
 		} else {
 			sequencer.setTickPosition(0);
 			sequencer.setTempoInBPM(120);
@@ -458,6 +467,93 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	}
 
 	public void setTimeView(JLabel timeView) {
-		columnView.setTimeView(timeView);
+		this.timeView = timeView;
+	}
+
+	// TimeViewを更新するためのスレッドを開始します.
+	private void startTimeViewUpdateThread() {
+		if (timeViewUpdateThread != null) {
+			return;
+		}
+		// TODO: びみょう・・・？
+		timeViewUpdateThread = new Thread(
+				new Runnable() {
+					@Override
+					public void run() {
+						while (true) {
+							try {
+								Thread.sleep(100);
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							}
+							updateTimeView();
+						}
+					}
+				});
+		timeViewUpdateThread.start();
+	}
+
+	private void updateTimeView() {
+		long position = pianoRollView.getSequencePlayPosition();
+		List<MMLTempoEvent> tempoList = mmlScore.getTempoEventList();
+		double time = MMLTempoEvent.getTimeOnTickOffset(tempoList, (int)position);
+		int totalTick = mmlScore.getTotalTickLength();
+		double totalTime = MMLTempoEvent.getTimeOnTickOffset(tempoList, totalTick);
+		int tempo = MMLTempoEvent.searchOnTick(tempoList, (int)position);
+
+		String str = String.format("time %d:%02d/%d:%02d (t%d)", 
+				(int)(time/60), (int)(time%60),
+				(int)(totalTime/60), (int)(totalTime%60),
+				tempo);
+		if (timeView != null) {
+			timeView.setText(str);
+		}
+	}
+
+	private Thread updateViewThread;
+	// PianoRoll, Sequence系の描画を行うスレッドを開始します.
+	private void startSequenceThread() {
+		if (updateViewThread != null) {
+			return;
+		}
+		updateViewThread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				while (true) {
+					try {
+						Thread.sleep(25);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					updatePianoRollView();
+				}
+			}
+		});
+		updateViewThread.start();
+	}
+
+	// TODO: Play方式をリアルタイム式にすれば、これを統合可能.
+	private void updatePianoRollView() {
+		Sequencer sequencer = MabiDLS.getInstance().getSequencer();
+		if (sequencer.isRunning()) {
+			EventQueue.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					long position = pianoRollView.getSequencePlayPosition();
+					position = pianoRollView.convertTicktoX(position);
+					JViewport viewport = scrollPane.getViewport();
+					Point point = viewport.getViewPosition();
+					Dimension dim = viewport.getExtentSize();
+					double x1 = point.getX();
+					double x2 = x1 + dim.getWidth();
+					if ( (position < x1) || (position > x2) ) {
+						/* ビュー外にあるので、現在のポジションにあわせる */
+						point.setLocation(position, point.getY());
+						viewport.setViewPosition(point);
+					}
+					scrollPane.repaint();
+				}
+			});
+		}
 	}
 }
