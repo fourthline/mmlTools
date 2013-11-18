@@ -455,7 +455,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 			// メロディパートのMML更新（テンポ, tickLengthにあわせる.
 			MMLEventList eventList = track.getMMLEventList(0);
 			int totalTick = (int)track.getMaxTickLength();
-			String mml = eventList.toMMLString(true, totalTick);
+			String mml = eventList.toMMLString(mmlScore.getTempoEventList(), totalTick);
 			String optimizedMML = new MMLStringOptimizer(mml).toString();
 			view.setPartMMLString(0, optimizedMML);
 		}

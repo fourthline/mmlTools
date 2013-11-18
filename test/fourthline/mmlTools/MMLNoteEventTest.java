@@ -1,6 +1,6 @@
 /*
-　* Copyright (C) 2013 たんらる
-　*/
+ * Copyright (C) 2013 たんらる
+ */
 
 package fourthline.mmlTools;
 
@@ -18,7 +18,7 @@ public class MMLNoteEventTest {
 	public void testGetOctave() {
 		MMLEventList eventList = new MMLEventList("c");
 		MMLNoteEvent noteEvent = eventList.getMMLNoteEventList().get(0);
-		
+
 		System.out.println(noteEvent.getOctave());
 		assertEquals(4, noteEvent.getOctave());
 	}
@@ -28,10 +28,10 @@ public class MMLNoteEventTest {
 		MMLEventList eventList = new MMLEventList("c>>c");
 		MMLNoteEvent noteEvent0 = eventList.getMMLNoteEventList().get(0);
 		MMLNoteEvent noteEvent1 = eventList.getMMLNoteEventList().get(1);
-		
+
 		int noteOctave0 = noteEvent0.getOctave();
 		assertEquals(4, noteEvent0.getOctave());
-		
+
 		String changedOctave = noteEvent1.changeOctaveinMMLString(noteOctave0);
 		assertEquals(">>", changedOctave);
 	}
@@ -41,10 +41,10 @@ public class MMLNoteEventTest {
 		MMLEventList eventList = new MMLEventList("c<<c");
 		MMLNoteEvent noteEvent0 = eventList.getMMLNoteEventList().get(0);
 		MMLNoteEvent noteEvent1 = eventList.getMMLNoteEventList().get(1);
-		
+
 		int noteOctave0 = noteEvent0.getOctave();
 		assertEquals(4, noteEvent0.getOctave());
-		
+
 		String changedOctave = noteEvent1.changeOctaveinMMLString(noteOctave0);
 		assertEquals("<<", changedOctave);
 	}
@@ -55,16 +55,16 @@ public class MMLNoteEventTest {
 		String expected = "c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64";
 		MMLNoteEvent noteEvent = eventList.getMMLNoteEventList().get(0);
 		noteEvent.setTuningNote(true);
-		
+
 		System.out.println(noteEvent.toMMLString());
 		assertEquals(expected, noteEvent.toMMLString());
 	}
-	
+
 	@Test
 	public void testParse_0() {
 		MMLEventList eventList1 = new MMLEventList("v14l16o5aa");
 		MMLEventList eventList2 = new MMLEventList("V14L16O5aa");
-		
+
 		assertEquals(eventList1.toString(), eventList2.toString());
 	}
 

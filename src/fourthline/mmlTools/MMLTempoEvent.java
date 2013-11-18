@@ -62,7 +62,7 @@ public class MMLTempoEvent extends MMLEvent {
 			}
 		}
 
-		list.add(this);
+		list.add(index, this);
 	}
 
 	public static List<MMLTempoEvent> mergeTempoList(List<MMLTempoEvent> list1, List<MMLTempoEvent> list2) {

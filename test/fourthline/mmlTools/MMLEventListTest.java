@@ -230,7 +230,7 @@ public class MMLEventListTest {
 	public void testToMMLString_3() {
 		MMLEventList eventList = new MMLEventList("T150v10c8.g16e4v8g-<at120<b-");
 
-		String mml = eventList.toMMLString(true);
+		String mml = eventList.toMMLString(eventList.getGlobalTempoList());
 		System.out.println(mml);
 
 		assertEquals(eventList.toString(), new MMLEventList(mml).toString());
@@ -246,8 +246,7 @@ public class MMLEventListTest {
 		String expectMML = "c8t150r8d4";
 		globalTempoList.add(new MMLTempoEvent(150, 48));
 
-		eventList.setGlobalTempoList(globalTempoList);
-		String mml = eventList.toMMLString(true);
+		String mml = eventList.toMMLString(globalTempoList);
 		System.out.println(mml);
 
 		assertEquals(expectMML, mml);
@@ -263,8 +262,7 @@ public class MMLEventListTest {
 		List<MMLTempoEvent> globalTempoList = new ArrayList<MMLTempoEvent>();
 		globalTempoList.add(new MMLTempoEvent(150, 96*2+96*12));
 
-		eventList.setGlobalTempoList(globalTempoList);
-		String mml = eventList.toMMLString(true);
+		String mml = eventList.toMMLString(globalTempoList);
 		System.out.println(mml);
 
 		assertEquals(expectMML, mml);
@@ -278,7 +276,7 @@ public class MMLEventListTest {
 		MMLEventList eventList = new MMLEventList("c4d4");
 		String expectMML = "c4d4r1r1";
 
-		String mml = eventList.toMMLString(true, 96+96+(96*8));
+		String mml = eventList.toMMLString(eventList.getGlobalTempoList(), 96+96+(96*8));
 		System.out.println(mml);
 
 		assertEquals(expectMML, mml);
@@ -294,8 +292,7 @@ public class MMLEventListTest {
 		List<MMLTempoEvent> globalTempoList = new ArrayList<MMLTempoEvent>();
 		globalTempoList.add(new MMLTempoEvent(150, (96*8)));
 
-		eventList.setGlobalTempoList(globalTempoList);
-		String mml = eventList.toMMLString(true);
+		String mml = eventList.toMMLString(globalTempoList);
 		System.out.println(mml);
 
 		assertEquals(expectMML, mml);
