@@ -199,7 +199,6 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 
 		String rank = tools.mmlRankFormat();
 		trackComposeLabel.setText(rank);
-		System.out.println(rank);
 	}
 
 	public void setInstProgram(int program) {

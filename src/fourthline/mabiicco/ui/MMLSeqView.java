@@ -249,6 +249,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 
 		initialSetView();
 		pianoRollView.setSequenceX(0);
+		updateTempoRoll();
 		repaint();
 	}
 
@@ -265,6 +266,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		MMLTrackView view = (MMLTrackView)tabbedPane.getComponentAt(index);
 		view.setMMLTrack(mml);
 		updateSelectedTrackAndMMLPart();
+		updateTempoRoll();
 		repaint();
 	}
 
@@ -446,19 +448,19 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 
 	@Override
 	public void updateTempoRoll() {
-		// すべてのmelodyパートを更新します. 
+		// すべての全パートMMLテキストを更新します. 
 		int count = tabbedPane.getComponentCount();
 		for (int i = 0; i < count; i++) {
 			MMLTrackView view = (MMLTrackView) tabbedPane.getComponentAt(i);
 			MMLTrack track = mmlScore.getTrack(i);
 
-			// メロディパートのMML更新（テンポ, tickLengthにあわせる.
-			MMLEventList eventList = track.getMMLEventList(0);
-			int totalTick = (int)track.getMaxTickLength();
-			String mml = eventList.toMMLString(mmlScore.getTempoEventList(), totalTick);
-			String optimizedMML = new MMLStringOptimizer(mml).toString();
-			view.setPartMMLString(0, optimizedMML);
+			String mmlStrings[] = track.getMMLStrings();
+			view.setPartMMLString(0, mmlStrings[0]);
+			view.setPartMMLString(1, mmlStrings[1]);
+			view.setPartMMLString(2, mmlStrings[2]);
 		}
+
+		pianoRollView.repaint();
 	}
 
 	@Override

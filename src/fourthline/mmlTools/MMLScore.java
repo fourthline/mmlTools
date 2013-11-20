@@ -41,6 +41,7 @@ public class MMLScore {
 
 		// グローバルテンポリストの統合.
 		MMLTempoEvent.mergeTempoList(track.getGlobalTempoList(), globalTempoList);
+		track.setGlobalTempoList(globalTempoList);
 
 		return trackIndex;
 	}
@@ -80,6 +81,7 @@ public class MMLScore {
 
 		// グローバルテンポリストの統合.
 		MMLTempoEvent.mergeTempoList(track.getGlobalTempoList(), globalTempoList);
+		track.setGlobalTempoList(globalTempoList);
 	}
 
 	public int getTempoOnTick(long tickOffset) {

@@ -296,7 +296,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 
 		toolBar.add(newToolBarSeparator());
 		timeView = new JLabel("time MM:SS/MM:SS (120)");
-		timeView.setFont(new Font("Monospaced", Font.BOLD, 12));
+		timeView.setFont(new Font(Font.MONOSPACED, Font.BOLD, 12));
 		toolBar.add(timeView);
 
 		mmlSeqView = new MMLSeqView();

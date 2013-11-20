@@ -194,10 +194,6 @@ public class PianoRollView extends AbstractMMLView {
 
 		if (!MabiDLS.getInstance().getSequencer().isRunning()) {
 			sequencePosition = tick;
-
-			if (mmlManager != null) {
-				mmlManager.updateActivePart();
-			}
 		}
 	}
 

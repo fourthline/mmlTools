@@ -13,6 +13,7 @@ import javax.sound.midi.ShortMessage;
 import javax.sound.midi.Track;
 
 import fourthline.mmlTools.core.MMLTools;
+import fourthline.mmlTools.optimizer.MMLStringOptimizer;
 
 public class MMLTrack extends MMLTools {
 	private List<MMLEventList> mmlParts;
@@ -46,6 +47,14 @@ public class MMLTrack extends MMLTools {
 
 		for (int i = 0; i < mml.length; i++) {
 			mmlParts.add( new MMLEventList(mml[i], globalTempoList) );
+		}
+	}
+
+	public void setGlobalTempoList(List<MMLTempoEvent> globalTempoList) {
+		this.globalTempoList = globalTempoList;
+
+		for (MMLEventList eventList : mmlParts) {
+			eventList.setGlobalTempoList(globalTempoList);
 		}
 	}
 
@@ -86,6 +95,10 @@ public class MMLTrack extends MMLTools {
 		return mmlParts.get(index);
 	}
 
+	public int getMMLEventListSize() {
+		return mmlParts.size();
+	}
+
 	public long getMaxTickLength() {
 		long max = 0;
 		for (int i = 0; i < mmlParts.size(); i++) {
@@ -98,6 +111,25 @@ public class MMLTrack extends MMLTools {
 		return max;
 	}
 
+	public String[] getMMLStrings() {
+		int count = mmlParts.size();
+		String mml[] = new String[count];
+
+		for (int i = 0; i < count; i++) {
+			// メロディパートのMML更新（テンポ, tickLengthにあわせる.
+			MMLEventList eventList = mmlParts.get(i);
+			if (i == 0) {
+				int totalTick = (int)this.getMaxTickLength();
+				mml[i] = eventList.toMMLString(true, totalTick);
+			} else {
+				mml[i] = eventList.toMMLString();
+			}
+
+			mml[i] = new MMLStringOptimizer(mml[i]).toString();
+		}
+
+		return mml;
+	}
 	/**
 	 * トラックに含まれるすべてのMMLEventListを1つのMIDIトラックに変換します.
 	 * @param track

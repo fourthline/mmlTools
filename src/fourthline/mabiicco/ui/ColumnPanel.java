@@ -4,6 +4,7 @@
 
 package fourthline.mabiicco.ui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -207,7 +208,11 @@ public class ColumnPanel extends AbstractMMLView implements MouseListener, Actio
 		spinner.setModel(new SpinnerNumberModel(tempo, 32, 255, 1));
 		spinner.setFocusable(false);
 		panel.add(spinner);
-		int status = JOptionPane.showConfirmDialog(null, panel, title, JOptionPane.OK_CANCEL_OPTION);
+		JPanel cPanel = new JPanel(new BorderLayout());
+		cPanel.add(panel, BorderLayout.CENTER);
+		cPanel.add(new JLabel("** テンポにまたがる音符は途中で切られます **"), BorderLayout.NORTH);
+
+		int status = JOptionPane.showConfirmDialog(null, cPanel, title, JOptionPane.OK_CANCEL_OPTION);
 		if (status == JOptionPane.OK_OPTION) {
 			return ((Integer) spinner.getValue()).intValue();
 		}

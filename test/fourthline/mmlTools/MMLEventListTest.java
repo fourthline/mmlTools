@@ -230,7 +230,7 @@ public class MMLEventListTest {
 	public void testToMMLString_3() {
 		MMLEventList eventList = new MMLEventList("T150v10c8.g16e4v8g-<at120<b-");
 
-		String mml = eventList.toMMLString(eventList.getGlobalTempoList());
+		String mml = eventList.toMMLString(true);
 		System.out.println(mml);
 
 		assertEquals(eventList.toString(), new MMLEventList(mml).toString());
@@ -245,8 +245,9 @@ public class MMLEventListTest {
 		List<MMLTempoEvent> globalTempoList = new ArrayList<MMLTempoEvent>();
 		String expectMML = "c8t150r8d4";
 		globalTempoList.add(new MMLTempoEvent(150, 48));
+		eventList.setGlobalTempoList(globalTempoList);
 
-		String mml = eventList.toMMLString(globalTempoList);
+		String mml = eventList.toMMLString(true);
 		System.out.println(mml);
 
 		assertEquals(expectMML, mml);
@@ -261,8 +262,9 @@ public class MMLEventListTest {
 		String expectMML = "c4d4v0c1.c1.t150";
 		List<MMLTempoEvent> globalTempoList = new ArrayList<MMLTempoEvent>();
 		globalTempoList.add(new MMLTempoEvent(150, 96*2+96*12));
+		eventList.setGlobalTempoList(globalTempoList);
 
-		String mml = eventList.toMMLString(globalTempoList);
+		String mml = eventList.toMMLString(true);
 		System.out.println(mml);
 
 		assertEquals(expectMML, mml);
@@ -276,7 +278,7 @@ public class MMLEventListTest {
 		MMLEventList eventList = new MMLEventList("c4d4");
 		String expectMML = "c4d4r1r1";
 
-		String mml = eventList.toMMLString(eventList.getGlobalTempoList(), 96+96+(96*8));
+		String mml = eventList.toMMLString(true, 96+96+(96*8));
 		System.out.println(mml);
 
 		assertEquals(expectMML, mml);
@@ -287,12 +289,10 @@ public class MMLEventListTest {
 	 */
 	@Test
 	public void testToMMLString_7() {
-		MMLEventList eventList = new MMLEventList("c1r1c1");
+		MMLEventList eventList = new MMLEventList("c1r1t150c1");
 		String expectMML = "c1v0c1v8t150c1";
-		List<MMLTempoEvent> globalTempoList = new ArrayList<MMLTempoEvent>();
-		globalTempoList.add(new MMLTempoEvent(150, (96*8)));
 
-		String mml = eventList.toMMLString(globalTempoList);
+		String mml = eventList.toMMLString(true);
 		System.out.println(mml);
 
 		assertEquals(expectMML, mml);

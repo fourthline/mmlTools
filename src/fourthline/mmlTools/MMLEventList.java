@@ -60,6 +60,10 @@ public class MMLEventList {
 		}
 	}
 
+	public void setGlobalTempoList(List<MMLTempoEvent> globalTempoList) {
+		tempoList = globalTempoList;
+	}
+
 	public List<MMLTempoEvent> getGlobalTempoList() {
 		return tempoList;
 	}
@@ -205,11 +209,11 @@ public class MMLEventList {
 	}
 
 	public String toMMLString() {
-		return toMMLString(null, 0);
+		return toMMLString(false, 0);
 	}
 
-	public String toMMLString(List<MMLTempoEvent> withTempoList) {
-		return toMMLString(withTempoList, 0);
+	public String toMMLString(boolean withTempo) {
+		return toMMLString(withTempo, 0);
 	}
 
 	private MMLNoteEvent insertTempoMML(StringBuilder sb, MMLNoteEvent prevNoteEvent, MMLTempoEvent tempoEvent, int volumn) {
@@ -234,14 +238,12 @@ public class MMLEventList {
 	 * @param totalTick 最大tick長. これに満たない場合は、末尾を休符分で埋めます.
 	 * @return
 	 */
-	public String toMMLString(List<MMLTempoEvent> withTempoList, int totalTick) {
+	public String toMMLString(boolean withTempo, int totalTick) {
 		//　テンポ
 		Iterator<MMLTempoEvent> tempoIterator = null;
 		MMLTempoEvent tempoEvent = null;
-		if (withTempoList != null) {
-			tempoIterator = withTempoList.iterator();
-			tempoEvent = (MMLTempoEvent) nextEvent(tempoIterator);
-		}
+		tempoIterator = tempoList.iterator();
+		tempoEvent = (MMLTempoEvent) nextEvent(tempoIterator);
 
 		//　ボリューム
 		int volumn = INITIAL_VOLUMN;
@@ -257,7 +259,7 @@ public class MMLEventList {
 
 			// テンポのMML挿入判定
 			if ( (tempoEvent != null) && (tempoEvent.getTickOffset() <= noteEvent.getTickOffset()) ) {
-				if (withTempoList != null) {
+				if (withTempo) {
 					// tempo挿入 (rrrT***N の処理)
 					prevNoteEvent = insertTempoMML(sb, prevNoteEvent, tempoEvent, volumn);
 				}
@@ -275,14 +277,15 @@ public class MMLEventList {
 			if ( (tempoEvent != null) && (noteEvent.getTickOffset() < tempoEvent.getTickOffset()) && (tempoEvent.getTickOffset() < noteEvent.getEndTick()) ) {
 				int tick = tempoEvent.getTickOffset() - noteEvent.getTickOffset();
 				// TODO: 内部データ上も切ること.
-				noteEvent = new MMLNoteEvent(noteEvent.getNote(), tick, noteEvent.getTickOffset());
+				noteEvent.setTick(tick);
+				//				noteEvent = new MMLNoteEvent(noteEvent.getNote(), tick, noteEvent.getTickOffset());
 			}
 			sb.append( noteEvent.toMMLString(prevNoteEvent) );
 			prevNoteEvent = noteEvent;
 		}
 
 		// テンポがまだ残っていれば、その分をつなげる.
-		if ( (withTempoList != null) && (tempoEvent != null) && (noteEvent != null) ) {
+		if ( (withTempo) && (tempoEvent != null) && (noteEvent != null) ) {
 			int endTick = noteEvent.getEndTick();
 			int tickOffset = tempoEvent.getTickOffset();
 			int tick = tickOffset - endTick;
@@ -295,7 +298,7 @@ public class MMLEventList {
 		}
 
 		// 全体のtickに達していなければ、さらに休符をつなげる
-		if ( (withTempoList != null) && (noteEvent != null) && (noteEvent.getEndTick() < totalTick) ) {
+		if ( (withTempo) && (noteEvent != null) && (noteEvent.getEndTick() < totalTick) ) {
 			int tick = totalTick - noteEvent.getEndTick();
 			sb.append( new MMLTicks("r", tick, false).toString() );
 		}
