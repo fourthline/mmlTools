@@ -503,9 +503,9 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		double totalTime = MMLTempoEvent.getTimeOnTickOffset(tempoList, totalTick);
 		int tempo = MMLTempoEvent.searchOnTick(tempoList, (int)position);
 
-		String str = String.format("time %d:%02d/%d:%02d (t%d)", 
-				(int)(time/60), (int)(time%60),
-				(int)(totalTime/60), (int)(totalTime%60),
+		String str = String.format("time %d:%04.1f/%d:%04.1f (t%d)", 
+				(int)(time/60), (time%60),
+				(int)(totalTime/60), (totalTime%60),
 				tempo);
 		if (timeView != null) {
 			timeView.setText(str);
