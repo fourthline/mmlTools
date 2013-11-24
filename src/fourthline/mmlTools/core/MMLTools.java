@@ -77,7 +77,7 @@ public class MMLTools {
 	 * マビノギ演奏でのMML解析
 	 * @throws UndefinedTickException
 	 */
-	protected void parseMMLforMabinogi() throws UndefinedTickException {
+	public void parseMMLforMabinogi() throws UndefinedTickException {
 		melodyParser = new MelodyParser(mml_melody);
 		chord1Parser = new MelodyParser(mml_chord1, "4", melodyParser.getTempo());
 		chord2Parser = new MelodyParser(mml_chord2, "4", chord1Parser.getTempo());
@@ -90,7 +90,7 @@ public class MMLTools {
 	 * @param drumMode
 	 * @throws UndefinedTickException
 	 */
-	protected void parsePlayMode(boolean drumMode) throws UndefinedTickException {
+	public void parsePlayMode(boolean drumMode) throws UndefinedTickException {
 		if (drumMode) {
 			String s = mml_melody
 					+ "T"+melodyParser.getTempo() + mml_chord1

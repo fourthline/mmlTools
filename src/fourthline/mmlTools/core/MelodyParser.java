@@ -80,11 +80,6 @@ public class MelodyParser {
 		if (mml_length < 0)
 			cals_length();
 
-		int beat = MMLTicks.getTick("1");
-		int beatLength = mml_length / beat;
-		int lastbeatLength = mml_length % beat;
-		System.out.println("beat: "+beatLength+" + ["+lastbeatLength+"]");
-
 		return mml_length;
 	}
 
@@ -308,13 +303,11 @@ public class MelodyParser {
 	 */
 	private int cals_length() throws UndefinedTickException {
 		MMLTokenizer mt = new MMLTokenizer(mml_src);
-		int i = 1;
 		reset();
 
 		while (mt.hasNext()) {
 			int parseIndex = mt.getIndex();
 			String item = mt.next();
-			System.out.println(i + ": " + item + " ");
 
 			try {
 				mml_length += noteGT(item);
@@ -322,10 +315,7 @@ public class MelodyParser {
 				System.err.println(warn.getMessage()+parseIndex);
 				warnIndex.add(parseIndex);
 			}
-			i++;
 		}
-
-		System.out.println();
 
 		try {
 			mmlOperation("T0");

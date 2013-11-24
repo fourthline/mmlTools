@@ -297,12 +297,6 @@ public class MMLEventList {
 			noteEvent = new MMLNoteEvent(noteEvent.getNote(), noteEvent.getTick() + tick, noteEvent.getTickOffset());
 		}
 
-		// 全体のtickに達していなければ、さらに休符をつなげる
-		if ( (withTempo) && (noteEvent != null) && (noteEvent.getEndTick() < totalTick) ) {
-			int tick = totalTick - noteEvent.getEndTick();
-			sb.append( new MMLTicks("r", tick, false).toString() );
-		}
-
 		return sb.toString();
 	}
 

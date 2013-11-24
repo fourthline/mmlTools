@@ -8,6 +8,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import fourthline.mmlTools.core.MMLTools;
+
 /**
  * @author fourthline
  *
@@ -31,4 +33,76 @@ public class MMLTrackTest {
 		assertArrayEquals(expect, mml);
 	}
 
+
+	private void checkPlayTimeAndMabinogiTime(String mml) {
+		MMLTrack track = new MMLTrack(mml);
+		MMLTools tools = new MMLTools(mml);
+		try {
+			tools.parseMMLforMabinogi();
+			tools.parsePlayMode(false);
+			double expectPlayTime = tools.getPlayTime();
+			double expectMabinogiTime = tools.getMabinogiTime();
+			System.out.printf("playTime: %f, mabinogiTime: %f\n", expectPlayTime, expectMabinogiTime);
+
+			assertEquals(expectPlayTime, track.getPlayTime(), 0.00001);
+			assertEquals(expectMabinogiTime, track.getMabinogiTime(), 0.00001);
+		} catch (UndefinedTickException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * test aaaa
+	 * @throws Exception
+	 */
+	@Test
+	public void testTime_0() throws Exception {
+		String mml = "MML@aaaa;";
+
+		checkPlayTimeAndMabinogiTime(mml);
+	}
+
+	/**
+	 * テンポ変速 途中で切れるタイプ
+	 */
+	@Test
+	public void testPlayingShort() throws Exception {
+		String mml = "MML@t90cccccccccccct150cccc,eeeeeeeeeeeeeeeedddd,;";
+
+		checkPlayTimeAndMabinogiTime(mml);
+	}
+
+	/**
+	 * テンポ変速　終わらないタイプ
+	 */
+	@Test
+	public void testPlayingLong() throws Exception {
+		String mml = "MML@t150cccccccccccct90cccc,eeeeeeeeeeeeeeee,;";
+
+		checkPlayTimeAndMabinogiTime(mml);
+	}
+
+	/**
+	 * テンポ変速 途中で切れるタイプのMML補正
+	 */
+	@Test
+	public void testPlayingShortMML() throws Exception {
+		String mml       = "MML@t90cccccccccccct150cccc,eeeeeeeeeeeeeeeedddd,;";
+		String expectMML = "MML@t90c4c4c4c4c4c4c4c4c4c4c4c4t150c4c4c4c4r1,e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4d4d4d4d4,;";
+
+		MMLTrack track = new MMLTrack(mml);
+		assertEquals(expectMML, track.getMMLString());
+	}
+
+	/**
+	 * テンポ変速　終わらないタイプのMML補正
+	 */
+	@Test
+	public void testPlayingLongMML() throws Exception {
+		String mml =       "MML@t150cccccccccccct90cccc,eeeeeeeeeeeeeeee,;";
+		String expectMML = "MML@t150c4c4c4c4c4c4c4c4c4c4c4c4t90c4c4c4c4t150,e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4,;";
+
+		MMLTrack track = new MMLTrack(mml);
+		assertEquals(expectMML, track.getMMLString());
+	}
 }

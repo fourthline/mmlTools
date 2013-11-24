@@ -12,6 +12,7 @@ import javax.sound.midi.MidiEvent;
 import javax.sound.midi.ShortMessage;
 import javax.sound.midi.Track;
 
+import fourthline.mmlTools.core.MMLTicks;
 import fourthline.mmlTools.core.MMLTools;
 import fourthline.mmlTools.optimizer.MMLStringOptimizer;
 
@@ -111,15 +112,22 @@ public class MMLTrack extends MMLTools {
 		return max;
 	}
 
+	public String getMMLString() {
+		String mml[] = getMMLStrings();
+		MMLTools tools = new MMLTools(mml[0], mml[1], mml[2]);
+
+		return tools.getMML();
+	}
+
 	public String[] getMMLStrings() {
 		int count = mmlParts.size();
 		String mml[] = new String[count];
+		int totalTick = (int)this.getMaxTickLength();
 
 		for (int i = 0; i < count; i++) {
 			// メロディパートのMML更新（テンポ, tickLengthにあわせる.
 			MMLEventList eventList = mmlParts.get(i);
 			if (i == 0) {
-				int totalTick = (int)this.getMaxTickLength();
 				mml[i] = eventList.toMMLString(true, totalTick);
 			} else {
 				mml[i] = eventList.toMMLString();
@@ -128,8 +136,65 @@ public class MMLTrack extends MMLTools {
 			mml[i] = new MMLStringOptimizer(mml[i]).toString();
 		}
 
+		double playTime = getPlayTime();
+		double mmlTime = getMabinogiTime();
+		if (playTime > mmlTime) {
+			// スキルが演奏の途中で止まるのを防ぎます.
+			List<MMLNoteEvent> noteList = mmlParts.get(0).getMMLNoteEventList();
+			int tick = totalTick - noteList.get(noteList.size()-1).getEndTick();
+			mml[0] += new MMLTicks("r", tick, false).toString();
+		} else if (playTime < mmlTime) {
+			// 演奏が終ってスキルが止まらないのを防ぎます.
+			mml[0] += MMLTempoEvent.getMaxTempoEvent(globalTempoList).toMMLString();
+		}
+
 		return mml;
 	}
+
+	/**
+	 * MMLの演奏時間を取得する.
+	 * @return 時間（秒）
+	 */
+	public double getPlayTime() {
+		int totalTick = (int)getMaxTickLength();
+		double playTime = MMLTempoEvent.getTimeOnTickOffset(globalTempoList, totalTick);
+
+		return playTime;
+	}	
+
+	/**
+	 * マビノギでの演奏スキル時間を取得する.
+	 * <p>演奏時間  － 0.6秒 ＜ スキル時間 であれば、切れずに演奏される</p>
+	 * @return 時間（秒）
+	 */
+	public double getMabinogiTime() {
+		double partTime[] = new double[mmlParts.size()];
+
+		int melodyTick = (int)mmlParts.get(0).getTickLength();
+		partTime[0] = MMLTempoEvent.getTimeOnTickOffset(globalTempoList, melodyTick);
+
+		ArrayList<MMLTempoEvent> globalTailTempo = new ArrayList<>();
+		MMLTempoEvent lastTempoEvent = new MMLTempoEvent(120, 0);
+		if (globalTempoList.size() > 0) {
+			lastTempoEvent.setTempo(globalTempoList.get(globalTempoList.size()-1).getTempo());
+		}
+		globalTailTempo.add(new MMLTempoEvent(lastTempoEvent.getTempo(), 0));
+
+		for (int i = 1; i < partTime.length; i++) {
+			int tick = (int)mmlParts.get(i).getTickLength();
+			partTime[i] = MMLTempoEvent.getTimeOnTickOffset(globalTailTempo, tick);
+		}
+
+		double maxTime = 0.0;
+		for (double time : partTime) {
+			if (maxTime < time) {
+				maxTime = time;
+			}
+		}
+
+		return maxTime;
+	}
+
 	/**
 	 * トラックに含まれるすべてのMMLEventListを1つのMIDIトラックに変換します.
 	 * @param track

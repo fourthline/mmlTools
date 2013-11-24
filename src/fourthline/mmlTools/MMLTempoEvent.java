@@ -116,4 +116,21 @@ public class MMLTempoEvent extends MMLEvent {
 		totalTime /= 96.0;
 		return totalTime;
 	}
+
+	/**
+	 * テンポリスト中の最大テンポ値を取得します.
+	 * @param tempoList
+	 * @return
+	 */
+	public static MMLTempoEvent getMaxTempoEvent(List<MMLTempoEvent> tempoList) {
+		MMLTempoEvent maxEvent = new MMLTempoEvent(INITIAL_TEMPO, 0);
+		for (MMLTempoEvent tempoEvent : tempoList) {
+			int currentTempo = tempoEvent.getTempo();
+			if (maxEvent.getTempo() < currentTempo) {
+				maxEvent.setTempo(currentTempo);
+			}
+		}
+
+		return maxEvent;
+	}
 }
