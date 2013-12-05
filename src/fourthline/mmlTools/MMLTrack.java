@@ -7,11 +7,6 @@ package fourthline.mmlTools;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.sound.midi.InvalidMidiDataException;
-import javax.sound.midi.MidiEvent;
-import javax.sound.midi.ShortMessage;
-import javax.sound.midi.Track;
-
 import fourthline.mmlTools.core.MMLTicks;
 import fourthline.mmlTools.core.MMLTools;
 import fourthline.mmlTools.optimizer.MMLStringOptimizer;
@@ -173,7 +168,7 @@ public class MMLTrack extends MMLTools {
 		int melodyTick = (int)mmlParts.get(0).getTickLength();
 		partTime[0] = MMLTempoEvent.getTimeOnTickOffset(globalTempoList, melodyTick);
 
-		ArrayList<MMLTempoEvent> globalTailTempo = new ArrayList<>();
+		ArrayList<MMLTempoEvent> globalTailTempo = new ArrayList<MMLTempoEvent>();
 		MMLTempoEvent lastTempoEvent = new MMLTempoEvent(120, 0);
 		if (globalTempoList.size() > 0) {
 			lastTempoEvent.setTempo(globalTempoList.get(globalTempoList.size()-1).getTempo());
@@ -195,22 +190,6 @@ public class MMLTrack extends MMLTools {
 		return maxTime;
 	}
 
-	/**
-	 * トラックに含まれるすべてのMMLEventListを1つのMIDIトラックに変換します.
-	 * @param track
-	 * @param channel
-	 * @throws InvalidMidiDataException
-	 */
-	public void convertMidiTrack(Track track, int channel) throws InvalidMidiDataException {
-		ShortMessage pcMessage = new ShortMessage(ShortMessage.PROGRAM_CHANGE, 
-				channel,
-				program,
-				0);
-		track.add(new MidiEvent(pcMessage, 0));
 
-		for (int i = 0; i < mmlParts.size(); i++) {
-			mmlParts.get(i).convertMidiTrack(track, channel);
-		}
-	}
 
 }

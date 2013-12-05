@@ -10,6 +10,7 @@ import fourthline.mmlTools.MMLEvent;
 import fourthline.mmlTools.MMLNoteEvent;
 import fourthline.mmlTools.MMLTempoEvent;
 import fourthline.mmlTools.UndefinedTickException;
+import fourthline.mmlTools.core.MMLTicks;
 import fourthline.mmlTools.core.MMLTokenizer;
 import fourthline.mmlTools.core.MelodyParser;
 import fourthline.mmlTools.core.ParserWarn3ML;
@@ -30,7 +31,8 @@ public class MMLEventParser extends MelodyParser implements Iterator<MMLEvent> {
 	private boolean hasTie = false;
 	private int totalTick = 0;
 	private MMLNoteEvent prevNoteEvent = null;
-	int volumn = MMLNoteEvent.NO_VEL;
+	private int volumn = MMLNoteEvent.NO_VEL;
+	private final int minimum = MMLTicks.minimumTick();
 
 	/**
 	 * @return すべてMMLパースが終っているときは、nullを返す.
@@ -66,8 +68,12 @@ public class MMLEventParser extends MelodyParser implements Iterator<MMLEvent> {
 				if (MMLTokenizer.isNote(firstC)) {
 					/* tie でかつ、同じノートであれば、前のNoteEventにTickを加算する */
 					if ( (hasTie) && (prevNoteEvent != null) && (prevNoteEvent.getNote() == this.noteNumber)) {
-						prevNoteEvent.setTick( prevNoteEvent.getTick() + tick);
-					} else {
+						int prevTick = prevNoteEvent.getTick();
+						if ( (prevTick == minimum) && (tick == minimum) ) {
+							prevNoteEvent.setTuningNote(true);
+						}
+						prevNoteEvent.setTick( prevTick + tick);
+					} else if (this.noteNumber >= 0) {
 						nextItem = prevNoteEvent;
 						prevNoteEvent = new MMLNoteEvent(this.noteNumber, tick, totalTick);
 						prevNoteEvent.setVelocity(volumn);

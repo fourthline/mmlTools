@@ -28,12 +28,12 @@ public class ComposeRank {
 	final public static ComposeRank RANK_1 = new ComposeRank(1200, 800, 500, "1");
 	/** 作曲不可ランク */
 	final public static ComposeRank RANK_0 = new ComposeRank(   0,   0,   0, "-");
-	
+
 	private int melody;
 	private int chord1;
 	private int chord2;
 	private String rank = "-";
-	
+
 	/**
 	 * MMLのランクを計算します。
 	 * @param melody MMLのメロディ
@@ -60,16 +60,16 @@ public class ComposeRank {
 				RANK_2,
 				RANK_1
 		};
-		
+
 		for (int i = 0; i < rankList.length; i++) {
 			if (rankList[i].compare(melody, chord1, chord2))
 				return rankList[i].getRank();
 		}
-		
+
 		return RANK_0.getRank();
 	}
-	
-	
+
+
 	@SuppressWarnings("unused")
 	private ComposeRank() {}
 
@@ -78,18 +78,18 @@ public class ComposeRank {
 		this.chord1 = chord1;
 		this.chord2 = chord2;
 	}
-	
+
 	public ComposeRank(int melody, int chord1, int chord2, String rank) {
 		this(melody, chord1, chord2);
 		this.rank = rank;
 	}
-	
+
 	public boolean compare(String melody, String chord1, String chord2) {
 		if ( (melody.length() <= this.melody) &&
-			 (chord1.length() <= this.chord1) &&
-			 (chord2.length() <= this.chord2) )
+				(chord1.length() <= this.chord1) &&
+				(chord2.length() <= this.chord2) )
 			return true;
-		
+
 		return false;
 	}
 
@@ -104,14 +104,14 @@ public class ComposeRank {
 	public int getChord2() {
 		return chord2;
 	}
-	
+
 	public String getRank() {
 		return rank;
 	}
-	
+
 	public String toString() {
 		String result = "Rank " + rank + " ( " + melody + ", " + chord1 + ", " + chord2 + " )";
-		
+
 		return result;
 	}
 }

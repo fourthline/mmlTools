@@ -8,11 +8,16 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import javax.sound.midi.*;
 
+import fourthline.mmlTools.MMLEventList;
+import fourthline.mmlTools.MMLNoteEvent;
+import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTempoEvent;
+import fourthline.mmlTools.MMLTrack;
 
 public final class MabiDLS {
 	private static final MabiDLS instance = new MabiDLS();
@@ -250,6 +255,102 @@ public final class MabiDLS {
 			e.printStackTrace();
 		}
 	}
+	
+	
+
+	/**
+	 * MIDIシーケンスを作成します。
+	 * @throws InvalidMidiDataException 
+	 */
+	public Sequence createSequence(MMLScore score) throws InvalidMidiDataException {
+		Sequence sequence = new Sequence(Sequence.PPQ, 96);
+
+		int trackCount = score.getTrackCount();
+		for (int i = 0; i < trackCount; i++) {
+			MMLTrack mmlTrack = score.getTrack(i);
+			convertMidiTrack(sequence.createTrack(), mmlTrack, i);
+			// FIXME: パンポットの設定はここじゃない気がする～。
+			int panpot = mmlTrack.getPanpot();
+			MabiDLS.getInstance().setChannelPanpot(i, panpot);
+		}
+
+		// グローバルテンポ
+		Track track = sequence.getTracks()[0];
+		List<MMLTempoEvent> globalTempoList = score.getTempoEventList();
+		for (MMLTempoEvent tempoEvent :  globalTempoList) {
+			byte tempo[] = tempoEvent.getMetaData();
+			int tickOffset = tempoEvent.getTickOffset();
+
+			MidiMessage message = new MetaMessage(MMLTempoEvent.META, 
+					tempo, tempo.length);
+			track.add(new MidiEvent(message, tickOffset));
+		}
+
+		return sequence;
+	}
+	
+	/**
+	 * トラックに含まれるすべてのMMLEventListを1つのMIDIトラックに変換します.
+	 * @param track
+	 * @param channel
+	 * @throws InvalidMidiDataException
+	 */
+	private void convertMidiTrack(Track track, MMLTrack mmlTrack, int channel) throws InvalidMidiDataException {
+		ShortMessage pcMessage = new ShortMessage(ShortMessage.PROGRAM_CHANGE, 
+				channel,
+				mmlTrack.getProgram(),
+				0);
+		track.add(new MidiEvent(pcMessage, 0));
+		
+		int partCount = mmlTrack.getMMLEventListSize();
+
+		for (int i = 0; i < partCount; i++) {
+			MMLEventList eventList = mmlTrack.getMMLEventList(i);
+			convertMidiPart(track, eventList, channel);
+		}
+	}
+	
+
+	
+	private void convertMidiPart(Track track, MMLEventList eventList, int channel) throws InvalidMidiDataException {
+		int volumn = MMLNoteEvent.INITIAL_VOLUMN;
+
+		// Noteイベントの変換
+		for ( MMLNoteEvent noteEvent : eventList.getMMLNoteEventList() ) {
+			int note = noteEvent.getNote();
+			int tick = noteEvent.getTick();
+			int tickOffset = noteEvent.getTickOffset();
+			int endTickOffset = tickOffset + tick - 1;
+
+			// ボリュームの変更
+			if (noteEvent.getVelocity() >= 0) {
+				volumn = noteEvent.getVelocity();
+			}
+
+			// ON イベント作成
+			MidiMessage message1 = new ShortMessage(ShortMessage.NOTE_ON, 
+					channel,
+					convertNoteMML2Midi(note), 
+					convertVelocityMML2Midi(volumn));
+			track.add(new MidiEvent(message1, tickOffset));
+
+			// Off イベント作成
+			MidiMessage message2 = new ShortMessage(ShortMessage.NOTE_OFF,
+					channel, 
+					convertNoteMML2Midi(note),
+					0);
+			track.add(new MidiEvent(message2, endTickOffset));
+		}
+	}
+
+	private int convertVelocityMML2Midi(int mml_velocity) {
+		return (mml_velocity * 8);
+	}
+	
+	private int convertNoteMML2Midi(int mml_note) {
+		return (mml_note + 12);
+	}
+
 }
 
 

@@ -209,7 +209,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 			public void run() {
 				try {
 					Sequencer sequencer = MabiDLS.getInstance().getSequencer();
-					Sequence sequence = mmlScore.createSequence();
+					Sequence sequence = MabiDLS.getInstance().createSequence(mmlScore);
 
 					// 再生開始が先頭でない場合、そこのテンポに設定する必要がある。
 					long startTick = pianoRollView.getSequencePossition();

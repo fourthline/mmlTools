@@ -7,14 +7,6 @@ package fourthline.mmlTools;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.sound.midi.InvalidMidiDataException;
-import javax.sound.midi.MetaMessage;
-import javax.sound.midi.MidiEvent;
-import javax.sound.midi.MidiMessage;
-import javax.sound.midi.Sequence;
-import javax.sound.midi.Track;
-
-import fourthline.mabiicco.midi.MabiDLS;
 
 /**
  *
@@ -102,35 +94,5 @@ public class MMLScore {
 		}
 
 		return (int)tick;
-	}
-
-	/**
-	 * MIDIシーケンスを作成します。
-	 * @throws InvalidMidiDataException 
-	 */
-	public Sequence createSequence() throws InvalidMidiDataException {
-		Sequence sequence = new Sequence(Sequence.PPQ, 96);
-
-		int trackCount = getTrackCount();
-		for (int i = 0; i < trackCount; i++) {
-			MMLTrack mmlTrack = getTrack(i);
-			mmlTrack.convertMidiTrack(sequence.createTrack(), i);
-			// FIXME: パンポットの設定はここじゃない気がする～。
-			int panpot = mmlTrack.getPanpot();
-			MabiDLS.getInstance().setChannelPanpot(i, panpot);
-		}
-
-		// グローバルテンポ
-		Track track = sequence.getTracks()[0];
-		for (MMLTempoEvent tempoEvent : globalTempoList) {
-			byte tempo[] = tempoEvent.getMetaData();
-			int tickOffset = tempoEvent.getTickOffset();
-
-			MidiMessage message = new MetaMessage(MMLTempoEvent.META, 
-					tempo, tempo.length);
-			track.add(new MidiEvent(message, tickOffset));
-		}
-
-		return sequence;
 	}
 }

@@ -8,12 +8,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.sound.midi.InvalidMidiDataException;
-import javax.sound.midi.MidiEvent;
-import javax.sound.midi.MidiMessage;
-import javax.sound.midi.ShortMessage;
-import javax.sound.midi.Track;
-
 import fourthline.mmlTools.core.MMLTicks;
 import fourthline.mmlTools.parser.MMLEventParser;
 
@@ -83,50 +77,11 @@ public class MMLEventList {
 		return noteList;
 	}
 
-	private int convertVelocityMML2Midi(int mml_velocity) {
-		return (mml_velocity * 8);
-	}
-	private int convertNoteMML2Midi(int mml_note) {
-		return (mml_note + 12);
-	}
-
 	private Object nextEvent(Iterator<? extends MMLEvent> iterator) {
 		if (iterator.hasNext()) {
 			return iterator.next();
 		} else {
 			return null;
-		}
-	}
-
-	private static final int INITIAL_VOLUMN = 8;
-	public void convertMidiTrack(Track track, int channel) throws InvalidMidiDataException {
-		int volumn = INITIAL_VOLUMN;
-
-		// Noteイベントの変換
-		for (MMLNoteEvent noteEvent : noteList) {
-			int note = noteEvent.getNote();
-			int tick = noteEvent.getTick();
-			int tickOffset = noteEvent.getTickOffset();
-			int endTickOffset = tickOffset + tick - 1;
-
-			// ボリュームの変更
-			if (noteEvent.getVelocity() >= 0) {
-				volumn = noteEvent.getVelocity();
-			}
-
-			// ON イベント作成
-			MidiMessage message1 = new ShortMessage(ShortMessage.NOTE_ON, 
-					channel,
-					convertNoteMML2Midi(note), 
-					convertVelocityMML2Midi(volumn));
-			track.add(new MidiEvent(message1, tickOffset));
-
-			// Off イベント作成
-			MidiMessage message2 = new ShortMessage(ShortMessage.NOTE_OFF,
-					channel, 
-					convertNoteMML2Midi(note),
-					0);
-			track.add(new MidiEvent(message2, endTickOffset));
 		}
 	}
 
@@ -246,7 +201,7 @@ public class MMLEventList {
 		tempoEvent = (MMLTempoEvent) nextEvent(tempoIterator);
 
 		//　ボリューム
-		int volumn = INITIAL_VOLUMN;
+		int volumn = MMLNoteEvent.INITIAL_VOLUMN;
 
 		StringBuilder sb = new StringBuilder();
 		int noteCount = noteList.size();

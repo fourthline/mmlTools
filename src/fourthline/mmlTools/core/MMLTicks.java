@@ -177,6 +177,17 @@ public class MMLTicks {
 		}
 	}
 
+	static public int minimumTick() {
+		Integer minimum = null;
+		for (Integer i : tickTable.values()) {
+			if ( (minimum == null) || (i < minimum) ) {
+				minimum = i;
+			}
+		}
+
+		return minimum;
+	}
+
 
 	private String noteName;
 	int tick;

@@ -283,4 +283,32 @@ public class MMLEventListTest {
 
 		assertEquals(expectMML, mml);
 	}
+
+	/**
+	 * tempo, velocity を含むMML. (r前のv)
+	 */
+	@Test
+	public void testToMMLString_8() {
+		MMLEventList eventList = new MMLEventList("v12rc");
+		String expectMML = "v12r4c4";
+
+		String mml = eventList.toMMLString(true);
+		System.out.println(mml);
+
+		assertEquals(expectMML, mml);
+	}
+
+	/**
+	 * 調律符の判定テスト.
+	 */
+	@Test
+	public void testTuningNote() {
+		MMLEventList eventList = new MMLEventList("c64&c64&c64&c64");
+		String expectMML = "c64&c64&c64&c64";
+
+		String mml = eventList.toMMLString(true);
+		System.out.println(mml);
+
+		assertEquals(expectMML, mml);
+	}
 }
