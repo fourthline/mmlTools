@@ -226,7 +226,7 @@ public class MelodyParser {
 		case 'T':
 			int temp = Integer.parseInt( note.substring(1) );
 			tempoList.put(mml_length, temp);
-			if (temp > 0) {
+			if ( (temp <= 255) && (temp >= 32) ) {
 				this.tempo = temp;
 			}
 			if ( (this.playingNote == 'r') || (this.playingNote == 'R') ) {
@@ -238,10 +238,14 @@ public class MelodyParser {
 			mml_oct = Integer.parseInt( note.substring(1) );
 			break;
 		case '<':
-			mml_oct--;
+			if (mml_oct > 0) {
+				mml_oct--;
+			}
 			break;
 		case '>':
-			mml_oct++;
+			if (mml_oct < 8) {
+				mml_oct++;
+			}
 			break;
 		default:
 			break;

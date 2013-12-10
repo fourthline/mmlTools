@@ -311,4 +311,28 @@ public class MMLEventListTest {
 
 		assertEquals(expectMML, mml);
 	}
+
+	/**
+	 * オクターブ上限のテスト.
+	 */
+	@Test
+	public void testTopOctave() {
+		MMLEventList eventList = new MMLEventList("c>>>>>c<<<<c");
+		MMLNoteEvent event1 = eventList.getMMLNoteEventList().get(0);
+		MMLNoteEvent event2 = eventList.getMMLNoteEventList().get(2);
+
+		assertEquals(event1.getNote(), event2.getNote());
+	}
+	
+	/**
+	 * オクターブ下限のテスト.
+	 */
+	@Test
+	public void testBottomOctave() {
+		MMLEventList eventList = new MMLEventList("c<<<<<c>>>>c");
+		MMLNoteEvent event1 = eventList.getMMLNoteEventList().get(0);
+		MMLNoteEvent event2 = eventList.getMMLNoteEventList().get(2);
+
+		assertEquals(event1.getNote(), event2.getNote());
+	}
 }

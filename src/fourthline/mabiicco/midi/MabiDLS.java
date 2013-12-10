@@ -255,8 +255,8 @@ public final class MabiDLS {
 			e.printStackTrace();
 		}
 	}
-	
-	
+
+
 
 	/**
 	 * MIDIシーケンスを作成します。
@@ -288,7 +288,7 @@ public final class MabiDLS {
 
 		return sequence;
 	}
-	
+
 	/**
 	 * トラックに含まれるすべてのMMLEventListを1つのMIDIトラックに変換します.
 	 * @param track
@@ -301,7 +301,7 @@ public final class MabiDLS {
 				mmlTrack.getProgram(),
 				0);
 		track.add(new MidiEvent(pcMessage, 0));
-		
+
 		int partCount = mmlTrack.getMMLEventListSize();
 
 		for (int i = 0; i < partCount; i++) {
@@ -309,10 +309,10 @@ public final class MabiDLS {
 			convertMidiPart(track, eventList, channel);
 		}
 	}
-	
 
-	
-	private void convertMidiPart(Track track, MMLEventList eventList, int channel) throws InvalidMidiDataException {
+
+
+	private void convertMidiPart(Track track, MMLEventList eventList, int channel) {
 		int volumn = MMLNoteEvent.INITIAL_VOLUMN;
 
 		// Noteイベントの変換
@@ -327,26 +327,30 @@ public final class MabiDLS {
 				volumn = noteEvent.getVelocity();
 			}
 
-			// ON イベント作成
-			MidiMessage message1 = new ShortMessage(ShortMessage.NOTE_ON, 
-					channel,
-					convertNoteMML2Midi(note), 
-					convertVelocityMML2Midi(volumn));
-			track.add(new MidiEvent(message1, tickOffset));
+			try {
+				// ON イベント作成
+				MidiMessage message1 = new ShortMessage(ShortMessage.NOTE_ON, 
+						channel,
+						convertNoteMML2Midi(note), 
+						convertVelocityMML2Midi(volumn));
+				track.add(new MidiEvent(message1, tickOffset));
 
-			// Off イベント作成
-			MidiMessage message2 = new ShortMessage(ShortMessage.NOTE_OFF,
-					channel, 
-					convertNoteMML2Midi(note),
-					0);
-			track.add(new MidiEvent(message2, endTickOffset));
+				// Off イベント作成
+				MidiMessage message2 = new ShortMessage(ShortMessage.NOTE_OFF,
+						channel, 
+						convertNoteMML2Midi(note),
+						0);
+				track.add(new MidiEvent(message2, endTickOffset));
+			} catch (InvalidMidiDataException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
 	private int convertVelocityMML2Midi(int mml_velocity) {
 		return (mml_velocity * 8);
 	}
-	
+
 	private int convertNoteMML2Midi(int mml_note) {
 		return (mml_note + 12);
 	}
