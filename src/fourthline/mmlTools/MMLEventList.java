@@ -171,15 +171,19 @@ public class MMLEventList {
 		return toMMLString(withTempo, 0);
 	}
 
-	private MMLNoteEvent insertTempoMML(StringBuilder sb, MMLNoteEvent prevNoteEvent, MMLTempoEvent tempoEvent, int volumn) {
+	private MMLNoteEvent insertTempoMML(StringBuilder sb, MMLNoteEvent prevNoteEvent, MMLTempoEvent tempoEvent) {
 		// rrrT***N の処理
 		if (prevNoteEvent.getEndTick() != tempoEvent.getTickOffset()) {
 			int tickLength = tempoEvent.getTickOffset() - prevNoteEvent.getEndTick();
 			int tickOffset = prevNoteEvent.getEndTick();
 			int note = prevNoteEvent.getNote();
-			prevNoteEvent = new MMLNoteEvent(note, tickLength, tickOffset);
 			MMLTicks ticks = new MMLTicks("c", tickLength, false);
-			sb.append("v0").append(ticks.toString()).append("v"+volumn);
+			if (prevNoteEvent.getVelocity() != 0) {
+				sb.append("v0");
+			}
+			sb.append(ticks.toString());
+			prevNoteEvent = new MMLNoteEvent(note, tickLength, tickOffset);
+			prevNoteEvent.setVelocity(0);
 		}
 		sb.append(tempoEvent.toMMLString());
 
@@ -213,10 +217,10 @@ public class MMLEventList {
 			noteEvent = noteList.get(i);
 
 			// テンポのMML挿入判定
-			if ( (tempoEvent != null) && (tempoEvent.getTickOffset() <= noteEvent.getTickOffset()) ) {
+			while ( (tempoEvent != null) && (tempoEvent.getTickOffset() <= noteEvent.getTickOffset()) ) {
 				if (withTempo) {
 					// tempo挿入 (rrrT***N の処理)
-					prevNoteEvent = insertTempoMML(sb, prevNoteEvent, tempoEvent, volumn);
+					prevNoteEvent = insertTempoMML(sb, prevNoteEvent, tempoEvent);
 				}
 				tempoEvent = (MMLTempoEvent) nextEvent(tempoIterator);
 			}
@@ -226,6 +230,9 @@ public class MMLEventList {
 			if ( (noteVelocity >= 0) && (noteVelocity != volumn) ) {
 				volumn = noteVelocity;
 				sb.append(noteEvent.getVelocityString());
+			} else if (prevNoteEvent.getVelocity() == 0) {
+				// テンポ処理で音量がゼロになっている場合は元に戻す.
+				sb.append("v"+volumn);
 			}
 
 			// endTickOffsetがTempoを跨いでいたら、そこで切る.

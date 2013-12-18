@@ -276,7 +276,7 @@ public class MMLEventListTest {
 	@Test
 	public void testToMMLString_7() {
 		MMLEventList eventList = new MMLEventList("c1r1t150c1");
-		String expectMML = "c1v0c1v8t150c1";
+		String expectMML = "c1v0c1t150v8c1";
 
 		String mml = eventList.toMMLString(true);
 		System.out.println(mml);
@@ -323,7 +323,7 @@ public class MMLEventListTest {
 
 		assertEquals(event1.getNote(), event2.getNote());
 	}
-	
+
 	/**
 	 * オクターブ下限のテスト.
 	 */
@@ -334,5 +334,19 @@ public class MMLEventListTest {
 		MMLNoteEvent event2 = eventList.getMMLNoteEventList().get(2);
 
 		assertEquals(event1.getNote(), event2.getNote());
+	}
+
+	/**
+	 * テンポ＋休符のテスト.
+	 */
+	@Test
+	public void testTempoAndR() {
+		MMLEventList eventList = new MMLEventList("v12t110rt60rt90c");
+		String expectMML = "t110v0c4t60c4t90v12c4";
+
+		String mml = eventList.toMMLString(true);
+		System.out.println(mml);
+
+		assertEquals(expectMML, mml);
 	}
 }
