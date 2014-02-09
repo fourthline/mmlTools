@@ -238,7 +238,7 @@ public final class MabiDLS {
 
 	public static void main(String args[]) {
 		try {
-			MabiDLS midi = MabiDLS.getInstance();
+			MabiDLS midi = new MabiDLS();
 			midi.initializeMIDI();
 			MidiChannel channel[] = midi.getSynthesizer().getChannels();
 
@@ -271,7 +271,7 @@ public final class MabiDLS {
 			convertMidiTrack(sequence.createTrack(), mmlTrack, i);
 			// FIXME: パンポットの設定はここじゃない気がする～。
 			int panpot = mmlTrack.getPanpot();
-			MabiDLS.getInstance().setChannelPanpot(i, panpot);
+			this.setChannelPanpot(i, panpot);
 		}
 
 		// グローバルテンポ

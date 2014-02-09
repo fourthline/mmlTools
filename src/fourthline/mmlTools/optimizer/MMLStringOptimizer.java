@@ -289,9 +289,12 @@ public class MMLStringOptimizer {
 		MMLTokenizer tokenizer = new MMLTokenizer(originalMML);
 		String section = "4";
 		int noteCount = 0;
+		String prevToken = "";
+		String token = "";
 
 		while (tokenizer.hasNext()) {
-			String token = tokenizer.next();
+			prevToken = token;
+			token = tokenizer.next();
 			if (MMLTokenizer.isNote(token.charAt(0))) {
 				String s[] = MMLTokenizer.noteNames(token);
 				String noteName = s[0];
@@ -301,6 +304,11 @@ public class MMLStringOptimizer {
 						(stack.get(0).getIndex()) <= noteCount) {
 					section = stack.get(0).getSectionName();
 					stack.remove(0);
+					if (prevToken == "&") {
+						/* Lの直前に '&' があると、効かなくなるため. */
+						sb.deleteCharAt(sb.length()-1);
+						section += "&";
+					}
 					sb.append("l" + section);
 				}
 
