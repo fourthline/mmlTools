@@ -69,7 +69,7 @@ public class MMLOptTools {
 
 	/**
 	 * フルートノイズを消すための、後方64休符置換
-	 * @param token （例：c4,f8,e-32）
+	 * @param mml （例：c4,f8,e-32）
 	 * @return 合成後の token
 	 */
 	public String replaceNoise(String mml) throws UndefinedTickException {
@@ -137,7 +137,8 @@ public class MMLOptTools {
 
 	/**
 	 * 後方64休符置換
-	 * @param token (例： c4, d16., f+32)
+	 * @param note ノート文字 ("c", "c+")
+	 * @param width Length文字 ("64", "8")
 	 * @return 合成後の token
 	 */
 	public String replaceTail64(String note, String width) throws UndefinedTickException {		
