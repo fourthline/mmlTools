@@ -177,6 +177,7 @@ public class MMLEventList {
 			int tickLength = tempoEvent.getTickOffset() - prevNoteEvent.getEndTick();
 			int tickOffset = prevNoteEvent.getEndTick();
 			int note = prevNoteEvent.getNote();
+			// FIXME: 最後の1つのrだけに細工すればよいね.
 			MMLTicks ticks = new MMLTicks("c", tickLength, false);
 			if (prevNoteEvent.getVelocity() != 0) {
 				sb.append("v0");
@@ -235,14 +236,25 @@ public class MMLEventList {
 				sb.append("v"+volumn);
 			}
 
-			// endTickOffsetがTempoを跨いでいたら、そこで切る.
+			// endTickOffsetがTempoを跨いでいたら、'&'でつなげる.
 			if ( (tempoEvent != null) && (noteEvent.getTickOffset() < tempoEvent.getTickOffset()) && (tempoEvent.getTickOffset() < noteEvent.getEndTick()) ) {
 				int tick = tempoEvent.getTickOffset() - noteEvent.getTickOffset();
-				// TODO: 内部データ上も切ること.
-				noteEvent.setTick(tick);
-				//				noteEvent = new MMLNoteEvent(noteEvent.getNote(), tick, noteEvent.getTickOffset());
+				int tick2 = noteEvent.getTick() - tick;
+
+				MMLNoteEvent divNoteEvent = noteEvent.clone();
+				divNoteEvent.setTick(tick);
+				sb.append( divNoteEvent.toMMLString(prevNoteEvent) );
+
+				if (withTempo) {
+					sb.append( tempoEvent.toMMLString() );
+				}
+				tempoEvent = (MMLTempoEvent) nextEvent(tempoIterator);
+
+				divNoteEvent.setTick(tick2);
+				sb.append('&').append( divNoteEvent.toMMLString() );
+			} else {
+				sb.append( noteEvent.toMMLString(prevNoteEvent) );
 			}
-			sb.append( noteEvent.toMMLString(prevNoteEvent) );
 			prevNoteEvent = noteEvent;
 		}
 

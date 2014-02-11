@@ -23,9 +23,9 @@ public class MMLTrackTest {
 	public void testGetMMLStrings() {
 		MMLTrack track = new MMLTrack("MML@aaa,bbb,ccc;");
 		String expect[] = {
-				"a8t150r8aa", // melodyパートのみテンポ指定.
-				"b8r8bb",
-				"c8r8cc",
+				"a8t150&a8aa", // melodyパートのみテンポ指定.
+				"b8&b8bb",
+				"c8&c8cc",
 		};
 		new MMLTempoEvent(150, 48).appendToListElement(track.getGlobalTempoList());
 		String mml[] = track.getMMLStrings();
@@ -83,6 +83,16 @@ public class MMLTrackTest {
 	}
 
 	/**
+	 * テンポ変速　終わらないタイプ
+	 */
+	@Test
+	public void testPlayingLong2() throws Exception {
+		String mml = "MML@t150cccccccccccct90c,eeeeeeeeeeeeeeee;";
+
+		checkPlayTimeAndMabinogiTime(mml);
+	}
+
+	/**
 	 * テンポ変速 途中で切れるタイプのMML補正
 	 */
 	@Test
@@ -101,6 +111,18 @@ public class MMLTrackTest {
 	public void testPlayingLongMML() throws Exception {
 		String mml =       "MML@t150cccccccccccct90cccc,eeeeeeeeeeeeeeee,;";
 		String expectMML = "MML@t150cccccccccccct90cccct150,eeeeeeeeeeeeeeee,;";
+
+		MMLTrack track = new MMLTrack(mml);
+		assertEquals(expectMML, track.getMMLString());
+	}
+
+	/**
+	 * テンポ変速　終わらないタイプのMML補正
+	 */
+	@Test
+	public void testPlayingLong2MML() throws Exception {
+		String mml =       "MML@t150cccccccccccct90c,eeeeeeeeeeeeeeee;";
+		String expectMML = "MML@t150cccccccccccct90cr2.v0c64t150,eeeeeeeeeeeeeeee,;";
 
 		MMLTrack track = new MMLTrack(mml);
 		assertEquals(expectMML, track.getMMLString());

@@ -304,12 +304,12 @@ public class MMLStringOptimizer {
 						(stack.get(0).getIndex()) <= noteCount) {
 					section = stack.get(0).getSectionName();
 					stack.remove(0);
-					if (prevToken == "&") {
-						/* Lの直前に '&' があると、効かなくなるため. */
-						sb.deleteCharAt(sb.length()-1);
-						section += "&";
-					}
 					sb.append("l" + section);
+					if (prevToken.equals("&")) {
+						/* Lの直前に '&' があると、効かなくなるため. */
+						sb.deleteCharAt(sb.length()-section.length()-2);
+						sb.append('&');
+					}
 				}
 
 				sb.append(noteName);

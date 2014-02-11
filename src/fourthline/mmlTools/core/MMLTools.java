@@ -199,7 +199,7 @@ public class MMLTools {
 		if (
 				melodyParser.checkPitch(min, max) &&
 				chord1Parser.checkPitch(min, max) && 
-				chord1Parser.checkPitch(min, max) ) {
+				chord2Parser.checkPitch(min, max) ) {
 			return true;
 		} else {
 			return false;

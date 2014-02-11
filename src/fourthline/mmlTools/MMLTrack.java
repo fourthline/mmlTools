@@ -133,13 +133,15 @@ public class MMLTrack extends MMLTools {
 
 		double playTime = getPlayTime();
 		double mmlTime = getMabinogiTime();
+		int tick = (int)(totalTick - mmlParts.get(0).getTickLength());
 		if (playTime > mmlTime) {
 			// スキルが演奏の途中で止まるのを防ぎます.
-			List<MMLNoteEvent> noteList = mmlParts.get(0).getMMLNoteEventList();
-			int tick = totalTick - noteList.get(noteList.size()-1).getEndTick();
 			mml[0] += new MMLTicks("r", tick, false).toString();
 		} else if (playTime < mmlTime) {
 			// 演奏が終ってスキルが止まらないのを防ぎます.
+			if (tick > 0) {
+				mml[0] += new MMLTicks("r", tick, false).toString() + "v0c64";
+			}
 			mml[0] += MMLTempoEvent.getMaxTempoEvent(globalTempoList).toMMLString();
 		}
 

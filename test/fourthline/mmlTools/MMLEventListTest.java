@@ -243,7 +243,7 @@ public class MMLEventListTest {
 	public void testToMMLString_4() {
 		MMLEventList eventList = new MMLEventList("c4d4");
 		List<MMLTempoEvent> globalTempoList = new ArrayList<MMLTempoEvent>();
-		String expectMML = "c8t150r8d4";
+		String expectMML = "c8t150&c8d4";
 		globalTempoList.add(new MMLTempoEvent(150, 48));
 		eventList.setGlobalTempoList(globalTempoList);
 

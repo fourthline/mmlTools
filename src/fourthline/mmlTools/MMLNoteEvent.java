@@ -6,7 +6,7 @@ package fourthline.mmlTools;
 
 import fourthline.mmlTools.core.MMLTicks;
 
-public class MMLNoteEvent extends MMLEvent {
+public class MMLNoteEvent extends MMLEvent implements Cloneable {
 
 	public static final int NO_VEL = -1;
 	private int note;
@@ -136,5 +136,13 @@ public class MMLNoteEvent extends MMLEvent {
 
 	public int getOctave() {
 		return (note /12);
+	}
+
+	public MMLNoteEvent clone() {
+		try {  
+			return (MMLNoteEvent) super.clone();  
+		} catch (CloneNotSupportedException e) {   
+			return null;  
+		}  
 	}
 }

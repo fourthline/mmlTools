@@ -116,4 +116,11 @@ public class MMLStringOptimizerTest {
 		String expect = "l2cc8cc8c16c16ccc";
 		checkMMLStringOptimize(input, expect);
 	}
+
+	@Test(timeout=TIMEOUT)
+	public void testOptimize_amp_L_0() {
+		String input  = "c2&c8d8d8d8d8d8d8";
+		String expect = "c2l8&cdddddd";
+		checkMMLStringOptimize(input, expect);
+	}
 }
