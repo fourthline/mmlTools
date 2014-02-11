@@ -241,8 +241,7 @@ public class MMLEventList {
 				int tick = tempoEvent.getTickOffset() - noteEvent.getTickOffset();
 				int tick2 = noteEvent.getTick() - tick;
 
-				MMLNoteEvent divNoteEvent = noteEvent.clone();
-				divNoteEvent.setTick(tick);
+				MMLNoteEvent divNoteEvent = new MMLNoteEvent(noteEvent.getNote(), tick, noteEvent.getTickOffset());
 				sb.append( divNoteEvent.toMMLString(prevNoteEvent) );
 
 				if (withTempo) {
