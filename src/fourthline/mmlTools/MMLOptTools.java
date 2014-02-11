@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2013 たんらる
+ */
+
 package fourthline.mmlTools;
 
 import fourthline.mmlTools.core.MMLTokenizer;
@@ -15,7 +19,7 @@ public class MMLOptTools {
 
 	private String analysisString;
 	private int replaceCount = 0;
-	
+
 	public int getReplaceCount() {
 		return replaceCount;
 	}
@@ -37,9 +41,9 @@ public class MMLOptTools {
 			"6",
 			"12",
 			"24"
-	
+
 	};
-	
+
 	/**
 	 * 変換パターン
 	 * space: 休符
@@ -62,7 +66,7 @@ public class MMLOptTools {
 			"19&64 64",
 			"38 64"
 	};
-	
+
 	/**
 	 * フルートノイズを消すための、後方64休符置換
 	 * @param token （例：c4,f8,e-32）
@@ -78,7 +82,7 @@ public class MMLOptTools {
 		StringBuilder sb = new StringBuilder();
 		StringBuilder anly = new StringBuilder();
 		replaceCount = 0;
-		
+
 		while (mt.hasNext()) {
 			String token = mt.next();
 			int gate = 0;
@@ -86,16 +90,17 @@ public class MMLOptTools {
 			try {
 				gate = parser.noteGT(token);
 			} catch (ParserWarn3ML e) {}
-			
+
 			int noteNumber = parser.getNoteNumber();
-			if (gate <= 0)
+			if (gate <= 0) {
 				noteNumber = 0;
-			
+			}
+
 			if ( (gate > 0) && (noteNumber > 0) && (beforeNoteNumber == noteNumber) ) {
 				System.out.println("...."+beforeToken);
 
 				String note = toNote(beforeToken);
-				
+
 				beforeToken = replaceTail64(note, beforeWidth);
 				anlyToken = " ["+note+"] ";
 			}
@@ -111,7 +116,7 @@ public class MMLOptTools {
 		sb.append(beforeToken);
 		anly.append(anlyToken);
 		analysisString = anly.toString();
-		
+
 		return sb.toString();
 	}
 
@@ -119,19 +124,17 @@ public class MMLOptTools {
 		return analysisString;
 	}
 
-	
 	private String toNote(String token) {
 		int noteIndex = 1;
 		if ( (token.length() > 1) && (!Character.isDigit(token.charAt(1))) ) {
 			noteIndex++;
 		}
-		
+
 		String note = token.substring(0, noteIndex);
-		
+
 		return note;
 	}
-	
-	
+
 	/**
 	 * 後方64休符置換
 	 * @param token (例： c4, d16., f+32)
@@ -145,11 +148,11 @@ public class MMLOptTools {
 				break;
 			}
 		}
-		
+
 		if (patternIndex < 0) {
 			return note;
 		}
-		
+
 		String pattern = pattern64_tick[patternIndex];
 		int patternLength = pattern.length();
 		StringBuilder sb = new StringBuilder(note);
@@ -167,9 +170,9 @@ public class MMLOptTools {
 				break;
 			}
 		}
-		
+
 		replaceCount++;
-		
+
 		return sb.toString();
 	}
 }

@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2013 たんらる
+ */
+
 package fourthline.mmlTools;
 
 
@@ -13,7 +17,7 @@ import fourthline.mmlTools.core.MMLTools;
  */
 public class MMLTimeTools extends MMLTools {
 	public final static int CHECK_RANGE_N = 5;
-	
+
 	/**
 	 * 音域チェックテーブル
 	 * リュート
@@ -36,30 +40,32 @@ public class MMLTimeTools extends MMLTools {
 
 	public MMLTimeTools(String mml, boolean drumMode) throws UndefinedTickException {
 		super(mml);
-		
+
 		parseMMLforMabinogi();
 		parsePlayMode(drumMode);
 	}
 
-	
+
 	public boolean[] checkRange() {
 		fourthline.mmlTools.core.MelodyParser parser[] = {
 				melodyParser, chord1Parser, chord2Parser
 		};
-		
+
 		boolean result[] = new boolean[minTable.length];
-		for (int i = 0; i < result.length; i++)
+		for (int i = 0; i < result.length; i++) {
 			result[i] = true;
-		
+		}
+
 		// 楽器ごとの音域チェック
 		for (int tableIndex = 0; tableIndex < minTable.length; tableIndex++) {
 			// パートごとの音域チェック
 			for (int i = 0; i < parser.length; i++) {
 				int min = parser[i].getMinNote();
 				int max = parser[i].getMaxNote();
-				if ( (min < 0) || (max < 0) )
+				if ( (min < 0) || (max < 0) ) {
 					continue;
-				
+				}
+
 				if ( (minTable[tableIndex] > min) ||
 						(maxTable[tableIndex] < max) ) {
 					result[tableIndex] = false;
@@ -67,26 +73,24 @@ public class MMLTimeTools extends MMLTools {
 				}
 			}
 		}
-		
+
 		return result;
 	}
-	
-	
+
+
 	public Map<Integer, Integer> getPlayList() throws UndefinedTickException {
 		return playParser.getTempoList();
 	}
-	
+
 	public Map<Integer, Integer> getMelodyList() throws UndefinedTickException {
 		return melodyParser.getTempoList();
 	}
-	
+
 	public Map<Integer, Integer> getChord1List() throws UndefinedTickException {
 		return chord1Parser.getTempoList();
 	}
-	
+
 	public Map<Integer, Integer> getChord2List() throws UndefinedTickException {
 		return chord2Parser.getTempoList();
 	}
-	
-
 }
