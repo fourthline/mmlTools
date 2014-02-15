@@ -7,6 +7,7 @@ package fourthline.mmlTools;
 import fourthline.mmlTools.core.MMLTicks;
 
 public class MMLNoteEvent extends MMLEvent {
+	private static final long serialVersionUID = 4372538748155995529L;
 
 	public static final int NO_VEL = -1;
 	private int note;

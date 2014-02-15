@@ -4,6 +4,7 @@
 
 package fourthline.mmlTools;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -15,7 +16,8 @@ import fourthline.mmlTools.parser.MMLEventParser;
 /**
  * 1行のMMLデータを扱います.
  */
-public class MMLEventList {
+public class MMLEventList implements Serializable {
+	private static final long serialVersionUID = -1430758411579285535L;
 
 	private List<MMLNoteEvent>   noteList   = new ArrayList<MMLNoteEvent>();
 	private List<MMLTempoEvent>  tempoList;

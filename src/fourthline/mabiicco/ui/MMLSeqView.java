@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 たんらる
+ * Copyright (C) 2013-2014 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -17,6 +17,7 @@ import javax.swing.event.ChangeListener;
 
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.editor.MMLEditor;
+import fourthline.mabiicco.ui.editor.MMLScoreUndoEdit;
 import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTempoEvent;
@@ -52,6 +53,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	private ColumnPanel columnView;
 
 	private MMLScore mmlScore = new MMLScore();
+	private MMLScoreUndoEdit undoEdit = new MMLScoreUndoEdit(this);
 
 	private MMLInputPanel dialog = new MMLInputPanel(this);
 
@@ -127,6 +129,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		}
 
 		repaint();
+		undoEdit.saveState();
 	}
 
 	private String getNewTrackName() {
@@ -414,6 +417,23 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		pianoRollView.setWideScale(scale);
 	}
 
+	public void undo() {
+		if (undoEdit.canUndo()) {
+			undoEdit.undo();
+			updateSelectedTrackAndMMLPart();
+			updateTempoRoll();
+			repaint();
+		}
+	}
+
+	public void redo() {
+		if (undoEdit.canRedo()) {
+			undoEdit.redo();
+			updateSelectedTrackAndMMLPart();
+			updateTempoRoll();
+			repaint();
+		}
+	}
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
@@ -444,6 +464,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		}
 
 		updateTempoRoll();
+		undoEdit.saveState();
 	}
 
 	@Override

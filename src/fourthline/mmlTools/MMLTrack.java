@@ -4,6 +4,7 @@
 
 package fourthline.mmlTools;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +12,9 @@ import fourthline.mmlTools.core.MMLTicks;
 import fourthline.mmlTools.core.MMLTools;
 import fourthline.mmlTools.optimizer.MMLStringOptimizer;
 
-public class MMLTrack extends MMLTools {
+public class MMLTrack extends MMLTools implements Serializable {
+	private static final long serialVersionUID = 2006880378975808647L;
+	
 	private List<MMLEventList> mmlParts;
 	private List<MMLTempoEvent> globalTempoList = new ArrayList<MMLTempoEvent>();
 

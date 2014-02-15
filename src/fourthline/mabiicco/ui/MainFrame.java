@@ -79,6 +79,8 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 	private static final String SET_START_POSITION = "setStartPosition";
 	private static final String INPUT_FROM_CLIPBOARD = "inputFromClipboard";
 	private static final String OUTPUT_TO_CLIPBOARD = "outputToClipboard";
+	private static final String UNDO = "undo";
+	private static final String REDO = "redo";
 
 	private JPanel contentPane;
 	private JTextField statusField;
@@ -104,97 +106,8 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		loadWindowPeoperties();
 		addComponentListener(this);
 
-		JMenuBar menuBar = new JMenuBar();
-		setJMenuBar(menuBar);
+		setJMenuBar(createMenuBar());
 
-		JMenu fileMenu = new JMenu("ファイル");
-		fileMenu.setMnemonic('F');
-		menuBar.add(fileMenu);
-
-		JMenuItem newFileMenuItem = new JMenuItem("新規作成");
-		newFileMenuItem.setIcon(new ImageIcon(MainFrame.class.getResource("/img/file.png")));
-		noplayFunctions.add(newFileMenuItem);
-		newFileMenuItem.addActionListener(this);
-		newFileMenuItem.setActionCommand(NEW_FILE);
-		newFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK));
-		fileMenu.add(newFileMenuItem);
-
-		JMenuItem fileOpenMenuItem = new JMenuItem("開く");
-		fileOpenMenuItem.setIcon(new ImageIcon(MainFrame.class.getResource("/img/open.png")));
-		noplayFunctions.add(fileOpenMenuItem);
-		fileOpenMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
-		fileOpenMenuItem.addActionListener(this);
-		fileOpenMenuItem.setActionCommand(FILE_OPEN);
-		fileMenu.add(fileOpenMenuItem);
-
-		JMenuItem reloadMenuItem = new JMenuItem("再読み込み");
-		noplayFunctions.add(reloadMenuItem);
-		reloadMenuItem.addActionListener(this);
-		reloadMenuItem.setActionCommand(RELOAD_FILE);
-		fileMenu.add(reloadMenuItem);
-
-		fileMenu.add(new JSeparator());
-
-		JMenuItem exitMenuItem = new JMenuItem("終了");
-		exitMenuItem.addActionListener(this);
-		exitMenuItem.setActionCommand(QUIT);
-		fileMenu.add(exitMenuItem);
-
-		JMenu trackMenu = new JMenu("トラック");
-		menuBar.add(trackMenu);
-
-		JMenuItem addTrackMenu = new JMenuItem("トラック追加");
-		noplayFunctions.add(addTrackMenu);
-		addTrackMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_MASK));
-		addTrackMenu.addActionListener(this);
-		addTrackMenu.setActionCommand(ADD_TRACK);
-		trackMenu.add(addTrackMenu);
-
-		JMenuItem removeTrackMenu = new JMenuItem("トラック削除");
-		noplayFunctions.add(removeTrackMenu);
-		removeTrackMenu.addActionListener(this);
-		removeTrackMenu.setActionCommand(REMOVE_TRACK);
-		trackMenu.add(removeTrackMenu);
-
-		trackMenu.add(new JSeparator());
-
-		JMenuItem trackPropertyMenu = new JMenuItem("トラックプロパティ");
-		noplayFunctions.add(trackPropertyMenu);
-		trackPropertyMenu.addActionListener(this);
-		trackPropertyMenu.setActionCommand(TRACK_PROPERTY);
-		trackPropertyMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.ALT_MASK));
-		trackMenu.add(trackPropertyMenu);
-
-		JMenu playMenu = new JMenu("操作");
-		menuBar.add(playMenu);
-
-		JMenuItem headPlayPositionMenuItem = new JMenuItem("先頭へ戻す");
-		headPlayPositionMenuItem.setIcon(new ImageIcon(MainFrame.class.getResource("/img/head.png")));
-		headPlayPositionMenuItem.addActionListener(this);
-		headPlayPositionMenuItem.setActionCommand(SET_START_POSITION);
-		headPlayPositionMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0));
-		playMenu.add(headPlayPositionMenuItem);
-
-		JMenuItem playMenuItem = new JMenuItem("再生");
-		playMenuItem.setIcon(new ImageIcon(MainFrame.class.getResource("/img/playButton.png")));
-		playMenuItem.addActionListener(this);
-		playMenuItem.setActionCommand(PLAY);
-		playMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
-		playMenu.add(playMenuItem);
-
-		JMenuItem stopMenuItem = new JMenuItem("停止");
-		stopMenuItem.setIcon(new ImageIcon(MainFrame.class.getResource("/img/stop.png")));
-		stopMenuItem.addActionListener(this);
-		stopMenuItem.setActionCommand(STOP);
-
-		JMenuItem pauseMenuItem = new JMenuItem("一時停止");
-		pauseMenuItem.addActionListener(this);
-		pauseMenuItem.setActionCommand(PAUSE);
-		pauseMenuItem.setIcon(new ImageIcon(MainFrame.class.getResource("/img/pause.png")));
-		playMenu.add(pauseMenuItem);
-
-		stopMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
-		playMenu.add(stopMenuItem);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -319,6 +232,102 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		setEditAlign();
 	}
 
+	private JMenuItem createMenuItem(String name, String actionCommand) {
+		JMenuItem menuItem = new JMenuItem(name);
+		menuItem.addActionListener(this);
+		menuItem.setActionCommand(actionCommand);
+
+		return menuItem;
+	}
+
+	private JMenuItem createMenuItem(String name, String actionCommand, String iconName) {
+		JMenuItem menuItem = createMenuItem(name, actionCommand);
+		menuItem.setIcon(new ImageIcon(MainFrame.class.getResource(iconName)));
+
+		return menuItem;
+	}
+
+	private JMenuBar createMenuBar() {
+		JMenuBar menuBar = new JMenuBar();
+		// FIXME:
+		/************************* File Menu *************************/
+		JMenu fileMenu = new JMenu("ファイル");
+		fileMenu.setMnemonic('F');
+		menuBar.add(fileMenu);
+
+		JMenuItem newFileMenuItem = createMenuItem("新規作成", NEW_FILE, "/img/file.png");
+		noplayFunctions.add(newFileMenuItem);
+		newFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK));
+		fileMenu.add(newFileMenuItem);
+
+		JMenuItem fileOpenMenuItem = createMenuItem("開く", FILE_OPEN, "/img/open.png");
+		noplayFunctions.add(fileOpenMenuItem);
+		fileOpenMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
+		fileMenu.add(fileOpenMenuItem);
+
+		JMenuItem reloadMenuItem = createMenuItem("再読み込み", RELOAD_FILE);
+		noplayFunctions.add(reloadMenuItem);
+		fileMenu.add(reloadMenuItem);
+
+		fileMenu.add(new JSeparator());
+
+		JMenuItem exitMenuItem = createMenuItem("終了", QUIT);
+		fileMenu.add(exitMenuItem);
+
+		/************************* Edit Menu *************************/
+		JMenu editMenu = new JMenu("編集");
+		fileMenu.setMnemonic('E');
+		menuBar.add(editMenu);
+
+		JMenuItem undoMenu = createMenuItem("Undo", UNDO);
+		undoMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_MASK));
+		editMenu.add(undoMenu);
+
+		JMenuItem redoMenu = createMenuItem("Redo", REDO);
+		redoMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_MASK));
+		editMenu.add(redoMenu);
+
+		/************************* Track Menu *************************/
+		JMenu trackMenu = new JMenu("トラック");
+		menuBar.add(trackMenu);
+
+		JMenuItem addTrackMenu = createMenuItem("トラック追加", ADD_TRACK);
+		noplayFunctions.add(addTrackMenu);
+		addTrackMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_MASK));
+		trackMenu.add(addTrackMenu);
+
+		JMenuItem removeTrackMenu = createMenuItem("トラック削除", REMOVE_TRACK);
+		noplayFunctions.add(removeTrackMenu);
+		trackMenu.add(removeTrackMenu);
+
+		trackMenu.add(new JSeparator());
+
+		JMenuItem trackPropertyMenu = createMenuItem("トラックプロパティ", TRACK_PROPERTY);
+		noplayFunctions.add(trackPropertyMenu);
+		trackPropertyMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.ALT_MASK));
+		trackMenu.add(trackPropertyMenu);
+
+		/************************* Play Menu *************************/
+		JMenu playMenu = new JMenu("操作");
+		menuBar.add(playMenu);
+
+		JMenuItem headPlayPositionMenuItem = createMenuItem("先頭へ戻す", SET_START_POSITION, "/img/head.png");
+		headPlayPositionMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0));
+		playMenu.add(headPlayPositionMenuItem);
+
+		JMenuItem playMenuItem = createMenuItem("再生", PLAY, "/img/playButton.png");
+		playMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
+		playMenu.add(playMenuItem);
+
+		JMenuItem stopMenuItem = createMenuItem("停止", STOP, "/img/stop.png");
+		stopMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
+		playMenu.add(stopMenuItem);
+
+		JMenuItem pauseMenuItem = createMenuItem("一時停止", PAUSE, "/img/pause.png");
+		playMenu.add(pauseMenuItem);
+
+		return menuBar;
+	}
 
 	private JSeparator newToolBarSeparator() {
 		JSeparator separator = new JToolBar.Separator();
@@ -522,6 +531,10 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		} else if (command.equals(OUTPUT_TO_CLIPBOARD)) {
 			mmlSeqView.outputClipBoardAction();
 			JOptionPane.showMessageDialog(this, "クリップボードにコピーしました.");
+		} else if (command.equals(UNDO)) {
+			mmlSeqView.undo();
+		} else if (command.equals(REDO)) {
+			mmlSeqView.redo();
 		}
 	}
 

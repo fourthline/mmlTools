@@ -4,6 +4,11 @@
 
 package fourthline.mmlTools;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,5 +99,32 @@ public class MMLScore {
 		}
 
 		return (int)tick;
+	}
+
+	public byte[] getObjectState() {
+		byte objState[] = null;
+
+		try {
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			ObjectOutputStream ostream = new ObjectOutputStream(bos);
+			ostream.writeObject(this.trackList);
+			ostream.close();
+			objState = bos.toByteArray();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return objState;
+	}
+
+	public void putObjectState(byte objState[]) {
+		try {
+			ByteArrayInputStream bis = new ByteArrayInputStream(objState);
+			ObjectInputStream istream = new ObjectInputStream(bis);
+			this.trackList = (ArrayList<MMLTrack>) istream.readObject();
+			istream.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

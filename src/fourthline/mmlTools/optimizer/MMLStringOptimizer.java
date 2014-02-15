@@ -169,7 +169,6 @@ public class MMLStringOptimizer {
 		}
 
 		endScore();
-		System.out.println( "stack1: " + stack );
 	}
 
 	private int searchNextSectionIndex(int startIndex) {
@@ -246,7 +245,6 @@ public class MMLStringOptimizer {
 			}
 		}
 
-		System.out.println( "stack2: " + stack );
 		return result;
 	}
 
@@ -264,8 +262,6 @@ public class MMLStringOptimizer {
 				mergeSection2(i, nextIndex);
 			}
 		}
-
-		System.out.println( "stack3: " + stack );
 	}
 
 	private void trimSection() {

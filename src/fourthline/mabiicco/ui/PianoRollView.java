@@ -27,11 +27,6 @@ import fourthline.mmlTools.core.MMLTicks;
  * ピアノロール表示を行うためのビューです.
  */
 public class PianoRollView extends AbstractMMLView {
-
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -7229093886476553295L;
 
 	private double wideScale = 6; // ピアノロールの拡大/縮小率 (1~6)

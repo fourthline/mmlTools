@@ -104,6 +104,7 @@ public class MMLTools {
 		}
 	}
 
+	public MMLTools() {}
 
 	public MMLTools(String mml) {
 		if (!mml.startsWith("MML@")) {
