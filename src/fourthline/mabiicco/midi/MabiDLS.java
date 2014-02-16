@@ -192,6 +192,16 @@ public final class MabiDLS {
 		return insts;
 	}
 
+	public InstClass getInstByProgram(int program) {
+		for (InstClass inst : insts) {
+			if (inst.getProgram() == program) {
+				return inst;
+			}
+		}
+
+		return null;
+	}
+
 	private int play_note = -1;
 	/** 単音再生 */
 	public void playNote(int note, int channel) {

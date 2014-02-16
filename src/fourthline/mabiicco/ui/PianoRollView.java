@@ -14,6 +14,7 @@ import java.util.List;
 import javax.swing.JViewport;
 import javax.swing.event.MouseInputListener;
 
+import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLNoteEvent;
@@ -45,6 +46,10 @@ public class PianoRollView extends AbstractMMLView {
 
 	private int activeTrackIndex = 0;
 
+	// draw pitch range
+	private int lowerNote = 0;
+	private int upperNote = 14;
+
 	// ピアノロール上に表示する各トラックの色リスト
 	private static final Color trackBaseColor[] = {
 		new Color(0.7f, 0.0f, 0.0f),
@@ -72,9 +77,9 @@ public class PianoRollView extends AbstractMMLView {
 		bKeyColor, 
 		wKeyColor
 	};
+	private static final Color noSoundColor = new Color(0.9f, 0.8f, 0.8f);
 
 	private static final Color barBorder = new Color(0.5f, 0.5f, 0.5f);
-
 
 
 	/**
@@ -241,13 +246,19 @@ public class PianoRollView extends AbstractMMLView {
 
 	private void paintOctPianoLine(Graphics2D g, int pos, char posText) {
 		int startY = 12 * AbstractMMLView.HEIGHT * pos;
+		int octave = AbstractMMLView.OCTNUM - pos - 1;
 
 		// グリッド
 		int y = startY;
 		int width = getWidth();
 		g.drawLine(0, y, width, y);
 		for (int i = 0; i < 12; i++) {
-			g.setColor(keyColors[i]);
+			int line = octave*12 + (11-i);
+			if ( (line >= lowerNote) && (line <= upperNote) ) {
+				g.setColor(keyColors[i]);
+			} else {
+				g.setColor(noSoundColor);
+			}
 			g.fillRect(0, i*6+y, width, AbstractMMLView.HEIGHT);
 			g.setColor(borderColor);
 			g.drawLine(0, i*6+y, width, i*6+y);
@@ -392,4 +403,8 @@ public class PianoRollView extends AbstractMMLView {
 		}
 	}
 
+	public void setPitchRange(InstClass inst) {
+		this.lowerNote = inst.getLowerNote();
+		this.upperNote = inst.getUpperNote();
+	}
 }

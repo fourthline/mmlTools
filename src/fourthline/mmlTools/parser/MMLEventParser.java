@@ -22,8 +22,19 @@ public class MMLEventParser extends MelodyParser implements Iterator<MMLEvent> {
 	public MMLEventParser(String mml) {
 		super(mml);
 		tokenizer = new MMLTokenizer(mml);
-	}		
+	}
 
+	public static int firstNoteNumber(String mml) {
+		MMLEventParser parser = new MMLEventParser(mml);
+		while (parser.hasNext()) {
+			MMLEvent e = parser.next();
+			if (e instanceof MMLNoteEvent) {
+				return ((MMLNoteEvent)e).getNote();
+			}
+		}
+
+		return -1;
+	}
 
 	private MMLEvent nextItem = null;
 

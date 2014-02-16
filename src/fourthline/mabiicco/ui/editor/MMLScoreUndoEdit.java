@@ -26,6 +26,13 @@ public class MMLScoreUndoEdit extends AbstractUndoableEdit {
 		this.mmlManager = mmlManager;
 	}
 
+	public void initState() {
+		undoState.clear();
+		redoState.clear();
+
+		saveState();
+	}
+
 	public void saveState() {
 		MMLScore score = mmlManager.getMMLScore();
 		undoState.push( score.getObjectState() );
@@ -55,9 +62,8 @@ public class MMLScoreUndoEdit extends AbstractUndoableEdit {
 		MMLScore score = mmlManager.getMMLScore();
 		if (canRedo()) {
 			byte state[] = redoState.pop();
-			byte prevState[] = score.getObjectState();
 			score.putObjectState(state);
-			undoState.push(prevState);
+			undoState.push(state);
 		}
 	}
 

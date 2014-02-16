@@ -129,7 +129,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		}
 
 		repaint();
-		undoEdit.saveState();
+		undoEdit.initState();
 	}
 
 	private String getNewTrackName() {
@@ -161,11 +161,15 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		// エディタ更新
 		updateTempoRoll();
 		updateSelectedTrackAndMMLPart();
+
+		undoEdit.saveState();
 	}
 
 	private void removeAllMMLTrack() {
 		mmlScore = new MMLScore();
 		tabbedPane.removeAll();
+
+		undoEdit.saveState();
 	}
 
 	/**
@@ -193,7 +197,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 			updateSelectedTrackAndMMLPart();
 		}
 
-
+		undoEdit.saveState();
 	}
 
 
@@ -254,6 +258,8 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		pianoRollView.setSequenceX(0);
 		updateTempoRoll();
 		repaint();
+
+		undoEdit.initState();
 	}
 
 	/**
@@ -271,6 +277,8 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		updateSelectedTrackAndMMLPart();
 		updateTempoRoll();
 		repaint();
+
+		undoEdit.saveState();
 	}
 
 	/**
@@ -355,7 +363,6 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	}
 
 	private void updateSelectedTrackAndMMLPart() {
-		int trackIndex = tabbedPane.getSelectedIndex();
 		MMLTrackView view = (MMLTrackView) tabbedPane.getSelectedComponent();
 		if (view != null) {
 			int channel = view.getChannel();
@@ -363,7 +370,8 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 			int mmlPartIndex = view.getSelectedMMLPartIndex();
 
 			// ピアノロールビューにアクティブトラックとアクティブパートを設定します.
-			editor.setMMLEventList(mmlScore.getTrack(trackIndex).getMMLEventList(mmlPartIndex));
+			editor.setMMLEventList(getSelectedTrack().getMMLEventList(mmlPartIndex));
+			pianoRollView.setPitchRange(MabiDLS.getInstance().getInstByProgram(getSelectedTrack().getProgram()));
 			pianoRollView.repaint();
 			System.out.printf("stateChanged(): %d, %d\n", channel, mmlPartIndex);
 		}
@@ -487,6 +495,8 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	@Override
 	public void updateActiveTrackProgram(int program) {
 		getSelectedTrack().setProgram(program);
+		pianoRollView.setPitchRange(MabiDLS.getInstance().getInstByProgram(program));
+		pianoRollView.repaint();
 	}
 
 	public void setTimeView(JLabel timeView) {
