@@ -28,9 +28,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Point;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -354,12 +351,8 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	}
 
 	public void outputClipBoardAction() {
-		MMLTrackView view = (MMLTrackView) tabbedPane.getSelectedComponent();
-		String mml = view.getMMLText();
-
-		Toolkit kit = Toolkit.getDefaultToolkit();
-		Clipboard clip = kit.getSystemClipboard();
-		clip.setContents(new StringSelection(mml), null);
+		MMLOutputPanel outputPanel = new MMLOutputPanel(mmlScore.getTrackList());
+		outputPanel.showDialog();
 	}
 
 	private void updateSelectedTrackAndMMLPart() {

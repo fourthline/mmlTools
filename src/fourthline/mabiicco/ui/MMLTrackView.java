@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 たんらる
+ * Copyright (C) 2013-2014 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -186,11 +186,16 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 	@Override
 	public void insertUpdate(DocumentEvent event) {
 	}
+
 	@Override
 	public void changedUpdate(DocumentEvent event) {
 	}
 
-	private void updateComposeRank() {
+	/**
+	 * 保持しているMMLテキストの作曲ランク文字列を取得します.
+	 * @return 作曲ランクのフォーマットされた文字列.
+	 */
+	private String getRankText() {
 		MMLTools tools = new MMLTools(
 				mmlText[0].getText(),
 				mmlText[1].getText(),
@@ -198,7 +203,11 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 				);
 
 		String rank = tools.mmlRankFormat();
-		trackComposeLabel.setText(rank);
+		return rank;
+	}
+
+	private void updateComposeRank() {
+		trackComposeLabel.setText( getRankText() );
 	}
 
 	public void setInstProgram(int program) {

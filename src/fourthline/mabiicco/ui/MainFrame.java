@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 たんらる
+ * Copyright (C) 2013-2014 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -530,7 +530,6 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 			mmlSeqView.inputClipBoardAction();
 		} else if (command.equals(OUTPUT_TO_CLIPBOARD)) {
 			mmlSeqView.outputClipBoardAction();
-			JOptionPane.showMessageDialog(this, "クリップボードにコピーしました.");
 		} else if (command.equals(UNDO)) {
 			mmlSeqView.undo();
 		} else if (command.equals(REDO)) {

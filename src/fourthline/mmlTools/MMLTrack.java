@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 たんらる
+ * Copyright (C) 2013-2014 たんらる
  */
 
 package fourthline.mmlTools;
@@ -194,7 +194,4 @@ public class MMLTrack extends MMLTools implements Serializable {
 
 		return maxTime;
 	}
-
-
-
 }

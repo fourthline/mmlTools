@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 たんらる
+ * Copyright (C) 2013-2014 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -63,6 +63,7 @@ public class PianoRollView extends AbstractMMLView {
 	private static final Color wKeyColor = new Color(0.9f, 0.9f, 0.9f); // 白鍵盤用
 	private static final Color bKeyColor = new Color(0.8f, 0.8f, 0.8f); // 黒鍵盤用
 	private static final Color borderColor = new Color(0.6f, 0.6f, 0.6f); // 境界線用
+	private static final Color pitchRangeBorderColor = Color.RED; // pitch range
 	private static final Color keyColors[] = new Color[] {
 		wKeyColor, 
 		bKeyColor, 
@@ -228,6 +229,8 @@ public class PianoRollView extends AbstractMMLView {
 		}
 
 		paintMeasure(g2);
+		paintPitchRangeBorder(g2);
+
 		if (mmlScore != null) {
 			int trackCount = mmlScore.getTrackCount();
 			for (int i = 0; i < trackCount; i++) {
@@ -254,15 +257,24 @@ public class PianoRollView extends AbstractMMLView {
 		g.drawLine(0, y, width, y);
 		for (int i = 0; i < 12; i++) {
 			int line = octave*12 + (11-i);
-			if ( (line >= lowerNote) && (line <= upperNote) ) {
-				g.setColor(keyColors[i]);
-			} else {
-				g.setColor(noSoundColor);
+			Color fillColor = keyColors[i];
+			if ( (line < lowerNote) || (line > upperNote) ) {
+				fillColor = noSoundColor;
 			}
-			g.fillRect(0, i*6+y, width, AbstractMMLView.HEIGHT);
+			g.setColor(fillColor);
+			g.fillRect(0, i*HEIGHT+y, width, AbstractMMLView.HEIGHT);
 			g.setColor(borderColor);
-			g.drawLine(0, i*6+y, width, i*6+y);
+			g.drawLine(0, i*HEIGHT+y, width, i*HEIGHT+y);
 		}
+	}
+
+	private void paintPitchRangeBorder(Graphics2D g) {
+		int width = getWidth();
+		int y1 = convertNote2Y(lowerNote-1);
+		int y2 = convertNote2Y(upperNote);
+		g.setColor(pitchRangeBorderColor);
+		g.drawLine(0, y1, width, y1);
+		g.drawLine(0, y2, width, y2);
 	}
 
 	public void paintSequenceLine(Graphics2D g, int height) {
@@ -303,7 +315,7 @@ public class PianoRollView extends AbstractMMLView {
 		int x = convertTicktoX(offset);
 		int y = getHeight() - ((note +1) * AbstractMMLView.HEIGHT);
 		int width = convertTicktoX(tick) -1;
-		int height = AbstractMMLView.HEIGHT;
+		int height = AbstractMMLView.HEIGHT-2;
 
 		g.setColor(fillColor);
 		g.fillRect(x, y, width, height);

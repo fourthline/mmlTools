@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 たんらる
+ * Copyright (C) 2013-2014 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -28,10 +28,6 @@ import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mmlTools.MMLTrack;
 
 public class MMLInputPanel extends JPanel {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -2517820687250637949L;
 	private JTextField textField;
 	private JComboBox<InstClass> comboBox;
@@ -41,8 +37,6 @@ public class MMLInputPanel extends JPanel {
 
 	MMLSeqView parent;
 	MMLTrack track;
-
-
 
 	public MMLInputPanel() {
 		this(null);
@@ -94,8 +88,6 @@ public class MMLInputPanel extends JPanel {
 		comboBox.setMaximumRowCount(30);
 		panel2.add(comboBox);
 
-
-
 		JPanel panel3 = new JPanel();
 		panel3.setBorder(new TitledBorder(new LineBorder(new Color(128, 128, 128), 1, true), "\u30C8\u30E9\u30C3\u30AF\u540D", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel3.setBounds(26, 249, 275, 75);
@@ -113,7 +105,6 @@ public class MMLInputPanel extends JPanel {
 	public Dimension getPreferredSize() {
 		return new Dimension(350, 350);
 	}
-
 
 	/**
 	 * トラック名を指定して、ダイアログを表示する.
@@ -143,7 +134,6 @@ public class MMLInputPanel extends JPanel {
 		}
 	}
 
-
 	private void applyMMLTrack() {
 		InstClass inst = (InstClass)comboBox.getSelectedItem();
 		track.setProgram(inst.getProgram());
@@ -155,7 +145,6 @@ public class MMLInputPanel extends JPanel {
 			parent.addMMLTrack(track);
 		}
 	}
-
 
 	private String getClipboardString() {
 		Toolkit kit = Toolkit.getDefaultToolkit();

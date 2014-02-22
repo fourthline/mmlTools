@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 たんらる
+ * Copyright (C) 2013-2014 たんらる
  */
 
 package fourthline.mmlTools;
@@ -57,6 +57,15 @@ public class MMLScore {
 	 */
 	public int getTrackCount() {
 		return trackList.size();
+	}
+
+	/**
+	 * 保持しているトラックリストを返します.
+	 * @return MMLTrackの配列
+	 */
+	public MMLTrack[] getTrackList() {
+		MMLTrack list[] = new MMLTrack[trackList.size()];
+		return trackList.toArray(list);
 	}
 
 	/**
