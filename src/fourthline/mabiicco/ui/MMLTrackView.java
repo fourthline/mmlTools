@@ -10,6 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.JToggleButton;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
@@ -21,6 +22,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import fourthline.mabiicco.midi.InstClass;
+import fourthline.mabiicco.midi.InstType;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mmlTools.MMLTrack;
 import fourthline.mmlTools.core.MMLTools;
@@ -28,6 +30,7 @@ import fourthline.mmlTools.core.MMLTools;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.EnumSet;
 
 public class MMLTrackView extends JPanel implements ActionListener, DocumentListener {
 	/**
@@ -35,21 +38,19 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 	 */
 	private static final long serialVersionUID = 4955513242349170508L;
 	private final String MMLPART_NAME[] = {
-			"メロディー", "和音1", "和音2"
+			"メロディー", "和音1", "和音2", "歌"
 	};
 	private JToggleButton partButton[];
 	private JTextField mmlText[];
 
-	@SuppressWarnings("rawtypes")
-	private JComboBox comboBox;
+	private JComboBox<InstClass> comboBox;
+	private JComboBox<InstClass> songComboBox;
 
 	private JLabel trackComposeLabel;
 
 	private int channel;
 
 	private IMMLManager mmlManager;
-
-
 
 	/**
 	 * Create the panel.
@@ -75,9 +76,9 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{20, 0, 0, 0, 0, 20};
-		gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
+		gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
-		gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		centerPanel.setLayout(gridBagLayout);
 
 		InstClass insts[] = null;
@@ -86,12 +87,19 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		} catch (NullPointerException e) {}
 		if (insts == null) {
 			comboBox = new JComboBox();
+			songComboBox = new JComboBox();
 		} else {
-			comboBox = new JComboBox(insts);
+			comboBox = new JComboBox( InstClass.filterInstArray(insts, EnumSet.of(InstType.NORMAL, InstType.DRUMS)) );
+			songComboBox = new JComboBox( InstClass.filterInstArray(insts, EnumSet.of(InstType.VOICE)) );
 		}
 		northPanel.add(comboBox);
 		comboBox.addActionListener(this);
 		comboBox.setMaximumRowCount(30);
+		comboBox.setPreferredSize(new Dimension(140, 20));
+		northPanel.add(songComboBox);
+		songComboBox.addActionListener(this);
+		songComboBox.setMaximumRowCount(30);
+		songComboBox.setPreferredSize(new Dimension(140, 20));
 
 		// 各パートのボタンとテキストフィールドを作成します.
 		ButtonGroup bGroup = new ButtonGroup();
@@ -141,8 +149,6 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		for (int i = 0; i < MMLPART_NAME.length; i++) {
 			partButton[i].addActionListener(actionListener);
 		}
-
-		MabiDLS.getInstance().changeProgram(track.getProgram(), channel);
 	}
 
 	public void setChannel(int channel) {
@@ -180,6 +186,14 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		return index;
 	}
 
+	public boolean isSelectedVoicePart() {
+		if (getSelectedMMLPartIndex() == 3) {
+			return true;
+		}
+
+		return false;
+	}
+
 	@Override
 	public void removeUpdate(DocumentEvent event) {
 	}
@@ -199,7 +213,8 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		MMLTools tools = new MMLTools(
 				mmlText[0].getText(),
 				mmlText[1].getText(),
-				mmlText[2].getText()
+				mmlText[2].getText(),
+				mmlText[3].getText()
 				);
 
 		String rank = tools.mmlRankFormat();
@@ -210,17 +225,11 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		trackComposeLabel.setText( getRankText() );
 	}
 
-	public void setInstProgram(int program) {
+	public void setInstProgram(int program, int songProgram) {
 		InstClass insts[] = MabiDLS.getInstance().getInsts();
-		InstClass selectedInst = insts[0];
-		for ( int i = 0; i < insts.length; i++ ) {
-			if ( insts[i].getProgram()  == program ) {
-				selectedInst = insts[i];
-				break;
-			}
-		}
 
-		comboBox.setSelectedItem(selectedInst);
+		comboBox.setSelectedItem(InstClass.searchInstAtProgram(insts, program));
+		songComboBox.setSelectedItem(InstClass.searchInstAtProgram(insts, songProgram));
 	}
 
 	public void setMMLTrack(MMLTrack track) {
@@ -228,7 +237,7 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		mmlText[1].setText( track.getChord1() );
 		mmlText[2].setText( track.getChord2() );
 
-		setInstProgram( track.getProgram() );
+		setInstProgram( track.getProgram(), track.getSongProgram() );
 	}
 
 	public void setActivePartMMLString(String mml) {
@@ -248,15 +257,15 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == comboBox) {
-			InstClass inst = (InstClass) comboBox.getSelectedItem();
-			int program = inst.getProgram();
-
-			MabiDLS.getInstance().changeProgram(program, this.channel);
+		Object source = e.getSource();
+		if (source instanceof JComboBox<?>) {
+			InstClass inst1 = (InstClass) comboBox.getSelectedItem();
+			InstClass inst2 = (InstClass) songComboBox.getSelectedItem();
+			int program = inst1.getProgram();
+			int songProgram = inst2.getProgram();
 			if (mmlManager != null) {
-				mmlManager.updateActiveTrackProgram(program);
+				mmlManager.updateActiveTrackProgram(program, songProgram);
 			}
 		}
 	}
-
 }

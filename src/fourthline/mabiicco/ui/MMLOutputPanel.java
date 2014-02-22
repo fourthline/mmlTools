@@ -38,7 +38,7 @@ public class MMLOutputPanel extends JPanel {
 	private static final long serialVersionUID = 8558159209741558854L;
 	private JTable table;
 	private JDialog dialog = new JDialog((Dialog)null, "クリップボードへ出力", true);
-	JButton copyButton = new JButton("MMLコピー");
+	private JButton copyButton = new JButton("MMLコピー");
 
 	private MMLTrack trackList[];
 

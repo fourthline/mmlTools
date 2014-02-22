@@ -15,6 +15,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import fourthline.mabiicco.midi.InstType;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.editor.MMLEditor;
 import fourthline.mabiicco.ui.editor.MMLScoreUndoEdit;
@@ -88,7 +89,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		// MMLTrackView (tab) - SOUTH
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane.addChangeListener(this);
-		tabbedPane.setPreferredSize(new Dimension(0, 180));
+		tabbedPane.setPreferredSize(new Dimension(0, 220));
 		add(tabbedPane, BorderLayout.SOUTH);
 
 		// create mml editor
@@ -359,14 +360,22 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		MMLTrackView view = (MMLTrackView) tabbedPane.getSelectedComponent();
 		if (view != null) {
 			int channel = view.getChannel();
+			int program = getSelectedTrack().getProgram();
+			if (view.isSelectedVoicePart()) {
+				channel = InstType.VOICE_PLAYBACK_CHANNEL;
+				program = getSelectedTrack().getSongProgram();
+				MabiDLS.getInstance().changeProgram(getSelectedTrack().getSongProgram(), InstType.VOICE_PLAYBACK_CHANNEL);
+			}
 			keyboardView.setChannel(channel);
 			int mmlPartIndex = view.getSelectedMMLPartIndex();
 
+
 			// ピアノロールビューにアクティブトラックとアクティブパートを設定します.
 			editor.setMMLEventList(getSelectedTrack().getMMLEventList(mmlPartIndex));
-			pianoRollView.setPitchRange(MabiDLS.getInstance().getInstByProgram(getSelectedTrack().getProgram()));
+			pianoRollView.setPitchRange(MabiDLS.getInstance().getInstByProgram(program));
+
 			pianoRollView.repaint();
-			System.out.printf("stateChanged(): %d, %d\n", channel, mmlPartIndex);
+			System.out.printf("stateChanged(): %d, %d, %d\n", channel, mmlPartIndex, program);
 		}
 	}
 
@@ -486,10 +495,16 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	}
 
 	@Override
-	public void updateActiveTrackProgram(int program) {
+	public void updateActiveTrackProgram(int program, int songProgram) {
 		getSelectedTrack().setProgram(program);
-		pianoRollView.setPitchRange(MabiDLS.getInstance().getInstByProgram(program));
-		pianoRollView.repaint();
+		getSelectedTrack().setSongProgram(songProgram);
+
+		// プログラムチェンジ
+		MMLTrackView view = (MMLTrackView) tabbedPane.getSelectedComponent();
+		MabiDLS.getInstance().changeProgram(program, view.getChannel());
+		MabiDLS.getInstance().changeProgram(songProgram, InstType.VOICE_PLAYBACK_CHANNEL);
+
+		updateSelectedTrackAndMMLPart();
 	}
 
 	public void setTimeView(JLabel timeView) {

@@ -1,8 +1,11 @@
 /*
- * Copyright (C) 2013 たんらる
+ * Copyright (C) 2013-2014 たんらる
  */
 
 package fourthline.mabiicco.midi;
+
+import java.util.ArrayList;
+import java.util.EnumSet;
 
 import fourthline.mmlTools.parser.MMLEventParser;
 
@@ -12,14 +15,14 @@ public class InstClass {
 	private int program;
 	private int lowerNote = 0;
 	private int upperNote = 1024;
-	private String type;
+	private InstType type;
 
 	public InstClass(String name, int bank, int program) {
 		String str[] = name.split(",");
 		this.name = str[0];
 
 		if (str.length > 1) {
-			this.type = str[1];
+			this.type = InstType.getInstType(str[1]);
 		}
 		if (str.length > 2) {
 			this.lowerNote = MMLEventParser.firstNoteNumber(str[2]);
@@ -50,5 +53,25 @@ public class InstClass {
 
 	public int getUpperNote() {
 		return this.upperNote;
+	}
+
+	public static InstClass[] filterInstArray(InstClass[] array, EnumSet<InstType> e) {
+		ArrayList<InstClass> resultArray = new ArrayList<InstClass>();
+		for (InstClass inst : array) {
+			if (e.contains(inst.type)) {
+				resultArray.add(inst);
+			}
+		}
+		return resultArray.toArray(new InstClass[resultArray.size()]);
+	}
+
+	public static InstClass searchInstAtProgram(InstClass insts[], int program) {
+		for (InstClass inst : insts) {
+			if (inst.getProgram() == program) {
+				return inst;
+			}
+		}
+
+		return insts[0];
 	}
 }

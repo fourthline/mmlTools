@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 たんらる
+ * Copyright (C) 2013-2014 たんらる
  */
 
 package fourthline.mmlTools;
@@ -21,11 +21,12 @@ public class MMLTrackTest {
 	 */
 	@Test
 	public void testGetMMLStrings() {
-		MMLTrack track = new MMLTrack("MML@aaa,bbb,ccc;");
+		MMLTrack track = new MMLTrack("MML@aaa,bbb,ccc,ddd;");
 		String expect[] = {
 				"a8t150&a8aa", // melodyパートのみテンポ指定.
 				"b8&b8bb",
 				"c8&c8cc",
+				"d8&d8dd" // TODO: 歌パートはどうなるんだろ？
 		};
 		new MMLTempoEvent(150, 48).appendToListElement(track.getGlobalTempoList());
 		String mml[] = track.getMMLStrings();

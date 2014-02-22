@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 たんらる
+ * Copyright (C) 2013-2014 たんらる
  */
 
 package fourthline.mabiicco.midi;
@@ -296,7 +296,28 @@ public final class MabiDLS {
 			track.add(new MidiEvent(message, tickOffset));
 		}
 
+		// 歌パートの作成
+		createVoiceMidiTrack(sequence, score, 11, 120); // 男声
+		createVoiceMidiTrack(sequence, score, 12, 121); // 女声
+
 		return sequence;
+	}
+
+	private void createVoiceMidiTrack(Sequence sequence, MMLScore score, int channel, int program) throws InvalidMidiDataException {
+		Track track = sequence.createTrack();
+		ShortMessage pcMessage = new ShortMessage(ShortMessage.PROGRAM_CHANGE, 
+				channel,
+				program,
+				0);
+		track.add(new MidiEvent(pcMessage, 0));
+
+		for (MMLTrack mmlTrack : score.getTrackList()) {
+			if (mmlTrack.getSongProgram() != program) {
+				continue;
+			}
+
+			convertMidiPart(track, mmlTrack.getMMLEventList(3), channel);
+		}
 	}
 
 	/**
@@ -312,9 +333,7 @@ public final class MabiDLS {
 				0);
 		track.add(new MidiEvent(pcMessage, 0));
 
-		int partCount = mmlTrack.getMMLEventListSize();
-
-		for (int i = 0; i < partCount; i++) {
+		for (int i = 0; i < 3; i++) {
 			MMLEventList eventList = mmlTrack.getMMLEventList(i);
 			convertMidiPart(track, eventList, channel);
 		}

@@ -14,7 +14,7 @@ import fourthline.mmlTools.optimizer.MMLStringOptimizer;
 
 public class MMLTrack extends MMLTools implements Serializable {
 	private static final long serialVersionUID = 2006880378975808647L;
-	
+
 	private List<MMLEventList> mmlParts;
 	private List<MMLTempoEvent> globalTempoList = new ArrayList<MMLTempoEvent>();
 
@@ -22,7 +22,10 @@ public class MMLTrack extends MMLTools implements Serializable {
 	private String trackName;
 	private int panpot = 64;
 
-	private static final int PART_COUNT = 3;
+	// 歌パート用
+	private int songProgram = 121;  // 女声JP
+
+	private static final int PART_COUNT = 4;
 
 	public MMLTrack(String mml) {
 		super(mml);
@@ -30,8 +33,8 @@ public class MMLTrack extends MMLTools implements Serializable {
 		mmlParse();
 	}
 
-	public MMLTrack(String mml1, String mml2, String mml3) {
-		super(mml1, mml2, mml3);
+	public MMLTrack(String mml1, String mml2, String mml3, String mml4) {
+		super(mml1, mml2, mml3, mml4);
 
 		mmlParse();
 	}
@@ -41,7 +44,8 @@ public class MMLTrack extends MMLTools implements Serializable {
 		String mml[] = {
 				getMelody(),
 				getChord1(),
-				getChord2()
+				getChord2(),
+				getSongEx()
 		};
 
 		for (int i = 0; i < mml.length; i++) {
@@ -67,6 +71,14 @@ public class MMLTrack extends MMLTools implements Serializable {
 
 	public int getProgram() {
 		return this.program;
+	}
+
+	public void setSongProgram(int songProgram) {
+		this.songProgram = songProgram;
+	}
+
+	public int getSongProgram() {
+		return this.songProgram;
 	}
 
 	public void setTrackName(String name) {
@@ -112,7 +124,7 @@ public class MMLTrack extends MMLTools implements Serializable {
 
 	public String getMMLString() {
 		String mml[] = getMMLStrings();
-		MMLTools tools = new MMLTools(mml[0], mml[1], mml[2]);
+		MMLTools tools = new MMLTools(mml[0], mml[1], mml[2], mml[3]);
 
 		return tools.getMML();
 	}
@@ -165,6 +177,7 @@ public class MMLTrack extends MMLTools implements Serializable {
 	/**
 	 * マビノギでの演奏スキル時間を取得する.
 	 * <p>演奏時間  － 0.6秒 ＜ スキル時間 であれば、切れずに演奏される</p>
+	 * TODO: 歌パートの扱いは調べる必要があります・・・.
 	 * @return 時間（秒）
 	 */
 	public double getMabinogiTime() {

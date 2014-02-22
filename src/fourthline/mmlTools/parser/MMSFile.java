@@ -127,7 +127,7 @@ public class MMSFile implements IMMLFileParser {
 			}
 		}
 		
-		MMLTrack track = new MMLTrack(mml1, mml2, mml3);
+		MMLTrack track = new MMLTrack(mml1, mml2, mml3, "");
 		track.setProgram(program);
 		track.setTrackName(name);
 		track.setPanpot(panpot);

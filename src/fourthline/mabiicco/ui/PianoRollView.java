@@ -376,7 +376,8 @@ public class PianoRollView extends AbstractMMLView {
 
 		MMLEventList activePart = mmlManager.getActiveMMLPart();
 
-		for (int i = 0; i < 3; i++) {
+		int count = track.getMMLEventListSize();
+		for (int i = 0; i < count; i++) {
 			MMLEventList targetPart = track.getMMLEventList(i);
 			if ( targetPart != activePart ) {
 				// アクティブトラック中のアクティブパートはここでは描画しない.

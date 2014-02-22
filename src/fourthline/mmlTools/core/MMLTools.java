@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 たんらる
+ * Copyright (C) 2013-2014 たんらる
  */
 
 package fourthline.mmlTools.core;
@@ -21,11 +21,13 @@ public class MMLTools {
 	protected String mml_melody = "";
 	protected String mml_chord1 = "";
 	protected String mml_chord2 = "";
+	protected String mml_songEx = "";
 
 	protected MelodyParser playParser;
 	protected MelodyParser melodyParser;
 	protected MelodyParser chord1Parser;
 	protected MelodyParser chord2Parser;
+	protected MelodyParser songExParser;
 
 	private double play_length = -1.0;
 	private double mabinogi_length = -1.0;
@@ -81,6 +83,7 @@ public class MMLTools {
 		melodyParser = new MelodyParser(mml_melody);
 		chord1Parser = new MelodyParser(mml_chord1, "4", melodyParser.getTempo());
 		chord2Parser = new MelodyParser(mml_chord2, "4", chord1Parser.getTempo());
+		// TODO: 歌パートの扱いってどうなってるんだろ？
 	}
 
 
@@ -126,12 +129,19 @@ public class MMLTools {
 			mml_chord1 = parts[1];
 		if (parts.length > 2)
 			mml_chord2 = parts[2];
+		if (parts.length > 3)
+			mml_songEx = parts[3];
 	}
 
 	public MMLTools(String melody, String chord1, String chord2) {
+		this(melody, chord1, chord2, "");
+	}
+
+	public MMLTools(String melody, String chord1, String chord2, String songEx) {
 		mml_melody = melody;
 		mml_chord1 = chord1;
 		mml_chord2 = chord2;
+		mml_songEx = songEx;
 	}
 
 	public String getMelody() {
@@ -146,31 +156,56 @@ public class MMLTools {
 		return mml_chord2;
 	}
 
+	public String getSongEx() {
+		return mml_songEx;
+	}
+
+	protected boolean hasSongPart() {
+		if ( (mml_songEx != null) && (mml_songEx.length() > 0) ) {
+			return true;
+		}
+
+		return false;
+	}
+
 	/**
-	 * {@code MML@aaa,bbb,ccc;} 形式でMMLを取得する
-	 * @return　{@code MML@aaa,bbb,ccc;} 形式の文字列
+	 * {@code MML@aaa,bbb,ccc,ddd;} 形式でMMLを取得する
+	 *   ddd: 歌パートがない場合は、dddは出力しない.
+	 * @return　{@code MML@aaa,bbb,ccc,ddd;} 形式の文字列
 	 */
 	public String getMML() {
 		String mml = "MML@"
 				+ mml_melody + ","
 				+ mml_chord1 + ","
-				+ mml_chord2 + ";";
+				+ mml_chord2;
+		if ( hasSongPart() ) {
+			mml += "," + mml_songEx;
+		}
 
+		mml += ";";
 		return mml;
 	}
 
 	public String mmlRank() {
-		return ComposeRank.mmlRank(mml_melody, mml_chord1, mml_chord2);
+		return ComposeRank.mmlRank(mml_melody, mml_chord1, mml_chord2, mml_songEx);
 	}
 
+	/**
+	 * 作曲ランクを表す文字列をフォーマットして作成します.
+	 * 歌パートがある場合は、4つ分のパート表示を行います.
+	 * @return フォーマット済みの文字列
+	 */
 	public String mmlRankFormat() {
 		String str = "Rank "
 				+ this.mmlRank() + " "
 				+ "( " + this.mml_melody.length()
 				+ ", " + this.mml_chord1.length()
-				+ ", " + this.mml_chord2.length()
-				+ " )";
+				+ ", " + this.mml_chord2.length();
+		if ( hasSongPart() ) {
+			str += ", " + this.mml_songEx.length();
+		}
 
+		str += " )";
 		return str;
 	}
 
