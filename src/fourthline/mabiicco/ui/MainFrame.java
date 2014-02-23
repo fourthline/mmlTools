@@ -182,7 +182,6 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		toolBar.add(inputClipButton);
 
 		JButton outputClipButton = new JButton("クリップボードへ出力");
-		noplayFunctions.add(outputClipButton);
 		outputClipButton.setFocusable(false);
 		outputClipButton.addActionListener(this);
 		outputClipButton.setActionCommand(OUTPUT_TO_CLIPBOARD);

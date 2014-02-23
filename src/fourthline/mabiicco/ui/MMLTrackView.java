@@ -60,19 +60,23 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		setLayout(new BorderLayout());
 
 		JPanel northPanel = new JPanel();
-		northPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-		add(northPanel, BorderLayout.NORTH);
+		northPanel.setLayout(new BorderLayout());
+
+		JPanel northLPanel = new JPanel();
+		northLPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
 		JPanel centerPanel = new JPanel();
 		add(centerPanel, BorderLayout.CENTER);
 
-		JPanel southPanel = new JPanel();
-		FlowLayout flowLayout = (FlowLayout) southPanel.getLayout();
-		flowLayout.setAlignment(FlowLayout.RIGHT);
-		add(southPanel, BorderLayout.SOUTH);
+		JPanel northRPanel = new JPanel();
+		add(northRPanel, BorderLayout.SOUTH);
+
+		northPanel.add(northLPanel, BorderLayout.WEST);
+		northPanel.add(northRPanel, BorderLayout.EAST);
+		add(northPanel, BorderLayout.NORTH);
 
 		trackComposeLabel = new JLabel("");
-		southPanel.add(trackComposeLabel);
+		northRPanel.add(trackComposeLabel);
 
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{20, 0, 0, 0, 0, 20};
@@ -92,11 +96,11 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 			comboBox = new JComboBox( InstClass.filterInstArray(insts, EnumSet.of(InstType.NORMAL, InstType.DRUMS)) );
 			songComboBox = new JComboBox( InstClass.filterInstArray(insts, EnumSet.of(InstType.VOICE)) );
 		}
-		northPanel.add(comboBox);
+		northLPanel.add(comboBox);
 		comboBox.addActionListener(this);
 		comboBox.setMaximumRowCount(30);
 		comboBox.setPreferredSize(new Dimension(140, 20));
-		northPanel.add(songComboBox);
+		northLPanel.add(songComboBox);
 		songComboBox.addActionListener(this);
 		songComboBox.setMaximumRowCount(30);
 		songComboBox.setPreferredSize(new Dimension(140, 20));
@@ -164,7 +168,8 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		MMLTools tools = new MMLTools(
 				mmlText[0].getText(),
 				mmlText[1].getText(),
-				mmlText[2].getText()
+				mmlText[2].getText(),
+				mmlText[3].getText()
 				);
 		return tools.getMML();
 	}

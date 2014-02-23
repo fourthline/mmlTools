@@ -89,7 +89,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		// MMLTrackView (tab) - SOUTH
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane.addChangeListener(this);
-		tabbedPane.setPreferredSize(new Dimension(0, 220));
+		tabbedPane.setPreferredSize(new Dimension(0, 200));
 		add(tabbedPane, BorderLayout.SOUTH);
 
 		// create mml editor
