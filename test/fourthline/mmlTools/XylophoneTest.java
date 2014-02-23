@@ -5,6 +5,7 @@
 package fourthline.mmlTools;
 
 import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 
 import fourthline.mmlTools.core.MMLTools;

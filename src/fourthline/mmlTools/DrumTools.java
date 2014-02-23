@@ -4,7 +4,10 @@
 
 package fourthline.mmlTools;
 
-import fourthline.mmlTools.core.*;
+import fourthline.mmlTools.core.MMLTicks;
+import fourthline.mmlTools.core.MMLTokenizer;
+import fourthline.mmlTools.core.MMLTools;
+import fourthline.mmlTools.core.MelodyParser;
 
 /**
  * ドラムの和音分割

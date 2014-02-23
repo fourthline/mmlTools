@@ -4,8 +4,8 @@
 
 package fourthline.mabiicco.ui;
 
-import java.awt.Dialog;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -37,7 +37,7 @@ import fourthline.mmlTools.core.MMLTools;
 public class MMLOutputPanel extends JPanel {
 	private static final long serialVersionUID = 8558159209741558854L;
 	private JTable table;
-	private JDialog dialog = new JDialog((Dialog)null, "クリップボードへ出力", true);
+	private JDialog dialog = new JDialog((Frame)null, "クリップボードへ出力", true);
 	private JButton copyButton = new JButton("MMLコピー");
 
 	private MMLTrack trackList[];
