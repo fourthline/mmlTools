@@ -123,13 +123,21 @@ public class MMLTrack extends MMLTools implements Serializable {
 	}
 
 	public String getMMLString() {
-		String mml[] = getMMLStrings();
+		return getMMLString(true);
+	}
+
+	public String getMMLString(boolean tailFix) {
+		String mml[] = getMMLStrings(tailFix);
 		MMLTools tools = new MMLTools(mml[0], mml[1], mml[2], mml[3]);
 
 		return tools.getMML();
 	}
 
 	public String[] getMMLStrings() {
+		return getMMLStrings(true);
+	}
+
+	public String[] getMMLStrings(boolean tailFix) {
 		int count = mmlParts.size();
 		String mml[] = new String[count];
 		int totalTick = (int)this.getMaxTickLength();
@@ -146,21 +154,30 @@ public class MMLTrack extends MMLTools implements Serializable {
 			mml[i] = new MMLStringOptimizer(mml[i]).toString();
 		}
 
+		if (tailFix) { // 終端補正
+			mml[0] = tailFix(mml[0]);
+		}
+
+		return mml;
+	}
+
+	private String tailFix(String s) {
+		long totalTick = this.getMaxTickLength();
 		double playTime = getPlayTime();
 		double mmlTime = getMabinogiTime();
 		int tick = (int)(totalTick - mmlParts.get(0).getTickLength());
 		if (playTime > mmlTime) {
 			// スキルが演奏の途中で止まるのを防ぎます.
-			mml[0] += new MMLTicks("r", tick, false).toString();
+			s += new MMLTicks("r", tick, false).toString();
 		} else if (playTime < mmlTime) {
 			// 演奏が終ってスキルが止まらないのを防ぎます.
 			if (tick > 0) {
-				mml[0] += new MMLTicks("r", tick, false).toString() + "v0c64";
+				s += new MMLTicks("r", tick, false).toString() + "v0c64";
 			}
-			mml[0] += MMLTempoEvent.getMaxTempoEvent(globalTempoList).toMMLString();
+			s += MMLTempoEvent.getMaxTempoEvent(globalTempoList).toMMLString();
 		}
 
-		return mml;
+		return s;
 	}
 
 	/**

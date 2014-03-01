@@ -4,20 +4,31 @@
 
 package fourthline.mmlTools;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+
+import fourthline.mmlTools.parser.IMMLFileParser;
+import fourthline.mmlTools.parser.MMLParseException;
+import fourthline.mmlTools.parser.MMSFile;
 
 
 /**
  *
  */
-public class MMLScore {
-	private ArrayList<MMLTrack> trackList = new ArrayList<MMLTrack>();
+public class MMLScore implements IMMLFileParser {
+	private List<MMLTrack> trackList = new ArrayList<MMLTrack>();
 	private List<MMLTempoEvent> globalTempoList = new ArrayList<MMLTempoEvent>();
 
 	private static final int MAX_TRACK = 8;
@@ -117,6 +128,7 @@ public class MMLScore {
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
 			ObjectOutputStream ostream = new ObjectOutputStream(bos);
 			ostream.writeObject(this.trackList);
+			ostream.writeObject(this.globalTempoList);
 			ostream.close();
 			objState = bos.toByteArray();
 		} catch (IOException e) {
@@ -131,7 +143,88 @@ public class MMLScore {
 			ByteArrayInputStream bis = new ByteArrayInputStream(objState);
 			ObjectInputStream istream = new ObjectInputStream(bis);
 			this.trackList = (ArrayList<MMLTrack>) istream.readObject();
+			this.globalTempoList = (List<MMLTempoEvent>) istream.readObject();
 			istream.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void writeToOutputStream(OutputStream outputStreame) {
+		try {
+			PrintStream stream = new PrintStream(outputStreame, false, "UTF-8");
+
+			stream.println("[mml-score]");
+			stream.println("version=1");
+
+			for (MMLTrack track : trackList) {
+				stream.println("mml-track="+track.getMMLString(false));
+				stream.println("name="+track.getTrackName());
+				stream.println("program="+track.getProgram());
+				stream.println("songProgram="+track.getSongProgram());
+				stream.println("panpot="+track.getPanpot());
+			}
+
+			stream.flush();
+		} catch (UnsupportedEncodingException e) {}
+	}
+
+	@Override
+	public MMLScore parse(File file) throws MMLParseException {
+		BufferedReader reader = null;
+		this.globalTempoList.clear();
+		this.trackList.clear();
+
+		try {
+			FileInputStream fisFile = new FileInputStream(file);
+			InputStreamReader isReader = new InputStreamReader(fisFile, "UTF-8");
+			reader = new BufferedReader(isReader);
+
+			String s;
+			s = reader.readLine();
+			/* ヘッダチェック */
+			if (!s.equals("[mml-score]")) {
+				throw(new MMLParseException());
+			}
+
+			// mml-track
+			MMLTrack track = null;
+			while ( (s = reader.readLine()) != null ) {
+				if ( s.startsWith("mml-track=") ) {
+					track = new MMLTrack(s.substring("mml-track=".length()));
+					this.addTrack(track);
+				} else if ( s.startsWith("name=") ) {
+					track.setTrackName(s.substring("name=".length()));
+				} else if ( s.startsWith("program=") ) {
+					track.setProgram(Integer.parseInt(s.substring("program=".length())));
+				} else if ( s.startsWith("songProgram=") ) {
+					track.setSongProgram(Integer.parseInt(s.substring("songProgram=".length())));
+				} else if ( s.startsWith("panpot=") ) {
+					track.setPanpot(Integer.parseInt(s.substring("panpot=".length())));
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException e) {}
+			}
+		}
+		return this;
+	}
+
+	public static void main(String args[]) {
+		try {
+			System.out.println(" --- parse sample.mms ---");
+			MMSFile mms = new MMSFile();
+			MMLScore score = mms.parse(new File("sample.mms"));
+			score.writeToOutputStream(System.out);
+
+			System.out.println(" --- parse sample-version1.mmi ---");
+			score = new MMLScore();
+			score.parse(new File("sample-version1.mmi"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
