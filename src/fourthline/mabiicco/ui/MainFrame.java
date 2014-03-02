@@ -27,6 +27,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -50,12 +52,7 @@ import javax.swing.JComboBox;
 
 
 public class MainFrame extends JFrame implements ComponentListener, INotifyTrackEnd, ActionListener {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -7484797594534384422L;
-
 
 	private JPanel contentPane;
 	private JTextField statusField;
@@ -70,6 +67,12 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 
 	/** シーケンス再生中に無効化する機能のリスト */
 	ArrayList<JComponent> noplayFunctions = new ArrayList<JComponent>();
+
+	/** 状態が変化するメニューたち */
+	private JMenuItem reloadMenuItem;
+	private JMenuItem undoMenu;
+	private JMenuItem redoMenu;
+	private JMenuItem saveMenuItem;
 
 	/**
 	 * Create the frame.
@@ -206,6 +209,25 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		noteTypeSelect.addActionListener(this); // MainFrameでAction処理します.
 		noteTypeSelect.setSelectedIndex(MMLEditor.DEFAULT_ALIGN_INDEX);
 		setEditAlign();
+
+		setCanReloadFile(false);
+		setCanUndo(false);
+		setCanRedo(false);
+		setCanSaveFile(false);
+
+		// 閉じるボタンへのアクション設定
+		setDefaultCloseOperation( DO_NOTHING_ON_CLOSE );
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				quitEvent();
+			}
+		});
+	}
+
+	private void quitEvent() {
+		ActionEvent event = new ActionEvent(this, 0, ActionDispatcher.QUIT);
+		this.listener.actionPerformed(event);
 	}
 
 	private JMenuItem createMenuItem(String name, String actionCommand) {
@@ -241,13 +263,12 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		fileOpenMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
 		fileMenu.add(fileOpenMenuItem);
 
-		JMenuItem reloadMenuItem = createMenuItem("再読み込み", ActionDispatcher.RELOAD_FILE);
+		reloadMenuItem = createMenuItem("再読み込み", ActionDispatcher.RELOAD_FILE);
 		noplayFunctions.add(reloadMenuItem);
 		fileMenu.add(reloadMenuItem);
 
-		JMenuItem saveMenuItem = createMenuItem("上書き保存", ActionDispatcher.SAVE_FILE);
+		saveMenuItem = createMenuItem("上書き保存", ActionDispatcher.SAVE_FILE);
 		saveMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK));
-		saveMenuItem.setEnabled(false);
 		fileMenu.add(saveMenuItem);
 
 		JMenuItem saveAsMenuItem = createMenuItem("名前を付けて保存", ActionDispatcher.SAVEAS_FILE);
@@ -265,11 +286,11 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		fileMenu.setMnemonic('E');
 		menuBar.add(editMenu);
 
-		JMenuItem undoMenu = createMenuItem("Undo", ActionDispatcher.UNDO);
+		undoMenu = createMenuItem("Undo", ActionDispatcher.UNDO);
 		undoMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_MASK));
 		editMenu.add(undoMenu);
 
-		JMenuItem redoMenu = createMenuItem("Redo", ActionDispatcher.REDO);
+		redoMenu = createMenuItem("Redo", ActionDispatcher.REDO);
 		redoMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_MASK));
 		editMenu.add(redoMenu);
 
@@ -363,7 +384,6 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		return mmlSeqView;
 	}
 
-
 	// JFrameのイベント
 	@Override
 	public void componentHidden(ComponentEvent e) {}
@@ -386,7 +406,6 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		MabiDLS.getInstance().clearAllChannelPanpot();
 		enableNoplayItems();
 	}
-
 
 	/**
 	 * 再生中に各機能を無効化する。
@@ -429,5 +448,37 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		if (source.equals(noteTypeSelect)) {
 			setEditAlign();
 		}
+	}
+
+	/**
+	 * 再読み込みUIの有効化
+	 * @param b
+	 */
+	public void setCanReloadFile(boolean b) {
+		reloadMenuItem.setEnabled(b);
+	}
+
+	/**
+	 * Undo-UIの有効化
+	 * @param b
+	 */
+	public void setCanUndo(boolean b) {
+		undoMenu.setEnabled(b);
+	}
+
+	/**
+	 * Redo-UIの有効化
+	 * @param b
+	 */
+	public void setCanRedo(boolean b) {
+		redoMenu.setEnabled(b);
+	}
+
+	/**
+	 * 上書き保存UIの有効化
+	 * @param b
+	 */
+	public void setCanSaveFile(boolean b) {
+		saveMenuItem.setEnabled(b);
 	}
 }

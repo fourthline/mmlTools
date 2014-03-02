@@ -15,6 +15,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import fourthline.mabiicco.IFileState;
 import fourthline.mabiicco.midi.InstType;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.editor.MMLEditor;
@@ -34,10 +35,6 @@ import java.awt.event.ActionListener;
 import java.util.List;
 
 public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, ActionListener {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -479890612015524747L;
 
 	private static final int INITIAL_TRACK_COUNT = 1;
@@ -369,9 +366,9 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 				program = getSelectedTrack().getSongProgram();
 				MabiDLS.getInstance().changeProgram(getSelectedTrack().getSongProgram(), InstType.VOICE_PLAYBACK_CHANNEL);
 			}
+			MabiDLS.getInstance().changeProgram(program, channel);
 			keyboardView.setChannel(channel);
 			int mmlPartIndex = view.getSelectedMMLPartIndex();
-
 
 			// ピアノロールビューにアクティブトラックとアクティブパートを設定します.
 			editor.setMMLEventList(getSelectedTrack().getMMLEventList(mmlPartIndex));
@@ -431,33 +428,31 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	}
 
 	/**
-	 * MMLTrackの数とトラックタブの数を比較して、あっていなければタブを再構築する.
+	 * MMLTrackViewのタブを再構築する.
 	 * トラック追加/削除のundo, redo時に実行される.
 	 */
-	private void checkTrackCount() {
+	private void resetTrackView() {
 		int selectedTab = tabbedPane.getSelectedIndex();
-		int tabbedCount = tabbedPane.getComponentCount();
 		int trackCount = mmlScore.getTrackCount();
-		if (tabbedCount != trackCount) {
-			tabbedPane.removeAll();
-			int i;
-			for (i = 0; i < trackCount; i++) {
-				MMLTrack track = mmlScore.getTrack(i);
-				tabbedPane.add(track.getTrackName(), new MMLTrackView(track, i, this, this));
-			}
 
-			if (selectedTab >= i) {
-				selectedTab = i-1;
-			}
-
-			tabbedPane.setSelectedIndex(selectedTab);
+		tabbedPane.removeAll();
+		int i;
+		for (i = 0; i < trackCount; i++) {
+			MMLTrack track = mmlScore.getTrack(i);
+			tabbedPane.add(track.getTrackName(), new MMLTrackView(track, i, this, this));
 		}
+
+		if (selectedTab >= i) {
+			selectedTab = i-1;
+		}
+
+		tabbedPane.setSelectedIndex(selectedTab);
 	}
 
 	public void undo() {
 		if (undoEdit.canUndo()) {
 			undoEdit.undo();
-			checkTrackCount();
+			resetTrackView();
 			updateSelectedTrackAndMMLPart();
 			updateTempoRoll();
 			repaint();
@@ -467,7 +462,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	public void redo() {
 		if (undoEdit.canRedo()) {
 			undoEdit.redo();
-			checkTrackCount();
+			resetTrackView();
 			updateSelectedTrackAndMMLPart();
 			updateTempoRoll();
 			repaint();
@@ -534,10 +529,15 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		MabiDLS.getInstance().changeProgram(songProgram, InstType.VOICE_PLAYBACK_CHANNEL);
 
 		updateSelectedTrackAndMMLPart();
+		undoEdit.saveState();
 	}
 
 	public void setTimeView(JLabel timeView) {
 		this.timeView = timeView;
+	}
+
+	public IFileState getFileState() {
+		return undoEdit;
 	}
 
 	// TimeViewを更新するためのスレッドを開始します.

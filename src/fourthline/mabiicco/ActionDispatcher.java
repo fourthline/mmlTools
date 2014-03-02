@@ -23,10 +23,11 @@ import fourthline.mmlTools.parser.IMMLFileParser;
 import fourthline.mmlTools.parser.MMLParseException;
 import fourthline.mmlTools.parser.MMSFile;
 
-public class ActionDispatcher implements ActionListener {
+public class ActionDispatcher implements ActionListener, IFileStateObserver {
 
 	private MainFrame mainFrame;
 	private MMLSeqView mmlSeqView;
+	private IFileState fileState;
 
 	// action commands
 	public static final String VIEW_EXPAND = "viewExpand";
@@ -59,8 +60,8 @@ public class ActionDispatcher implements ActionListener {
 	public void setMainFrame(MainFrame mainFrame) {
 		this.mainFrame = mainFrame;
 		this.mmlSeqView = mainFrame.getMMLSeqView();
+		this.fileState = this.mmlSeqView.getFileState();
 	}
-
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -88,7 +89,10 @@ public class ActionDispatcher implements ActionListener {
 		} else if (command.equals(RELOAD_FILE)) {
 			reloadMMLFileAction();
 		} else if (command.equals(QUIT)) {
-			System.exit(0);
+			//  閉じる前に、変更が保存されていなければダイアログ表示する.
+			if (checkQuitModifiedFileState()) {
+				System.exit(0);
+			}
 		} else if (command.equals(ADD_TRACK)) {
 			mmlSeqView.addMMLTrack(null);
 		} else if (command.equals(REMOVE_TRACK)) {
@@ -126,10 +130,11 @@ public class ActionDispatcher implements ActionListener {
 			MMLScore score = fileParser.parse(file);
 			mmlSeqView.setMMLScore(score);
 
-			mainFrame.setTitleAndFileName(file.getName());
+			openedFile = file;
+			notifyUpdateFileState();
 			MabiIccoProperties.getInstance().setRecentFile(file.getPath());
 		} catch (MMLParseException e) {
-			JOptionPane.showMessageDialog(null, "読み込みに失敗しました", "ファイル形式が不正です", JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(mainFrame, "読み込みに失敗しました", "ファイル形式が不正です", JOptionPane.WARNING_MESSAGE);
 		}
 	}
 
@@ -149,14 +154,16 @@ public class ActionDispatcher implements ActionListener {
 			mmlSeqView.getMMLScore().writeToOutputStream(outputStream);
 			outputStream.close();
 			mainFrame.setTitleAndFileName(file.getName());
+			fileState.setOriginalBase();
+			notifyUpdateFileState();
 			MabiIccoProperties.getInstance().setRecentFile(file.getPath());
 		} catch (Exception e) {}
 	}
 
 	private void newMMLFileAction() {
-		mainFrame.setTitleAndFileName(null);
 		openedFile = null;
 		mmlSeqView.initializeMMLTrack();
+		notifyUpdateFileState();
 	}
 
 	private void openMMLFileAction() {
@@ -175,11 +182,10 @@ public class ActionDispatcher implements ActionListener {
 				fileChooser.addChoosableFileFilter(mmsFilter);
 				fileChooser.setFileFilter(allFilter);
 				fileChooser.setAcceptAllFileFilterUsed(false);
-				int status = fileChooser.showOpenDialog(null);
+				int status = fileChooser.showOpenDialog(mainFrame);
 				if (status == JFileChooser.APPROVE_OPTION) {
 					File file = fileChooser.getSelectedFile();
 					openMMLFile(file);
-					openedFile = file;
 				}
 			}
 		});
@@ -193,22 +199,119 @@ public class ActionDispatcher implements ActionListener {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				String recentPath = MabiIccoProperties.getInstance().getRecentFile();
-				JFileChooser fileChooser = new JFileChooser();
-				fileChooser.setCurrentDirectory(new File(recentPath));
-				fileChooser.addChoosableFileFilter(mmiFilter);
-				fileChooser.setFileFilter(mmiFilter);
-				fileChooser.setAcceptAllFileFilterUsed(false);
-				int status = fileChooser.showSaveDialog(null);
-				if (status == JFileChooser.APPROVE_OPTION) {
-					File file = fileChooser.getSelectedFile();
-					if (!file.toString().endsWith(".mmi")) {
-						file = new File(file+".mmi");
-					}
-					saveMMLFile(file);
-					openedFile = file;
-				}
+				showDialogSaveFile();
 			}
 		});
+	}
+
+	/**
+	 * 別名保存のダイアログ表示
+	 * @return 保存した場合は trueを返す.
+	 */
+	private boolean showDialogSaveFile() {
+		String recentPath = MabiIccoProperties.getInstance().getRecentFile();
+		JFileChooser fileChooser = new JFileChooser();
+		if (openedFile != null) {
+			fileChooser.setSelectedFile(openedFile);
+		} else {
+			fileChooser.setCurrentDirectory(new File(recentPath));
+		}
+		fileChooser.addChoosableFileFilter(mmiFilter);
+		fileChooser.setFileFilter(mmiFilter);
+		fileChooser.setAcceptAllFileFilterUsed(false);
+		int status = fileChooser.showSaveDialog(mainFrame);
+		if (status == JFileChooser.APPROVE_OPTION) {
+			File file = fileChooser.getSelectedFile();
+			if (!file.toString().endsWith(".mmi")) {
+				file = new File(file+".mmi");
+			}
+
+			status = JOptionPane.YES_OPTION;
+			if (file.exists()) {
+				// すでにファイルが存在する場合の上書き警告表示.
+				status = JOptionPane.showConfirmDialog(mainFrame, "すでにファイルが存在します。上書きしますか？", "", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+			}
+			if (status == JOptionPane.YES_OPTION) {
+				saveMMLFile(file);
+				openedFile = file;
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * ファイルの変更状態をみて、アプリケーション終了ができるかどうかをチェックする.
+	 * @return 終了できる状態であれば、trueを返す.
+	 */
+	private boolean checkQuitModifiedFileState() {
+		if (!fileState.isModified()) {
+			// 保存が必要な変更なし.
+			return true;
+		}
+
+		// 保存するかどうかのダイアログ表示
+		int status = JOptionPane.showConfirmDialog(mainFrame, "変更されていますが、閉じる前に保存しますか？", "", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+		if (status == JOptionPane.CANCEL_OPTION) {
+			return false;
+		} else if (status == JOptionPane.NO_OPTION) {
+			return true;
+		}
+
+		if (openedFile == null) {
+			// 新規ファイルなので、別名保存.
+			if (showDialogSaveFile()) {
+				return true;
+			}
+		} else {
+			if (isSupportedSaveFile()) {
+				// 上書き保存可.
+				saveMMLFile(openedFile);
+				return true;
+			} else if (showDialogSaveFile()) {
+				// ファイルOpenされているが、サポート外なので別名保存.
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private boolean isSupportedSaveFile() {
+		if (openedFile != null) {
+			if (openedFile.getName().endsWith(".mmi")) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	@Override
+	public void notifyUpdateFileState() {
+		System.out.println("notifyUpdateFileState()");
+
+		mainFrame.setCanSaveFile(false);
+		mainFrame.setTitleAndFileName(null);
+		mainFrame.setCanReloadFile(false);
+		if (openedFile != null) {
+			if (fileState.isModified()) {
+				// 上書き保存有効
+				if (isSupportedSaveFile()) {
+					mainFrame.setCanSaveFile(true);
+				}
+				mainFrame.setTitleAndFileName(openedFile.getName()+" (変更あり)");
+				mainFrame.setCanReloadFile(true);
+			} else {
+				mainFrame.setTitleAndFileName(openedFile.getName());
+			}
+		}
+
+		// undo-UI更新
+		mainFrame.setCanUndo(fileState.canUndo());
+
+		// redo-UI更新
+		mainFrame.setCanRedo(fileState.canRedo());
 	}
 }
