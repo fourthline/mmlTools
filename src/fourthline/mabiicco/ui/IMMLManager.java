@@ -16,4 +16,5 @@ public interface IMMLManager {
 	public void updateActivePart();
 	public void updateActiveTrackProgram(int program, int songProgram);
 	public void updateTempoRoll();
+	public void saveState();
 }

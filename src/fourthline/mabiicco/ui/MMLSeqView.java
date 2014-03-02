@@ -166,7 +166,10 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	private void removeAllMMLTrack() {
 		mmlScore = new MMLScore();
 		tabbedPane.removeAll();
+	}
 
+	@Override
+	public void saveState() {
 		undoEdit.saveState();
 	}
 
@@ -427,9 +430,34 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		pianoRollView.setWideScale(scale);
 	}
 
+	/**
+	 * MMLTrackの数とトラックタブの数を比較して、あっていなければタブを再構築する.
+	 * トラック追加/削除のundo, redo時に実行される.
+	 */
+	private void checkTrackCount() {
+		int selectedTab = tabbedPane.getSelectedIndex();
+		int tabbedCount = tabbedPane.getComponentCount();
+		int trackCount = mmlScore.getTrackCount();
+		if (tabbedCount != trackCount) {
+			tabbedPane.removeAll();
+			int i;
+			for (i = 0; i < trackCount; i++) {
+				MMLTrack track = mmlScore.getTrack(i);
+				tabbedPane.add(track.getTrackName(), new MMLTrackView(track, i, this, this));
+			}
+
+			if (selectedTab >= i) {
+				selectedTab = i-1;
+			}
+
+			tabbedPane.setSelectedIndex(selectedTab);
+		}
+	}
+
 	public void undo() {
 		if (undoEdit.canUndo()) {
 			undoEdit.undo();
+			checkTrackCount();
 			updateSelectedTrackAndMMLPart();
 			updateTempoRoll();
 			repaint();
@@ -439,6 +467,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	public void redo() {
 		if (undoEdit.canRedo()) {
 			undoEdit.redo();
+			checkTrackCount();
 			updateSelectedTrackAndMMLPart();
 			updateTempoRoll();
 			repaint();

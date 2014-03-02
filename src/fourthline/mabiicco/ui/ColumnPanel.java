@@ -197,6 +197,7 @@ public class ColumnPanel extends AbstractMMLView implements MouseListener, Actio
 			System.out.println("delete tempo.");
 		}
 
+		mmlManager.saveState();
 		mmlManager.updateTempoRoll();
 		repaint();
 	}
@@ -210,7 +211,6 @@ public class ColumnPanel extends AbstractMMLView implements MouseListener, Actio
 		panel.add(spinner);
 		JPanel cPanel = new JPanel(new BorderLayout());
 		cPanel.add(panel, BorderLayout.CENTER);
-		cPanel.add(new JLabel("** テンポにまたがる音符は途中で切られます **"), BorderLayout.NORTH);
 
 		int status = JOptionPane.showConfirmDialog(null, cPanel, title, JOptionPane.OK_CANCEL_OPTION);
 		if (status == JOptionPane.OK_OPTION) {
