@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 たんらる
+ * Copyright (C) 2013-2014 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -47,7 +47,7 @@ public class TrackPropertyPanel extends JPanel {
 		trackNameField = new JTextField();
 		trackNameField.setBounds(100, 36, 200, 19);
 		// TODO: 日本語を入力したとき、再生時にCPU負荷がかかる問題あり.
-		trackNameField.setEditable(false);
+		trackNameField.setEditable(true);
 		add(trackNameField);
 		trackNameField.setColumns(10);
 

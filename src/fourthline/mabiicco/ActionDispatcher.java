@@ -83,14 +83,18 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver {
 			mmlSeqView.pauseTickPosition();
 			mainFrame.enableNoplayItems();
 		} else if (command.equals(FILE_OPEN)) {
-			openMMLFileAction();
+			if (checkCloseModifiedFileState()) {
+				openMMLFileAction();
+			}
 		} else if (command.equals(NEW_FILE)) {
-			newMMLFileAction();
+			if (checkCloseModifiedFileState()) {
+				newMMLFileAction();
+			}
 		} else if (command.equals(RELOAD_FILE)) {
 			reloadMMLFileAction();
 		} else if (command.equals(QUIT)) {
 			//  閉じる前に、変更が保存されていなければダイアログ表示する.
-			if (checkQuitModifiedFileState()) {
+			if (checkCloseModifiedFileState()) {
 				System.exit(0);
 			}
 		} else if (command.equals(ADD_TRACK)) {
@@ -144,7 +148,12 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver {
 		}
 
 		if (openedFile != null) {
-			openMMLFile(openedFile);
+			if (fileState.isModified()) {
+				int status = JOptionPane.showConfirmDialog(mainFrame, "いままでの変更が破棄されますが、よろしいですか？", "", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+				if (status == JOptionPane.YES_OPTION) {
+					openMMLFile(openedFile);
+				}
+			}
 		}
 	}
 
@@ -200,6 +209,7 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver {
 			@Override
 			public void run() {
 				showDialogSaveFile();
+				notifyUpdateFileState();
 			}
 		});
 	}
@@ -245,7 +255,7 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver {
 	 * ファイルの変更状態をみて、アプリケーション終了ができるかどうかをチェックする.
 	 * @return 終了できる状態であれば、trueを返す.
 	 */
-	private boolean checkQuitModifiedFileState() {
+	private boolean checkCloseModifiedFileState() {
 		if (!fileState.isModified()) {
 			// 保存が必要な変更なし.
 			return true;
