@@ -81,6 +81,7 @@ public class PianoRollView extends AbstractMMLView {
 	private static final Color noSoundColor = new Color(0.9f, 0.8f, 0.8f);
 
 	private static final Color barBorder = new Color(0.5f, 0.5f, 0.5f);
+	private static final Color timeBarBorder = new Color(0.3f, 0.2f, 0.3f);
 
 
 	/**
@@ -294,10 +295,13 @@ public class PianoRollView extends AbstractMMLView {
 		int width = (int)convertXtoTick(getWidth());
 		try {
 			int sect = MMLTicks.getTick("4");
-			g.setColor(barBorder);
-
-			for (int i = 0; i < width; i += sect) {
-				int x = convertTicktoX(i);
+			for (int i = 0; i*sect < width; i++) {
+				if (i%4 == 0) {
+					g.setColor(timeBarBorder);
+				} else {
+					g.setColor(barBorder);
+				}
+				int x = convertTicktoX(i*sect);
 				int y1 = 0;
 				int y2 = getHeight();
 				g.drawLine(x, y1, x, y2);

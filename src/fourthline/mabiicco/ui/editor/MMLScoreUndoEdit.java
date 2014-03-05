@@ -4,6 +4,7 @@
 
 package fourthline.mabiicco.ui.editor;
 
+import java.util.Arrays;
 import java.util.Stack;
 
 import javax.swing.undo.AbstractUndoableEdit;
@@ -41,7 +42,12 @@ public class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFileState
 
 	public void saveState() {
 		MMLScore score = mmlManager.getMMLScore();
-		undoState.push( score.getObjectState() );
+		byte state[] = score.getObjectState();
+		if ( !undoState.empty() && Arrays.equals(state, undoState.lastElement()) ) {
+			return;
+		}
+
+		undoState.push(state);
 		redoState.clear();
 
 		if (undoState.size() > MAX_UNDO) {

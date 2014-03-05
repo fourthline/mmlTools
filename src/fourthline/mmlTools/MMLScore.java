@@ -7,12 +7,10 @@ package fourthline.mmlTools;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
@@ -122,29 +120,15 @@ public class MMLScore implements IMMLFileParser {
 	}
 
 	public byte[] getObjectState() {
-		byte objState[] = null;
-
-		try {
-			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			ObjectOutputStream ostream = new ObjectOutputStream(bos);
-			ostream.writeObject(this.trackList);
-			ostream.writeObject(this.globalTempoList);
-			ostream.close();
-			objState = bos.toByteArray();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return objState;
+		ByteArrayOutputStream ostream = new ByteArrayOutputStream();
+		writeToOutputStream(ostream);
+		return ostream.toByteArray();
 	}
 
 	public void putObjectState(byte objState[]) {
 		try {
 			ByteArrayInputStream bis = new ByteArrayInputStream(objState);
-			ObjectInputStream istream = new ObjectInputStream(bis);
-			this.trackList = (ArrayList<MMLTrack>) istream.readObject();
-			this.globalTempoList = (List<MMLTempoEvent>) istream.readObject();
-			istream.close();
+			parse(bis);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -165,19 +149,18 @@ public class MMLScore implements IMMLFileParser {
 				stream.println("panpot="+track.getPanpot());
 			}
 
-			stream.flush();
+			stream.close();
 		} catch (UnsupportedEncodingException e) {}
 	}
 
 	@Override
-	public MMLScore parse(File file) throws MMLParseException {
+	public MMLScore parse(InputStream istream) throws MMLParseException {
 		BufferedReader reader = null;
 		this.globalTempoList.clear();
 		this.trackList.clear();
 
 		try {
-			FileInputStream fisFile = new FileInputStream(file);
-			InputStreamReader isReader = new InputStreamReader(fisFile, "UTF-8");
+			InputStreamReader isReader = new InputStreamReader(istream, "UTF-8");
 			reader = new BufferedReader(isReader);
 
 			String s;
@@ -219,12 +202,12 @@ public class MMLScore implements IMMLFileParser {
 		try {
 			System.out.println(" --- parse sample.mms ---");
 			MMSFile mms = new MMSFile();
-			MMLScore score = mms.parse(new File("sample.mms"));
+			MMLScore score = mms.parse(new FileInputStream("sample.mms"));
 			score.writeToOutputStream(System.out);
 
 			System.out.println(" --- parse sample-version1.mmi ---");
 			score = new MMLScore();
-			score.parse(new File("sample-version1.mmi"));
+			score.parse(new FileInputStream("sample-version1.mmi"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -17,22 +17,20 @@ import fourthline.mmlTools.MMLTrack;
 
 
 public class TrackPropertyPanel extends JPanel {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 7599129671956571455L;
 	private JTextField trackNameField;
 	private JSlider panpotSlider;
+	private IMMLManager mmlManager;
 
 	MMLTrack track;
 
 	/**
 	 * Create the dialog.
 	 */
-	public TrackPropertyPanel(MMLTrack track) {
+	public TrackPropertyPanel(MMLTrack track, IMMLManager mmlManager) {
 		super();
 		this.track = track;
+		this.mmlManager = mmlManager;
 		initialize();
 	}
 
@@ -74,6 +72,7 @@ public class TrackPropertyPanel extends JPanel {
 	private void applyProperty() {
 		track.setTrackName( trackNameField.getText() );
 		track.setPanpot( panpotSlider.getValue() );
+		mmlManager.saveState();
 	}
 
 	public void showDialog() {

@@ -299,7 +299,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 
 	public void editTrackPropertyAction() {
 		MMLTrack track = getSelectedTrack();
-		new TrackPropertyPanel(track).showDialog();
+		new TrackPropertyPanel(track, this).showDialog();
 		tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), track.getTrackName());
 	}
 

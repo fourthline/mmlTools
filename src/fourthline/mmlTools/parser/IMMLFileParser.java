@@ -4,7 +4,7 @@
 
 package fourthline.mmlTools.parser;
 
-import java.io.File;
+import java.io.InputStream;
 
 import fourthline.mmlTools.MMLScore;
 
@@ -14,5 +14,5 @@ import fourthline.mmlTools.MMLScore;
  *
  */
 public interface IMMLFileParser {
-	public MMLScore parse(File file) throws MMLParseException;
+	public MMLScore parse(InputStream istream) throws MMLParseException;
 }

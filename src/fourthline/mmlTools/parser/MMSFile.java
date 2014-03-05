@@ -5,10 +5,9 @@
 package fourthline.mmlTools.parser;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import fourthline.mmlTools.MMLScore;
@@ -22,12 +21,11 @@ import fourthline.mmlTools.MMLTrack;
 public class MMSFile implements IMMLFileParser {
 
 	@Override
-	public MMLScore parse(File file) throws MMLParseException {
+	public MMLScore parse(InputStream istream) throws MMLParseException {
 		MMLScore score = new MMLScore();
 		BufferedReader reader = null;
 		try {
-			FileInputStream fisFile = new FileInputStream(file);
-			InputStreamReader isReader = new InputStreamReader(fisFile, "Shift_JIS");
+			InputStreamReader isReader = new InputStreamReader(istream, "Shift_JIS");
 			reader = new BufferedReader(isReader);
 
 			String s;

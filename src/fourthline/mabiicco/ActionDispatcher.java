@@ -7,6 +7,8 @@ package fourthline.mabiicco;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
 import javax.swing.JFileChooser;
@@ -131,12 +133,14 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver {
 			} else {
 				fileParser = new MMLScore();
 			}
-			MMLScore score = fileParser.parse(file);
+			MMLScore score = fileParser.parse(new FileInputStream(file));
 			mmlSeqView.setMMLScore(score);
 
 			openedFile = file;
 			notifyUpdateFileState();
 			MabiIccoProperties.getInstance().setRecentFile(file.getPath());
+		} catch (FileNotFoundException e) {
+			JOptionPane.showMessageDialog(mainFrame, "読み込みに失敗しました", "指定されたファイルがありません", JOptionPane.WARNING_MESSAGE);
 		} catch (MMLParseException e) {
 			JOptionPane.showMessageDialog(mainFrame, "読み込みに失敗しました", "ファイル形式が不正です", JOptionPane.WARNING_MESSAGE);
 		}
@@ -161,7 +165,6 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver {
 		try {
 			FileOutputStream outputStream = new FileOutputStream(file);
 			mmlSeqView.getMMLScore().writeToOutputStream(outputStream);
-			outputStream.close();
 			mainFrame.setTitleAndFileName(file.getName());
 			fileState.setOriginalBase();
 			notifyUpdateFileState();
