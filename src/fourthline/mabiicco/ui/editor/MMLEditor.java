@@ -176,9 +176,7 @@ public class MMLEditor implements MouseInputListener {
 			return;
 		}
 		if (editMode == EDIT_NOTE_LENGTH) {
-			if (editNote.getTick() > 0) {
-				eventList.addMMLNoteEvent(editNote);
-			}
+			eventList.addMMLNoteEvent(editNote);
 		}
 		if (editMode == EDIT_NOTE_SLIDE) {
 			eventList.addMMLNoteEvent(editNote);

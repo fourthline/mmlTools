@@ -115,8 +115,13 @@ public class MMLEventList implements Serializable {
 	 */
 	public void addMMLNoteEvent(MMLNoteEvent addNoteEvent) {
 		int i;
-		if ((addNoteEvent.getNote() <= 0) || (addNoteEvent.getTick() <= 0)) {
+		if ((addNoteEvent.getNote() < 0) || (addNoteEvent.getTick() <= 0)) {
 			return;
+		}
+		int offset = addNoteEvent.getTickOffset();
+		if (offset < 0) {
+			addNoteEvent.setTick( (addNoteEvent.getTick() + offset) );
+			addNoteEvent.setTickOffset(0);
 		}
 
 		// 追加したノートイベントに重なる前のノートを調節します.
