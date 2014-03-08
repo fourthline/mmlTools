@@ -9,9 +9,6 @@ import javax.swing.JPanel;
 
 
 public abstract class AbstractMMLView extends JPanel {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -701943909797286599L;
 	public static final int OCTNUM = 9;
 	public static final int HEIGHT = 6;

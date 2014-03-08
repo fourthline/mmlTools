@@ -80,7 +80,6 @@ public class Loader {
 			public void run() {
 				ActionDispatcher dispatcher = new ActionDispatcher();
 				MainFrame mainFrame = new MainFrame(dispatcher);
-				mainFrame.getMMLSeqView().getFileState().setFileStateObserver(dispatcher);
 				dispatcher.setMainFrame(mainFrame);
 				mainFrame.setVisible(true);
 				window.setVisible(false);

@@ -10,5 +10,5 @@ public interface IFileState {
 	public boolean canRedo();
 
 	public void setOriginalBase();
-	public void setFileStateObserver(IFileStateObserver state);
+	public void setFileStateObserver(IFileStateObserver observer);
 }

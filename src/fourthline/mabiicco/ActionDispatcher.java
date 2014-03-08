@@ -25,11 +25,12 @@ import fourthline.mmlTools.parser.IMMLFileParser;
 import fourthline.mmlTools.parser.MMLParseException;
 import fourthline.mmlTools.parser.MMSFile;
 
-public class ActionDispatcher implements ActionListener, IFileStateObserver {
+public class ActionDispatcher implements ActionListener, IFileStateObserver, IEditStateObserver {
 
 	private MainFrame mainFrame;
 	private MMLSeqView mmlSeqView;
 	private IFileState fileState;
+	private IEditState editState;
 
 	// action commands
 	public static final String VIEW_EXPAND = "viewExpand";
@@ -51,6 +52,7 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver {
 	public static final String REDO = "redo";
 	public static final String SAVE_FILE = "save_file";
 	public static final String SAVEAS_FILE = "saveas_file";
+	public static final String DELETE = "delete";
 
 	private File openedFile = null;
 
@@ -63,6 +65,10 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver {
 		this.mainFrame = mainFrame;
 		this.mmlSeqView = mainFrame.getMMLSeqView();
 		this.fileState = this.mmlSeqView.getFileState();
+		this.editState = this.mmlSeqView.getEditState();
+
+		this.fileState.setFileStateObserver(this);
+		this.editState.setEditStateObserver(this);
 	}
 
 	@Override
@@ -122,6 +128,8 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver {
 			saveMMLFile(openedFile);
 		} else if (command.equals(SAVEAS_FILE)) {
 			saveMMLFileAction();
+		} else if (command.equals(DELETE)) {
+			editState.selectedDelete();
 		}
 	}
 
@@ -303,8 +311,6 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver {
 
 	@Override
 	public void notifyUpdateFileState() {
-		System.out.println("notifyUpdateFileState()");
-
 		mainFrame.setCanSaveFile(false);
 		mainFrame.setTitleAndFileName(null);
 		mainFrame.setCanReloadFile(false);
@@ -326,5 +332,10 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver {
 
 		// redo-UI更新
 		mainFrame.setCanRedo(fileState.canRedo());
+	}
+
+	@Override
+	public void notifyUpdateEditState() {
+		mainFrame.setSelectedEdit(editState.hasSelectedNote());
 	}
 }

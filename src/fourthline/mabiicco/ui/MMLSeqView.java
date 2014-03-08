@@ -15,6 +15,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import fourthline.mabiicco.IEditState;
 import fourthline.mabiicco.IFileState;
 import fourthline.mabiicco.midi.InstType;
 import fourthline.mabiicco.midi.MabiDLS;
@@ -538,6 +539,10 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 
 	public IFileState getFileState() {
 		return undoEdit;
+	}
+
+	public IEditState getEditState() {
+		return editor;
 	}
 
 	// TimeViewを更新するためのスレッドを開始します.

@@ -73,6 +73,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 	private JMenuItem undoMenu;
 	private JMenuItem redoMenu;
 	private JMenuItem saveMenuItem;
+	private JMenuItem deleteMenu;
 
 	/**
 	 * Create the frame.
@@ -214,6 +215,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		setCanUndo(false);
 		setCanRedo(false);
 		setCanSaveFile(false);
+		setSelectedEdit(false);
 
 		// 閉じるボタンへのアクション設定
 		setDefaultCloseOperation( DO_NOTHING_ON_CLOSE );
@@ -286,13 +288,19 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		fileMenu.setMnemonic('E');
 		menuBar.add(editMenu);
 
-		undoMenu = createMenuItem("Undo", ActionDispatcher.UNDO);
+		undoMenu = createMenuItem("元に戻す", ActionDispatcher.UNDO);
 		undoMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_MASK));
 		editMenu.add(undoMenu);
 
-		redoMenu = createMenuItem("Redo", ActionDispatcher.REDO);
+		redoMenu = createMenuItem("やり直す", ActionDispatcher.REDO);
 		redoMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_MASK));
 		editMenu.add(redoMenu);
+
+		editMenu.add(new JSeparator());	
+
+		deleteMenu = createMenuItem("削除", ActionDispatcher.DELETE);
+		deleteMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
+		editMenu.add(deleteMenu);
 
 		/************************* Track Menu *************************/
 		JMenu trackMenu = new JMenu("トラック");
@@ -480,5 +488,9 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 	 */
 	public void setCanSaveFile(boolean b) {
 		saveMenuItem.setEnabled(b);
+	}
+
+	public void setSelectedEdit(boolean b) {
+		deleteMenu.setEnabled(b);
 	}
 }

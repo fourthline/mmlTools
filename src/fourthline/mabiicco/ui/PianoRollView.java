@@ -9,6 +9,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.util.List;
 
 import javax.swing.JViewport;
@@ -41,8 +42,11 @@ public class PianoRollView extends AbstractMMLView {
 	private double startViewTick;
 	private double endViewTick;
 
-	// 編集中のノートイベント
-	private MMLNoteEvent editNote;
+	// 選択中のノートイベント
+	private List<MMLNoteEvent> selectNoteList;
+
+	// 選択用の枠
+	private Rectangle selectingRect;
 
 	private int activeTrackIndex = 0;
 
@@ -113,12 +117,12 @@ public class PianoRollView extends AbstractMMLView {
 		revalidate();
 	}
 
-	public void setEditNote(MMLNoteEvent note) {
-		editNote = note;
+	public void setSelectNote(List<MMLNoteEvent> list) {
+		selectNoteList = list;
 	}
 
-	public MMLNoteEvent getEditNote() {
-		return editNote;
+	public void setSelectingArea(Rectangle rect) {
+		selectingRect = rect;
 	}
 
 	/**
@@ -240,7 +244,8 @@ public class PianoRollView extends AbstractMMLView {
 		}
 
 		paintActivePart(g2);
-		paintEditNote(g2);
+		paintSelectedNote(g2);
+		paintSelectingArea(g2);
 
 		paintSequenceLine(g2, getHeight());
 
@@ -344,9 +349,7 @@ public class PianoRollView extends AbstractMMLView {
 	 */
 	private void paintMMLPart(Graphics2D g, List<MMLNoteEvent> mmlPart, Color rectColor, Color fillColor) {
 		// 現在のView範囲のみを描画する.
-		for (int i = 0; i < mmlPart.size(); i++) {
-			MMLNoteEvent noteEvent = mmlPart.get(i);
-
+		for (MMLNoteEvent noteEvent : mmlPart) {
 			if (noteEvent.getEndTick() < startViewTick) {
 				continue;
 			}
@@ -414,9 +417,17 @@ public class PianoRollView extends AbstractMMLView {
 		drawOption = false;
 	}
 
-	private void paintEditNote(Graphics2D g) {
-		if (editNote != null) {
-			drawNote(g, editNote, Color.YELLOW, Color.YELLOW);
+	private void paintSelectedNote(Graphics2D g) {
+		// 選択中ノートの表示
+		if (selectNoteList != null) {
+			paintMMLPart(g, selectNoteList, Color.YELLOW, Color.YELLOW);
+		}
+	}
+
+	private void paintSelectingArea(Graphics2D g) {
+		if (selectingRect != null) {
+			g.setColor(Color.BLUE);
+			g.draw(selectingRect);
 		}
 	}
 
