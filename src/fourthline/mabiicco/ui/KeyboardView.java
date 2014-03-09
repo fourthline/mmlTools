@@ -154,6 +154,10 @@ public class KeyboardView extends AbstractMMLView {
 
 
 	public void playNote(int note) {
+		if (note < 0) {
+			offNote();
+			return;
+		}
 		playNote = note + 12;
 
 		MabiDLS.getInstance().playNote(playNote, channel);

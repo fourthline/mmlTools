@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 たんらる
+ * Copyright (C) 2013-2014 たんらる
  */
 
 package fourthline.mabiicco.ui.editor;
@@ -25,18 +25,14 @@ import fourthline.mmlTools.MMLNoteEvent;
 import fourthline.mmlTools.UndefinedTickException;
 
 
-public class MMLEditor implements MouseInputListener, IEditState {
+public class MMLEditor implements MouseInputListener, IEditState, IEditContext {
 
-	// ノートの編集モード
-	private final int EDIT_NONE = 0;
-	private final int EDIT_NOTE_INSERT = 1; // ノート挿入
-	private final int EDIT_NOTE_SLIDE  = 2; // ノート移動
-	private final int EDIT_NOTE_LENGTH = 3; // ノートの長さ変更
-	private final int RECT_NOTE_SELECT = 4; // 範囲選択
-	private int editMode = EDIT_NONE;
+	private EditMode editMode = EditMode.SELECT;
 
 	// 編集選択中のノート
-	private ArrayList<MMLNoteEvent> selectedNote = new ArrayList<MMLNoteEvent>();
+	ArrayList<MMLNoteEvent> selectedNote = new ArrayList<MMLNoteEvent>();
+	// 複数ノート移動時のdetachリスト
+	ArrayList<MMLNoteEvent> detachedNote = new ArrayList<MMLNoteEvent>();
 
 	// 編集対象のイベントリスト
 	private MMLEventList editEventList;
@@ -45,8 +41,6 @@ public class MMLEditor implements MouseInputListener, IEditState {
 	private int editAlign = 48;
 
 	private IEditStateObserver editObserver;
-
-	private Point pressedPoint;
 
 	private PianoRollView pianoRollView;
 	private KeyboardView keyboardView;
@@ -96,180 +90,223 @@ public class MMLEditor implements MouseInputListener, IEditState {
 	}
 
 	private void selectNote(MMLNoteEvent noteEvent) {
-		if (!selectedNote.contains(noteEvent)) {
+		selectNote(noteEvent, false);
+	}
+
+	private void selectNote(MMLNoteEvent noteEvent, boolean multiSelect) {
+		if (noteEvent == null) {
 			selectedNote.clear();
-			if (noteEvent != null) {
+		}
+		if ( (noteEvent != null) && (!selectedNote.contains(noteEvent))) {
+			if (!multiSelect) {
+				selectedNote.clear();
+			}
+			selectedNote.add(noteEvent);
+		}
+	}
+
+	/**
+	 * @param point  nullのときはクリアする.
+	 */
+	@Override
+	public void selectNoteByPoint(Point point, boolean multiSelect) {
+		if (point == null) {
+			selectNote(null);
+		} else {
+			int note = pianoRollView.convertY2Note(point.y);
+			long tickOffset = pianoRollView.convertXtoTick(point.x);
+			MMLNoteEvent noteEvent = editEventList.searchOnTickOffset(tickOffset);
+
+			if (noteEvent.getNote() == note) {
+				selectNote(noteEvent, multiSelect);
+			}
+		}
+	}
+
+	/**
+	 * 指定されたPointに新しいノートを作成する.
+	 * 作成されたNoteは、選択状態になる.
+	 */
+	@Override
+	public void newMMLNoteAndSelected(Point p) {
+		int note = pianoRollView.convertY2Note(p.y);
+		long tickOffset = pianoRollView.convertXtoTick(p.x);
+		long alignedTickOffset = tickOffset - (tickOffset % editAlign);
+
+		MMLNoteEvent noteEvent = new MMLNoteEvent(note, editAlign, (int)alignedTickOffset);
+		selectNote(noteEvent);
+		keyboardView.playNote( note );
+	}
+
+	/**
+	 * 選択状態のノート、ノート長を更新する（ノート挿入時）
+	 */
+	@Override
+	public void updateSelectedNoteAndTick(Point p, boolean updateNote) {
+		MMLNoteEvent noteEvent = selectedNote.get(0);
+		int note = pianoRollView.convertY2Note(p.y);
+		long tickOffset = pianoRollView.convertXtoTick(p.x);
+		long alignedTickOffset = tickOffset - (tickOffset % editAlign);
+		long newTick = (alignedTickOffset - noteEvent.getTickOffset()) + editAlign;
+		if (newTick < 0) {
+			newTick = 0;
+		}
+		if (updateNote) {
+			noteEvent.setNote(note);
+		}
+		noteEvent.setTick((int)newTick);
+		keyboardView.playNote(noteEvent.getNote());
+	}
+
+	@Override
+	public void detachSelectedMMLNote() {
+		detachedNote.clear();
+		for (MMLNoteEvent noteEvent : selectedNote) {
+			int note = noteEvent.getNote();
+			int tick = noteEvent.getTick();
+			int tickOffset = noteEvent.getTickOffset();
+			detachedNote.add(new MMLNoteEvent(note, tick, tickOffset));
+		}
+	}
+	/**
+	 * 選択状態のノートを移動する
+	 */
+	@Override
+	public void moveSelectedMMLNote(Point start, Point p) {
+		int noteDelta = pianoRollView.convertY2Note(p.y) - pianoRollView.convertY2Note(start.y);
+		long tickOffsetDelta = pianoRollView.convertXtoTick(p.x) - pianoRollView.convertXtoTick(start.x);
+
+		long alignedTickOffsetDelta = tickOffsetDelta - (tickOffsetDelta % editAlign);
+
+		for (int i = 0; i < selectedNote.size(); i++) {
+			MMLNoteEvent note1 = detachedNote.get(i);
+			MMLNoteEvent note2 = selectedNote.get(i);
+			note2.setNote(note1.getNote() + noteDelta);
+			note2.setTickOffset(note1.getTickOffset() + (int)alignedTickOffsetDelta);
+		}
+
+		if (selectedNote.size() == 1) {
+			keyboardView.playNote( selectedNote.get(0).getNote() );
+		}
+	}
+
+	@Override
+	public void cancelMove() {
+		int i = 0;
+		for (MMLNoteEvent noteEvent : selectedNote) {
+			MMLNoteEvent revertNote = detachedNote.get(i++);
+			noteEvent.setNote(revertNote.getNote());
+			noteEvent.setTickOffset(revertNote.getTickOffset());
+		}
+	}
+
+	/**
+	 * 編集選択中のノートをイベントリストに反映する.
+	 * @param select trueの場合は選択状態を維持する.
+	 */
+	@Override
+	public void applyEditNote(boolean select) {
+		for (MMLNoteEvent noteEvent : selectedNote) {
+			editEventList.deleteMMLEvent(noteEvent);
+			editEventList.addMMLNoteEvent(noteEvent);
+		}
+		if (!select) {
+			selectNote(null);
+		}
+		mmlManager.updateActivePart();
+		keyboardView.offNote();
+	}
+
+	@Override
+	public void setCursor(Cursor cursor) {
+		pianoRollView.setCursor(cursor);
+	}
+
+	@Override
+	public void multiSelectingAction(Point startPoint, Point point) {
+		int x1 = startPoint.x;
+		int x2 = point.x;
+		if (x1 > x2) {
+			x2 = startPoint.x;
+			x1 = point.x;
+		}
+		int y1 = startPoint.y;
+		int y2 = point.y;
+		if (y1 > y2) {
+			y2 = startPoint.y;
+			y1 = point.y;
+		}
+		Rectangle rect = new Rectangle(x1, y1, (x2-x1), (y2-y1));
+		pianoRollView.setSelectingArea(rect);
+
+		int note1 = pianoRollView.convertY2Note( y1 );
+		int tickOffset1 = (int)pianoRollView.convertXtoTick( x1 );
+		int note2 = pianoRollView.convertY2Note( y2 );
+		int tickOffset2 = (int)pianoRollView.convertXtoTick( x2 );
+
+		selectedNote.clear();
+		for (MMLNoteEvent noteEvent : editEventList.getMMLNoteEventList()) {
+			if ( (noteEvent.getNote() <= note1) && (noteEvent.getNote() >= note2) 
+					&& (noteEvent.getEndTick() >= tickOffset1)
+					&& (noteEvent.getTickOffset() <= tickOffset2) ) {
 				selectedNote.add(noteEvent);
 			}
 		}
 	}
 
+	@Override
+	public void applyMultiSelect() {
+		pianoRollView.setSelectingArea(null);
+	}
+
+
 	/**
-	 * 編集モードの判定を行います.
-	 * @param note
-	 * @param tickOffset
-	 * @return 判定した編集モード.
+	 * Editスタートポイントがノート上であるかどうかを判定する.
+	 * @param point
+	 * @return ノート上の場合はtrue.
 	 */
-	private int decisionEditMode(int note, int tickOffset) {
+	@Override
+	public boolean onExistNote(Point point) {
+		int note = pianoRollView.convertY2Note( point.y );
+		int tickOffset = (int)pianoRollView.convertXtoTick( point.x );
+		MMLNoteEvent noteEvent = editEventList.searchOnTickOffset(tickOffset);
+
+		if ( (noteEvent != null) && (note == noteEvent.getNote()) ) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * 音価編集位置にあるかどうかを判定する.
+	 * @param point
+	 * @return
+	 */
+	@Override
+	public boolean isEditLengthPosition(Point point) {
+		int note = pianoRollView.convertY2Note( point.y );
+		int tickOffset = (int)pianoRollView.convertXtoTick( point.x );
 		MMLNoteEvent noteEvent = editEventList.searchOnTickOffset( tickOffset );
 
 		if ( (noteEvent != null) && (noteEvent.getNote() == note) ) {
 			if (noteEvent.getEndTick() <= tickOffset +(editAlign/2) ) {
-				return EDIT_NOTE_LENGTH;
-			} else {
-				return EDIT_NOTE_SLIDE;
+				return true;
 			}
 		}
 
-		return EDIT_NOTE_INSERT;
-	}
-
-	private int editDeltaOffset;
-	/**
-	 * 編集モードを開始します.
-	 * @param note
-	 * @param tickOffset
-	 */
-	private void startEditAction(int note, int tickOffset) {
-		int alignedTickOffset = tickOffset - (tickOffset % editAlign);
-
-		MMLNoteEvent noteEvent = editEventList.searchOnTickOffset( tickOffset );
-		editMode = decisionEditMode(note, tickOffset);
-
-		if ( (editMode == EDIT_NOTE_LENGTH) || (editMode == EDIT_NOTE_SLIDE) ) {
-			editDeltaOffset = tickOffset - noteEvent.getTickOffset();
-		} else {
-			// 新規追加.
-			noteEvent = new MMLNoteEvent(note, editAlign, alignedTickOffset);
-		}
-
-		keyboardView.playNote( note );
-		selectNote(noteEvent);
+		return false;
 	}
 
 	/**
-	 * 編集中モードでの表示更新を行います.
-	 *  EDIT_NOTE_LENGTH: 音の長さを更新します.
-	 *  EDIT_NOTE_SLIDE:  音の高さ、offsetを更新します.
-	 *  EDIT_NOTE_INSERT: 音の高さを更新します.
-	 * @param note
-	 * @param tickOffset
+	 * Edit状態を変更する.
+	 * @param nextMode
 	 */
-	private void updateEditAction(int note, int tickOffset) {
-		if (selectedNote.size() == 0) {
-			return;
-		}
-
-		MMLNoteEvent editNote = selectedNote.get(0);
-		if (editMode == EDIT_NOTE_LENGTH) {
-			// 既存音符の編集. (一度イベントを削除します)
-			editEventList.deleteMMLEvent(editNote);
-			int alignedTickOffset = tickOffset - (tickOffset % editAlign);
-			int newTick = (alignedTickOffset - editNote.getTickOffset()) + editAlign;
-			if (newTick < 0) {
-				newTick = 0;
-			}
-			editNote.setTick(newTick);
-		}
-		if (editMode == EDIT_NOTE_SLIDE) {
-			// 既存音符の編集. (一度イベントを削除します)
-			editEventList.deleteMMLEvent(editNote);
-			editNote.setNote(note);
-
-			int newTickOffset = (tickOffset - editDeltaOffset);
-			newTickOffset -= newTickOffset % editAlign;
-			editNote.setTickOffset(newTickOffset);
-			keyboardView.playNote( note );
-		}
-		if (editMode == EDIT_NOTE_INSERT) {
-			editNote.setNote(note);
-			int alignedTickOffset = tickOffset - (tickOffset % editAlign);
-			int newTick = (alignedTickOffset - editNote.getTickOffset()) + editAlign;
-			if (newTick < 0) {
-				newTick = 0;
-			}
-			editNote.setTick(newTick);
-			keyboardView.playNote( note );
-		}
-	}
-
-	private void editApply() {
-		if (selectedNote.size() == 0) {
-			return;
-		}
-
-		MMLNoteEvent editNote = selectedNote.get(0);
-		if (editMode == EDIT_NOTE_LENGTH) {
-			editEventList.addMMLNoteEvent(editNote);
-		}
-		if (editMode == EDIT_NOTE_SLIDE) {
-			editEventList.addMMLNoteEvent(editNote);
-		}
-		if (editMode == EDIT_NOTE_INSERT) {
-			editEventList.addMMLNoteEvent(editNote);
-			selectNote(null);
-		}
-		keyboardView.offNote();
-		mmlManager.updateActivePart();
-	}
-
-	private void updatePretarget(int note, int tickOffset) {
-		Cursor cursor;
-
-		int preEditMode = decisionEditMode(note, tickOffset);
-		if (preEditMode == EDIT_NOTE_LENGTH) {
-			cursor = Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR);
-		} else if (preEditMode == EDIT_NOTE_SLIDE) {
-			cursor = Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR);
-		} else {
-			cursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
-		}
-
-		pianoRollView.setCursor(cursor);
-	}
-
-	private void startSelectingAction(int note, int tickOffset) {
-		MMLNoteEvent noteEvent = editEventList.searchOnTickOffset( tickOffset );
-
-		if ( (noteEvent == null) || (noteEvent.getNote() != note) ) {
-			selectNote(null);
-			editMode = RECT_NOTE_SELECT;
-		} else {
-			// TODO: Note編集メニュー
-			selectNote(noteEvent);
-		}
-	}
-
-	private void multiSelectingAction(Point point) {
-		if (editMode == RECT_NOTE_SELECT) {
-			int x1 = pressedPoint.x;
-			int x2 = point.x;
-			if (x1 > x2) {
-				x2 = pressedPoint.x;
-				x1 = point.x;
-			}
-			int y1 = pressedPoint.y;
-			int y2 = point.y;
-			if (y1 > y2) {
-				y2 = pressedPoint.y;
-				y1 = point.y;
-			}
-			Rectangle rect = new Rectangle(x1, y1, (x2-x1), (y2-y1));
-			pianoRollView.setSelectingArea(rect);
-
-			int note1 = pianoRollView.convertY2Note( y1 );
-			int tickOffset1 = (int)pianoRollView.convertXtoTick( x1 );
-			int note2 = pianoRollView.convertY2Note( y2 );
-			int tickOffset2 = (int)pianoRollView.convertXtoTick( x2 );
-
-			selectedNote.clear();
-			for (MMLNoteEvent noteEvent : editEventList.getMMLNoteEventList()) {
-				if ( (noteEvent.getNote() <= note1) && (noteEvent.getNote() >= note2) 
-						&& (noteEvent.getEndTick() >= tickOffset1)
-						&& (noteEvent.getTickOffset() <= tickOffset2) ) {
-					selectedNote.add(noteEvent);
-				}
-			}
+	@Override
+	public void changeState(EditMode nextMode) {
+		if (editMode != nextMode) {
+			editMode.exit(this);
+			editMode = nextMode;
+			editMode.enter(this);
 		}
 	}
 
@@ -300,51 +337,26 @@ public class MMLEditor implements MouseInputListener, IEditState {
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		int note = pianoRollView.convertY2Note( e.getY() );
-		int tickOffset = (int)pianoRollView.convertXtoTick( e.getX() );
-		pressedPoint = e.getPoint();
-
-		if (SwingUtilities.isLeftMouseButton(e)) {
-			startEditAction(note, tickOffset);
-		} else if (SwingUtilities.isRightMouseButton(e)) {
-			startSelectingAction(note, tickOffset);
-		}
-
+		editMode.pressEvent(this, e);
 		pianoRollView.repaint();
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		if (SwingUtilities.isLeftMouseButton(e)) {
-			editApply();
-		} else if (SwingUtilities.isRightMouseButton(e)) {
-			pianoRollView.setSelectingArea(null);
-		}
-
-		editMode = EDIT_NONE;
+		editMode.releaseEvent(this, e);
 		pianoRollView.repaint();
 		editObserver.notifyUpdateEditState();
 	}
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		int note = pianoRollView.convertY2Note( e.getY() );
-		int tickOffset = (int)pianoRollView.convertXtoTick( e.getX() );
-
-		if (SwingUtilities.isLeftMouseButton(e)) {
-			updateEditAction(note, tickOffset);
-		} else if (SwingUtilities.isRightMouseButton(e)) {
-			multiSelectingAction(e.getPoint());
-		}
-
+		editMode.executeEvent(this, e);
 		pianoRollView.repaint();
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		int note = pianoRollView.convertY2Note( e.getY() );
-		int tickOffset = (int)pianoRollView.convertXtoTick( e.getX() );
-		updatePretarget( note, tickOffset );
+		editMode.executeEvent(this, e);
 	}
 
 	@Override

@@ -115,7 +115,7 @@ public class MMLEventList implements Serializable {
 	 */
 	public void addMMLNoteEvent(MMLNoteEvent addNoteEvent) {
 		int i;
-		if ((addNoteEvent.getNote() < 0) || (addNoteEvent.getTick() <= 0)) {
+		if ((addNoteEvent.getNote() < 0) || (addNoteEvent.getTick() <= 0) || (addNoteEvent.getEndTick() <= 0)) {
 			return;
 		}
 		int offset = addNoteEvent.getTickOffset();
