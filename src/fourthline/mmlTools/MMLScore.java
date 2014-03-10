@@ -142,7 +142,7 @@ public class MMLScore implements IMMLFileParser {
 			stream.println("version=1");
 
 			for (MMLTrack track : trackList) {
-				stream.println("mml-track="+track.getMMLString(false));
+				stream.println("mml-track="+track.getMMLString(false, false));
 				stream.println("name="+track.getTrackName());
 				stream.println("program="+track.getProgram());
 				stream.println("songProgram="+track.getSongProgram());

@@ -171,27 +171,32 @@ public class MMLEventList implements Serializable {
 	}
 
 	public String toMMLString() {
-		return toMMLString(false, 0);
+		return toMMLString(false, 0, true);
 	}
 
-	public String toMMLString(boolean withTempo) {
-		return toMMLString(withTempo, 0);
+	public String toMMLString(boolean withTempo, boolean mabiTempo) {
+		return toMMLString(withTempo, 0, mabiTempo);
 	}
 
-	private MMLNoteEvent insertTempoMML(StringBuilder sb, MMLNoteEvent prevNoteEvent, MMLTempoEvent tempoEvent) {
-		// rrrT***N の処理
+	private MMLNoteEvent insertTempoMML(StringBuilder sb, MMLNoteEvent prevNoteEvent, MMLTempoEvent tempoEvent, boolean mabiTempo) {
 		if (prevNoteEvent.getEndTick() != tempoEvent.getTickOffset()) {
 			int tickLength = tempoEvent.getTickOffset() - prevNoteEvent.getEndTick();
 			int tickOffset = prevNoteEvent.getEndTick();
 			int note = prevNoteEvent.getNote();
 			// FIXME: 最後の1つのrだけに細工すればよいね.
-			MMLTicks ticks = new MMLTicks("c", tickLength, false);
-			if (prevNoteEvent.getVelocity() != 0) {
-				sb.append("v0");
+			if (mabiTempo) {
+				// マビノギ補正（rrrT***N の処理
+				MMLTicks ticks = new MMLTicks("c", tickLength, false);
+				if (prevNoteEvent.getVelocity() != 0) {
+					sb.append("v0");
+				}
+				sb.append(ticks.toString());
+				prevNoteEvent = new MMLNoteEvent(note, tickLength, tickOffset);
+				prevNoteEvent.setVelocity(0);
+			} else {
+				MMLTicks ticks = new MMLTicks("r", tickLength, false);
+				sb.append(ticks.toString());
 			}
-			sb.append(ticks.toString());
-			prevNoteEvent = new MMLNoteEvent(note, tickLength, tickOffset);
-			prevNoteEvent.setVelocity(0);
 		}
 		sb.append(tempoEvent.toMMLString());
 
@@ -205,7 +210,7 @@ public class MMLEventList implements Serializable {
 	 * @param totalTick 最大tick長. これに満たない場合は、末尾を休符分で埋めます.
 	 * @return
 	 */
-	public String toMMLString(boolean withTempo, int totalTick) {
+	public String toMMLString(boolean withTempo, int totalTick, boolean mabiTempo) {
 		//　テンポ
 		Iterator<MMLTempoEvent> tempoIterator = null;
 		MMLTempoEvent tempoEvent = null;
@@ -228,7 +233,7 @@ public class MMLEventList implements Serializable {
 			while ( (tempoEvent != null) && (tempoEvent.getTickOffset() <= noteEvent.getTickOffset()) ) {
 				if (withTempo) {
 					// tempo挿入 (rrrT***N の処理)
-					prevNoteEvent = insertTempoMML(sb, prevNoteEvent, tempoEvent);
+					prevNoteEvent = insertTempoMML(sb, prevNoteEvent, tempoEvent, mabiTempo);
 				}
 				tempoEvent = (MMLTempoEvent) nextEvent(tempoIterator);
 			}

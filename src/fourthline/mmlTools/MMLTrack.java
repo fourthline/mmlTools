@@ -123,21 +123,21 @@ public class MMLTrack extends MMLTools implements Serializable {
 	}
 
 	public String getMMLString() {
-		return getMMLString(true);
+		return getMMLString(true, true);
 	}
 
-	public String getMMLString(boolean tailFix) {
-		String mml[] = getMMLStrings(tailFix);
+	public String getMMLString(boolean tailFix, boolean mabiTempo) {
+		String mml[] = getMMLStrings(tailFix, mabiTempo);
 		MMLTools tools = new MMLTools(mml[0], mml[1], mml[2], mml[3]);
 
 		return tools.getMML();
 	}
 
 	public String[] getMMLStrings() {
-		return getMMLStrings(true);
+		return getMMLStrings(true, true);
 	}
 
-	public String[] getMMLStrings(boolean tailFix) {
+	public String[] getMMLStrings(boolean tailFix, boolean mabiTempo) {
 		int count = mmlParts.size();
 		String mml[] = new String[count];
 		int totalTick = (int)this.getMaxTickLength();
@@ -146,7 +146,7 @@ public class MMLTrack extends MMLTools implements Serializable {
 			// メロディパートのMML更新（テンポ, tickLengthにあわせる.
 			MMLEventList eventList = mmlParts.get(i);
 			if (i == 0) {
-				mml[i] = eventList.toMMLString(true, totalTick);
+				mml[i] = eventList.toMMLString(true, totalTick, mabiTempo);
 			} else {
 				mml[i] = eventList.toMMLString();
 			}
