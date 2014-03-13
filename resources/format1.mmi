@@ -1,0 +1,12 @@
+[mml-score]
+version=1
+mml-track=MML@at150at120a,bbb,ccc;
+name=track1
+program=0
+songProgram=121
+panpot=64
+mml-track=MML@at150at120a,bbb,ccc;
+name=track2
+program=4
+songProgram=120
+panpot=64

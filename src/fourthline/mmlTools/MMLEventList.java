@@ -195,6 +195,7 @@ public class MMLEventList implements Serializable {
 				prevNoteEvent.setVelocity(0);
 			} else {
 				MMLTicks ticks = new MMLTicks("r", tickLength, false);
+				prevNoteEvent = new MMLNoteEvent(prevNoteEvent.getNote(), tickLength, tickOffset);
 				sb.append(ticks.toString());
 			}
 		}
