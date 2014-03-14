@@ -271,7 +271,7 @@ public class MMLEventList implements Serializable {
 		}
 
 		// テンポがまだ残っていれば、その分をつなげる.
-		if ( (withTempo) && (tempoEvent != null) && (noteEvent != null) ) {
+		if ( (withTempo) && (tempoEvent != null) && (noteEvent != null) && (mabiTempo) ) {
 			int endTick = noteEvent.getEndTick();
 			int tickOffset = tempoEvent.getTickOffset();
 			int tick = tickOffset - endTick;
