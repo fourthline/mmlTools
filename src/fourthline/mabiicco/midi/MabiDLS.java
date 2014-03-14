@@ -204,11 +204,12 @@ public final class MabiDLS {
 
 	private int play_note = -1;
 	/** 単音再生 */
-	public void playNote(int note, int channel) {
+	public void playNote(int note, int program, int channel) {
 		/* シーケンサによる再生中は鳴らさない */
 		if (sequencer.isRunning()) {
 			return;
 		}
+		changeProgram(program, channel);
 		MidiChannel midiChannel = this.getChannel(channel);
 
 		if (note < 0) {

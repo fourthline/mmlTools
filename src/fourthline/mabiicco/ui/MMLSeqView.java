@@ -17,7 +17,6 @@ import javax.swing.event.ChangeListener;
 
 import fourthline.mabiicco.IEditState;
 import fourthline.mabiicco.IFileState;
-import fourthline.mabiicco.midi.InstType;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.editor.MMLEditor;
 import fourthline.mabiicco.ui.editor.MMLScoreUndoEdit;
@@ -69,7 +68,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 
 		// Scroll View (KeyboardView, PianoRollView) - CENTER
 		pianoRollView = new PianoRollView();
-		keyboardView = new KeyboardView();
+		keyboardView = new KeyboardView(this);
 
 		scrollPane = new JScrollPane(pianoRollView);
 		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -148,7 +147,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		}
 
 		// トラックビューの追加
-		tabbedPane.add(newTrack.getTrackName(), new MMLTrackView(newTrack, trackIndex, this, this));
+		tabbedPane.add(newTrack.getTrackName(), new MMLTrackView(newTrack, this, this));
 		tabbedPane.setSelectedIndex(trackIndex);
 
 		// ピアノロール更新
@@ -180,12 +179,6 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 
 		mmlScore.removeTrack(index);
 		tabbedPane.remove(index);
-
-		// MMLTrackViewのチャンネルを更新する.
-		for (int i = index; i < tabbedPane.getComponentCount(); i++) {
-			MMLTrackView view = (MMLTrackView) (tabbedPane.getComponentAt(i));
-			view.setChannel(i);
-		}
 
 		if (mmlScore.getTrackCount() == 0) {
 			addMMLTrack(null);
@@ -250,7 +243,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 				name = "Track"+(i+1);
 			}
 
-			tabbedPane.add(name, new MMLTrackView(track, i, this, this));
+			tabbedPane.add(name, new MMLTrackView(track, this, this));
 		}
 
 		initialSetView();
@@ -360,15 +353,10 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	private void updateSelectedTrackAndMMLPart() {
 		MMLTrackView view = (MMLTrackView) tabbedPane.getSelectedComponent();
 		if (view != null) {
-			int channel = view.getChannel();
 			int program = getSelectedTrack().getProgram();
 			if (view.isSelectedVoicePart()) {
-				channel = InstType.VOICE_PLAYBACK_CHANNEL;
 				program = getSelectedTrack().getSongProgram();
-				MabiDLS.getInstance().changeProgram(getSelectedTrack().getSongProgram(), InstType.VOICE_PLAYBACK_CHANNEL);
 			}
-			MabiDLS.getInstance().changeProgram(program, channel);
-			keyboardView.setChannel(channel);
 			int mmlPartIndex = view.getSelectedMMLPartIndex();
 
 			// ピアノロールビューにアクティブトラックとアクティブパートを設定します.
@@ -376,7 +364,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 			pianoRollView.setPitchRange(MabiDLS.getInstance().getInstByProgram(program));
 
 			pianoRollView.repaint();
-			System.out.printf("stateChanged(): %d, %d, %d\n", channel, mmlPartIndex, program);
+			System.out.printf("stateChanged(): %d, %d\n", mmlPartIndex, program);
 		}
 	}
 
@@ -440,7 +428,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		int i;
 		for (i = 0; i < trackCount; i++) {
 			MMLTrack track = mmlScore.getTrack(i);
-			tabbedPane.add(track.getTrackName(), new MMLTrackView(track, i, this, this));
+			tabbedPane.add(track.getTrackName(), new MMLTrackView(track, this, this));
 		}
 
 		if (selectedTab >= i) {
@@ -523,11 +511,6 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	public void updateActiveTrackProgram(int program, int songProgram) {
 		getSelectedTrack().setProgram(program);
 		getSelectedTrack().setSongProgram(songProgram);
-
-		// プログラムチェンジ
-		MMLTrackView view = (MMLTrackView) tabbedPane.getSelectedComponent();
-		MabiDLS.getInstance().changeProgram(program, view.getChannel());
-		MabiDLS.getInstance().changeProgram(songProgram, InstType.VOICE_PLAYBACK_CHANNEL);
 
 		updateSelectedTrackAndMMLPart();
 		undoEdit.saveState();
@@ -630,5 +613,21 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 				}
 			});
 		}
+	}
+
+	@Override
+	public int getActivePartProgram() {
+		MMLTrackView view = (MMLTrackView) tabbedPane.getSelectedComponent();
+		MMLTrack track = getSelectedTrack();
+		if (view != null) {
+			int part = view.getSelectedMMLPartIndex();
+			if ( (part >= 0) && (part < 3) ) {
+				return track.getProgram();
+			} else {
+				return track.getSongProgram();
+			}
+		}
+
+		return 0;
 	}
 }

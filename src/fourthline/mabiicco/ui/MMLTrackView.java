@@ -48,8 +48,6 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 
 	private JLabel trackComposeLabel;
 
-	private int channel;
-
 	private IMMLManager mmlManager;
 
 	/**
@@ -142,10 +140,8 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		updateComposeRank();
 	}
 
-	public MMLTrackView(MMLTrack track, int channel, ActionListener actionListener, IMMLManager mmlManager) {
+	public MMLTrackView(MMLTrack track, ActionListener actionListener, IMMLManager mmlManager) {
 		this();
-
-		this.channel = channel;
 		this.setMMLTrack(track);
 		this.mmlManager = mmlManager;
 		trackComposeLabel.setText(track.mmlRankFormat());
@@ -153,15 +149,6 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		for (int i = 0; i < MMLPART_NAME.length; i++) {
 			partButton[i].addActionListener(actionListener);
 		}
-	}
-
-	public void setChannel(int channel) {
-		this.channel = channel;
-	}
-
-	public int getChannel() {
-		// TODO: 歌パートのときは、チャンネルを変える。
-		return this.channel;
 	}
 
 	public String getMMLText() {

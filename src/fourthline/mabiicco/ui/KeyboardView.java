@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 たんらる
+ * Copyright (C) 2013-2014 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -16,22 +16,19 @@ import java.awt.event.MouseMotionAdapter;
 import fourthline.mabiicco.midi.MabiDLS;
 
 public class KeyboardView extends AbstractMMLView {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -3850112420986284800L;
 
-	private int channel = 0;
 	private int playNote = -1;
-
 	private final int width = 60;
+	private final int PLAY_CHANNEL = 0;
+	IMMLManager mmlManager;
 
 	/**
 	 * Create the panel.
 	 */
-	public KeyboardView() {
+	public KeyboardView(IMMLManager manager) {
 		setPreferredSize(new Dimension(width, 649));
+		this.mmlManager = manager;
 
 		this.addMouseListener(new MouseAdapter() {
 			@Override
@@ -73,10 +70,6 @@ public class KeyboardView extends AbstractMMLView {
 		paintPlayNote(g2);
 
 		g2.dispose();
-	}
-
-	public void setChannel(int channel) {
-		this.channel = channel;
 	}
 
 	private boolean isWhiteKey(int note) {
@@ -160,14 +153,15 @@ public class KeyboardView extends AbstractMMLView {
 		}
 		playNote = note + 12;
 
-		MabiDLS.getInstance().playNote(playNote, channel);
+		int program = mmlManager.getActivePartProgram();
+		MabiDLS.getInstance().playNote(playNote, program, PLAY_CHANNEL);
 
 		repaint();
 	}
 
 	public void offNote() {
 		playNote = -1;
-		MabiDLS.getInstance().playNote(playNote, channel);
+		MabiDLS.getInstance().playNote(playNote, 0, PLAY_CHANNEL);
 
 		repaint();
 	}
