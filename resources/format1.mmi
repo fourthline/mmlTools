@@ -1,5 +1,8 @@
 [mml-score]
 version=1
+title=
+author=
+time=4/4
 mml-track=MML@at150at120a,bbb,ccc;
 name=track1
 program=0

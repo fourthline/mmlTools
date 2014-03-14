@@ -18,6 +18,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import fourthline.mabiicco.midi.MabiDLS;
+import fourthline.mabiicco.ui.MMLScorePropertyPanel;
 import fourthline.mabiicco.ui.MMLSeqView;
 import fourthline.mabiicco.ui.MainFrame;
 import fourthline.mmlTools.MMLScore;
@@ -53,6 +54,7 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 	public static final String SAVE_FILE = "save_file";
 	public static final String SAVEAS_FILE = "saveas_file";
 	public static final String DELETE = "delete";
+	public static final String SCORE_PROPERTY = "score_property";
 
 	private File openedFile = null;
 
@@ -130,6 +132,8 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 			saveMMLFileAction();
 		} else if (command.equals(DELETE)) {
 			editState.selectedDelete();
+		} else if (command.equals(SCORE_PROPERTY)) {
+			scorePropertyAction();
 		}
 	}
 
@@ -307,6 +311,12 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 		}
 
 		return false;
+	}
+
+	private void scorePropertyAction() {
+		MMLScorePropertyPanel propertyPanel = new MMLScorePropertyPanel();
+		propertyPanel.showDialog(mainFrame, mmlSeqView.getMMLScore());
+		mmlSeqView.repaint();
 	}
 
 	@Override

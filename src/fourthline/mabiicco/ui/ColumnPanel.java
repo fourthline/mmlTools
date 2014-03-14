@@ -107,9 +107,12 @@ public class ColumnPanel extends AbstractMMLView implements MouseListener, Actio
 		int width = getWidth();
 		try {
 			g.setColor(BEAT_BORDER_COLOR);
-			int sect = pianoRollView.convertTicktoX( MMLTicks.getTick("1") );
+			int sect = MMLTicks.getTick(mmlManager.getMMLScore().getBaseOnly());
+			sect = pianoRollView.convertTicktoX(sect);
+			int borderCount = mmlManager.getMMLScore().getTimeCountOnly();
+			int incr = sect * borderCount;
 			int count = 0;
-			for (int i = 0; i < width; i += sect) {
+			for (int i = 0; i < width; i += incr) {
 				int x = i;
 				int y1 = 0;
 				int y2 = getHeight();

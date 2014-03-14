@@ -31,6 +31,10 @@ public class MMLScore implements IMMLFileParser {
 
 	private static final int MAX_TRACK = 8;
 
+	private String title = "";
+	private String author = "";
+	private String baseTime = "4/4";
+
 	/**
 	 * 新たにトラックを追加します.
 	 * @param track
@@ -107,6 +111,40 @@ public class MMLScore implements IMMLFileParser {
 		return globalTempoList;
 	}
 
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getTitle() {
+		return this.title;
+	}
+
+	public void setAuthor(String author) {
+		this.author = author;
+	}
+
+	public String getAuthor() {
+		return this.author;
+	}
+
+	public void setBaseTime(String baseTime) {
+		this.baseTime = baseTime;
+	}
+
+	public String getBaseTime() {
+		return this.baseTime;
+	}
+
+	public String getBaseOnly() {
+		String s[] = this.baseTime.split("/");
+		return s[1];
+	}
+
+	public int getTimeCountOnly() {
+		String s[] = this.baseTime.split("/");
+		return Integer.parseInt(s[0]);
+	}
+
 	public int getTotalTickLength() {
 		long tick = 0;
 		for (MMLTrack track : trackList) {
@@ -140,6 +178,9 @@ public class MMLScore implements IMMLFileParser {
 
 			stream.println("[mml-score]");
 			stream.println("version=1");
+			stream.println("title="+getTitle());
+			stream.println("author="+getAuthor());
+			stream.println("time="+getBaseTime());
 
 			for (MMLTrack track : trackList) {
 				stream.println("mml-track="+track.getMMLString(false, false));
@@ -169,6 +210,10 @@ public class MMLScore implements IMMLFileParser {
 			if (!s.equals("[mml-score]")) {
 				throw(new MMLParseException());
 			}
+			/* バージョン */
+			if ( !(s = reader.readLine()).startsWith("version=") ) {
+				throw(new MMLParseException());
+			}
 
 			// mml-track
 			MMLTrack track = null;
@@ -184,6 +229,15 @@ public class MMLScore implements IMMLFileParser {
 					track.setSongProgram(Integer.parseInt(s.substring("songProgram=".length())));
 				} else if ( s.startsWith("panpot=") ) {
 					track.setPanpot(Integer.parseInt(s.substring("panpot=".length())));
+				} else if ( s.startsWith("title=") ) {
+					/* 曲名 */
+					setTitle(s.substring("title=".length()));
+				} else if ( s.startsWith("author=") ) {
+					/* 作者 */
+					setAuthor(s.substring("author=".length()));
+				} else if ( s.startsWith("time=") ) {
+					/* 拍子 */
+					setBaseTime(s.substring("time=".length()));
 				}
 			}
 		} catch (Exception e) {

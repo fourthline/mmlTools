@@ -280,6 +280,12 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 
 		fileMenu.add(new JSeparator());
 
+		JMenuItem scorePropertyMenu = createMenuItem("プロパティ", ActionDispatcher.SCORE_PROPERTY);
+		noplayFunctions.add(scorePropertyMenu);
+		fileMenu.add(scorePropertyMenu);
+
+		fileMenu.add(new JSeparator());
+
 		JMenuItem exitMenuItem = createMenuItem("終了", ActionDispatcher.QUIT);
 		fileMenu.add(exitMenuItem);
 

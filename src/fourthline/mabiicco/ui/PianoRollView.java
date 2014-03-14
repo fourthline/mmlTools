@@ -303,9 +303,10 @@ public class PianoRollView extends AbstractMMLView {
 	private void paintMeasure(Graphics2D g) {
 		int width = (int)convertXtoTick(getWidth());
 		try {
-			int sect = MMLTicks.getTick("4");
+			int sect = MMLTicks.getTick(mmlManager.getMMLScore().getBaseOnly());
+			int borderCount = mmlManager.getMMLScore().getTimeCountOnly();
 			for (int i = 0; i*sect < width; i++) {
-				if (i%4 == 0) {
+				if (i%borderCount == 0) {
 					g.setColor(darkBarBorder);
 				} else {
 					g.setColor(barBorder);
