@@ -597,6 +597,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 			EventQueue.invokeLater(new Runnable() {
 				@Override
 				public void run() {
+					pianoRollView.updateRunningSequencePosition();
 					long position = pianoRollView.getSequencePlayPosition();
 					position = pianoRollView.convertTicktoX(position);
 					JViewport viewport = scrollPane.getViewport();

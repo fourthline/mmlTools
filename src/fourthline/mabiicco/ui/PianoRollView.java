@@ -36,7 +36,8 @@ public class PianoRollView extends AbstractMMLView {
 	private JViewport viewport;
 	private IMMLManager mmlManager;
 
-	private long sequencePosition;
+	private long sequencePosition = 0;
+	private long runningSequencePosition = 0;
 
 	// 描画位置判定用 (tick base)
 	private double startViewTick;
@@ -186,10 +187,14 @@ public class PianoRollView extends AbstractMMLView {
 		return convertTicktoX( sequencePosition );
 	}
 
+	public void updateRunningSequencePosition() {
+		runningSequencePosition = MabiDLS.getInstance().getSequencer().getTickPosition();
+	}
+
 	public long getSequencePlayPosition() {
 		long position = sequencePosition;
 		if (MabiDLS.getInstance().getSequencer().isRunning()) {
-			position = MabiDLS.getInstance().getSequencer().getTickPosition();
+			return runningSequencePosition;
 		}
 
 		return position;
