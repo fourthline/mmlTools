@@ -58,6 +58,9 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext {
 					new NoteAlign("16分音符", "16"),
 					new NoteAlign("32分音符", "32"),
 					new NoteAlign("64分音符", "64"),
+					new NoteAlign("12分音符(3連符)", "12"),
+					new NoteAlign("24分音符(3連符)", "24"),
+					new NoteAlign("48分音符(3連符)", "48"),
 			};
 
 			return list;

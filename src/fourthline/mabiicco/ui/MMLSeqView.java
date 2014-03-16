@@ -422,20 +422,22 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	 */
 	private void resetTrackView() {
 		int selectedTab = tabbedPane.getSelectedIndex();
-		int trackCount = mmlScore.getTrackCount();
+		int selectedPart = ((MMLTrackView) tabbedPane.getSelectedComponent()).getSelectedMMLPartIndex();
 
 		tabbedPane.removeAll();
-		int i;
-		for (i = 0; i < trackCount; i++) {
-			MMLTrack track = mmlScore.getTrack(i);
+		int i = 0;
+		for (MMLTrack track : mmlScore.getTrackList()) {
+			i++;
 			tabbedPane.add(track.getTrackName(), new MMLTrackView(track, this, this));
 		}
 
 		if (selectedTab >= i) {
 			selectedTab = i-1;
+			selectedPart = 0;
 		}
 
 		tabbedPane.setSelectedIndex(selectedTab);
+		((MMLTrackView) tabbedPane.getSelectedComponent()).setSelectMMLPartOfIndex(selectedPart);
 	}
 
 	public void undo() {

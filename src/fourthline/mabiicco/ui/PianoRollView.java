@@ -344,7 +344,7 @@ public class PianoRollView extends AbstractMMLView {
 		if (drawOption) {
 			// velocityの描画.
 			int velocity = noteEvent.getVelocity();
-			if (velocity > 0) {
+			if (velocity >= 0) {
 				String s = "V" + velocity;
 				g.drawString(s, x, y);
 			}

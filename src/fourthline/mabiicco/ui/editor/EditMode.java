@@ -25,7 +25,11 @@ enum EditMode {
 				multiSelect = true;
 			}
 			if (SwingUtilities.isRightMouseButton(e)) {
-				context.changeState(EditMode.AREA);
+				if (context.onExistNote(startPoint)) {
+					// TODO: show note edit menu
+				} else {
+					context.changeState(EditMode.AREA);
+				}
 			} else if (SwingUtilities.isLeftMouseButton(e)) {
 				if (context.onExistNote(startPoint)) {
 					// ノート上であれば、ノートを選択状態にする. 複数選択判定も.
