@@ -317,7 +317,7 @@ public final class MabiDLS {
 				continue;
 			}
 
-			convertMidiPart(track, mmlTrack.getMMLEventList(3), channel);
+			convertMidiPart(track, mmlTrack.getMMLEventAtIndex(3), channel);
 		}
 	}
 
@@ -335,7 +335,7 @@ public final class MabiDLS {
 		track.add(new MidiEvent(pcMessage, 0));
 
 		for (int i = 0; i < 3; i++) {
-			MMLEventList eventList = mmlTrack.getMMLEventList(i);
+			MMLEventList eventList = mmlTrack.getMMLEventAtIndex(i);
 			convertMidiPart(track, eventList, channel);
 		}
 	}

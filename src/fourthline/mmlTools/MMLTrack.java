@@ -102,12 +102,16 @@ public class MMLTrack extends MMLTools implements Serializable {
 		return this.panpot;
 	}
 
-	public MMLEventList getMMLEventList(int index) {
+	public MMLEventList getMMLEventAtIndex(int index) {
 		return mmlParts.get(index);
 	}
 
 	public int getMMLEventListSize() {
 		return mmlParts.size();
+	}
+
+	public List<MMLEventList> getMMLEventList() {
+		return mmlParts;
 	}
 
 	public long getMaxTickLength() {

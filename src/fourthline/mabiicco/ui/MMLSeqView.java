@@ -360,7 +360,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 			int mmlPartIndex = view.getSelectedMMLPartIndex();
 
 			// ピアノロールビューにアクティブトラックとアクティブパートを設定します.
-			editor.setMMLEventList(getSelectedTrack().getMMLEventList(mmlPartIndex));
+			editor.setMMLEventList(getSelectedTrack().getMMLEventAtIndex(mmlPartIndex));
 			pianoRollView.setPitchRange(MabiDLS.getInstance().getInstByProgram(program));
 
 			pianoRollView.repaint();
@@ -373,7 +373,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		int trackIndex = tabbedPane.getSelectedIndex();
 		MMLTrackView view = (MMLTrackView) tabbedPane.getSelectedComponent();
 		int mmlPartIndex = view.getSelectedMMLPartIndex();
-		return mmlScore.getTrack(trackIndex).getMMLEventList(mmlPartIndex);
+		return mmlScore.getTrack(trackIndex).getMMLEventAtIndex(mmlPartIndex);
 	}
 
 	/**
@@ -482,7 +482,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 
 		// TODO: 他のパートのtickLength増加でパート1に関しては、tickLength追従が必要.
 		if (mmlPartIndex > 0) {
-			MMLEventList eventList = track.getMMLEventList(mmlPartIndex);
+			MMLEventList eventList = track.getMMLEventAtIndex(mmlPartIndex);
 			String mml = eventList.toMMLString();
 			String optimizedMML = new MMLStringOptimizer(mml).toString();
 			view.setPartMMLString(mmlPartIndex, optimizedMML);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 たんらる
+ * Copyright (C) 2013-2014 たんらる
  */
 
 package fourthline.mmlTools;
@@ -50,7 +50,7 @@ public class DrumToolsTest {
 	public void testMakeForMabiMML_t32_0() throws Exception {
 		DrumTools tools = new DrumTools("MML@t32l1.cccc;");
 
-		tools.makeForMabiMML(new ComposeRank(8, 2, 10));
+		tools.makeForMabiMML(ComposeRank.createComposeRank(8, 2, 10));
 
 		assertEquals("t32l1.cc", tools.getMelody());
 		assertEquals("cc", tools.getChord1());
@@ -65,7 +65,7 @@ public class DrumToolsTest {
 	public void testMakeForMabiMML_t32_1() throws Exception {
 		DrumTools tools = new DrumTools("MML@t32l1.cccct240r64;");
 
-		tools.makeForMabiMML(new ComposeRank(8, 9, 10));
+		tools.makeForMabiMML(ComposeRank.createComposeRank(8, 9, 10));
 
 		assertEquals("t32l1.cc", tools.getMelody());
 		assertEquals("cct240r64", tools.getChord1());
@@ -80,7 +80,7 @@ public class DrumToolsTest {
 	public void testMakeForMabiMML_t64_2() throws Exception {
 		DrumTools tools = new DrumTools("MML@t64l1.cccc;");
 
-		tools.makeForMabiMML(new ComposeRank(8, 9, 10));
+		tools.makeForMabiMML(ComposeRank.createComposeRank(8, 9, 10));
 
 		assertEquals("t64l1.cc", tools.getMelody());
 		assertEquals("cc", tools.getChord1());
@@ -95,7 +95,7 @@ public class DrumToolsTest {
 	public void testMakeForMabiMML_t128_2() throws Exception {
 		DrumTools tools = new DrumTools("MML@t128l1.cccc;");
 
-		tools.makeForMabiMML(new ComposeRank(9, 9, 10));
+		tools.makeForMabiMML(ComposeRank.createComposeRank(9, 9, 10));
 
 		assertEquals("t128l1.cc", tools.getMelody());
 		assertEquals("cc", tools.getChord1());
@@ -110,7 +110,7 @@ public class DrumToolsTest {
 	public void testOverTime_0() throws Exception {
 		DrumTools tools = new DrumTools("MML@T32l1.rrrr2");
 
-		tools.makeForMabiMML(new ComposeRank(5, 10, 10));
+		tools.makeForMabiMML(ComposeRank.createComposeRank(5, 10, 10));
 
 		assertEquals("T32", tools.getMelody());
 		assertEquals("l1.rrrr2", tools.getChord1());
@@ -137,9 +137,8 @@ public class DrumToolsTest {
 	public void testMakeForMabiMML4Maki_t1() throws Exception {
 		DrumTools tools = new DrumTools("MML@abct120l64rrrl2.r;");
 
-
 		tools.setMakiOption(true);
-		tools.makeForMabiMML(new ComposeRank(10, 10, 4));
+		tools.makeForMabiMML(ComposeRank.createComposeRank(10, 10, 4));
 
 		assertEquals("abc", tools.getMelody());
 		assertEquals("t120l64rrr", tools.getChord1());
@@ -153,9 +152,8 @@ public class DrumToolsTest {
 	public void testMakeForMabiMML4Maki_t2() throws Exception {
 		DrumTools tools = new DrumTools("MML@abct120l64rrrl2.r;");
 
-
 		tools.setMakiOption(true);
-		tools.makeForMabiMML(new ComposeRank(11, 10, 4));
+		tools.makeForMabiMML(ComposeRank.createComposeRank(11, 10, 4));
 
 		assertEquals("abct120l64r", tools.getMelody());
 		assertEquals("l64rrl2.r", tools.getChord1());

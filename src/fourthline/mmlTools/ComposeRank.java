@@ -70,17 +70,26 @@ public class ComposeRank {
 		return RANK_0.getRank();
 	}
 
+	/**
+	 * for Test, package private
+	 * @param melody
+	 * @param chord1
+	 * @param chord2
+	 * @return
+	 */
+	static ComposeRank createComposeRank(int melody, int chord1, int chord2) {
+		return new ComposeRank(melody, chord1, chord2);
+	}
 
-	@SuppressWarnings("unused")
 	private ComposeRank() {}
 
-	public ComposeRank(int melody, int chord1, int chord2) {
+	private ComposeRank(int melody, int chord1, int chord2) {
 		this.melody = melody;
 		this.chord1 = chord1;
 		this.chord2 = chord2;
 	}
 
-	public ComposeRank(int melody, int chord1, int chord2, String rank) {
+	private ComposeRank(int melody, int chord1, int chord2, String rank) {
 		this(melody, chord1, chord2);
 		this.rank = rank;
 	}

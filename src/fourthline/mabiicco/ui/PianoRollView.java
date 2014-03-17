@@ -55,16 +55,6 @@ public class PianoRollView extends AbstractMMLView {
 	private int lowerNote = 0;
 	private int upperNote = 14;
 
-	// ピアノロール上に表示する各トラックの色リスト
-	private static final Color trackBaseColor[] = {
-		new Color(0.7f, 0.0f, 0.0f),
-		new Color(0.0f, 0.7f, 0.0f),
-		new Color(0.0f, 0.0f, 0.7f),
-		new Color(0.35f, 0.35f, 0.0f),
-		new Color(0.35f, 0.0f, 0.35f),
-		new Color(0.0f, 0.35f, 0.35f)
-	};
-
 	private static final Color wKeyColor = new Color(0.9f, 0.9f, 0.9f); // 白鍵盤用
 	private static final Color bKeyColor = new Color(0.8f, 0.8f, 0.8f); // 黒鍵盤用
 	private static final Color borderColor = new Color(0.6f, 0.6f, 0.6f); // 境界線用
@@ -337,7 +327,7 @@ public class PianoRollView extends AbstractMMLView {
 		int height = AbstractMMLView.HEIGHT-2;
 
 		g.setColor(fillColor);
-		g.fillRect(x, y, width, height);
+		g.fillRect(x+1, y+1, width, height-1);
 		g.setColor(rectColor);
 		g.drawRect(x, y, width, height);
 
@@ -377,25 +367,15 @@ public class PianoRollView extends AbstractMMLView {
 	 * @param index トラックindex
 	 */
 	private void paintMusicScore(Graphics2D g, int index, MMLTrack track) {
-		Color baseColor = trackBaseColor[index%trackBaseColor.length];
-		Color rectColor = new Color(
-				baseColor.getRed(),
-				baseColor.getGreen(),
-				baseColor.getBlue(),
-				100
-				);
-		Color fillColor = new Color(
-				baseColor.getRed(),
-				baseColor.getGreen(),
-				baseColor.getBlue(),
-				50
-				);
 
 		MMLEventList activePart = mmlManager.getActiveMMLPart();
 
-		int count = track.getMMLEventListSize();
-		for (int i = 0; i < count; i++) {
-			MMLEventList targetPart = track.getMMLEventList(i);
+		int part = 0;
+		for (MMLEventList targetPart : track.getMMLEventList()) {
+			ColorPalette partColor = ColorPalette.getColorType(part++);
+			Color rectColor = partColor.getRectColor(index);
+			Color fillColor = partColor.getFillColor(index);
+
 			if ( targetPart != activePart ) {
 				// アクティブトラック中のアクティブパートはここでは描画しない.
 				paintMMLPart(g, targetPart.getMMLNoteEventList(), rectColor, fillColor);
@@ -407,19 +387,8 @@ public class PianoRollView extends AbstractMMLView {
 
 	private void paintActivePart(Graphics2D g) {
 		int index = activeTrackIndex;
-		Color baseColor = trackBaseColor[index%trackBaseColor.length];
-		Color rectColor = new Color(
-				baseColor.getRed(),
-				baseColor.getGreen(),
-				baseColor.getBlue(),
-				255
-				);
-		Color fillColor = new Color(
-				baseColor.getRed(),
-				baseColor.getGreen(),
-				baseColor.getBlue(),
-				200
-				);
+		Color rectColor = ColorPalette.ACTIVE.getRectColor(index);
+		Color fillColor = ColorPalette.ACTIVE.getFillColor(index);
 
 		MMLEventList activePart = mmlManager.getActiveMMLPart();
 		drawOption = true;
