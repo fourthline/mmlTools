@@ -75,7 +75,7 @@ public class MMLLengthKeyword {
 	public static List<MMLLengthKeyword> parseMMLLengthList(String mml) {
 		MMLTokenizer tokenizer = new MMLTokenizer(mml);
 		int noteCount = 0;
-		ArrayList<MMLLengthKeyword> list = new ArrayList<MMLLengthKeyword>();
+		ArrayList<MMLLengthKeyword> list = new ArrayList<>();
 
 		while (tokenizer.hasNext()) {
 			String token = tokenizer.next();

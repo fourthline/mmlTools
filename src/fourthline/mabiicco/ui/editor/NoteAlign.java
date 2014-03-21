@@ -11,8 +11,8 @@ import fourthline.mmlTools.core.MMLTicks;
 
 public class NoteAlign {
 	
-	private String viewText;
-	private int alignTick;
+	private final String viewText;
+	private final int alignTick;
 	
 	public NoteAlign(String viewText, String tickName) throws UndefinedTickException {
 		this.viewText = viewText;

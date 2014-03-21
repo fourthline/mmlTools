@@ -16,7 +16,7 @@ public class MMLTrack extends MMLTools implements Serializable {
 	private static final long serialVersionUID = 2006880378975808647L;
 
 	private List<MMLEventList> mmlParts;
-	private List<MMLTempoEvent> globalTempoList = new ArrayList<MMLTempoEvent>();
+	private List<MMLTempoEvent> globalTempoList = new ArrayList<>();
 
 	private int program = 0;
 	private String trackName;
@@ -40,7 +40,7 @@ public class MMLTrack extends MMLTools implements Serializable {
 	}
 
 	private void mmlParse() {
-		mmlParts = new ArrayList<MMLEventList>(PART_COUNT);
+		mmlParts = new ArrayList<>(PART_COUNT);
 		String mml[] = {
 				getMelody(),
 				getChord1(),
@@ -48,8 +48,8 @@ public class MMLTrack extends MMLTools implements Serializable {
 				getSongEx()
 		};
 
-		for (int i = 0; i < mml.length; i++) {
-			mmlParts.add( new MMLEventList(mml[i], globalTempoList) );
+		for (String s : mml) {
+			mmlParts.add( new MMLEventList(s, globalTempoList) );
 		}
 	}
 
@@ -116,8 +116,8 @@ public class MMLTrack extends MMLTools implements Serializable {
 
 	public long getMaxTickLength() {
 		long max = 0;
-		for (int i = 0; i < mmlParts.size(); i++) {
-			long tick = mmlParts.get(i).getTickLength();
+		for (MMLEventList eventList : mmlParts) {
+			long tick = eventList.getTickLength();
 			if (max < tick) {
 				max = tick;
 			}
@@ -207,7 +207,7 @@ public class MMLTrack extends MMLTools implements Serializable {
 		int melodyTick = (int)mmlParts.get(0).getTickLength();
 		partTime[0] = MMLTempoEvent.getTimeOnTickOffset(globalTempoList, melodyTick);
 
-		ArrayList<MMLTempoEvent> globalTailTempo = new ArrayList<MMLTempoEvent>();
+		ArrayList<MMLTempoEvent> globalTailTempo = new ArrayList<>();
 		MMLTempoEvent lastTempoEvent = new MMLTempoEvent(120, 0);
 		if (globalTempoList.size() > 0) {
 			lastTempoEvent.setTempo(globalTempoList.get(globalTempoList.size()-1).getTempo());

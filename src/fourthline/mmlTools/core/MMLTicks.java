@@ -19,12 +19,12 @@ public class MMLTicks {
 	/**
 	 * For MML text -> tick
 	 */
-	private static HashMap<String, Integer> tickTable = new HashMap<String, Integer>();
+	private static final HashMap<String, Integer> tickTable = new HashMap<>();
 
 	/**
 	 * For tick -> MML text
 	 */
-	private static HashMap<Integer, String> tickInvTable = new HashMap<Integer, String>();
+	private static final HashMap<Integer, String> tickInvTable = new HashMap<>();
 
 
 	static {

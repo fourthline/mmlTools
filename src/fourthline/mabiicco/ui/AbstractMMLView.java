@@ -11,7 +11,7 @@ import javax.swing.JPanel;
 public abstract class AbstractMMLView extends JPanel {
 	private static final long serialVersionUID = -701943909797286599L;
 	public static final int OCTNUM = 9;
-	public static final int HEIGHT = 6;
+	public static final int HEIGHT_C = 6;
 
 	/**
 	 * Panel上のy座標をnote番号に変換します.
@@ -21,7 +21,7 @@ public abstract class AbstractMMLView extends JPanel {
 	public final int convertY2Note(int y) {
 		int note = -1;
 		if (y >= 0) {
-			note = (9*12-(y/HEIGHT)) -1;
+			note = (9*12-(y/HEIGHT_C)) -1;
 		}
 
 		return note;
@@ -29,12 +29,12 @@ public abstract class AbstractMMLView extends JPanel {
 
 	/**
 	 * note番号をPanel上のy座標に変換します.
-	 * @param y
+	 * @param note
 	 * @return
 	 */
 	public final int convertNote2Y(int note) {
 		int y = 9*12 - note - 1;
-		y *= HEIGHT;
+		y *= HEIGHT_C;
 
 		return y;
 	}

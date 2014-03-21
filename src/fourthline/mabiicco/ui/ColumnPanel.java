@@ -41,13 +41,13 @@ public class ColumnPanel extends AbstractMMLView implements MouseListener, Actio
 	private static final Color BEAT_BORDER_COLOR = new Color(0.4f, 0.4f, 0.4f);
 	private static final Color MAKER_FILL_COLOR = new Color(0.4f, 0.8f, 0.8f);
 
-	private PianoRollView pianoRollView;
-	private IMMLManager mmlManager;
+	private final PianoRollView pianoRollView;
+	private final IMMLManager mmlManager;
 
-	private JPopupMenu popupMenu = new JPopupMenu();
-	private JMenuItem insertTempoMenu;
-	private JMenuItem editTempoMenu;
-	private JMenuItem deleteTempoMenu;
+	private final JPopupMenu popupMenu = new JPopupMenu();
+	private final JMenuItem insertTempoMenu;
+	private final JMenuItem editTempoMenu;
+	private final JMenuItem deleteTempoMenu;
 
 	private final String INSERT_TEMPO = "insert_tempo";
 	private final String EDIT_TEMPO   = "edit_tempo";
@@ -124,7 +124,6 @@ public class ColumnPanel extends AbstractMMLView implements MouseListener, Actio
 
 		} catch (UndefinedTickException e) {
 			e.printStackTrace();
-			return;
 		}
 	}
 
@@ -228,7 +227,6 @@ public class ColumnPanel extends AbstractMMLView implements MouseListener, Actio
 			int tickX2 = (int)pianoRollView.convertXtoTick(x+6);
 			if ( (tick > tickX1) && 
 					(tick < tickX2) ) {
-				tick = tickOffset;
 				return tempoEvent;
 			}
 		}

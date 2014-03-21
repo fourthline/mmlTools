@@ -26,8 +26,8 @@ import fourthline.mmlTools.parser.MMSFile;
  *
  */
 public class MMLScore implements IMMLFileParser {
-	private List<MMLTrack> trackList = new ArrayList<MMLTrack>();
-	private List<MMLTempoEvent> globalTempoList = new ArrayList<MMLTempoEvent>();
+	private final List<MMLTrack> trackList = new ArrayList<>();
+	private final List<MMLTempoEvent> globalTempoList = new ArrayList<>();
 
 	private static final int MAX_TRACK = 8;
 
@@ -76,9 +76,8 @@ public class MMLScore implements IMMLFileParser {
 	 * 保持しているトラックリストを返します.
 	 * @return MMLTrackの配列
 	 */
-	public MMLTrack[] getTrackList() {
-		MMLTrack list[] = new MMLTrack[trackList.size()];
-		return trackList.toArray(list);
+	public List<MMLTrack> getTrackList() {
+		return trackList;
 	}
 
 	/**

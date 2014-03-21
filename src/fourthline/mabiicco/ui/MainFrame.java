@@ -30,7 +30,6 @@ import java.awt.event.ComponentListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -54,19 +53,19 @@ import javax.swing.JComboBox;
 public class MainFrame extends JFrame implements ComponentListener, INotifyTrackEnd, ActionListener {
 	private static final long serialVersionUID = -7484797594534384422L;
 
-	private JPanel contentPane;
-	private JTextField statusField;
-	private MMLSeqView mmlSeqView;
+	private final JPanel contentPane;
+	private final JTextField statusField;
+	private final MMLSeqView mmlSeqView;
 	@SuppressWarnings("rawtypes")
-	private JComboBox noteTypeSelect;
-	private JLabel timeView;
+	private final JComboBox noteTypeSelect;
+	private final JLabel timeView;
 
-	private ActionListener listener;
+	private final ActionListener listener;
 
 	private final String DEFAULT_TITLE = " * MabiIcco *";
 
 	/** シーケンス再生中に無効化する機能のリスト */
-	ArrayList<JComponent> noplayFunctions = new ArrayList<JComponent>();
+	private final ArrayList<JComponent> noplayFunctions = new ArrayList<>();
 
 	/** 状態が変化するメニューたち */
 	private JMenuItem reloadMenuItem;
@@ -425,8 +424,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 	 * 再生中に各機能を無効化する。
 	 */
 	public void disableNoplayItems() {
-		for (Iterator<JComponent> i = noplayFunctions.iterator(); i.hasNext(); ) {
-			JComponent component = i.next();
+		for (JComponent component : noplayFunctions) {
 			component.setEnabled(false);
 		}
 	}
@@ -435,8 +433,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 	 * 再生中に無効化されている機能を有効にする。
 	 */
 	public void enableNoplayItems() {
-		for (Iterator<JComponent> i = noplayFunctions.iterator(); i.hasNext(); ) {
-			JComponent component = i.next();
+		for (JComponent component : noplayFunctions) {
 			component.setEnabled(true);
 		}
 		EventQueue.invokeLater(new Runnable() {

@@ -17,7 +17,7 @@ public class MMLScoreTest {
 	private void checkMMLFileOutput(MMLScore score, String expectFileName, String expectMML[]) {
 		try {
 			/* MMLScore.writeToOutputStream() */
-			File file = new File("resources/"+expectFileName);
+			File file = new File(expectFileName);
 			System.out.println("Read: "+file.getAbsolutePath());
 			FileInputStream inputStream = new FileInputStream(file);
 			int size = inputStream.available();

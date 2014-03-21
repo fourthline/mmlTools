@@ -107,7 +107,7 @@ public class MMLNotePropertyPanel extends JPanel implements ActionListener {
 
 		if (velocityCheckBox.isSelected()) {
 			Integer value = (Integer) velocityValueField.getValue();
-			noteEvent.setVelocity(value.intValue());
+			noteEvent.setVelocity(value);
 		} else {
 			noteEvent.setVelocity(MMLNoteEvent.NO_VEL);
 		}

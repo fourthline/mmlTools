@@ -22,22 +22,19 @@ public class Loader {
 
 	/**
 	 * Launch the application.
+	 * @param args
 	 */
 	public static void main(String[] args) {
 		MabiIccoProperties appProperties = MabiIccoProperties.getInstance();
 
 		try {
 			UIManager.LookAndFeelInfo infos[] = UIManager.getInstalledLookAndFeels();
-
-			System.out.println("getClassName:");
-
-			for(int i = 0 ; i < infos.length ; i++){
-				System.out.println(infos[i].getClassName());
+			for (UIManager.LookAndFeelInfo info : infos) {
+				System.out.println(info.getClassName());
 			}
 
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 		} catch (Exception e) {}
-
 
 		final Startup window = new Startup();
 		window.setVisible(true);
@@ -77,6 +74,7 @@ public class Loader {
 		}
 
 		EventQueue.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				ActionDispatcher dispatcher = new ActionDispatcher();
 				MainFrame mainFrame = new MainFrame(dispatcher);

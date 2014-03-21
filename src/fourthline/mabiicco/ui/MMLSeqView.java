@@ -41,18 +41,18 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 
 	private int trackCounter;
 
-	private JScrollPane scrollPane;
-	private PianoRollView pianoRollView;
-	private KeyboardView keyboardView;
-	private JTabbedPane tabbedPane;
-	private ColumnPanel columnView;
+	private final JScrollPane scrollPane;
+	private final PianoRollView pianoRollView;
+	private final KeyboardView keyboardView;
+	private final JTabbedPane tabbedPane;
+	private final ColumnPanel columnView;
 
 	private MMLScore mmlScore = new MMLScore();
-	private MMLScoreUndoEdit undoEdit = new MMLScoreUndoEdit(this);
+	private final MMLScoreUndoEdit undoEdit = new MMLScoreUndoEdit(this);
 
-	private MMLInputPanel dialog = new MMLInputPanel(this);
+	private final MMLInputPanel dialog = new MMLInputPanel(this);
 
-	private MMLEditor editor;
+	private final MMLEditor editor;
 
 	private JLabel timeView;
 	private Thread timeViewUpdateThread;
@@ -73,7 +73,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		scrollPane = new JScrollPane(pianoRollView);
 		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-		scrollPane.getVerticalScrollBar().setUnitIncrement(AbstractMMLView.HEIGHT);
+		scrollPane.getVerticalScrollBar().setUnitIncrement(AbstractMMLView.HEIGHT_C);
 
 		scrollPane.setRowHeaderView(keyboardView);
 		columnView = new ColumnPanel(pianoRollView, this);
@@ -112,8 +112,6 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 			}
 		});
 	}
-
-
 
 	public void initializeMMLTrack() {
 		removeAllMMLTrack();
@@ -235,15 +233,15 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		pianoRollView.repaint();
 		tabbedPane.removeAll();
 
-		int trackCount = score.getTrackCount();
-		for (int i = 0; i < trackCount; i++) {
-			MMLTrack track = score.getTrack(i);
+		int trackCount = 0;
+		for (MMLTrack track : score.getTrackList()) {
 			String name = track.getTrackName();
 			if (name == null) {
-				name = "Track"+(i+1);
+				name = "Track"+(trackCount+1);
 			}
 
 			tabbedPane.add(name, new MMLTrackView(track, this, this));
+			trackCount++;
 		}
 
 		initialSetView();

@@ -19,7 +19,7 @@ import fourthline.mmlTools.parser.MMLEventParser;
 public class MMLEventList implements Serializable {
 	private static final long serialVersionUID = -1430758411579285535L;
 
-	private List<MMLNoteEvent>   noteList   = new ArrayList<MMLNoteEvent>();
+	private List<MMLNoteEvent>   noteList   = new ArrayList<>();
 	private List<MMLTempoEvent>  tempoList;
 
 	/**
@@ -94,8 +94,7 @@ public class MMLEventList implements Serializable {
 	 * @return 見つからなかった場合は、nullを返します.
 	 */
 	public MMLNoteEvent searchOnTickOffset(long tickOffset) {
-		for (int i = 0; i < noteList.size(); i++) {
-			MMLNoteEvent noteEvent = noteList.get(i);
+		for (MMLNoteEvent noteEvent : noteList) {
 			if (noteEvent.getTickOffset() <= tickOffset) {
 				if (tickOffset <= noteEvent.getEndTick()) {
 					return noteEvent;
@@ -280,7 +279,6 @@ public class MMLEventList implements Serializable {
 				sb.append( new MMLTicks("c", tick, false).toString() );
 			}
 			sb.append(tempoEvent.toMMLString());
-			noteEvent = new MMLNoteEvent(noteEvent.getNote(), noteEvent.getTick() + tick, noteEvent.getTickOffset());
 		}
 
 		return sb.toString();

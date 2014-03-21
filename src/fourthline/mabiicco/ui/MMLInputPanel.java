@@ -80,9 +80,9 @@ public class MMLInputPanel extends JPanel {
 			insts = MabiDLS.getInstance().getInsts();
 		} catch (NullPointerException e) {}
 		if (insts == null) {
-			comboBox = new JComboBox<InstClass>();
+			comboBox = new JComboBox<>();
 		} else {
-			comboBox = new JComboBox<InstClass>(insts);
+			comboBox = new JComboBox<>(insts);
 		}
 		comboBox.setBounds(25, 33, 193, 19);
 		comboBox.setMaximumRowCount(30);
@@ -154,10 +154,10 @@ public class MMLInputPanel extends JPanel {
 			return (String) clip.getData(DataFlavor.stringFlavor);
 		} catch (UnsupportedFlavorException e) {
 			e.printStackTrace();
-			return null;
 		} catch (IOException e) {
 			e.printStackTrace();
-			return null;
 		}
+
+		return "";
 	}
 }

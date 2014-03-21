@@ -16,15 +16,15 @@ import fourthline.mabiicco.midi.MabiDLS;
 
 public class MabiIccoProperties {
 
-	private Properties properties = new Properties();
+	private final Properties properties = new Properties();
 	private final String configFile = "config.properties";
-	
-	private static MabiIccoProperties instance = new MabiIccoProperties();
-	
+
+	private static final MabiIccoProperties instance = new MabiIccoProperties();
+
 	public static MabiIccoProperties getInstance() {
 		return instance;
 	}
-	
+
 	private MabiIccoProperties() {
 		try {
 			properties.load(new FileInputStream(configFile));
@@ -33,7 +33,7 @@ public class MabiIccoProperties {
 		} catch (IOException e) {
 		}
 	}
-	
+
 	private void save() {
 		try {
 			properties.store(new FileOutputStream(configFile), "");
@@ -43,53 +43,53 @@ public class MabiIccoProperties {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public String getRecentFile() {
 		String str = properties.getProperty("app.recent_file", "");
 		return str;
 	}
-	
+
 	public void setRecentFile(String path) {
 		properties.setProperty("app.recent_file", path);
 		save();
 	}
-	
+
 	public String getDlsFile() {
 		String str = properties.getProperty("app.dls_file", MabiDLS.DEFALUT_DLS_PATH);
 		return str;
 	}
-	
+
 	public void setDlsFile(String path) {
 		properties.setProperty("app.dls_file", path);
 		save();
 	}
-	
+
 	public boolean getWindowMaximize() {
 		String str = properties.getProperty("window.maximize", "false");
 		return Boolean.parseBoolean(str);
 	}
-	
+
 	public void setWindowMaximize(boolean b) {
 		properties.setProperty("window.maximize", Boolean.toString(b));
 		save();
 	}
-	
+
 	public Rectangle getWindowRect() {
 		String x = properties.getProperty("window.x", "-1");
 		String y = properties.getProperty("window.y", "-1");
 		String width = properties.getProperty("window.width", "-1");
 		String height = properties.getProperty("window.height", "-1");
-		
+
 		Rectangle rect = new Rectangle(
 				Integer.parseInt(x), 
 				Integer.parseInt(y),
 				Integer.parseInt(width),
 				Integer.parseInt(height)
 				);
-		
+
 		return rect;
 	}
-	
+
 	public void setWindowRect(Rectangle rect) {
 		properties.setProperty("window.x", Integer.toString((int)rect.getX()));
 		properties.setProperty("window.y", Integer.toString((int)rect.getY()));

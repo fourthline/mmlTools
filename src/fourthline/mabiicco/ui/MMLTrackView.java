@@ -181,7 +181,6 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 	/**
 	 * 指定されたIndexのMMLパートを選択します.
 	 * @param index
-	 * @return
 	 */
 	public void setSelectMMLPartOfIndex(int index) {
 		for (JToggleButton button : partButton) {

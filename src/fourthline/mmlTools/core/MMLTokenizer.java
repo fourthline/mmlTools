@@ -12,9 +12,9 @@ import java.util.Iterator;
  * @author たんらる
  */
 public class MMLTokenizer implements Iterator<String> {
-	static private String noteString = "abcdefgABCDEFGnNrR";
-	static private String tokenString = noteString + "tToOlLvV<>&";
-	private String mml_src;
+	static private final String noteString = "abcdefgABCDEFGnNrR";
+	static private final String tokenString = noteString + "tToOlLvV<>&";
+	private final String mml_src;
 	private int index = 0;
 
 	public MMLTokenizer(String src) {
@@ -67,10 +67,9 @@ public class MMLTokenizer implements Iterator<String> {
 
 	static public String noteName(String token) {
 		String noteName = ""+token.charAt(0);
-		char note2 = ' ';
 
 		if (token.length() > 1) {
-			note2 = token.charAt(1);
+			char note2 = token.charAt(1);
 
 			if ( (note2 == '+') || (note2 == '-') || (note2 == '#') )
 				noteName += note2;

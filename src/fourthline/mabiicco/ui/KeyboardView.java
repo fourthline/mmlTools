@@ -97,7 +97,7 @@ public class KeyboardView extends AbstractMMLView {
 		if ( isWhiteKey(playNote) ) {
 			x += 20;
 		}
-		int y = getHeight() - ((playNote -11) * AbstractMMLView.HEIGHT) + yAdd[playNote%12];
+		int y = getHeight() - ((playNote -11) * AbstractMMLView.HEIGHT_C) + yAdd[playNote%12];
 		g.setColor(Color.RED);
 		g.fillOval(x, y, 4, 4);
 	}
@@ -107,7 +107,7 @@ public class KeyboardView extends AbstractMMLView {
 		// ド～シのしろ鍵盤
 		g.setColor(new Color(0.3f, 0.3f, 0.3f));
 
-		int startY = 12 * AbstractMMLView.HEIGHT * pos;
+		int startY = 12 * AbstractMMLView.HEIGHT_C * pos;
 		int y = startY;
 		for (int i = 0; i < white_wigth.length; i++) {
 			g.drawRect(0, y, 40, white_wigth[i]);
@@ -127,10 +127,10 @@ public class KeyboardView extends AbstractMMLView {
 			y = (black_posIndex[i]*10+5)+startY+posOffset[i];
 
 			g.setColor(new Color(0.0f, 0.0f, 0.0f));
-			g.fillRect(0, y, 20, AbstractMMLView.HEIGHT);
+			g.fillRect(0, y, 20, AbstractMMLView.HEIGHT_C);
 
 			g.setColor(new Color(0.3f, 0.3f, 0.3f));
-			g.drawRect(0, y, 20, AbstractMMLView.HEIGHT);
+			g.drawRect(0, y, 20, AbstractMMLView.HEIGHT_C);
 		}
 
 		// グリッド
@@ -141,7 +141,7 @@ public class KeyboardView extends AbstractMMLView {
 		// オクターブ
 		char o_char[] = { 'o', posText };
 		g.setFont(new Font("Arial", Font.PLAIN, 12));
-		y = startY + (12 * AbstractMMLView.HEIGHT);
+		y = startY + (12 * AbstractMMLView.HEIGHT_C);
 		g.drawChars(o_char, 0, o_char.length, 42, y);
 	}
 

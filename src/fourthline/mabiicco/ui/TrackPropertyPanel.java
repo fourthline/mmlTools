@@ -20,7 +20,7 @@ public class TrackPropertyPanel extends JPanel {
 	private static final long serialVersionUID = 7599129671956571455L;
 	private JTextField trackNameField;
 	private JSlider panpotSlider;
-	private IMMLManager mmlManager;
+	private final IMMLManager mmlManager;
 
 	MMLTrack track;
 

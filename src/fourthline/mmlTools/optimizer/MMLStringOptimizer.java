@@ -114,15 +114,15 @@ public class MMLStringOptimizer {
 	}
 
 	private String primaryLength;
-	private HashMap<String, Integer> counter = new HashMap<String, Integer>();
-	private HashMap<String, Integer> countStartIndex = new HashMap<String, Integer>();
-	private ArrayList<MMLLengthKeyword> stack = new ArrayList<MMLLengthKeyword>();
+	private HashMap<String, Integer> counter = new HashMap<>();
+	private HashMap<String, Integer> countStartIndex = new HashMap<>();
+	private ArrayList<MMLLengthKeyword> stack = new ArrayList<>();
 
 
 	private String[] parseLengthArray() {
 		MMLTokenizer tokenizer = new MMLTokenizer(originalMML);
 		String section = "4";
-		ArrayList<String> list = new ArrayList<String>();
+		ArrayList<String> list = new ArrayList<>();
 
 		while (tokenizer.hasNext()) {
 			String token = tokenizer.next();
@@ -347,4 +347,3 @@ public class MMLStringOptimizer {
 		System.out.println(optimizedMML);
 	}
 }
-

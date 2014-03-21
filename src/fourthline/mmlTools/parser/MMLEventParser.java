@@ -17,7 +17,7 @@ import fourthline.mmlTools.core.ParserWarn3ML;
 
 public class MMLEventParser extends MelodyParser implements Iterator<MMLEvent> {
 
-	private MMLTokenizer tokenizer;
+	private final MMLTokenizer tokenizer;
 
 	public MMLEventParser(String mml) {
 		super(mml);

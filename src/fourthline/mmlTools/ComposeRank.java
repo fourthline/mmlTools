@@ -62,9 +62,9 @@ public class ComposeRank {
 				RANK_1
 		};
 
-		for (int i = 0; i < rankList.length; i++) {
-			if (rankList[i].compare(melody, chord1, chord2, songEx))
-				return rankList[i].getRank();
+		for (ComposeRank rank : rankList) {
+			if (rank.compare(melody, chord1, chord2, songEx))
+				return rank.getRank();
 		}
 
 		return RANK_0.getRank();

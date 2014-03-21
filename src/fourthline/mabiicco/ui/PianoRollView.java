@@ -122,10 +122,9 @@ public class PianoRollView extends AbstractMMLView {
 	private void updateViewWidthTrackLength() {
 		long tickLength = 0;
 		MMLScore mmlScore = mmlManager.getMMLScore();
-		int trackCount = mmlScore.getTrackCount();
 
-		for (int i = 0; i < trackCount; i++) {
-			long length = mmlScore.getTrack(i).getMaxTickLength();
+		for (MMLTrack track : mmlScore.getTrackList()) {
+			long length = track.getMaxTickLength();
 			if (tickLength < length) {
 				tickLength = length;
 			}
@@ -232,9 +231,9 @@ public class PianoRollView extends AbstractMMLView {
 		paintPitchRangeBorder(g2);
 
 		if (mmlScore != null) {
-			int trackCount = mmlScore.getTrackCount();
-			for (int i = 0; i < trackCount; i++) {
-				paintMusicScore(g2, i, mmlScore.getTrack(i));
+			int i = 0;
+			for (MMLTrack track : mmlScore.getTrackList()) {
+				paintMusicScore(g2, i++, track);
 			}
 		}
 
@@ -249,7 +248,7 @@ public class PianoRollView extends AbstractMMLView {
 
 
 	private void paintOctPianoLine(Graphics2D g, int pos, char posText) {
-		int startY = 12 * AbstractMMLView.HEIGHT * pos;
+		int startY = 12 * AbstractMMLView.HEIGHT_C * pos;
 		int octave = AbstractMMLView.OCTNUM - pos - 1;
 
 		// グリッド
@@ -263,13 +262,13 @@ public class PianoRollView extends AbstractMMLView {
 				fillColor = noSoundColor;
 			}
 			g.setColor(fillColor);
-			g.fillRect(0, i*HEIGHT+y, width, AbstractMMLView.HEIGHT);
+			g.fillRect(0, i*HEIGHT_C+y, width, AbstractMMLView.HEIGHT_C);
 			if (i == 0) {
 				g.setColor(darkBarBorder);
 			} else {
 				g.setColor(borderColor);
 			}
-			g.drawLine(0, i*HEIGHT+y, width, i*HEIGHT+y);
+			g.drawLine(0, i*HEIGHT_C+y, width, i*HEIGHT_C+y);
 		}
 	}
 
@@ -322,9 +321,9 @@ public class PianoRollView extends AbstractMMLView {
 		int tick = noteEvent.getTick();
 		int offset = noteEvent.getTickOffset();
 		int x = convertTicktoX(offset);
-		int y = getHeight() - ((note +1) * AbstractMMLView.HEIGHT);
+		int y = getHeight() - ((note +1) * AbstractMMLView.HEIGHT_C);
 		int width = convertTicktoX(tick) -1;
-		int height = AbstractMMLView.HEIGHT-2;
+		int height = AbstractMMLView.HEIGHT_C-2;
 
 		g.setColor(fillColor);
 		g.fillRect(x+1, y+1, width, height-1);
@@ -367,7 +366,6 @@ public class PianoRollView extends AbstractMMLView {
 	 * @param index トラックindex
 	 */
 	private void paintMusicScore(Graphics2D g, int index, MMLTrack track) {
-
 		MMLEventList activePart = mmlManager.getActiveMMLPart();
 
 		int part = 0;

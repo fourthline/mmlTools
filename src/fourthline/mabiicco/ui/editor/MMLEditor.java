@@ -30,9 +30,9 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext {
 	private EditMode editMode = EditMode.SELECT;
 
 	// 編集選択中のノート
-	ArrayList<MMLNoteEvent> selectedNote = new ArrayList<MMLNoteEvent>();
+	private final ArrayList<MMLNoteEvent> selectedNote = new ArrayList<>();
 	// 複数ノート移動時のdetachリスト
-	ArrayList<MMLNoteEvent> detachedNote = new ArrayList<MMLNoteEvent>();
+	private final ArrayList<MMLNoteEvent> detachedNote = new ArrayList<>();
 
 	// 編集対象のイベントリスト
 	private MMLEventList editEventList;
@@ -42,9 +42,9 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext {
 
 	private IEditStateObserver editObserver;
 
-	private PianoRollView pianoRollView;
-	private KeyboardView keyboardView;
-	private IMMLManager mmlManager;
+	private final PianoRollView pianoRollView;
+	private final KeyboardView keyboardView;
+	private final IMMLManager mmlManager;
 
 	public static int DEFAULT_ALIGN_INDEX = 2;
 

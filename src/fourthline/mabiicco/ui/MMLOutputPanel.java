@@ -12,6 +12,7 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.InputMap;
@@ -37,20 +38,20 @@ import fourthline.mmlTools.core.MMLTools;
 public class MMLOutputPanel extends JPanel {
 	private static final long serialVersionUID = 8558159209741558854L;
 	private JTable table;
-	private JDialog dialog = new JDialog((Frame)null, "クリップボードへ出力", true);
-	private JButton copyButton = new JButton("MMLコピー");
+	private final JDialog dialog = new JDialog((Frame)null, "クリップボードへ出力", true);
+	private final JButton copyButton = new JButton("MMLコピー");
 
-	private MMLTrack trackList[];
+	private List<MMLTrack> trackList;
 
 	public MMLOutputPanel() {
 		initializePanel(null);
 	}
 
-	public MMLOutputPanel(MMLTrack trackList[]) {
+	public MMLOutputPanel(List<MMLTrack> trackList) {
 		initializePanel(trackList);
 	}
 
-	private void initializePanel(MMLTrack trackList[]) {
+	private void initializePanel(List<MMLTrack> trackList) {
 		this.trackList = trackList;
 		setLayout(null);
 
@@ -98,7 +99,7 @@ public class MMLOutputPanel extends JPanel {
 			}});
 	}
 
-	private JTable createJTableFromMMLTrack(MMLTrack trackList[]) {
+	private JTable createJTableFromMMLTrack(List<MMLTrack> trackList) {
 		String columnNames[] = {
 				"トラック名", "楽器", "作曲ランク"
 		};
@@ -128,12 +129,12 @@ public class MMLOutputPanel extends JPanel {
 
 	private void currentSelectedPartMMLOutput() {
 		int row = table.getSelectedRow();
-		String mmlText = trackList[row].getMMLString();
+		String mmlText = trackList.get(row).getMMLString();
 		copyToClipboard(mmlText);
 		JOptionPane.showMessageDialog(this, "クリップボードにコピーしました.");
 
 		row++;
-		if (row >= trackList.length) {
+		if (row >= trackList.size()) {
 			row = 0;
 		}
 		table.setRowSelectionInterval(row, row);

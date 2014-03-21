@@ -26,11 +26,11 @@ public class MelodyParser {
 	private int mml_oct = 4;
 
 	private int tempo;
-	private Map<Integer, Integer> tempoList = new TreeMap<Integer, Integer>(); // <tick, tempo>
+	private final Map<Integer, Integer> tempoList = new TreeMap<>(); // <tick, tempo>
 
 	// for check tempo backward
 	private char playingNote = ' ';
-	private List<Integer> warnIndex = new ArrayList<Integer>();
+	private final List<Integer> warnIndex = new ArrayList<>();
 
 	private int minNote = -1;
 	private int maxNote = -1;

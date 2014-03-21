@@ -113,13 +113,12 @@ public final class MabiDLS {
 	private Soundbank loadDLS(File dlsFile) throws InvalidMidiDataException, IOException {
 		Soundbank sb = MidiSystem.getSoundbank(dlsFile);
 
-		Instrument inst[] = sb.getInstruments();
-		ArrayList<InstClass> instArray = new ArrayList<InstClass>();
-		for (int i = 0; i < inst.length; i++) {
-			String name = instName(inst[i]);
-			String originalName = inst[i].getName();
-			int bank = inst[i].getPatch().getBank();
-			int program = inst[i].getPatch().getProgram();
+		ArrayList<InstClass> instArray = new ArrayList<>();
+		for (Instrument inst : sb.getInstruments()) {
+			String name = instName(inst);
+			String originalName = inst.getName();
+			int bank = inst.getPatch().getBank();
+			int program = inst.getPatch().getProgram();
 			if (name == null) {
 				name = "*" + originalName;
 			}
@@ -233,14 +232,14 @@ public final class MabiDLS {
 	 * すべてのチャンネルのパンポット設定を中央に戻します. 
 	 */
 	public void clearAllChannelPanpot() {
-		for (int i = 0; i < channel.length; i++) {
-			channel[i].controlChange(10, 64);
+		for (MidiChannel ch : channel) {
+			ch.controlChange(10, 64);
 		}
 	}
 
 	/**
 	 * 指定したチャンネルのパンポットを設定します.
-	 * @param channel
+	 * @param ch_num
 	 * @param panpot
 	 */
 	public void setChannelPanpot(int ch_num, int panpot) {
@@ -251,14 +250,8 @@ public final class MabiDLS {
 		try {
 			MabiDLS midi = new MabiDLS();
 			midi.initializeMIDI();
-			MidiChannel channel[] = midi.getSynthesizer().getChannels();
-
-			for (int i = 0; i < MidiSystem.getMidiDeviceInfo().length; i++) {
-				System.out.println(MidiSystem.getMidiDeviceInfo()[i]);
-			}
-
-			for (int i = 0; i > 128; i++) {
-				System.out.printf("%d\n", channel[10].getController(i));
+			for (MidiDevice.Info info : MidiSystem.getMidiDeviceInfo()) {
+				System.out.println(info);
 			}
 
 			System.exit(0);
@@ -267,8 +260,6 @@ public final class MabiDLS {
 		}
 	}
 
-
-
 	/**
 	 * MIDIシーケンスを作成します。
 	 * @throws InvalidMidiDataException 
@@ -276,13 +267,13 @@ public final class MabiDLS {
 	public Sequence createSequence(MMLScore score) throws InvalidMidiDataException {
 		Sequence sequence = new Sequence(Sequence.PPQ, 96);
 
-		int trackCount = score.getTrackCount();
-		for (int i = 0; i < trackCount; i++) {
-			MMLTrack mmlTrack = score.getTrack(i);
-			convertMidiTrack(sequence.createTrack(), mmlTrack, i);
+		int trackCount = 0;
+		for (MMLTrack mmlTrack : score.getTrackList()) {
+			convertMidiTrack(sequence.createTrack(), mmlTrack, trackCount);
 			// FIXME: パンポットの設定はここじゃない気がする～。
 			int panpot = mmlTrack.getPanpot();
-			this.setChannelPanpot(i, panpot);
+			this.setChannelPanpot(trackCount, panpot);
+			trackCount++;
 		}
 
 		// グローバルテンポ
@@ -384,8 +375,4 @@ public final class MabiDLS {
 	private int convertNoteMML2Midi(int mml_note) {
 		return (mml_note + 12);
 	}
-
 }
-
-
-
