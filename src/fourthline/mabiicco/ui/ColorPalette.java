@@ -30,11 +30,11 @@ public enum ColorPalette {
 			new Color(200, 0, 0),
 			new Color(0, 200, 0),
 			new Color(0, 0, 200),
-			new Color(240, 0, 100),
-			new Color(30, 240, 60),
-			new Color(30, 160, 240),
-			new Color(160, 30, 240),
-			new Color(240, 160, 30),
+			Color.ORANGE.darker(),
+			Color.CYAN.darker(),
+			Color.MAGENTA.darker(),
+			Color.YELLOW.darker(),
+			Color.decode("#FF5564"),
 	};
 
 	private final Color rectColorTable[];
@@ -56,19 +56,23 @@ public enum ColorPalette {
 			Color baseColor = trackBaseColor[i];
 			rectColorTable[i] = filter(new Color(
 					baseColor.getRed(),
-					baseColor.getBlue(),
 					baseColor.getGreen(),
+					baseColor.getBlue(),
 					rectAlpha));
 			fillColorTable[i] = filter(new Color(
 					baseColor.getRed(),
-					baseColor.getBlue(),
 					baseColor.getGreen(),
+					baseColor.getBlue(),
 					fillAlpha));
 		}
 	}
 
+	public int size() {
+		return rectColorTable.length;
+	}
+
 	public Color getRectColor(int index) {
-		return rectColorTable[index%fillColorTable.length];
+		return rectColorTable[index%rectColorTable.length];
 	}
 
 	public Color getFillColor(int index) {

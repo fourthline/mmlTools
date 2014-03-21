@@ -12,6 +12,7 @@ import fourthline.mmlTools.MMLScore;
  */
 public interface IMMLManager {
 	public MMLScore getMMLScore();
+	public int getActiveTrackIndex();
 	public MMLEventList getActiveMMLPart();
 	public void updateActivePart();
 	public void updateActiveTrackProgram(int program, int songProgram);

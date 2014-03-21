@@ -145,8 +145,9 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		}
 
 		// トラックビューの追加
-		tabbedPane.add(newTrack.getTrackName(), new MMLTrackView(newTrack, this, this));
+		tabbedPane.add(newTrack.getTrackName(), new MMLTrackView(newTrack, trackIndex, this, this));
 		tabbedPane.setSelectedIndex(trackIndex);
+		updateTrackTabIcon();
 
 		// ピアノロール更新
 		pianoRollView.repaint();
@@ -177,6 +178,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 
 		mmlScore.removeTrack(index);
 		tabbedPane.remove(index);
+		updateTrackTabIcon();
 
 		if (mmlScore.getTrackCount() == 0) {
 			addMMLTrack(null);
@@ -190,6 +192,13 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		undoEdit.saveState();
 	}
 
+	private void updateTrackTabIcon() {
+		int len = tabbedPane.getTabCount();
+
+		for (int i = 0; i < len; i++) {
+			tabbedPane.setIconAt(i, PartButtonIcon.getInstance(1, i));
+		}
+	}
 
 	/**
 	 * 全トラックにおける、指定Tick位置のテンポを取得する。
@@ -240,12 +249,13 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 				name = "Track"+(trackCount+1);
 			}
 
-			tabbedPane.add(name, new MMLTrackView(track, this, this));
+			tabbedPane.add(name, new MMLTrackView(track, trackCount, this, this));
 			trackCount++;
 		}
 
 		initialSetView();
 		pianoRollView.setSequenceX(0);
+		updateTrackTabIcon();
 		updateTempoRoll();
 		repaint();
 
@@ -367,11 +377,17 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	}
 
 	@Override
-	public MMLEventList getActiveMMLPart() {
+	public int getActiveTrackIndex() {
 		int trackIndex = tabbedPane.getSelectedIndex();
+		return trackIndex;
+	}
+
+	@Override
+	public MMLEventList getActiveMMLPart() {
 		MMLTrackView view = (MMLTrackView) tabbedPane.getSelectedComponent();
 		int mmlPartIndex = view.getSelectedMMLPartIndex();
-		return mmlScore.getTrack(trackIndex).getMMLEventAtIndex(mmlPartIndex);
+		MMLTrack track = mmlScore.getTrack(getActiveTrackIndex());
+		return track.getMMLEventAtIndex(mmlPartIndex);
 	}
 
 	/**
@@ -426,7 +442,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		int i = 0;
 		for (MMLTrack track : mmlScore.getTrackList()) {
 			i++;
-			tabbedPane.add(track.getTrackName(), new MMLTrackView(track, this, this));
+			tabbedPane.add(track.getTrackName(), new MMLTrackView(track, i, this, this));
 		}
 
 		if (selectedTab >= i) {
@@ -436,6 +452,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 
 		tabbedPane.setSelectedIndex(selectedTab);
 		((MMLTrackView) tabbedPane.getSelectedComponent()).setSelectMMLPartOfIndex(selectedPart);
+		updateTrackTabIcon();
 	}
 
 	public void undo() {

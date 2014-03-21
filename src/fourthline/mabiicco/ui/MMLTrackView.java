@@ -37,7 +37,7 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 	 * 
 	 */
 	private static final long serialVersionUID = 4955513242349170508L;
-	private final String MMLPART_NAME[] = {
+	public static final String MMLPART_NAME[] = {
 			"メロディー", "和音1", "和音2", "歌"
 	};
 	private JToggleButton partButton[];
@@ -140,7 +140,14 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		updateComposeRank();
 	}
 
-	public MMLTrackView(MMLTrack track, ActionListener actionListener, IMMLManager mmlManager) {
+	/**
+	 * 
+	 * @param track
+	 * @param index TrackTabIconを各ボタンに設定するためのIndex値.
+	 * @param actionListener
+	 * @param mmlManager
+	 */
+	public MMLTrackView(MMLTrack track, int index, ActionListener actionListener, IMMLManager mmlManager) {
 		this();
 		this.setMMLTrack(track);
 		this.mmlManager = mmlManager;
@@ -148,6 +155,7 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 
 		for (int i = 0; i < MMLPART_NAME.length; i++) {
 			partButton[i].addActionListener(actionListener);
+			partButton[i].setIcon(PartButtonIcon.getInstance(i, index));
 		}
 	}
 
