@@ -25,7 +25,7 @@ import fourthline.mmlTools.MMLNoteEvent;
 import fourthline.mmlTools.UndefinedTickException;
 
 
-public class MMLEditor implements MouseInputListener, IEditState, IEditContext {
+public class MMLEditor implements MouseInputListener, IEditState, IEditContext, IEditAlign {
 
 	private EditMode editMode = EditMode.SELECT;
 
@@ -34,6 +34,8 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext {
 	// 複数ノート移動時のdetachリスト
 	private final ArrayList<MMLNoteEvent> detachedNote = new ArrayList<>();
 
+	// Cut, Copy時に保持するリスト.
+	private MMLEventList clipEventList;
 	// 編集対象のイベントリスト
 	private MMLEventList editEventList;
 
@@ -81,6 +83,11 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext {
 
 	public void setEditAlign(int alignTick) {
 		editAlign = alignTick;
+	}
+
+	@Override
+	public int getEditAlign() {
+		return editAlign;
 	}
 
 	/** 
@@ -226,7 +233,7 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext {
 	}
 
 	@Override
-	public void multiSelectingAction(Point startPoint, Point point) {
+	public void areaSelectingAction(Point startPoint, Point point) {
 		int x1 = startPoint.x;
 		int x2 = point.x;
 		if (x1 > x2) {
@@ -258,7 +265,7 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext {
 	}
 
 	@Override
-	public void applyMultiSelect() {
+	public void applyAreaSelect() {
 		pianoRollView.setSelectingArea(null);
 	}
 
@@ -370,6 +377,62 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext {
 	@Override
 	public void setEditStateObserver(IEditStateObserver observer) {
 		this.editObserver = observer;
+	}
+
+	@Override 
+	public boolean canPaste() {
+		if (clipEventList == null) {
+			return false;
+		}
+		if (clipEventList.getMMLNoteEventList().size() == 0) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public void paste(long startTick) {
+		if (!canPaste()) {
+			return;
+		}
+
+		selectNote(null);
+		long offset = clipEventList.getMMLNoteEventList().get(0).getTickOffset();
+		for (MMLNoteEvent noteEvent : clipEventList.getMMLNoteEventList()) {
+			long tickOffset = noteEvent.getTickOffset() - offset + startTick;
+			MMLNoteEvent addNote = new MMLNoteEvent(noteEvent.getNote(), noteEvent.getTick(), (int)tickOffset);
+			editEventList.addMMLNoteEvent(addNote);
+			selectNote(addNote, true);
+		}
+
+		pianoRollView.repaint();
+		editObserver.notifyUpdateEditState();
+		mmlManager.updateActivePart();
+	}
+
+	@Override
+	public void selectedCut() {
+		clipEventList = new MMLEventList("");
+		for (MMLNoteEvent noteEvent : selectedNote) {
+			clipEventList.addMMLNoteEvent(noteEvent);
+			editEventList.deleteMMLEvent(noteEvent);
+		}
+
+		selectNote(null);
+		pianoRollView.repaint();
+		editObserver.notifyUpdateEditState();
+		mmlManager.updateActivePart();
+	}
+
+	@Override
+	public void selectedCopy() {
+		clipEventList = new MMLEventList("");
+		for (MMLNoteEvent noteEvent : selectedNote) {
+			clipEventList.addMMLNoteEvent(noteEvent);
+		}
+
+		editObserver.notifyUpdateEditState();
 	}
 
 	@Override

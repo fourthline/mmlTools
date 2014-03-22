@@ -38,7 +38,7 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 	 */
 	private static final long serialVersionUID = 4955513242349170508L;
 	public static final String MMLPART_NAME[] = {
-			"メロディー", "和音1", "和音2", "歌"
+		"メロディー", "和音1", "和音2", "歌"
 	};
 	private JToggleButton partButton[];
 	private JTextField mmlText[];

@@ -53,6 +53,9 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 	public static final String REDO = "redo";
 	public static final String SAVE_FILE = "save_file";
 	public static final String SAVEAS_FILE = "saveas_file";
+	public static final String CUT = "cut";
+	public static final String COPY = "copy";
+	public static final String PASTE = "paste";
 	public static final String DELETE = "delete";
 	public static final String SCORE_PROPERTY = "score_property";
 
@@ -130,6 +133,12 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 			saveMMLFile(openedFile);
 		} else if (command.equals(SAVEAS_FILE)) {
 			saveMMLFileAction();
+		} else if (command.equals(CUT)) {
+			editState.selectedCut();
+		} else if (command.equals(COPY)) {
+			editState.selectedCopy();
+		} else if (command.equals(PASTE)) {
+			editPasteAction();
 		} else if (command.equals(DELETE)) {
 			editState.selectedDelete();
 		} else if (command.equals(SCORE_PROPERTY)) {
@@ -319,6 +328,11 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 		mmlSeqView.repaint();
 	}
 
+	private void editPasteAction() {
+		long startTick = mmlSeqView.getEditSequencePosition();
+		editState.paste(startTick);
+	}
+
 	@Override
 	public void notifyUpdateFileState() {
 		mainFrame.setCanSaveFile(false);
@@ -347,5 +361,6 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 	@Override
 	public void notifyUpdateEditState() {
 		mainFrame.setSelectedEdit(editState.hasSelectedNote());
+		mainFrame.setPasteEnable(editState.canPaste());
 	}
 }

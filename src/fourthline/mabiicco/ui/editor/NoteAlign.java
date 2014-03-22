@@ -10,7 +10,6 @@ import fourthline.mmlTools.core.MMLTicks;
 
 
 public class NoteAlign {
-	
 	private final String viewText;
 	private final int alignTick;
 	

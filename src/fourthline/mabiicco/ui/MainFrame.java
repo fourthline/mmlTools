@@ -72,6 +72,9 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 	private JMenuItem undoMenu;
 	private JMenuItem redoMenu;
 	private JMenuItem saveMenuItem;
+	private JMenuItem cutMenu;
+	private JMenuItem copyMenu;
+	private JMenuItem pasteMenu;
 	private JMenuItem deleteMenu;
 
 	/**
@@ -215,6 +218,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		setCanRedo(false);
 		setCanSaveFile(false);
 		setSelectedEdit(false);
+		setPasteEnable(false);
 
 		// 閉じるボタンへのアクション設定
 		setDefaultCloseOperation( DO_NOTHING_ON_CLOSE );
@@ -302,6 +306,18 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		editMenu.add(redoMenu);
 
 		editMenu.add(new JSeparator());	
+
+		cutMenu = createMenuItem("切り取り", ActionDispatcher.CUT);
+		cutMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_MASK));
+		editMenu.add(cutMenu);
+
+		copyMenu = createMenuItem("コピー", ActionDispatcher.COPY);
+		copyMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK));
+		editMenu.add(copyMenu);
+
+		pasteMenu = createMenuItem("貼り付け", ActionDispatcher.PASTE);
+		pasteMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_MASK));
+		editMenu.add(pasteMenu);
 
 		deleteMenu = createMenuItem("削除", ActionDispatcher.DELETE);
 		deleteMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
@@ -494,6 +510,12 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 	}
 
 	public void setSelectedEdit(boolean b) {
+		cutMenu.setEnabled(b);
+		copyMenu.setEnabled(b);
 		deleteMenu.setEnabled(b);
+	}
+
+	public void setPasteEnable(boolean b) {
+		pasteMenu.setEnabled(b);
 	}
 }

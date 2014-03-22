@@ -27,6 +27,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 
 import fourthline.mabiicco.midi.MabiDLS;
+import fourthline.mabiicco.ui.editor.IEditAlign;
 import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTempoEvent;
 import fourthline.mmlTools.UndefinedTickException;
@@ -43,6 +44,7 @@ public class ColumnPanel extends AbstractMMLView implements MouseListener, Actio
 
 	private final PianoRollView pianoRollView;
 	private final IMMLManager mmlManager;
+	private final IEditAlign editAlign;
 
 	private final JPopupMenu popupMenu = new JPopupMenu();
 	private final JMenuItem insertTempoMenu;
@@ -53,10 +55,11 @@ public class ColumnPanel extends AbstractMMLView implements MouseListener, Actio
 	private final String EDIT_TEMPO   = "edit_tempo";
 	private final String DELETE_TEMPO = "delete_tempo";
 
-	public ColumnPanel(PianoRollView pianoRollView, IMMLManager mmlManager) {
+	public ColumnPanel(PianoRollView pianoRollView, IMMLManager mmlManager, IEditAlign editAlign) {
 		super();
 		this.pianoRollView = pianoRollView;
 		this.mmlManager = mmlManager;
+		this.editAlign = editAlign;
 		addMouseListener(this);
 
 		insertTempoMenu = newPopupMenu("テンポ挿入");
@@ -156,7 +159,9 @@ public class ColumnPanel extends AbstractMMLView implements MouseListener, Actio
 	private void setSequenceBar(int x) {
 		Sequencer sequencer = MabiDLS.getInstance().getSequencer();
 		if (!sequencer.isRunning()) {
-			pianoRollView.setSequenceX(x);
+			long tick = pianoRollView.convertXtoTick(x);
+			tick -= tick % editAlign.getEditAlign();
+			pianoRollView.setSequenceX(pianoRollView.convertTicktoX(tick));
 			repaint();
 			pianoRollView.repaint();
 		} else {
@@ -180,7 +185,7 @@ public class ColumnPanel extends AbstractMMLView implements MouseListener, Actio
 			}
 			List<MMLTempoEvent> tempoList =  mmlManager.getMMLScore().getTempoEventList();
 			// tempo align
-			int tick = targetTick - (targetTick % 96);
+			int tick = targetTick - (targetTick % this.editAlign.getEditAlign());
 			MMLTempoEvent insertTempo = new MMLTempoEvent(tempo, tick);
 			insertTempo.appendToListElement(tempoList);
 			System.out.println("insert tempo." + tempo);
@@ -262,7 +267,6 @@ public class ColumnPanel extends AbstractMMLView implements MouseListener, Actio
 		int y = e.getY();
 
 		if (SwingUtilities.isLeftMouseButton(e)) {
-			setSequenceBar(x);
 		} else if (SwingUtilities.isRightMouseButton(e)) {
 			popupAction(e.getComponent(), x, y);
 		}
@@ -278,6 +282,11 @@ public class ColumnPanel extends AbstractMMLView implements MouseListener, Actio
 
 	@Override
 	public void mousePressed(MouseEvent e) {
+		int x = e.getX();
+
+		if (SwingUtilities.isLeftMouseButton(e)) {
+			setSequenceBar(x);
+		}
 	}
 
 	@Override

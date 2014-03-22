@@ -75,10 +75,6 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		scrollPane.getVerticalScrollBar().setUnitIncrement(AbstractMMLView.HEIGHT_C);
 
-		scrollPane.setRowHeaderView(keyboardView);
-		columnView = new ColumnPanel(pianoRollView, this);
-		scrollPane.setColumnHeaderView(columnView);
-
 		add(scrollPane, BorderLayout.CENTER);
 		pianoRollView.setViewportAndParent(scrollPane.getViewport(), this);
 
@@ -92,6 +88,10 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		// create mml editor
 		editor = new MMLEditor(keyboardView, pianoRollView, this);
 		pianoRollView.addMouseInputListener(editor);
+		columnView = new ColumnPanel(pianoRollView, this, editor);
+
+		scrollPane.setRowHeaderView(keyboardView);
+		scrollPane.setColumnHeaderView(columnView);
 
 		initialSetView();
 		initializeMMLTrack();
@@ -543,6 +543,10 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 
 	public IEditState getEditState() {
 		return editor;
+	}
+
+	public long getEditSequencePosition() {
+		return pianoRollView.getSequencePossition();
 	}
 
 	// TimeViewを更新するためのスレッドを開始します.

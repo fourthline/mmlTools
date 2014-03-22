@@ -135,12 +135,12 @@ enum EditMode {
 		@Override
 		public void executeEvent(IEditContext context, MouseEvent e) {
 			// 範囲選択.
-			context.multiSelectingAction(startPoint, e.getPoint());
+			context.areaSelectingAction(startPoint, e.getPoint());
 		}
 		@Override
 		public void exit(IEditContext context) {
 			// 範囲選択反映.
-			context.applyMultiSelect();
+			context.applyAreaSelect();
 		}
 	};
 
