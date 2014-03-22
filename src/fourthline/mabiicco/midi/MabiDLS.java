@@ -119,14 +119,13 @@ public final class MabiDLS {
 			String originalName = inst.getName();
 			int bank = inst.getPatch().getBank();
 			int program = inst.getPatch().getProgram();
-			if (name == null) {
-				name = "*" + originalName;
+			if (name != null) {
+				name = ""+program+": "+name;
+				instArray.add(new InstClass( name,
+						bank,
+						program ));
+				System.out.printf("%d=%s \"%s\"\n", program,  originalName, name);
 			}
-			name = ""+program+": "+name;
-			instArray.add(new InstClass( name,
-					bank,
-					program ));
-			System.out.printf("%d=%s \"%s\"\n", program,  originalName, name);
 		}
 
 		insts = new InstClass[instArray.size()];
@@ -319,15 +318,19 @@ public final class MabiDLS {
 	 * @throws InvalidMidiDataException
 	 */
 	private void convertMidiTrack(Track track, MMLTrack mmlTrack, int channel) throws InvalidMidiDataException {
+		int program = mmlTrack.getProgram();
 		ShortMessage pcMessage = new ShortMessage(ShortMessage.PROGRAM_CHANGE, 
 				channel,
-				mmlTrack.getProgram(),
+				program,
 				0);
 		track.add(new MidiEvent(pcMessage, 0));
+		boolean enablePart[] = InstClass.getEnablePartByProgram(program);
 
-		for (int i = 0; i < 3; i++) {
-			MMLEventList eventList = mmlTrack.getMMLEventAtIndex(i);
-			convertMidiPart(track, eventList, channel);
+		for (int i = 0; i < enablePart.length; i++) {
+			if (enablePart[i]) {
+				MMLEventList eventList = mmlTrack.getMMLEventAtIndex(i);
+				convertMidiPart(track, eventList, channel);
+			}
 		}
 	}
 

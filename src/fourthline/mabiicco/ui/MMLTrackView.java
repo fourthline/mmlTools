@@ -50,6 +50,8 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 
 	private IMMLManager mmlManager;
 
+	private final InstClass noUseSongEx = new InstClass("コーラスなし,0", -1, -1);
+
 	/**
 	 * Create the panel.
 	 */
@@ -91,8 +93,9 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 			comboBox = new JComboBox();
 			songComboBox = new JComboBox();
 		} else {
-			comboBox = new JComboBox( InstClass.filterInstArray(insts, EnumSet.of(InstType.NORMAL, InstType.DRUMS)) );
+			comboBox = new JComboBox( InstClass.filterInstArray(insts, EnumSet.of(InstType.NORMAL, InstType.DRUMS, InstType.VOICE)) );
 			songComboBox = new JComboBox( InstClass.filterInstArray(insts, EnumSet.of(InstType.VOICE)) );
+			songComboBox.addItem(noUseSongEx);
 		}
 		northLPanel.add(comboBox);
 		comboBox.addActionListener(this);
@@ -198,14 +201,6 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		partButton[index].setSelected(true);
 	}
 
-	public boolean isSelectedVoicePart() {
-		if (getSelectedMMLPartIndex() == 3) {
-			return true;
-		}
-
-		return false;
-	}
-
 	@Override
 	public void removeUpdate(DocumentEvent event) {
 	}
@@ -237,11 +232,74 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		trackComposeLabel.setText( getRankText() );
 	}
 
-	public void setInstProgram(int program, int songProgram) {
+	private void setInstProgram(int program, int songProgram) {
 		InstClass insts[] = MabiDLS.getInstance().getInsts();
 
-		comboBox.setSelectedItem(InstClass.searchInstAtProgram(insts, program));
-		songComboBox.setSelectedItem(InstClass.searchInstAtProgram(insts, songProgram));
+		InstClass inst = InstClass.searchInstAtProgram(insts, program);
+		if (inst != null) {
+			comboBox.setSelectedItem(inst);
+		} else {
+			comboBox.setSelectedItem(insts[0]);
+		}
+		InstClass songInst = InstClass.searchInstAtProgram(insts, songProgram);
+		if ( (songInst != null) && (songInst.getType() == InstType.VOICE) ) {
+			songComboBox.setSelectedItem(songInst);
+		} else {
+			songComboBox.setSelectedItem(noUseSongEx);
+		}
+
+		updateProgramChangeStatus();
+	}
+
+	/**
+	 * 楽器選択
+	 *  N: melody, chord1, chord2
+	 *  D: melody
+	 *  V: songEX, songComboBoxは選択不可
+	 * songEX
+	 *  V: songEX
+	 */
+	private void updateProgramChangeStatus() {
+		InstClass inst = (InstClass) comboBox.getSelectedItem();
+		if (inst.getType() == InstType.VOICE) {
+			songComboBox.setSelectedItem(noUseSongEx);
+			songComboBox.setEnabled(false);
+		} else {
+			songComboBox.setEnabled(true);
+		}
+
+		InstClass songInst = ((InstClass) songComboBox.getSelectedItem());
+		int program = inst.getProgram();
+		int songProgram = songInst.getProgram();
+
+		updatePartButtonStatus();
+
+		if (mmlManager != null) {
+			mmlManager.updateActiveTrackProgram(program, songProgram);
+		}
+	}
+
+	private void updatePartButtonStatus() {
+		InstClass inst = (InstClass) comboBox.getSelectedItem();
+		InstClass songInst = ((InstClass) songComboBox.getSelectedItem());
+
+		// 選択された楽器にあわせて、MMLパートの有効/無効化を行う.
+		boolean instEnable[] = inst.getType().getEnablePart();
+		boolean songExEnable[] = songInst.getType().getEnablePart();
+		for (int i = 0; i < partButton.length; i++) {
+			boolean b = (instEnable[i] || songExEnable[i]);
+			partButton[i].setEnabled(b);
+			mmlText[i].setEnabled(b);
+		}
+
+		if (!partButton[getSelectedMMLPartIndex()].isEnabled()) {
+			partButton[getSelectedMMLPartIndex()].setSelected(false);
+			for (JToggleButton button : partButton) {
+				if (button.isEnabled()) {
+					button.setSelected(true);
+				}
+			}
+		}
 	}
 
 	public void setMMLTrack(MMLTrack track) {
@@ -271,13 +329,7 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 	public void actionPerformed(ActionEvent e) {
 		Object source = e.getSource();
 		if (source instanceof JComboBox<?>) {
-			InstClass inst1 = (InstClass) comboBox.getSelectedItem();
-			InstClass inst2 = (InstClass) songComboBox.getSelectedItem();
-			int program = inst1.getProgram();
-			int songProgram = inst2.getProgram();
-			if (mmlManager != null) {
-				mmlManager.updateActiveTrackProgram(program, songProgram);
-			}
+			updateProgramChangeStatus();
 		}
 	}
 }

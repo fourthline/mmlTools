@@ -229,9 +229,11 @@ public class PianoRollView extends AbstractMMLView {
 		paintPitchRangeBorder(g2);
 
 		if (mmlScore != null) {
-			int i = 0;
-			for (MMLTrack track : mmlScore.getTrackList()) {
-				paintMusicScoreWithoutActiveTrack(g2, i++, track);
+			for (int i = 0; i < mmlScore.getTrackCount(); i++) {
+				MMLTrack track = mmlScore.getTrack(i);
+				if (track != mmlScore.getTrack(mmlManager.getActiveTrackIndex())) {
+					paintMMLTrack(g2, i, track);
+				}
 			}
 		}
 
@@ -363,36 +365,31 @@ public class PianoRollView extends AbstractMMLView {
 	 * @param g
 	 * @param index トラックindex
 	 */
-	private void paintMusicScoreWithoutActiveTrack(Graphics2D g, int index, MMLTrack track) {
-		int trackIndex = mmlManager.getActiveTrackIndex();
-		MMLTrack activeTrack = mmlManager.getMMLScore().getTrack(trackIndex);
-		if (track == activeTrack) {
-			return;
-		}
+	private void paintMMLTrack(Graphics2D g, int index, MMLTrack track) {
+		boolean instEnable[] = InstClass.getEnablePartByProgram(track.getProgram());
+		boolean songExEnable[] = InstClass.getEnablePartByProgram(track.getSongProgram());
 
-		int part = 0;
-		for (MMLEventList targetPart : track.getMMLEventList()) {
-			ColorPalette partColor = ColorPalette.getColorType(part++);
+		MMLEventList activePart = mmlManager.getActiveMMLPart();
+
+		for (int i = 0; i < track.getMMLEventList().size(); i++) {
+			MMLEventList targetPart = track.getMMLEventAtIndex(i);
+			if (targetPart == activePart) {
+				continue;
+			}
+			ColorPalette partColor = ColorPalette.getColorType(i);
+			if ( !instEnable[i] && !songExEnable[i] ) {
+				partColor = ColorPalette.UNUSED;
+			}
 			Color rectColor = partColor.getRectColor(index);
 			Color fillColor = partColor.getFillColor(index);
-			paintMMLPart(g, targetPart.getMMLNoteEventList(), rectColor, fillColor);
+			paintMMLPart(g, track.getMMLEventList().get(i).getMMLNoteEventList(), rectColor, fillColor);
 		}
 	}
 
 	private void paintActiveTrack(Graphics2D g) {
-		MMLEventList activePart = mmlManager.getActiveMMLPart();
 		int trackIndex = mmlManager.getActiveTrackIndex();
-		MMLTrack activeTrack = mmlManager.getMMLScore().getTrack(trackIndex);
-
-		int part = 0;
-		for (MMLEventList targetPart : activeTrack.getMMLEventList()) {
-			ColorPalette partColor = ColorPalette.getColorType(part++);
-			if (targetPart != activePart) {
-				Color rectColor = partColor.getRectColor(trackIndex);
-				Color fillColor = partColor.getFillColor(trackIndex);
-				paintMMLPart(g, targetPart.getMMLNoteEventList(), rectColor, fillColor);
-			}
-		}
+		paintMMLTrack(g, trackIndex, mmlManager.getMMLScore().getTrack(trackIndex));
+		MMLEventList activePart = mmlManager.getActiveMMLPart();
 
 		Color rectColor = ColorPalette.ACTIVE.getRectColor(trackIndex);
 		Color fillColor = ColorPalette.ACTIVE.getFillColor(trackIndex);
@@ -417,6 +414,9 @@ public class PianoRollView extends AbstractMMLView {
 	}
 
 	public void setPitchRange(InstClass inst) {
+		if (inst == null) {
+			return;
+		}
 		this.lowerNote = inst.getLowerNote();
 		this.upperNote = inst.getUpperNote();
 	}

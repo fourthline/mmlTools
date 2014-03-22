@@ -22,8 +22,8 @@ public class MMLTrack extends MMLTools implements Serializable {
 	private String trackName;
 	private int panpot = 64;
 
-	// 歌パート用
-	private int songProgram = 121;  // 女声JP
+	// コーラスオプション (楽器＋歌）
+	private int songProgram = -1;  // コーラスを使用しない.
 
 	private static final int PART_COUNT = 4;
 

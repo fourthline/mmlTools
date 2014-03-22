@@ -5,14 +5,15 @@
 package fourthline.mabiicco.midi;
 
 public enum InstType {
-	NORMAL {
-	},
-	DRUMS {
-	},
-	VOICE {
-	};
+	NONE(false, false, false, false),
+	NORMAL(true, true, true, false),
+	DRUMS(true, false, false, false),
+	VOICE(false, false, false, true);
 
 	public static InstType getInstType(String s) {
+		if (s.equals("0")) {
+			return NONE;
+		}
 		if (s.equals("N")) {
 			return NORMAL;
 		}
@@ -27,4 +28,15 @@ public enum InstType {
 	}
 
 	public static final int VOICE_PLAYBACK_CHANNEL = 10;
+
+	private final boolean enablePart[];
+	private InstType(boolean melody, boolean chord1, boolean chord2, boolean songEx) {
+		enablePart = new boolean[] {
+				melody, chord1, chord2, songEx
+		};
+	}
+
+	public boolean[] getEnablePart() {
+		return enablePart;
+	}
 }

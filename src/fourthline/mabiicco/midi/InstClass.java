@@ -61,6 +61,10 @@ public class InstClass {
 		return this.upperNote;
 	}
 
+	public InstType getType() {
+		return this.type;
+	}
+
 	public static InstClass[] filterInstArray(InstClass[] array, EnumSet<InstType> e) {
 		ArrayList<InstClass> resultArray = new ArrayList<>();
 		for (InstClass inst : array) {
@@ -78,6 +82,20 @@ public class InstClass {
 			}
 		}
 
-		return insts[0];
+		return null;
+	}
+
+	/**
+	 * プログラム番号上で有効なパート情報を取得する.
+	 * @param program
+	 * @return
+	 */
+	public static boolean[] getEnablePartByProgram(int program) {
+		InstClass insts[] = MabiDLS.getInstance().getInsts();
+		InstClass inst = InstClass.searchInstAtProgram(insts, program);
+		if (inst != null) {
+			return inst.getType().getEnablePart();
+		}
+		return InstType.NONE.getEnablePart();
 	}
 }

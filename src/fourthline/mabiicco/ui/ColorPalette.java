@@ -16,7 +16,13 @@ public enum ColorPalette {
 	MELODY(0, 200, 0),
 	CHORD1(0, 200, 40),
 	CHORD2(0, 200, 80),
-	SONGEX(0, 200, 120);
+	SONGEX(0, 200, 120),
+	UNUSED(0, 80, 0) {
+		@Override
+		public Color getFillColor(int index) {
+			return Color.GRAY;
+		}
+	};
 
 	protected Color filter(Color color) {
 		return new Color(

@@ -361,10 +361,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	private void updateSelectedTrackAndMMLPart() {
 		MMLTrackView view = (MMLTrackView) tabbedPane.getSelectedComponent();
 		if (view != null) {
-			int program = getSelectedTrack().getProgram();
-			if (view.isSelectedVoicePart()) {
-				program = getSelectedTrack().getSongProgram();
-			}
+			int program = getActivePartProgram();
 			int mmlPartIndex = view.getSelectedMMLPartIndex();
 
 			// ピアノロールビューにアクティブトラックとアクティブパートを設定します.
@@ -441,8 +438,8 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		tabbedPane.removeAll();
 		int i = 0;
 		for (MMLTrack track : mmlScore.getTrackList()) {
-			i++;
 			tabbedPane.add(track.getTrackName(), new MMLTrackView(track, i, this, this));
+			i++;
 		}
 
 		if (selectedTab >= i) {
@@ -643,11 +640,11 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		MMLTrack track = getSelectedTrack();
 		if (view != null) {
 			int part = view.getSelectedMMLPartIndex();
-			if ( (part >= 0) && (part < 3) ) {
-				return track.getProgram();
-			} else {
+			if ( (part == 3) && (track.getSongProgram() >= 0) ) {
 				return track.getSongProgram();
 			}
+
+			return track.getProgram();
 		}
 
 		return 0;
