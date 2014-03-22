@@ -196,7 +196,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		int len = tabbedPane.getTabCount();
 
 		for (int i = 0; i < len; i++) {
-			tabbedPane.setIconAt(i, PartButtonIcon.getInstance(1, i));
+			tabbedPane.setIconAt(i, PartButtonIconArray.getInstance(1, i));
 		}
 	}
 

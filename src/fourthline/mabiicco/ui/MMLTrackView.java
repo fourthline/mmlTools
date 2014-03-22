@@ -51,6 +51,7 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 	private IMMLManager mmlManager;
 
 	private final InstClass noUseSongEx = new InstClass("コーラスなし,0", -1, -1);
+	private int trackIndex;
 
 	/**
 	 * Create the panel.
@@ -146,19 +147,19 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 	/**
 	 * 
 	 * @param track
-	 * @param index TrackTabIconを各ボタンに設定するためのIndex値.
+	 * @param trackIndex TrackTabIconを各ボタンに設定するためのIndex値.
 	 * @param actionListener
 	 * @param mmlManager
 	 */
-	public MMLTrackView(MMLTrack track, int index, ActionListener actionListener, IMMLManager mmlManager) {
+	public MMLTrackView(MMLTrack track, int trackIndex, ActionListener actionListener, IMMLManager mmlManager) {
 		this();
 		this.setMMLTrack(track);
 		this.mmlManager = mmlManager;
+		this.trackIndex = trackIndex;
 		trackComposeLabel.setText(track.mmlRankFormat());
 
 		for (int i = 0; i < MMLPART_NAME.length; i++) {
 			partButton[i].addActionListener(actionListener);
-			partButton[i].setIcon(PartButtonIcon.getInstance(i, index));
 		}
 	}
 
@@ -263,9 +264,9 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		InstClass inst = (InstClass) comboBox.getSelectedItem();
 		if (inst.getType() == InstType.VOICE) {
 			songComboBox.setSelectedItem(noUseSongEx);
-			songComboBox.setEnabled(false);
+			songComboBox.setVisible(false);
 		} else {
-			songComboBox.setEnabled(true);
+			songComboBox.setVisible(true);
 		}
 
 		InstClass songInst = ((InstClass) songComboBox.getSelectedItem());
@@ -290,6 +291,10 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 			boolean b = (instEnable[i] || songExEnable[i]);
 			partButton[i].setEnabled(b);
 			mmlText[i].setEnabled(b);
+			partButton[i].setIcon(
+					(b) 
+					? (PartButtonIconArray.getInstance(i, trackIndex)) : 
+						(PartButtonIcon.getInstance()) );
 		}
 
 		if (!partButton[getSelectedMMLPartIndex()].isEnabled()) {
