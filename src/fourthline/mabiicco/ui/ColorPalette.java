@@ -7,12 +7,7 @@ package fourthline.mabiicco.ui;
 import java.awt.Color;
 
 public enum ColorPalette {
-	ACTIVE(250, 200, 0) {
-		@Override
-		public Color getRectColor(int index) {
-			return Color.DARK_GRAY;
-		}
-	},
+	ACTIVE(250, 200, 0),
 	MELODY(0, 200, 0),
 	CHORD1(0, 200, 40),
 	CHORD2(0, 200, 80),

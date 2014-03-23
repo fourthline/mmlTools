@@ -266,8 +266,10 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	 * 現在のトラックにMMLを設定する。
 	 */
 	public void setMMLselectedTrack(MMLTrack mml) {
+		if (mmlScore.getTrackCount() == 1) {
+			mmlScore.getTempoEventList().clear();
+		}
 		int index = tabbedPane.getSelectedIndex();
-
 		mmlScore.setTrack(index, mml);
 		tabbedPane.setTitleAt(index, mml.getTrackName());
 

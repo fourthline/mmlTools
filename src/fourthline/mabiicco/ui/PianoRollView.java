@@ -335,6 +335,7 @@ public class PianoRollView extends AbstractMMLView {
 			int velocity = noteEvent.getVelocity();
 			if (velocity >= 0) {
 				String s = "V" + velocity;
+				g.setColor(Color.DARK_GRAY);
 				g.drawString(s, x, y);
 			}
 		}
@@ -368,7 +369,6 @@ public class PianoRollView extends AbstractMMLView {
 	private void paintMMLTrack(Graphics2D g, int index, MMLTrack track) {
 		boolean instEnable[] = InstClass.getEnablePartByProgram(track.getProgram());
 		boolean songExEnable[] = InstClass.getEnablePartByProgram(track.getSongProgram());
-
 		MMLEventList activePart = mmlManager.getActiveMMLPart();
 
 		for (int i = 0; i < track.getMMLEventList().size(); i++) {

@@ -6,7 +6,6 @@ package fourthline.mabiicco.ui.editor;
 
 import java.awt.Cursor;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 
 import javax.swing.SwingUtilities;
@@ -19,11 +18,6 @@ enum EditMode {
 		@Override
 		public void pressEvent(IEditContext context, MouseEvent e) {
 			startPoint = e.getPoint();
-			boolean multiSelect = false;
-			// Ctrlによる複数選択
-			if ( (e.getModifiers() & ActionEvent.CTRL_MASK) != 0) {
-				multiSelect = true;
-			}
 			if (SwingUtilities.isRightMouseButton(e)) {
 				if (context.onExistNote(startPoint)) {
 					// TODO: show note edit menu
@@ -33,7 +27,7 @@ enum EditMode {
 			} else if (SwingUtilities.isLeftMouseButton(e)) {
 				if (context.onExistNote(startPoint)) {
 					// ノート上であれば、ノートを選択状態にする. 複数選択判定も.
-					context.selectNoteByPoint(startPoint, multiSelect);
+					context.selectNoteByPoint(startPoint, e.getModifiers());
 					if (context.isEditLengthPosition(startPoint)) {
 						context.changeState(LENGTH);
 					} else {
@@ -63,7 +57,7 @@ enum EditMode {
 		public void pressEvent(IEditContext context, MouseEvent e) {
 			// 右クリックで、編集キャンセル
 			if (SwingUtilities.isRightMouseButton(e)) {
-				context.selectNoteByPoint(null, false);
+				context.selectNoteByPoint(null, 0);
 				context.changeState(SELECT);
 			}
 		}
@@ -112,8 +106,8 @@ enum EditMode {
 		@Override
 		public void enter(IEditContext context) {
 			// 単音選択
-			context.selectNoteByPoint(null, false);
-			context.selectNoteByPoint(startPoint, false);
+			context.selectNoteByPoint(null, 0);
+			context.selectNoteByPoint(startPoint, 0);
 		}
 		@Override
 		public void executeEvent(IEditContext context, MouseEvent e) {
@@ -130,7 +124,7 @@ enum EditMode {
 		@Override
 		public void enter(IEditContext context) {
 			// 選択解除.
-			context.selectNoteByPoint(null, false);
+			context.selectNoteByPoint(null, 0);
 		}
 		@Override
 		public void executeEvent(IEditContext context, MouseEvent e) {

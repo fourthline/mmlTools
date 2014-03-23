@@ -23,5 +23,5 @@ interface IEditContext {
 	public void setCursor(Cursor cursor);
 	public void areaSelectingAction(Point startPoint, Point point);
 	public void applyAreaSelect();
-	public void selectNoteByPoint(Point point, boolean multiSelect);
+	public void selectNoteByPoint(Point point, int selectModifiers);
 }

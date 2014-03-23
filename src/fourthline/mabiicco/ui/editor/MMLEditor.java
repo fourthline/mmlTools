@@ -8,8 +8,10 @@ package fourthline.mabiicco.ui.editor;
 import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputListener;
@@ -115,20 +117,62 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext, 
 		}
 	}
 
+	private void selectMultipleNote(MMLNoteEvent noteEvent1, MMLNoteEvent noteEvent2) {
+		selectMultipleNote(noteEvent1, noteEvent2, true);
+	}
+
+	/**
+	 * @param noteEvent1
+	 * @param noteEvent2
+	 * @param lookNote falseの場合は、tickOffset間にあるすべてのノートが選択される. trueの場合はnote情報もみて判定する.
+	 */
+	private void selectMultipleNote(MMLNoteEvent noteEvent1, MMLNoteEvent noteEvent2, boolean lookNote) {
+		int note[] = {
+				noteEvent1.getNote(),
+				noteEvent2.getNote()
+		};
+		int tickOffset[] = {
+				noteEvent1.getTickOffset(),
+				noteEvent2.getTickOffset()
+		};
+
+		Arrays.sort(note);
+		Arrays.sort(tickOffset);
+
+		if (!lookNote) {
+			note[0] = 0;
+			note[1] = 96;
+		}
+
+		selectedNote.clear();
+		for (MMLNoteEvent noteEvent : editEventList.getMMLNoteEventList()) {
+			if ( (noteEvent.getNote() >= note[0]) && (noteEvent.getNote() <= note[1]) 
+					&& (noteEvent.getEndTick() > tickOffset[0])
+					&& (noteEvent.getTickOffset() <= tickOffset[1]) ) {
+				selectedNote.add(noteEvent);
+			}
+		}
+	}
+
 	/**
 	 * @param point  nullのときはクリアする.
 	 */
 	@Override
-	public void selectNoteByPoint(Point point, boolean multiSelect) {
+	public void selectNoteByPoint(Point point, int selectModifiers) {
 		if (point == null) {
 			selectNote(null);
 		} else {
 			int note = pianoRollView.convertY2Note(point.y);
 			long tickOffset = pianoRollView.convertXtoTick(point.x);
 			MMLNoteEvent noteEvent = editEventList.searchOnTickOffset(tickOffset);
+			if (noteEvent.getNote() != note) {
+				return;
+			}
 
-			if (noteEvent.getNote() == note) {
-				selectNote(noteEvent, multiSelect);
+			if ( (selectedNote.size() == 1) && ((selectModifiers & ActionEvent.SHIFT_MASK) != 0) ) {
+				selectMultipleNote(selectedNote.get(0), noteEvent, false);
+			} else {
+				selectNote(noteEvent, ((selectModifiers & ActionEvent.CTRL_MASK) != 0));
 			}
 		}
 	}
@@ -254,14 +298,9 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext, 
 		int note2 = pianoRollView.convertY2Note( y2 );
 		int tickOffset2 = (int)pianoRollView.convertXtoTick( x2 );
 
-		selectedNote.clear();
-		for (MMLNoteEvent noteEvent : editEventList.getMMLNoteEventList()) {
-			if ( (noteEvent.getNote() <= note1) && (noteEvent.getNote() >= note2) 
-					&& (noteEvent.getEndTick() >= tickOffset1)
-					&& (noteEvent.getTickOffset() <= tickOffset2) ) {
-				selectedNote.add(noteEvent);
-			}
-		}
+		selectMultipleNote(
+				new MMLNoteEvent(note1, 0, tickOffset1),
+				new MMLNoteEvent(note2, 0, tickOffset2) );
 	}
 
 	@Override
