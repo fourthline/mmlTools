@@ -6,7 +6,7 @@ package fourthline.mmlTools;
 
 import fourthline.mmlTools.core.MMLTicks;
 
-public class MMLNoteEvent extends MMLEvent {
+public class MMLNoteEvent extends MMLEvent implements Cloneable {
 	private static final long serialVersionUID = 4372538748155995529L;
 
 	public static final int NO_VEL = -1;
@@ -137,5 +137,14 @@ public class MMLNoteEvent extends MMLEvent {
 
 	public int getOctave() {
 		return (note /12);
+	}
+
+	@Override
+	public MMLNoteEvent clone() {
+		try {
+			return (MMLNoteEvent) super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new AssertionError();
+		}
 	}
 }

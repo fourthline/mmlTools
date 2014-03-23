@@ -216,10 +216,7 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext, 
 	public void detachSelectedMMLNote() {
 		detachedNote.clear();
 		for (MMLNoteEvent noteEvent : selectedNote) {
-			int note = noteEvent.getNote();
-			int tick = noteEvent.getTick();
-			int tickOffset = noteEvent.getTickOffset();
-			detachedNote.add(new MMLNoteEvent(note, tick, tickOffset));
+			detachedNote.add(noteEvent.clone());
 		}
 	}
 	/**
@@ -441,6 +438,7 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext, 
 		for (MMLNoteEvent noteEvent : clipEventList.getMMLNoteEventList()) {
 			long tickOffset = noteEvent.getTickOffset() - offset + startTick;
 			MMLNoteEvent addNote = new MMLNoteEvent(noteEvent.getNote(), noteEvent.getTick(), (int)tickOffset);
+			addNote.setVelocity(noteEvent.getVelocity());
 			editEventList.addMMLNoteEvent(addNote);
 			selectNote(addNote, true);
 		}
