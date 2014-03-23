@@ -13,8 +13,6 @@ import java.awt.Color;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
-import java.awt.Font;
-
 public class Startup extends JDialog {
 	private static final long serialVersionUID = 4112879755056918382L;
 
@@ -47,7 +45,6 @@ public class Startup extends JDialog {
 		panel.setLayout(null);
 
 		textArea = new JTextArea();
-		textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
 		textArea.setBounds(12, 150, 352, 120);
 		panel.add(textArea);
 		textArea.setBackground(UIManager.getColor("Panel.background"));

@@ -39,7 +39,7 @@ public class TrackPropertyPanel extends JPanel {
 		setLayout(null);
 
 		JLabel lblNewLabel = new JLabel("トラック名");
-		lblNewLabel.setBounds(38, 39, 50, 13);
+		lblNewLabel.setBounds(30, 39, 70, 13);
 		add(lblNewLabel);
 
 		trackNameField = new JTextField();
@@ -60,7 +60,7 @@ public class TrackPropertyPanel extends JPanel {
 		add(panpotSlider);
 
 		JLabel label = new JLabel("パンポット");
-		label.setBounds(38, 97, 50, 13);
+		label.setBounds(30, 97, 70, 13);
 		add(label);
 	}
 

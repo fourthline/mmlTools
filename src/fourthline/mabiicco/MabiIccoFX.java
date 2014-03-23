@@ -2,11 +2,12 @@
  * Copyright (C) 2014 たんらる
  */
 
-
 package fourthline.mabiicco;
 
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.io.File;
+import java.util.Collections;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -17,14 +18,12 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.MainFrame;
 import fourthline.mabiicco.ui.Startup;
+import javafx.application.Application;
+import javafx.stage.Stage;
 
-public class Loader {
-
-	/**
-	 * Launch the application.
-	 * @param args
-	 */
-	public static void main(String[] args) {
+public class MabiIccoFX extends Application {
+	@Override
+	public void start(Stage arg0) throws Exception {
 		MabiIccoProperties appProperties = MabiIccoProperties.getInstance();
 
 		try {
@@ -83,5 +82,21 @@ public class Loader {
 				window.setVisible(false);
 			}
 		});
+	}
+
+	public static void setUIFont (javax.swing.plaf.FontUIResource resource){
+		for (Object key : Collections.list(UIManager.getDefaults().keys())) {
+			Object value = UIManager.get(key);
+			if (value instanceof javax.swing.plaf.FontUIResource) {
+				UIManager.put(key, resource);
+			}
+		}
+	}
+
+	public static void main(String[] args) {
+		try {
+			setUIFont(new javax.swing.plaf.FontUIResource("Meiryo", Font.PLAIN, 11));
+		} catch (Exception e) {}
+		launch(args);
 	}
 }

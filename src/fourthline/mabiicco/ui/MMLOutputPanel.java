@@ -55,7 +55,7 @@ public class MMLOutputPanel extends JPanel {
 		this.trackList = trackList;
 		setLayout(null);
 
-		copyButton.setBounds(141, 189, 84, 29);
+		copyButton.setBounds(141, 189, 90, 29);
 		add(copyButton);
 		copyButton.addActionListener(new ActionListener() {
 			@Override
@@ -65,7 +65,7 @@ public class MMLOutputPanel extends JPanel {
 		});
 
 		JButton closeButton = new JButton("閉じる");
-		closeButton.setBounds(257, 189, 84, 29);
+		closeButton.setBounds(257, 189, 90, 29);
 		add(closeButton);
 		closeButton.setFocusable(false);
 		closeButton.addActionListener(new ActionListener() {
