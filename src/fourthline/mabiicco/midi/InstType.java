@@ -8,7 +8,8 @@ public enum InstType {
 	NONE(false, false, false, false),
 	NORMAL(true, true, true, false),
 	DRUMS(true, false, false, false),
-	VOICE(false, false, false, true);
+	VOICE(false, false, false, true),
+	CHORUS(false, false, false, true);
 
 	public static InstType getInstType(String s) {
 		if (s.equals("0")) {
@@ -22,6 +23,9 @@ public enum InstType {
 		}
 		if (s.equals("V")) {
 			return VOICE;
+		}
+		if (s.equals("C")) {
+			return CHORUS;
 		}
 
 		return null;

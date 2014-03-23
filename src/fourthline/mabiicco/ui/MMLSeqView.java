@@ -515,9 +515,9 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 			MMLTrack track = mmlScore.getTrack(i);
 
 			String mmlStrings[] = track.getMMLStrings();
-			view.setPartMMLString(0, mmlStrings[0]);
-			view.setPartMMLString(1, mmlStrings[1]);
-			view.setPartMMLString(2, mmlStrings[2]);
+			for (int j = 0; j < mmlStrings.length; j++) {
+				view.setPartMMLString(j, mmlStrings[j]);
+			}
 		}
 
 		pianoRollView.repaint();

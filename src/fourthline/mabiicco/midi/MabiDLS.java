@@ -119,12 +119,12 @@ public final class MabiDLS {
 			String originalName = inst.getName();
 			int bank = inst.getPatch().getBank();
 			int program = inst.getPatch().getProgram();
+			System.out.printf("%d=%s \"%s\"\n", program,  originalName, name);
 			if (name != null) {
 				name = ""+program+": "+name;
 				instArray.add(new InstClass( name,
 						bank,
 						program ));
-				System.out.printf("%d=%s \"%s\"\n", program,  originalName, name);
 			}
 		}
 
@@ -288,8 +288,8 @@ public final class MabiDLS {
 		}
 
 		// 歌パートの作成
-		createVoiceMidiTrack(sequence, score, 11, 120); // 男声
-		createVoiceMidiTrack(sequence, score, 12, 121); // 女声
+		createVoiceMidiTrack(sequence, score, 11, 100); // 男声
+		createVoiceMidiTrack(sequence, score, 12, 110); // 女声
 
 		return sequence;
 	}

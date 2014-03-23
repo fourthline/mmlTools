@@ -76,7 +76,7 @@ public class MMLOutputPanel extends JPanel {
 		});
 
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(12, 10, 345, 169);
+		scrollPane.setBounds(12, 10, 372, 169);
 		add(scrollPane);
 
 		table = createJTableFromMMLTrack(trackList);
@@ -116,7 +116,7 @@ public class MMLOutputPanel extends JPanel {
 		}
 
 		TableColumnModel columnModel = jTable.getColumnModel();
-		columnModel.getColumn(2).setPreferredWidth(140);
+		columnModel.getColumn(2).setPreferredWidth(180);
 
 		return jTable;
 	}
@@ -142,7 +142,7 @@ public class MMLOutputPanel extends JPanel {
 
 	@Override
 	public Dimension getPreferredSize() {
-		return new Dimension(370, 240);
+		return new Dimension(390, 220);
 	}
 
 	/**

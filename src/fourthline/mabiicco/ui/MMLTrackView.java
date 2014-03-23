@@ -95,7 +95,7 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 			songComboBox = new JComboBox();
 		} else {
 			comboBox = new JComboBox( InstClass.filterInstArray(insts, EnumSet.of(InstType.NORMAL, InstType.DRUMS, InstType.VOICE)) );
-			songComboBox = new JComboBox( InstClass.filterInstArray(insts, EnumSet.of(InstType.VOICE)) );
+			songComboBox = new JComboBox( InstClass.filterInstArray(insts, EnumSet.of(InstType.CHORUS)) );
 			songComboBox.addItem(noUseSongEx);
 		}
 		northLPanel.add(comboBox);
@@ -243,7 +243,7 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 			comboBox.setSelectedItem(insts[0]);
 		}
 		InstClass songInst = InstClass.searchInstAtProgram(insts, songProgram);
-		if ( (songInst != null) && (songInst.getType() == InstType.VOICE) ) {
+		if ( (songInst != null) && (songInst.getType() == InstType.CHORUS) ) {
 			songComboBox.setSelectedItem(songInst);
 		} else {
 			songComboBox.setSelectedItem(noUseSongEx);
@@ -311,6 +311,7 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		mmlText[0].setText( track.getMelody() );
 		mmlText[1].setText( track.getChord1() );
 		mmlText[2].setText( track.getChord2() );
+		mmlText[3].setText( track.getSongEx() );
 
 		setInstProgram( track.getProgram(), track.getSongProgram() );
 	}
