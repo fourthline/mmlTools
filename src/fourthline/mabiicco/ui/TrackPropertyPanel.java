@@ -72,7 +72,7 @@ public class TrackPropertyPanel extends JPanel {
 	private void applyProperty() {
 		track.setTrackName( trackNameField.getText() );
 		track.setPanpot( panpotSlider.getValue() );
-		mmlManager.saveState();
+		mmlManager.updateActivePart();
 	}
 
 	public void showDialog() {

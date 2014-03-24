@@ -40,8 +40,8 @@ public class PianoRollView extends AbstractMMLView {
 	private long runningSequencePosition = 0;
 
 	// 描画位置判定用 (tick base)
-	private double startViewTick;
-	private double endViewTick;
+	private long startViewTick;
+	private long endViewTick;
 
 	// 選択中のノートイベント
 	private List<MMLNoteEvent> selectNoteList;
@@ -300,6 +300,12 @@ public class PianoRollView extends AbstractMMLView {
 			int sect = MMLTicks.getTick(mmlManager.getMMLScore().getBaseOnly());
 			int borderCount = mmlManager.getMMLScore().getTimeCountOnly();
 			for (int i = 0; i*sect < width; i++) {
+				if (i*sect < startViewTick) {
+					continue;
+				}
+				if (i*sect > endViewTick) {
+					break;
+				}
 				if (i%borderCount == 0) {
 					g.setColor(darkBarBorder);
 				} else {

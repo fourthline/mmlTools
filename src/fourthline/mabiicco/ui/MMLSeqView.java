@@ -24,7 +24,6 @@ import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTempoEvent;
 import fourthline.mmlTools.MMLTrack;
-import fourthline.mmlTools.optimizer.MMLStringOptimizer;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -149,24 +148,14 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		tabbedPane.setSelectedIndex(trackIndex);
 		updateTrackTabIcon();
 
-		// ピアノロール更新
-		pianoRollView.repaint();
-
 		// エディタ更新
-		updateTempoRoll();
+		updateActivePart();
 		updateSelectedTrackAndMMLPart();
-
-		undoEdit.saveState();
 	}
 
 	private void removeAllMMLTrack() {
 		mmlScore = new MMLScore();
 		tabbedPane.removeAll();
-	}
-
-	@Override
-	public void saveState() {
-		undoEdit.saveState();
 	}
 
 	/**
@@ -256,10 +245,8 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		initialSetView();
 		pianoRollView.setSequenceX(0);
 		updateTrackTabIcon();
-		updateTempoRoll();
-		repaint();
-
 		undoEdit.initState();
+		updateActivePart();
 	}
 
 	/**
@@ -277,10 +264,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		MMLTrackView view = (MMLTrackView)tabbedPane.getComponentAt(index);
 		view.setMMLTrack(mml);
 		updateSelectedTrackAndMMLPart();
-		updateTempoRoll();
-		repaint();
-
-		undoEdit.saveState();
+		updateActivePart();
 	}
 
 	/**
@@ -459,8 +443,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 			undoEdit.undo();
 			resetTrackView();
 			updateSelectedTrackAndMMLPart();
-			updateTempoRoll();
-			repaint();
+			updateActivePart();
 		}
 	}
 
@@ -469,8 +452,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 			undoEdit.redo();
 			resetTrackView();
 			updateSelectedTrackAndMMLPart();
-			updateTempoRoll();
-			repaint();
+			updateActivePart();
 		}
 	}
 
@@ -489,25 +471,10 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 
 	@Override
 	public void updateActivePart() {
-		int trackIndex = tabbedPane.getSelectedIndex();
-		MMLTrackView view = (MMLTrackView) tabbedPane.getSelectedComponent();
-		int mmlPartIndex = view.getSelectedMMLPartIndex();
-		MMLTrack track = mmlScore.getTrack(trackIndex);
-
-		// TODO: 他のパートのtickLength増加でパート1に関しては、tickLength追従が必要.
-		if (mmlPartIndex > 0) {
-			MMLEventList eventList = track.getMMLEventAtIndex(mmlPartIndex);
-			String mml = eventList.toMMLString();
-			String optimizedMML = new MMLStringOptimizer(mml).toString();
-			view.setPartMMLString(mmlPartIndex, optimizedMML);
-		}
-
-		updateTempoRoll();
-		undoEdit.saveState();
+		updateAllMMLPart();
 	}
 
-	@Override
-	public void updateTempoRoll() {
+	private void updateAllMMLPart() {
 		// すべての全パートMMLテキストを更新します. 
 		int count = tabbedPane.getComponentCount();
 		for (int i = 0; i < count; i++) {
@@ -520,7 +487,8 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 			}
 		}
 
-		pianoRollView.repaint();
+		undoEdit.saveState();
+		repaint();
 	}
 
 	@Override

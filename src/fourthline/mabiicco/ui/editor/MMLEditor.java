@@ -218,6 +218,10 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext, 
 		for (MMLNoteEvent noteEvent : selectedNote) {
 			detachedNote.add(noteEvent.clone());
 		}
+
+		if (selectedNote.size() == 1) {
+			keyboardView.playNote( selectedNote.get(0).getNote() );
+		}
 	}
 	/**
 	 * 選択状態のノートを移動する
@@ -367,7 +371,6 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext, 
 				if ( (noteEvent != null) && (noteEvent.getNote() == note) ) {
 					new MMLNotePropertyPanel(noteEvent).showDialog();
 					mmlManager.updateActivePart();
-					pianoRollView.repaint();
 				}
 			}
 		}
@@ -443,7 +446,6 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext, 
 			selectNote(addNote, true);
 		}
 
-		pianoRollView.repaint();
 		editObserver.notifyUpdateEditState();
 		mmlManager.updateActivePart();
 	}
@@ -457,7 +459,6 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext, 
 		}
 
 		selectNote(null);
-		pianoRollView.repaint();
 		editObserver.notifyUpdateEditState();
 		mmlManager.updateActivePart();
 	}
@@ -479,7 +480,6 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext, 
 		}
 
 		selectNote(null);
-		pianoRollView.repaint();
 		editObserver.notifyUpdateEditState();
 		mmlManager.updateActivePart();
 	}

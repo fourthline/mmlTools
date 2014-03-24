@@ -200,9 +200,7 @@ public class ColumnPanel extends AbstractMMLView implements MouseListener, Actio
 			System.out.println("delete tempo.");
 		}
 
-		mmlManager.saveState();
-		mmlManager.updateTempoRoll();
-		repaint();
+		mmlManager.updateActivePart();
 	}
 
 	private int showTempoInputDialog(String title, int tempo) {
