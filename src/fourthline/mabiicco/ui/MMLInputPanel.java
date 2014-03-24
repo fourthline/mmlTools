@@ -119,7 +119,8 @@ public class MMLInputPanel extends JPanel {
 		// 各パートが全て空であれば、ダイアログ表示しない。
 		if ( (track.getMelody().length() == 0) &&
 				(track.getChord1().length() == 0) &&
-				(track.getChord2().length() == 0) ) {
+				(track.getChord2().length() == 0) &&
+				(track.getSongEx().length() == 0) ) {
 			return;
 		}
 

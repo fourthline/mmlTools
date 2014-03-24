@@ -161,6 +161,8 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		for (int i = 0; i < MMLPART_NAME.length; i++) {
 			partButton[i].addActionListener(actionListener);
 		}
+
+		updatePartButtonStatus();
 	}
 
 	public String getMMLText() {
