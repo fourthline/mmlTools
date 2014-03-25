@@ -69,8 +69,8 @@ public class MMLScoreTest {
 		score.addTrack(track2);
 
 		String mml[] = { 
-				"MML@at150at120at150,bbb,ccc;",
-				"MML@at150at120at150,bbb,ccc;"
+				"MML@at150at120at150,bbb,ccc,v0ct150;",
+				"MML@at150at120at150,bbb,ccc,v0ct150;"
 		};
 
 		checkMMLFileOutput(score, "format1.mmi", mml);
@@ -83,7 +83,7 @@ public class MMLScoreTest {
 		track.setTrackName("track1");
 		score.addTrack(track);
 
-		String mml[] = { "MML@v0c1t180v8c8,,;" };
+		String mml[] = { "MML@v0c1t180v8c8,,,v0c1t180;" };
 
 		checkMMLFileOutput(score, "format_r0.mmi", mml);
 	}
@@ -104,9 +104,9 @@ public class MMLScoreTest {
 		score.addTrack(track3);
 
 		String mml[] = {
-				"MML@l1r>f+t120&f+,,;",
-				"MML@v0l1cct120v8a+,,;",
-				"MML@d1v0c1t120,,;"
+				"MML@l1r>f+t120&f+,,,v0c1c1t120;",
+				"MML@v0l1cct120v8a+,,,v0c1c1t120;",
+				"MML@d1v0c1t120,,,v0c1c1t120;"
 		};
 
 		checkMMLFileOutput(score, "format_r1.mmi", mml);

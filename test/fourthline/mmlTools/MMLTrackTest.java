@@ -26,7 +26,7 @@ public class MMLTrackTest {
 				"a8t150&a8aa", // melodyパートのみテンポ指定.
 				"b8&b8bb",
 				"c8&c8cc",
-				"d8&d8dd" // TODO: 歌パートはどうなるんだろ？
+				"d8t150&d8dd"
 		};
 		new MMLTempoEvent(150, 48).appendToListElement(track.getGlobalTempoList());
 		String mml[] = track.getMMLStrings();
@@ -99,7 +99,7 @@ public class MMLTrackTest {
 	@Test
 	public void testPlayingShortMML() throws Exception {
 		String mml       = "MML@t90cccccccccccct150cccc,eeeeeeeeeeeeeeeedddd,;";
-		String expectMML = "MML@t90cccccccccccct150ccccr1,eeeeeeeeeeeeeeeedddd,;";
+		String expectMML = "MML@t90cccccccccccct150ccccr1,eeeeeeeeeeeeeeeedddd,,t90;";
 
 		MMLTrack track = new MMLTrack(mml);
 		assertEquals(expectMML, track.getMMLString());
@@ -111,7 +111,7 @@ public class MMLTrackTest {
 	@Test
 	public void testPlayingLongMML() throws Exception {
 		String mml =       "MML@t150cccccccccccct90cccc,eeeeeeeeeeeeeeee,;";
-		String expectMML = "MML@t150cccccccccccct90cccct150,eeeeeeeeeeeeeeee,;";
+		String expectMML = "MML@t150cccccccccccct90cccct150,eeeeeeeeeeeeeeee,,t150;";
 
 		MMLTrack track = new MMLTrack(mml);
 		assertEquals(expectMML, track.getMMLString());
@@ -123,7 +123,7 @@ public class MMLTrackTest {
 	@Test
 	public void testPlayingLong2MML() throws Exception {
 		String mml =       "MML@t150cccccccccccct90c,eeeeeeeeeeeeeeee;";
-		String expectMML = "MML@t150cccccccccccct90cr2.v0c64t150,eeeeeeeeeeeeeeee,;";
+		String expectMML = "MML@t150cccccccccccct90cr2.v0c64t150,eeeeeeeeeeeeeeee,,t150;";
 
 		MMLTrack track = new MMLTrack(mml);
 		assertEquals(expectMML, track.getMMLString());
