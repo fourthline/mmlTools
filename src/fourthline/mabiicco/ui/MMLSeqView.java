@@ -24,6 +24,8 @@ import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTempoEvent;
 import fourthline.mmlTools.MMLTrack;
+import fourthline.mmlTools.UndefinedTickException;
+import fourthline.mmlTools.core.MMLTicks;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -454,6 +456,30 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 			updateSelectedTrackAndMMLPart();
 			updateActivePart();
 		}
+	}
+
+	public void nextStepTimeTo(boolean next) {
+		try {
+			int step = MMLTicks.getTick(mmlScore.getBaseOnly());
+			int deltaTick = mmlScore.getTimeCountOnly() * step;
+			Sequencer sequencer = MabiDLS.getInstance().getSequencer();
+			long tick = pianoRollView.getSequencePlayPosition();
+			if (next) {
+				tick += deltaTick;
+			} else {
+				tick -= step;
+			}
+			tick -= tick % deltaTick;
+			if (!sequencer.isRunning()) {
+				pianoRollView.setSequenceX(pianoRollView.convertTicktoX(tick));
+				repaint();
+			} else {
+				// 移動先のテンポに設定する.
+				int tempo = mmlScore.getTempoOnTick(tick);
+				sequencer.setTickPosition(tick);
+				sequencer.setTempoInBPM(tempo);
+			}
+		} catch (UndefinedTickException e) {}
 	}
 
 	@Override

@@ -58,6 +58,8 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 	public static final String PASTE = "paste";
 	public static final String DELETE = "delete";
 	public static final String SCORE_PROPERTY = "score_property";
+	public static final String NEXT_TIME = "next_time";
+	public static final String PREV_TIME = "prev_time";
 
 	private File openedFile = null;
 
@@ -143,6 +145,10 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 			editState.selectedDelete();
 		} else if (command.equals(SCORE_PROPERTY)) {
 			scorePropertyAction();
+		} else if (command.equals(NEXT_TIME)) {
+			mmlSeqView.nextStepTimeTo(true);
+		} else if (command.equals(PREV_TIME)) {
+			mmlSeqView.nextStepTimeTo(false);
 		}
 	}
 

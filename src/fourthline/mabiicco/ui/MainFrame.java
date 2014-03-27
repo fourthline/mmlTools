@@ -131,6 +131,14 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		startPositionButton.addActionListener(listener);
 		startPositionButton.setActionCommand(ActionDispatcher.SET_START_POSITION);
 
+		JButton prevPositionButton = new JButton("");
+		toolBar.add(prevPositionButton);
+		prevPositionButton.setToolTipText("1小節戻る");
+		prevPositionButton.setIcon(new ImageIcon(MainFrame.class.getResource("/img/prev.png")));
+		prevPositionButton.setFocusable(false);
+		prevPositionButton.addActionListener(listener);
+		prevPositionButton.setActionCommand(ActionDispatcher.PREV_TIME);
+
 		JButton playButton = new JButton("");
 		toolBar.add(playButton);
 		playButton.setToolTipText("再生");
@@ -138,6 +146,14 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		playButton.setFocusable(false);
 		playButton.addActionListener(listener);
 		playButton.setActionCommand(ActionDispatcher.PLAY);
+
+		JButton nextPositionButton = new JButton("");
+		toolBar.add(nextPositionButton);
+		nextPositionButton.setToolTipText("1小節進む");
+		nextPositionButton.setIcon(new ImageIcon(MainFrame.class.getResource("/img/next.png")));
+		nextPositionButton.setFocusable(false);
+		nextPositionButton.addActionListener(listener);
+		nextPositionButton.setActionCommand(ActionDispatcher.NEXT_TIME);
 
 		JButton pauseButton = new JButton("");
 		pauseButton.setIcon(new ImageIcon(MainFrame.class.getResource("/img/pause.png")));
@@ -361,6 +377,16 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 
 		JMenuItem pauseMenuItem = createMenuItem("一時停止", ActionDispatcher.PAUSE, "/img/pause.png");
 		playMenu.add(pauseMenuItem);
+
+		playMenu.add(new JSeparator());	
+
+		JMenuItem prevMenuItem = createMenuItem("1小節戻る", ActionDispatcher.PREV_TIME, "/img/prev.png");
+		prevMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, 0));
+		playMenu.add(prevMenuItem);
+
+		JMenuItem nextMenuItem = createMenuItem("1小節進む", ActionDispatcher.NEXT_TIME, "/img/next.png");
+		nextMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F6, 0));
+		playMenu.add(nextMenuItem);
 
 		return menuBar;
 	}
