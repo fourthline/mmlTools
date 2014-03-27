@@ -99,7 +99,7 @@ public class MMLTrackTest {
 	@Test
 	public void testPlayingShortMML() throws Exception {
 		String mml       = "MML@t90cccccccccccct150cccc,eeeeeeeeeeeeeeeedddd,;";
-		String expectMML = "MML@t90cccccccccccct150ccccr1,eeeeeeeeeeeeeeeedddd,,t90;";
+		String expectMML = "MML@t90cccccccccccct150ccccr1,eeeeeeeeeeeeeeeedddd,;";
 
 		MMLTrack track = new MMLTrack(mml);
 		assertEquals(expectMML, track.getMMLString());
@@ -111,7 +111,7 @@ public class MMLTrackTest {
 	@Test
 	public void testPlayingLongMML() throws Exception {
 		String mml =       "MML@t150cccccccccccct90cccc,eeeeeeeeeeeeeeee,;";
-		String expectMML = "MML@t150cccccccccccct90cccct150,eeeeeeeeeeeeeeee,,t150;";
+		String expectMML = "MML@t150cccccccccccct90cccct150,eeeeeeeeeeeeeeee,;";
 
 		MMLTrack track = new MMLTrack(mml);
 		assertEquals(expectMML, track.getMMLString());
@@ -123,7 +123,7 @@ public class MMLTrackTest {
 	@Test
 	public void testPlayingLong2MML() throws Exception {
 		String mml =       "MML@t150cccccccccccct90c,eeeeeeeeeeeeeeee;";
-		String expectMML = "MML@t150cccccccccccct90cr2.v0c64t150,eeeeeeeeeeeeeeee,,t150;";
+		String expectMML = "MML@t150cccccccccccct90cr2.v0c64t150,eeeeeeeeeeeeeeee,;";
 
 		MMLTrack track = new MMLTrack(mml);
 		assertEquals(expectMML, track.getMMLString());
