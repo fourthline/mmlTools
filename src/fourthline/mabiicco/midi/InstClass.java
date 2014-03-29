@@ -98,4 +98,21 @@ public class InstClass {
 		}
 		return InstType.NONE.getEnablePart();
 	}
+
+	/**
+	 * プログラム番号上で有効な最初のパート番号を取得する.
+	 * @param program
+	 * @return パート番号
+	 */
+	public static int getFirstPartNumberOnProgram(int program) {
+		boolean b[] = getEnablePartByProgram(program);
+
+		for (int i = 0; i < b.length; i++) {
+			if (b[i]) {
+				return i;
+			}
+		}
+
+		throw new AssertionError("Invalid Inst Part Number.");
+	}
 }

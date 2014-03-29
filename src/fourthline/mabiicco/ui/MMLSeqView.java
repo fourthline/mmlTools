@@ -17,6 +17,7 @@ import javax.swing.event.ChangeListener;
 
 import fourthline.mabiicco.IEditState;
 import fourthline.mabiicco.IFileState;
+import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.editor.MMLEditor;
 import fourthline.mabiicco.ui.editor.MMLScoreUndoEdit;
@@ -432,7 +433,10 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 
 		if (selectedTab >= i) {
 			selectedTab = i-1;
-			selectedPart = 0;
+		}
+		int program = mmlScore.getTrack(selectedTab).getProgram();
+		if (InstClass.getEnablePartByProgram(program)[selectedPart] == false) {
+			selectedPart = InstClass.getFirstPartNumberOnProgram(program);
 		}
 
 		tabbedPane.setSelectedIndex(selectedTab);
