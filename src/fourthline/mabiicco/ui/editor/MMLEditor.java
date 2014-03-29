@@ -13,9 +13,12 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputListener;
 
+import fourthline.mabiicco.ActionDispatcher;
 import fourthline.mabiicco.IEditState;
 import fourthline.mabiicco.IEditStateObserver;
 import fourthline.mabiicco.ui.IMMLManager;
@@ -50,6 +53,8 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext, 
 	private final KeyboardView keyboardView;
 	private final IMMLManager mmlManager;
 
+	private final JPopupMenu popupMenu = new JPopupMenu();
+
 	public static int DEFAULT_ALIGN_INDEX = 2;
 
 	public static NoteAlign[] createAlignList() {
@@ -81,6 +86,8 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext, 
 		this.mmlManager = mmlManager;
 
 		pianoRoll.setSelectNote(selectedNote);
+
+		newPopupMenu("パート入れ替え", ActionDispatcher.PART_CHANGE);
 	}
 
 	public void setEditAlign(int alignTick) {
@@ -482,5 +489,55 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext, 
 		selectNote(null);
 		editObserver.notifyUpdateEditState();
 		mmlManager.updateActivePart();
+	}
+
+	public void changePart(MMLEventList from, MMLEventList to, boolean useSelectedNoteList, ChangePartAction action) {
+		int startTick = 0;
+		int endTick;
+		if (useSelectedNoteList && (selectedNote.size() > 0) ) {
+			MMLNoteEvent startNote = selectedNote.get(0);
+			MMLNoteEvent endNote = selectedNote.get(selectedNote.size()-1);
+
+			startTick = from.getAlignmentStartTick(to, startNote.getTickOffset());
+			endTick = from.getAlignmentEndTick(to, endNote.getEndTick());
+		} else {
+			endTick = (int) from.getTickLength();
+			int toEndTick = (int) to.getTickLength();
+			if (endTick < toEndTick) {
+				endTick = toEndTick;
+			}			
+		}
+
+		switch (action) {
+		case SWAP:
+			from.swap(to, startTick, endTick);
+			break;
+		case MOVE:
+			from.move(to, startTick, endTick);
+			break;
+		case COPY:
+			from.copy(to, startTick, endTick);
+			break;
+		default:
+		}
+	}
+
+	public enum ChangePartAction {
+		SWAP, MOVE, COPY
+	}
+
+	private JMenuItem newPopupMenu(String name, String command) {
+		JMenuItem menu = new JMenuItem(name);
+		menu.addActionListener(ActionDispatcher.getInstance());
+		menu.setActionCommand(command);
+		popupMenu.add(menu);
+		return menu;
+	}
+
+	@Override
+	public void showPopupMenu(Point point) {
+		int x = (int)point.getX();
+		int y = (int)point.getY();
+		popupMenu.show(pianoRollView, x, y);
 	}
 }

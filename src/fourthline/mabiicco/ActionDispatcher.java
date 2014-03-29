@@ -60,6 +60,7 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 	public static final String SCORE_PROPERTY = "score_property";
 	public static final String NEXT_TIME = "next_time";
 	public static final String PREV_TIME = "prev_time";
+	public static final String PART_CHANGE = "part_change";
 
 	private File openedFile = null;
 
@@ -67,6 +68,12 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 	private final FileFilter mmiFilter = new FileNameExtensionFilter("MabiIcco形式 (*.mmi)", "mmi");
 	private final FileFilter allFilter = new FileNameExtensionFilter("すべての対応形式 (*.mmi, *.mms)", "mmi", "mms");
 
+	private static final ActionDispatcher instance = new ActionDispatcher();
+	public static ActionDispatcher getInstance() {
+		return instance;
+	}
+
+	private ActionDispatcher() {}
 
 	public void setMainFrame(MainFrame mainFrame) {
 		this.mainFrame = mainFrame;
@@ -117,16 +124,16 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 		} else if (command.equals(REMOVE_TRACK)) {
 			mmlSeqView.removeMMLTrack();
 		} else if (command.equals(TRACK_PROPERTY)) {
-			mmlSeqView.editTrackPropertyAction();
+			mmlSeqView.editTrackPropertyAction(mainFrame);
 		} else if (command.equals(SET_START_POSITION)) {
 			mmlSeqView.setStartPosition();
 		} else if (command.equals(PLAY)) {
 			mmlSeqView.startSequence();
 			mainFrame.disableNoplayItems();
 		} else if (command.equals(INPUT_FROM_CLIPBOARD)) {
-			mmlSeqView.inputClipBoardAction();
+			mmlSeqView.inputClipBoardAction(mainFrame);
 		} else if (command.equals(OUTPUT_TO_CLIPBOARD)) {
-			mmlSeqView.outputClipBoardAction();
+			mmlSeqView.outputClipBoardAction(mainFrame);
 		} else if (command.equals(UNDO)) {
 			mmlSeqView.undo();
 		} else if (command.equals(REDO)) {
@@ -149,6 +156,8 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 			mmlSeqView.nextStepTimeTo(true);
 		} else if (command.equals(PREV_TIME)) {
 			mmlSeqView.nextStepTimeTo(false);
+		} else if (command.equals(PART_CHANGE)) {
+			mmlSeqView.partChange(mainFrame);
 		}
 	}
 

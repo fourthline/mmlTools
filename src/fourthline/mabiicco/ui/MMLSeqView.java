@@ -31,6 +31,7 @@ import fourthline.mmlTools.core.MMLTicks;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Frame;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -288,9 +289,9 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		return mmlScore;
 	}
 
-	public void editTrackPropertyAction() {
+	public void editTrackPropertyAction(Frame parentFrame) {
 		MMLTrack track = getSelectedTrack();
-		new TrackPropertyPanel(track, this).showDialog();
+		new TrackPropertyPanel(track, this).showDialog(parentFrame);
 		tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), track.getTrackName());
 	}
 
@@ -338,12 +339,12 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		pianoRollView.setSequenceX(x);
 	}
 
-	public void inputClipBoardAction() {
-		dialog.showDialog(getNewTrackName());
+	public void inputClipBoardAction(Frame parentFrame) {
+		dialog.showDialog(parentFrame, getNewTrackName());
 	}
 
-	public void outputClipBoardAction() {
-		MMLOutputPanel outputPanel = new MMLOutputPanel(mmlScore.getTrackList());
+	public void outputClipBoardAction(Frame parentFrame) {
+		MMLOutputPanel outputPanel = new MMLOutputPanel(parentFrame, mmlScore.getTrackList());
 		outputPanel.showDialog();
 	}
 
@@ -484,6 +485,11 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 				sequencer.setTempoInBPM(tempo);
 			}
 		} catch (UndefinedTickException e) {}
+	}
+
+	public void partChange(Frame parentFrame) {
+		MMLPartChangePanel panel = new MMLPartChangePanel(parentFrame, this, editor);
+		panel.showDialog();
 	}
 
 	@Override

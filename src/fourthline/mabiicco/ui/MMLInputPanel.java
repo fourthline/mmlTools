@@ -5,6 +5,7 @@
 package fourthline.mabiicco.ui;
 
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.Toolkit;
 
 import javax.swing.ButtonGroup;
@@ -110,7 +111,7 @@ public class MMLInputPanel extends JPanel {
 	 * トラック名を指定して、ダイアログを表示する.
 	 * @param trackName トラック名
 	 */
-	public void showDialog(String trackName) {
+	public void showDialog(Frame parentFrame, String trackName) {
 		textField.setText(trackName);
 
 		String mml = getClipboardString();
@@ -124,7 +125,7 @@ public class MMLInputPanel extends JPanel {
 			return;
 		}
 
-		int status = JOptionPane.showConfirmDialog(null, 
+		int status = JOptionPane.showConfirmDialog(parentFrame, 
 				this,
 				"クリップボードからのMML入力", 
 				JOptionPane.OK_CANCEL_OPTION,

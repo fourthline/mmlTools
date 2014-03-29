@@ -6,6 +6,7 @@ package fourthline.mabiicco.ui;
 
 
 import java.awt.Dimension;
+import java.awt.Frame;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -75,11 +76,11 @@ public class TrackPropertyPanel extends JPanel {
 		mmlManager.updateActivePart();
 	}
 
-	public void showDialog() {
+	public void showDialog(Frame parentFrame) {
 		trackNameField.setText(track.getTrackName());
 		panpotSlider.setValue(track.getPanpot());
 
-		int status = JOptionPane.showConfirmDialog(null, 
+		int status = JOptionPane.showConfirmDialog(parentFrame, 
 				this,
 				"トラックプロパティ", 
 				JOptionPane.OK_CANCEL_OPTION,

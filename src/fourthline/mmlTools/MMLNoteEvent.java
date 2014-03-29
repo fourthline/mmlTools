@@ -69,8 +69,8 @@ public class MMLNoteEvent extends MMLEvent implements Cloneable {
 		return "[Note] note: " + note + ", tick: " + tick + ", offset: " + getTickOffset() + ", velocity: " + velocity;
 	}
 
-	private final String noteNameTable[] = {
-			"c", "c+", "d", "d+", "e", "f", "f+", "g", "g+", "a", "a+", "b"
+	private static final String noteNameTable[] = {
+		"c", "c+", "d", "d+", "e", "f", "f+", "g", "g+", "a", "a+", "b"
 	};
 	private String getNoteName() {
 		return noteNameTable[ note%noteNameTable.length ];

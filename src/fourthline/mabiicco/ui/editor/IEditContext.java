@@ -24,4 +24,5 @@ interface IEditContext {
 	public void areaSelectingAction(Point startPoint, Point point);
 	public void applyAreaSelect();
 	public void selectNoteByPoint(Point point, int selectModifiers);
+	public void showPopupMenu(Point point);
 }

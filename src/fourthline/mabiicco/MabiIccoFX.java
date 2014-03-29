@@ -75,7 +75,7 @@ public class MabiIccoFX extends Application {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				ActionDispatcher dispatcher = new ActionDispatcher();
+				ActionDispatcher dispatcher = ActionDispatcher.getInstance();
 				MainFrame mainFrame = new MainFrame(dispatcher);
 				dispatcher.setMainFrame(mainFrame);
 				mainFrame.setVisible(true);

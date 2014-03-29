@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 たんらる
+ * Copyright (C) 2013-2014 たんらる
  */
 
 package fourthline.mmlTools;
@@ -16,7 +16,7 @@ import fourthline.mmlTools.parser.MMLEventParser;
 /**
  * 1行のMMLデータを扱います.
  */
-public class MMLEventList implements Serializable {
+public class MMLEventList implements Serializable, Cloneable {
 	private static final long serialVersionUID = -1430758411579285535L;
 
 	private List<MMLNoteEvent>   noteList   = new ArrayList<>();
@@ -287,5 +287,82 @@ public class MMLEventList implements Serializable {
 	@Override
 	public String toString() {
 		return tempoList.toString() + noteList.toString();
+	}
+
+	@Override
+	public MMLEventList clone() {
+		try {
+			MMLEventList obj = (MMLEventList) super.clone();
+			obj.noteList = new ArrayList<>(noteList);
+			obj.tempoList = new ArrayList<>(tempoList);
+			return obj;
+		} catch (CloneNotSupportedException e) {
+			throw new AssertionError();
+		}
+	}
+
+	public int getAlignmentStartTick(MMLEventList list2, int tickOffset) {
+		MMLNoteEvent target = list2.searchOnTickOffset(tickOffset);
+		if ( (target == null) || (target.getTickOffset() == tickOffset) ) {
+			return tickOffset;
+		} else {
+			return list2.getAlignmentStartTick(this, target.getTickOffset());
+		}
+	}
+
+	public int getAlignmentEndTick(MMLEventList list2, int endTick) {
+		MMLNoteEvent target = list2.searchOnTickOffset(endTick-1);
+		if ( (target == null) || (target.getEndTick() == endTick) ) {
+			return endTick;
+		} else {
+			return list2.getAlignmentEndTick(this, target.getEndTick());
+		}
+	}
+
+	public void swap(MMLEventList list2, int startTick, int endTick) {
+		List<MMLNoteEvent> tmp1 = new ArrayList<>();
+		List<MMLNoteEvent> tmp2 = new ArrayList<>();
+		for (MMLNoteEvent noteEvent : noteList) {
+			if ( (noteEvent.getTickOffset() >= startTick) && (noteEvent.getEndTick() <= endTick) ) {
+				tmp1.add(noteEvent);
+			}
+		}
+		for (MMLNoteEvent noteEvent : tmp1) {
+			noteList.remove(noteEvent);
+		}
+
+		for (MMLNoteEvent noteEvent : list2.getMMLNoteEventList()) {
+			if ( (noteEvent.getTickOffset() >= startTick) && (noteEvent.getEndTick() <= endTick) ) {
+				tmp2.add(noteEvent);
+			}
+		}
+		for (MMLNoteEvent noteEvent : tmp2) {
+			list2.getMMLNoteEventList().remove(noteEvent);
+			addMMLNoteEvent(noteEvent);
+		}
+		for (MMLNoteEvent noteEvent : tmp1) {
+			list2.addMMLNoteEvent(noteEvent);
+		}
+	}
+
+	public void move(MMLEventList list2, int startTick, int endTick) {
+		List<MMLNoteEvent> tmp1 = new ArrayList<>();
+		for (MMLNoteEvent noteEvent : noteList) {
+			if ( (noteEvent.getTickOffset() >= startTick) && (noteEvent.getEndTick() <= endTick) ) {
+				tmp1.add(noteEvent);
+			}
+		}
+		for (MMLNoteEvent noteEvent : tmp1) {
+			deleteMMLEvent(noteEvent);
+			list2.addMMLNoteEvent(noteEvent);
+		}
+	}
+
+	public void copy(MMLEventList list2, int startTick, int endTick) {
+		for (MMLNoteEvent noteEvent : noteList) {
+			if ( (noteEvent.getTickOffset() >= startTick) && (noteEvent.getEndTick() <= endTick) ) {
+				list2.addMMLNoteEvent(noteEvent);
+			}
+		}
 	}
 }

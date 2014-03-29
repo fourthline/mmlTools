@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 たんらる
+ * Copyright (C) 2013-2014 たんらる
  */
 
 package fourthline.mmlTools;
@@ -348,5 +348,189 @@ public class MMLEventListTest {
 		System.out.println(mml);
 
 		assertEquals(expectMML, mml);
+	}
+
+	/**
+	 * list2に1つだけ
+	 */
+	@Test
+	public void testAlignmentStartTick0() {
+		MMLEventList eventList1 = new MMLEventList("rrrc");
+		MMLEventList eventList2 = new MMLEventList("rrc2");
+
+		MMLNoteEvent note1 = eventList1.getMMLNoteEventList().get(0);
+		MMLNoteEvent note2 = eventList2.getMMLNoteEventList().get(0);
+
+		int result = eventList1.getAlignmentStartTick(eventList2, note1.getTickOffset());
+
+		assertEquals(note2.getTickOffset(), result);
+	}
+
+	/**
+	 * list1のひとつ前まで.
+	 */
+	@Test
+	public void testAlignmentStartTick1() {
+		MMLEventList eventList1 = new MMLEventList("rcrc");
+		MMLEventList eventList2 = new MMLEventList("r.c2");
+
+		MMLNoteEvent note1 = eventList1.getMMLNoteEventList().get(0);
+		MMLNoteEvent note2 = eventList1.getMMLNoteEventList().get(1);
+
+		int result = eventList1.getAlignmentStartTick(eventList2, note2.getTickOffset());
+
+		assertEquals(note1.getTickOffset(), result);
+	}
+
+	/**
+	 * 同じoffset
+	 */
+	@Test
+	public void testAlignmentStartTick2() {
+		MMLEventList eventList1 = new MMLEventList("rc");
+		MMLEventList eventList2 = new MMLEventList("rc");
+
+		MMLNoteEvent note1 = eventList1.getMMLNoteEventList().get(0);
+		MMLNoteEvent note2 = eventList1.getMMLNoteEventList().get(0);
+
+		int result = eventList1.getAlignmentStartTick(eventList2, note1.getTickOffset());
+
+		assertEquals(note2.getTickOffset(), result);
+	}
+
+	/**
+	 * endTick = tickOffset
+	 */
+	@Test
+	public void testAlignmentStartTick3() {
+		MMLEventList eventList1 = new MMLEventList("c");
+		MMLEventList eventList2 = new MMLEventList("rc");
+
+		MMLNoteEvent note1 = eventList2.getMMLNoteEventList().get(0);
+
+		int result = eventList1.getAlignmentStartTick(eventList2, note1.getTickOffset());
+
+		assertEquals(note1.getTickOffset(), result);
+	}
+
+	/**
+	 * list2に1つだけ
+	 */
+	@Test
+	public void testAlignmentEndTick0() {
+		MMLEventList eventList1 = new MMLEventList("rrc");
+		MMLEventList eventList2 = new MMLEventList("rrc2");
+
+		MMLNoteEvent note1 = eventList1.getMMLNoteEventList().get(0);
+		MMLNoteEvent note2 = eventList2.getMMLNoteEventList().get(0);
+
+		int result = eventList1.getAlignmentEndTick(eventList2, note1.getEndTick());
+
+		assertEquals(note2.getEndTick(), result);
+	}
+
+	/**
+	 * list1の1つ後ろまで.
+	 */
+	@Test
+	public void testAlignmentEndTick1() {
+		MMLEventList eventList1 = new MMLEventList("rcrc");
+		MMLEventList eventList2 = new MMLEventList("r.c2");
+
+		MMLNoteEvent note1 = eventList1.getMMLNoteEventList().get(0);
+		MMLNoteEvent note2 = eventList1.getMMLNoteEventList().get(1);
+
+		int result = eventList1.getAlignmentEndTick(eventList2, note1.getEndTick());
+
+		assertEquals(note2.getEndTick(), result);
+	}
+
+	/**
+	 * 同じoffset
+	 */
+	@Test
+	public void testAlignmentEndTick2() {
+		MMLEventList eventList1 = new MMLEventList("rc");
+		MMLEventList eventList2 = new MMLEventList("rc");
+
+		MMLNoteEvent note1 = eventList1.getMMLNoteEventList().get(0);
+		MMLNoteEvent note2 = eventList1.getMMLNoteEventList().get(0);
+
+		int result = eventList1.getAlignmentEndTick(eventList2, note1.getEndTick());
+
+		assertEquals(note2.getEndTick(), result);
+	}
+
+	/**
+	 * endTick = tickOffset
+	 */
+	@Test
+	public void testAlignmentEndTick3() {
+		MMLEventList eventList1 = new MMLEventList("c");
+		MMLEventList eventList2 = new MMLEventList("rc");
+
+		MMLNoteEvent note1 = eventList1.getMMLNoteEventList().get(0);
+
+		int result = eventList1.getAlignmentEndTick(eventList2, note1.getEndTick());
+
+		assertEquals(note1.getEndTick(), result);
+	}
+
+	/**
+	 * swap
+	 */
+	@Test
+	public void testSwap0() {
+		MMLEventList eventList1 = new MMLEventList("rcrc");
+		MMLEventList eventList2 = new MMLEventList("r.c2");
+
+		String mml1 = eventList1.toMMLString();
+		String mml2 = eventList2.toMMLString();
+		int endTick = eventList1.getAlignmentEndTick(eventList2, eventList1.getMMLNoteEventList().get(1).getEndTick());
+
+		eventList1.swap(eventList2, 0, endTick);
+		System.out.println(eventList1.getMMLNoteEventList().size());
+		System.out.println(eventList2.getMMLNoteEventList().size());
+
+		assertEquals(mml1, eventList2.toMMLString());
+		assertEquals(mml2, eventList1.toMMLString());
+	}
+
+	/**
+	 * move
+	 */
+	@Test
+	public void testMove0() {
+		MMLEventList eventList1 = new MMLEventList("rcrc");
+		MMLEventList eventList2 = new MMLEventList("r.c2");
+
+		String mml1 = eventList1.toMMLString();
+		int endTick = eventList1.getAlignmentEndTick(eventList2, eventList1.getMMLNoteEventList().get(1).getEndTick());
+
+		eventList1.move(eventList2, 0, endTick);
+		System.out.println(eventList1.getMMLNoteEventList().size());
+		System.out.println(eventList2.getMMLNoteEventList().size());
+
+		assertEquals(mml1, eventList2.toMMLString());
+		assertEquals("", eventList1.toMMLString());
+	}
+
+	/**
+	 * copy
+	 */
+	@Test
+	public void testCopy0() {
+		MMLEventList eventList1 = new MMLEventList("rcrc");
+		MMLEventList eventList2 = new MMLEventList("r.c2");
+
+		String mml1 = eventList1.toMMLString();
+		int endTick = eventList1.getAlignmentEndTick(eventList2, eventList1.getMMLNoteEventList().get(1).getEndTick());
+
+		eventList1.copy(eventList2, 0, endTick);
+		System.out.println(eventList1.getMMLNoteEventList().size());
+		System.out.println(eventList2.getMMLNoteEventList().size());
+
+		assertEquals(mml1, eventList2.toMMLString());
+		assertEquals(mml1, eventList1.toMMLString());
 	}
 }

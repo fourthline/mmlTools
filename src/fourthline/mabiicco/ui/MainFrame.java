@@ -339,6 +339,12 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		deleteMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
 		editMenu.add(deleteMenu);
 
+		editMenu.add(new JSeparator());
+
+		JMenuItem partChangeMenu = createMenuItem("パート入れ替え", ActionDispatcher.PART_CHANGE);
+		noplayFunctions.add(partChangeMenu);
+		editMenu.add(partChangeMenu);
+
 		/************************* Track Menu *************************/
 		JMenu trackMenu = new JMenu("トラック");
 		menuBar.add(trackMenu);

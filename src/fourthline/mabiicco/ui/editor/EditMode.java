@@ -20,7 +20,7 @@ enum EditMode {
 			startPoint = e.getPoint();
 			if (SwingUtilities.isRightMouseButton(e)) {
 				if (context.onExistNote(startPoint)) {
-					// TODO: show note edit menu
+					context.showPopupMenu(startPoint);
 				} else {
 					context.changeState(EditMode.AREA);
 				}

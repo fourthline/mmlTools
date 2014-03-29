@@ -38,16 +38,18 @@ import fourthline.mmlTools.core.MMLTools;
 public class MMLOutputPanel extends JPanel {
 	private static final long serialVersionUID = 8558159209741558854L;
 	private JTable table;
-	private final JDialog dialog = new JDialog((Frame)null, "クリップボードへ出力", true);
+	private final JDialog dialog;
 	private final JButton copyButton = new JButton("MMLコピー");
 
 	private List<MMLTrack> trackList;
 
-	public MMLOutputPanel() {
+	public MMLOutputPanel(Frame parentFrame) {
+		this.dialog = null;
 		initializePanel(null);
 	}
 
-	public MMLOutputPanel(List<MMLTrack> trackList) {
+	public MMLOutputPanel(Frame parentFrame, List<MMLTrack> trackList) {
+		this.dialog = new JDialog(parentFrame, "クリップボードへ出力", true);
 		initializePanel(trackList);
 	}
 
@@ -99,20 +101,21 @@ public class MMLOutputPanel extends JPanel {
 			}});
 	}
 
-	private JTable createJTableFromMMLTrack(List<MMLTrack> trackList) {
+	public static JTable createJTableFromMMLTrack(List<MMLTrack> trackList) {
 		String columnNames[] = {
 				"トラック名", "楽器", "作曲ランク"
 		};
 		DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
 		JTable jTable = new JTable(tableModel);
-
-		for (MMLTrack track : trackList) {
-			MMLTools tools = new MMLTools( track.getMMLString() );
-			InstClass inst = MabiDLS.getInstance().getInstByProgram(track.getProgram());
-			String rowData[] = {
-					track.getTrackName(), inst.toString(), tools.mmlRankFormat()
-			};
-			tableModel.addRow(rowData);
+		if (trackList != null) {
+			for (MMLTrack track : trackList) {
+				MMLTools tools = new MMLTools( track.getMMLString() );
+				InstClass inst = MabiDLS.getInstance().getInstByProgram(track.getProgram());
+				String rowData[] = {
+						track.getTrackName(), inst.toString(), tools.mmlRankFormat()
+				};
+				tableModel.addRow(rowData);
+			}
 		}
 
 		TableColumnModel columnModel = jTable.getColumnModel();
