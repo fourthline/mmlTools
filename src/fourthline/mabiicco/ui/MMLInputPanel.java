@@ -97,7 +97,7 @@ public class MMLInputPanel extends JPanel {
 		textField = new JTextField(20);
 		textField.setBounds(27, 35, 193, 19);
 		// TODO: 日本語を入力したとき、再生時にCPU負荷がかかる問題あり.
-		textField.setEditable(false);
+		// textField.setEditable(false);
 		panel3.add(textField);
 	}
 

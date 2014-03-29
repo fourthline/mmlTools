@@ -168,7 +168,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		int index = tabbedPane.getSelectedIndex();
 
 		mmlScore.removeTrack(index);
-		tabbedPane.remove(index);
+		resetTrackView();
 		updateTrackTabIcon();
 
 		if (mmlScore.getTrackCount() == 0) {
