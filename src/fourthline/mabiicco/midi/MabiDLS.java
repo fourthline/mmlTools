@@ -245,6 +245,24 @@ public final class MabiDLS {
 		channel[ch_num].controlChange(10, panpot);
 	}
 
+	public void toggleMute(int ch) {
+		channel[ch].setMute(!channel[ch].getMute());
+	}
+
+	public void solo(int ch) {
+		for (MidiChannel c : channel) {
+			c.setMute(true);
+		}
+
+		channel[ch].setMute(false);
+	}
+
+	public void all() {
+		for (MidiChannel c : channel) {
+			c.setMute(false);
+		}
+	}
+
 	public static void main(String args[]) {
 		try {
 			MabiDLS midi = new MabiDLS();
@@ -333,8 +351,6 @@ public final class MabiDLS {
 			}
 		}
 	}
-
-
 
 	private void convertMidiPart(Track track, MMLEventList eventList, int channel) {
 		int volumn = MMLNoteEvent.INITIAL_VOLUMN;

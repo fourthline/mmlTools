@@ -81,7 +81,6 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		add(scrollPane, BorderLayout.CENTER);
 		pianoRollView.setViewportAndParent(scrollPane.getViewport(), this);
 
-
 		// MMLTrackView (tab) - SOUTH
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane.addChangeListener(this);
@@ -351,6 +350,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	private void updateSelectedTrackAndMMLPart() {
 		MMLTrackView view = (MMLTrackView) tabbedPane.getSelectedComponent();
 		if (view != null) {
+			view.updateMuteButton();
 			int program = getActivePartProgram();
 			int mmlPartIndex = view.getSelectedMMLPartIndex();
 

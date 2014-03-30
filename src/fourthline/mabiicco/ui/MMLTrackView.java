@@ -5,9 +5,12 @@
 package fourthline.mabiicco.ui;
 
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -47,6 +50,10 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 	private JComboBox<InstClass> songComboBox;
 
 	private JLabel trackComposeLabel;
+	private JToolBar toolBar;
+	private JButton muteButton;
+	private JButton soloButton;
+	private JButton allButton;
 
 	private IMMLManager mmlManager;
 
@@ -107,6 +114,10 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		songComboBox.setMaximumRowCount(30);
 		songComboBox.setPreferredSize(new Dimension(140, 20));
 
+		toolBar = new JToolBar();
+		toolBar.setFloatable(false);
+		northPanel.add(toolBar);
+
 		// 各パートのボタンとテキストフィールドを作成します.
 		ButtonGroup bGroup = new ButtonGroup();
 		partButton = new JToggleButton[MMLPART_NAME.length];
@@ -162,7 +173,31 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 			partButton[i].addActionListener(actionListener);
 		}
 
+		muteButton = new JButton("");
+		updateMuteButton();
+		muteButton.setToolTipText("Mute");
+		toolBar.add(muteButton);
+		soloButton = new JButton("");
+		soloButton.setIcon(new ImageIcon(this.getClass().getResource("/img/play_solo.png")));
+		soloButton.setToolTipText("Solo");
+		toolBar.add(soloButton);
+		allButton = new JButton("");
+		allButton.setIcon(new ImageIcon(this.getClass().getResource("/img/play_all.png")));
+		allButton.setToolTipText("All");
+		toolBar.add(allButton);
+		muteButton.addActionListener(this);
+		soloButton.addActionListener(this);
+		allButton.addActionListener(this);
+
 		updatePartButtonStatus();
+	}
+
+	public void updateMuteButton() {
+		if (MabiDLS.getInstance().getChannel(trackIndex).getMute()) {
+			muteButton.setIcon(new ImageIcon(this.getClass().getResource("/img/mute_on.png")));
+		} else {
+			muteButton.setIcon(new ImageIcon(this.getClass().getResource("/img/mute_off.png")));
+		}
 	}
 
 	public String getMMLText() {
@@ -329,15 +364,20 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		updateComposeRank();
 	}
 
-
-	/**
-	 * コンボボックスによる楽器の変更。
-	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object source = e.getSource();
 		if (source instanceof JComboBox<?>) {
 			updateProgramChangeStatus();
+		} else if (source.equals(muteButton)) {
+			MabiDLS.getInstance().toggleMute(trackIndex);
+			updateMuteButton();
+		} else if (source.equals(soloButton)) {
+			MabiDLS.getInstance().solo(trackIndex);
+			updateMuteButton();
+		} else if (source.equals(allButton)) {
+			MabiDLS.getInstance().all();
+			updateMuteButton();
 		}
 	}
 }
