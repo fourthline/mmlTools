@@ -21,6 +21,7 @@ import javax.swing.event.MouseInputListener;
 import fourthline.mabiicco.ActionDispatcher;
 import fourthline.mabiicco.IEditState;
 import fourthline.mabiicco.IEditStateObserver;
+import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.IMMLManager;
 import fourthline.mabiicco.ui.KeyboardView;
 import fourthline.mabiicco.ui.MMLNotePropertyPanel;
@@ -536,6 +537,9 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext, 
 
 	@Override
 	public void showPopupMenu(Point point) {
+		if (MabiDLS.getInstance().getSequencer().isRecording()) {
+			return;
+		}
 		int x = (int)point.getX();
 		int y = (int)point.getY();
 		popupMenu.show(pianoRollView, x, y);
