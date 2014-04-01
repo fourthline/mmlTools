@@ -30,8 +30,6 @@ import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.editor.IEditAlign;
 import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTempoEvent;
-import fourthline.mmlTools.UndefinedTickException;
-import fourthline.mmlTools.core.MMLTicks;
 
 /**
  *
@@ -108,25 +106,17 @@ public class ColumnPanel extends AbstractMMLView implements MouseListener, Actio
 	 */
 	private void paintRuler(Graphics2D g) {
 		int width = getWidth();
-		try {
-			g.setColor(BEAT_BORDER_COLOR);
-			int sect = MMLTicks.getTick(mmlManager.getMMLScore().getBaseOnly());
-			sect = pianoRollView.convertTicktoX(sect);
-			int borderCount = mmlManager.getMMLScore().getTimeCountOnly();
-			int incr = sect * borderCount;
-			int count = 0;
-			for (int i = 0; i < width; i += incr) {
-				int x = i;
-				int y1 = 0;
-				int y2 = getHeight();
-				g.drawLine(x, y1, x, y2);
+		g.setColor(BEAT_BORDER_COLOR);
+		int incr = pianoRollView.getMeasureWidth();
+		int count = 0;
+		for (int i = 0; i < width; i += incr) {
+			int x = i;
+			int y1 = 0;
+			int y2 = getHeight();
+			g.drawLine(x, y1, x, y2);
 
-				String s = "" + (count++);
-				g.drawString(s, x+2, y1+10);
-			}
-
-		} catch (UndefinedTickException e) {
-			e.printStackTrace();
+			String s = "" + (count++);
+			g.drawString(s, x+2, y1+10);
 		}
 	}
 

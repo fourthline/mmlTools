@@ -622,13 +622,15 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 				@Override
 				public void run() {
 					pianoRollView.updateRunningSequencePosition();
+					int measure = pianoRollView.getMeasureWidth();
 					long position = pianoRollView.getSequencePlayPosition();
 					position = pianoRollView.convertTicktoX(position);
+					position -= position % measure;
 					JViewport viewport = scrollPane.getViewport();
 					Point point = viewport.getViewPosition();
 					Dimension dim = viewport.getExtentSize();
 					double x1 = point.getX();
-					double x2 = x1 + dim.getWidth();
+					double x2 = x1 + dim.getWidth() - measure;
 					if ( (position < x1) || (position > x2) ) {
 						/* ビュー外にあるので、現在のポジションにあわせる */
 						point.setLocation(position, point.getY());

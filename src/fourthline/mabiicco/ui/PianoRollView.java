@@ -293,6 +293,21 @@ public class PianoRollView extends AbstractMMLView {
 	}
 
 	/**
+	 * 現在のスコアを基準とした1小節の幅を取得する.
+	 * @return
+	 */
+	public int getMeasureWidth() {
+		try {
+			int sect = MMLTicks.getTick(mmlManager.getMMLScore().getBaseOnly());
+			sect = convertTicktoX(sect);
+			int borderCount = mmlManager.getMMLScore().getTimeCountOnly();
+			return (sect * borderCount);
+		} catch (UndefinedTickException e) {
+			throw new AssertionError();
+		}
+	}
+
+	/**
 	 * メジャーを表示します。
 	 */
 	private void paintMeasure(Graphics2D g) {
