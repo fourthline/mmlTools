@@ -60,7 +60,7 @@ public class KeyboardView extends AbstractMMLView {
 		super.paintComponent(g);
 
 		Graphics2D g2 = (Graphics2D)g.create();
-		for (int i = 0; i <= OCTNUM; i++) {
+		for (int i = 0; i < OCTNUM; i++) {
 			paintOctPianoLine(g2, i, (char)('0'+OCTNUM-i-1));
 		}
 
@@ -143,6 +143,7 @@ public class KeyboardView extends AbstractMMLView {
 		g.setFont(new Font("Arial", Font.PLAIN, 12));
 		y = startY + (12 * AbstractMMLView.HEIGHT_C);
 		g.drawChars(o_char, 0, o_char.length, 42, y);
+		g.drawLine(40, y, width, y);
 	}
 
 

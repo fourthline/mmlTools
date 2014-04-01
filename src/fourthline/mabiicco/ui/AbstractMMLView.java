@@ -21,7 +21,7 @@ public abstract class AbstractMMLView extends JPanel {
 	public final int convertY2Note(int y) {
 		int note = -1;
 		if (y >= 0) {
-			note = (9*12-(y/HEIGHT_C)) -1;
+			note = (OCTNUM*12-(y/HEIGHT_C)) -1;
 		}
 
 		return note;
@@ -33,7 +33,7 @@ public abstract class AbstractMMLView extends JPanel {
 	 * @return
 	 */
 	public final int convertNote2Y(int note) {
-		int y = 9*12 - note - 1;
+		int y = OCTNUM*12 - note - 1;
 		y *= HEIGHT_C;
 
 		return y;

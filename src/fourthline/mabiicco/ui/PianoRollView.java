@@ -221,7 +221,7 @@ public class PianoRollView extends AbstractMMLView {
 		updateViewWidthTrackLength();
 
 		Graphics2D g2 = (Graphics2D)g.create();
-		for (int i = 0; i <= AbstractMMLView.OCTNUM; i++) {
+		for (int i = 0; i < AbstractMMLView.OCTNUM; i++) {
 			paintOctPianoLine(g2, i, (char)('0'+AbstractMMLView.OCTNUM-i-1));
 		}
 
@@ -241,7 +241,7 @@ public class PianoRollView extends AbstractMMLView {
 		paintSelectedNote(g2);
 		paintSelectingArea(g2);
 
-		paintSequenceLine(g2, getHeight());
+		paintSequenceLine(g2, convertNote2Y(-1));
 
 		g2.dispose();
 	}
@@ -254,7 +254,6 @@ public class PianoRollView extends AbstractMMLView {
 		// グリッド
 		int y = startY;
 		int width = getWidth();
-		g.drawLine(0, y, width, y);
 		for (int i = 0; i < 12; i++) {
 			int line = octave*12 + (11-i);
 			Color fillColor = keyColors[i];
@@ -270,6 +269,8 @@ public class PianoRollView extends AbstractMMLView {
 			}
 			g.drawLine(0, i*HEIGHT_C+y, width, i*HEIGHT_C+y);
 		}
+		g.setColor(darkBarBorder);
+		g.drawLine(0, 12*HEIGHT_C+y, width, 12*HEIGHT_C+y);
 	}
 
 	private void paintPitchRangeBorder(Graphics2D g) {
@@ -313,7 +314,7 @@ public class PianoRollView extends AbstractMMLView {
 				}
 				int x = convertTicktoX(i*sect);
 				int y1 = 0;
-				int y2 = getHeight();
+				int y2 = convertNote2Y(-1);
 				g.drawLine(x, y1, x, y2);
 			}
 		} catch (UndefinedTickException e) {
@@ -327,14 +328,15 @@ public class PianoRollView extends AbstractMMLView {
 		int tick = noteEvent.getTick();
 		int offset = noteEvent.getTickOffset();
 		int x = convertTicktoX(offset);
-		int y = getHeight() - ((note +1) * AbstractMMLView.HEIGHT_C);
+		int y = convertNote2Y(note) +1;
 		int width = convertTicktoX(tick) -1;
 		int height = AbstractMMLView.HEIGHT_C-2;
+		if (width > 1) width--;
 
 		g.setColor(fillColor);
 		g.fillRect(x+1, y+1, width, height-1);
 		g.setColor(rectColor);
-		g.drawRect(x, y, width, height);
+		g.drawRect(x+1, y, width, height);
 
 		if (drawOption) {
 			// velocityの描画.

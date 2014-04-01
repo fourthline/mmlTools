@@ -27,6 +27,7 @@ public class MabiIccoFX extends Application {
 		MabiIccoProperties appProperties = MabiIccoProperties.getInstance();
 
 		try {
+			setUIFont(new javax.swing.plaf.FontUIResource("Meiryo", Font.PLAIN, 11));
 			UIManager.LookAndFeelInfo infos[] = UIManager.getInstalledLookAndFeels();
 			for (UIManager.LookAndFeelInfo info : infos) {
 				System.out.println(info.getClassName());
@@ -84,7 +85,7 @@ public class MabiIccoFX extends Application {
 		});
 	}
 
-	public static void setUIFont (javax.swing.plaf.FontUIResource resource){
+	private static void setUIFont(javax.swing.plaf.FontUIResource resource) {
 		for (Object key : Collections.list(UIManager.getDefaults().keys())) {
 			Object value = UIManager.get(key);
 			if (value instanceof javax.swing.plaf.FontUIResource) {
@@ -93,10 +94,7 @@ public class MabiIccoFX extends Application {
 		}
 	}
 
-	public static void main(String[] args) {
-		try {
-			setUIFont(new javax.swing.plaf.FontUIResource("Meiryo", Font.PLAIN, 11));
-		} catch (Exception e) {}
+	public static void main(String args[]) {
 		launch(args);
 	}
 }
