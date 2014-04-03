@@ -224,7 +224,6 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		}).start();
 	}
 
-
 	/**
 	 * 新規で複数のトラックをセットする。
 	 */
@@ -629,8 +628,8 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 					JViewport viewport = scrollPane.getViewport();
 					Point point = viewport.getViewPosition();
 					Dimension dim = viewport.getExtentSize();
-					double x1 = point.getX();
-					double x2 = x1 + dim.getWidth() - measure;
+					int x1 = point.x;
+					int x2 = x1 + dim.width - measure;
 					if ( (position < x1) || (position > x2) ) {
 						/* ビュー外にあるので、現在のポジションにあわせる */
 						point.setLocation(position, point.getY());

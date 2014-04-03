@@ -211,8 +211,8 @@ public class PianoRollView extends AbstractMMLView {
 	 * 9オクターブ分つくると、648
 	 */
 	@Override
-	public void paint(Graphics g) {
-		super.paint(g);
+	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
 		updateViewTick();
 
 		MMLScore mmlScore = mmlManager.getMMLScore();

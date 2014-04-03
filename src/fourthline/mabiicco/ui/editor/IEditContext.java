@@ -13,11 +13,11 @@ import java.awt.Point;
 interface IEditContext {
 	public boolean onExistNote(Point p);
 	public boolean isEditLengthPosition(Point point);
-	public void changeState(EditMode nextMode);
+	public EditMode changeState(EditMode nextMode);
 	public void newMMLNoteAndSelected(Point p);
 	public void detachSelectedMMLNote();
 	public void updateSelectedNoteAndTick(Point p, boolean updateNote);
-	public void moveSelectedMMLNote(Point start, Point p);
+	public void moveSelectedMMLNote(Point start, Point p, boolean shiftOption);
 	public void cancelMove();
 	public void applyEditNote(boolean select);
 	public void setCursor(Cursor cursor);

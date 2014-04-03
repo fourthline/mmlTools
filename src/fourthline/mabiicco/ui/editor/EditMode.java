@@ -6,6 +6,7 @@ package fourthline.mabiicco.ui.editor;
 
 import java.awt.Cursor;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 
 import javax.swing.SwingUtilities;
@@ -22,19 +23,19 @@ enum EditMode {
 				if (context.onExistNote(startPoint)) {
 					context.showPopupMenu(startPoint);
 				} else {
-					context.changeState(EditMode.AREA);
+					context.changeState(AREA).executeEvent(context, e);
 				}
 			} else if (SwingUtilities.isLeftMouseButton(e)) {
 				if (context.onExistNote(startPoint)) {
 					// ノート上であれば、ノートを選択状態にする. 複数選択判定も.
 					context.selectNoteByPoint(startPoint, e.getModifiers());
 					if (context.isEditLengthPosition(startPoint)) {
-						context.changeState(LENGTH);
+						context.changeState(LENGTH).executeEvent(context, e);
 					} else {
-						context.changeState(MOVE);
+						context.changeState(MOVE).executeEvent(context, e);
 					}
 				} else {
-					context.changeState(INSERT);
+					context.changeState(INSERT).executeEvent(context, e);
 				}
 			}
 		}
@@ -58,7 +59,7 @@ enum EditMode {
 			// 右クリックで、編集キャンセル
 			if (SwingUtilities.isRightMouseButton(e)) {
 				context.selectNoteByPoint(null, 0);
-				context.changeState(SELECT);
+				context.changeState(SELECT).executeEvent(context, e);
 			}
 		}
 		@Override
@@ -83,7 +84,7 @@ enum EditMode {
 			// 右クリックで、編集キャンセル
 			if (SwingUtilities.isRightMouseButton(e)) {
 				context.cancelMove();
-				context.changeState(SELECT);
+				context.changeState(SELECT).executeEvent(context, e);
 			}
 		}
 		@Override
@@ -94,7 +95,11 @@ enum EditMode {
 		@Override
 		public void executeEvent(IEditContext context, MouseEvent e) {
 			// 選択中のNoteを移動
-			context.moveSelectedMMLNote(startPoint, e.getPoint());
+			boolean shiftOption = false;
+			if ( (e.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
+				shiftOption = true;
+			}
+			context.moveSelectedMMLNote(startPoint, e.getPoint(), shiftOption);
 		}
 		@Override
 		public void exit(IEditContext context) {
@@ -150,12 +155,12 @@ enum EditMode {
 		case LENGTH:
 		case MOVE:
 			if (SwingUtilities.isLeftMouseButton(e)) {
-				context.changeState(SELECT);
+				context.changeState(SELECT).executeEvent(context, e);
 			}
 			break;
 		case AREA:
 			if (SwingUtilities.isRightMouseButton(e)) {
-				context.changeState(SELECT);
+				context.changeState(SELECT).executeEvent(context, e);
 			}
 			break;
 		case SELECT:

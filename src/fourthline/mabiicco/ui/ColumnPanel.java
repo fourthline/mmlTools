@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 たんらる
+ * Copyright (C) 2013-2014 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -31,9 +31,7 @@ import fourthline.mabiicco.ui.editor.IEditAlign;
 import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTempoEvent;
 
-/**
- *
- */
+
 public class ColumnPanel extends AbstractMMLView implements MouseListener, ActionListener {
 	private static final long serialVersionUID = -6609938350741425221L;
 
@@ -87,8 +85,8 @@ public class ColumnPanel extends AbstractMMLView implements MouseListener, Actio
 	}
 
 	@Override
-	public void paint(Graphics g) {
-		super.paint(g);
+	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
 
 		Graphics2D g2 = (Graphics2D)g.create();
 		/**
@@ -280,5 +278,4 @@ public class ColumnPanel extends AbstractMMLView implements MouseListener, Actio
 	@Override
 	public void mouseReleased(MouseEvent e) {
 	}
-
 }

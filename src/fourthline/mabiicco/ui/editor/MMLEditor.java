@@ -226,20 +226,18 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext, 
 		for (MMLNoteEvent noteEvent : selectedNote) {
 			detachedNote.add(noteEvent.clone());
 		}
-
-		if (selectedNote.size() == 1) {
-			keyboardView.playNote( selectedNote.get(0).getNote() );
-		}
 	}
 	/**
 	 * 選択状態のノートを移動する
 	 */
 	@Override
-	public void moveSelectedMMLNote(Point start, Point p) {
+	public void moveSelectedMMLNote(Point start, Point p, boolean shiftOption) {
 		int noteDelta = pianoRollView.convertY2Note(p.y) - pianoRollView.convertY2Note(start.y);
 		long tickOffsetDelta = pianoRollView.convertXtoTick(p.x) - pianoRollView.convertXtoTick(start.x);
-
 		long alignedTickOffsetDelta = tickOffsetDelta - (tickOffsetDelta % editAlign);
+		if (shiftOption) {
+			alignedTickOffsetDelta = 0;
+		}
 
 		for (int i = 0; i < selectedNote.size(); i++) {
 			MMLNoteEvent note1 = detachedNote.get(i);
@@ -248,9 +246,7 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext, 
 			note2.setTickOffset(note1.getTickOffset() + (int)alignedTickOffsetDelta);
 		}
 
-		if (selectedNote.size() == 1) {
-			keyboardView.playNote( selectedNote.get(0).getNote() );
-		}
+		keyboardView.playNote( pianoRollView.convertY2Note(p.y) );
 	}
 
 	@Override
@@ -360,12 +356,14 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext, 
 	 * @param nextMode
 	 */
 	@Override
-	public void changeState(EditMode nextMode) {
+	public EditMode changeState(EditMode nextMode) {
 		if (editMode != nextMode) {
 			editMode.exit(this);
 			editMode = nextMode;
 			editMode.enter(this);
 		}
+
+		return nextMode;
 	}
 
 	@Override
