@@ -13,27 +13,29 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 
+import javax.swing.JPanel;
+
 import fourthline.mabiicco.midi.MabiDLS;
 
-public class KeyboardView extends AbstractMMLView {
+public class KeyboardView extends JPanel implements IMMLView {
 	private static final long serialVersionUID = -3850112420986284800L;
 
 	private int playNote = -1;
 	private final int width = 60;
 	private final int PLAY_CHANNEL = 0;
-	IMMLManager mmlManager;
+	private final IMMLManager mmlManager;
 
 	/**
 	 * Create the panel.
 	 */
-	public KeyboardView(IMMLManager manager) {
+	public KeyboardView(IMMLManager manager, final PianoRollView pianoRollView) {
 		setPreferredSize(new Dimension(width, 649));
 		this.mmlManager = manager;
 
 		this.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				int note = convertY2Note( e.getY() );
+				int note = pianoRollView.convertY2Note( e.getY() );
 				playNote( note );
 			}
 			@Override
@@ -44,7 +46,7 @@ public class KeyboardView extends AbstractMMLView {
 		this.addMouseMotionListener(new MouseMotionAdapter() {
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				int note = convertY2Note( e.getY() );
+				int note = pianoRollView.convertY2Note( e.getY() );
 				playNote( note );
 			}
 		});
@@ -97,7 +99,7 @@ public class KeyboardView extends AbstractMMLView {
 		if ( isWhiteKey(playNote) ) {
 			x += 20;
 		}
-		int y = getHeight() - ((playNote -11) * AbstractMMLView.HEIGHT_C) + yAdd[playNote%12];
+		int y = getHeight() - ((playNote -11) * HEIGHT_C) + yAdd[playNote%12];
 		g.setColor(Color.RED);
 		g.fillOval(x, y, 4, 4);
 	}
@@ -107,7 +109,7 @@ public class KeyboardView extends AbstractMMLView {
 		// ド～シのしろ鍵盤
 		g.setColor(new Color(0.3f, 0.3f, 0.3f));
 
-		int startY = 12 * AbstractMMLView.HEIGHT_C * pos;
+		int startY = 12 * HEIGHT_C * pos;
 		int y = startY;
 		for (int i = 0; i < white_wigth.length; i++) {
 			g.drawRect(0, y, 40, white_wigth[i]);
@@ -127,10 +129,10 @@ public class KeyboardView extends AbstractMMLView {
 			y = (black_posIndex[i]*10+5)+startY+posOffset[i];
 
 			g.setColor(new Color(0.0f, 0.0f, 0.0f));
-			g.fillRect(0, y, 20, AbstractMMLView.HEIGHT_C);
+			g.fillRect(0, y, 20, HEIGHT_C);
 
 			g.setColor(new Color(0.3f, 0.3f, 0.3f));
-			g.drawRect(0, y, 20, AbstractMMLView.HEIGHT_C);
+			g.drawRect(0, y, 20, HEIGHT_C);
 		}
 
 		// グリッド
@@ -141,7 +143,7 @@ public class KeyboardView extends AbstractMMLView {
 		// オクターブ
 		char o_char[] = { 'o', posText };
 		g.setFont(new Font("Arial", Font.PLAIN, 12));
-		y = startY + (12 * AbstractMMLView.HEIGHT_C);
+		y = startY + (12 * HEIGHT_C);
 		g.drawChars(o_char, 0, o_char.length, 42, y);
 		g.drawLine(40, y, width, y);
 	}

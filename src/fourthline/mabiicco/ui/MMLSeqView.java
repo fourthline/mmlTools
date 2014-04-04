@@ -71,12 +71,12 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 
 		// Scroll View (KeyboardView, PianoRollView) - CENTER
 		pianoRollView = new PianoRollView();
-		keyboardView = new KeyboardView(this);
+		keyboardView = new KeyboardView(this, pianoRollView);
 
 		scrollPane = new JScrollPane(pianoRollView);
 		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-		scrollPane.getVerticalScrollBar().setUnitIncrement(AbstractMMLView.HEIGHT_C);
+		scrollPane.getVerticalScrollBar().setUnitIncrement(IMMLView.HEIGHT_C);
 
 		add(scrollPane, BorderLayout.CENTER);
 		pianoRollView.setViewportAndParent(scrollPane.getViewport(), this);

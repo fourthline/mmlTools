@@ -12,6 +12,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.List;
 
+import javax.swing.JPanel;
 import javax.swing.JViewport;
 import javax.swing.event.MouseInputListener;
 
@@ -28,7 +29,7 @@ import fourthline.mmlTools.core.MMLTicks;
 /**
  * ピアノロール表示を行うためのビューです.
  */
-public class PianoRollView extends AbstractMMLView {
+public class PianoRollView extends JPanel implements IMMLView {
 	private static final long serialVersionUID = -7229093886476553295L;
 
 	private double wideScale = 6; // ピアノロールの拡大/縮小率 (1~6)
@@ -75,7 +76,6 @@ public class PianoRollView extends AbstractMMLView {
 
 	private static final Color barBorder = new Color(0.5f, 0.5f, 0.5f);
 	private static final Color darkBarBorder = new Color(0.3f, 0.2f, 0.3f);
-
 
 	/**
 	 * Create the panel.
@@ -166,6 +166,32 @@ public class PianoRollView extends AbstractMMLView {
 		return (int)(tick / wideScale);
 	}
 
+	/**
+	 * Panel上のy座標をnote番号に変換します.
+	 * @param y
+	 * @return
+	 */
+	public final int convertY2Note(int y) {
+		int note = -1;
+		if (y >= 0) {
+			note = (OCTNUM*12-(y/HEIGHT_C)) -1;
+		}
+
+		return note;
+	}
+
+	/**
+	 * note番号をPanel上のy座標に変換します.
+	 * @param note
+	 * @return
+	 */
+	public final int convertNote2Y(int note) {
+		int y = OCTNUM*12 - note - 1;
+		y *= HEIGHT_C;
+
+		return y;
+	}
+
 	public long getSequencePossition() {
 		return sequencePosition;
 	}
@@ -221,8 +247,8 @@ public class PianoRollView extends AbstractMMLView {
 		updateViewWidthTrackLength();
 
 		Graphics2D g2 = (Graphics2D)g.create();
-		for (int i = 0; i < AbstractMMLView.OCTNUM; i++) {
-			paintOctPianoLine(g2, i, (char)('0'+AbstractMMLView.OCTNUM-i-1));
+		for (int i = 0; i < OCTNUM; i++) {
+			paintOctPianoLine(g2, i, (char)('0'+OCTNUM-i-1));
 		}
 
 		paintMeasure(g2);
@@ -240,16 +266,14 @@ public class PianoRollView extends AbstractMMLView {
 		paintActiveTrack(g2);
 		paintSelectedNote(g2);
 		paintSelectingArea(g2);
-
 		paintSequenceLine(g2, convertNote2Y(-1));
 
 		g2.dispose();
 	}
 
-
 	private void paintOctPianoLine(Graphics2D g, int pos, char posText) {
-		int startY = 12 * AbstractMMLView.HEIGHT_C * pos;
-		int octave = AbstractMMLView.OCTNUM - pos - 1;
+		int startY = 12 * HEIGHT_C * pos;
+		int octave = OCTNUM - pos - 1;
 
 		// グリッド
 		int y = startY;
@@ -261,7 +285,7 @@ public class PianoRollView extends AbstractMMLView {
 				fillColor = noSoundColor;
 			}
 			g.setColor(fillColor);
-			g.fillRect(0, i*HEIGHT_C+y, width, AbstractMMLView.HEIGHT_C);
+			g.fillRect(0, i*HEIGHT_C+y, width, HEIGHT_C);
 			if (i == 0) {
 				g.setColor(darkBarBorder);
 			} else {
@@ -345,7 +369,7 @@ public class PianoRollView extends AbstractMMLView {
 		int x = convertTicktoX(offset);
 		int y = convertNote2Y(note) +1;
 		int width = convertTicktoX(tick) -1;
-		int height = AbstractMMLView.HEIGHT_C-2;
+		int height = HEIGHT_C-2;
 		if (width > 1) width--;
 
 		g.setColor(fillColor);

@@ -32,7 +32,7 @@ import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTempoEvent;
 
 
-public class ColumnPanel extends AbstractMMLView implements MouseListener, ActionListener {
+public class ColumnPanel extends JPanel implements MouseListener, ActionListener {
 	private static final long serialVersionUID = -6609938350741425221L;
 
 	private static final Color BEAT_BORDER_COLOR = new Color(0.4f, 0.4f, 0.4f);
