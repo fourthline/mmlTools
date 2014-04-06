@@ -632,6 +632,10 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 					int x2 = x1 + dim.width - measure;
 					if ( (position < x1) || (position > x2) ) {
 						/* ビュー外にあるので、現在のポジションにあわせる */
+						if (position + dim.width > pianoRollView.getWidth()) {
+							position = (pianoRollView.getWidth() - dim.width);
+							position -= position % measure;
+						}
 						point.setLocation(position, point.getY());
 						viewport.setViewPosition(point);
 					}
