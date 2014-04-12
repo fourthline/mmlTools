@@ -100,10 +100,7 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 			MabiDLS.getInstance().clearAllChannelPanpot();
 			mainFrame.enableNoplayItems();
 		} else if (command.equals(PAUSE)) {
-			MabiDLS.getInstance().getSequencer().stop();
-			MabiDLS.getInstance().clearAllChannelPanpot();
-			mmlSeqView.pauseTickPosition();
-			mainFrame.enableNoplayItems();
+			pauseAction();
 		} else if (command.equals(FILE_OPEN)) {
 			if (checkCloseModifiedFileState()) {
 				openMMLFileAction();
@@ -128,8 +125,7 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 		} else if (command.equals(SET_START_POSITION)) {
 			mmlSeqView.setStartPosition();
 		} else if (command.equals(PLAY)) {
-			mmlSeqView.startSequence();
-			mainFrame.disableNoplayItems();
+			playAction();
 		} else if (command.equals(INPUT_FROM_CLIPBOARD)) {
 			mmlSeqView.inputClipBoardAction(mainFrame);
 		} else if (command.equals(OUTPUT_TO_CLIPBOARD)) {
@@ -346,6 +342,22 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 	private void editPasteAction() {
 		long startTick = mmlSeqView.getEditSequencePosition();
 		editState.paste(startTick);
+	}
+
+	private void pauseAction() {
+		MabiDLS.getInstance().getSequencer().stop();
+		MabiDLS.getInstance().clearAllChannelPanpot();
+		mmlSeqView.pauseTickPosition();
+		mainFrame.enableNoplayItems();
+	}
+
+	private void playAction() {
+		if (MabiDLS.getInstance().getSequencer().isRunning()) {
+			pauseAction();
+		} else {
+			mmlSeqView.startSequence();
+			mainFrame.disableNoplayItems();
+		}
 	}
 
 	@Override
