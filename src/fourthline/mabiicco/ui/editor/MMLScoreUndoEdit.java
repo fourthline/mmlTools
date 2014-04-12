@@ -26,7 +26,7 @@ public class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFileState
 	private final Stack<byte[]> redoState = new Stack<>();
 
 	private final IMMLManager mmlManager;
-	private int originalIndex = 1; /** undo/redo範囲外になった場合は 0. 初期位置は 1 */
+	private int originalIndex = 0; /** オリジナル位置. undo/redo範囲外になった場合は 負値. 0~size-1 */
 
 	public MMLScoreUndoEdit(IMMLManager mmlManager) {
 		this.mmlManager = mmlManager;
@@ -35,7 +35,7 @@ public class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFileState
 	public void initState() {
 		undoState.clear();
 		redoState.clear();
-		originalIndex = 1;
+		originalIndex = 0;
 
 		saveState();
 	}
@@ -52,7 +52,7 @@ public class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFileState
 
 		if (undoState.size() > MAX_UNDO) {
 			undoState.remove(0);
-			originalIndex = 0;
+			originalIndex = -1;
 		}
 
 		if (fileStateObserver != null)
@@ -105,18 +105,16 @@ public class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFileState
 
 	@Override
 	public boolean isModified() {
-		if ( originalIndex != (undoState.size()) ) {
-			return true;
+		if ( originalIndex == (undoState.size()-1) ) {
+			return false;
 		}
 
-		return false;
+		return true;
 	}
 
 	@Override
 	public void setOriginalBase() {
-		if (originalIndex > 0) {
-			originalIndex = undoState.size();
-		}
+		originalIndex = undoState.size() - 1;
 	}
 
 	@Override
