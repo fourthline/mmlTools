@@ -210,7 +210,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 					Sequence sequence = MabiDLS.getInstance().createSequence(mmlScore);
 
 					// 再生開始が先頭でない場合、そこのテンポに設定する必要がある。
-					long startTick = pianoRollView.getSequencePossition();
+					long startTick = pianoRollView.getSequencePosition();
 					int tempo = getTempoInSequenceAtTick(startTick);
 					System.out.printf("Sequence start: tick(%d), tempo(%d)\n", startTick, tempo);
 					sequencer.setSequence(sequence);
@@ -548,7 +548,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	}
 
 	public long getEditSequencePosition() {
-		return pianoRollView.getSequencePossition();
+		return pianoRollView.getSequencePosition();
 	}
 
 	// TimeViewを更新するためのスレッドを開始します.

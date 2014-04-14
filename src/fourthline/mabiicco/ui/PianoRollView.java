@@ -192,7 +192,7 @@ public class PianoRollView extends JPanel implements IMMLView {
 		return y;
 	}
 
-	public long getSequencePossition() {
+	public long getSequencePosition() {
 		return sequencePosition;
 	}
 
