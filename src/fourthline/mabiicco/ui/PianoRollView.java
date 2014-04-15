@@ -361,8 +361,7 @@ public class PianoRollView extends JPanel implements IMMLView {
 		}
 	}
 
-	private boolean drawOption = false;
-	private void drawNote(Graphics2D g, MMLNoteEvent noteEvent, Color rectColor, Color fillColor) {
+	private void drawNote(Graphics2D g, MMLNoteEvent noteEvent, Color rectColor, Color fillColor, boolean drawOption) {
 		int note = noteEvent.getNote();
 		int tick = noteEvent.getTick();
 		int offset = noteEvent.getTickOffset();
@@ -375,7 +374,10 @@ public class PianoRollView extends JPanel implements IMMLView {
 		g.setColor(fillColor);
 		g.fillRect(x+1, y+1, width, height-1);
 		g.setColor(rectColor);
-		g.drawRect(x+1, y, width, height);
+		g.drawLine(x+1, y+1, x+1, y+height-1);
+		g.drawLine(x+width+1, y+height-1, x+width+1, y+1);
+		g.drawLine(x+2, y, x+width, y);
+		g.drawLine(x+width, y+height, x+2, y+height);
 
 		if (drawOption) {
 			// velocityの描画.
@@ -394,7 +396,7 @@ public class PianoRollView extends JPanel implements IMMLView {
 	 * @param mmlPart
 	 * @return
 	 */
-	private void paintMMLPart(Graphics2D g, List<MMLNoteEvent> mmlPart, Color rectColor, Color fillColor) {
+	private void paintMMLPart(Graphics2D g, List<MMLNoteEvent> mmlPart, Color rectColor, Color fillColor, boolean drawOption) {
 		// 現在のView範囲のみを描画する.
 		for (MMLNoteEvent noteEvent : mmlPart) {
 			if (noteEvent.getEndTick() < startViewTick) {
@@ -404,7 +406,7 @@ public class PianoRollView extends JPanel implements IMMLView {
 				break;
 			}
 
-			drawNote(g, noteEvent, rectColor, fillColor);
+			drawNote(g, noteEvent, rectColor, fillColor, drawOption);
 		}
 	}
 
@@ -429,7 +431,7 @@ public class PianoRollView extends JPanel implements IMMLView {
 			}
 			Color rectColor = partColor.getRectColor(index);
 			Color fillColor = partColor.getFillColor(index);
-			paintMMLPart(g, track.getMMLEventList().get(i).getMMLNoteEventList(), rectColor, fillColor);
+			paintMMLPart(g, track.getMMLEventList().get(i).getMMLNoteEventList(), rectColor, fillColor, false);
 		}
 	}
 
@@ -440,16 +442,13 @@ public class PianoRollView extends JPanel implements IMMLView {
 
 		Color rectColor = ColorPalette.ACTIVE.getRectColor(trackIndex);
 		Color fillColor = ColorPalette.ACTIVE.getFillColor(trackIndex);
-
-		drawOption = true;
-		paintMMLPart(g, activePart.getMMLNoteEventList(), rectColor, fillColor);
-		drawOption = false;
+		paintMMLPart(g, activePart.getMMLNoteEventList(), rectColor, fillColor, true);
 	}
 
 	private void paintSelectedNote(Graphics2D g) {
 		// 選択中ノートの表示
 		if (selectNoteList != null) {
-			paintMMLPart(g, selectNoteList, Color.YELLOW, Color.YELLOW);
+			paintMMLPart(g, selectNoteList, Color.YELLOW, Color.YELLOW, false);
 		}
 	}
 
