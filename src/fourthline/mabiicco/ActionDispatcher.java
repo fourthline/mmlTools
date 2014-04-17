@@ -61,6 +61,7 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 	public static final String NEXT_TIME = "next_time";
 	public static final String PREV_TIME = "prev_time";
 	public static final String PART_CHANGE = "part_change";
+	public static final String CHANGE_NOTE_HEIGHT_INT = "change_note_height_";
 
 	private File openedFile = null;
 
@@ -154,6 +155,10 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 			mmlSeqView.nextStepTimeTo(false);
 		} else if (command.equals(PART_CHANGE)) {
 			mmlSeqView.partChange(mainFrame);
+		} else if (command.startsWith(CHANGE_NOTE_HEIGHT_INT)) {
+			int index = Integer.parseInt( command.substring(CHANGE_NOTE_HEIGHT_INT.length()) );
+			mmlSeqView.setPianoRollHeightScaleIndex(index);
+			MabiIccoProperties.getInstance().setPianoRollViewHeightScaleProperty(index);
 		}
 	}
 

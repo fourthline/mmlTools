@@ -30,7 +30,10 @@ import java.awt.event.ComponentListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
@@ -394,7 +397,31 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		nextMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F6, 0));
 		playMenu.add(nextMenuItem);
 
+		/************************* Setting Menu *************************/
+		JMenu settingMenu = new JMenu("設定");
+		menuBar.add(settingMenu);
+		createNoteHeightMenu(settingMenu);
+
 		return menuBar;
+	}
+
+	private void createNoteHeightMenu(JMenu settingMenu) {
+		JMenu noteHeightMenu = new JMenu("ノート表示（高さ）");
+		settingMenu.add(noteHeightMenu);
+
+		ButtonGroup group = new ButtonGroup();
+		int index = 0;
+		for (int value : PianoRollView.NOTE_HEIGHT_TABLE) {
+			JCheckBoxMenuItem menu = new JCheckBoxMenuItem(value+"px");
+			menu.setActionCommand(ActionDispatcher.CHANGE_NOTE_HEIGHT_INT+(index++));
+			menu.addActionListener(listener);
+			noteHeightMenu.add(menu);
+			group.add(menu);
+		}
+
+		MabiIccoProperties properties = MabiIccoProperties.getInstance();
+		index = properties.getPianoRollViewHeightScaleProperty();
+		Collections.list(group.getElements()).get(index).setSelected(true);
 	}
 
 	private JSeparator newToolBarSeparator() {

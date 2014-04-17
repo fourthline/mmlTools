@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JViewport;
 import javax.swing.event.MouseInputListener;
 
+import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mmlTools.MMLEventList;
@@ -29,8 +30,27 @@ import fourthline.mmlTools.core.MMLTicks;
 /**
  * ピアノロール表示を行うためのビューです.
  */
-public class PianoRollView extends JPanel implements IMMLView {
+public class PianoRollView extends JPanel {
 	private static final long serialVersionUID = -7229093886476553295L;
+
+	public static final int OCTNUM = 9;
+
+	/**
+	 * ノートの表示高さ
+	 */
+	public static int NOTE_HEIGHT_TABLE[] = { 4, 6, 9, 12 };
+	private int noteHeight = NOTE_HEIGHT_TABLE[3];
+	public int getNoteHeight() {
+		return noteHeight;
+	}
+	public void setNoteHeightIndex(int index) {
+		if ( (index >= 0) && (index < NOTE_HEIGHT_TABLE.length) ) {
+			noteHeight = NOTE_HEIGHT_TABLE[index];
+		}
+	}
+	public int getTotalHeight() {
+		return (12*OCTNUM*noteHeight+1);
+	}
 
 	private double wideScale = 6; // ピアノロールの拡大/縮小率 (1~6)
 
@@ -82,8 +102,10 @@ public class PianoRollView extends JPanel implements IMMLView {
 	 */
 	public PianoRollView() {
 		super();
-		setPreferredSize(new Dimension(0, 649));
+		setPreferredSize(new Dimension(0, getTotalHeight()));
 
+		MabiIccoProperties properties = MabiIccoProperties.getInstance();
+		setNoteHeightIndex( properties.getPianoRollViewHeightScaleProperty() );
 		setSequenceX(0);
 	}
 
@@ -102,7 +124,7 @@ public class PianoRollView extends JPanel implements IMMLView {
 	}
 
 	public void setWidth(int width) {
-		super.setPreferredSize(new Dimension(width, 649));
+		super.setPreferredSize(new Dimension(width, getTotalHeight()));
 		revalidate();
 	}
 
@@ -174,7 +196,7 @@ public class PianoRollView extends JPanel implements IMMLView {
 	public final int convertY2Note(int y) {
 		int note = -1;
 		if (y >= 0) {
-			note = (OCTNUM*12-(y/HEIGHT_C)) -1;
+			note = (OCTNUM*12-(y/noteHeight)) -1;
 		}
 
 		return note;
@@ -187,7 +209,7 @@ public class PianoRollView extends JPanel implements IMMLView {
 	 */
 	public final int convertNote2Y(int note) {
 		int y = OCTNUM*12 - note - 1;
-		y *= HEIGHT_C;
+		y *= noteHeight;
 
 		return y;
 	}
@@ -272,7 +294,7 @@ public class PianoRollView extends JPanel implements IMMLView {
 	}
 
 	private void paintOctPianoLine(Graphics2D g, int pos, char posText) {
-		int startY = 12 * HEIGHT_C * pos;
+		int startY = 12 * noteHeight * pos;
 		int octave = OCTNUM - pos - 1;
 
 		// グリッド
@@ -285,16 +307,16 @@ public class PianoRollView extends JPanel implements IMMLView {
 				fillColor = noSoundColor;
 			}
 			g.setColor(fillColor);
-			g.fillRect(0, i*HEIGHT_C+y, width, HEIGHT_C);
+			g.fillRect(0, i*noteHeight+y, width, noteHeight);
 			if (i == 0) {
 				g.setColor(darkBarBorder);
 			} else {
 				g.setColor(borderColor);
 			}
-			g.drawLine(0, i*HEIGHT_C+y, width, i*HEIGHT_C+y);
+			g.drawLine(0, i*noteHeight+y, width, i*noteHeight+y);
 		}
 		g.setColor(darkBarBorder);
-		g.drawLine(0, 12*HEIGHT_C+y, width, 12*HEIGHT_C+y);
+		g.drawLine(0, 12*noteHeight+y, width, 12*noteHeight+y);
 	}
 
 	private void paintPitchRangeBorder(Graphics2D g) {
@@ -368,7 +390,7 @@ public class PianoRollView extends JPanel implements IMMLView {
 		int x = convertTicktoX(offset);
 		int y = convertNote2Y(note) +1;
 		int width = convertTicktoX(tick) -1;
-		int height = HEIGHT_C-2;
+		int height = noteHeight-2;
 		if (width > 1) width--;
 
 		g.setColor(fillColor);

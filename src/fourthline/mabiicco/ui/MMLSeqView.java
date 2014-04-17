@@ -76,7 +76,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		scrollPane = new JScrollPane(pianoRollView);
 		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-		scrollPane.getVerticalScrollBar().setUnitIncrement(IMMLView.HEIGHT_C);
+		scrollPane.getVerticalScrollBar().setUnitIncrement(pianoRollView.getNoteHeight());
 
 		add(scrollPane, BorderLayout.CENTER);
 		pianoRollView.setViewportAndParent(scrollPane.getViewport(), this);
@@ -107,7 +107,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 			@Override
 			public void run() {
 				// (ピアノロール全体の高さ / 2) - （表示領域 / 2）＝真ん中の座標。
-				int y = (pianoRollView.getHeight() / 2) - (scrollPane.getHeight() / 2);
+				int y = (pianoRollView.getTotalHeight() / 2) - (scrollPane.getHeight() / 2);
 
 				// 初期のView位置
 				scrollPane.getViewport().setViewPosition(new Point(0, y));
@@ -304,6 +304,12 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 			point.setLocation(x, point.getY());
 			viewport.setViewPosition(point);
 		}
+	}
+
+	public void setPianoRollHeightScaleIndex(int index) {
+		pianoRollView.setNoteHeightIndex(index);
+		keyboardView.updateHeight();
+		repaint();
 	}
 
 	/**

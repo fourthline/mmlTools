@@ -13,9 +13,9 @@ import java.util.InvalidPropertiesFormatException;
 import java.util.Properties;
 
 import fourthline.mabiicco.midi.MabiDLS;
+import fourthline.mabiicco.ui.PianoRollView;
 
 public class MabiIccoProperties {
-
 	private final Properties properties = new Properties();
 	private final String configFile = "config.properties";
 
@@ -95,6 +95,21 @@ public class MabiIccoProperties {
 		properties.setProperty("window.y", Integer.toString((int)rect.getY()));
 		properties.setProperty("window.width", Integer.toString((int)rect.getWidth()));
 		properties.setProperty("window.height", Integer.toString((int)rect.getHeight()));
+		save();
+	}
+
+	public int getPianoRollViewHeightScaleProperty() {
+		String s = properties.getProperty("view.pianoRoll.heightScale", "1");
+		int index = Integer.parseInt(s);
+		if ( (index < 0) || (index >= PianoRollView.NOTE_HEIGHT_TABLE.length) ) {
+			index = 1;
+		}
+
+		return index;
+	}
+
+	public void setPianoRollViewHeightScaleProperty(int index) {
+		properties.setProperty("view.pianoRoll.heightScale", ""+index);
 		save();
 	}
 }

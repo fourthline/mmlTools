@@ -17,7 +17,7 @@ import javax.swing.JPanel;
 
 import fourthline.mabiicco.midi.MabiDLS;
 
-public class KeyboardView extends JPanel implements IMMLView {
+public class KeyboardView extends JPanel {
 	private static final long serialVersionUID = -3850112420986284800L;
 
 	private int playNote = -1;
@@ -25,12 +25,15 @@ public class KeyboardView extends JPanel implements IMMLView {
 	private final int PLAY_CHANNEL = 0;
 	private final IMMLManager mmlManager;
 
+	private final PianoRollView pianoRollView;
+
 	/**
 	 * Create the panel.
 	 */
 	public KeyboardView(IMMLManager manager, final PianoRollView pianoRollView) {
-		setPreferredSize(new Dimension(width, 649));
 		this.mmlManager = manager;
+		this.pianoRollView = pianoRollView;
+		updateHeight();
 
 		this.addMouseListener(new MouseAdapter() {
 			@Override
@@ -52,7 +55,9 @@ public class KeyboardView extends JPanel implements IMMLView {
 		});
 	}
 
-
+	public void updateHeight() {
+		setPreferredSize(new Dimension(width, 12*PianoRollView.OCTNUM*pianoRollView.getNoteHeight()+1));
+	}
 
 	/**
 	 * 1オクターブ 12 x 6
@@ -62,12 +67,12 @@ public class KeyboardView extends JPanel implements IMMLView {
 		super.paintComponent(g);
 
 		Graphics2D g2 = (Graphics2D)g.create();
-		for (int i = 0; i < OCTNUM; i++) {
-			paintOctPianoLine(g2, i, (char)('0'+OCTNUM-i-1));
+		for (int i = 0; i < PianoRollView.OCTNUM; i++) {
+			paintOctPianoLine(g2, i, (char)('0'+PianoRollView.OCTNUM-i-1));
 		}
 
 		g2.setColor(Color.BLUE);
-		g2.drawLine(width-1, 0, width-1, getHeight());
+		g2.drawLine(width-1, 0, width-1, pianoRollView.getTotalHeight()-1);
 
 		paintPlayNote(g2);
 
@@ -99,55 +104,54 @@ public class KeyboardView extends JPanel implements IMMLView {
 		if ( isWhiteKey(playNote) ) {
 			x += 20;
 		}
-		int y = getHeight() - ((playNote -11) * HEIGHT_C) + yAdd[playNote%12];
+		int y = pianoRollView.getTotalHeight() - ((playNote -11) * pianoRollView.getNoteHeight()) + yAdd[playNote%12];
 		g.setColor(Color.RED);
 		g.fillOval(x, y, 4, 4);
 	}
 
 	private void paintOctPianoLine(Graphics2D g, int pos, char posText) {
-		int white_wigth[] = { 10, 10, 10, 11, 10, 10, 11 };
+		int octHeight = pianoRollView.getNoteHeight() * 12;
 		// ド～シのしろ鍵盤
 		g.setColor(new Color(0.3f, 0.3f, 0.3f));
 
-		int startY = 12 * HEIGHT_C * pos;
-		int y = startY;
-		for (int i = 0; i < white_wigth.length; i++) {
-			g.drawRect(0, y, 40, white_wigth[i]);
-			y += white_wigth[i];
+		int startY = octHeight * pos;
+		for (int i = 0; i < 7; i++) {
+			double y1 = octHeight * i / 7;
+			double y2 = octHeight * (i+1) / 7;
+			g.drawRect(0, (int)(startY+y1), 40, (int)(y2-y1));
 		}
+
 		// 黒鍵盤
 		int black_posIndex[] = { 
-				0, // A#
-				1, // G#
-				2, // F#
-				4, // D#
-				5  // C#
+				1, // A#
+				2, // G#
+				3, // F#
+				5, // D#
+				6  // C#
 		};
-		int posOffset[] = { 1, 2, 3, 1, 3 };
 
 		for (int i = 0; i < black_posIndex.length; i++) {
-			y = (black_posIndex[i]*10+5)+startY+posOffset[i];
+			int y = octHeight * black_posIndex[i] / 7 - pianoRollView.getNoteHeight() / 2-1;
+			y += startY;
 
 			g.setColor(new Color(0.0f, 0.0f, 0.0f));
-			g.fillRect(0, y, 20, HEIGHT_C);
+			g.fillRect(0, y, 20, pianoRollView.getNoteHeight());
 
 			g.setColor(new Color(0.3f, 0.3f, 0.3f));
-			g.drawRect(0, y, 20, HEIGHT_C);
+			g.drawRect(0, y, 20, pianoRollView.getNoteHeight());
 		}
 
 		// グリッド
-		y = startY;
 		g.setColor(new Color(0.3f, 0.3f, 0.6f));
-		g.drawLine(40, y, width, y);
+		g.drawLine(40, startY, width, startY);
 
 		// オクターブ
 		char o_char[] = { 'o', posText };
 		g.setFont(new Font("Arial", Font.PLAIN, 12));
-		y = startY + (12 * HEIGHT_C);
+		int y = startY + octHeight;
 		g.drawChars(o_char, 0, o_char.length, 42, y);
 		g.drawLine(40, y, width, y);
 	}
-
 
 	public void playNote(int note) {
 		if (note < 0) {
