@@ -329,8 +329,8 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 			pianoRollView.setSequenceX(0);
 			repaint();
 		} else {
-			sequencer.setTickPosition(0);
 			sequencer.setTempoInBPM(120);
+			sequencer.setTickPosition(0);
 		}
 	}
 
