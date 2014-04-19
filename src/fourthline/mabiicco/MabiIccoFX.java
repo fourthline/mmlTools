@@ -8,6 +8,7 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.io.File;
 import java.util.Collections;
+import java.util.List;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -79,6 +80,10 @@ public class MabiIccoFX extends Application {
 				ActionDispatcher dispatcher = ActionDispatcher.getInstance();
 				MainFrame mainFrame = new MainFrame(dispatcher);
 				dispatcher.setMainFrame(mainFrame);
+				List<String> args = getParameters().getRaw();
+				if (args.size() > 0) {
+					dispatcher.openMMLFile(new File(args.get(0)));
+				}
 				mainFrame.setVisible(true);
 				window.setVisible(false);
 			}

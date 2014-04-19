@@ -69,12 +69,24 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 	private final FileFilter mmiFilter = new FileNameExtensionFilter("MabiIcco形式 (*.mmi)", "mmi");
 	private final FileFilter allFilter = new FileNameExtensionFilter("すべての対応形式 (*.mmi, *.mms)", "mmi", "mms");
 
+	private final JFileChooser openFileChooser = new JFileChooser();
+	private final JFileChooser saveFileChooser = new JFileChooser();
+
 	private static final ActionDispatcher instance = new ActionDispatcher();
 	public static ActionDispatcher getInstance() {
 		return instance;
 	}
 
-	private ActionDispatcher() {}
+	private ActionDispatcher() {
+		initializeFileChooser();
+	}
+
+	private void initializeFileChooser() {
+		openFileChooser.addChoosableFileFilter(allFilter);
+		openFileChooser.addChoosableFileFilter(mmiFilter);
+		openFileChooser.addChoosableFileFilter(mmsFilter);
+		saveFileChooser.addChoosableFileFilter(mmiFilter);
+	}
 
 	public void setMainFrame(MainFrame mainFrame) {
 		this.mainFrame = mainFrame;
@@ -162,7 +174,7 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 		}
 	}
 
-	private void openMMLFile(File file) {
+	public void openMMLFile(File file) {
 		try {
 			IMMLFileParser fileParser;
 			if (file.toString().endsWith(".mms")) {
@@ -224,16 +236,12 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 			@Override
 			public void run() {
 				String recentPath = MabiIccoProperties.getInstance().getRecentFile();
-				JFileChooser fileChooser = new JFileChooser();
-				fileChooser.setCurrentDirectory(new File(recentPath));
-				fileChooser.addChoosableFileFilter(allFilter);
-				fileChooser.addChoosableFileFilter(mmiFilter);
-				fileChooser.addChoosableFileFilter(mmsFilter);
-				fileChooser.setFileFilter(allFilter);
-				fileChooser.setAcceptAllFileFilterUsed(false);
-				int status = fileChooser.showOpenDialog(mainFrame);
+				openFileChooser.setCurrentDirectory(new File(recentPath));
+				openFileChooser.setFileFilter(allFilter);
+				openFileChooser.setAcceptAllFileFilterUsed(false);
+				int status = openFileChooser.showOpenDialog(mainFrame);
 				if (status == JFileChooser.APPROVE_OPTION) {
-					File file = fileChooser.getSelectedFile();
+					File file = openFileChooser.getSelectedFile();
 					openMMLFile(file);
 				}
 			}
@@ -260,18 +268,16 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 	 */
 	private boolean showDialogSaveFile() {
 		String recentPath = MabiIccoProperties.getInstance().getRecentFile();
-		JFileChooser fileChooser = new JFileChooser();
 		if (openedFile != null) {
-			fileChooser.setSelectedFile(openedFile);
+			saveFileChooser.setSelectedFile(openedFile);
 		} else {
-			fileChooser.setCurrentDirectory(new File(recentPath));
+			saveFileChooser.setCurrentDirectory(new File(recentPath));
 		}
-		fileChooser.addChoosableFileFilter(mmiFilter);
-		fileChooser.setFileFilter(mmiFilter);
-		fileChooser.setAcceptAllFileFilterUsed(false);
-		int status = fileChooser.showSaveDialog(mainFrame);
+		saveFileChooser.setFileFilter(mmiFilter);
+		saveFileChooser.setAcceptAllFileFilterUsed(false);
+		int status = saveFileChooser.showSaveDialog(mainFrame);
 		if (status == JFileChooser.APPROVE_OPTION) {
-			File file = fileChooser.getSelectedFile();
+			File file = saveFileChooser.getSelectedFile();
 			if (!file.toString().endsWith(".mmi")) {
 				file = new File(file+".mmi");
 			}
