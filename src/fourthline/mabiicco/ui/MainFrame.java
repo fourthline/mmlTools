@@ -31,6 +31,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.ResourceBundle;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
@@ -80,10 +81,18 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 	private JMenuItem pasteMenu;
 	private JMenuItem deleteMenu;
 
+	private final ResourceBundle bundle = ResourceBundle.getBundle("mainFrame");
+	private String text(String key) {
+		try {
+			return bundle.getString(key);
+		} catch (java.util.MissingResourceException e) {
+			return "(null)";
+		}
+	}
+
 	/**
 	 * Create the frame.
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public MainFrame(ActionListener listener) {
 		this.listener = listener;
 
@@ -107,8 +116,8 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		northPanel.add(toolBar);
 
 		JButton newFileButton = new JButton("");
-		newFileButton.setToolTipText("新規作成");
-		newFileButton.setIcon(new ImageIcon(MainFrame.class.getResource("/img/file.png")));
+		newFileButton.setToolTipText(text("menu.newFile"));
+		newFileButton.setIcon(new ImageIcon(MainFrame.class.getResource(text("menu.newFile.icon"))));
 		noplayFunctions.add(newFileButton);
 		newFileButton.setFocusable(false);
 		newFileButton.addActionListener(listener);
@@ -116,8 +125,8 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		toolBar.add(newFileButton);
 
 		JButton openFileButton = new JButton("");
-		openFileButton.setToolTipText("開く");
-		openFileButton.setIcon(new ImageIcon(MainFrame.class.getResource("/img/open.png")));
+		openFileButton.setToolTipText(text("menu.openFile"));
+		openFileButton.setIcon(new ImageIcon(MainFrame.class.getResource(text("menu.openFile.icon"))));
 		noplayFunctions.add(openFileButton);
 		openFileButton.setFocusable(false);
 		openFileButton.addActionListener(listener);
@@ -128,39 +137,39 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 
 		JButton startPositionButton = new JButton("");
 		toolBar.add(startPositionButton);
-		startPositionButton.setToolTipText("先頭へ戻す");
-		startPositionButton.setIcon(new ImageIcon(MainFrame.class.getResource("/img/head.png")));
+		startPositionButton.setToolTipText(text("menu.head"));
+		startPositionButton.setIcon(new ImageIcon(MainFrame.class.getResource(text("menu.head.icon"))));
 		startPositionButton.setFocusable(false);
 		startPositionButton.addActionListener(listener);
 		startPositionButton.setActionCommand(ActionDispatcher.SET_START_POSITION);
 
 		JButton prevPositionButton = new JButton("");
 		toolBar.add(prevPositionButton);
-		prevPositionButton.setToolTipText("1小節戻る");
-		prevPositionButton.setIcon(new ImageIcon(MainFrame.class.getResource("/img/prev.png")));
+		prevPositionButton.setToolTipText(text("menu.prev"));
+		prevPositionButton.setIcon(new ImageIcon(MainFrame.class.getResource(text("menu.prev.icon"))));
 		prevPositionButton.setFocusable(false);
 		prevPositionButton.addActionListener(listener);
 		prevPositionButton.setActionCommand(ActionDispatcher.PREV_TIME);
 
 		JButton playButton = new JButton("");
 		toolBar.add(playButton);
-		playButton.setToolTipText("再生");
-		playButton.setIcon(new ImageIcon(MainFrame.class.getResource("/img/playButton.png")));
+		playButton.setToolTipText(text("menu.play"));
+		playButton.setIcon(new ImageIcon(MainFrame.class.getResource(text("menu.play.icon"))));
 		playButton.setFocusable(false);
 		playButton.addActionListener(listener);
 		playButton.setActionCommand(ActionDispatcher.PLAY);
 
 		JButton nextPositionButton = new JButton("");
 		toolBar.add(nextPositionButton);
-		nextPositionButton.setToolTipText("1小節進む");
-		nextPositionButton.setIcon(new ImageIcon(MainFrame.class.getResource("/img/next.png")));
+		nextPositionButton.setToolTipText(text("menu.next"));
+		nextPositionButton.setIcon(new ImageIcon(MainFrame.class.getResource(text("menu.next.icon"))));
 		nextPositionButton.setFocusable(false);
 		nextPositionButton.addActionListener(listener);
 		nextPositionButton.setActionCommand(ActionDispatcher.NEXT_TIME);
 
 		JButton pauseButton = new JButton("");
-		pauseButton.setIcon(new ImageIcon(MainFrame.class.getResource("/img/pause.png")));
-		pauseButton.setToolTipText("一時停止");
+		pauseButton.setToolTipText(text("menu.pause"));
+		pauseButton.setIcon(new ImageIcon(MainFrame.class.getResource(text("menu.pause.icon"))));
 		pauseButton.setFocusable(false);
 		pauseButton.addActionListener(listener);
 		pauseButton.setActionCommand(ActionDispatcher.PAUSE);
@@ -168,22 +177,22 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 
 		JButton stopButton = new JButton("");
 		toolBar.add(stopButton);
-		stopButton.setIcon(new ImageIcon(MainFrame.class.getResource("/img/stop.png")));
-		stopButton.setToolTipText("停止");
+		stopButton.setToolTipText(text("menu.stop"));
+		stopButton.setIcon(new ImageIcon(MainFrame.class.getResource(text("menu.stop.icon"))));
 		stopButton.setFocusable(false);
 		stopButton.addActionListener(listener);
 		stopButton.setActionCommand(ActionDispatcher.STOP);
 
 		toolBar.add(newToolBarSeparator());
 
-		JButton inputClipButton = new JButton("クリップボードから入力");
+		JButton inputClipButton = new JButton(text("menu.inputMML"));
 		noplayFunctions.add(inputClipButton);
 		inputClipButton.setFocusable(false);
 		inputClipButton.addActionListener(listener);
 		inputClipButton.setActionCommand(ActionDispatcher.INPUT_FROM_CLIPBOARD);
 		toolBar.add(inputClipButton);
 
-		JButton outputClipButton = new JButton("クリップボードへ出力");
+		JButton outputClipButton = new JButton(text("menu.outputMML"));
 		outputClipButton.setFocusable(false);
 		outputClipButton.addActionListener(listener);
 		outputClipButton.setActionCommand(ActionDispatcher.OUTPUT_TO_CLIPBOARD);
@@ -192,19 +201,19 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		toolBar.add(newToolBarSeparator());
 
 		// ビューの拡大/縮小ツールボタン
-		JButton expandButton = new JButton("拡大");
+		JButton expandButton = new JButton(text("view.scale.up"));
 		expandButton.setFocusable(false);
 		expandButton.addActionListener(listener);
-		expandButton.setActionCommand("viewExpand");
+		expandButton.setActionCommand(ActionDispatcher.VIEW_SCALE_UP);
 		toolBar.add(expandButton);
 
-		JButton reduceButton = new JButton("縮小");
+		JButton reduceButton = new JButton(text("view.scale.down"));
 		reduceButton.setFocusable(false);
 		reduceButton.addActionListener(listener);
-		reduceButton.setActionCommand("viewReduce");
+		reduceButton.setActionCommand(ActionDispatcher.VIEW_SCALE_DOWN);
 		toolBar.add(reduceButton);
 
-		noteTypeSelect = new JComboBox(MMLEditor.createAlignList());
+		noteTypeSelect = new JComboBox<>(MMLEditor.createAlignList());
 		noteTypeSelect.setFocusable(false);
 		toolBar.add(noteTypeSelect);
 
@@ -264,7 +273,9 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 
 	private JMenuItem createMenuItem(String name, String actionCommand, String iconName) {
 		JMenuItem menuItem = createMenuItem(name, actionCommand);
-		menuItem.setIcon(new ImageIcon(MainFrame.class.getResource(iconName)));
+		try {
+			menuItem.setIcon(new ImageIcon(MainFrame.class.getResource(iconName)));
+		} catch (NullPointerException e) {}
 
 		return menuItem;
 	}
@@ -273,132 +284,140 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		JMenuBar menuBar = new JMenuBar();
 		// FIXME:
 		/************************* File Menu *************************/
-		JMenu fileMenu = new JMenu("ファイル");
+		JMenu fileMenu = new JMenu(text("menu.file"));
 		fileMenu.setMnemonic('F');
 		menuBar.add(fileMenu);
 
-		JMenuItem newFileMenuItem = createMenuItem("新規作成", ActionDispatcher.NEW_FILE, "/img/file.png");
+		JMenuItem newFileMenuItem = createMenuItem(text("menu.newFile"), ActionDispatcher.NEW_FILE, text("menu.newFile.icon"));
 		noplayFunctions.add(newFileMenuItem);
 		newFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK));
 		fileMenu.add(newFileMenuItem);
 
-		JMenuItem fileOpenMenuItem = createMenuItem("開く", ActionDispatcher.FILE_OPEN, "/img/open.png");
+		JMenuItem fileOpenMenuItem = createMenuItem(text("menu.openFile"), ActionDispatcher.FILE_OPEN, text("menu.openFile.icon"));
 		noplayFunctions.add(fileOpenMenuItem);
 		fileOpenMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
 		fileMenu.add(fileOpenMenuItem);
 
-		reloadMenuItem = createMenuItem("再読み込み", ActionDispatcher.RELOAD_FILE);
+		reloadMenuItem = createMenuItem(text("menu.reloadFile"), ActionDispatcher.RELOAD_FILE);
 		noplayFunctions.add(reloadMenuItem);
 		fileMenu.add(reloadMenuItem);
 
-		saveMenuItem = createMenuItem("上書き保存", ActionDispatcher.SAVE_FILE);
+		saveMenuItem = createMenuItem(text("menu.saveFile"), ActionDispatcher.SAVE_FILE);
 		saveMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK));
 		fileMenu.add(saveMenuItem);
 
-		JMenuItem saveAsMenuItem = createMenuItem("名前を付けて保存", ActionDispatcher.SAVEAS_FILE);
+		JMenuItem saveAsMenuItem = createMenuItem(text("menu.saveAsFile"), ActionDispatcher.SAVEAS_FILE);
 		noplayFunctions.add(saveAsMenuItem);
 		saveAsMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK | InputEvent.SHIFT_DOWN_MASK));
 		fileMenu.add(saveAsMenuItem);
 
 		fileMenu.add(new JSeparator());
 
-		JMenuItem scorePropertyMenu = createMenuItem("プロパティ", ActionDispatcher.SCORE_PROPERTY);
+		JMenuItem scorePropertyMenu = createMenuItem(text("menu.scoreProperty"), ActionDispatcher.SCORE_PROPERTY);
 		noplayFunctions.add(scorePropertyMenu);
 		fileMenu.add(scorePropertyMenu);
 
 		fileMenu.add(new JSeparator());
 
-		JMenuItem exitMenuItem = createMenuItem("終了", ActionDispatcher.QUIT);
+		JMenuItem exitMenuItem = createMenuItem(text("menu.quit"), ActionDispatcher.QUIT);
 		fileMenu.add(exitMenuItem);
 
 		/************************* Edit Menu *************************/
-		JMenu editMenu = new JMenu("編集");
+		JMenu editMenu = new JMenu(text("menu.edit"));
 		fileMenu.setMnemonic('E');
 		menuBar.add(editMenu);
 
-		undoMenu = createMenuItem("元に戻す", ActionDispatcher.UNDO);
+		undoMenu = createMenuItem(text("menu.undo"), ActionDispatcher.UNDO);
 		undoMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_MASK));
 		editMenu.add(undoMenu);
 
-		redoMenu = createMenuItem("やり直す", ActionDispatcher.REDO);
+		redoMenu = createMenuItem(text("menu.redo"), ActionDispatcher.REDO);
 		redoMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_MASK));
 		editMenu.add(redoMenu);
 
 		editMenu.add(new JSeparator());	
 
-		cutMenu = createMenuItem("切り取り", ActionDispatcher.CUT);
+		cutMenu = createMenuItem(text("menu.cut"), ActionDispatcher.CUT);
 		cutMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_MASK));
 		editMenu.add(cutMenu);
 
-		copyMenu = createMenuItem("コピー", ActionDispatcher.COPY);
+		copyMenu = createMenuItem(text("menu.copy"), ActionDispatcher.COPY);
 		copyMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK));
 		editMenu.add(copyMenu);
 
-		pasteMenu = createMenuItem("貼り付け", ActionDispatcher.PASTE);
+		pasteMenu = createMenuItem(text("menu.paste"), ActionDispatcher.PASTE);
 		pasteMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_MASK));
 		editMenu.add(pasteMenu);
 
-		deleteMenu = createMenuItem("削除", ActionDispatcher.DELETE);
+		deleteMenu = createMenuItem(text("menu.delete"), ActionDispatcher.DELETE);
 		deleteMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
 		editMenu.add(deleteMenu);
 
 		editMenu.add(new JSeparator());
 
-		JMenuItem partChangeMenu = createMenuItem("パート入れ替え", ActionDispatcher.PART_CHANGE);
+		JMenuItem partChangeMenu = createMenuItem(text("menu.changePart"), ActionDispatcher.PART_CHANGE);
 		noplayFunctions.add(partChangeMenu);
 		editMenu.add(partChangeMenu);
 
+		JMenuItem addMeasureMenu = createMenuItem(text("menu.addMeasure"), ActionDispatcher.ADD_MEASURE);
+		noplayFunctions.add(addMeasureMenu);
+		editMenu.add(addMeasureMenu);
+
+		JMenuItem removeMeasureMenu = createMenuItem(text("menu.removeMeasure"), ActionDispatcher.REMOVE_MEASURE);
+		noplayFunctions.add(removeMeasureMenu);
+		editMenu.add(removeMeasureMenu);
+
 		/************************* Track Menu *************************/
-		JMenu trackMenu = new JMenu("トラック");
+		JMenu trackMenu = new JMenu(text("menu.track"));
 		menuBar.add(trackMenu);
 
-		JMenuItem addTrackMenu = createMenuItem("トラック追加", ActionDispatcher.ADD_TRACK);
+		JMenuItem addTrackMenu = createMenuItem(text("menu.addTrack"), ActionDispatcher.ADD_TRACK);
 		noplayFunctions.add(addTrackMenu);
 		addTrackMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_MASK));
 		trackMenu.add(addTrackMenu);
 
-		JMenuItem removeTrackMenu = createMenuItem("トラック削除", ActionDispatcher.REMOVE_TRACK);
+		JMenuItem removeTrackMenu = createMenuItem(text("menu.removeTrack"), ActionDispatcher.REMOVE_TRACK);
 		noplayFunctions.add(removeTrackMenu);
 		trackMenu.add(removeTrackMenu);
 
 		trackMenu.add(new JSeparator());
 
-		JMenuItem trackPropertyMenu = createMenuItem("トラックプロパティ", ActionDispatcher.TRACK_PROPERTY);
+		JMenuItem trackPropertyMenu = createMenuItem(text("menu.trackProperty"), ActionDispatcher.TRACK_PROPERTY);
 		noplayFunctions.add(trackPropertyMenu);
 		trackPropertyMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.ALT_MASK));
 		trackMenu.add(trackPropertyMenu);
 
 		/************************* Play Menu *************************/
-		JMenu playMenu = new JMenu("操作");
+		JMenu playMenu = new JMenu(text("menu.operate"));
 		menuBar.add(playMenu);
 
-		JMenuItem headPlayPositionMenuItem = createMenuItem("先頭へ戻す", ActionDispatcher.SET_START_POSITION, "/img/head.png");
+		JMenuItem headPlayPositionMenuItem = createMenuItem(text("menu.head"), ActionDispatcher.SET_START_POSITION, text("menu.head.icon"));
 		headPlayPositionMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0));
 		playMenu.add(headPlayPositionMenuItem);
 
-		JMenuItem playMenuItem = createMenuItem("再生", ActionDispatcher.PLAY, "/img/playButton.png");
+		JMenuItem playMenuItem = createMenuItem(text("menu.play"), ActionDispatcher.PLAY, text("menu.play.icon"));
 		playMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
 		playMenu.add(playMenuItem);
 
-		JMenuItem stopMenuItem = createMenuItem("停止", ActionDispatcher.STOP, "/img/stop.png");
+		JMenuItem stopMenuItem = createMenuItem(text("menu.stop"), ActionDispatcher.STOP, text("menu.stop.icon"));
 		stopMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
 		playMenu.add(stopMenuItem);
 
-		JMenuItem pauseMenuItem = createMenuItem("一時停止", ActionDispatcher.PAUSE, "/img/pause.png");
+		JMenuItem pauseMenuItem = createMenuItem(text("menu.pause"), ActionDispatcher.PAUSE, text("menu.pause.icon"));
 		playMenu.add(pauseMenuItem);
 
 		playMenu.add(new JSeparator());	
 
-		JMenuItem prevMenuItem = createMenuItem("1小節戻る", ActionDispatcher.PREV_TIME, "/img/prev.png");
+		JMenuItem prevMenuItem = createMenuItem(text("menu.prev"), ActionDispatcher.PREV_TIME, text("menu.prev.icon"));
 		prevMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, 0));
 		playMenu.add(prevMenuItem);
 
-		JMenuItem nextMenuItem = createMenuItem("1小節進む", ActionDispatcher.NEXT_TIME, "/img/next.png");
+		JMenuItem nextMenuItem = createMenuItem(text("menu.next"), ActionDispatcher.NEXT_TIME, text("menu.next.icon"));
 		nextMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F6, 0));
 		playMenu.add(nextMenuItem);
 
 		/************************* Setting Menu *************************/
-		JMenu settingMenu = new JMenu("設定");
+		JMenu settingMenu = new JMenu(text("menu.setting"));
 		menuBar.add(settingMenu);
 		createNoteHeightMenu(settingMenu);
 
@@ -406,7 +425,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 	}
 
 	private void createNoteHeightMenu(JMenu settingMenu) {
-		JMenu noteHeightMenu = new JMenu("ノート表示（高さ）");
+		JMenu noteHeightMenu = new JMenu(text("menu.noteHeight"));
 		settingMenu.add(noteHeightMenu);
 
 		ButtonGroup group = new ButtonGroup();
@@ -437,7 +456,6 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		}
 		setTitle(DEFAULT_TITLE + " [" + fileTitle + "]");
 	}
-
 
 	private void loadWindowPeoperties() {
 		MabiIccoProperties properties = MabiIccoProperties.getInstance();

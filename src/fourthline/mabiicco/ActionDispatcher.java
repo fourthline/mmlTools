@@ -34,8 +34,8 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 	private IEditState editState;
 
 	// action commands
-	public static final String VIEW_EXPAND = "viewExpand";
-	public static final String VIEW_REDUCE = "viewReduce";
+	public static final String VIEW_SCALE_UP = "view_scale_up";
+	public static final String VIEW_SCALE_DOWN = "view_scale_down";
 	public static final String PLAY = "play";
 	public static final String STOP = "stop";
 	public static final String PAUSE = "pause";
@@ -62,6 +62,8 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 	public static final String PREV_TIME = "prev_time";
 	public static final String PART_CHANGE = "part_change";
 	public static final String CHANGE_NOTE_HEIGHT_INT = "change_note_height_";
+	public static final String ADD_MEASURE = "add_measure";
+	public static final String REMOVE_MEASURE = "remove_measure";
 
 	private File openedFile = null;
 
@@ -72,8 +74,11 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 	private final JFileChooser openFileChooser = new JFileChooser();
 	private final JFileChooser saveFileChooser = new JFileChooser();
 
-	private static final ActionDispatcher instance = new ActionDispatcher();
+	private static ActionDispatcher instance = null;
 	public static ActionDispatcher getInstance() {
+		if (instance == null) {
+			instance = new ActionDispatcher();
+		}
 		return instance;
 	}
 
@@ -102,10 +107,10 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 	public void actionPerformed(ActionEvent e) {
 		String command = e.getActionCommand();
 
-		if (command.equals(VIEW_EXPAND)) {
+		if (command.equals(VIEW_SCALE_UP)) {
 			mmlSeqView.expandPianoViewWide();
 			mmlSeqView.repaint();
-		} else if (command.equals(VIEW_REDUCE)) {
+		} else if (command.equals(VIEW_SCALE_DOWN)) {
 			mmlSeqView.reducePianoViewWide();
 			mmlSeqView.repaint();
 		} else if (command.equals(STOP)) {
@@ -171,6 +176,10 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 			int index = Integer.parseInt( command.substring(CHANGE_NOTE_HEIGHT_INT.length()) );
 			mmlSeqView.setPianoRollHeightScaleIndex(index);
 			MabiIccoProperties.getInstance().setPianoRollViewHeightScaleProperty(index);
+		} else if (command.equals(ADD_MEASURE)) {
+			mmlSeqView.addMeasure();
+		} else if (command.equals(REMOVE_MEASURE)) {
+			mmlSeqView.removeMeasure();;
 		}
 	}
 

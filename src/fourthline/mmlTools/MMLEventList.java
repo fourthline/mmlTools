@@ -365,4 +365,42 @@ public class MMLEventList implements Serializable, Cloneable {
 			}
 		}
 	}
+
+	/**
+	 * tick長の空白を挿入します.
+	 * @param startTick
+	 * @param tick
+	 */
+	public void insertTick(int startTick, int tick) {
+		for (MMLNoteEvent noteEvent : noteList) {
+			int noteTick = noteEvent.getTickOffset();
+			if (noteTick >= startTick) {
+				noteEvent.setTickOffset(noteTick + tick);
+			}
+		}
+	}
+
+	/**
+	 * tick長の部分を削除して詰めます.
+	 * @param startTick
+	 * @param tick
+	 */
+	public void removeTick(int startTick, int tick) {
+		ArrayList<MMLNoteEvent> deleteNote = new ArrayList<>();
+		for (MMLNoteEvent noteEvent : noteList) {
+			int noteTick = noteEvent.getTickOffset();
+			if (noteTick >= startTick) {
+				if (noteTick < startTick+tick) {
+					// 削除リストに加えておく.
+					deleteNote.add(noteEvent);
+				} else {
+					noteEvent.setTickOffset(noteTick - tick);
+				}
+			}
+		}
+
+		for (MMLNoteEvent noteEvent : deleteNote) {
+			deleteMMLEvent(noteEvent);
+		}
+	}
 }

@@ -17,6 +17,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+import fourthline.mmlTools.core.MMLTicks;
 import fourthline.mmlTools.parser.IMMLFileParser;
 import fourthline.mmlTools.parser.MMLParseException;
 import fourthline.mmlTools.parser.MMSFile;
@@ -142,6 +143,53 @@ public class MMLScore implements IMMLFileParser {
 	public int getTimeCountOnly() {
 		String s[] = this.baseTime.split("/");
 		return Integer.parseInt(s[0]);
+	}
+
+	public int getMeasureTick() {
+		try {
+			int step = MMLTicks.getTick(getBaseOnly());
+			return (getTimeCountOnly() * step);
+		} catch (UndefinedTickException e) {
+			e.printStackTrace();
+			throw new AssertionError();
+		}
+	}
+	public void addMeasure(int tickPosition, int tick) {
+		for (MMLTrack track : getTrackList()) {
+			for (MMLEventList eventList : track.getMMLEventList()) {
+				eventList.insertTick(tickPosition, tick);
+			}
+		}
+		// テンポはカーソル上のは移動せずに, 後方のものを反映.
+		for (MMLTempoEvent tempo : globalTempoList) {
+			int tempoTick = tempo.getTickOffset();
+			if (tempoTick > tickPosition) {
+				tempo.setTickOffset(tempoTick+tick);
+			}
+		}
+	}
+
+	public void removeMeasure(int tickPosition, int tick) {
+		for (MMLTrack track : getTrackList()) {
+			for (MMLEventList eventList : track.getMMLEventList()) {
+				eventList.removeTick(tickPosition, tick);
+			}
+		}
+		ArrayList<MMLTempoEvent> deleteTempo = new ArrayList<>();
+		for (MMLTempoEvent tempo : globalTempoList) {
+			int tempoTick = tempo.getTickOffset();
+			// テンポはカーソル上のは消さずに, 後方のものを消す.
+			if (tempoTick > tickPosition) {
+				if (tempoTick <= tickPosition+tick) {
+					deleteTempo.add(tempo);
+				} else {
+					tempo.setTickOffset(tempoTick-tick);
+				}
+			}
+		}
+		for (MMLTempoEvent tempo : deleteTempo) {
+			globalTempoList.remove(tempo);
+		}
 	}
 
 	public int getTotalTickLength() {

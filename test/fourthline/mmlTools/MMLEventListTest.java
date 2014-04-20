@@ -533,4 +533,46 @@ public class MMLEventListTest {
 		assertEquals(mml1, eventList2.toMMLString());
 		assertEquals(mml1, eventList1.toMMLString());
 	}
+
+	/**
+	 * insertTick
+	 * @throws UndefinedTickException 
+	 */
+	@Test
+	public void testInsertTick0() throws UndefinedTickException {
+		MMLEventList eventList1 = new MMLEventList("aabb");
+		MMLEventList eventList2 = new MMLEventList("aar1bb");
+
+		eventList1.insertTick(MMLTicks.getTick("2"), MMLTicks.getTick("1"));
+
+		assertEquals(eventList2.toMMLString(), eventList1.toMMLString());
+	}
+
+	/**
+	 * removeTick
+	 * @throws UndefinedTickException 
+	 */
+	@Test
+	public void testRemoveTick0() throws UndefinedTickException {
+		MMLEventList eventList1 = new MMLEventList("aac1bb");
+		MMLEventList eventList2 = new MMLEventList("aar8r9b");
+
+		eventList1.removeTick(MMLTicks.getTick("2"), MMLTicks.getTick("1")+MMLTicks.getTick("64"));
+
+		assertEquals(eventList2.toMMLString(), eventList1.toMMLString());
+	}
+
+	/**
+	 * removeTick
+	 * @throws UndefinedTickException 
+	 */
+	@Test
+	public void testRemoveTick1() throws UndefinedTickException {
+		MMLEventList eventList1 = new MMLEventList("aac1bb");
+		MMLEventList eventList2 = new MMLEventList("aabb");
+
+		eventList1.removeTick(MMLTicks.getTick("2")-MMLTicks.getTick("64"), MMLTicks.getTick("1"));
+
+		assertEquals(eventList2.toMMLString(), eventList1.toMMLString());
+	}
 }

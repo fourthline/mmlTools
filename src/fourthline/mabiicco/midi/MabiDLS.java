@@ -20,7 +20,7 @@ import fourthline.mmlTools.MMLTempoEvent;
 import fourthline.mmlTools.MMLTrack;
 
 public final class MabiDLS {
-	private static final MabiDLS instance = new MabiDLS();
+	private static MabiDLS instance = null;
 	private Synthesizer synthesizer;
 	private Sequencer sequencer;
 	private MidiChannel channel[];
@@ -33,6 +33,9 @@ public final class MabiDLS {
 	private INotifyTrackEnd notifier = null;
 
 	public static MabiDLS getInstance() {
+		if (instance == null) {
+			instance = new MabiDLS();
+		}
 		return instance;
 	}
 

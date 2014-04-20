@@ -557,6 +557,20 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		return pianoRollView.getSequencePosition();
 	}
 
+	public void addMeasure() {
+		int tickPosition = (int) pianoRollView.getSequencePosition();
+		int tick = mmlScore.getMeasureTick();
+		mmlScore.addMeasure(tickPosition, tick);
+		updateAllMMLPart();
+	}
+
+	public void removeMeasure() {
+		int tickPosition = (int) pianoRollView.getSequencePosition();
+		int tick = mmlScore.getMeasureTick();
+		mmlScore.removeMeasure(tickPosition, tick);
+		updateAllMMLPart();
+	}
+
 	// TimeViewを更新するためのスレッドを開始します.
 	private void startTimeViewUpdateThread() {
 		if (timeViewUpdateThread != null) {

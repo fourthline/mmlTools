@@ -70,8 +70,6 @@ public class MMLLengthKeyword {
 		return str;
 	}
 
-
-
 	public static List<MMLLengthKeyword> parseMMLLengthList(String mml) {
 		MMLTokenizer tokenizer = new MMLTokenizer(mml);
 		int noteCount = 0;
