@@ -339,7 +339,9 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	 */
 	public void pauseTickPosition() {
 		Sequencer sequencer = MabiDLS.getInstance().getSequencer();
-		int x = pianoRollView.convertTicktoX( sequencer.getTickPosition() );
+		long tickPosition = sequencer.getTickPosition();
+		tickPosition -= tickPosition % MMLTicks.minimumTick();
+		int x = pianoRollView.convertTicktoX( tickPosition );
 		pianoRollView.setSequenceX(x);
 	}
 

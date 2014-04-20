@@ -155,7 +155,7 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 		} else if (command.equals(SAVE_FILE)) {
 			saveMMLFile(openedFile);
 		} else if (command.equals(SAVEAS_FILE)) {
-			saveMMLFileAction();
+			saveAsMMLFileAction();
 		} else if (command.equals(CUT)) {
 			editState.selectedCut();
 		} else if (command.equals(COPY)) {
@@ -206,7 +206,7 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 
 	public void reloadMMLFileAction() {
 		if (MabiDLS.getInstance().getSequencer().isRunning()) {
-			MabiDLS.getInstance().getSequencer().stop();
+			return;
 		}
 
 		if (openedFile != null) {
@@ -238,7 +238,7 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 
 	private void openMMLFileAction() {
 		if (MabiDLS.getInstance().getSequencer().isRunning()) {
-			MabiDLS.getInstance().getSequencer().stop();
+			return;
 		}
 
 		SwingUtilities.invokeLater(new Runnable() {
@@ -257,9 +257,9 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 		});
 	}
 
-	private void saveMMLFileAction() {
+	private void saveAsMMLFileAction() {
 		if (MabiDLS.getInstance().getSequencer().isRunning()) {
-			MabiDLS.getInstance().getSequencer().stop();
+			return;
 		}
 
 		SwingUtilities.invokeLater(new Runnable() {
