@@ -20,11 +20,19 @@ import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.MainFrame;
 import fourthline.mabiicco.ui.Startup;
 import javafx.application.Application;
+import javafx.application.Preloader;
 import javafx.stage.Stage;
+import javax.swing.SwingUtilities;
 
 public class MabiIccoFX extends Application {
 	@Override
-	public void start(Stage arg0) throws Exception {
+	public void start(Stage stage) throws Exception {
+		SwingUtilities.invokeLater(() -> {
+			initialize();
+		});
+	}
+
+	public void initialize() {
 		MabiIccoProperties appProperties = MabiIccoProperties.getInstance();
 
 		try {
@@ -37,15 +45,12 @@ public class MabiIccoFX extends Application {
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 		} catch (Exception e) {}
 
-		final Startup window = new Startup();
-		window.setVisible(true);
-
 		try {
-			window.printStatus("MIDI初期化中...");
+			notifyPreloader(new MabiIccoPreloaderNotification("MIDI初期化中...", 10));
 			MabiDLS.getInstance().initializeMIDI();
-			window.printStatus("OK\n");
+			notifyPreloader(new MabiIccoPreloaderNotification("OK\n", 20));
 
-			window.printStatus("DLSファイル読み込み中...");
+			notifyPreloader(new MabiIccoPreloaderNotification("DLSファイル読み込み中...", 20));
 			File file = new File( appProperties.getDlsFile() );
 			if ( !file.exists() ) {
 				/* DLSファイルがない場合 */
@@ -54,11 +59,10 @@ public class MabiIccoFX extends Application {
 				fileChooser.addChoosableFileFilter(dlsFilter);
 				fileChooser.setFileFilter(dlsFilter);
 				fileChooser.setAcceptAllFileFilterUsed(false);
-				int status = fileChooser.showOpenDialog(window);
+				int status = fileChooser.showOpenDialog(null);
 				if (status == JFileChooser.APPROVE_OPTION) {
 					file = fileChooser.getSelectedFile();
 				} else {
-					window.setVisible(false);
 					JOptionPane.showMessageDialog(null, "DLSファイルが必要です。", "ERROR", JOptionPane.ERROR_MESSAGE);
 					System.exit(1);
 				}
@@ -66,10 +70,9 @@ public class MabiIccoFX extends Application {
 
 			MabiDLS.getInstance().initializeSound(file);
 			appProperties.setDlsFile(file.getPath());
-			window.printStatus("OK\n");
+			notifyPreloader(new MabiIccoPreloaderNotification("OK\n", 100));
 		} catch (Exception e) {
 			e.printStackTrace();
-			window.setVisible(false);
 			JOptionPane.showMessageDialog(null, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
 			System.exit(1);
 		}
@@ -84,8 +87,8 @@ public class MabiIccoFX extends Application {
 				if (args.size() > 0) {
 					dispatcher.openMMLFile(new File(args.get(0)));
 				}
+				notifyPreloader(new Preloader.StateChangeNotification(Preloader.StateChangeNotification.Type.BEFORE_START));
 				mainFrame.setVisible(true);
-				window.setVisible(false);
 			}
 		});
 	}
