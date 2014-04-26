@@ -462,7 +462,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 
 		Rectangle rect = properties.getWindowRect();
 		if (rect.getX() < 0.0) {
-			setSize(640, 480);
+			setSize(850, 650);
 			setLocationRelativeTo(null);
 		} else {
 			setBounds(rect);

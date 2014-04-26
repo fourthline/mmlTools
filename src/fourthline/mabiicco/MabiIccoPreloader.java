@@ -36,15 +36,13 @@ public class MabiIccoPreloader extends Preloader {
 		if (pn instanceof MabiIccoPreloaderNotification) {
 			MabiIccoPreloaderNotification notify = (MabiIccoPreloaderNotification) pn;
 			String message = notify.getMessage();
+			double progress = notify.getProgress();
 			controller.text.setText( controller.text.getText() + message );
-			System.out.println("MabiIccoPreloader: " + message);
+			System.out.println("MabiIccoPreloader: " + message + " " + progress);
 
-			controller.bar.setProgress(notify.getProgress()/100.0);
-		}
-
-		else if (pn instanceof StateChangeNotification) {
-//			stage.hide();
+			controller.bar.setProgress(progress/100.0);
+		} else if (pn instanceof StateChangeNotification) {
+			stage.hide();
 		}
 	}
-
 }

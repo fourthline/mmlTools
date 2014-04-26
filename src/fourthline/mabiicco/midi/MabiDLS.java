@@ -26,6 +26,7 @@ public final class MabiDLS {
 	private MidiChannel channel[];
 	private InstClass insts[];
 	private Properties instProperties;
+	private Soundbank soundBank;
 
 	private static final String INST_PROPERTIESFILE = "instrument.properties";
 	public static final String DEFALUT_DLS_PATH = "C:/Nexon/Mabinogi/mp3/MSXspirit.dls";
@@ -89,8 +90,8 @@ public final class MabiDLS {
 		}
 
 		// シーケンサとシンセサイザの初期化
-		Soundbank sb = loadDLS(dlsFile);
-		Receiver receiver = initializeSynthesizer(sb);
+		this.soundBank = loadDLS(dlsFile);
+		Receiver receiver = initializeSynthesizer();
 		Transmitter transmitter = this.sequencer.getTransmitters().get(0);
 		transmitter.setReceiver(receiver);
 	}
@@ -105,6 +106,10 @@ public final class MabiDLS {
 
 	public MidiChannel getChannel(int ch) {
 		return channel[ch];
+	}
+
+	public Soundbank getSoundbank() {
+		return this.soundBank;
 	}
 
 	private String instName(Instrument inst) {
@@ -138,8 +143,7 @@ public final class MabiDLS {
 	}
 
 
-	private Receiver initializeSynthesizer(Soundbank sb) throws InvalidMidiDataException, IOException, MidiUnavailableException {
-		this.synthesizer.loadAllInstruments(sb);
+	private Receiver initializeSynthesizer() throws InvalidMidiDataException, IOException, MidiUnavailableException {
 		this.channel = this.synthesizer.getChannels();
 		Receiver receiver = this.synthesizer.getReceiver();
 

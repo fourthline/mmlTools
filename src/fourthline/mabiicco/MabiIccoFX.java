@@ -10,6 +10,8 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
+import javax.sound.midi.Instrument;
+import javax.sound.midi.Synthesizer;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -18,17 +20,20 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.MainFrame;
-import fourthline.mabiicco.ui.Startup;
 import javafx.application.Application;
 import javafx.application.Preloader;
 import javafx.stage.Stage;
+
 import javax.swing.SwingUtilities;
 
 public class MabiIccoFX extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {
-		SwingUtilities.invokeLater(() -> {
-			initialize();
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				initialize();
+			}
 		});
 	}
 
@@ -69,6 +74,7 @@ public class MabiIccoFX extends Application {
 			}
 
 			MabiDLS.getInstance().initializeSound(file);
+			loadSoundbank(20, 90);
 			appProperties.setDlsFile(file.getPath());
 			notifyPreloader(new MabiIccoPreloaderNotification("OK\n", 100));
 		} catch (Exception e) {
@@ -91,6 +97,21 @@ public class MabiIccoFX extends Application {
 				mainFrame.setVisible(true);
 			}
 		});
+	}
+
+	private void loadSoundbank(int startProgress, int endProgress) {
+		Instrument insts[] = MabiDLS.getInstance().getSoundbank().getInstruments();
+		Synthesizer synthesizer = MabiDLS.getInstance().getSynthesizer();
+
+		double progress = startProgress;
+		double delta = ((double)endProgress - startProgress) / insts.length;
+		System.out.println(delta);
+		System.out.println(insts.length);
+		for (Instrument instrument : insts) {
+			synthesizer.loadInstrument(instrument);
+			progress += delta;
+			notifyPreloader(new MabiIccoPreloaderNotification("", progress));
+		}
 	}
 
 	private static void setUIFont(javax.swing.plaf.FontUIResource resource) {
