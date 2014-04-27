@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 たんらる
+ * Copyright (C) 2013-2014 たんらる
  */
 
 package fourthline.mmlTools.core;
@@ -246,12 +246,16 @@ public class MMLTicks {
 				int baseTick = getTick(""+base);
 				if (tickInvTable.containsKey(remTick)) {
 					sb.append( mmlNotePart(tickInvTable.get(remTick)) );
+					remTick = 0;
 					break;
 				}
 				while (remTick >= baseTick) {
 					sb.append( mmlNotePart(""+base) );
 					remTick -= baseTick;
 				}
+			}
+			if (remTick > 0) {
+				sb.append( mmlNotePart(tickInvTable.get(minimumTick())) );
 			}
 
 			if (needTie) {

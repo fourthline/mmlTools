@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="222.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fourthline.mabiicco.StartupController">
+<AnchorPane id="AnchorPane" prefHeight="222.0" prefWidth="300.0" style="-fx-border-width: 1; -fx-border-color: black;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fourthline.mabiicco.StartupController">
 <children><TextArea fx:id="text" editable="false" focusTraversable="false" layoutX="14.0" layoutY="103.0" prefHeight="70.0" prefWidth="272.0">
 <font>
 <Font name="Meiryo" size="10.0" />
@@ -15,5 +15,8 @@
 <Label layoutX="88.0" layoutY="42.0" text=" * MabiIcco * ">
 <font>
 <Font name="Meiryo" size="18.0" />
+</font></Label><Label fx:id="versionLabel" layoutX="188.0" layoutY="78.0" prefHeight="15.0" prefWidth="97.0" textAlignment="RIGHT">
+<font>
+<Font name="Meiryo" size="10.0" />
 </font></Label>
 </children></AnchorPane>

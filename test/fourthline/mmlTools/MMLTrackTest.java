@@ -128,4 +128,16 @@ public class MMLTrackTest {
 		MMLTrack track = new MMLTrack(mml);
 		assertEquals(expectMML, track.getMMLString());
 	}
+
+	/**
+	 * テンポを跨ぐ場合の分割Tick-Undefined（最小Tick近似）
+	 */
+	@Test
+	public void testGeneric00() {
+		String mml =       "MML@ggt150gg,rr8r16.a24aa;";
+		String expectMML = "MML@ggt150ggr64,rr8r16.a32&a64aa,;";
+
+		MMLTrack track = new MMLTrack(mml);
+		assertEquals(expectMML, track.getMMLString());
+	}
 }

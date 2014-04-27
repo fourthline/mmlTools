@@ -29,6 +29,7 @@ import javax.swing.SwingUtilities;
 public class MabiIccoFX extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {
+		notifyPreloader(new MabiIccoPreloaderNotification("MIDI初期化中...", 10));
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -51,7 +52,6 @@ public class MabiIccoFX extends Application {
 		} catch (Exception e) {}
 
 		try {
-			notifyPreloader(new MabiIccoPreloaderNotification("MIDI初期化中...", 10));
 			MabiDLS.getInstance().initializeMIDI();
 			notifyPreloader(new MabiIccoPreloaderNotification("OK\n", 20));
 

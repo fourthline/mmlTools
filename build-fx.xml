@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="MabiIccoFX" basedir="." default="jfx-package" xmlns:fx="javafx:com.sun.javafx.tools.ant">
+
+	<!-- 環境変数 -->
+	<property environment="env" />
+	<property name="javafx.tools.ant.jar" value="${env.JAVA_HOME}/lib/ant-javafx.jar" />
+
+	<property name="src" location="src" />
+	<property name="dest" location="dest" />
+	<property name="properties" location="properties" />
+	<property name="jardest" location="" />
+
+	<!-- アプリケーションの設定 -->
+	<property name="app.vendor" value="fourthline" />
+	<property name="app.id" value="MabiIcco" />
+	<property name="app.name" value="MabiIcco" />
+	<property name="app.version" value="1.0-alpha8" />
+	<property name="app.main-class" value="fourthline.mabiicco.MabiIccoFX" />
+	<property name="app.preloader-class" value="fourthline.mabiicco.MabiIccoPreloader" />
+
+	<!-- clean task -->
+	<target name="clean">
+		<mkdir dir="${dest}" />
+		<delete dir="${dest}" />
+		<mkdir dir="${dest}" />
+	</target>
+
+	<!-- compile task -->
+	<target name="compile" depends="clean">
+		<javac srcdir="${src}" destdir="${dest}" encoding="UTF-8" includeantruntime="false" />
+	</target>
+
+	<!-- resources task -->
+	<target name="resources">
+		<copy todir="${dest}">
+			<fileset dir="${src}">
+				<include name="**/*.png" />
+			</fileset>
+		</copy>
+		<copy todir="${dest}">
+			<fileset dir="${src}">
+				<include name="**/*.fxml" />
+			</fileset>
+		</copy>
+	</target>
+
+	<!-- properties task -->
+	<target name="properties">
+		<native2ascii src="${properties}" dest="${dest}" encoding="UTF-8">
+			<include name="**/*.properties" />
+		</native2ascii>
+	</target>
+
+	<!-- jfx-package task -->
+	<target name="jfx-package" description="javafxpackage" depends="compile,resources,properties">
+		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml" uri="javafx:com.sun.javafx.tools.ant" classpath="${javafx.tools.ant.jar}" />
+
+		<fx:application id="app-info" name="${app.name}" mainClass="${app.main-class}" preloaderClass="${app.preloader-class}">
+		</fx:application>
+
+		<fx:jar destfile="${jardest}/${app.id}.jar">
+			<fx:application refid="app-info" />
+			<fx:platform javafx="2.2+">
+			</fx:platform>
+			<manifest>
+				<attribute name="Implementation-Vendor" value="${app.vendor}" />
+				<attribute name="Implementation-Title" value="${app.name}" />
+				<attribute name="Implementation-Version" value="${app.version}" />
+			</manifest>
+			<fileset dir="${dest}" />
+		</fx:jar>
+	</target>
+	<!-- // jfx-package task -->
+</project>
