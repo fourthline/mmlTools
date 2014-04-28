@@ -4,11 +4,6 @@
 
 package fourthline.mabiicco;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.jar.Attributes;
-import java.util.jar.Manifest;
-
 import javafx.application.Preloader;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -25,7 +20,7 @@ public class MabiIccoPreloader extends Preloader {
 		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Startup.fxml"));
 		Parent root = (Parent) fxmlLoader.load();
 		controller = fxmlLoader.getController();
-		controller.versionLabel.setText(getManifestValue("Implementation-Version"));
+		controller.versionLabel.setText(AppResource.getManifestValue("Implementation-Version"));
 		return new Scene(root);
 	}
 
@@ -50,18 +45,4 @@ public class MabiIccoPreloader extends Preloader {
 		}
 	}
 
-	private String getManifestValue(String key) {
-		try {
-			InputStream is = this.getClass().getResourceAsStream("/META-INF/MANIFEST.MF");
-			Manifest mf;
-			mf = new Manifest(is);
-			Attributes a = mf.getMainAttributes();
-			String val = a.getValue(key);
-			return val;
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return "";
-	}
 }

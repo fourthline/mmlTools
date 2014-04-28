@@ -17,6 +17,7 @@ import javax.swing.JTextField;
 import javax.swing.JButton;
 
 import fourthline.mabiicco.ActionDispatcher;
+import fourthline.mabiicco.AppResource;
 import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mabiicco.midi.INotifyTrackEnd;
 import fourthline.mabiicco.midi.MabiDLS;
@@ -31,7 +32,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.ResourceBundle;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
@@ -81,13 +81,8 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 	private JMenuItem pasteMenu;
 	private JMenuItem deleteMenu;
 
-	private final ResourceBundle bundle = ResourceBundle.getBundle("mainFrame");
 	private String text(String key) {
-		try {
-			return bundle.getString(key);
-		} catch (java.util.MissingResourceException e) {
-			return "(null)";
-		}
+		return AppResource.getText(key);
 	}
 
 	/**

@@ -29,7 +29,7 @@ import javax.swing.SwingUtilities;
 public class MabiIccoFX extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {
-		notifyPreloader(new MabiIccoPreloaderNotification("MIDI初期化中...", 10));
+		notifyPreloader(new MabiIccoPreloaderNotification(AppResource.getText("init.midi"), 10));
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -55,12 +55,12 @@ public class MabiIccoFX extends Application {
 			MabiDLS.getInstance().initializeMIDI();
 			notifyPreloader(new MabiIccoPreloaderNotification("OK\n", 20));
 
-			notifyPreloader(new MabiIccoPreloaderNotification("DLSファイル読み込み中...", 20));
+			notifyPreloader(new MabiIccoPreloaderNotification(AppResource.getText("init.dls"), 20));
 			File file = new File( appProperties.getDlsFile() );
 			if ( !file.exists() ) {
 				/* DLSファイルがない場合 */
 				JFileChooser fileChooser = new JFileChooser();
-				FileFilter dlsFilter = new FileNameExtensionFilter("DLSファイル (*.dls)", "dls");
+				FileFilter dlsFilter = new FileNameExtensionFilter(AppResource.getText("file.dls"), "dls");
 				fileChooser.addChoosableFileFilter(dlsFilter);
 				fileChooser.setFileFilter(dlsFilter);
 				fileChooser.setAcceptAllFileFilterUsed(false);
@@ -68,7 +68,7 @@ public class MabiIccoFX extends Application {
 				if (status == JFileChooser.APPROVE_OPTION) {
 					file = fileChooser.getSelectedFile();
 				} else {
-					JOptionPane.showMessageDialog(null, "DLSファイルが必要です。", "ERROR", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null, AppResource.getText("error.needDls"), "ERROR", JOptionPane.ERROR_MESSAGE);
 					System.exit(1);
 				}
 			}
