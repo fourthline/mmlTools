@@ -332,7 +332,8 @@ public final class MabiDLS {
 				continue;
 			}
 
-			convertMidiPart(track, mmlTrack.getMMLEventAtIndex(3), channel);
+			InstType instType = InstClass.searchInstAtProgram(insts, program).getType();
+			convertMidiPart(track, mmlTrack.getMMLEventAtIndex(3), channel, instType);
 		}
 	}
 
@@ -350,16 +351,17 @@ public final class MabiDLS {
 				0);
 		track.add(new MidiEvent(pcMessage, 0));
 		boolean enablePart[] = InstClass.getEnablePartByProgram(program);
+		InstType instType = InstClass.searchInstAtProgram(insts, mmlTrack.getProgram()).getType();
 
 		for (int i = 0; i < enablePart.length; i++) {
 			if (enablePart[i]) {
 				MMLEventList eventList = mmlTrack.getMMLEventAtIndex(i);
-				convertMidiPart(track, eventList, channel);
+				convertMidiPart(track, eventList, channel, instType);
 			}
 		}
 	}
 
-	private void convertMidiPart(Track track, MMLEventList eventList, int channel) {
+	private void convertMidiPart(Track track, MMLEventList eventList, int channel, InstType inst) {
 		int volumn = MMLNoteEvent.INITIAL_VOLUMN;
 
 		// Noteイベントの変換
@@ -379,7 +381,7 @@ public final class MabiDLS {
 				MidiMessage message1 = new ShortMessage(ShortMessage.NOTE_ON, 
 						channel,
 						convertNoteMML2Midi(note), 
-						convertVelocityMML2Midi(volumn));
+						inst.convertVelocityMML2Midi(volumn));
 				track.add(new MidiEvent(message1, tickOffset));
 
 				// Off イベント作成
@@ -392,10 +394,6 @@ public final class MabiDLS {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	private int convertVelocityMML2Midi(int mml_velocity) {
-		return (mml_velocity * 8);
 	}
 
 	private int convertNoteMML2Midi(int mml_note) {

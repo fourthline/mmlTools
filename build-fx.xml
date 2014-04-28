@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="MabiIccoFX" basedir="." default="jfx-package" xmlns:fx="javafx:com.sun.javafx.tools.ant">
+<project name="MabiIccoFX"
+	basedir="."
+	default="jfx-package"
+	xmlns:fx="javafx:com.sun.javafx.tools.ant">
 
 	<!-- 環境変数 -->
 	<property environment="env" />
@@ -14,7 +17,7 @@
 	<property name="app.vendor" value="fourthline" />
 	<property name="app.id" value="MabiIcco" />
 	<property name="app.name" value="MabiIcco" />
-	<property name="app.version" value="1.0-alpha8" />
+	<property name="app.version" value="1.0-alpha9" />
 	<property name="app.main-class" value="fourthline.mabiicco.MabiIccoFX" />
 	<property name="app.preloader-class" value="fourthline.mabiicco.MabiIccoPreloader" />
 
@@ -27,7 +30,13 @@
 
 	<!-- compile task -->
 	<target name="compile" depends="clean">
-		<javac srcdir="${src}" destdir="${dest}" encoding="UTF-8" includeantruntime="false" />
+		<javac
+			srcdir="${src}"
+			destdir="${dest}"
+			excludes="**/package-info.java"
+			encoding="UTF-8"
+			listfiles="yes"
+			includeantruntime="false" />
 	</target>
 
 	<!-- resources task -->
@@ -52,10 +61,19 @@
 	</target>
 
 	<!-- jfx-package task -->
-	<target name="jfx-package" description="javafxpackage" depends="compile,resources,properties">
-		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml" uri="javafx:com.sun.javafx.tools.ant" classpath="${javafx.tools.ant.jar}" />
+	<target name="jfx-package"
+		description="javafxpackage"
+		depends="compile,resources,properties">
+		
+		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml"
+			uri="javafx:com.sun.javafx.tools.ant"
+			classpath="${javafx.tools.ant.jar}" />
 
-		<fx:application id="app-info" name="${app.name}" mainClass="${app.main-class}" preloaderClass="${app.preloader-class}">
+		<fx:application
+			id="app-info"
+			name="${app.name}"
+			mainClass="${app.main-class}"
+			preloaderClass="${app.preloader-class}">
 		</fx:application>
 
 		<fx:jar destfile="${jardest}/${app.id}.jar">

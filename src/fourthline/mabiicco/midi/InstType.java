@@ -7,7 +7,15 @@ package fourthline.mabiicco.midi;
 public enum InstType {
 	NONE(false, false, false, false),
 	NORMAL(true, true, true, false),
-	DRUMS(true, false, false, false),
+	DRUMS(true, false, false, false) {
+		@Override
+		public int convertVelocityMML2Midi(int mml_velocity) {
+			if (mml_velocity > 11) {
+				mml_velocity = 11;
+			}
+			return (mml_velocity * 11);
+		}
+	},
 	VOICE(false, false, false, true),
 	CHORUS(false, false, false, true);
 
@@ -42,5 +50,12 @@ public enum InstType {
 
 	public boolean[] getEnablePart() {
 		return enablePart;
+	}
+
+	public int convertVelocityMML2Midi(int mml_velocity) {
+		if (mml_velocity > 15) {
+			mml_velocity = 15;
+		}
+		return (mml_velocity * 8);
 	}
 }
