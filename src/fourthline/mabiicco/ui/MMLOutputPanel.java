@@ -30,6 +30,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.JScrollPane;
 
+import fourthline.mabiicco.AppResource;
 import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mmlTools.MMLTrack;
@@ -39,7 +40,7 @@ public class MMLOutputPanel extends JPanel {
 	private static final long serialVersionUID = 8558159209741558854L;
 	private JTable table;
 	private final JDialog dialog;
-	private final JButton copyButton = new JButton("MMLコピー");
+	private final JButton copyButton = new JButton(AppResource.getText("mml.output.copyButton"));
 
 	private List<MMLTrack> trackList;
 
@@ -49,7 +50,7 @@ public class MMLOutputPanel extends JPanel {
 	}
 
 	public MMLOutputPanel(Frame parentFrame, List<MMLTrack> trackList) {
-		this.dialog = new JDialog(parentFrame, "クリップボードへ出力", true);
+		this.dialog = new JDialog(parentFrame, AppResource.getText("mml.output"), true);
 		initializePanel(trackList);
 	}
 
@@ -66,7 +67,7 @@ public class MMLOutputPanel extends JPanel {
 			}
 		});
 
-		JButton closeButton = new JButton("閉じる");
+		JButton closeButton = new JButton(AppResource.getText("mml.output.closeButton"));
 		closeButton.setBounds(257, 189, 90, 29);
 		add(closeButton);
 		closeButton.setFocusable(false);
@@ -103,7 +104,9 @@ public class MMLOutputPanel extends JPanel {
 
 	public static JTable createJTableFromMMLTrack(List<MMLTrack> trackList) {
 		String columnNames[] = {
-				"トラック名", "楽器", "作曲ランク"
+				AppResource.getText("mml.output.trackName"),
+				AppResource.getText("mml.output.instrument"),
+				AppResource.getText("mml.output.rank")
 		};
 		DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
 		JTable jTable = new JTable(tableModel);
@@ -134,7 +137,7 @@ public class MMLOutputPanel extends JPanel {
 		int row = table.getSelectedRow();
 		String mmlText = trackList.get(row).getMMLString();
 		copyToClipboard(mmlText);
-		JOptionPane.showMessageDialog(this, "クリップボードにコピーしました.");
+		JOptionPane.showMessageDialog(this, AppResource.getText("mml.output.done"));
 
 		row++;
 		if (row >= trackList.size()) {

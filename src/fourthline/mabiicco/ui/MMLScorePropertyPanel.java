@@ -11,6 +11,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import fourthline.mabiicco.AppResource;
 import fourthline.mmlTools.MMLScore;
 
 import javax.swing.JTextField;
@@ -34,15 +35,15 @@ public class MMLScorePropertyPanel extends JPanel {
 		setBounds(100, 100, 260, 170);
 		setLayout(null);
 
-		JLabel label1 = new JLabel("<曲名>");
+		JLabel label1 = new JLabel(AppResource.getText("score_property.name"));
 		label1.setBounds(12, 40, 50, 13);
 		add(label1);
 
-		JLabel label2 = new JLabel("<作者>");
+		JLabel label2 = new JLabel(AppResource.getText("score_property.author"));
 		label2.setBounds(12, 73, 50, 13);
 		add(label2);
 
-		JLabel label3 = new JLabel("<拍子>");
+		JLabel label3 = new JLabel(AppResource.getText("score_property.measure"));
 		label3.setBounds(12, 105, 50, 13);
 		add(label3);
 
@@ -105,7 +106,7 @@ public class MMLScorePropertyPanel extends JPanel {
 
 		int status = JOptionPane.showConfirmDialog(parent, 
 				this,
-				"Scoreプロパティ", 
+				AppResource.getText("score_property"), 
 				JOptionPane.OK_CANCEL_OPTION,
 				JOptionPane.PLAIN_MESSAGE);
 

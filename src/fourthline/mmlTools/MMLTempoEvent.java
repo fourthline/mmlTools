@@ -51,7 +51,6 @@ public class MMLTempoEvent extends MMLEvent {
 	public void appendToListElement(List<MMLTempoEvent> list) {
 		int index = 0;
 		int targetOffset = getTickOffset();
-		System.out.println("[T] "+targetOffset);
 
 		for ( ; index < list.size(); index++) {
 			MMLTempoEvent tempoEvent = list.get(index);

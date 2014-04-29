@@ -24,6 +24,7 @@ import java.io.IOException;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 
+import fourthline.mabiicco.AppResource;
 import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mmlTools.MMLTrack;
@@ -52,16 +53,16 @@ public class MMLInputPanel extends JPanel {
 		setLayout(null);
 
 		JPanel panel1 = new JPanel();
-		panel1.setBorder(new TitledBorder(new LineBorder(new Color(128, 128, 128), 1, true), "\u5165\u529B\u65B9\u6CD5", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel1.setBorder(new TitledBorder(new LineBorder(new Color(128, 128, 128), 1, true), AppResource.getText("mml.input.method"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel1.setBounds(26, 28, 275, 87);
 		add(panel1);
 		panel1.setLayout(null);
 
-		overrideButton = new JRadioButton("現在のトラックに上書き");
+		overrideButton = new JRadioButton(AppResource.getText("mml.input.method.override"));
 		overrideButton.setBounds(8, 51, 174, 21);
 		panel1.add(overrideButton);
 
-		newTrackButton = new JRadioButton("新しいトラックを作成");
+		newTrackButton = new JRadioButton(AppResource.getText("mml.input.method.new"));
 		newTrackButton.setBounds(8, 23, 144, 21);
 		panel1.add(newTrackButton);
 
@@ -71,7 +72,7 @@ public class MMLInputPanel extends JPanel {
 		newTrackButton.setSelected(true);
 
 		JPanel panel2 = new JPanel();
-		panel2.setBorder(new TitledBorder(new LineBorder(new Color(128, 128, 128), 1, true), "\u697D\u5668\u8A2D\u5B9A", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel2.setBorder(new TitledBorder(new LineBorder(new Color(128, 128, 128), 1, true), AppResource.getText("mml.input.instrument"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel2.setBounds(26, 140, 275, 75);
 		add(panel2);
 		panel2.setLayout(null);
@@ -90,7 +91,7 @@ public class MMLInputPanel extends JPanel {
 		panel2.add(comboBox);
 
 		JPanel panel3 = new JPanel();
-		panel3.setBorder(new TitledBorder(new LineBorder(new Color(128, 128, 128), 1, true), "\u30C8\u30E9\u30C3\u30AF\u540D", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel3.setBorder(new TitledBorder(new LineBorder(new Color(128, 128, 128), 1, true), AppResource.getText("mml.input.trackname"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel3.setBounds(26, 249, 275, 75);
 		add(panel3);
 		panel3.setLayout(null);
@@ -127,7 +128,7 @@ public class MMLInputPanel extends JPanel {
 
 		int status = JOptionPane.showConfirmDialog(parentFrame, 
 				this,
-				"クリップボードからのMML入力", 
+				AppResource.getText("mml.input"), 
 				JOptionPane.OK_CANCEL_OPTION,
 				JOptionPane.PLAIN_MESSAGE);
 

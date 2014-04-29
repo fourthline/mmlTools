@@ -14,6 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JSlider;
 
+import fourthline.mabiicco.AppResource;
 import fourthline.mmlTools.MMLTrack;
 
 
@@ -39,7 +40,7 @@ public class TrackPropertyPanel extends JPanel {
 		setBounds(100, 100, 363, 285);
 		setLayout(null);
 
-		JLabel lblNewLabel = new JLabel("トラック名");
+		JLabel lblNewLabel = new JLabel(AppResource.getText("track_property.trackname"));
 		lblNewLabel.setBounds(30, 39, 70, 13);
 		add(lblNewLabel);
 
@@ -60,7 +61,7 @@ public class TrackPropertyPanel extends JPanel {
 		panpotSlider.setBounds(100, 97, 200, 23);
 		add(panpotSlider);
 
-		JLabel label = new JLabel("パンポット");
+		JLabel label = new JLabel(AppResource.getText("track_property.panpot"));
 		label.setBounds(30, 97, 70, 13);
 		add(label);
 	}
@@ -82,7 +83,7 @@ public class TrackPropertyPanel extends JPanel {
 
 		int status = JOptionPane.showConfirmDialog(parentFrame, 
 				this,
-				"トラックプロパティ", 
+				AppResource.getText("track_property"), 
 				JOptionPane.OK_CANCEL_OPTION,
 				JOptionPane.PLAIN_MESSAGE);
 

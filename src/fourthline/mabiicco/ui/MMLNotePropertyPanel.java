@@ -12,6 +12,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JCheckBox;
 
+import fourthline.mabiicco.AppResource;
 import fourthline.mmlTools.MMLNoteEvent;
 
 import javax.swing.JSpinner;
@@ -36,7 +37,7 @@ public class MMLNotePropertyPanel extends JPanel implements ActionListener {
 	public void showDialog() {
 		int status = JOptionPane.showConfirmDialog(null, 
 				this,
-				"ノートのプロパティ", 
+				AppResource.getText("note.properties"),
 				JOptionPane.OK_CANCEL_OPTION,
 				JOptionPane.PLAIN_MESSAGE);
 
@@ -64,12 +65,12 @@ public class MMLNotePropertyPanel extends JPanel implements ActionListener {
 		velocityValueField.setBounds(209, 37, 72, 19);
 		add(velocityValueField);
 
-		velocityCheckBox = new JCheckBox("音量コマンド（0～15）");
+		velocityCheckBox = new JCheckBox(AppResource.getText("note.properties.velocity"));
 		velocityCheckBox.setBounds(42, 36, 150, 21);
 		velocityCheckBox.addActionListener(this);
 		add(velocityCheckBox);
 
-		tuningNoteCheckBox = new JCheckBox("調律音符（L64を使って連結します）");
+		tuningNoteCheckBox = new JCheckBox(AppResource.getText("note.properties.tuning"));
 		tuningNoteCheckBox.setBounds(43, 99, 220, 21);
 		add(tuningNoteCheckBox);
 

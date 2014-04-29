@@ -24,6 +24,7 @@ import javax.swing.JComboBox;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import fourthline.mabiicco.AppResource;
 import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.InstType;
 import fourthline.mabiicco.midi.MabiDLS;
@@ -41,7 +42,10 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 	 */
 	private static final long serialVersionUID = 4955513242349170508L;
 	public static final String MMLPART_NAME[] = {
-		"メロディー", "和音1", "和音2", "歌"
+		AppResource.getText("melody"),
+		AppResource.getText("chord1"),
+		AppResource.getText("chord2"),
+		AppResource.getText("song")
 	};
 	private JToggleButton partButton[];
 	private JTextField mmlText[];
@@ -57,13 +61,12 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 
 	private IMMLManager mmlManager;
 
-	private final InstClass noUseSongEx = new InstClass("コーラスなし,0", -1, -1);
+	private final InstClass noUseSongEx = new InstClass(AppResource.getText("instrument.nouse_chorus"), -1, -1);
 	private int trackIndex;
 
 	/**
 	 * Create the panel.
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public MMLTrackView() {
 		setLayout(new BorderLayout());
 
@@ -98,11 +101,11 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 			insts = MabiDLS.getInstance().getInsts();
 		} catch (NullPointerException e) {}
 		if (insts == null) {
-			comboBox = new JComboBox();
-			songComboBox = new JComboBox();
+			comboBox = new JComboBox<>();
+			songComboBox = new JComboBox<>();
 		} else {
-			comboBox = new JComboBox( InstClass.filterInstArray(insts, EnumSet.of(InstType.NORMAL, InstType.DRUMS, InstType.VOICE)) );
-			songComboBox = new JComboBox( InstClass.filterInstArray(insts, EnumSet.of(InstType.CHORUS)) );
+			comboBox = new JComboBox<>( InstClass.filterInstArray(insts, EnumSet.of(InstType.NORMAL, InstType.DRUMS, InstType.VOICE)) );
+			songComboBox = new JComboBox<>( InstClass.filterInstArray(insts, EnumSet.of(InstType.CHORUS)) );
 			songComboBox.addItem(noUseSongEx);
 		}
 		northLPanel.add(comboBox);
@@ -175,15 +178,15 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 
 		muteButton = new JButton("");
 		updateMuteButton();
-		muteButton.setToolTipText("Mute");
+		muteButton.setToolTipText(AppResource.getText("mmltrack.mute"));
 		toolBar.add(muteButton);
 		soloButton = new JButton("");
-		soloButton.setIcon(new ImageIcon(this.getClass().getResource("/img/play_solo.png")));
-		soloButton.setToolTipText("Solo");
+		soloButton.setIcon(new ImageIcon(this.getClass().getResource(AppResource.getText("mmltrack.solo.icon"))));
+		soloButton.setToolTipText(AppResource.getText("mmltrack.solo"));
 		toolBar.add(soloButton);
 		allButton = new JButton("");
-		allButton.setIcon(new ImageIcon(this.getClass().getResource("/img/play_all.png")));
-		allButton.setToolTipText("All");
+		allButton.setIcon(new ImageIcon(this.getClass().getResource(AppResource.getText("mmltrack.all.icon"))));
+		allButton.setToolTipText(AppResource.getText("mmltrack.all"));
 		toolBar.add(allButton);
 		muteButton.addActionListener(this);
 		soloButton.addActionListener(this);
@@ -194,9 +197,9 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 
 	public void updateMuteButton() {
 		if (MabiDLS.getInstance().getChannel(trackIndex).getMute()) {
-			muteButton.setIcon(new ImageIcon(this.getClass().getResource("/img/mute_on.png")));
+			muteButton.setIcon(new ImageIcon(this.getClass().getResource(AppResource.getText("mmltrack.mute.on.icon"))));
 		} else {
-			muteButton.setIcon(new ImageIcon(this.getClass().getResource("/img/mute_off.png")));
+			muteButton.setIcon(new ImageIcon(this.getClass().getResource(AppResource.getText("mmltrack.mute.off.icon"))));
 		}
 	}
 

@@ -67,9 +67,9 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 
 	private File openedFile = null;
 
-	private final FileFilter mmsFilter = new FileNameExtensionFilter("まきまびしーく形式 (*.mms)", "mms");
-	private final FileFilter mmiFilter = new FileNameExtensionFilter("MabiIcco形式 (*.mmi)", "mmi");
-	private final FileFilter allFilter = new FileNameExtensionFilter("すべての対応形式 (*.mmi, *.mms)", "mmi", "mms");
+	private final FileFilter mmsFilter = new FileNameExtensionFilter(AppResource.getText("file.mms"), "mms");
+	private final FileFilter mmiFilter = new FileNameExtensionFilter(AppResource.getText("file.mmi"), "mmi");
+	private final FileFilter allFilter = new FileNameExtensionFilter(AppResource.getText("file.all"), "mmi", "mms");
 
 	private final JFileChooser openFileChooser = new JFileChooser();
 	private final JFileChooser saveFileChooser = new JFileChooser();
@@ -198,9 +198,9 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 			notifyUpdateFileState();
 			MabiIccoProperties.getInstance().setRecentFile(file.getPath());
 		} catch (FileNotFoundException e) {
-			JOptionPane.showMessageDialog(mainFrame, "読み込みに失敗しました", "指定されたファイルがありません", JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(mainFrame, AppResource.getText("error.read"), AppResource.getText("error.nofile"), JOptionPane.WARNING_MESSAGE);
 		} catch (MMLParseException e) {
-			JOptionPane.showMessageDialog(mainFrame, "読み込みに失敗しました", "ファイル形式が不正です", JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(mainFrame, AppResource.getText("error.read"), AppResource.getText("error.invalid_file"), JOptionPane.WARNING_MESSAGE);
 		}
 	}
 
@@ -211,7 +211,7 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 
 		if (openedFile != null) {
 			if (fileState.isModified()) {
-				int status = JOptionPane.showConfirmDialog(mainFrame, "いままでの変更が破棄されますが、よろしいですか？", "", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+				int status = JOptionPane.showConfirmDialog(mainFrame, AppResource.getText("message.throw"), "", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 				if (status == JOptionPane.YES_OPTION) {
 					openMMLFile(openedFile);
 				}
@@ -294,7 +294,7 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 			status = JOptionPane.YES_OPTION;
 			if (file.exists()) {
 				// すでにファイルが存在する場合の上書き警告表示.
-				status = JOptionPane.showConfirmDialog(mainFrame, "すでにファイルが存在します。上書きしますか？", "", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+				status = JOptionPane.showConfirmDialog(mainFrame, AppResource.getText("message.override"), "", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 			}
 			if (status == JOptionPane.YES_OPTION) {
 				saveMMLFile(file);
@@ -317,7 +317,7 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 		}
 
 		// 保存するかどうかのダイアログ表示
-		int status = JOptionPane.showConfirmDialog(mainFrame, "変更されていますが、閉じる前に保存しますか？", "", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+		int status = JOptionPane.showConfirmDialog(mainFrame, AppResource.getText("message.modifiedClose"), "", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 		if (status == JOptionPane.CANCEL_OPTION) {
 			return false;
 		} else if (status == JOptionPane.NO_OPTION) {
@@ -391,7 +391,7 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 				if (isSupportedSaveFile()) {
 					mainFrame.setCanSaveFile(true);
 				}
-				mainFrame.setTitleAndFileName(openedFile.getName()+" (変更あり)");
+				mainFrame.setTitleAndFileName(openedFile.getName()+" "+AppResource.getText("file.modified"));
 				mainFrame.setCanReloadFile(true);
 			} else {
 				mainFrame.setTitleAndFileName(openedFile.getName());

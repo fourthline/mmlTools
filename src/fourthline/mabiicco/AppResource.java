@@ -37,7 +37,7 @@ public class AppResource {
 		try {
 			return bundle.getString(key);
 		} catch (java.util.MissingResourceException e) {
-			return "(null)";
+			throw new AssertionError(key);
 		}
 	}
 }

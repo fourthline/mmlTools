@@ -26,6 +26,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 
+import fourthline.mabiicco.AppResource;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.editor.IEditAlign;
 import fourthline.mmlTools.MMLScore;
@@ -58,11 +59,11 @@ public class ColumnPanel extends JPanel implements MouseListener, ActionListener
 		this.editAlign = editAlign;
 		addMouseListener(this);
 
-		insertTempoMenu = newPopupMenu("テンポ挿入");
+		insertTempoMenu = newPopupMenu(AppResource.getText("edit.insert_tempo"));
 		insertTempoMenu.setActionCommand(INSERT_TEMPO);
-		editTempoMenu = newPopupMenu("テンポ編集");
+		editTempoMenu = newPopupMenu(AppResource.getText("edit.edit_tempo"));
 		editTempoMenu.setActionCommand(EDIT_TEMPO);
-		deleteTempoMenu = newPopupMenu("テンポ削除");
+		deleteTempoMenu = newPopupMenu(AppResource.getText("edit.delete_tempo"));
 		deleteTempoMenu.setActionCommand(DELETE_TEMPO);
 	}
 
@@ -167,7 +168,7 @@ public class ColumnPanel extends JPanel implements MouseListener, ActionListener
 		String actionCommand = e.getActionCommand();
 
 		if (actionCommand.equals(INSERT_TEMPO)) {
-			int tempo = showTempoInputDialog("テンポの挿入", 120);
+			int tempo = showTempoInputDialog(AppResource.getText("edit.insert_tempo"), 120);
 			if (tempo < 0) {
 				return;
 			}
@@ -178,7 +179,7 @@ public class ColumnPanel extends JPanel implements MouseListener, ActionListener
 			insertTempo.appendToListElement(tempoList);
 			System.out.println("insert tempo." + tempo);
 		} else if (actionCommand.equals(EDIT_TEMPO)) {
-			int tempo = showTempoInputDialog("テンポの編集", targetTempoEvent.getTempo());
+			int tempo = showTempoInputDialog(AppResource.getText("edit.edit_tempo"), targetTempoEvent.getTempo());
 			if (tempo < 0) {
 				return;
 			}
@@ -193,7 +194,7 @@ public class ColumnPanel extends JPanel implements MouseListener, ActionListener
 
 	private int showTempoInputDialog(String title, int tempo) {
 		JPanel panel = new JPanel();
-		panel.add(new JLabel("テンポ（32～255）"));
+		panel.add(new JLabel(AppResource.getText("edit.tempo_label")));
 		JSpinner spinner = new JSpinner();
 		spinner.setModel(new SpinnerNumberModel(tempo, 32, 255, 1));
 		spinner.setFocusable(false);

@@ -19,6 +19,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputListener;
 
 import fourthline.mabiicco.ActionDispatcher;
+import fourthline.mabiicco.AppResource;
 import fourthline.mabiicco.IEditState;
 import fourthline.mabiicco.IEditStateObserver;
 import fourthline.mabiicco.midi.MabiDLS;
@@ -61,16 +62,16 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext, 
 	public static NoteAlign[] createAlignList() {
 		try {
 			NoteAlign list[] = {
-					new NoteAlign("全音符", "1"),
-					new NoteAlign("2分音符", "2"),
-					new NoteAlign("4分音符", "4"),
-					new NoteAlign("8分音符", "8"),
-					new NoteAlign("16分音符", "16"),
-					new NoteAlign("32分音符", "32"),
-					new NoteAlign("64分音符", "64"),
-					new NoteAlign("12分音符(3連符)", "12"),
-					new NoteAlign("24分音符(3連符)", "24"),
-					new NoteAlign("48分音符(3連符)", "48"),
+					new NoteAlign(AppResource.getText("note_1"), "1"),
+					new NoteAlign(AppResource.getText("note_2"), "2"),
+					new NoteAlign(AppResource.getText("note_4"), "4"),
+					new NoteAlign(AppResource.getText("note_8"), "8"),
+					new NoteAlign(AppResource.getText("note_16"), "16"),
+					new NoteAlign(AppResource.getText("note_32"), "32"),
+					new NoteAlign(AppResource.getText("note_64"), "64"),
+					new NoteAlign(AppResource.getText("note_12"), "12"),
+					new NoteAlign(AppResource.getText("note_24"), "24"),
+					new NoteAlign(AppResource.getText("note_48"), "48"),
 			};
 
 			return list;
@@ -88,7 +89,7 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext, 
 
 		pianoRoll.setSelectNote(selectedNote);
 
-		newPopupMenu("パート入れ替え", ActionDispatcher.PART_CHANGE);
+		newPopupMenu(AppResource.getText("part_change"), ActionDispatcher.PART_CHANGE);
 	}
 
 	public void setEditAlign(int alignTick) {
