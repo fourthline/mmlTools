@@ -2,8 +2,9 @@
  * Copyright (C) 2014 たんらる
  */
 
-package fourthline.mabiicco;
+package fourthline.mabiicco.preloader;
 
+import fourthline.mabiicco.AppResource;
 import javafx.application.Preloader;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

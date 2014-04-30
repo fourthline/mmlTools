@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="MabiIccoFX"
+<project name="MabiIcco"
 	basedir="."
 	default="jfx-package"
 	xmlns:fx="javafx:com.sun.javafx.tools.ant">
@@ -18,8 +18,8 @@
 	<property name="app.id" value="MabiIcco" />
 	<property name="app.name" value="MabiIcco" />
 	<property name="app.version" value="1.0-alpha9" />
-	<property name="app.main-class" value="fourthline.mabiicco.MabiIccoFX" />
-	<property name="app.preloader-class" value="fourthline.mabiicco.MabiIccoPreloader" />
+	<property name="app.main-class" value="fourthline.mabiicco.MabiIcco" />
+	<property name="app.preloader-class" value="fourthline.mabiicco.preloader.MabiIccoPreloader" />
 
 	<!-- clean task -->
 	<target name="clean">

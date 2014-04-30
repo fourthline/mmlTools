@@ -19,6 +19,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import fourthline.mabiicco.midi.MabiDLS;
+import fourthline.mabiicco.preloader.MabiIccoPreloaderNotification;
 import fourthline.mabiicco.ui.MainFrame;
 import javafx.application.Application;
 import javafx.application.Preloader;
@@ -26,7 +27,7 @@ import javafx.stage.Stage;
 
 import javax.swing.SwingUtilities;
 
-public class MabiIccoFX extends Application {
+public class MabiIcco extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {
 		notifyPreloader(new MabiIccoPreloaderNotification(AppResource.getText("init.midi"), 10));

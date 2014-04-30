@@ -2,7 +2,7 @@
  * Copyright (C) 2014 たんらる
  */
 
-package fourthline.mabiicco;
+package fourthline.mabiicco.preloader;
 
 import javafx.application.Preloader;
 
