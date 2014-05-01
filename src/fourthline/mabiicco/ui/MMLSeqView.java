@@ -22,6 +22,7 @@ import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.editor.MMLEditor;
 import fourthline.mabiicco.ui.editor.MMLScoreUndoEdit;
 import fourthline.mmlTools.MMLEventList;
+import fourthline.mmlTools.MMLNoteEvent;
 import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTempoEvent;
 import fourthline.mmlTools.MMLTrack;
@@ -539,6 +540,28 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 
 		updateSelectedTrackAndMMLPart();
 		undoEdit.saveState();
+	}
+
+	@Override
+	public boolean selectTrackOnExistNote(int note, int tickOffset) {
+		int trackIndex = 0;
+		for (MMLTrack track : mmlScore.getTrackList()) {
+			int partIndex = 0;
+			for (MMLEventList eventList : track.getMMLEventList()) {
+				MMLNoteEvent noteEvent = eventList.searchOnTickOffset(tickOffset);
+				if ( (noteEvent != null) && (note == noteEvent.getNote()) ) {
+					tabbedPane.setSelectedIndex(trackIndex);
+					MMLTrackView view = (MMLTrackView) tabbedPane.getSelectedComponent();
+					view.setSelectMMLPartOfIndex(partIndex);
+					updateSelectedTrackAndMMLPart();
+					return true;
+				}
+				partIndex++;
+			}
+			trackIndex++;
+		}
+
+		return false;
 	}
 
 	public void setTimeView(JLabel timeView) {

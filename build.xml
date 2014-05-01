@@ -51,6 +51,11 @@
 				<include name="**/*.fxml" />
 			</fileset>
 		</copy>
+		<copy todir="${dest}">
+			<fileset dir="${src}">
+				<include name="**/*.css" />
+			</fileset>
+		</copy>
 	</target>
 
 	<!-- properties task -->

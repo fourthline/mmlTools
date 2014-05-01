@@ -17,4 +17,5 @@ public interface IMMLManager {
 	public void updateActivePart();
 	public void updateActiveTrackProgram(int program, int songProgram);
 	public int getActivePartProgram();
+	public boolean selectTrackOnExistNote(int note, int tickOffset);
 }

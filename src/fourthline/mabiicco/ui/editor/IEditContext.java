@@ -11,7 +11,7 @@ import java.awt.Point;
  * EditModeから使用するContext.
  */
 interface IEditContext {
-	public boolean onExistNote(Point p);
+	public boolean onExistNote(Point p, boolean autoSelect);
 	public boolean isEditLengthPosition(Point point);
 	public EditMode changeState(EditMode nextMode);
 	public void newMMLNoteAndSelected(Point p);

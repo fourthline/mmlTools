@@ -321,7 +321,7 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext, 
 	 * @return ノート上の場合はtrue.
 	 */
 	@Override
-	public boolean onExistNote(Point point) {
+	public boolean onExistNote(Point point, boolean autoSelect) {
 		int note = pianoRollView.convertY2Note( point.y );
 		int tickOffset = (int)pianoRollView.convertXtoTick( point.x );
 		MMLNoteEvent noteEvent = editEventList.searchOnTickOffset(tickOffset);
@@ -329,6 +329,11 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext, 
 		if ( (noteEvent != null) && (note == noteEvent.getNote()) ) {
 			return true;
 		}
+
+		if (autoSelect) {
+			return mmlManager.selectTrackOnExistNote(note, tickOffset);
+		}
+
 		return false;
 	}
 

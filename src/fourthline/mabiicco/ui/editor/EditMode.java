@@ -20,13 +20,13 @@ enum EditMode {
 		public void pressEvent(IEditContext context, MouseEvent e) {
 			startPoint = e.getPoint();
 			if (SwingUtilities.isRightMouseButton(e)) {
-				if (context.onExistNote(startPoint)) {
+				if (context.onExistNote(startPoint, false)) {
 					context.showPopupMenu(startPoint);
 				} else {
 					context.changeState(AREA).executeEvent(context, e);
 				}
 			} else if (SwingUtilities.isLeftMouseButton(e)) {
-				if (context.onExistNote(startPoint)) {
+				if (context.onExistNote(startPoint, true)) {
 					// ノート上であれば、ノートを選択状態にする. 複数選択判定も.
 					context.selectNoteByPoint(startPoint, e.getModifiers());
 					if (context.isEditLengthPosition(startPoint)) {
@@ -43,7 +43,8 @@ enum EditMode {
 		public void executeEvent(IEditContext context, MouseEvent e) {
 			int cursorType = Cursor.DEFAULT_CURSOR;
 			Point p = e.getPoint();
-			if (context.onExistNote(p)) {
+			boolean onAlt = (e.getModifiers() & ActionEvent.ALT_MASK) != 0;
+			if (context.onExistNote(p, onAlt)) {
 				if (context.isEditLengthPosition(p)) {
 					cursorType = Cursor.E_RESIZE_CURSOR;
 				} else {
