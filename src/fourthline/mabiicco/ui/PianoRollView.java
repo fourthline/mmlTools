@@ -395,7 +395,11 @@ public class PianoRollView extends JPanel {
 		if (width > 1) width--;
 
 		g.setColor(fillColor);
-		g.fillRect(x+1, y+1, width, height-1);
+		if (width != 0) {
+			g.fillRect(x+1, y+1, width, height-1);
+		} else {
+			g.drawLine(x+1, y+1, x+1, y+height-1);
+		}
 		g.setColor(rectColor);
 		g.drawLine(x+1, y+1, x+1, y+height-1);
 		g.drawLine(x+width+1, y+height-1, x+width+1, y+1);
