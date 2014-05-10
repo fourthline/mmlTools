@@ -10,7 +10,6 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
-import javax.sound.midi.Instrument;
 import javax.sound.midi.Synthesizer;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -18,6 +17,7 @@ import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.preloader.MabiIccoPreloaderNotification;
 import fourthline.mabiicco.ui.MainFrame;
@@ -101,15 +101,15 @@ public class MabiIcco extends Application {
 	}
 
 	private void loadSoundbank(int startProgress, int endProgress) {
-		Instrument insts[] = MabiDLS.getInstance().getSoundbank().getInstruments();
+		InstClass insts[] = MabiDLS.getInstance().getInsts();
 		Synthesizer synthesizer = MabiDLS.getInstance().getSynthesizer();
 
 		double progress = startProgress;
 		double delta = ((double)endProgress - startProgress) / insts.length;
 		System.out.println(delta);
 		System.out.println(insts.length);
-		for (Instrument instrument : insts) {
-			synthesizer.loadInstrument(instrument);
+		for (InstClass instrument : insts) {
+			synthesizer.loadInstrument(instrument.getInstrument());
 			progress += delta;
 			notifyPreloader(new MabiIccoPreloaderNotification("", progress));
 		}

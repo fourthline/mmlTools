@@ -4,30 +4,36 @@
 
 package fourthline.mmlTools;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.ResourceBundle;
+
 /**
- * 作曲ランク
- * @author たんらる
+ * 作曲ランク.
  */
-public class ComposeRank {
-	/** 練習ランク  */
-	final public static ComposeRank RANK_t = new ComposeRank( 200, 100,   0, "練習");
-	final public static ComposeRank RANK_F = new ComposeRank( 400, 200, 100, "F");
-	final public static ComposeRank RANK_E = new ComposeRank( 500, 200, 100, "E");
-	final public static ComposeRank RANK_D = new ComposeRank( 600, 250, 150, "D");
-	final public static ComposeRank RANK_C = new ComposeRank( 650, 250, 200, "C");
-	final public static ComposeRank RANK_B = new ComposeRank( 700, 300, 200, "B");
-	final public static ComposeRank RANK_A = new ComposeRank( 750, 300, 200, "A");
-	final public static ComposeRank RANK_9 = new ComposeRank( 800, 350, 200, "9");
-	final public static ComposeRank RANK_8 = new ComposeRank( 850, 400, 200, "8");
-	final public static ComposeRank RANK_7 = new ComposeRank( 900, 400, 200, "7");
-	final public static ComposeRank RANK_6 = new ComposeRank( 950, 450, 200, "6");
-	final public static ComposeRank RANK_5 = new ComposeRank(1000, 500, 250, "5");
-	final public static ComposeRank RANK_4 = new ComposeRank(1050, 550, 300, "4");
-	final public static ComposeRank RANK_3 = new ComposeRank(1100, 600, 350, "3");
-	final public static ComposeRank RANK_2 = new ComposeRank(1150, 700, 400, "2");
-	final public static ComposeRank RANK_1 = new ComposeRank(1200, 800, 500, "1");
+public class ComposeRank implements Comparator<ComposeRank> {
+	final private static String RESOURCE_NAME = "rank";
 	/** 作曲不可ランク */
-	final public static ComposeRank RANK_0 = new ComposeRank(   0,   0,   0, "-");
+	final private static ComposeRank RANK_0 = new ComposeRank(   0,   0,   0, "-");
+
+	final private static ArrayList<ComposeRank> rankList;
+	static {
+		rankList = new ArrayList<>();
+		ResourceBundle bundle = ResourceBundle.getBundle(RESOURCE_NAME);
+		for (String key : Collections.list(bundle.getKeys()) ) {
+			String s[] = bundle.getString(key).split(",");
+			if (s.length != 4) {
+				continue;
+			}
+			int melody = Integer.parseInt(s[0].trim());
+			int chord1 = Integer.parseInt(s[1].trim());
+			int chord2 = Integer.parseInt(s[2].trim());
+			rankList.add( new ComposeRank(melody, chord1, chord2, s[3].trim()) );
+		}
+
+		rankList.sort(RANK_0);
+	}
 
 	private int melody;
 	private int chord1;
@@ -43,25 +49,6 @@ public class ComposeRank {
 	 * @return ランクの文字
 	 */
 	static public String mmlRank(String melody, String chord1, String chord2, String songEx) {
-		ComposeRank rankList[] = {
-				RANK_t,
-				RANK_F,
-				RANK_E,
-				RANK_D,
-				RANK_C,
-				RANK_B,
-				RANK_A,
-				RANK_9,
-				RANK_8,
-				RANK_7,
-				RANK_6,
-				RANK_5,
-				RANK_4,
-				RANK_3,
-				RANK_2,
-				RANK_1
-		};
-
 		for (ComposeRank rank : rankList) {
 			if (rank.compare(melody, chord1, chord2, songEx))
 				return rank.getRank();
@@ -124,5 +111,11 @@ public class ComposeRank {
 		String result = "Rank " + rank + " ( " + melody + ", " + chord1 + ", " + chord2 + " )";
 
 		return result;
+	}
+
+	@Override
+	public int compare(ComposeRank rank1, ComposeRank rank2) {
+		return (rank1.melody + rank1.chord1 + rank1.chord2)
+				- (rank2.melody + rank2.chord1 + rank2.chord2);
 	}
 }

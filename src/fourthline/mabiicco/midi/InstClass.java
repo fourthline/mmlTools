@@ -7,6 +7,8 @@ package fourthline.mabiicco.midi;
 import java.util.ArrayList;
 import java.util.EnumSet;
 
+import javax.sound.midi.Instrument;
+
 import fourthline.mmlTools.parser.MMLEventParser;
 
 public class InstClass {
@@ -16,10 +18,12 @@ public class InstClass {
 	private final int lowerNote;
 	private final int upperNote;
 	private final InstType type;
+	private final Instrument inst;
 
-	public InstClass(String name, int bank, int program) {
+	public InstClass(String name, int bank, int program, Instrument inst) {
 		String str[] = name.split(",");
 		this.name = str[0];
+		this.inst = inst;
 
 		if (str.length > 1) {
 			this.type = InstType.getInstType(str[1]);
@@ -63,6 +67,10 @@ public class InstClass {
 
 	public InstType getType() {
 		return this.type;
+	}
+
+	public Instrument getInstrument() {
+		return this.inst;
 	}
 
 	public static InstClass[] filterInstArray(InstClass[] array, EnumSet<InstType> e) {

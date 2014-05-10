@@ -6,10 +6,10 @@ package fourthline.mabiicco.midi;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 import javax.sound.midi.*;
 
@@ -25,10 +25,9 @@ public final class MabiDLS {
 	private Sequencer sequencer;
 	private MidiChannel channel[];
 	private InstClass insts[];
-	private Properties instProperties;
-	private Soundbank soundBank;
+	private ResourceBundle instResource;
 
-	private static final String INST_PROPERTIESFILE = "instrument.properties";
+	private static final String RESOURCE_NAME = "instrument";
 	public static final String DEFALUT_DLS_PATH = "C:/Nexon/Mabinogi/mp3/MSXspirit.dls";
 
 	private INotifyTrackEnd notifier = null;
@@ -82,15 +81,11 @@ public final class MabiDLS {
 
 	public void initializeSound(File dlsFile) throws MidiUnavailableException, InvalidMidiDataException, IOException {
 		// 楽器名の読み込み
-		try {
-			instProperties = new Properties();
-			instProperties.load(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream(INST_PROPERTIESFILE), "UTF-8"));
-		} catch (IOException e) {
-			System.err.println(e.getMessage());
-		}
+		instResource = ResourceBundle.getBundle(RESOURCE_NAME);
+
 
 		// シーケンサとシンセサイザの初期化
-		this.soundBank = loadDLS(dlsFile);
+		loadDLS(dlsFile);
 		Receiver receiver = initializeSynthesizer();
 		Transmitter transmitter = this.sequencer.getTransmitters().get(0);
 		transmitter.setReceiver(receiver);
@@ -108,17 +103,16 @@ public final class MabiDLS {
 		return channel[ch];
 	}
 
-	public Soundbank getSoundbank() {
-		return this.soundBank;
-	}
-
 	private String instName(Instrument inst) {
-		String name = instProperties.getProperty(""+inst.getPatch().getProgram());
-
-		return name;
+		try {
+			String name = instResource.getString(""+inst.getPatch().getProgram());
+			return name;
+		} catch (MissingResourceException e) {
+			return null;
+		}
 	}
 
-	private Soundbank loadDLS(File dlsFile) throws InvalidMidiDataException, IOException {
+	private void loadDLS(File dlsFile) throws InvalidMidiDataException, IOException {
 		Soundbank sb = MidiSystem.getSoundbank(dlsFile);
 
 		ArrayList<InstClass> instArray = new ArrayList<>();
@@ -132,14 +126,13 @@ public final class MabiDLS {
 				name = ""+program+": "+name;
 				instArray.add(new InstClass( name,
 						bank,
-						program ));
+						program,
+						inst));
 			}
 		}
 
 		insts = new InstClass[instArray.size()];
 		insts = instArray.toArray(insts);
-
-		return sb;
 	}
 
 
