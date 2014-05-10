@@ -90,6 +90,7 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext, 
 		pianoRoll.setSelectNote(selectedNote);
 
 		newPopupMenu(AppResource.getText("part_change"), ActionDispatcher.PART_CHANGE);
+		newPopupMenu(AppResource.getText("note.properties"), ActionDispatcher.NOTE_PROPERTY);
 	}
 
 	public void setEditAlign(int alignTick) {
@@ -376,14 +377,7 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext, 
 	public void mouseClicked(MouseEvent e) {
 		if (SwingUtilities.isLeftMouseButton(e)) {
 			if (e.getClickCount() == 2) {
-				// 左ダブルクリック: 音符上なら、その音符のプロパティ画面を表示します.
-				int note = pianoRollView.convertY2Note( e.getY() );
-				int tickOffset = (int)pianoRollView.convertXtoTick( e.getX() );
-				MMLNoteEvent noteEvent = editEventList.searchOnTickOffset( tickOffset );
-				if ( (noteEvent != null) && (noteEvent.getNote() == note) ) {
-					new MMLNotePropertyPanel(noteEvent).showDialog();
-					mmlManager.updateActivePart();
-				}
+				noteProperty();
 			}
 		}
 	}
@@ -493,6 +487,16 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext, 
 
 		selectNote(null);
 		editObserver.notifyUpdateEditState();
+		mmlManager.updateActivePart();
+	}
+
+	@Override
+	public void noteProperty() {
+		if (selectedNote.isEmpty()) {
+			return;
+		}
+
+		new MMLNotePropertyPanel(selectedNote.toArray(new MMLNoteEvent[selectedNote.size()])).showDialog();
 		mmlManager.updateActivePart();
 	}
 

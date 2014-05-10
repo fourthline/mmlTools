@@ -11,6 +11,7 @@ public interface IEditState {
 	public void selectedCut();
 	public void selectedCopy();
 	public void selectedDelete();
+	public void noteProperty();
 
 	public void setEditStateObserver(IEditStateObserver observer);
 }

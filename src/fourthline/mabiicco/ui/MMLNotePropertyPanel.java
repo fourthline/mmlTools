@@ -32,7 +32,7 @@ public class MMLNotePropertyPanel extends JPanel implements ActionListener {
 	private JSpinner velocityValueField;
 	private JCheckBox velocityCheckBox;
 	private JCheckBox tuningNoteCheckBox;
-	private MMLNoteEvent noteEvent;
+	private MMLNoteEvent noteEvent[];
 
 	public void showDialog() {
 		int status = JOptionPane.showConfirmDialog(null, 
@@ -56,7 +56,7 @@ public class MMLNotePropertyPanel extends JPanel implements ActionListener {
 	/**
 	 * Create the panel.
 	 */
-	public MMLNotePropertyPanel(MMLNoteEvent noteEvent) {
+	public MMLNotePropertyPanel(MMLNoteEvent noteEvent[]) {
 		super();
 		setLayout(null);
 
@@ -77,15 +77,15 @@ public class MMLNotePropertyPanel extends JPanel implements ActionListener {
 		setNoteEvent(noteEvent);
 	}
 
-	private void setNoteEvent(MMLNoteEvent noteEvent) {
+	private void setNoteEvent(MMLNoteEvent noteEvent[]) {
 		this.noteEvent = noteEvent;
 		if (noteEvent == null) {
 			return;
 		}
 
-		tuningNoteCheckBox.setSelected( noteEvent.isTuningNote() );
+		tuningNoteCheckBox.setSelected( noteEvent[0].isTuningNote() );
 
-		int velocity = noteEvent.getVelocity();
+		int velocity = noteEvent[0].getVelocity();
 		if (velocity >= 0) {
 			velocityCheckBox.setSelected(true);
 			velocityValueField.setEnabled(true);
@@ -100,17 +100,19 @@ public class MMLNotePropertyPanel extends JPanel implements ActionListener {
 	 * パネルの情報をノートに反映します.
 	 */
 	public void applyProperty() {
-		if (tuningNoteCheckBox.isSelected()) {
-			noteEvent.setTuningNote(true);
-		} else {
-			noteEvent.setTuningNote(false);
-		}
+		for (MMLNoteEvent event : noteEvent) {
+			if (tuningNoteCheckBox.isSelected()) {
+				event.setTuningNote(true);
+			} else {
+				event.setTuningNote(false);
+			}
 
-		if (velocityCheckBox.isSelected()) {
-			Integer value = (Integer) velocityValueField.getValue();
-			noteEvent.setVelocity(value);
-		} else {
-			noteEvent.setVelocity(MMLNoteEvent.NO_VEL);
+			if (velocityCheckBox.isSelected()) {
+				Integer value = (Integer) velocityValueField.getValue();
+				event.setVelocity(value);
+			} else {
+				event.setVelocity(MMLNoteEvent.NO_VEL);
+			}
 		}
 	}
 

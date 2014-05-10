@@ -64,6 +64,7 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 	public static final String CHANGE_NOTE_HEIGHT_INT = "change_note_height_";
 	public static final String ADD_MEASURE = "add_measure";
 	public static final String REMOVE_MEASURE = "remove_measure";
+	public static final String NOTE_PROPERTY = "note_property";
 
 	private File openedFile = null;
 
@@ -179,7 +180,9 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 		} else if (command.equals(ADD_MEASURE)) {
 			mmlSeqView.addMeasure();
 		} else if (command.equals(REMOVE_MEASURE)) {
-			mmlSeqView.removeMeasure();;
+			mmlSeqView.removeMeasure();
+		} else if (command.equals(NOTE_PROPERTY)) {
+			editState.noteProperty();
 		}
 	}
 
