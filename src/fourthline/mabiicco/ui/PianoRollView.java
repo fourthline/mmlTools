@@ -176,6 +176,42 @@ public class PianoRollView extends JPanel {
 		viewport.setViewPosition(p);
 	}
 
+	/**
+	 * pointが表示領域になければ、Viewportをスクロールする.
+	 * pointの位置は表示領域内に補正される.
+	 * @param point
+	 */
+	public void onViewScrollPoint(Point point) {
+		int y = point.y;
+		int y1 = viewport.getViewPosition().y;
+		int y2 = y1 + viewport.getHeight() - noteHeight;
+		int x = viewport.getViewPosition().x;
+		if (x + viewport.getWidth() < point.x) {
+			x++;
+		}
+
+		if (y < y1) {
+			// up-scroll
+			y1 -= noteHeight;
+			if (y1 < 0) {
+				y1 = 0;
+			}
+			y = y1;
+		} else if (y > y2) {
+			// down-scroll
+			y1 += noteHeight;
+			if (y1 > getHeight() - viewport.getHeight()) {
+				y1 = getHeight() - viewport.getHeight();
+				y = y2;
+			} else {
+				y = y2 + noteHeight;
+			}
+		}
+
+		viewport.setViewPosition(new Point(x, y1));
+		point.y = y;
+	}
+
 	public double getWideScale() {
 		return this.wideScale;
 	}

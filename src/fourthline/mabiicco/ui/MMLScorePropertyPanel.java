@@ -32,19 +32,19 @@ public class MMLScorePropertyPanel extends JPanel {
 	}
 
 	private void initializePanel() {
-		setBounds(100, 100, 260, 170);
+		setBounds(100, 100, 300, 170);
 		setLayout(null);
 
 		JLabel label1 = new JLabel(AppResource.getText("score_property.name"));
-		label1.setBounds(12, 40, 50, 13);
+		label1.setBounds(12, 40, 90, 13);
 		add(label1);
 
 		JLabel label2 = new JLabel(AppResource.getText("score_property.author"));
-		label2.setBounds(12, 73, 50, 13);
+		label2.setBounds(12, 73, 90, 13);
 		add(label2);
 
 		JLabel label3 = new JLabel(AppResource.getText("score_property.measure"));
-		label3.setBounds(12, 105, 50, 13);
+		label3.setBounds(12, 105, 90, 13);
 		add(label3);
 
 		JLabel label4 = new JLabel("/");
@@ -52,27 +52,27 @@ public class MMLScorePropertyPanel extends JPanel {
 		add(label4);
 
 		titleField = new JTextField();
-		titleField.setBounds(85, 37, 152, 19);
+		titleField.setBounds(125, 37, 152, 19);
 		add(titleField);
 		titleField.setColumns(10);
 
 		authorField = new JTextField();
 		authorField.setColumns(10);
-		authorField.setBounds(85, 70, 152, 19);
+		authorField.setBounds(125, 70, 152, 19);
 		add(authorField);
 
 		timeCount = new JComboBox<String>();
-		timeCount.setBounds(85, 102, 63, 19);
+		timeCount.setBounds(125, 102, 63, 19);
 		add(timeCount);
 
 		timeBase = new JComboBox<String>();
-		timeBase.setBounds(174, 102, 63, 19);
+		timeBase.setBounds(214, 102, 63, 19);
 		add(timeBase);
 	}
 
 	@Override
 	public Dimension getPreferredSize() {
-		return new Dimension(260, 170);
+		return new Dimension(300, 170);
 	}
 
 	private void initialComboBox(String baseTime) {

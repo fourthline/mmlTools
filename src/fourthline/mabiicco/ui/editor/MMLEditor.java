@@ -207,6 +207,7 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext, 
 	 */
 	@Override
 	public void updateSelectedNoteAndTick(Point p, boolean updateNote) {
+		pianoRollView.onViewScrollPoint(p);
 		MMLNoteEvent noteEvent = selectedNote.get(0);
 		int note = pianoRollView.convertY2Note(p.y);
 		long tickOffset = pianoRollView.convertXtoTick(p.x);
@@ -234,6 +235,7 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext, 
 	 */
 	@Override
 	public void moveSelectedMMLNote(Point start, Point p, boolean shiftOption) {
+		pianoRollView.onViewScrollPoint(p);
 		int noteDelta = pianoRollView.convertY2Note(p.y) - pianoRollView.convertY2Note(start.y);
 		long tickOffsetDelta = pianoRollView.convertXtoTick(p.x) - pianoRollView.convertXtoTick(start.x);
 		long alignedTickOffsetDelta = tickOffsetDelta - (tickOffsetDelta % editAlign);
