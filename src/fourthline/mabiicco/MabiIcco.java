@@ -43,7 +43,10 @@ public class MabiIcco extends Application {
 		MabiIccoProperties appProperties = MabiIccoProperties.getInstance();
 
 		try {
-			setUIFont(new javax.swing.plaf.FontUIResource("Meiryo", Font.PLAIN, 11));
+			String fontName = AppResource.getText("ui.font");
+			if (!fontName.equals("ui.font")) {
+				setUIFont(new javax.swing.plaf.FontUIResource(fontName, Font.PLAIN, 11));
+			}
 			UIManager.LookAndFeelInfo infos[] = UIManager.getInstalledLookAndFeels();
 			for (UIManager.LookAndFeelInfo info : infos) {
 				System.out.println(info.getClassName());
