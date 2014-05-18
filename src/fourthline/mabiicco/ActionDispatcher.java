@@ -244,18 +244,15 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 			return;
 		}
 
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				String recentPath = MabiIccoProperties.getInstance().getRecentFile();
-				openFileChooser.setCurrentDirectory(new File(recentPath));
-				openFileChooser.setFileFilter(allFilter);
-				openFileChooser.setAcceptAllFileFilterUsed(false);
-				int status = openFileChooser.showOpenDialog(mainFrame);
-				if (status == JFileChooser.APPROVE_OPTION) {
-					File file = openFileChooser.getSelectedFile();
-					openMMLFile(file);
-				}
+		SwingUtilities.invokeLater(() -> {
+			String recentPath = MabiIccoProperties.getInstance().getRecentFile();
+			openFileChooser.setCurrentDirectory(new File(recentPath));
+			openFileChooser.setFileFilter(allFilter);
+			openFileChooser.setAcceptAllFileFilterUsed(false);
+			int status = openFileChooser.showOpenDialog(mainFrame);
+			if (status == JFileChooser.APPROVE_OPTION) {
+				File file = openFileChooser.getSelectedFile();
+				openMMLFile(file);
 			}
 		});
 	}
@@ -265,12 +262,9 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 			return;
 		}
 
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				showDialogSaveFile();
-				notifyUpdateFileState();
-			}
+		SwingUtilities.invokeLater(() -> {
+			showDialogSaveFile();
+			notifyUpdateFileState();
 		});
 	}
 

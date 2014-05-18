@@ -7,7 +7,6 @@ package fourthline.mabiicco.ui;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -77,24 +76,18 @@ public class MMLPartChangePanel extends JPanel {
 
 		applyButton.setBounds(202, 335, 90, 29);
 		add(applyButton);
-		applyButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
+		applyButton.addActionListener((event) -> {
 				changePartAction();
 				mmlManager.updateActivePart();
 				dialog.setVisible(false);
-			}
 		});
 
 		JButton closeButton = new JButton(AppResource.getText("part_change.cancel"));
 		closeButton.setBounds(317, 335, 90, 29);
 		add(closeButton);
 		closeButton.setFocusable(false);
-		closeButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				dialog.setVisible(false);
-			}
+		closeButton.addActionListener((event) -> {
+			dialog.setVisible(false);
 		});
 
 		/* 入れ替え元 */

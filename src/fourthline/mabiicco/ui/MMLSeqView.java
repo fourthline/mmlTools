@@ -104,15 +104,12 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	}
 
 	private void initialSetView() {
-		EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				// (ピアノロール全体の高さ / 2) - （表示領域 / 2）＝真ん中の座標。
-				int y = (pianoRollView.getTotalHeight() / 2) - (scrollPane.getHeight() / 2);
+		EventQueue.invokeLater(() -> {
+			// (ピアノロール全体の高さ / 2) - （表示領域 / 2）＝真ん中の座標。
+			int y = (pianoRollView.getTotalHeight() / 2) - (scrollPane.getHeight() / 2);
 
-				// 初期のView位置
-				scrollPane.getViewport().setViewPosition(new Point(0, y));
-			}
+			// 初期のView位置
+			scrollPane.getViewport().setViewPosition(new Point(0, y));
 		});
 	}
 
@@ -204,23 +201,21 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	 * 再生スタート（現在のシーケンス位置を使用）
 	 */
 	public void startSequence() {
-		new Thread(new Runnable() {
-			public void run() {
-				try {
-					Sequencer sequencer = MabiDLS.getInstance().getSequencer();
-					Sequence sequence = MabiDLS.getInstance().createSequence(mmlScore);
+		new Thread(() -> {
+			try {
+				Sequencer sequencer = MabiDLS.getInstance().getSequencer();
+				Sequence sequence = MabiDLS.getInstance().createSequence(mmlScore);
 
-					// 再生開始が先頭でない場合、そこのテンポに設定する必要がある。
-					long startTick = pianoRollView.getSequencePosition();
-					int tempo = getTempoInSequenceAtTick(startTick);
-					System.out.printf("Sequence start: tick(%d), tempo(%d)\n", startTick, tempo);
-					sequencer.setSequence(sequence);
-					sequencer.setTickPosition(startTick);
-					sequencer.setTempoInBPM(tempo);
-					sequencer.start();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				// 再生開始が先頭でない場合、そこのテンポに設定する必要がある。
+				long startTick = pianoRollView.getSequencePosition();
+				int tempo = getTempoInSequenceAtTick(startTick);
+				System.out.printf("Sequence start: tick(%d), tempo(%d)\n", startTick, tempo);
+				sequencer.setSequence(sequence);
+				sequencer.setTickPosition(startTick);
+				sequencer.setTempoInBPM(tempo);
+				sequencer.start();
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}).start();
 	}
@@ -600,20 +595,16 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 			return;
 		}
 		// TODO: びみょう・・・？
-		timeViewUpdateThread = new Thread(
-				new Runnable() {
-					@Override
-					public void run() {
-						while (true) {
-							try {
-								Thread.sleep(100);
-							} catch (InterruptedException e) {
-								e.printStackTrace();
-							}
-							updateTimeView();
-						}
-					}
-				});
+		timeViewUpdateThread = new Thread(() -> {
+			while (true) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				updateTimeView();
+			}
+		});
 		timeViewUpdateThread.start();
 	}
 
@@ -640,17 +631,14 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		if (updateViewThread != null) {
 			return;
 		}
-		updateViewThread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				while (true) {
-					try {
-						Thread.sleep(25);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					updatePianoRollView();
+		updateViewThread = new Thread(() -> {
+			while (true) {
+				try {
+					Thread.sleep(25);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
+				updatePianoRollView();
 			}
 		});
 		updateViewThread.start();
@@ -660,30 +648,27 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	private void updatePianoRollView() {
 		Sequencer sequencer = MabiDLS.getInstance().getSequencer();
 		if (sequencer.isRunning()) {
-			EventQueue.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					pianoRollView.updateRunningSequencePosition();
-					int measure = pianoRollView.getMeasureWidth();
-					long position = pianoRollView.getSequencePlayPosition();
-					position = pianoRollView.convertTicktoX(position);
-					position -= position % measure;
-					JViewport viewport = scrollPane.getViewport();
-					Point point = viewport.getViewPosition();
-					Dimension dim = viewport.getExtentSize();
-					int x1 = point.x;
-					int x2 = x1 + dim.width - measure;
-					if ( (position < x1) || (position > x2) ) {
-						/* ビュー外にあるので、現在のポジションにあわせる */
-						if (position + dim.width > pianoRollView.getWidth()) {
-							position = (pianoRollView.getWidth() - dim.width);
-							position -= position % measure;
-						}
-						point.setLocation(position, point.getY());
-						viewport.setViewPosition(point);
+			EventQueue.invokeLater(() -> {
+				pianoRollView.updateRunningSequencePosition();
+				int measure = pianoRollView.getMeasureWidth();
+				long position = pianoRollView.getSequencePlayPosition();
+				position = pianoRollView.convertTicktoX(position);
+				position -= position % measure;
+				JViewport viewport = scrollPane.getViewport();
+				Point point = viewport.getViewPosition();
+				Dimension dim = viewport.getExtentSize();
+				int x1 = point.x;
+				int x2 = x1 + dim.width - measure;
+				if ( (position < x1) || (position > x2) ) {
+					/* ビュー外にあるので、現在のポジションにあわせる */
+					if (position + dim.width > pianoRollView.getWidth()) {
+						position = (pianoRollView.getWidth() - dim.width);
+						position -= position % measure;
 					}
-					scrollPane.repaint();
+					point.setLocation(position, point.getY());
+					viewport.setViewPosition(point);
 				}
+				scrollPane.repaint();
 			});
 		}
 	}

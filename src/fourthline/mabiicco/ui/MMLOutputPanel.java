@@ -10,7 +10,6 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.List;
 
@@ -60,22 +59,16 @@ public class MMLOutputPanel extends JPanel {
 
 		copyButton.setBounds(141, 189, 90, 29);
 		add(copyButton);
-		copyButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				currentSelectedPartMMLOutput();
-			}
+		copyButton.addActionListener((event) -> {
+			currentSelectedPartMMLOutput();
 		});
 
 		JButton closeButton = new JButton(AppResource.getText("mml.output.closeButton"));
 		closeButton.setBounds(257, 189, 90, 29);
 		add(closeButton);
 		closeButton.setFocusable(false);
-		closeButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				dialog.setVisible(false);
-			}
+		closeButton.addActionListener((event) -> {
+			dialog.setVisible(false);
 		});
 
 		JScrollPane scrollPane = new JScrollPane();

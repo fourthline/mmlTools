@@ -55,21 +55,18 @@ public final class MabiDLS {
 
 		this.sequencer = MidiSystem.getSequencer();
 		this.sequencer.open();
-		this.sequencer.addMetaEventListener(new MetaEventListener() {
-			@Override
-			public void meta(MetaMessage meta) {
-				int type = meta.getType();
-				if (type == MMLTempoEvent.META) {
-					// テンポイベントを処理します.
-					byte metaData[] = meta.getData();
-					int tempo = metaData[0] & 0xff;
-					sequencer.setTempoInBPM(tempo);
-					System.out.println(" [midi-event] tempo: " + tempo);
-				} else if (type == 0x2f) {
-					// トラック終端
-					if (notifier != null) {
-						notifier.trackEndNotify();
-					}
+		this.sequencer.addMetaEventListener((MetaMessage meta) -> {
+			int type = meta.getType();
+			if (type == MMLTempoEvent.META) {
+				// テンポイベントを処理します.
+				byte metaData[] = meta.getData();
+				int tempo = metaData[0] & 0xff;
+				sequencer.setTempoInBPM(tempo);
+				System.out.println(" [midi-event] tempo: " + tempo);
+			} else if (type == 0x2f) {
+				// トラック終端
+				if (notifier != null) {
+					notifier.trackEndNotify();
 				}
 			}
 		});

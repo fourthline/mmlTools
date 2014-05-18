@@ -6,16 +6,15 @@ package fourthline.mmlTools;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.ResourceBundle;
 
 /**
  * 作曲ランク.
  */
-public class ComposeRank implements Comparator<ComposeRank> {
+public class ComposeRank {
 	final private static String RESOURCE_NAME = "rank";
 	/** 作曲不可ランク */
-	final private static ComposeRank RANK_0 = new ComposeRank(   0,   0,   0, "-");
+	final private static ComposeRank RANK_0 = new ComposeRank(0, 0, 0, "-");
 
 	final private static ArrayList<ComposeRank> rankList;
 	static {
@@ -32,7 +31,10 @@ public class ComposeRank implements Comparator<ComposeRank> {
 			rankList.add( new ComposeRank(melody, chord1, chord2, s[3].trim()) );
 		}
 
-		rankList.sort(RANK_0);
+		rankList.sort((rank1, rank2) -> {
+			return (rank1.melody + rank1.chord1 + rank1.chord2)
+					- (rank2.melody + rank2.chord1 + rank2.chord2);
+		});
 	}
 
 	private int melody;
@@ -111,11 +113,5 @@ public class ComposeRank implements Comparator<ComposeRank> {
 		String result = "Rank " + rank + " ( " + melody + ", " + chord1 + ", " + chord2 + " )";
 
 		return result;
-	}
-
-	@Override
-	public int compare(ComposeRank rank1, ComposeRank rank2) {
-		return (rank1.melody + rank1.chord1 + rank1.chord2)
-				- (rank2.melody + rank2.chord1 + rank2.chord2);
 	}
 }

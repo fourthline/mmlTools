@@ -524,12 +524,9 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		for (JComponent component : noplayFunctions) {
 			component.setEnabled(true);
 		}
-		EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				mmlSeqView.resetViewPosition();
-				mmlSeqView.repaint();
-			}
+		EventQueue.invokeLater(() -> {
+			mmlSeqView.resetViewPosition();
+			mmlSeqView.repaint();
 		});
 	}
 

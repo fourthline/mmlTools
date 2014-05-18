@@ -31,11 +31,8 @@ public class MabiIcco extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {
 		notifyPreloader(new MabiIccoPreloaderNotification(AppResource.getText("init.midi"), 10));
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				initialize();
-			}
+		SwingUtilities.invokeLater(() -> {
+			initialize();
 		});
 	}
 
@@ -80,26 +77,24 @@ public class MabiIcco extends Application {
 			MabiDLS.getInstance().initializeSound(file);
 			loadSoundbank(20, 90);
 			appProperties.setDlsFile(file.getPath());
-			notifyPreloader(new MabiIccoPreloaderNotification("OK\n", 100));
+			notifyPreloader(new MabiIccoPreloaderNotification("OK\n", 90));
 		} catch (Exception e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
 			System.exit(1);
 		}
 
-		EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				ActionDispatcher dispatcher = ActionDispatcher.getInstance();
-				MainFrame mainFrame = new MainFrame(dispatcher);
-				dispatcher.setMainFrame(mainFrame);
-				List<String> args = getParameters().getRaw();
-				if (args.size() > 0) {
-					dispatcher.openMMLFile(new File(args.get(0)));
-				}
-				notifyPreloader(new Preloader.StateChangeNotification(Preloader.StateChangeNotification.Type.BEFORE_START));
-				mainFrame.setVisible(true);
+		EventQueue.invokeLater(() -> {
+			ActionDispatcher dispatcher = ActionDispatcher.getInstance();
+			MainFrame mainFrame = new MainFrame(dispatcher);
+			notifyPreloader(new MabiIccoPreloaderNotification("", 100));
+			dispatcher.setMainFrame(mainFrame);
+			List<String> args = getParameters().getRaw();
+			if (args.size() > 0) {
+				dispatcher.openMMLFile(new File(args.get(0)));
 			}
+			notifyPreloader(new Preloader.StateChangeNotification(Preloader.StateChangeNotification.Type.BEFORE_START));
+			mainFrame.setVisible(true);
 		});
 	}
 
