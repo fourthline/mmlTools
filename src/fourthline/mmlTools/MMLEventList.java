@@ -87,7 +87,6 @@ public class MMLEventList implements Serializable, Cloneable {
 		}
 	}
 
-
 	/**
 	 * 指定したtickOffset位置にあるNoteEventを検索します.
 	 * @param tickOffset
@@ -293,8 +292,11 @@ public class MMLEventList implements Serializable, Cloneable {
 	public MMLEventList clone() {
 		try {
 			MMLEventList obj = (MMLEventList) super.clone();
-			obj.noteList = new ArrayList<>(noteList);
+			obj.noteList = new ArrayList<>();
 			obj.tempoList = new ArrayList<>(tempoList);
+			for (MMLNoteEvent note : noteList) {
+				obj.noteList.add(note.clone());
+			}
 			return obj;
 		} catch (CloneNotSupportedException e) {
 			throw new AssertionError();
@@ -402,5 +404,54 @@ public class MMLEventList implements Serializable, Cloneable {
 		for (MMLNoteEvent noteEvent : deleteNote) {
 			deleteMMLEvent(noteEvent);
 		}
+	}
+
+	/**
+	 * 重複音（開始）の判定を行います.
+	 * @param note
+	 * @param tickOffset
+	 * @return
+	 */
+	private boolean searchEqualsTickOffsetNote(int note, int tickOffset) {
+		for (MMLNoteEvent noteEvent : noteList) {
+			if (noteEvent.getTickOffset() > tickOffset) {
+				return false;
+			} else if ( (noteEvent.getNote() == note) && 
+					(noteEvent.getTickOffset() == tickOffset)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Mabinogi演奏に近くなるように修正を行います.
+	 * 重複音（開始）、テンポ重複.
+	 * @param registedPart
+	 * @param globalTempoList
+	 * @return
+	 */
+	public MMLEventList emulateMabiPlay(List<MMLEventList> registedPart, List<MMLTempoEvent> globalTempoList) {
+		for (MMLNoteEvent noteEvent : noteList) {
+			int tickOffset = noteEvent.getTickOffset();
+			boolean onTempo = false;
+			// テンポと重複していない && 前パートと同一開始位置: tickOffsetを1つ増やして tickを1つ減らす.
+			for (MMLTempoEvent tempo : globalTempoList) {
+				if (tempo.getTickOffset() == tickOffset) {
+					onTempo = true;
+					break;
+				}
+			}
+			if (!onTempo) {
+				registedPart.forEach(prePart -> {
+					if (prePart.searchEqualsTickOffsetNote(noteEvent.getNote(), tickOffset)) {
+						int tick = noteEvent.getTick();
+						noteEvent.setTickOffset(tickOffset+1);
+						noteEvent.setTick(tick - 1);
+					}
+				});
+			}
+		}
+		return this;
 	}
 }

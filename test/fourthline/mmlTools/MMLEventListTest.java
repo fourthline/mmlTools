@@ -575,4 +575,56 @@ public class MMLEventListTest {
 
 		assertEquals(eventList2.toMMLString(), eventList1.toMMLString());
 	}
+
+	/**
+	 * 音符の重複の演奏補正（なし）
+	 */
+	@Test
+	public void testEmulateMabiPlay0() {
+		MMLEventList eventList1 = new MMLEventList("b");
+		MMLEventList eventList2 = new MMLEventList("a");
+
+		ArrayList<MMLEventList> list = new ArrayList<>();
+		list.add(eventList1);
+
+		MMLEventList resultList = eventList2.emulateMabiPlay(list, eventList1.getGlobalTempoList());
+		MMLNoteEvent note = resultList.getMMLNoteEventList().get(0);
+		assertEquals(0, note.getTickOffset());
+		assertEquals(96, note.getTick());
+	}
+
+	/**
+	 * 音符の重複の演奏補正
+	 */
+	@Test
+	public void testEmulateMabiPlay1() {
+		MMLEventList eventList1 = new MMLEventList("a");
+		MMLEventList eventList2 = new MMLEventList("a");
+
+		ArrayList<MMLEventList> list = new ArrayList<>();
+		list.add(eventList1);
+
+		MMLEventList resultList = eventList2.emulateMabiPlay(list, eventList1.getGlobalTempoList());
+		MMLNoteEvent note = resultList.getMMLNoteEventList().get(0);
+		assertEquals(1, note.getTickOffset());
+		assertEquals(95, note.getTick());
+	}
+
+	/**
+	 * 音符の重複の演奏補正
+	 * テンポ指定上
+	 */
+	@Test
+	public void testEmulateMabiPlay2() {
+		MMLEventList eventList1 = new MMLEventList("t120a");
+		MMLEventList eventList2 = new MMLEventList("a");
+
+		ArrayList<MMLEventList> list = new ArrayList<>();
+		list.add(eventList1);
+
+		MMLEventList resultList = eventList2.emulateMabiPlay(list, eventList1.getGlobalTempoList());
+		MMLNoteEvent note = resultList.getMMLNoteEventList().get(0);
+		assertEquals(0, note.getTickOffset());
+		assertEquals(96, note.getTick());
+	}
 }

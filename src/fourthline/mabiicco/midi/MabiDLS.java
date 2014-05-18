@@ -343,10 +343,13 @@ public final class MabiDLS {
 		boolean enablePart[] = InstClass.getEnablePartByProgram(program);
 		InstType instType = InstClass.searchInstAtProgram(insts, mmlTrack.getProgram()).getType();
 
+		ArrayList<MMLEventList> registedPart = new ArrayList<>();
 		for (int i = 0; i < enablePart.length; i++) {
 			if (enablePart[i]) {
 				MMLEventList eventList = mmlTrack.getMMLEventAtIndex(i);
-				convertMidiPart(track, eventList, channel, instType);
+				MMLEventList playList = eventList.clone().emulateMabiPlay(registedPart, mmlTrack.getGlobalTempoList());
+				convertMidiPart(track, playList, channel, instType);
+				registedPart.add(eventList);
 			}
 		}
 	}
