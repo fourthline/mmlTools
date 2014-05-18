@@ -600,14 +600,19 @@ public class MMLEventListTest {
 	public void testEmulateMabiPlay1() {
 		MMLEventList eventList1 = new MMLEventList("a");
 		MMLEventList eventList2 = new MMLEventList("a");
-
 		ArrayList<MMLEventList> list = new ArrayList<>();
+
+		MMLEventList resultList1 = eventList1.emulateMabiPlay(list, eventList1.getGlobalTempoList());
+		MMLNoteEvent note1 = resultList1.getMMLNoteEventList().get(0);
+		assertEquals(0, note1.getTickOffset());
+		assertEquals(96, note1.getTick());
+
 		list.add(eventList1);
 
-		MMLEventList resultList = eventList2.emulateMabiPlay(list, eventList1.getGlobalTempoList());
-		MMLNoteEvent note = resultList.getMMLNoteEventList().get(0);
-		assertEquals(1, note.getTickOffset());
-		assertEquals(95, note.getTick());
+		MMLEventList resultList2 = eventList2.emulateMabiPlay(list, eventList1.getGlobalTempoList());
+		MMLNoteEvent note2 = resultList2.getMMLNoteEventList().get(0);
+		assertEquals(1, note2.getTickOffset());
+		assertEquals(95, note2.getTick());
 	}
 
 	/**
@@ -618,13 +623,18 @@ public class MMLEventListTest {
 	public void testEmulateMabiPlay2() {
 		MMLEventList eventList1 = new MMLEventList("t120a");
 		MMLEventList eventList2 = new MMLEventList("a");
-
 		ArrayList<MMLEventList> list = new ArrayList<>();
+
+		MMLEventList resultList1 = eventList1.emulateMabiPlay(list, eventList1.getGlobalTempoList());
+		MMLNoteEvent note1 = resultList1.getMMLNoteEventList().get(0);
+		assertEquals(1, note1.getTickOffset());
+		assertEquals(95, note1.getTick());
+
 		list.add(eventList1);
 
-		MMLEventList resultList = eventList2.emulateMabiPlay(list, eventList1.getGlobalTempoList());
-		MMLNoteEvent note = resultList.getMMLNoteEventList().get(0);
-		assertEquals(0, note.getTickOffset());
-		assertEquals(96, note.getTick());
+		MMLEventList resultList2 = eventList2.emulateMabiPlay(list, eventList1.getGlobalTempoList());
+		MMLNoteEvent note2 = resultList2.getMMLNoteEventList().get(0);
+		assertEquals(0, note2.getTickOffset());
+		assertEquals(96, note2.getTick());
 	}
 }

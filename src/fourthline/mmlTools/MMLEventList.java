@@ -435,6 +435,7 @@ public class MMLEventList implements Serializable, Cloneable {
 		for (MMLNoteEvent noteEvent : noteList) {
 			int tickOffset = noteEvent.getTickOffset();
 			boolean onTempo = false;
+			boolean shift = false;
 			// テンポと重複していない && 前パートと同一開始位置: tickOffsetを1つ増やして tickを1つ減らす.
 			for (MMLTempoEvent tempo : globalTempoList) {
 				if (tempo.getTickOffset() == tickOffset) {
@@ -443,13 +444,20 @@ public class MMLEventList implements Serializable, Cloneable {
 				}
 			}
 			if (!onTempo) {
-				registedPart.forEach(prePart -> {
+				for (MMLEventList prePart : registedPart) {
 					if (prePart.searchEqualsTickOffsetNote(noteEvent.getNote(), tickOffset)) {
-						int tick = noteEvent.getTick();
-						noteEvent.setTickOffset(tickOffset+1);
-						noteEvent.setTick(tick - 1);
+						shift = true;
+						break;
 					}
-				});
+				}
+			} else if (registedPart.isEmpty()) {
+				// テンポと重複している && テンポパートであれば,
+				shift = true;
+			}
+			if (shift) {
+				int tick = noteEvent.getTick();
+				noteEvent.setTickOffset(tickOffset+1);
+				noteEvent.setTick(tick - 1);
 			}
 		}
 		return this;
