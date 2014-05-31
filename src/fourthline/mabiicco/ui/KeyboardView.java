@@ -22,7 +22,7 @@ public class KeyboardView extends JPanel {
 
 	private int playNote = -1;
 	private final int width = 60;
-	private final int PLAY_CHANNEL = 0;
+	private final int PLAY_CHANNEL = 15;
 	private final IMMLManager mmlManager;
 
 	private final PianoRollView pianoRollView;
@@ -161,6 +161,7 @@ public class KeyboardView extends JPanel {
 		playNote = note + 12;
 
 		int program = mmlManager.getActivePartProgram();
+		MabiDLS.getInstance().setMute(PLAY_CHANNEL, false);
 		MabiDLS.getInstance().playNote(playNote, program, PLAY_CHANNEL);
 
 		repaint();

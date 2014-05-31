@@ -80,7 +80,6 @@ public final class MabiDLS {
 		// 楽器名の読み込み
 		instResource = ResourceBundle.getBundle(RESOURCE_NAME);
 
-
 		// シーケンサとシンセサイザの初期化
 		loadDLS(dlsFile);
 		Receiver receiver = initializeSynthesizer();
@@ -246,6 +245,10 @@ public final class MabiDLS {
 		channel[ch].setMute(!channel[ch].getMute());
 	}
 
+	public void setMute(int ch, boolean mute) {
+		channel[ch].setMute(mute);
+	}
+
 	public void solo(int ch) {
 		for (MidiChannel c : channel) {
 			c.setMute(true);
@@ -361,8 +364,8 @@ public final class MabiDLS {
 		for ( MMLNoteEvent noteEvent : eventList.getMMLNoteEventList() ) {
 			int note = noteEvent.getNote();
 			int tick = noteEvent.getTick();
-			int tickOffset = noteEvent.getTickOffset();
-			int endTickOffset = tickOffset + tick - 1;
+			int tickOffset = noteEvent.getTickOffset() + 1;
+			int endTickOffset = tickOffset + tick;
 
 			// ボリュームの変更
 			if (noteEvent.getVelocity() >= 0) {

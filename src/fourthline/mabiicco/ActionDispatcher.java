@@ -200,6 +200,7 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 			openedFile = file;
 			notifyUpdateFileState();
 			MabiIccoProperties.getInstance().setRecentFile(file.getPath());
+			MabiDLS.getInstance().all();
 		} catch (FileNotFoundException e) {
 			JOptionPane.showMessageDialog(mainFrame, AppResource.getText("error.read"), AppResource.getText("error.nofile"), JOptionPane.WARNING_MESSAGE);
 		} catch (MMLParseException e) {
@@ -237,6 +238,7 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 		openedFile = null;
 		mmlSeqView.initializeMMLTrack();
 		notifyUpdateFileState();
+		MabiDLS.getInstance().all();
 	}
 
 	private void openMMLFileAction() {
