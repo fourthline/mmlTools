@@ -14,7 +14,6 @@ public class MMLNoteEvent extends MMLEvent implements Cloneable {
 	private int tick;
 	private boolean isTuningNote = false;
 	private int velocity = NO_VEL; // 0以上であれば、このノートから音量を変更する.
-
 	public static final int INITIAL_VOLUMN = 8;
 
 	public MMLNoteEvent(int note, int tickLength, int tickOffset) {

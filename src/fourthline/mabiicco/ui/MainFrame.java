@@ -219,7 +219,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 
 		mmlSeqView = new MMLSeqView();
 		mmlSeqView.setTimeView(timeView);
-		contentPane.add(mmlSeqView, BorderLayout.CENTER);
+		contentPane.add(mmlSeqView.getPanel(), BorderLayout.CENTER);
 
 		JPanel southPanel = new JPanel();
 		contentPane.add(southPanel, BorderLayout.SOUTH);

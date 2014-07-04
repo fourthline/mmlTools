@@ -15,7 +15,8 @@ public class MMLTokenizer implements Iterator<String> {
 	static private final String noteString = "abcdefgABCDEFGnNrR";
 	static private final String tokenString = noteString + "tToOlLvV<>&";
 	private final String mml_src;
-	private int index = 0;
+	int startIndex = 0;
+	int endIndex = 0;
 
 	public MMLTokenizer(String src) {
 		mml_src = src;
@@ -23,7 +24,7 @@ public class MMLTokenizer implements Iterator<String> {
 
 	@Override
 	public boolean hasNext() {
-		if (index < mml_src.length())
+		if (endIndex < mml_src.length())
 			return true;
 
 		return false;
@@ -31,24 +32,24 @@ public class MMLTokenizer implements Iterator<String> {
 
 	@Override
 	public String next() {
-		int startIndex = index;
-		int endIndex = searchToken(index+1);
-		index = endIndex;
+		startIndex = endIndex;
+		endIndex = searchToken(endIndex+1);
 
 		return mml_src.substring(startIndex, endIndex);
 	}
 
 	@Override
 	public void remove() {
-		index = 0;
+		startIndex = 0;
+		endIndex = 0;
 	}
 
 	/**
 	 * 解析位置の取得
 	 * @return 解析位置
 	 */
-	public int getIndex() {
-		return index;
+	public int[] getIndex() {
+		return new int[] { startIndex, endIndex} ;
 	}
 
 	static public boolean isToken(char ch) {

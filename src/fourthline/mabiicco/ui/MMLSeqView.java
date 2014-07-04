@@ -38,9 +38,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, ActionListener {
-	private static final long serialVersionUID = -479890612015524747L;
-
+public class MMLSeqView implements IMMLManager, ChangeListener, ActionListener {
 	private static final int INITIAL_TRACK_COUNT = 1;
 
 	private int trackCounter;
@@ -58,17 +56,17 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 
 	private final MMLEditor editor;
 
+	private final JPanel panel;
 	private JLabel timeView;
 	private Thread timeViewUpdateThread;
-
 
 
 	/**
 	 * Create the panel.
 	 */
 	public MMLSeqView() {
-		super(false);
-		setLayout(new BorderLayout(0, 0));
+		panel = new JPanel(false);
+		panel.setLayout(new BorderLayout(0, 0));
 
 		// Scroll View (KeyboardView, PianoRollView) - CENTER
 		pianoRollView = new PianoRollView();
@@ -79,14 +77,14 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		scrollPane.getVerticalScrollBar().setUnitIncrement(pianoRollView.getNoteHeight());
 
-		add(scrollPane, BorderLayout.CENTER);
+		panel.add(scrollPane, BorderLayout.CENTER);
 		pianoRollView.setViewportAndParent(scrollPane.getViewport(), this);
 
 		// MMLTrackView (tab) - SOUTH
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane.addChangeListener(this);
 		tabbedPane.setPreferredSize(new Dimension(0, 200));
-		add(tabbedPane, BorderLayout.SOUTH);
+		panel.add(tabbedPane, BorderLayout.SOUTH);
 
 		// create mml editor
 		editor = new MMLEditor(keyboardView, pianoRollView, this);
@@ -101,6 +99,14 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 
 		startSequenceThread();
 		startTimeViewUpdateThread();
+	}
+
+	public void repaint() {
+		panel.repaint();
+	}
+
+	public JPanel getPanel() {
+		return panel;
 	}
 
 	private void initialSetView() {
@@ -121,7 +127,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 			addMMLTrack(null);
 		}
 
-		repaint();
+		panel.repaint();
 		undoEdit.initState();
 	}
 
@@ -305,7 +311,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 	public void setPianoRollHeightScaleIndex(int index) {
 		pianoRollView.setNoteHeightIndex(index);
 		keyboardView.updateHeight();
-		repaint();
+		panel.repaint();
 	}
 
 	/**
@@ -323,7 +329,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		if (!sequencer.isRunning()) {
 			setViewPosition(0);
 			pianoRollView.setSequenceX(0);
-			repaint();
+			panel.repaint();
 		} else {
 			sequencer.setTempoInBPM(120);
 			sequencer.setTickPosition(0);
@@ -478,7 +484,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 			tick -= tick % deltaTick;
 			if (!sequencer.isRunning()) {
 				pianoRollView.setSequenceX(pianoRollView.convertTicktoX(tick));
-				repaint();
+				panel.repaint();
 			} else {
 				// 移動先のテンポに設定する.
 				int tempo = mmlScore.getTempoOnTick(tick);
@@ -525,7 +531,7 @@ public class MMLSeqView extends JPanel implements IMMLManager, ChangeListener, A
 		}
 
 		undoEdit.saveState();
-		repaint();
+		panel.repaint();
 	}
 
 	@Override

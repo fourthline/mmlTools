@@ -310,14 +310,14 @@ public class MelodyParser {
 		reset();
 
 		while (mt.hasNext()) {
-			int parseIndex = mt.getIndex();
+			int parseIndex[] = mt.getIndex();
 			String item = mt.next();
 
 			try {
 				mml_length += noteGT(item);
 			} catch (ParserWarn3ML warn) {
-				System.err.println(warn.getMessage()+parseIndex);
-				warnIndex.add(parseIndex);
+				System.err.println(warn.getMessage()+parseIndex[1]);
+				warnIndex.add(parseIndex[1]);
 			}
 		}
 

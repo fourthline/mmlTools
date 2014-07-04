@@ -48,7 +48,7 @@ public class MMLScorePropertyPanel extends JPanel {
 		add(label3);
 
 		JLabel label4 = new JLabel("/");
-		label4.setBounds(156, 105, 15, 13);
+		label4.setBounds(198, 105, 15, 13);
 		add(label4);
 
 		titleField = new JTextField();
