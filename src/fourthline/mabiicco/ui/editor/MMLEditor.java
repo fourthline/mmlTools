@@ -60,26 +60,30 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext, 
 	public static int DEFAULT_ALIGN_INDEX = 2;
 
 	public static NoteAlign[] createAlignList() {
-		try {
-			NoteAlign list[] = {
-					new NoteAlign(AppResource.getText("note_1"), "1"),
-					new NoteAlign(AppResource.getText("note_2"), "2"),
-					new NoteAlign(AppResource.getText("note_4"), "4"),
-					new NoteAlign(AppResource.getText("note_8"), "8"),
-					new NoteAlign(AppResource.getText("note_16"), "16"),
-					new NoteAlign(AppResource.getText("note_32"), "32"),
-					new NoteAlign(AppResource.getText("note_64"), "64"),
-					new NoteAlign(AppResource.getText("note_12"), "12"),
-					new NoteAlign(AppResource.getText("note_24"), "24"),
-					new NoteAlign(AppResource.getText("note_48"), "48"),
-			};
-
-			return list;
-		} catch (UndefinedTickException e) {
-			e.printStackTrace();
+		String keyList[] = {
+				"editor.note_1",
+				"editor.note_2",
+				"editor.note_4",
+				"editor.note_8",
+				"editor.note_16",
+				"editor.note_32",
+				"editor.note_64",
+				"editor.note_12",
+				"editor.note_24",
+				"editor.note_48"
+		};
+		ArrayList<NoteAlign> list = new ArrayList<>();
+		for (String key : keyList) {
+			try {
+				String tickText = key.substring("editor.note_".length());
+				NoteAlign noteAlign = new NoteAlign(AppResource.getText(key), tickText);
+				list.add(noteAlign);
+			} catch (UndefinedTickException e) {
+				e.printStackTrace();
+			}
 		}
 
-		return null;
+		return list.toArray(new NoteAlign[list.size()]);
 	}
 
 	public MMLEditor(KeyboardView keyboard, PianoRollView pianoRoll, IMMLManager mmlManager) {

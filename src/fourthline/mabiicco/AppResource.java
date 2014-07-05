@@ -12,7 +12,7 @@ import java.util.jar.Manifest;
 public class AppResource {
 	private final static String RESOURCE_NAME = "appResource";
 	private static Manifest mf;
-	private static ResourceBundle bundle;
+	private static ResourceBundle bundle = ResourceBundle.getBundle(RESOURCE_NAME);
 
 	private AppResource() {}
 
@@ -31,9 +31,6 @@ public class AppResource {
 	}
 
 	public static String getText(String key) {
-		if (bundle == null) {
-			bundle = ResourceBundle.getBundle(RESOURCE_NAME);
-		}
 		try {
 			return bundle.getString(key);
 		} catch (java.util.MissingResourceException e) {
