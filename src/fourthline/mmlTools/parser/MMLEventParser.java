@@ -84,10 +84,12 @@ public class MMLEventParser extends MelodyParser implements Iterator<MMLEvent> {
 							prevNoteEvent.setTuningNote(true);
 						}
 						prevNoteEvent.setTick( prevTick + tick);
+						prevNoteEvent.getIndexOfMMLString()[1] = tokenizer.getIndex()[1];
 					} else if (this.noteNumber >= 0) {
 						nextItem = prevNoteEvent;
 						prevNoteEvent = new MMLNoteEvent(this.noteNumber, tick, totalTick);
 						prevNoteEvent.setVelocity(volumn);
+						prevNoteEvent.setIndexOfMMLString(tokenizer.getIndex());
 						volumn = MMLNoteEvent.NO_VEL;
 					}
 

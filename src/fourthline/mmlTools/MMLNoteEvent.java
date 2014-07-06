@@ -14,6 +14,7 @@ public class MMLNoteEvent extends MMLEvent implements Cloneable {
 	private int tick;
 	private boolean isTuningNote = false;
 	private int velocity = NO_VEL; // 0以上であれば、このノートから音量を変更する.
+	private int indexOfMMLString[] = null; // { startIndex, endIndex }
 	public static final int INITIAL_VOLUMN = 8;
 
 	public MMLNoteEvent(int note, int tickLength, int tickOffset) {
@@ -61,6 +62,14 @@ public class MMLNoteEvent extends MMLEvent implements Cloneable {
 
 	public void setVelocity(int velocity) {
 		this.velocity = velocity;
+	}
+
+	public int[] getIndexOfMMLString() {
+		return indexOfMMLString;
+	}
+
+	public void setIndexOfMMLString(int index[]) {
+		this.indexOfMMLString = index;
 	}
 
 	@Override

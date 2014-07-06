@@ -107,6 +107,27 @@ public class MMLEventList implements Serializable, Cloneable {
 	}
 
 	/**
+	 * 指定したtickOffset位置のparsed-MML文字列に対するIndexを取得します.
+	 * @param tickOffset
+	 * @return
+	 */
+	public int[] indexOfMMLString(long tickOffset) {
+		int start = 0;
+		for (MMLNoteEvent noteEvent : noteList) {
+			int index[] = noteEvent.getIndexOfMMLString();
+			if (noteEvent.getTickOffset() <= tickOffset) {
+				if (tickOffset <= noteEvent.getEndTick()) {
+					return index;
+				} else {
+					return new int[] { start, index[0] };
+				}
+			}	
+			start = index[1];
+		}
+		return null;
+	}
+
+	/**
 	 * ノートイベントを追加します.
 	 * TODO: MMLNoteEvent のメソッドのほうがいいかな？Listを引数として渡す.
 	 * @param addNoteEvent
