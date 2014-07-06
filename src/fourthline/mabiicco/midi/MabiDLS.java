@@ -365,7 +365,7 @@ public final class MabiDLS {
 			int note = noteEvent.getNote();
 			int tick = noteEvent.getTick();
 			int tickOffset = noteEvent.getTickOffset() + 1;
-			int endTickOffset = tickOffset + tick;
+			int endTickOffset = tickOffset + tick - 1;
 
 			// ボリュームの変更
 			if (noteEvent.getVelocity() >= 0) {
