@@ -77,9 +77,9 @@ public class MMLPartChangePanel extends JPanel {
 		applyButton.setBounds(202, 335, 90, 29);
 		add(applyButton);
 		applyButton.addActionListener((event) -> {
-				changePartAction();
-				mmlManager.updateActivePart();
-				dialog.setVisible(false);
+			changePartAction();
+			mmlManager.updateActivePart();
+			dialog.setVisible(false);
 		});
 
 		JButton closeButton = new JButton(AppResource.getText("part_change.cancel"));

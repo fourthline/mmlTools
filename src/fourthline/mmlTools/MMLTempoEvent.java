@@ -14,9 +14,11 @@ public class MMLTempoEvent extends MMLEvent {
 	public static final int META = 0x51;  /* MIDI meta: tempo */
 	public static final int INITIAL_TEMPO = 120;
 
-	public MMLTempoEvent(int tempo, int tickOffset) {
+	public MMLTempoEvent(int tempo, int tickOffset) throws IllegalArgumentException {
 		super(tickOffset);
-
+		if ( (tempo < 32) || (tempo > 255) ) {
+			throw new IllegalArgumentException("tempo 32-255");
+		}
 		this.tempo = tempo;
 	}
 

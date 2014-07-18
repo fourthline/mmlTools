@@ -70,6 +70,8 @@ public class MMLEventParser extends MelodyParser implements Iterator<MMLEvent> {
 					nextItem = new MMLTempoEvent(tempo, totalTick);
 				} catch (NumberFormatException e) {
 					e.printStackTrace();
+				} catch (IllegalArgumentException e) {
+					continue;
 				}
 
 				return nextItem;
