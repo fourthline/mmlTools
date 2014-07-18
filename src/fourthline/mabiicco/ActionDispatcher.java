@@ -21,6 +21,7 @@ import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.MMLScorePropertyPanel;
 import fourthline.mabiicco.ui.MMLSeqView;
 import fourthline.mabiicco.ui.MainFrame;
+import fourthline.mabiicco.ui.editor.MMLTranspose;
 import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.parser.IMMLFileParser;
 import fourthline.mmlTools.parser.MMLParseException;
@@ -65,6 +66,7 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 	public static final String ADD_MEASURE = "add_measure";
 	public static final String REMOVE_MEASURE = "remove_measure";
 	public static final String NOTE_PROPERTY = "note_property";
+	public static final String TRANSPOSE = "transpose";
 
 	private File openedFile = null;
 
@@ -183,6 +185,8 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 			mmlSeqView.removeMeasure();
 		} else if (command.equals(NOTE_PROPERTY)) {
 			editState.noteProperty();
+		} else if (command.equals(TRANSPOSE)) {
+			new MMLTranspose().execute(mainFrame, mmlSeqView);
 		}
 	}
 

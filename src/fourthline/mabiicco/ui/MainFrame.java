@@ -362,6 +362,10 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		noplayFunctions.add(removeMeasureMenu);
 		editMenu.add(removeMeasureMenu);
 
+		JMenuItem transposeMenu = createMenuItem(text("edit.transpose"), ActionDispatcher.TRANSPOSE);
+		noplayFunctions.add(transposeMenu);
+		editMenu.add(transposeMenu);
+
 		/************************* Track Menu *************************/
 		JMenu trackMenu = new JMenu(text("menu.track"));
 		menuBar.add(trackMenu);
