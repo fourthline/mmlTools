@@ -149,7 +149,7 @@ public class MMLTrack extends MMLTools implements Serializable {
 		for (int i = 0; i < count; i++) {
 			// メロディパートのMML更新（テンポ, tickLengthにあわせる.
 			MMLEventList eventList = mmlParts.get(i);
-			boolean isPrimaryTempoPart = (i == 0) || ( (i == 3) && (mabiTempo) );
+			boolean isPrimaryTempoPart = (i == 0) || (i == 3);
 			if ( isPrimaryTempoPart ) {
 				mml[i] = eventList.toMMLString(true, totalTick, mabiTempo);
 			} else {
