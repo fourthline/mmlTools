@@ -442,9 +442,13 @@ public class MMLSeqView implements IMMLManager, ChangeListener, ActionListener {
 		if (selectedTab >= i) {
 			selectedTab = i-1;
 		}
-		int program = mmlScore.getTrack(selectedTab).getProgram();
+		MMLTrack track = mmlScore.getTrack(selectedTab);
+		int program = track.getProgram();
 		if (InstClass.getEnablePartByProgram(program)[selectedPart] == false) {
-			selectedPart = InstClass.getFirstPartNumberOnProgram(program);
+			if ( (selectedPart == 3) && (track.getSongProgram() >= 0) ) {
+			} else {
+				selectedPart = InstClass.getFirstPartNumberOnProgram(program);
+			}
 		}
 
 		tabbedPane.setSelectedIndex(selectedTab);

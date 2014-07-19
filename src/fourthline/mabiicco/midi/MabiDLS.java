@@ -305,9 +305,9 @@ public final class MabiDLS {
 			track.add(new MidiEvent(message, tickOffset));
 		}
 
-		// 歌パートの作成
-		createVoiceMidiTrack(sequence, score, 11, 100); // 男声
-		createVoiceMidiTrack(sequence, score, 12, 110); // 女声
+		// コーラスパートの作成
+		createVoiceMidiTrack(sequence, score, 11, 100); // 男声コーラス
+		createVoiceMidiTrack(sequence, score, 12, 110); // 女声コーラス
 
 		return sequence;
 	}
