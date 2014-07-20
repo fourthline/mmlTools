@@ -4,13 +4,17 @@
 
 package fourthline.mabiicco;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.jar.Manifest;
 
 public class AppResource {
 	private final static String RESOURCE_NAME = "appResource";
+	private final static String BUILD_NUMBER = "build.number";
 	private static Manifest mf;
 	private static ResourceBundle bundle = ResourceBundle.getBundle(RESOURCE_NAME);
 
@@ -28,6 +32,18 @@ public class AppResource {
 		}
 
 		return mf.getMainAttributes().getValue(key);
+	}
+
+	public static String getBuildNumber() {
+		try {
+			InputStream is = new FileInputStream(BUILD_NUMBER);
+			Properties buildNumber = new Properties();
+			buildNumber.load(is);
+			return buildNumber.getProperty("build.number");
+		} catch (FileNotFoundException e ) {
+		} catch (IOException e) {
+		}
+		return "";
 	}
 
 	public static String getText(String key) {

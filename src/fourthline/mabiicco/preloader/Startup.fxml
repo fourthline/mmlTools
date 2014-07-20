@@ -15,7 +15,7 @@
 <Label layoutX="88.0" layoutY="42.0" text=" * MabiIcco * ">
 <font>
 <Font name="Meiryo" size="18.0" />
-</font></Label><Label fx:id="versionLabel" layoutX="188.0" layoutY="78.0" prefHeight="15.0" prefWidth="97.0" textAlignment="RIGHT">
+</font></Label><Label fx:id="versionLabel" layoutX="168.0" layoutY="78.0" prefHeight="15.0" prefWidth="120.0" textAlignment="RIGHT">
 <font>
 <Font name="Meiryo" size="10.0" />
 </font></Label>
