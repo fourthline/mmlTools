@@ -155,12 +155,12 @@ public class MMLTrack extends MMLTools implements Serializable {
 			} else {
 				mml[i] = eventList.toMMLString();
 			}
-
-			mml[i] = new MMLStringOptimizer(mml[i]).toString();
 		}
-
 		if (tailFix) { // 終端補正
 			mml[0] = tailFix(mml[0]);
+		}
+		for (int i = 0; i < count; i++) {
+			mml[i] = new MMLStringOptimizer(mml[i]).toString();
 		}
 		if ((mmlParts.get(3).getTickLength() == 0)) {
 			mml[3] = "";
@@ -173,7 +173,7 @@ public class MMLTrack extends MMLTools implements Serializable {
 		long totalTick = this.getMaxTickLength();
 		double playTime = getPlayTime();
 		double mmlTime = getMabinogiTime();
-		int tick = (int)(totalTick - mmlParts.get(0).getTickLength());
+		int tick = (int)(totalTick - new MMLEventList(s).getTickLength());
 		if (playTime > mmlTime) {
 			// スキルが演奏の途中で止まるのを防ぎます.
 			s += new MMLTicks("r", tick, false).toString();

@@ -140,4 +140,18 @@ public class MMLTrackTest {
 		MMLTrack track = new MMLTrack(mml);
 		assertEquals(expectMML, track.getMMLString());
 	}
+
+	/**
+	 * メロディが短い場合の、後続複数のテンポ指定
+	 */
+	@Test
+	public void testTempo_all0() throws Exception {
+		String mml =        "MML@,t150c1c1t120c1c1t130c1c1;";
+		String expectMML1 = "MML@t150l1rrt120rrt130,l1cccccc,;";
+		String expectMML2 = "MML@t150v0l1cct120cct130rrv0c64t150,l1cccccc,;";
+
+		MMLTrack track = new MMLTrack(mml);
+		assertEquals(expectMML1, track.getMMLString(false, false));
+		assertEquals(expectMML2, track.getMMLString());
+	}
 }

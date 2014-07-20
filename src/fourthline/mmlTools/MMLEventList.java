@@ -290,15 +290,12 @@ public class MMLEventList implements Serializable, Cloneable {
 		}
 
 		// テンポがまだ残っていれば、その分をつなげる.
-		if ( (withTempo) && (tempoEvent != null) && (noteEvent != null) && (mabiTempo) ) {
-			int endTick = noteEvent.getEndTick();
-			int tickOffset = tempoEvent.getTickOffset();
-			int tick = tickOffset - endTick;
-			if (tick > 0) {
-				sb.append("v0");
-				sb.append( new MMLTicks("c", tick, false).toString() );
+		while ( (tempoEvent != null) ) {
+			if (withTempo) {
+				// tempo挿入 (rrrT***N の処理)
+				prevNoteEvent = insertTempoMML(sb, prevNoteEvent, tempoEvent, mabiTempo);
 			}
-			sb.append(tempoEvent.toMMLString());
+			tempoEvent = (MMLTempoEvent) nextEvent(tempoIterator);
 		}
 
 		return sb.toString();
