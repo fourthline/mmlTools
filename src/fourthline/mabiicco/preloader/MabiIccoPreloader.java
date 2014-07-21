@@ -18,12 +18,10 @@ public class MabiIccoPreloader extends Preloader {
 	private Stage stage;
 
 	private Scene createPreloaderScene() throws Exception {
-		String versionText = AppResource.getManifestValue("Implementation-Version")
-				+ " build" + AppResource.getBuildNumber();
 		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Startup.fxml"));
 		Parent root = (Parent) fxmlLoader.load();
 		controller = fxmlLoader.getController();
-		controller.versionLabel.setText(versionText);
+		controller.versionLabel.setText(AppResource.getVersionText());
 		return new Scene(root);
 	}
 

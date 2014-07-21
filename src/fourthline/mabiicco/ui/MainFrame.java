@@ -420,6 +420,13 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		menuBar.add(settingMenu);
 		createNoteHeightMenu(settingMenu);
 
+		/************************* Help Menu *************************/
+		JMenu helpMenu = new JMenu(text("menu.help"));
+		menuBar.add(helpMenu);
+
+		JMenuItem aboutMenuItem = createMenuItem(text("menu.about"), ActionDispatcher.ABOUT);
+		helpMenu.add(aboutMenuItem);
+
 		return menuBar;
 	}
 

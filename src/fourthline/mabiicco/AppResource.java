@@ -20,6 +20,11 @@ public class AppResource {
 
 	private AppResource() {}
 
+	public static String getVersionText() {
+		String versionText = AppResource.getManifestValue("Implementation-Version")
+				+ " build" + AppResource.getBuildNumber();
+		return versionText;
+	}
 	public static String getManifestValue(String key) {
 		if (mf == null) {
 			try {

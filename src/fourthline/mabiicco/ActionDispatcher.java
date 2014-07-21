@@ -18,6 +18,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import fourthline.mabiicco.midi.MabiDLS;
+import fourthline.mabiicco.ui.About;
 import fourthline.mabiicco.ui.MMLScorePropertyPanel;
 import fourthline.mabiicco.ui.MMLSeqView;
 import fourthline.mabiicco.ui.MainFrame;
@@ -67,6 +68,7 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 	public static final String REMOVE_MEASURE = "remove_measure";
 	public static final String NOTE_PROPERTY = "note_property";
 	public static final String TRANSPOSE = "transpose";
+	public static final String ABOUT = "about";
 
 	private File openedFile = null;
 
@@ -187,6 +189,8 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 			editState.noteProperty();
 		} else if (command.equals(TRANSPOSE)) {
 			new MMLTranspose().execute(mainFrame, mmlSeqView);
+		} else if (command.equals(ABOUT)) {
+			new About().show(mainFrame);
 		}
 	}
 
