@@ -46,6 +46,7 @@ public class AppResource {
 			return buildNumber.getProperty("build.number");
 		} catch (FileNotFoundException e ) {
 		} catch (IOException e) {
+		} catch (NullPointerException e) {
 		}
 		return "";
 	}
