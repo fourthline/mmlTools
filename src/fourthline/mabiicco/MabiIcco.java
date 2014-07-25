@@ -40,6 +40,7 @@ public class MabiIcco extends Application {
 		MabiIccoProperties appProperties = MabiIccoProperties.getInstance();
 
 		try {
+			// font
 			String fontName = AppResource.getText("ui.font");
 			if (!fontName.equals("ui.font")) {
 				setUIFont(new javax.swing.plaf.FontUIResource(fontName, Font.PLAIN, 11));
@@ -50,9 +51,8 @@ public class MabiIcco extends Application {
 			}
 
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-		} catch (Exception e) {}
 
-		try {
+			// initialize
 			MabiDLS.getInstance().initializeMIDI();
 			notifyPreloader(new MabiIccoPreloaderNotification("OK\n", 20));
 
@@ -78,7 +78,7 @@ public class MabiIcco extends Application {
 			loadSoundbank(20, 90);
 			appProperties.setDlsFile(file.getPath());
 			notifyPreloader(new MabiIccoPreloaderNotification("OK\n", 90));
-		} catch (Exception e) {
+		} catch (Exception | Error e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
 			System.exit(1);
@@ -106,10 +106,17 @@ public class MabiIcco extends Application {
 		double delta = ((double)endProgress - startProgress) / insts.length;
 		System.out.println(delta);
 		System.out.println(insts.length);
-		for (InstClass instrument : insts) {
-			synthesizer.loadInstrument(instrument.getInstrument());
-			progress += delta;
-			notifyPreloader(new MabiIccoPreloaderNotification("", progress));
+		try {
+			for (InstClass instrument : insts) {
+				synthesizer.loadInstrument(instrument.getInstrument());
+				progress += delta;
+				notifyPreloader(new MabiIccoPreloaderNotification("", progress));
+			}
+		} catch (OutOfMemoryError e) {
+			for (InstClass instrument : insts) {
+				synthesizer.unloadInstrument(instrument.getInstrument());
+			}
+			throw e;
 		}
 	}
 
