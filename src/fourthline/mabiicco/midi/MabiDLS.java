@@ -87,6 +87,29 @@ public final class MabiDLS {
 		transmitter.setReceiver(receiver);
 	}
 
+	public void loadRequiredInstruments(MMLScore score) {
+		ArrayList<InstClass> requiredInsts = new ArrayList<>();
+		for (MMLTrack track : score.getTrackList()) {
+			InstClass inst1 = getInstByProgram( track.getProgram() );
+			InstClass inst2 = getInstByProgram( track.getSongProgram() );
+			if ( (inst1 != null) && (!requiredInsts.contains(inst1)) ) {
+				requiredInsts.add(inst1);
+			}
+			if ( (inst2 != null) && (!requiredInsts.contains(inst2)) ) {
+				requiredInsts.add(inst2);
+			}
+		}
+
+		// load required Instruments
+		for (InstClass inst : requiredInsts) {
+			try {
+				synthesizer.loadInstrument(inst.getInstrument());
+			} catch (OutOfMemoryError e) {
+				System.exit(1);
+			}
+		}
+	}
+
 	public Sequencer getSequencer() {
 		return sequencer;
 	}
@@ -130,7 +153,6 @@ public final class MabiDLS {
 		insts = new InstClass[instArray.size()];
 		insts = instArray.toArray(insts);
 	}
-
 
 	private Receiver initializeSynthesizer() throws InvalidMidiDataException, IOException, MidiUnavailableException {
 		this.channel = this.synthesizer.getChannels();

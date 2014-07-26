@@ -158,6 +158,8 @@ public class MMLSeqView implements IMMLManager, ChangeListener, ActionListener {
 		// エディタ更新
 		updateActivePart();
 		updateSelectedTrackAndMMLPart();
+		
+		MabiDLS.getInstance().loadRequiredInstruments(mmlScore);
 	}
 
 	private void removeAllMMLTrack() {
@@ -186,6 +188,7 @@ public class MMLSeqView implements IMMLManager, ChangeListener, ActionListener {
 		}
 
 		undoEdit.saveState();
+		MabiDLS.getInstance().loadRequiredInstruments(mmlScore);
 	}
 
 	private void updateTrackTabIcon() {
@@ -251,6 +254,7 @@ public class MMLSeqView implements IMMLManager, ChangeListener, ActionListener {
 		updateTrackTabIcon();
 		undoEdit.initState();
 		updateActivePart();
+		MabiDLS.getInstance().loadRequiredInstruments(mmlScore);
 	}
 
 	/**
@@ -462,6 +466,7 @@ public class MMLSeqView implements IMMLManager, ChangeListener, ActionListener {
 			resetTrackView();
 			updateSelectedTrackAndMMLPart();
 			updateActivePart();
+			MabiDLS.getInstance().loadRequiredInstruments(mmlScore);
 		}
 	}
 
@@ -471,6 +476,7 @@ public class MMLSeqView implements IMMLManager, ChangeListener, ActionListener {
 			resetTrackView();
 			updateSelectedTrackAndMMLPart();
 			updateActivePart();
+			MabiDLS.getInstance().loadRequiredInstruments(mmlScore);
 		}
 	}
 
@@ -545,6 +551,7 @@ public class MMLSeqView implements IMMLManager, ChangeListener, ActionListener {
 
 		updateSelectedTrackAndMMLPart();
 		undoEdit.saveState();
+		MabiDLS.getInstance().loadRequiredInstruments(mmlScore);
 	}
 
 	@Override

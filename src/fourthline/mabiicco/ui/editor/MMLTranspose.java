@@ -14,7 +14,6 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import fourthline.mabiicco.AppResource;
-import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.InstType;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.IMMLManager;
@@ -29,10 +28,10 @@ public class MMLTranspose {
 			return;
 		}
 
-		InstClass insts[] = MabiDLS.getInstance().getInsts();
+		MabiDLS dls = MabiDLS.getInstance();
 		for (MMLTrack track : mmlManager.getMMLScore().getTrackList()) {
 			// ドラムパートは移調対象外
-			if (InstClass.searchInstAtProgram(insts, track.getProgram()).getType().equals(InstType.DRUMS)) {
+			if (dls.getInstByProgram(track.getProgram()).getType().equals(InstType.DRUMS)) {
 				continue;
 			}
 			for (MMLEventList eventList : track.getMMLEventList()) {
