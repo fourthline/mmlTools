@@ -11,11 +11,13 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.jar.Manifest;
 
+import fourthline.mmlTools.core.ResourceLoader;
+
 public class AppResource {
 	private final static String RESOURCE_NAME = "appResource";
 	private final static String BUILD_NUMBER = "/build.number";
 	private static Manifest mf;
-	private static ResourceBundle bundle = ResourceBundle.getBundle(RESOURCE_NAME);
+	private static ResourceBundle bundle = ResourceBundle.getBundle(RESOURCE_NAME, new ResourceLoader());
 
 	private AppResource() {}
 

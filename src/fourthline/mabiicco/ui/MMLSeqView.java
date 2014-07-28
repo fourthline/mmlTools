@@ -188,7 +188,6 @@ public class MMLSeqView implements IMMLManager, ChangeListener, ActionListener {
 		}
 
 		undoEdit.saveState();
-		MabiDLS.getInstance().loadRequiredInstruments(mmlScore);
 	}
 
 	private void updateTrackTabIcon() {
@@ -466,7 +465,6 @@ public class MMLSeqView implements IMMLManager, ChangeListener, ActionListener {
 			resetTrackView();
 			updateSelectedTrackAndMMLPart();
 			updateActivePart();
-			MabiDLS.getInstance().loadRequiredInstruments(mmlScore);
 		}
 	}
 
@@ -476,7 +474,6 @@ public class MMLSeqView implements IMMLManager, ChangeListener, ActionListener {
 			resetTrackView();
 			updateSelectedTrackAndMMLPart();
 			updateActivePart();
-			MabiDLS.getInstance().loadRequiredInstruments(mmlScore);
 		}
 	}
 

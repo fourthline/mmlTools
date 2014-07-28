@@ -62,9 +62,11 @@
 
 	<!-- properties task -->
 	<target name="properties">
-		<native2ascii src="${properties}" dest="${dest}" encoding="UTF-8">
-			<include name="**/*.properties" />
-		</native2ascii>
+		<copy todir="${dest}">
+			<fileset dir="${properties}">
+				<include name="**/*.properties" />
+			</fileset>
+		</copy>
 	</target>
 
 	<!-- jfx-package task -->

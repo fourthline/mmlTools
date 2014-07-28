@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ResourceBundle;
 
+import fourthline.mmlTools.core.ResourceLoader;
+
 /**
  * 作曲ランク.
  */
@@ -19,7 +21,7 @@ public class ComposeRank {
 	final private static ArrayList<ComposeRank> rankList;
 	static {
 		rankList = new ArrayList<>();
-		ResourceBundle bundle = ResourceBundle.getBundle(RESOURCE_NAME);
+		ResourceBundle bundle = ResourceBundle.getBundle(RESOURCE_NAME, new ResourceLoader());
 		for (String key : Collections.list(bundle.getKeys()) ) {
 			String s[] = bundle.getString(key).split(",");
 			if (s.length != 4) {

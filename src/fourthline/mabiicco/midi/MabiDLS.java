@@ -18,6 +18,7 @@ import fourthline.mmlTools.MMLNoteEvent;
 import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTempoEvent;
 import fourthline.mmlTools.MMLTrack;
+import fourthline.mmlTools.core.ResourceLoader;
 
 public final class MabiDLS {
 	private static MabiDLS instance = null;
@@ -78,7 +79,7 @@ public final class MabiDLS {
 
 	public void initializeSound(File dlsFile) throws MidiUnavailableException, InvalidMidiDataException, IOException {
 		// 楽器名の読み込み
-		instResource = ResourceBundle.getBundle(RESOURCE_NAME);
+		instResource = ResourceBundle.getBundle(RESOURCE_NAME, new ResourceLoader());
 
 		// シーケンサとシンセサイザの初期化
 		loadDLS(dlsFile);
