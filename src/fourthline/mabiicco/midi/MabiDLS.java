@@ -88,7 +88,7 @@ public final class MabiDLS {
 		transmitter.setReceiver(receiver);
 	}
 
-	public void loadRequiredInstruments(MMLScore score) {
+	public synchronized void loadRequiredInstruments(MMLScore score) {
 		ArrayList<InstClass> requiredInsts = new ArrayList<>();
 		for (MMLTrack track : score.getTrackList()) {
 			InstClass inst1 = getInstByProgram( track.getProgram() );

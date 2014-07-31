@@ -4,12 +4,14 @@
 
 package fourthline.mabiicco.ui;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Stroke;
 import java.util.List;
 
 import javax.swing.JPanel;
@@ -390,6 +392,30 @@ public class PianoRollView extends JPanel {
 		}
 	}
 
+	private void paintHalfMeasure(Graphics2D g, int offset, int w) {
+		final float dash[] = { 2.0f, 4.0f };
+		final BasicStroke dashStroke = new BasicStroke(1.0f, 
+				BasicStroke.CAP_BUTT, 
+				BasicStroke.JOIN_MITER, 
+				10.0f, 
+				dash, 
+				0.0f);
+		int y = convertNote2Y(-1);
+		Stroke oldStroke = g.getStroke();
+		g.setStroke(dashStroke);
+		g.setColor(barBorder);
+
+		int step = w;
+		while (step >= 32) {
+			step /= 2;
+		}
+		for (int x = offset + step; x < (offset + w); x+=step) {
+			g.drawLine(x, 0, x, y);
+		}
+
+		g.setStroke(oldStroke);
+	}
+
 	/**
 	 * メジャーを表示します。
 	 */
@@ -411,9 +437,9 @@ public class PianoRollView extends JPanel {
 					g.setColor(barBorder);
 				}
 				int x = convertTicktoX(i*sect);
-				int y1 = 0;
-				int y2 = convertNote2Y(-1);
-				g.drawLine(x, y1, x, y2);
+				int y = convertNote2Y(-1);
+				g.drawLine(x, 0, x, y);
+				paintHalfMeasure(g, x, convertTicktoX(sect));
 			}
 		} catch (UndefinedTickException e) {
 			e.printStackTrace();
