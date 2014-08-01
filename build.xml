@@ -60,19 +60,10 @@
 		</copy>
 	</target>
 
-	<!-- properties task -->
-	<target name="properties">
-		<copy todir="${dest}">
-			<fileset dir="${properties}">
-				<include name="**/*.properties" />
-			</fileset>
-		</copy>
-	</target>
-
 	<!-- jfx-package task -->
 	<target name="jfx-package"
 		description="javafxpackage"
-		depends="compile,resources,properties">
+		depends="compile,resources">
 		
 		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml"
 			uri="javafx:com.sun.javafx.tools.ant"

@@ -4,6 +4,7 @@
 
 package fourthline.mmlTools.core;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -21,11 +22,9 @@ public class ResourceLoader extends Control {
 			throws IllegalAccessException, InstantiationException, IOException {
 		String bundleName = toBundleName(baseName, locale);
 		String resourceName = toResourceName(bundleName, "properties");
-		InputStream stream = ResourceLoader.class.getResourceAsStream("/"+resourceName);
-		if (stream != null) {
-			return new PropertyResourceBundle(new InputStreamReader(stream, "UTF-8"));
-		}
-
-		return super.newBundle(baseName, locale, format, loader, reload);
+		InputStream stream = new FileInputStream("properties/"+resourceName);
+		ResourceBundle resource = new PropertyResourceBundle(new InputStreamReader(stream, "UTF-8"));
+		stream.close();
+		return resource;
 	}
 }
