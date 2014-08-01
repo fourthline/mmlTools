@@ -37,6 +37,8 @@
 			encoding="UTF-8"
 			listfiles="yes"
 			includeantruntime="false" />
+		<buildnumber file="build.number" />
+		<property file="build.number"/>
 	</target>
 
 	<!-- resources task -->
@@ -56,8 +58,6 @@
 				<include name="**/*.css" />
 			</fileset>
 		</copy>
-		<buildnumber file="build.number" />
-		<copy file="build.number" todir="${dest}"/>
 	</target>
 
 	<!-- properties task -->
@@ -93,6 +93,7 @@
 				<attribute name="Implementation-Vendor" value="${app.vendor}" />
 				<attribute name="Implementation-Title" value="${app.name}" />
 				<attribute name="Implementation-Version" value="${app.version}" />
+				<attribute name="Implementation-Build" value="${build.number}" />
 			</manifest>
 			<fileset dir="${dest}" />
 		</fx:jar>

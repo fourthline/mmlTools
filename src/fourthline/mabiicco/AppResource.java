@@ -4,10 +4,8 @@
 
 package fourthline.mabiicco;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.jar.Manifest;
 
@@ -15,7 +13,6 @@ import fourthline.mmlTools.core.ResourceLoader;
 
 public class AppResource {
 	private final static String RESOURCE_NAME = "appResource";
-	private final static String BUILD_NUMBER = "/build.number";
 	private static Manifest mf;
 	private static ResourceBundle bundle = ResourceBundle.getBundle(RESOURCE_NAME, new ResourceLoader());
 
@@ -23,7 +20,7 @@ public class AppResource {
 
 	public static String getVersionText() {
 		String versionText = AppResource.getManifestValue("Implementation-Version")
-				+ " build" + AppResource.getBuildNumber();
+				+ " build" + AppResource.getManifestValue("Implementation-Build");
 		return versionText;
 	}
 	public static String getManifestValue(String key) {
@@ -38,19 +35,6 @@ public class AppResource {
 		}
 
 		return mf.getMainAttributes().getValue(key);
-	}
-
-	public static String getBuildNumber() {
-		try {
-			InputStream is = AppResource.class.getResourceAsStream(BUILD_NUMBER);
-			Properties buildNumber = new Properties();
-			buildNumber.load(is);
-			return buildNumber.getProperty("build.number");
-		} catch (FileNotFoundException e ) {
-		} catch (IOException e) {
-		} catch (NullPointerException e) {
-		}
-		return "";
 	}
 
 	public static String getText(String key) {
