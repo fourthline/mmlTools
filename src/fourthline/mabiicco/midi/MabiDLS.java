@@ -25,6 +25,8 @@ public final class MabiDLS {
 	private Synthesizer synthesizer;
 	private Sequencer sequencer;
 	private MidiChannel channel[];
+	private ArrayList<MMLNoteEvent[]> playNoteList;
+	private static final int MAX_CHANNEL_PLAY_NOTE = 4;
 	private InstClass insts[];
 	private ResourceBundle instResource;
 
@@ -157,6 +159,10 @@ public final class MabiDLS {
 
 	private Receiver initializeSynthesizer() throws InvalidMidiDataException, IOException, MidiUnavailableException {
 		this.channel = this.synthesizer.getChannels();
+		this.playNoteList = new ArrayList<>();
+		for (int i = 0; i < this.channel.length; i++) {
+			this.playNoteList.add(new MMLNoteEvent[MAX_CHANNEL_PLAY_NOTE]);
+		}
 		Receiver receiver = this.synthesizer.getReceiver();
 
 		// リバーブ設定
@@ -219,42 +225,51 @@ public final class MabiDLS {
 		return null;
 	}
 
-	private int play_note = -1;
 	/** 単音再生 */
 	public void playNote(int note, int program, int channel) {
+		MMLNoteEvent playNote = this.playNoteList.get(channel)[0];
+		if ( (playNote == null) || (playNote.getNote() != note) ) {
+			playNote = new MMLNoteEvent(note, 0, 0, 11);
+		}
+		playNotes(new MMLNoteEvent[] { playNote }, program, channel);
+	}
+
+	/** 和音再生 */
+	public void playNotes(MMLNoteEvent noteList[], int program, int channel) {
 		/* シーケンサによる再生中は鳴らさない */
 		if (sequencer.isRunning()) {
 			return;
 		}
 		changeProgram(program, channel);
 		MidiChannel midiChannel = this.getChannel(channel);
+		MMLNoteEvent[] playNoteList = this.playNoteList.get(channel);
 
-		if (note < 0) {
-			midiChannel.allNotesOff();
-			play_note = -1;
-		} else if (note != play_note) {
-			midiChannel.noteOff(play_note);
-			midiChannel.noteOn(note, 100);
-			play_note = note;
+		for (int i = 0; i < playNoteList.length; i++) {
+			MMLNoteEvent note = null;
+			if ( (noteList != null) && (i < noteList.length) ) {
+				note = noteList[i];
+			}
+			if ( (note == null) || (note != playNoteList[i]) ) {
+				if (playNoteList[i] != null) {
+					midiChannel.noteOff(playNoteList[i].getNote()+12);
+					playNoteList[i] = null;
+				}
+			}
+			if (note != playNoteList[i]) {
+				InstType instType = getInstByProgram(program).getType();
+				int volumn = instType.convertVelocityMML2Midi(note.getVelocity());
+				midiChannel.noteOn(note.getNote()+12, volumn);
+				playNoteList[i] = note;
+			}
 		}
 	}
-
+	
 	public void changeProgram(int program, int channel) {
 		MidiChannel midiChannel = this.getChannel(channel);
 		if (midiChannel.getProgram() != program) {
 			midiChannel.programChange(0, program);
 		}
 	}
-
-	/**
-	 * すべてのチャンネルのパンポット設定を中央に戻します. 
-	 */
-	public void clearAllChannelPanpot() {
-		for (MidiChannel ch : channel) {
-			ch.controlChange(10, 64);
-		}
-	}
-
 	/**
 	 * 指定したチャンネルのパンポットを設定します.
 	 * @param ch_num
@@ -300,6 +315,15 @@ public final class MabiDLS {
 		}
 	}
 
+	public void updatePanpot(MMLScore score) {
+		int trackCount = 0;
+		for (MMLTrack mmlTrack : score.getTrackList()) {
+			int panpot = mmlTrack.getPanpot();
+			this.setChannelPanpot(trackCount, panpot);
+			trackCount++;
+		}
+	}
+
 	/**
 	 * MIDIシーケンスを作成します。
 	 * @throws InvalidMidiDataException 
@@ -310,9 +334,6 @@ public final class MabiDLS {
 		int trackCount = 0;
 		for (MMLTrack mmlTrack : score.getTrackList()) {
 			convertMidiTrack(sequence.createTrack(), mmlTrack, trackCount);
-			// FIXME: パンポットの設定はここじゃない気がする～。
-			int panpot = mmlTrack.getPanpot();
-			this.setChannelPanpot(trackCount, panpot);
 			trackCount++;
 		}
 
@@ -367,7 +388,7 @@ public final class MabiDLS {
 				0);
 		track.add(new MidiEvent(pcMessage, 0));
 		boolean enablePart[] = InstClass.getEnablePartByProgram(program);
-		InstType instType = InstClass.searchInstAtProgram(insts, mmlTrack.getProgram()).getType();
+		InstType instType = getInstByProgram(mmlTrack.getProgram()).getType();
 
 		ArrayList<MMLEventList> registedPart = new ArrayList<>();
 		for (int i = 0; i < enablePart.length; i++) {

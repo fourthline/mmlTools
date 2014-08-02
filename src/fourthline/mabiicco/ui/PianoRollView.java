@@ -446,7 +446,7 @@ public class PianoRollView extends JPanel {
 		}
 	}
 
-	private void drawNote(Graphics2D g, MMLNoteEvent noteEvent, Color rectColor, Color fillColor, boolean drawOption) {
+	private void drawNote(Graphics2D g, MMLNoteEvent noteEvent, Color rectColor, Color fillColor, boolean drawOption, MMLNoteEvent prevNote) {
 		int note = noteEvent.getNote();
 		int tick = noteEvent.getTick();
 		int offset = noteEvent.getTickOffset();
@@ -471,7 +471,7 @@ public class PianoRollView extends JPanel {
 		if (drawOption) {
 			// velocityの描画.
 			int velocity = noteEvent.getVelocity();
-			if (velocity >= 0) {
+			if (prevNote.getVelocity() != velocity) {
 				String s = "V" + velocity;
 				g.setColor(Color.DARK_GRAY);
 				g.drawString(s, x, y);
@@ -486,16 +486,19 @@ public class PianoRollView extends JPanel {
 	 * @return
 	 */
 	private void paintMMLPart(Graphics2D g, List<MMLNoteEvent> mmlPart, Color rectColor, Color fillColor, boolean drawOption) {
+		MMLNoteEvent prevNote = mmlManager.getActiveMMLPart().searchPrevNoteOnTickOffset(0);
 		// 現在のView範囲のみを描画する.
 		for (MMLNoteEvent noteEvent : mmlPart) {
 			if (noteEvent.getEndTick() < startViewTick) {
+				prevNote = noteEvent;
 				continue;
 			}
 			if (noteEvent.getTickOffset() > endViewTick) {
 				break;
 			}
 
-			drawNote(g, noteEvent, rectColor, fillColor, drawOption);
+			drawNote(g, noteEvent, rectColor, fillColor, drawOption, prevNote);
+			prevNote = noteEvent;
 		}
 	}
 

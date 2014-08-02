@@ -120,7 +120,6 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 			mmlSeqView.repaint();
 		} else if (command.equals(STOP)) {
 			MabiDLS.getInstance().getSequencer().stop();
-			MabiDLS.getInstance().clearAllChannelPanpot();
 			mainFrame.enableNoplayItems();
 		} else if (command.equals(PAUSE)) {
 			pauseAction();
@@ -373,7 +372,6 @@ public class ActionDispatcher implements ActionListener, IFileStateObserver, IEd
 
 	private void pauseAction() {
 		MabiDLS.getInstance().getSequencer().stop();
-		MabiDLS.getInstance().clearAllChannelPanpot();
 		mmlSeqView.pauseTickPosition();
 		mainFrame.enableNoplayItems();
 	}

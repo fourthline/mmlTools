@@ -14,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.List;
 
 import javax.sound.midi.Sequencer;
@@ -29,11 +30,14 @@ import javax.swing.SwingUtilities;
 import fourthline.mabiicco.AppResource;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.editor.IEditAlign;
+import fourthline.mmlTools.MMLEventList;
+import fourthline.mmlTools.MMLNoteEvent;
 import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTempoEvent;
+import fourthline.mmlTools.MMLTrack;
 
 
-public class ColumnPanel extends JPanel implements MouseListener, ActionListener {
+public class ColumnPanel extends JPanel implements MouseListener, MouseMotionListener, ActionListener {
 	private static final long serialVersionUID = -6609938350741425221L;
 
 	private static final Color BEAT_BORDER_COLOR = new Color(0.4f, 0.4f, 0.4f);
@@ -58,6 +62,7 @@ public class ColumnPanel extends JPanel implements MouseListener, ActionListener
 		this.mmlManager = mmlManager;
 		this.editAlign = editAlign;
 		addMouseListener(this);
+		addMouseMotionListener(this);
 
 		insertTempoMenu = newPopupMenu(AppResource.getText("edit.insert_tempo"));
 		insertTempoMenu.setActionCommand(INSERT_TEMPO);
@@ -160,6 +165,33 @@ public class ColumnPanel extends JPanel implements MouseListener, ActionListener
 			sequencer.setTickPosition(tick);
 			sequencer.setTempoInBPM(tempo);
 			System.out.printf("Sequence update: tick(%d), tempo(%d)\n", tick, tempo);
+		}
+	}
+
+	private synchronized void playAllNoteOnTick(int x) {
+		Sequencer sequencer = MabiDLS.getInstance().getSequencer();
+		if (!sequencer.isRunning()) {
+			long tick = pianoRollView.convertXtoTick(x);
+			int trackIndex = 0;
+			for (MMLTrack track : mmlManager.getMMLScore().getTrackList()) {
+				int partIndex = 0;
+				int program = track.getProgram();
+				if (x < 0) {
+					MabiDLS.getInstance().playNotes(null, program, trackIndex);
+				} else {
+					MMLNoteEvent noteList[] = new MMLNoteEvent[4];
+					for (MMLEventList eventList : track.getMMLEventList()) {
+						if (partIndex == 3) {
+							continue;
+						}
+						noteList[partIndex] = eventList.searchOnTickOffset(tick);
+						partIndex++;
+					}
+					MabiDLS.getInstance().playNotes(noteList, program, trackIndex);
+				}
+
+				trackIndex++;
+			}
 		}
 	}
 
@@ -273,10 +305,26 @@ public class ColumnPanel extends JPanel implements MouseListener, ActionListener
 
 		if (SwingUtilities.isLeftMouseButton(e)) {
 			setSequenceBar(x);
+			playAllNoteOnTick(x);
 		}
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
+		if (SwingUtilities.isLeftMouseButton(e)) {
+			playAllNoteOnTick(-1);
+		}
+	}
+
+	@Override
+	public void mouseDragged(MouseEvent e) {
+		int x = e.getX();
+		if (SwingUtilities.isLeftMouseButton(e)) {
+			playAllNoteOnTick(x);
+		}
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent e) {
 	}
 }

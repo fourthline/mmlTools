@@ -107,6 +107,22 @@ public class MMLEventList implements Serializable, Cloneable {
 	}
 
 	/**
+	 * 指定したtickOffset位置の手前のNoteを検索します.
+	 * @param tickOffset
+	 * @return
+	 */
+	public MMLNoteEvent searchPrevNoteOnTickOffset(long tickOffset) {
+		MMLNoteEvent prevNote = new MMLNoteEvent(-1, 0, 0);
+		for (MMLNoteEvent noteEvent : noteList) {
+			if (noteEvent.getTickOffset() >= tickOffset) {
+				break;
+			}
+			prevNote = noteEvent;
+		}
+		return prevNote;
+	}
+
+	/**
 	 * 指定したtickOffset位置のparsed-MML文字列に対するIndexを取得します.
 	 * @param tickOffset
 	 * @return
@@ -210,11 +226,10 @@ public class MMLEventList implements Serializable, Cloneable {
 					sb.append("v0");
 				}
 				sb.append(ticks.toString());
-				prevNoteEvent = new MMLNoteEvent(note, tickLength, tickOffset);
-				prevNoteEvent.setVelocity(0);
+				prevNoteEvent = new MMLNoteEvent(note, tickLength, tickOffset, 0);
 			} else {
 				MMLTicks ticks = new MMLTicks("r", tickLength, false);
-				prevNoteEvent = new MMLNoteEvent(prevNoteEvent.getNote(), tickLength, tickOffset);
+				prevNoteEvent = new MMLNoteEvent(prevNoteEvent.getNote(), tickLength, tickOffset, prevNoteEvent.getVelocity());
 				sb.append(ticks.toString());
 			}
 		}
@@ -243,8 +258,8 @@ public class MMLEventList implements Serializable, Cloneable {
 		StringBuilder sb = new StringBuilder();
 		int noteCount = noteList.size();
 
-		// initial note: octave 4, tick 0, offset 0
-		MMLNoteEvent noteEvent = new MMLNoteEvent(12*4, 0, 0);
+		// initial note: octave 4, tick 0, offset 0, velocity 8
+		MMLNoteEvent noteEvent = new MMLNoteEvent(12*4, 0, 0, 8);
 		MMLNoteEvent prevNoteEvent = noteEvent;
 		for (int i = 0; i < noteCount; i++) {
 			noteEvent = noteList.get(i);
@@ -273,7 +288,7 @@ public class MMLEventList implements Serializable, Cloneable {
 				int tick = tempoEvent.getTickOffset() - noteEvent.getTickOffset();
 				int tick2 = noteEvent.getTick() - tick;
 
-				MMLNoteEvent divNoteEvent = new MMLNoteEvent(noteEvent.getNote(), tick, noteEvent.getTickOffset());
+				MMLNoteEvent divNoteEvent = new MMLNoteEvent(noteEvent.getNote(), tick, noteEvent.getTickOffset(), noteEvent.getVelocity());
 				sb.append( divNoteEvent.toMMLString(prevNoteEvent) );
 
 				if (withTempo) {

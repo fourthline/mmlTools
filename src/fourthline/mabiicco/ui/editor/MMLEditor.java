@@ -200,8 +200,9 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext, 
 		int note = pianoRollView.convertY2Note(p.y);
 		long tickOffset = pianoRollView.convertXtoTick(p.x);
 		long alignedTickOffset = tickOffset - (tickOffset % editAlign);
+		MMLNoteEvent prevNote = editEventList.searchPrevNoteOnTickOffset(tickOffset);
 
-		MMLNoteEvent noteEvent = new MMLNoteEvent(note, editAlign, (int)alignedTickOffset);
+		MMLNoteEvent noteEvent = new MMLNoteEvent(note, editAlign, (int)alignedTickOffset, prevNote.getVelocity());
 		selectNote(noteEvent);
 		keyboardView.playNote( note );
 	}
@@ -312,8 +313,8 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext, 
 		int tickOffset2 = (int)pianoRollView.convertXtoTick( x2 );
 
 		selectMultipleNote(
-				new MMLNoteEvent(note1, 0, tickOffset1),
-				new MMLNoteEvent(note2, 0, tickOffset2) );
+				new MMLNoteEvent(note1, 0, tickOffset1, 0),
+				new MMLNoteEvent(note2, 0, tickOffset2, 0) );
 	}
 
 	@Override
@@ -452,7 +453,7 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext, 
 		long offset = clipEventList.getMMLNoteEventList().get(0).getTickOffset();
 		for (MMLNoteEvent noteEvent : clipEventList.getMMLNoteEventList()) {
 			long tickOffset = noteEvent.getTickOffset() - offset + startTick;
-			MMLNoteEvent addNote = new MMLNoteEvent(noteEvent.getNote(), noteEvent.getTick(), (int)tickOffset);
+			MMLNoteEvent addNote = new MMLNoteEvent(noteEvent.getNote(), noteEvent.getTick(), (int)tickOffset, 0);
 			addNote.setVelocity(noteEvent.getVelocity());
 			editEventList.addMMLNoteEvent(addNote);
 			selectNote(addNote, true);
@@ -502,7 +503,7 @@ public class MMLEditor implements MouseInputListener, IEditState, IEditContext, 
 			return;
 		}
 
-		new MMLNotePropertyPanel(selectedNote.toArray(new MMLNoteEvent[selectedNote.size()])).showDialog();
+		new MMLNotePropertyPanel(selectedNote.toArray(new MMLNoteEvent[selectedNote.size()]), editEventList).showDialog();
 		mmlManager.updateActivePart();
 	}
 

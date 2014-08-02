@@ -104,7 +104,7 @@ public class KeyboardView extends JPanel {
 		if ( isWhiteKey(playNote) ) {
 			x += 20;
 		}
-		int y = pianoRollView.getTotalHeight() - ((playNote -11) * pianoRollView.getNoteHeight()) + yAdd[playNote%12];
+		int y = pianoRollView.getTotalHeight() - ((playNote +1) * pianoRollView.getNoteHeight()) + yAdd[playNote%12];
 		g.setColor(Color.RED);
 		g.fillOval(x, y, 4, 4);
 	}
@@ -158,7 +158,7 @@ public class KeyboardView extends JPanel {
 			offNote();
 			return;
 		}
-		playNote = note + 12;
+		playNote = note;
 
 		int program = mmlManager.getActivePartProgram();
 		MabiDLS.getInstance().setMute(PLAY_CHANNEL, false);

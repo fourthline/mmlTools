@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JCheckBox;
 
 import fourthline.mabiicco.AppResource;
+import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLNoteEvent;
 
 import javax.swing.JSpinner;
@@ -33,6 +34,7 @@ public class MMLNotePropertyPanel extends JPanel implements ActionListener {
 	private JCheckBox velocityCheckBox;
 	private JCheckBox tuningNoteCheckBox;
 	private MMLNoteEvent noteEvent[];
+	private MMLEventList eventList;
 
 	public void showDialog() {
 		int status = JOptionPane.showConfirmDialog(null, 
@@ -50,13 +52,13 @@ public class MMLNotePropertyPanel extends JPanel implements ActionListener {
 	 * Create the panel.
 	 */
 	public MMLNotePropertyPanel() {
-		this(null);
+		this(null, null);
 	}
 
 	/**
 	 * Create the panel.
 	 */
-	public MMLNotePropertyPanel(MMLNoteEvent noteEvent[]) {
+	public MMLNotePropertyPanel(MMLNoteEvent noteEvent[], MMLEventList eventList) {
 		super();
 		setLayout(null);
 
@@ -74,22 +76,24 @@ public class MMLNotePropertyPanel extends JPanel implements ActionListener {
 		tuningNoteCheckBox.setBounds(43, 99, 220, 21);
 		add(tuningNoteCheckBox);
 
-		setNoteEvent(noteEvent);
+		this.noteEvent = noteEvent;
+		this.eventList = eventList;
+		setNoteEvent();
 	}
 
-	private void setNoteEvent(MMLNoteEvent noteEvent[]) {
-		this.noteEvent = noteEvent;
+	private void setNoteEvent() {
 		if (noteEvent == null) {
 			return;
 		}
 
 		tuningNoteCheckBox.setSelected( noteEvent[0].isTuningNote() );
 
+		MMLNoteEvent prevNote = eventList.searchPrevNoteOnTickOffset(noteEvent[0].getTickOffset());
 		int velocity = noteEvent[0].getVelocity();
-		if (velocity >= 0) {
+		velocityValueField.setValue(velocity);
+		if (prevNote.getVelocity() != velocity) {
 			velocityCheckBox.setSelected(true);
 			velocityValueField.setEnabled(true);
-			velocityValueField.setValue(velocity);
 		} else {
 			velocityCheckBox.setSelected(false);
 			velocityValueField.setEnabled(false);
@@ -100,18 +104,26 @@ public class MMLNotePropertyPanel extends JPanel implements ActionListener {
 	 * パネルの情報をノートに反映します.
 	 */
 	public void applyProperty() {
-		for (MMLNoteEvent event : noteEvent) {
+		for (MMLNoteEvent targetNote : noteEvent) {
 			if (tuningNoteCheckBox.isSelected()) {
-				event.setTuningNote(true);
+				targetNote.setTuningNote(true);
 			} else {
-				event.setTuningNote(false);
+				targetNote.setTuningNote(false);
 			}
 
-			if (velocityCheckBox.isSelected()) {
-				Integer value = (Integer) velocityValueField.getValue();
-				event.setVelocity(value);
-			} else {
-				event.setVelocity(MMLNoteEvent.NO_VEL);
+			Integer value = (Integer) velocityValueField.getValue();
+			int prevVelocity = targetNote.getVelocity();
+			if ( (velocityCheckBox.isSelected()) && (value != prevVelocity) ) {
+				for (MMLNoteEvent note : eventList.getMMLNoteEventList()) {
+					if (note.getTickOffset() < targetNote.getTickOffset()) {
+						continue;
+					}
+					if (prevVelocity == note.getVelocity()) {
+						note.setVelocity(value);
+					} else {
+						break;
+					}
+				}
 			}
 		}
 	}

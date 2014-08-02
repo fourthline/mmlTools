@@ -515,7 +515,6 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 
 	@Override
 	public void trackEndNotify() {
-		MabiDLS.getInstance().clearAllChannelPanpot();
 		enableNoplayItems();
 	}
 

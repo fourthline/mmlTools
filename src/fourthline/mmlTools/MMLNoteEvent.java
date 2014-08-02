@@ -9,19 +9,27 @@ import fourthline.mmlTools.core.MMLTicks;
 public class MMLNoteEvent extends MMLEvent implements Cloneable {
 	private static final long serialVersionUID = 4372538748155995529L;
 
-	public static final int NO_VEL = -1;
+	public static final int INIT_VOL = 8;
 	private int note;
 	private int tick;
 	private boolean isTuningNote = false;
-	private int velocity = NO_VEL; // 0以上であれば、このノートから音量を変更する.
+	private int velocity;
 	private int indexOfMMLString[] = null; // { startIndex, endIndex }
 	public static final int INITIAL_VOLUMN = 8;
 
 	public MMLNoteEvent(int note, int tickLength, int tickOffset) {
+		this(note, tickLength, tickOffset, INIT_VOL);
+	}
+
+	public MMLNoteEvent(int note, int tickLength, int tickOffset, int velocity) {
 		super(tickOffset);
+		if ( (velocity < 0) || (velocity > 15) ) {
+			throw new IllegalArgumentException();
+		}
 
 		this.note = note;
 		this.tick = tickLength;
+		this.velocity = velocity;
 	}
 
 	public int getNote() {

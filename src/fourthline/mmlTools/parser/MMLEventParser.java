@@ -42,7 +42,7 @@ public class MMLEventParser extends MelodyParser implements Iterator<MMLEvent> {
 	private boolean hasTie = false;
 	private int totalTick = 0;
 	private MMLNoteEvent prevNoteEvent = null;
-	private int volumn = MMLNoteEvent.NO_VEL;
+	private int volumn = MMLNoteEvent.INIT_VOL;
 	private final int minimum = MMLTicks.minimumTick();
 
 	/**
@@ -89,10 +89,8 @@ public class MMLEventParser extends MelodyParser implements Iterator<MMLEvent> {
 						prevNoteEvent.getIndexOfMMLString()[1] = tokenizer.getIndex()[1];
 					} else if (this.noteNumber >= 0) {
 						nextItem = prevNoteEvent;
-						prevNoteEvent = new MMLNoteEvent(this.noteNumber, tick, totalTick);
-						prevNoteEvent.setVelocity(volumn);
+						prevNoteEvent = new MMLNoteEvent(this.noteNumber, tick, totalTick, volumn);
 						prevNoteEvent.setIndexOfMMLString(tokenizer.getIndex());
-						volumn = MMLNoteEvent.NO_VEL;
 					}
 
 					hasTie = false;
