@@ -425,7 +425,7 @@ public class PianoRollView extends JPanel {
 			int sect = MMLTicks.getTick(mmlManager.getMMLScore().getBaseOnly());
 			int borderCount = mmlManager.getMMLScore().getTimeCountOnly();
 			for (int i = 0; i*sect < width; i++) {
-				if (i*sect < startViewTick) {
+				if (i*sect < startViewTick-sect) {
 					continue;
 				}
 				if (i*sect > endViewTick) {

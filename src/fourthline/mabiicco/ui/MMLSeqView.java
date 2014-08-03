@@ -210,6 +210,7 @@ public class MMLSeqView implements IMMLManager, ChangeListener, ActionListener {
 	public void startSequence() {
 		new Thread(() -> {
 			try {
+				MabiDLS.getInstance().loadRequiredInstruments(mmlScore);
 				Sequencer sequencer = MabiDLS.getInstance().getSequencer();
 				Sequence sequence = MabiDLS.getInstance().createSequence(mmlScore);
 

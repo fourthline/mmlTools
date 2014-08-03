@@ -419,6 +419,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		JMenu settingMenu = new JMenu(text("menu.setting"));
 		menuBar.add(settingMenu);
 		createNoteHeightMenu(settingMenu);
+		createClickPlayMenu(settingMenu);
 
 		/************************* Help Menu *************************/
 		JMenu helpMenu = new JMenu(text("menu.help"));
@@ -447,6 +448,43 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		MabiIccoProperties properties = MabiIccoProperties.getInstance();
 		index = properties.getPianoRollViewHeightScaleProperty();
 		Collections.list(group.getElements()).get(index).setSelected(true);
+	}
+
+	/**
+	 * TODO: まとめられるんじゃないかなぁ・・・
+	 * @param settingMenu
+	 */
+	private void createClickPlayMenu(JMenu settingMenu) {
+		JMenu clickPlayMenu = new JMenu(text("clickPlayMenu"));
+		settingMenu.add(clickPlayMenu);
+
+		ButtonGroup group = new ButtonGroup();
+
+		JCheckBoxMenuItem enableMenu = new JCheckBoxMenuItem(text("enable"));
+		clickPlayMenu.add(enableMenu);
+		group.add(enableMenu);
+		JCheckBoxMenuItem disableMenu = new JCheckBoxMenuItem(text("disable"));
+		clickPlayMenu.add(disableMenu);
+		group.add(disableMenu);
+
+		if (MabiIccoProperties.getInstance().getEnableClickPlay()) {
+			enableMenu.setSelected(true);
+			disableMenu.setSelected(false);
+		} else {
+			enableMenu.setSelected(false);
+			disableMenu.setSelected(true);
+		}
+
+		enableMenu.addActionListener((e) -> {
+			MabiIccoProperties.getInstance().setEnableClickPlay(true);
+			enableMenu.setSelected(true);
+			disableMenu.setSelected(false);
+		});
+		disableMenu.addActionListener((e) -> {
+			MabiIccoProperties.getInstance().setEnableClickPlay(false);
+			enableMenu.setSelected(false);
+			disableMenu.setSelected(true);
+		});
 	}
 
 	private JSeparator newToolBarSeparator() {

@@ -28,6 +28,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 
 import fourthline.mabiicco.AppResource;
+import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.editor.IEditAlign;
 import fourthline.mmlTools.MMLEventList;
@@ -168,8 +169,11 @@ public class ColumnPanel extends JPanel implements MouseListener, MouseMotionLis
 		}
 	}
 
-	private synchronized void playAllNoteOnTick(int x) {
+	private void playAllNoteOnTick(int x) {
 		Sequencer sequencer = MabiDLS.getInstance().getSequencer();
+		if (!MabiIccoProperties.getInstance().getEnableClickPlay()) {
+			return;
+		}
 		if (!sequencer.isRunning()) {
 			long tick = pianoRollView.convertXtoTick(x);
 			int trackIndex = 0;

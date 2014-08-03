@@ -112,4 +112,14 @@ public class MabiIccoProperties {
 		properties.setProperty("view.pianoRoll.heightScale", ""+index);
 		save();
 	}
+
+	public boolean getEnableClickPlay() {
+		String str = properties.getProperty("function.enable_click_play", "true");
+		return Boolean.parseBoolean(str);
+	}
+
+	public void setEnableClickPlay(boolean b) {
+		properties.setProperty("function.enable_click_play", Boolean.toString(b));
+		save();
+	}
 }

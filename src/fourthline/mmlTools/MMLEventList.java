@@ -95,7 +95,7 @@ public class MMLEventList implements Serializable, Cloneable {
 	public MMLNoteEvent searchOnTickOffset(long tickOffset) {
 		for (MMLNoteEvent noteEvent : noteList) {
 			if (noteEvent.getTickOffset() <= tickOffset) {
-				if (tickOffset <= noteEvent.getEndTick()) {
+				if (tickOffset < noteEvent.getEndTick()) {
 					return noteEvent;
 				}
 			} else {
