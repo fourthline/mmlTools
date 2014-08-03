@@ -161,6 +161,7 @@ public class KeyboardView extends JPanel {
 		playNote = note;
 
 		int program = mmlManager.getActivePartProgram();
+		MabiDLS.getInstance().loadRequiredInstruments(mmlManager.getMMLScore());
 		MabiDLS.getInstance().setMute(PLAY_CHANNEL, false);
 		MabiDLS.getInstance().playNote(playNote, program, PLAY_CHANNEL);
 
