@@ -168,7 +168,6 @@ public class MMLEventListTest {
 		assertEquals(expected, actual);
 	}
 
-
 	/**
 	 * Test method for {@link fourthline.mmlTools.MMLEventList#searchOnTickOffset(fourthline.mmlTools.MMLNoteEvent)}.
 	 * @throws UndefinedTickException 
@@ -179,13 +178,48 @@ public class MMLEventListTest {
 		int t16 = MMLTicks.getTick("16");
 		MMLEventList eventList = new MMLEventList("ab-a");
 
-		// 2つ目のノートを検索で取得します.
-		MMLNoteEvent noteEvent = eventList.searchOnTickOffset(t4+t16);
+		// 0
+		MMLNoteEvent noteEvent0 = eventList.searchOnTickOffset(0);
+		assertEquals(57, noteEvent0.getNote());
 
-		assertEquals(58, noteEvent.getNote());
+		// 1
+		MMLNoteEvent noteEvent1 = eventList.searchOnTickOffset(t4-1);
+		assertEquals(57, noteEvent1.getNote());
 
+		// 2
+		MMLNoteEvent noteEvent2 = eventList.searchOnTickOffset(t4);
+		assertEquals(58, noteEvent2.getNote());
+
+		// 2
+		MMLNoteEvent noteEvent3 = eventList.searchOnTickOffset(t4+t16);
+		assertEquals(58, noteEvent3.getNote());
 	}
 
+	/**
+	 * Test method for {@link fourthline.mmlTools.MMLEventList#searchPrevNoteOnTickOffset(fourthline.mmlTools.MMLNoteEvent)}.
+	 * @throws UndefinedTickException 
+	 */
+	@Test
+	public void testSearchPrevNoteOnTickOffset() throws UndefinedTickException {
+		int t4 = MMLTicks.getTick("4");
+		MMLEventList eventList = new MMLEventList("ab-a");
+
+		// 0
+		MMLNoteEvent noteEvent0 = eventList.searchPrevNoteOnTickOffset(0);
+		assertEquals(-1, noteEvent0.getNote());
+
+		// 1
+		MMLNoteEvent noteEvent1 = eventList.searchPrevNoteOnTickOffset(t4);
+		assertEquals(57, noteEvent1.getNote());
+
+		// 2
+		MMLNoteEvent noteEvent2 = eventList.searchPrevNoteOnTickOffset(t4+t4-1);
+		assertEquals(58, noteEvent2.getNote());
+
+		// 2
+		MMLNoteEvent noteEvent3 = eventList.searchPrevNoteOnTickOffset(t4+t4);
+		assertEquals(58, noteEvent3.getNote());
+	}
 
 	@Test
 	public void testToMMLString_0() {
