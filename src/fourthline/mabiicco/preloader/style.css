@@ -1,4 +1,4 @@
 AnchorPane {
-	-fx-border-width: 1;
-	-fx-border-color: black;
+	-fx-border-width: 0;
+	-fx-background-image: url("/img/title.png");
 }

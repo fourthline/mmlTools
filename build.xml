@@ -20,6 +20,7 @@
 	<property name="app.version" value="1.0-alpha12" />
 	<property name="app.main-class" value="fourthline.mabiicco.MabiIcco" />
 	<property name="app.preloader-class" value="fourthline.mabiicco.preloader.MabiIccoPreloader" />
+	<property name="splash.image" value="img/title.png" />
 
 	<!-- clean task -->
 	<target name="clean">
@@ -85,6 +86,7 @@
 				<attribute name="Implementation-Title" value="${app.name}" />
 				<attribute name="Implementation-Version" value="${app.version}" />
 				<attribute name="Implementation-Build" value="${build.number}" />
+				<attribute name="SplashScreen-Image" value="${splash.image}" />
 			</manifest>
 			<fileset dir="${dest}" />
 		</fx:jar>

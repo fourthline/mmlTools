@@ -4,6 +4,9 @@
 
 package fourthline.mabiicco.preloader;
 
+import java.awt.Rectangle;
+import java.awt.SplashScreen;
+
 import fourthline.mabiicco.AppResource;
 import javafx.application.Preloader;
 import javafx.fxml.FXMLLoader;
@@ -30,7 +33,15 @@ public class MabiIccoPreloader extends Preloader {
 		this.stage = stage;
 		stage.initStyle(StageStyle.UNDECORATED);
 		stage.setScene(createPreloaderScene());
+		SplashScreen splashScreen = SplashScreen.getSplashScreen();
 		stage.show();
+		if (splashScreen != null) {
+			Rectangle rect = splashScreen.getBounds();
+			if ( (stage.getWidth() == rect.width) && (stage.getHeight() == rect.height) ) {
+				stage.setX(rect.x);
+				stage.setY(rect.y);
+			}
+		}
 	}
 
 	@Override
