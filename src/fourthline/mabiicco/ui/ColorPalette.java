@@ -94,4 +94,29 @@ public enum ColorPalette {
 
 		return null;
 	}
+
+	public static String toText(Color c) {
+		return String.format("%08x", c.getRGB());
+	}
+
+	public static Color toColor(String s) {
+		return new Color(Integer.parseUnsignedInt(s, 16), true);
+	}
+
+	public static void main(String args[]) {
+		for (ColorPalette palette : ColorPalette.values()) {
+			System.out.println(" -- rect color --");
+			for (Color c : palette.rectColorTable) {
+				System.out.println( toText(c) );
+			}
+			System.out.println(" -- fill color --");
+			for (Color c : palette.fillColorTable) {
+				System.out.println( toText(c) );
+			}
+			System.out.println(" -- base color --");
+			for (Color c : palette.trackBaseColor) {
+				System.out.println( toText(c) );
+			}
+		}
+	}
 }
