@@ -92,10 +92,10 @@ public class MMLTempoEvent extends MMLEvent {
 	 * 指定したtickオフセット位置の先頭からの時間を返します.
 	 * @param tempoList
 	 * @param tickOffset
-	 * @return 先頭からの時間（秒）
+	 * @return 先頭からの時間（ms）
 	 */
-	public static double getTimeOnTickOffset(List<MMLTempoEvent> tempoList, int tickOffset) {
-		double totalTime = 0.0;
+	public static long getTimeOnTickOffset(List<MMLTempoEvent> tempoList, int tickOffset) {
+		long totalTime = 0L;
 
 		int tempo = INITIAL_TEMPO;
 		int currentTick = 0;
@@ -107,16 +107,40 @@ public class MMLTempoEvent extends MMLEvent {
 
 			int currentTempo = tempoEvent.getTempo();
 			if (tempo != currentTempo) {
-				totalTime += (currentTempoTick - currentTick) * 60 / tempo;
+				totalTime += (currentTempoTick - currentTick) * 60 / tempo * 1000;
 				currentTick = currentTempoTick;
 			}
 
 			tempo = currentTempo;
 		}
 
-		totalTime += (tickOffset - currentTick) * 60 / tempo;
+		totalTime += (tickOffset - currentTick) * 60 / tempo * 1000;
 		totalTime /= 96.0;
 		return totalTime;
+	}
+
+	/**
+	 * 指定した時間からtickオフセットを返します.
+	 * @param tempoList
+	 * @param ms
+	 * @return 先頭からの時間（ms）
+	 */
+	public static long getTickOffsetOnTime(List<MMLTempoEvent> tempoList, long time) {
+		int tempo = INITIAL_TEMPO;
+		long pointTime = 0;
+		long tick = 0;
+		for (MMLTempoEvent tempoEvent : tempoList) {
+			long tempoTime = getTimeOnTickOffset(tempoList, tempoEvent.getTickOffset());
+			if (time <= tempoTime) {
+				break;
+			}
+			pointTime = tempoTime;
+			tempo = tempoEvent.getTempo();
+			tick = tempoEvent.getTickOffset();
+		}
+
+		tick += (time - pointTime) * 96 * tempo / 60 / 1000;
+		return tick;
 	}
 
 	/**

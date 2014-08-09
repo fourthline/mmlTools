@@ -626,14 +626,14 @@ public class MMLSeqView implements IMMLManager, ChangeListener, ActionListener {
 	private void updateTimeView() {
 		long position = pianoRollView.getSequencePlayPosition();
 		List<MMLTempoEvent> tempoList = mmlScore.getTempoEventList();
-		double time = MMLTempoEvent.getTimeOnTickOffset(tempoList, (int)position);
+		long time = MMLTempoEvent.getTimeOnTickOffset(tempoList, (int)position);
 		int totalTick = mmlScore.getTotalTickLength();
-		double totalTime = MMLTempoEvent.getTimeOnTickOffset(tempoList, totalTick);
+		long totalTime = MMLTempoEvent.getTimeOnTickOffset(tempoList, totalTick);
 		int tempo = MMLTempoEvent.searchOnTick(tempoList, (int)position);
 
-		String str = String.format("time %d:%04.1f/%d:%04.1f (t%d)", 
-				(int)(time/60), (time%60),
-				(int)(totalTime/60), (totalTime%60),
+		String str = String.format("time %d:%02d.%d/%d:%02d.%d (t%d)", 
+				(time/60/1000), (time/1000%60), (time/100%10),
+				(totalTime/60/1000), (totalTime/1000%60), (totalTime/100%10),
 				tempo);
 		if (timeView != null) {
 			timeView.setText(str);

@@ -45,8 +45,8 @@ public class MMLTrackTest {
 			double expectMabinogiTime = tools.getMabinogiTime();
 			System.out.printf("playTime: %f, mabinogiTime: %f\n", expectPlayTime, expectMabinogiTime);
 
-			assertEquals(expectPlayTime, track.getPlayTime(), 0.00001);
-			assertEquals(expectMabinogiTime, track.getMabinogiTime(), 0.00001);
+			assertEquals(expectPlayTime, track.getPlayTime(), 0.001);
+			assertEquals(expectMabinogiTime, track.getMabinogiTime(), 0.001);
 		} catch (UndefinedTickException e) {
 			e.printStackTrace();
 		}

@@ -194,9 +194,9 @@ public class MMLTrack extends MMLTools implements Serializable {
 	 */
 	public double getPlayTime() {
 		int totalTick = (int)getMaxTickLength();
-		double playTime = MMLTempoEvent.getTimeOnTickOffset(globalTempoList, totalTick);
+		long playTime = MMLTempoEvent.getTimeOnTickOffset(globalTempoList, totalTick);
 
-		return playTime;
+		return playTime/1000.0;
 	}	
 
 	/**
@@ -206,7 +206,7 @@ public class MMLTrack extends MMLTools implements Serializable {
 	 * @return 時間（秒）
 	 */
 	public double getMabinogiTime() {
-		double partTime[] = new double[mmlParts.size()];
+		long partTime[] = new long[mmlParts.size()];
 
 		int melodyTick = (int)mmlParts.get(0).getTickLength();
 		partTime[0] = MMLTempoEvent.getTimeOnTickOffset(globalTempoList, melodyTick);
@@ -223,13 +223,13 @@ public class MMLTrack extends MMLTools implements Serializable {
 			partTime[i] = MMLTempoEvent.getTimeOnTickOffset(globalTailTempo, tick);
 		}
 
-		double maxTime = 0.0;
-		for (double time : partTime) {
+		long maxTime = 0;
+		for (long time : partTime) {
 			if (maxTime < time) {
 				maxTime = time;
 			}
 		}
 
-		return maxTime;
+		return maxTime/1000.0;
 	}
 }

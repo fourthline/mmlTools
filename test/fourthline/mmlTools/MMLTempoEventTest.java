@@ -35,19 +35,21 @@ public class MMLTempoEventTest {
 		assertEquals(expectList.toString(), tempoList.toString());
 	}
 
-	private void checkGetTimeOnTickTest(String mml, double expect) {
+	private void checkGetTimeOnTickTest(String mml, long expect) {
 		ArrayList<MMLTempoEvent> tempoList = new ArrayList<MMLTempoEvent>();
 		MMLEventList eventList = new MMLEventList(mml, tempoList);
 
 		int tick = (int) eventList.getTickLength();
 		System.out.println("tick: " + tick);
-		assertEquals(expect, MMLTempoEvent.getTimeOnTickOffset(tempoList, tick), 0.0001);
+		long time = MMLTempoEvent.getTimeOnTickOffset(tempoList, tick);
+		assertEquals(expect, time);
+		assertEquals(tick, MMLTempoEvent.getTickOffsetOnTime(tempoList, time));
 	}
 
 	@Test
 	public void testGetTimeOnTickOffset_0() {
 		String mml = "t60cccccccccct120cccccccccc";
-		double expect = 15.0;
+		long expect = 15000;
 
 		checkGetTimeOnTickTest(mml, expect);
 	}
@@ -55,7 +57,7 @@ public class MMLTempoEventTest {
 	@Test
 	public void testGetTimeOnTickOffset_1() {
 		String mml = "cccccccccct60cccccccccc";
-		double expect = 15.0;
+		long expect = 15000;
 
 		checkGetTimeOnTickTest(mml, expect);
 	}
@@ -63,7 +65,7 @@ public class MMLTempoEventTest {
 	@Test
 	public void testGetTimeOnTickOffset_2() {
 		String mml = "t32l1.c";
-		double expect = 11.25;
+		long expect = 11250;
 
 		checkGetTimeOnTickTest(mml, expect);
 	}
@@ -71,9 +73,8 @@ public class MMLTempoEventTest {
 	@Test
 	public void testGetTimeOnTickOffset_3() {
 		String mml = "";
-		double expect = 0.0;
+		long expect = 0;
 
 		checkGetTimeOnTickTest(mml, expect);
 	}
-
 }
