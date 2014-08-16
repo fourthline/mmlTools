@@ -58,7 +58,7 @@ public final class MabiDLS {
 
 		this.sequencer = MidiSystem.getSequencer();
 		this.sequencer.open();
-		this.sequencer.addMetaEventListener((MetaMessage meta) -> {
+		this.sequencer.addMetaEventListener((meta) -> {
 			int type = meta.getType();
 			if (type == MMLTempoEvent.META) {
 				// テンポイベントを処理します.
@@ -174,39 +174,6 @@ public final class MabiDLS {
 					0);			
 			receiver.send(message, 0);
 		}
-		channel[9].resetAllControllers();
-		// TODO: ch10のドラムパートを解除する.
-		/* ドラムパート設定解除 */
-		byte b[] = {
-				(byte)0xF0,
-				0x41, // Maker ID
-				0x10, // Device ID
-				0x42, // Model ID
-				0x12, // Command ID
-				0x40, 
-				0x00, // part11
-				0x7F, 
-				0x00, // part
-				0x41, // sum
-		};
-		byte b2[] = {
-				(byte)0xF0,
-				0x41, // Maker ID
-				0x10, // Device ID
-				0x42, // Model ID
-				0x12, // Command ID
-				0x40, 
-				0x1A, // part11
-				0x15, 
-				0x02, // part
-				0x0F, // sum
-		};
-		SysexMessage sysexMessage;
-		sysexMessage = new SysexMessage(b, b.length);
-		receiver.send(sysexMessage, 0);
-		sysexMessage = new SysexMessage(b2, b2.length);
-		receiver.send(sysexMessage, 0);
-
 		return receiver;
 	}
 
@@ -251,19 +218,19 @@ public final class MabiDLS {
 			}
 			if ( (note == null) || (note != playNoteList[i]) ) {
 				if (playNoteList[i] != null) {
-					midiChannel.noteOff(playNoteList[i].getNote()+12);
+					midiChannel.noteOff( convertNoteMML2Midi(playNoteList[i].getNote()) );
 					playNoteList[i] = null;
 				}
 			}
 			if (note != playNoteList[i]) {
 				InstType instType = getInstByProgram(program).getType();
 				int volumn = instType.convertVelocityMML2Midi(note.getVelocity());
-				midiChannel.noteOn(note.getNote()+12, volumn);
+				midiChannel.noteOn( convertNoteMML2Midi(note.getNote()), volumn);
 				playNoteList[i] = note;
 			}
 		}
 	}
-	
+
 	public void changeProgram(int program, int channel) {
 		MidiChannel midiChannel = this.getChannel(channel);
 		if (midiChannel.getProgram() != program) {

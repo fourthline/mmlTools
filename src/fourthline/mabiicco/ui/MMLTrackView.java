@@ -35,6 +35,7 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.EnumSet;
+import java.util.HashMap;
 
 public class MMLTrackView extends JPanel implements ActionListener, DocumentListener {
 	/**
@@ -67,7 +68,7 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 	/**
 	 * Create the panel.
 	 */
-	public MMLTrackView() {
+	private MMLTrackView() {
 		setLayout(new BorderLayout());
 
 		JPanel northPanel = new JPanel();
@@ -107,6 +108,7 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 			comboBox = new JComboBox<>( InstClass.filterInstArray(insts, EnumSet.of(InstType.NORMAL, InstType.DRUMS, InstType.VOICE)) );
 			songComboBox = new JComboBox<>( InstClass.filterInstArray(insts, EnumSet.of(InstType.CHORUS)) );
 			songComboBox.addItem(noUseSongEx);
+			songComboBox.setSelectedItem(noUseSongEx);
 		}
 		northLPanel.add(comboBox);
 		comboBox.addActionListener(this);
@@ -154,8 +156,6 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 
 		// 一番上のパートが初期の選択パート.
 		partButton[0].setSelected(true);
-
-		updateComposeRank();
 	}
 
 	/**
@@ -165,19 +165,16 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 	 * @param actionListener
 	 * @param mmlManager
 	 */
-	public MMLTrackView(MMLTrack track, int trackIndex, ActionListener actionListener, IMMLManager mmlManager) {
+	private MMLTrackView(int trackIndex, ActionListener actionListener, IMMLManager mmlManager) {
 		this();
-		this.setMMLTrack(track);
 		this.mmlManager = mmlManager;
 		this.trackIndex = trackIndex;
-		trackComposeLabel.setText(track.mmlRankFormat());
 
 		for (int i = 0; i < MMLPART_NAME.length; i++) {
 			partButton[i].addActionListener(actionListener);
 		}
 
 		muteButton = new JButton("");
-		updateMuteButton();
 		muteButton.setToolTipText(AppResource.getText("mmltrack.mute"));
 		toolBar.add(muteButton);
 		soloButton = new JButton("");
@@ -191,8 +188,22 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		muteButton.addActionListener(this);
 		soloButton.addActionListener(this);
 		allButton.addActionListener(this);
+	}
 
-		updatePartButtonStatus();
+	private static HashMap<Integer, MMLTrackView> instanceList = new HashMap<>();
+	public static MMLTrackView getInstance(MMLTrack track, int trackIndex, ActionListener actionListener, IMMLManager mmlManager) {
+		MMLTrackView view;
+		if (instanceList.containsKey(trackIndex)) {
+			view = instanceList.get(trackIndex);
+		} else {
+			view = new MMLTrackView(trackIndex, actionListener, mmlManager);
+			instanceList.put(trackIndex, view);
+		}
+		view.setMMLTrack(track);
+		view.trackComposeLabel.setText(track.mmlRankFormat());
+		view.updateMuteButton();
+		view.updatePartButtonStatus();
+		return view;
 	}
 
 	public void updateMuteButton() {
@@ -316,7 +327,7 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		updatePartButtonStatus();
 
 		if (mmlManager != null) {
-			mmlManager.updateActiveTrackProgram(program, songProgram);
+			mmlManager.updateActiveTrackProgram(trackIndex, program, songProgram);
 		}
 	}
 

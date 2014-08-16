@@ -151,7 +151,7 @@ public class MMLSeqView implements IMMLManager, ChangeListener, ActionListener {
 		}
 
 		// トラックビューの追加
-		tabbedPane.add(newTrack.getTrackName(), new MMLTrackView(newTrack, trackIndex, this, this));
+		tabbedPane.add(newTrack.getTrackName(), MMLTrackView.getInstance(newTrack, trackIndex, this, this));
 		tabbedPane.setSelectedIndex(trackIndex);
 		updateTrackTabIcon();
 
@@ -244,7 +244,7 @@ public class MMLSeqView implements IMMLManager, ChangeListener, ActionListener {
 				name = "Track"+(trackCount+1);
 			}
 
-			tabbedPane.add(name, new MMLTrackView(track, trackCount, this, this));
+			tabbedPane.add(name, MMLTrackView.getInstance(track, trackCount, this, this));
 			trackCount++;
 		}
 
@@ -438,7 +438,7 @@ public class MMLSeqView implements IMMLManager, ChangeListener, ActionListener {
 		tabbedPane.removeAll();
 		int i = 0;
 		for (MMLTrack track : mmlScore.getTrackList()) {
-			tabbedPane.add(track.getTrackName(), new MMLTrackView(track, i, this, this));
+			tabbedPane.add(track.getTrackName(), MMLTrackView.getInstance(track, i, this, this));
 			i++;
 		}
 
@@ -543,9 +543,9 @@ public class MMLSeqView implements IMMLManager, ChangeListener, ActionListener {
 	}
 
 	@Override
-	public void updateActiveTrackProgram(int program, int songProgram) {
-		getSelectedTrack().setProgram(program);
-		getSelectedTrack().setSongProgram(songProgram);
+	public void updateActiveTrackProgram(int trackIndex, int program, int songProgram) {
+		mmlScore.getTrack(trackIndex).setProgram(program);
+		mmlScore.getTrack(trackIndex).setSongProgram(songProgram);
 
 		updateSelectedTrackAndMMLPart();
 		undoEdit.saveState();
