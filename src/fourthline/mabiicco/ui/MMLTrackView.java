@@ -165,9 +165,8 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 	 * @param actionListener
 	 * @param mmlManager
 	 */
-	private MMLTrackView(int trackIndex, ActionListener actionListener, IMMLManager mmlManager) {
+	private MMLTrackView(int trackIndex, ActionListener actionListener) {
 		this();
-		this.mmlManager = mmlManager;
 		this.trackIndex = trackIndex;
 
 		for (int i = 0; i < MMLPART_NAME.length; i++) {
@@ -196,10 +195,12 @@ public class MMLTrackView extends JPanel implements ActionListener, DocumentList
 		if (instanceList.containsKey(trackIndex)) {
 			view = instanceList.get(trackIndex);
 		} else {
-			view = new MMLTrackView(trackIndex, actionListener, mmlManager);
+			view = new MMLTrackView(trackIndex, actionListener);
 			instanceList.put(trackIndex, view);
 		}
+		view.mmlManager = null;
 		view.setMMLTrack(track);
+		view.mmlManager = mmlManager;
 		view.trackComposeLabel.setText(track.mmlRankFormat());
 		view.updateMuteButton();
 		view.updatePartButtonStatus();
