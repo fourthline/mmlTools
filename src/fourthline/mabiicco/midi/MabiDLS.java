@@ -8,8 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 
 import javax.sound.midi.*;
 
@@ -18,7 +16,6 @@ import fourthline.mmlTools.MMLNoteEvent;
 import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTempoEvent;
 import fourthline.mmlTools.MMLTrack;
-import fourthline.mmlTools.core.ResourceLoader;
 
 public final class MabiDLS {
 	private static MabiDLS instance = null;
@@ -28,9 +25,7 @@ public final class MabiDLS {
 	private ArrayList<MMLNoteEvent[]> playNoteList;
 	private static final int MAX_CHANNEL_PLAY_NOTE = 4;
 	private InstClass insts[];
-	private ResourceBundle instResource;
 
-	private static final String RESOURCE_NAME = "instrument";
 	public static final String DEFALUT_DLS_PATH = "C:/Nexon/Mabinogi/mp3/MSXspirit.dls";
 
 	private INotifyTrackEnd notifier = null;
@@ -80,11 +75,8 @@ public final class MabiDLS {
 	}
 
 	public void initializeSound(File dlsFile) throws MidiUnavailableException, InvalidMidiDataException, IOException {
-		// 楽器名の読み込み
-		instResource = ResourceBundle.getBundle(RESOURCE_NAME, new ResourceLoader());
-
 		// シーケンサとシンセサイザの初期化
-		loadDLS(dlsFile);
+		insts = InstClass.loadDLS(dlsFile);
 		Receiver receiver = initializeSynthesizer();
 		Transmitter transmitter = this.sequencer.getTransmitters().get(0);
 		transmitter.setReceiver(receiver);
@@ -123,38 +115,6 @@ public final class MabiDLS {
 
 	public MidiChannel getChannel(int ch) {
 		return channel[ch];
-	}
-
-	private String instName(Instrument inst) {
-		try {
-			String name = instResource.getString(""+inst.getPatch().getProgram());
-			return name;
-		} catch (MissingResourceException e) {
-			return null;
-		}
-	}
-
-	private void loadDLS(File dlsFile) throws InvalidMidiDataException, IOException {
-		Soundbank sb = MidiSystem.getSoundbank(dlsFile);
-
-		ArrayList<InstClass> instArray = new ArrayList<>();
-		for (Instrument inst : sb.getInstruments()) {
-			String name = instName(inst);
-			String originalName = inst.getName();
-			int bank = inst.getPatch().getBank();
-			int program = inst.getPatch().getProgram();
-			System.out.printf("%d=%s \"%s\"\n", program,  originalName, name);
-			if (name != null) {
-				name = ""+program+": "+name;
-				instArray.add(new InstClass( name,
-						bank,
-						program,
-						inst));
-			}
-		}
-
-		insts = new InstClass[instArray.size()];
-		insts = instArray.toArray(insts);
 	}
 
 	private Receiver initializeSynthesizer() throws InvalidMidiDataException, IOException, MidiUnavailableException {
@@ -275,7 +235,7 @@ public final class MabiDLS {
 			for (MidiDevice.Info info : MidiSystem.getMidiDeviceInfo()) {
 				System.out.println(info);
 			}
-
+			midi.initializeSound(new File(DEFALUT_DLS_PATH));
 			System.exit(0);
 		} catch (Exception e) {
 			e.printStackTrace();

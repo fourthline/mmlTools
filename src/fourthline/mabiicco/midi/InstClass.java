@@ -4,14 +4,22 @@
 
 package fourthline.mabiicco.midi;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 import javax.sound.midi.Instrument;
+import javax.sound.midi.InvalidMidiDataException;
+import javax.sound.midi.MidiSystem;
+import javax.sound.midi.Soundbank;
 
+import fourthline.mmlTools.core.ResourceLoader;
 import fourthline.mmlTools.parser.MMLEventParser;
 
-public class InstClass {
+public final class InstClass {
 	private final String name;
 	private final int bank;
 	private final int program;
@@ -19,6 +27,9 @@ public class InstClass {
 	private final int upperNote;
 	private final InstType type;
 	private final Instrument inst;
+
+	private static final String RESOURCE_NAME = "instrument";
+	private static final ResourceBundle instResource = ResourceBundle.getBundle(RESOURCE_NAME, new ResourceLoader());
 
 	public InstClass(String name, int bank, int program, Instrument inst) {
 		String str[] = name.split(",");
@@ -122,5 +133,38 @@ public class InstClass {
 		}
 
 		throw new AssertionError("Invalid Inst Part Number.");
+	}
+
+	private static String instName(Instrument inst) {
+		try {
+			String name = instResource.getString(""+inst.getPatch().getProgram());
+			return name;
+		} catch (MissingResourceException e) {
+			return null;
+		}
+	}
+
+	public static InstClass[] loadDLS(File dlsFile) throws InvalidMidiDataException, IOException {
+		Soundbank sb = MidiSystem.getSoundbank(dlsFile);
+
+		ArrayList<InstClass> instArray = new ArrayList<>();
+		for (Instrument inst : sb.getInstruments()) {
+			String name = instName(inst);
+			String originalName = inst.getName();
+			int bank = inst.getPatch().getBank();
+			int program = inst.getPatch().getProgram();
+			System.out.printf("%d=%s \"%s\"\n", program,  originalName, name);
+			if (name != null) {
+				name = ""+program+": "+name;
+				instArray.add(new InstClass( name,
+						bank,
+						program,
+						inst));
+			}
+		}
+
+		InstClass insts[] = new InstClass[instArray.size()];
+		insts = instArray.toArray(insts);
+		return insts;
 	}
 }
