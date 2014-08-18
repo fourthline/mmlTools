@@ -671,4 +671,42 @@ public class MMLEventListTest {
 		assertEquals(0, note2.getTickOffset());
 		assertEquals(96, note2.getTick());
 	}
+
+	@Test
+	public void testIndexOfMMLString_1() throws UndefinedTickException {
+		int t4 = MMLTicks.getTick("4");
+		MMLEventList eventList = new MMLEventList("rrcd&drrf.");
+
+		assertArrayEquals( new int[]{0, 2}, eventList.indexOfMMLString(0) );
+		assertArrayEquals( new int[]{0, 2}, eventList.indexOfMMLString(t4) );
+		assertArrayEquals( new int[]{0, 2}, eventList.indexOfMMLString(t4*2-1) );
+		assertArrayEquals( new int[]{2, 3}, eventList.indexOfMMLString(t4*2) );
+		assertArrayEquals( new int[]{2, 3}, eventList.indexOfMMLString(t4*3-1) );
+		assertArrayEquals( new int[]{3, 6}, eventList.indexOfMMLString(t4*3) );
+		assertArrayEquals( new int[]{3, 6}, eventList.indexOfMMLString(t4*4) );
+		assertArrayEquals( new int[]{3, 6}, eventList.indexOfMMLString(t4*5-1) );
+		assertArrayEquals( new int[]{6, 8}, eventList.indexOfMMLString(t4*5) );
+		assertArrayEquals( new int[]{6, 8}, eventList.indexOfMMLString(t4*6) );
+		assertArrayEquals( new int[]{6, 8}, eventList.indexOfMMLString(t4*7-1) );
+		assertArrayEquals( new int[]{8, 10}, eventList.indexOfMMLString(t4*7) );
+		assertArrayEquals( new int[]{8, 10}, eventList.indexOfMMLString(t4*8+t4/2-1) );
+		assertArrayEquals( new int[]{10, 10}, eventList.indexOfMMLString(t4*8+t4/2) );
+	}
+
+	@Test
+	public void testIndexOfMMLString_2() throws UndefinedTickException {
+		int t4 = MMLTicks.getTick("4");
+		MMLEventList eventList = new MMLEventList("rrv10c8t250l16d");
+
+		assertArrayEquals( new int[]{0, 5}, eventList.indexOfMMLString(0) );
+		assertArrayEquals( new int[]{5, 7}, eventList.indexOfMMLString(t4*2) );
+		assertArrayEquals( new int[]{14, 15}, eventList.indexOfMMLString(t4*2+t4/2) );
+		assertArrayEquals( new int[]{15, 15}, eventList.indexOfMMLString(t4*4) );
+	}
+
+	@Test
+	public void testIndexOfMMLString_3() throws UndefinedTickException {
+		MMLEventList eventList = new MMLEventList("l64c&c&c&c&c&c&c&c");
+		assertArrayEquals( new int[]{3, 18}, eventList.indexOfMMLString(0) );
+	}
 }

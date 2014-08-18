@@ -60,8 +60,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 	private final JPanel contentPane;
 	private final JTextField statusField;
 	private final MMLSeqView mmlSeqView;
-	@SuppressWarnings("rawtypes")
-	private final JComboBox noteTypeSelect;
+	private final JComboBox<NoteAlign> noteTypeSelect;
 	private final JLabel timeView;
 
 	private final ActionListener listener;

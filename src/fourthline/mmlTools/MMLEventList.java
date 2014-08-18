@@ -132,15 +132,15 @@ public class MMLEventList implements Serializable, Cloneable {
 		for (MMLNoteEvent noteEvent : noteList) {
 			int index[] = noteEvent.getIndexOfMMLString();
 			if (noteEvent.getTickOffset() <= tickOffset) {
-				if (tickOffset <= noteEvent.getEndTick()) {
+				if (tickOffset < noteEvent.getEndTick()) {
 					return index;
-				} else {
-					return new int[] { start, index[0] };
 				}
-			}	
+			} else {
+				return new int[] { start, index[0] };
+			}
 			start = index[1];
 		}
-		return null;
+		return new int[] { start, start };
 	}
 
 	/**
