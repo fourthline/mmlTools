@@ -5,8 +5,6 @@
 package fourthline.mabiicco.ui;
 
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -23,7 +21,7 @@ import javax.swing.SpinnerNumberModel;
 /**
  * ノートプロパティを編集するためのダイアログ表示で用いるPanelです.
  */
-public class MMLNotePropertyPanel extends JPanel implements ActionListener {
+public class MMLNotePropertyPanel extends JPanel {
 
 	/**
 	 * 
@@ -69,7 +67,6 @@ public class MMLNotePropertyPanel extends JPanel implements ActionListener {
 
 		velocityCheckBox = new JCheckBox(AppResource.getText("note.properties.velocity"));
 		velocityCheckBox.setBounds(42, 36, 150, 21);
-		velocityCheckBox.addActionListener(this);
 		add(velocityCheckBox);
 
 		tuningNoteCheckBox = new JCheckBox(AppResource.getText("note.properties.tuning"));
@@ -93,10 +90,8 @@ public class MMLNotePropertyPanel extends JPanel implements ActionListener {
 		velocityValueField.setValue(velocity);
 		if (prevNote.getVelocity() != velocity) {
 			velocityCheckBox.setSelected(true);
-			velocityValueField.setEnabled(true);
 		} else {
 			velocityCheckBox.setSelected(false);
-			velocityValueField.setEnabled(false);
 		}
 	}
 
@@ -113,7 +108,9 @@ public class MMLNotePropertyPanel extends JPanel implements ActionListener {
 
 			Integer value = (Integer) velocityValueField.getValue();
 			int prevVelocity = targetNote.getVelocity();
-			if ( (velocityCheckBox.isSelected()) && (value != prevVelocity) ) {
+			if (!velocityCheckBox.isSelected()) {
+				targetNote.setVelocity(value.intValue());
+			} else {
 				for (MMLNoteEvent note : eventList.getMMLNoteEventList()) {
 					if (note.getTickOffset() < targetNote.getTickOffset()) {
 						continue;
@@ -131,12 +128,5 @@ public class MMLNotePropertyPanel extends JPanel implements ActionListener {
 	@Override
 	public Dimension getPreferredSize() {
 		return new Dimension(350, 150);
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == velocityCheckBox) {
-			velocityValueField.setEnabled( velocityCheckBox.isSelected() );
-		}
 	}
 }
