@@ -37,7 +37,7 @@ import java.awt.event.ActionListener;
 import java.util.EnumSet;
 import java.util.HashMap;
 
-public class MMLTrackView extends JPanel implements ActionListener, DocumentListener {
+public final class MMLTrackView extends JPanel implements ActionListener, DocumentListener {
 	/**
 	 * 
 	 */

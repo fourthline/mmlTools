@@ -19,7 +19,7 @@ import javax.swing.JComboBox;
 
 
 
-public class MMLScorePropertyPanel extends JPanel {
+public final class MMLScorePropertyPanel extends JPanel {
 	private static final long serialVersionUID = -3976816581383137814L;
 
 	private JTextField titleField;

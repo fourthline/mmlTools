@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 たんらる
+ * Copyright (C) 2013-2014 たんらる
  */
 
 package fourthline.mmlTools.parser;
@@ -18,7 +18,7 @@ import fourthline.mmlTools.MMLTrack;
  * @author fourthline
  *
  */
-public class MMSFile implements IMMLFileParser {
+public final class MMSFile implements IMMLFileParser {
 
 	@Override
 	public MMLScore parse(InputStream istream) throws MMLParseException {

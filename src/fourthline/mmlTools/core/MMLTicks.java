@@ -14,7 +14,7 @@ import fourthline.mmlTools.UndefinedTickException;
  * 音符の時間変換値
  * @author たんらる
  */
-public class MMLTicks {
+public final class MMLTicks {
 
 	/**
 	 * For MML text -> tick

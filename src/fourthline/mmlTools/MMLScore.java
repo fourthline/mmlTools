@@ -26,7 +26,7 @@ import fourthline.mmlTools.parser.MMSFile;
 /**
  *
  */
-public class MMLScore implements IMMLFileParser {
+public final class MMLScore implements IMMLFileParser {
 	private final List<MMLTrack> trackList = new ArrayList<>();
 	private final List<MMLTempoEvent> globalTempoList = new ArrayList<>();
 

@@ -9,7 +9,7 @@ import javax.swing.JOptionPane;
 
 import fourthline.mabiicco.AppResource;
 
-public class About {
+public final class About {
 	public void show(Frame parentFrame) {
 		String title = AppResource.getText("menu.about");
 		String text = "Version: " + AppResource.getVersionText();

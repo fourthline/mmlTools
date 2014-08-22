@@ -35,7 +35,7 @@ import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mmlTools.MMLTrack;
 import fourthline.mmlTools.core.MMLTools;
 
-public class MMLOutputPanel extends JPanel {
+public final class MMLOutputPanel extends JPanel {
 	private static final long serialVersionUID = 8558159209741558854L;
 	private JTable table;
 	private final JDialog dialog;

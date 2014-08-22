@@ -18,7 +18,7 @@ import fourthline.mabiicco.AppResource;
 import fourthline.mmlTools.MMLTrack;
 
 
-public class TrackPropertyPanel extends JPanel {
+public final class TrackPropertyPanel extends JPanel {
 	private static final long serialVersionUID = 7599129671956571455L;
 	private JTextField trackNameField;
 	private JSlider panpotSlider;

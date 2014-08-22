@@ -21,7 +21,7 @@ import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLNoteEvent;
 import fourthline.mmlTools.MMLTrack;
 
-public class MMLTranspose {
+public final class MMLTranspose {
 	public void execute(Frame parentFrame, IMMLManager mmlManager) {
 		int transpose = showTransposeDialog(parentFrame);
 		if (transpose == 0) {

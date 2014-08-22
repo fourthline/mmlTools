@@ -28,7 +28,7 @@ import fourthline.mmlTools.parser.IMMLFileParser;
 import fourthline.mmlTools.parser.MMLParseException;
 import fourthline.mmlTools.parser.MMSFile;
 
-public class ActionDispatcher implements ActionListener, IFileStateObserver, IEditStateObserver {
+public final class ActionDispatcher implements ActionListener, IFileStateObserver, IEditStateObserver {
 
 	private MainFrame mainFrame;
 	private MMLSeqView mmlSeqView;

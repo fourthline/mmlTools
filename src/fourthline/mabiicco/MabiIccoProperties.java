@@ -15,7 +15,7 @@ import java.util.Properties;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.PianoRollView;
 
-public class MabiIccoProperties {
+public final class MabiIccoProperties {
 	private final Properties properties = new Properties();
 	private final String configFile = "config.properties";
 

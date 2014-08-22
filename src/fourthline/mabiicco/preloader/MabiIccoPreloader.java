@@ -15,7 +15,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-public class MabiIccoPreloader extends Preloader {
+public final class MabiIccoPreloader extends Preloader {
 
 	private StartupController controller;
 	private Stage stage;

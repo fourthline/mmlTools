@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 たんらる
+ * Copyright (C) 2013-2014 たんらる
  */
 
 package fourthline.mmlTools.optimizer;
@@ -11,14 +11,12 @@ import java.util.HashMap;
 import fourthline.mmlTools.core.MMLTokenizer;
 
 
-
 /**
  * FIXME: 
  * Ln-section merge式
  * @author fourthline
  */
-public class MMLStringOptimizer {
-
+public final class MMLStringOptimizer {
 	private String originalMML;
 
 	/**

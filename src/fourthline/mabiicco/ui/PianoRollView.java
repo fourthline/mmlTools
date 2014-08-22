@@ -32,7 +32,7 @@ import fourthline.mmlTools.core.MMLTicks;
 /**
  * ピアノロール表示を行うためのビューです.
  */
-public class PianoRollView extends JPanel {
+public final class PianoRollView extends JPanel {
 	private static final long serialVersionUID = -7229093886476553295L;
 
 	public static final int OCTNUM = 9;

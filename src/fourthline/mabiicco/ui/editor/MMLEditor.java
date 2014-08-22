@@ -32,7 +32,7 @@ import fourthline.mmlTools.MMLNoteEvent;
 import fourthline.mmlTools.UndefinedTickException;
 
 
-public class MMLEditor implements MouseInputListener, IEditState, IEditContext, IEditAlign {
+public final class MMLEditor implements MouseInputListener, IEditState, IEditContext, IEditAlign {
 
 	private EditMode editMode = EditMode.SELECT;
 

@@ -17,7 +17,7 @@ import javax.swing.JPanel;
 
 import fourthline.mabiicco.midi.MabiDLS;
 
-public class KeyboardView extends JPanel {
+public final class KeyboardView extends JPanel {
 	private static final long serialVersionUID = -3850112420986284800L;
 
 	private int playNote = -1;

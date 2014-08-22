@@ -12,7 +12,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
 
-public class StartupController implements Initializable {
+public final class StartupController implements Initializable {
 
 	public TextArea text;
 	public ProgressBar bar;

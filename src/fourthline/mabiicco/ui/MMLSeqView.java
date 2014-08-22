@@ -38,7 +38,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-public class MMLSeqView implements IMMLManager, ChangeListener, ActionListener {
+public final class MMLSeqView implements IMMLManager, ChangeListener, ActionListener {
 	private static final int INITIAL_TRACK_COUNT = 1;
 
 	private int trackCounter;

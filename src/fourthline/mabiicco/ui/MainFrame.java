@@ -54,7 +54,7 @@ import java.awt.Color;
 import javax.swing.JComboBox;
 
 
-public class MainFrame extends JFrame implements ComponentListener, INotifyTrackEnd, ActionListener {
+public final class MainFrame extends JFrame implements ComponentListener, INotifyTrackEnd, ActionListener {
 	private static final long serialVersionUID = -7484797594534384422L;
 
 	private final JPanel contentPane;
@@ -169,7 +169,7 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 		pauseButton.setActionCommand(ActionDispatcher.PAUSE);
 		toolBar.add(pauseButton);
 
-		JButton stopButton = new JButton("");
+		JButton stopButton = new JButton();
 		toolBar.add(stopButton);
 		stopButton.setToolTipText(text("menu.stop"));
 		stopButton.setIcon(new ImageIcon(MainFrame.class.getResource(text("menu.stop.icon"))));
@@ -179,14 +179,18 @@ public class MainFrame extends JFrame implements ComponentListener, INotifyTrack
 
 		toolBar.add(newToolBarSeparator());
 
-		JButton inputClipButton = new JButton(text("menu.inputMML"));
+		JButton inputClipButton = new JButton();
+		inputClipButton.setToolTipText(text("menu.inputMML"));
+		inputClipButton.setIcon(new ImageIcon(MainFrame.class.getResource(text("menu.inputMML.icon"))));
 		noplayFunctions.add(inputClipButton);
 		inputClipButton.setFocusable(false);
 		inputClipButton.addActionListener(listener);
 		inputClipButton.setActionCommand(ActionDispatcher.INPUT_FROM_CLIPBOARD);
 		toolBar.add(inputClipButton);
 
-		JButton outputClipButton = new JButton(text("menu.outputMML"));
+		JButton outputClipButton = new JButton();
+		outputClipButton.setToolTipText(text("menu.outputMML"));
+		outputClipButton.setIcon(new ImageIcon(MainFrame.class.getResource(text("menu.outputMML.icon"))));
 		outputClipButton.setFocusable(false);
 		outputClipButton.addActionListener(listener);
 		outputClipButton.setActionCommand(ActionDispatcher.OUTPUT_TO_CLIPBOARD);

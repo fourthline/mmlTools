@@ -16,7 +16,7 @@ import fourthline.mabiicco.IFileStateObserver;
 import fourthline.mabiicco.ui.IMMLManager;
 import fourthline.mmlTools.MMLScore;
 
-public class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFileState {
+public final class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFileState {
 	private static final long serialVersionUID = 4093930608712571204L;
 
 	private IFileStateObserver fileStateObserver = null;

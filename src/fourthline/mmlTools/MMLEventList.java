@@ -16,7 +16,7 @@ import fourthline.mmlTools.parser.MMLEventParser;
 /**
  * 1行のMMLデータを扱います.
  */
-public class MMLEventList implements Serializable, Cloneable {
+public final class MMLEventList implements Serializable, Cloneable {
 	private static final long serialVersionUID = -1430758411579285535L;
 
 	private List<MMLNoteEvent>   noteList   = new ArrayList<>();

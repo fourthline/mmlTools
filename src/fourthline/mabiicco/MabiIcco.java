@@ -25,7 +25,7 @@ import javafx.stage.Stage;
 
 import javax.swing.SwingUtilities;
 
-public class MabiIcco extends Application {
+public final class MabiIcco extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {
 		notifyPreloader(new MabiIccoPreloaderNotification(AppResource.getText("init.midi"), 10));

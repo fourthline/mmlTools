@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 たんらる
+ * Copyright (C) 2013-2014 たんらる
  */
 
 package fourthline.mmlTools.core;
@@ -11,7 +11,7 @@ import java.util.Iterator;
  * MML命令の分割
  * @author たんらる
  */
-public class MMLTokenizer implements Iterator<String> {
+public final class MMLTokenizer implements Iterator<String> {
 	static private final String noteString = "abcdefgABCDEFGnNrR";
 	static private final String tokenString = noteString + "tToOlLvV<>&";
 	private final String mml_src;

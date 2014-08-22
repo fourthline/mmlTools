@@ -29,7 +29,7 @@ import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mmlTools.MMLTrack;
 
-public class MMLInputPanel extends JPanel {
+public final class MMLInputPanel extends JPanel {
 	private static final long serialVersionUID = -2517820687250637949L;
 	private JTextField textField;
 	private JComboBox<InstClass> comboBox;

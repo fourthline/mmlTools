@@ -11,7 +11,7 @@ import java.util.jar.Manifest;
 
 import fourthline.mmlTools.core.ResourceLoader;
 
-public class AppResource {
+public final class AppResource {
 	private final static String RESOURCE_NAME = "appResource";
 	private static Manifest mf;
 	private static ResourceBundle bundle = ResourceBundle.getBundle(RESOURCE_NAME, new ResourceLoader());

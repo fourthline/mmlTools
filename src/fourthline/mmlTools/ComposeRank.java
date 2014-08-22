@@ -13,7 +13,7 @@ import fourthline.mmlTools.core.ResourceLoader;
 /**
  * 作曲ランク.
  */
-public class ComposeRank {
+public final class ComposeRank {
 	final private static String RESOURCE_NAME = "rank";
 	/** 作曲不可ランク */
 	final private static ComposeRank RANK_0 = new ComposeRank(0, 0, 0, "-");

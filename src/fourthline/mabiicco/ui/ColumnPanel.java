@@ -38,7 +38,7 @@ import fourthline.mmlTools.MMLTempoEvent;
 import fourthline.mmlTools.MMLTrack;
 
 
-public class ColumnPanel extends JPanel implements MouseListener, MouseMotionListener, ActionListener {
+public final class ColumnPanel extends JPanel implements MouseListener, MouseMotionListener, ActionListener {
 	private static final long serialVersionUID = -6609938350741425221L;
 
 	private static final Color BEAT_BORDER_COLOR = new Color(0.4f, 0.4f, 0.4f);

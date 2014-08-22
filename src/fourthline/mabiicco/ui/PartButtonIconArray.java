@@ -9,7 +9,7 @@ import java.awt.Graphics;
 
 import javax.swing.Icon;
 
-public class PartButtonIconArray extends PartButtonIcon {
+public final class PartButtonIconArray extends PartButtonIcon {
 
 	private final static PartButtonIconArray instance[][];
 

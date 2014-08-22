@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 たんらる
+ * Copyright (C) 2013-2014 たんらる
  */
 
 package fourthline.mmlTools.parser;
@@ -15,8 +15,7 @@ import fourthline.mmlTools.core.MMLTokenizer;
 import fourthline.mmlTools.core.MelodyParser;
 import fourthline.mmlTools.core.ParserWarn3ML;
 
-public class MMLEventParser extends MelodyParser implements Iterator<MMLEvent> {
-
+public final class MMLEventParser extends MelodyParser implements Iterator<MMLEvent> {
 	private final MMLTokenizer tokenizer;
 
 	public MMLEventParser(String mml) {

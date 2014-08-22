@@ -16,7 +16,7 @@ import java.util.ResourceBundle.Control;
 import fourthline.mmlTools.core.ResourceLoader;
 
 
-public class ResourceLoader extends Control {
+public final class ResourceLoader extends Control {
 	@Override
 	public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader, boolean reload) 
 			throws IllegalAccessException, InstantiationException, IOException {

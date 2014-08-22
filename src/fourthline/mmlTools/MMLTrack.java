@@ -12,7 +12,7 @@ import fourthline.mmlTools.core.MMLTicks;
 import fourthline.mmlTools.core.MMLTools;
 import fourthline.mmlTools.optimizer.MMLStringOptimizer;
 
-public class MMLTrack extends MMLTools implements Serializable {
+public final class MMLTrack extends MMLTools implements Serializable {
 	private static final long serialVersionUID = 2006880378975808647L;
 
 	private List<MMLEventList> mmlParts;

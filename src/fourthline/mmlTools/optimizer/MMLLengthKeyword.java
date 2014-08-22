@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 たんらる
+ * Copyright (C) 2013-2014 たんらる
  */
 
 package fourthline.mmlTools.optimizer;
@@ -10,7 +10,7 @@ import java.util.List;
 import fourthline.mmlTools.core.MMLTokenizer;
 
 
-public class MMLLengthKeyword {
+public final class MMLLengthKeyword {
 	private String sectionName;
 	private int index;
 	private int score;

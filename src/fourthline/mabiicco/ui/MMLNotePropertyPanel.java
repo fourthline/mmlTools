@@ -21,7 +21,7 @@ import javax.swing.SpinnerNumberModel;
 /**
  * ノートプロパティを編集するためのダイアログ表示で用いるPanelです.
  */
-public class MMLNotePropertyPanel extends JPanel {
+public final class MMLNotePropertyPanel extends JPanel {
 
 	/**
 	 * 

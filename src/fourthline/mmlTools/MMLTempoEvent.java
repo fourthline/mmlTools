@@ -7,7 +7,7 @@ package fourthline.mmlTools;
 import java.util.List;
 
 
-public class MMLTempoEvent extends MMLEvent {
+public final class MMLTempoEvent extends MMLEvent {
 	private static final long serialVersionUID = 8014294359518840951L;
 
 	private int tempo;

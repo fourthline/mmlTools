@@ -6,7 +6,7 @@ package fourthline.mabiicco.preloader;
 
 import javafx.application.Preloader;
 
-public class MabiIccoPreloaderNotification implements Preloader.PreloaderNotification {
+public final class MabiIccoPreloaderNotification implements Preloader.PreloaderNotification {
 
 	private String message;
 	private double progress;

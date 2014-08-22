@@ -41,7 +41,7 @@ import java.awt.Color;
 /**
  * パート入れ替え
  */
-public class MMLPartChangePanel extends JPanel {
+public final class MMLPartChangePanel extends JPanel {
 	private static final long serialVersionUID = 8558159209741558854L;
 	private JTable table;
 	private final JDialog dialog;
