@@ -4,6 +4,8 @@
 
 package fourthline.mmlTools;
 
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -31,9 +33,10 @@ public final class MMLTempoEvent extends MMLEvent {
 	}
 
 	public byte[] getMetaData() {
-		byte[] retVal = { (byte)tempo };
-
-		return retVal;
+		ByteBuffer buf = ByteBuffer.allocate(4);
+		buf.putInt(60000000/tempo);
+		byte array[] = buf.array();
+		return Arrays.copyOfRange(array, 1, array.length);
 	}
 
 	@Override

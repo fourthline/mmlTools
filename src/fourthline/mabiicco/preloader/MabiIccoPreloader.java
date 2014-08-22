@@ -56,5 +56,4 @@ public final class MabiIccoPreloader extends Preloader {
 			stage.hide();
 		}
 	}
-
 }

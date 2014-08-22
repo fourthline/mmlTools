@@ -6,6 +6,7 @@ package fourthline.mabiicco.midi;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,9 +59,7 @@ public final class MabiDLS {
 			if (type == MMLTempoEvent.META) {
 				// テンポイベントを処理します.
 				byte metaData[] = meta.getData();
-				int tempo = metaData[0] & 0xff;
-				sequencer.setTempoInBPM(tempo);
-				System.out.println(" [midi-event] tempo: " + tempo);
+				sequencer.setTempoInMPQ(ByteBuffer.wrap(metaData).getInt());
 			} else if (type == 0x2f) {
 				// トラック終端
 				if (notifier != null) {

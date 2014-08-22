@@ -10,7 +10,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
+import javax.sound.midi.InvalidMidiDataException;
+import javax.sound.midi.MidiSystem;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -69,15 +72,18 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	public static final String NOTE_PROPERTY = "note_property";
 	public static final String TRANSPOSE = "transpose";
 	public static final String ABOUT = "about";
+	public static final String MIDI_EXPORT = "midi_export";
 
 	private File openedFile = null;
 
 	private final FileFilter mmsFilter = new FileNameExtensionFilter(AppResource.getText("file.mms"), "mms");
 	private final FileFilter mmiFilter = new FileNameExtensionFilter(AppResource.getText("file.mmi"), "mmi");
 	private final FileFilter allFilter = new FileNameExtensionFilter(AppResource.getText("file.all"), "mmi", "mms");
+	private final FileFilter midFilter = new FileNameExtensionFilter(AppResource.getText("file.mid"), "mid");
 
 	private final JFileChooser openFileChooser = new JFileChooser();
 	private final JFileChooser saveFileChooser = new JFileChooser();
+	private final JFileChooser exportFileChooser = new JFileChooser();
 
 	private static ActionDispatcher instance = null;
 	public static ActionDispatcher getInstance() {
@@ -96,6 +102,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		openFileChooser.addChoosableFileFilter(mmiFilter);
 		openFileChooser.addChoosableFileFilter(mmsFilter);
 		saveFileChooser.addChoosableFileFilter(mmiFilter);
+		exportFileChooser.addChoosableFileFilter(midFilter);
 	}
 
 	public void setMainFrame(MainFrame mainFrame) {
@@ -190,6 +197,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			new MMLTranspose().execute(mainFrame, mmlSeqView);
 		} else if (command.equals(ABOUT)) {
 			new About().show(mainFrame);
+		} else if (command.equals(MIDI_EXPORT)) {
+			midiExportAction();
 		}
 	}
 
@@ -278,23 +287,22 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	}
 
 	/**
-	 * 別名保存のダイアログ表示
-	 * @return 保存した場合は trueを返す.
+	 * ファイル保存のためのダイアログ表示.
+	 * @return 保存ファイル, 保存ファイルがなければnull.
 	 */
-	private boolean showDialogSaveFile() {
+	private File showSaveDialog(JFileChooser fileChooser, String suffix) {
 		String recentPath = MabiIccoProperties.getInstance().getRecentFile();
 		if (openedFile != null) {
-			saveFileChooser.setSelectedFile(openedFile);
+			fileChooser.setSelectedFile(openedFile);
 		} else {
-			saveFileChooser.setCurrentDirectory(new File(recentPath));
+			fileChooser.setCurrentDirectory(new File(recentPath));
 		}
-		saveFileChooser.setFileFilter(mmiFilter);
-		saveFileChooser.setAcceptAllFileFilterUsed(false);
-		int status = saveFileChooser.showSaveDialog(mainFrame);
+		fileChooser.setAcceptAllFileFilterUsed(false);
+		int status = fileChooser.showSaveDialog(mainFrame);
 		if (status == JFileChooser.APPROVE_OPTION) {
-			File file = saveFileChooser.getSelectedFile();
-			if (!file.toString().endsWith(".mmi")) {
-				file = new File(file+".mmi");
+			File file = fileChooser.getSelectedFile();
+			if (!file.toString().endsWith("."+suffix)) {
+				file = new File(file+"."+suffix);
 			}
 
 			status = JOptionPane.YES_OPTION;
@@ -303,13 +311,40 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 				status = JOptionPane.showConfirmDialog(mainFrame, AppResource.getText("message.override"), "", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 			}
 			if (status == JOptionPane.YES_OPTION) {
-				saveMMLFile(file);
-				openedFile = file;
-				return true;
+				return file;
 			}
 		}
+		return null;
+	}
 
+	/**
+	 * 別名保存のダイアログ表示
+	 * @return 保存した場合は trueを返す.
+	 */
+	private boolean showDialogSaveFile() {
+		saveFileChooser.setFileFilter(mmiFilter);
+		File file = showSaveDialog(saveFileChooser, "mmi");
+		if (file != null) {
+			saveMMLFile(file);
+			openedFile = file;
+			return true;
+		}
 		return false;
+	}
+
+	/**
+	 * MIDI-exportダイアログ表示
+	 * @return 保存した場合は trueを返す.
+	 */
+	private void midiExportAction() {
+		File file = showSaveDialog(exportFileChooser, "mid");
+		if (file != null) {
+			try {
+				MidiSystem.write(MabiDLS.getInstance().createSequence(mmlSeqView.getMMLScore()), 1, file);
+			} catch (IOException | InvalidMidiDataException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	/**
