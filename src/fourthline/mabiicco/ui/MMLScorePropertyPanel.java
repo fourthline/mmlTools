@@ -35,15 +35,15 @@ public final class MMLScorePropertyPanel extends JPanel {
 		setBounds(100, 100, 300, 170);
 		setLayout(null);
 
-		JLabel label1 = new JLabel(AppResource.getText("score_property.name"));
+		JLabel label1 = new JLabel(AppResource.appText("score_property.name"));
 		label1.setBounds(12, 40, 90, 13);
 		add(label1);
 
-		JLabel label2 = new JLabel(AppResource.getText("score_property.author"));
+		JLabel label2 = new JLabel(AppResource.appText("score_property.author"));
 		label2.setBounds(12, 73, 90, 13);
 		add(label2);
 
-		JLabel label3 = new JLabel(AppResource.getText("score_property.measure"));
+		JLabel label3 = new JLabel(AppResource.appText("score_property.measure"));
 		label3.setBounds(12, 105, 90, 13);
 		add(label3);
 
@@ -106,7 +106,7 @@ public final class MMLScorePropertyPanel extends JPanel {
 
 		int status = JOptionPane.showConfirmDialog(parent, 
 				this,
-				AppResource.getText("score_property"), 
+				AppResource.appText("score_property"), 
 				JOptionPane.OK_CANCEL_OPTION,
 				JOptionPane.PLAIN_MESSAGE);
 

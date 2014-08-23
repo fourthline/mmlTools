@@ -76,10 +76,10 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 
 	private File openedFile = null;
 
-	private final FileFilter mmsFilter = new FileNameExtensionFilter(AppResource.getText("file.mms"), "mms");
-	private final FileFilter mmiFilter = new FileNameExtensionFilter(AppResource.getText("file.mmi"), "mmi");
-	private final FileFilter allFilter = new FileNameExtensionFilter(AppResource.getText("file.all"), "mmi", "mms");
-	private final FileFilter midFilter = new FileNameExtensionFilter(AppResource.getText("file.mid"), "mid");
+	private final FileFilter mmsFilter = new FileNameExtensionFilter(AppResource.appText("file.mms"), "mms");
+	private final FileFilter mmiFilter = new FileNameExtensionFilter(AppResource.appText("file.mmi"), "mmi");
+	private final FileFilter allFilter = new FileNameExtensionFilter(AppResource.appText("file.all"), "mmi", "mms");
+	private final FileFilter midFilter = new FileNameExtensionFilter(AppResource.appText("file.mid"), "mid");
 
 	private final JFileChooser openFileChooser = new JFileChooser();
 	private final JFileChooser saveFileChooser = new JFileChooser();
@@ -218,9 +218,9 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			MabiIccoProperties.getInstance().setRecentFile(file.getPath());
 			MabiDLS.getInstance().all();
 		} catch (FileNotFoundException e) {
-			JOptionPane.showMessageDialog(mainFrame, AppResource.getText("error.read"), AppResource.getText("error.nofile"), JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(mainFrame, AppResource.appText("error.read"), AppResource.appText("error.nofile"), JOptionPane.WARNING_MESSAGE);
 		} catch (MMLParseException e) {
-			JOptionPane.showMessageDialog(mainFrame, AppResource.getText("error.read"), AppResource.getText("error.invalid_file"), JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(mainFrame, AppResource.appText("error.read"), AppResource.appText("error.invalid_file"), JOptionPane.WARNING_MESSAGE);
 		}
 	}
 
@@ -231,7 +231,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 
 		if (openedFile != null) {
 			if (fileState.isModified()) {
-				int status = JOptionPane.showConfirmDialog(mainFrame, AppResource.getText("message.throw"), "", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+				int status = JOptionPane.showConfirmDialog(mainFrame, AppResource.appText("message.throw"), "", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 				if (status == JOptionPane.YES_OPTION) {
 					openMMLFile(openedFile);
 				}
@@ -308,7 +308,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			status = JOptionPane.YES_OPTION;
 			if (file.exists()) {
 				// すでにファイルが存在する場合の上書き警告表示.
-				status = JOptionPane.showConfirmDialog(mainFrame, AppResource.getText("message.override"), "", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+				status = JOptionPane.showConfirmDialog(mainFrame, AppResource.appText("message.override"), "", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 			}
 			if (status == JOptionPane.YES_OPTION) {
 				return file;
@@ -358,7 +358,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		}
 
 		// 保存するかどうかのダイアログ表示
-		int status = JOptionPane.showConfirmDialog(mainFrame, AppResource.getText("message.modifiedClose"), "", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+		int status = JOptionPane.showConfirmDialog(mainFrame, AppResource.appText("message.modifiedClose"), "", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 		if (status == JOptionPane.CANCEL_OPTION) {
 			return false;
 		} else if (status == JOptionPane.NO_OPTION) {
@@ -431,7 +431,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 				if (isSupportedSaveFile()) {
 					mainFrame.setCanSaveFile(true);
 				}
-				mainFrame.setTitleAndFileName(openedFile.getName()+" "+AppResource.getText("file.modified"));
+				mainFrame.setTitleAndFileName(openedFile.getName()+" "+AppResource.appText("file.modified"));
 				mainFrame.setCanReloadFile(true);
 			} else {
 				mainFrame.setTitleAndFileName(openedFile.getName());

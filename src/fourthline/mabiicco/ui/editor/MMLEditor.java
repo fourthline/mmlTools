@@ -76,7 +76,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		for (String key : keyList) {
 			try {
 				String tickText = key.substring("editor.note_".length());
-				NoteAlign noteAlign = new NoteAlign(AppResource.getText(key), tickText);
+				NoteAlign noteAlign = new NoteAlign(AppResource.appText(key), tickText);
 				list.add(noteAlign);
 			} catch (UndefinedTickException e) {
 				e.printStackTrace();
@@ -93,8 +93,8 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 
 		pianoRoll.setSelectNote(selectedNote);
 
-		newPopupMenu(AppResource.getText("part_change"), ActionDispatcher.PART_CHANGE);
-		newPopupMenu(AppResource.getText("note.properties"), ActionDispatcher.NOTE_PROPERTY);
+		newPopupMenu(AppResource.appText("part_change"), ActionDispatcher.PART_CHANGE);
+		newPopupMenu(AppResource.appText("note.properties"), ActionDispatcher.NOTE_PROPERTY);
 	}
 
 	public void setEditAlign(int alignTick) {

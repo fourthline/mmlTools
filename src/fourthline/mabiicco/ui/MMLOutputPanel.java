@@ -39,7 +39,7 @@ public final class MMLOutputPanel extends JPanel {
 	private static final long serialVersionUID = 8558159209741558854L;
 	private JTable table;
 	private final JDialog dialog;
-	private final JButton copyButton = new JButton(AppResource.getText("mml.output.copyButton"));
+	private final JButton copyButton = new JButton(AppResource.appText("mml.output.copyButton"));
 
 	private List<MMLTrack> trackList;
 
@@ -49,7 +49,7 @@ public final class MMLOutputPanel extends JPanel {
 	}
 
 	public MMLOutputPanel(Frame parentFrame, List<MMLTrack> trackList) {
-		this.dialog = new JDialog(parentFrame, AppResource.getText("mml.output"), true);
+		this.dialog = new JDialog(parentFrame, AppResource.appText("mml.output"), true);
 		initializePanel(trackList);
 	}
 
@@ -63,7 +63,7 @@ public final class MMLOutputPanel extends JPanel {
 			currentSelectedPartMMLOutput();
 		});
 
-		JButton closeButton = new JButton(AppResource.getText("mml.output.closeButton"));
+		JButton closeButton = new JButton(AppResource.appText("mml.output.closeButton"));
 		closeButton.setBounds(257, 189, 90, 29);
 		add(closeButton);
 		closeButton.setFocusable(false);
@@ -97,9 +97,9 @@ public final class MMLOutputPanel extends JPanel {
 
 	public static JTable createJTableFromMMLTrack(List<MMLTrack> trackList) {
 		String columnNames[] = {
-				AppResource.getText("mml.output.trackName"),
-				AppResource.getText("mml.output.instrument"),
-				AppResource.getText("mml.output.rank")
+				AppResource.appText("mml.output.trackName"),
+				AppResource.appText("mml.output.instrument"),
+				AppResource.appText("mml.output.rank")
 		};
 		DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
 		JTable jTable = new JTable(tableModel);
@@ -130,7 +130,7 @@ public final class MMLOutputPanel extends JPanel {
 		int row = table.getSelectedRow();
 		String mmlText = trackList.get(row).getMMLString();
 		copyToClipboard(mmlText);
-		JOptionPane.showMessageDialog(this, AppResource.getText("mml.output.done"));
+		JOptionPane.showMessageDialog(this, AppResource.appText("mml.output.done"));
 
 		row++;
 		if (row >= trackList.size()) {

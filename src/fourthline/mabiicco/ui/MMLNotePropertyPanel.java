@@ -37,7 +37,7 @@ public final class MMLNotePropertyPanel extends JPanel {
 	public void showDialog() {
 		int status = JOptionPane.showConfirmDialog(null, 
 				this,
-				AppResource.getText("note.properties"),
+				AppResource.appText("note.properties"),
 				JOptionPane.OK_CANCEL_OPTION,
 				JOptionPane.PLAIN_MESSAGE);
 
@@ -65,11 +65,11 @@ public final class MMLNotePropertyPanel extends JPanel {
 		velocityValueField.setBounds(209, 37, 72, 19);
 		add(velocityValueField);
 
-		velocityCheckBox = new JCheckBox(AppResource.getText("note.properties.velocity"));
+		velocityCheckBox = new JCheckBox(AppResource.appText("note.properties.velocity"));
 		velocityCheckBox.setBounds(42, 36, 150, 21);
 		add(velocityCheckBox);
 
-		tuningNoteCheckBox = new JCheckBox(AppResource.getText("note.properties.tuning"));
+		tuningNoteCheckBox = new JCheckBox(AppResource.appText("note.properties.tuning"));
 		tuningNoteCheckBox.setBounds(43, 99, 220, 21);
 		add(tuningNoteCheckBox);
 

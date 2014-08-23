@@ -65,11 +65,11 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 		addMouseListener(this);
 		addMouseMotionListener(this);
 
-		insertTempoMenu = newPopupMenu(AppResource.getText("edit.insert_tempo"));
+		insertTempoMenu = newPopupMenu(AppResource.appText("edit.insert_tempo"));
 		insertTempoMenu.setActionCommand(INSERT_TEMPO);
-		editTempoMenu = newPopupMenu(AppResource.getText("edit.edit_tempo"));
+		editTempoMenu = newPopupMenu(AppResource.appText("edit.edit_tempo"));
 		editTempoMenu.setActionCommand(EDIT_TEMPO);
-		deleteTempoMenu = newPopupMenu(AppResource.getText("edit.delete_tempo"));
+		deleteTempoMenu = newPopupMenu(AppResource.appText("edit.delete_tempo"));
 		deleteTempoMenu.setActionCommand(DELETE_TEMPO);
 	}
 
@@ -204,7 +204,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 		String actionCommand = e.getActionCommand();
 
 		if (actionCommand.equals(INSERT_TEMPO)) {
-			int tempo = showTempoInputDialog(AppResource.getText("edit.insert_tempo"), 120);
+			int tempo = showTempoInputDialog(AppResource.appText("edit.insert_tempo"), 120);
 			if (tempo < 0) {
 				return;
 			}
@@ -215,7 +215,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 			insertTempo.appendToListElement(tempoList);
 			System.out.println("insert tempo." + tempo);
 		} else if (actionCommand.equals(EDIT_TEMPO)) {
-			int tempo = showTempoInputDialog(AppResource.getText("edit.edit_tempo"), targetTempoEvent.getTempo());
+			int tempo = showTempoInputDialog(AppResource.appText("edit.edit_tempo"), targetTempoEvent.getTempo());
 			if (tempo < 0) {
 				return;
 			}
@@ -230,7 +230,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 
 	private int showTempoInputDialog(String title, int tempo) {
 		JPanel panel = new JPanel();
-		panel.add(new JLabel(AppResource.getText("edit.tempo_label")));
+		panel.add(new JLabel(AppResource.appText("edit.tempo_label")));
 		JSpinner spinner = new JSpinner();
 		spinner.setModel(new SpinnerNumberModel(tempo, 32, 255, 1));
 		spinner.setFocusable(false);

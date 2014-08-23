@@ -28,7 +28,7 @@ import javax.swing.SwingUtilities;
 public final class MabiIcco extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {
-		notifyPreloader(new MabiIccoPreloaderNotification(AppResource.getText("init.midi"), 10));
+		notifyPreloader(new MabiIccoPreloaderNotification(AppResource.appText("init.midi"), 10));
 		SwingUtilities.invokeLater(() -> {
 			initialize();
 		});
@@ -39,7 +39,7 @@ public final class MabiIcco extends Application {
 
 		try {
 			// font
-			String fontName = AppResource.getText("ui.font");
+			String fontName = AppResource.appText("ui.font");
 			if (!fontName.equals("ui.font")) {
 				setUIFont(new javax.swing.plaf.FontUIResource(fontName, Font.PLAIN, 11));
 			}
@@ -54,12 +54,12 @@ public final class MabiIcco extends Application {
 			MabiDLS.getInstance().initializeMIDI();
 			notifyPreloader(new MabiIccoPreloaderNotification("OK\n", 20));
 
-			notifyPreloader(new MabiIccoPreloaderNotification(AppResource.getText("init.dls"), 20));
+			notifyPreloader(new MabiIccoPreloaderNotification(AppResource.appText("init.dls"), 20));
 			File file = new File( appProperties.getDlsFile() );
 			if ( !file.exists() ) {
 				/* DLSファイルがない場合 */
 				JFileChooser fileChooser = new JFileChooser();
-				FileFilter dlsFilter = new FileNameExtensionFilter(AppResource.getText("file.dls"), "dls");
+				FileFilter dlsFilter = new FileNameExtensionFilter(AppResource.appText("file.dls"), "dls");
 				fileChooser.addChoosableFileFilter(dlsFilter);
 				fileChooser.setFileFilter(dlsFilter);
 				fileChooser.setAcceptAllFileFilterUsed(false);
@@ -67,7 +67,7 @@ public final class MabiIcco extends Application {
 				if (status == JFileChooser.APPROVE_OPTION) {
 					file = fileChooser.getSelectedFile();
 				} else {
-					JOptionPane.showMessageDialog(null, AppResource.getText("error.needDls"), "ERROR", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null, AppResource.appText("error.needDls"), "ERROR", JOptionPane.ERROR_MESSAGE);
 					System.exit(1);
 				}
 			}

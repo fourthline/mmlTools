@@ -17,7 +17,7 @@ import javax.swing.JTextField;
 import javax.swing.JButton;
 
 import fourthline.mabiicco.ActionDispatcher;
-import fourthline.mabiicco.AppResource;
+import static fourthline.mabiicco.AppResource.appText;
 import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mabiicco.midi.INotifyTrackEnd;
 import fourthline.mabiicco.midi.MabiDLS;
@@ -80,10 +80,6 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 	private JMenuItem pasteMenu;
 	private JMenuItem deleteMenu;
 
-	private String text(String key) {
-		return AppResource.getText(key);
-	}
-
 	/**
 	 * Create the frame.
 	 */
@@ -110,8 +106,8 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		northPanel.add(toolBar);
 
 		JButton newFileButton = new JButton("");
-		newFileButton.setToolTipText(text("menu.newFile"));
-		newFileButton.setIcon(new ImageIcon(MainFrame.class.getResource(text("menu.newFile.icon"))));
+		newFileButton.setToolTipText(appText("menu.newFile"));
+		newFileButton.setIcon(new ImageIcon(MainFrame.class.getResource(appText("menu.newFile.icon"))));
 		noplayFunctions.add(newFileButton);
 		newFileButton.setFocusable(false);
 		newFileButton.addActionListener(listener);
@@ -119,8 +115,8 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		toolBar.add(newFileButton);
 
 		JButton openFileButton = new JButton("");
-		openFileButton.setToolTipText(text("menu.openFile"));
-		openFileButton.setIcon(new ImageIcon(MainFrame.class.getResource(text("menu.openFile.icon"))));
+		openFileButton.setToolTipText(appText("menu.openFile"));
+		openFileButton.setIcon(new ImageIcon(MainFrame.class.getResource(appText("menu.openFile.icon"))));
 		noplayFunctions.add(openFileButton);
 		openFileButton.setFocusable(false);
 		openFileButton.addActionListener(listener);
@@ -131,39 +127,39 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 
 		JButton startPositionButton = new JButton("");
 		toolBar.add(startPositionButton);
-		startPositionButton.setToolTipText(text("menu.head"));
-		startPositionButton.setIcon(new ImageIcon(MainFrame.class.getResource(text("menu.head.icon"))));
+		startPositionButton.setToolTipText(appText("menu.head"));
+		startPositionButton.setIcon(new ImageIcon(MainFrame.class.getResource(appText("menu.head.icon"))));
 		startPositionButton.setFocusable(false);
 		startPositionButton.addActionListener(listener);
 		startPositionButton.setActionCommand(ActionDispatcher.SET_START_POSITION);
 
 		JButton prevPositionButton = new JButton("");
 		toolBar.add(prevPositionButton);
-		prevPositionButton.setToolTipText(text("menu.prev"));
-		prevPositionButton.setIcon(new ImageIcon(MainFrame.class.getResource(text("menu.prev.icon"))));
+		prevPositionButton.setToolTipText(appText("menu.prev"));
+		prevPositionButton.setIcon(new ImageIcon(MainFrame.class.getResource(appText("menu.prev.icon"))));
 		prevPositionButton.setFocusable(false);
 		prevPositionButton.addActionListener(listener);
 		prevPositionButton.setActionCommand(ActionDispatcher.PREV_TIME);
 
 		JButton playButton = new JButton("");
 		toolBar.add(playButton);
-		playButton.setToolTipText(text("menu.play"));
-		playButton.setIcon(new ImageIcon(MainFrame.class.getResource(text("menu.play.icon"))));
+		playButton.setToolTipText(appText("menu.play"));
+		playButton.setIcon(new ImageIcon(MainFrame.class.getResource(appText("menu.play.icon"))));
 		playButton.setFocusable(false);
 		playButton.addActionListener(listener);
 		playButton.setActionCommand(ActionDispatcher.PLAY);
 
 		JButton nextPositionButton = new JButton("");
 		toolBar.add(nextPositionButton);
-		nextPositionButton.setToolTipText(text("menu.next"));
-		nextPositionButton.setIcon(new ImageIcon(MainFrame.class.getResource(text("menu.next.icon"))));
+		nextPositionButton.setToolTipText(appText("menu.next"));
+		nextPositionButton.setIcon(new ImageIcon(MainFrame.class.getResource(appText("menu.next.icon"))));
 		nextPositionButton.setFocusable(false);
 		nextPositionButton.addActionListener(listener);
 		nextPositionButton.setActionCommand(ActionDispatcher.NEXT_TIME);
 
 		JButton pauseButton = new JButton("");
-		pauseButton.setToolTipText(text("menu.pause"));
-		pauseButton.setIcon(new ImageIcon(MainFrame.class.getResource(text("menu.pause.icon"))));
+		pauseButton.setToolTipText(appText("menu.pause"));
+		pauseButton.setIcon(new ImageIcon(MainFrame.class.getResource(appText("menu.pause.icon"))));
 		pauseButton.setFocusable(false);
 		pauseButton.addActionListener(listener);
 		pauseButton.setActionCommand(ActionDispatcher.PAUSE);
@@ -171,8 +167,8 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 
 		JButton stopButton = new JButton();
 		toolBar.add(stopButton);
-		stopButton.setToolTipText(text("menu.stop"));
-		stopButton.setIcon(new ImageIcon(MainFrame.class.getResource(text("menu.stop.icon"))));
+		stopButton.setToolTipText(appText("menu.stop"));
+		stopButton.setIcon(new ImageIcon(MainFrame.class.getResource(appText("menu.stop.icon"))));
 		stopButton.setFocusable(false);
 		stopButton.addActionListener(listener);
 		stopButton.setActionCommand(ActionDispatcher.STOP);
@@ -180,8 +176,8 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		toolBar.add(newToolBarSeparator());
 
 		JButton inputClipButton = new JButton();
-		inputClipButton.setToolTipText(text("menu.inputMML"));
-		inputClipButton.setIcon(new ImageIcon(MainFrame.class.getResource(text("menu.inputMML.icon"))));
+		inputClipButton.setToolTipText(appText("menu.inputMML"));
+		inputClipButton.setIcon(new ImageIcon(MainFrame.class.getResource(appText("menu.inputMML.icon"))));
 		noplayFunctions.add(inputClipButton);
 		inputClipButton.setFocusable(false);
 		inputClipButton.addActionListener(listener);
@@ -189,8 +185,8 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		toolBar.add(inputClipButton);
 
 		JButton outputClipButton = new JButton();
-		outputClipButton.setToolTipText(text("menu.outputMML"));
-		outputClipButton.setIcon(new ImageIcon(MainFrame.class.getResource(text("menu.outputMML.icon"))));
+		outputClipButton.setToolTipText(appText("menu.outputMML"));
+		outputClipButton.setIcon(new ImageIcon(MainFrame.class.getResource(appText("menu.outputMML.icon"))));
 		outputClipButton.setFocusable(false);
 		outputClipButton.addActionListener(listener);
 		outputClipButton.setActionCommand(ActionDispatcher.OUTPUT_TO_CLIPBOARD);
@@ -199,13 +195,13 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		toolBar.add(newToolBarSeparator());
 
 		// ビューの拡大/縮小ツールボタン
-		JButton expandButton = new JButton(text("view.scale.up"));
+		JButton expandButton = new JButton(appText("view.scale.up"));
 		expandButton.setFocusable(false);
 		expandButton.addActionListener(listener);
 		expandButton.setActionCommand(ActionDispatcher.VIEW_SCALE_UP);
 		toolBar.add(expandButton);
 
-		JButton reduceButton = new JButton(text("view.scale.down"));
+		JButton reduceButton = new JButton(appText("view.scale.down"));
 		reduceButton.setFocusable(false);
 		reduceButton.addActionListener(listener);
 		reduceButton.setActionCommand(ActionDispatcher.VIEW_SCALE_DOWN);
@@ -282,164 +278,164 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		JMenuBar menuBar = new JMenuBar();
 		// FIXME:
 		/************************* File Menu *************************/
-		JMenu fileMenu = new JMenu(text("menu.file"));
+		JMenu fileMenu = new JMenu(appText("menu.file"));
 		fileMenu.setMnemonic('F');
 		menuBar.add(fileMenu);
 
-		JMenuItem newFileMenuItem = createMenuItem(text("menu.newFile"), ActionDispatcher.NEW_FILE, text("menu.newFile.icon"));
+		JMenuItem newFileMenuItem = createMenuItem(appText("menu.newFile"), ActionDispatcher.NEW_FILE, appText("menu.newFile.icon"));
 		noplayFunctions.add(newFileMenuItem);
 		newFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK));
 		fileMenu.add(newFileMenuItem);
 
-		JMenuItem fileOpenMenuItem = createMenuItem(text("menu.openFile"), ActionDispatcher.FILE_OPEN, text("menu.openFile.icon"));
+		JMenuItem fileOpenMenuItem = createMenuItem(appText("menu.openFile"), ActionDispatcher.FILE_OPEN, appText("menu.openFile.icon"));
 		noplayFunctions.add(fileOpenMenuItem);
 		fileOpenMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
 		fileMenu.add(fileOpenMenuItem);
 
-		reloadMenuItem = createMenuItem(text("menu.reloadFile"), ActionDispatcher.RELOAD_FILE);
+		reloadMenuItem = createMenuItem(appText("menu.reloadFile"), ActionDispatcher.RELOAD_FILE);
 		noplayFunctions.add(reloadMenuItem);
 		fileMenu.add(reloadMenuItem);
 
-		saveMenuItem = createMenuItem(text("menu.saveFile"), ActionDispatcher.SAVE_FILE);
+		saveMenuItem = createMenuItem(appText("menu.saveFile"), ActionDispatcher.SAVE_FILE);
 		saveMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK));
 		fileMenu.add(saveMenuItem);
 
-		JMenuItem saveAsMenuItem = createMenuItem(text("menu.saveAsFile"), ActionDispatcher.SAVEAS_FILE);
+		JMenuItem saveAsMenuItem = createMenuItem(appText("menu.saveAsFile"), ActionDispatcher.SAVEAS_FILE);
 		noplayFunctions.add(saveAsMenuItem);
 		saveAsMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK | InputEvent.SHIFT_DOWN_MASK));
 		fileMenu.add(saveAsMenuItem);
 
 		fileMenu.add(new JSeparator());
 
-		JMenuItem midiExportItem = createMenuItem(text("menu.midiExport"), ActionDispatcher.MIDI_EXPORT);
+		JMenuItem midiExportItem = createMenuItem(appText("menu.midiExport"), ActionDispatcher.MIDI_EXPORT);
 		noplayFunctions.add(midiExportItem);
 		fileMenu.add(midiExportItem);
 
-		JMenuItem scorePropertyMenu = createMenuItem(text("menu.scoreProperty"), ActionDispatcher.SCORE_PROPERTY);
+		JMenuItem scorePropertyMenu = createMenuItem(appText("menu.scoreProperty"), ActionDispatcher.SCORE_PROPERTY);
 		noplayFunctions.add(scorePropertyMenu);
 		fileMenu.add(scorePropertyMenu);
 
 		fileMenu.add(new JSeparator());
 
-		JMenuItem exitMenuItem = createMenuItem(text("menu.quit"), ActionDispatcher.QUIT);
+		JMenuItem exitMenuItem = createMenuItem(appText("menu.quit"), ActionDispatcher.QUIT);
 		fileMenu.add(exitMenuItem);
 
 		/************************* Edit Menu *************************/
-		JMenu editMenu = new JMenu(text("menu.edit"));
+		JMenu editMenu = new JMenu(appText("menu.edit"));
 		fileMenu.setMnemonic('E');
 		menuBar.add(editMenu);
 
-		undoMenu = createMenuItem(text("menu.undo"), ActionDispatcher.UNDO);
+		undoMenu = createMenuItem(appText("menu.undo"), ActionDispatcher.UNDO);
 		undoMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_MASK));
 		editMenu.add(undoMenu);
 
-		redoMenu = createMenuItem(text("menu.redo"), ActionDispatcher.REDO);
+		redoMenu = createMenuItem(appText("menu.redo"), ActionDispatcher.REDO);
 		redoMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_MASK));
 		editMenu.add(redoMenu);
 
 		editMenu.add(new JSeparator());	
 
-		cutMenu = createMenuItem(text("menu.cut"), ActionDispatcher.CUT);
+		cutMenu = createMenuItem(appText("menu.cut"), ActionDispatcher.CUT);
 		cutMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_MASK));
 		editMenu.add(cutMenu);
 
-		copyMenu = createMenuItem(text("menu.copy"), ActionDispatcher.COPY);
+		copyMenu = createMenuItem(appText("menu.copy"), ActionDispatcher.COPY);
 		copyMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK));
 		editMenu.add(copyMenu);
 
-		pasteMenu = createMenuItem(text("menu.paste"), ActionDispatcher.PASTE);
+		pasteMenu = createMenuItem(appText("menu.paste"), ActionDispatcher.PASTE);
 		pasteMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_MASK));
 		editMenu.add(pasteMenu);
 
-		deleteMenu = createMenuItem(text("menu.delete"), ActionDispatcher.DELETE);
+		deleteMenu = createMenuItem(appText("menu.delete"), ActionDispatcher.DELETE);
 		deleteMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
 		editMenu.add(deleteMenu);
 
 		editMenu.add(new JSeparator());
 
-		JMenuItem partChangeMenu = createMenuItem(text("menu.changePart"), ActionDispatcher.PART_CHANGE);
+		JMenuItem partChangeMenu = createMenuItem(appText("menu.changePart"), ActionDispatcher.PART_CHANGE);
 		noplayFunctions.add(partChangeMenu);
 		editMenu.add(partChangeMenu);
 
-		JMenuItem addMeasureMenu = createMenuItem(text("menu.addMeasure"), ActionDispatcher.ADD_MEASURE);
+		JMenuItem addMeasureMenu = createMenuItem(appText("menu.addMeasure"), ActionDispatcher.ADD_MEASURE);
 		noplayFunctions.add(addMeasureMenu);
 		editMenu.add(addMeasureMenu);
 
-		JMenuItem removeMeasureMenu = createMenuItem(text("menu.removeMeasure"), ActionDispatcher.REMOVE_MEASURE);
+		JMenuItem removeMeasureMenu = createMenuItem(appText("menu.removeMeasure"), ActionDispatcher.REMOVE_MEASURE);
 		noplayFunctions.add(removeMeasureMenu);
 		editMenu.add(removeMeasureMenu);
 
-		JMenuItem transposeMenu = createMenuItem(text("edit.transpose"), ActionDispatcher.TRANSPOSE);
+		JMenuItem transposeMenu = createMenuItem(appText("edit.transpose"), ActionDispatcher.TRANSPOSE);
 		noplayFunctions.add(transposeMenu);
 		editMenu.add(transposeMenu);
 
 		/************************* Track Menu *************************/
-		JMenu trackMenu = new JMenu(text("menu.track"));
+		JMenu trackMenu = new JMenu(appText("menu.track"));
 		menuBar.add(trackMenu);
 
-		JMenuItem addTrackMenu = createMenuItem(text("menu.addTrack"), ActionDispatcher.ADD_TRACK);
+		JMenuItem addTrackMenu = createMenuItem(appText("menu.addTrack"), ActionDispatcher.ADD_TRACK);
 		noplayFunctions.add(addTrackMenu);
 		addTrackMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_MASK));
 		trackMenu.add(addTrackMenu);
 
-		JMenuItem removeTrackMenu = createMenuItem(text("menu.removeTrack"), ActionDispatcher.REMOVE_TRACK);
+		JMenuItem removeTrackMenu = createMenuItem(appText("menu.removeTrack"), ActionDispatcher.REMOVE_TRACK);
 		noplayFunctions.add(removeTrackMenu);
 		trackMenu.add(removeTrackMenu);
 
 		trackMenu.add(new JSeparator());
 
-		JMenuItem trackPropertyMenu = createMenuItem(text("menu.trackProperty"), ActionDispatcher.TRACK_PROPERTY);
+		JMenuItem trackPropertyMenu = createMenuItem(appText("menu.trackProperty"), ActionDispatcher.TRACK_PROPERTY);
 		noplayFunctions.add(trackPropertyMenu);
 		trackPropertyMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.ALT_MASK));
 		trackMenu.add(trackPropertyMenu);
 
 		/************************* Play Menu *************************/
-		JMenu playMenu = new JMenu(text("menu.operate"));
+		JMenu playMenu = new JMenu(appText("menu.operate"));
 		menuBar.add(playMenu);
 
-		JMenuItem headPlayPositionMenuItem = createMenuItem(text("menu.head"), ActionDispatcher.SET_START_POSITION, text("menu.head.icon"));
+		JMenuItem headPlayPositionMenuItem = createMenuItem(appText("menu.head"), ActionDispatcher.SET_START_POSITION, appText("menu.head.icon"));
 		headPlayPositionMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0));
 		playMenu.add(headPlayPositionMenuItem);
 
-		JMenuItem playMenuItem = createMenuItem(text("menu.play"), ActionDispatcher.PLAY, text("menu.play.icon"));
+		JMenuItem playMenuItem = createMenuItem(appText("menu.play"), ActionDispatcher.PLAY, appText("menu.play.icon"));
 		playMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
 		playMenu.add(playMenuItem);
 
-		JMenuItem stopMenuItem = createMenuItem(text("menu.stop"), ActionDispatcher.STOP, text("menu.stop.icon"));
+		JMenuItem stopMenuItem = createMenuItem(appText("menu.stop"), ActionDispatcher.STOP, appText("menu.stop.icon"));
 		stopMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
 		playMenu.add(stopMenuItem);
 
-		JMenuItem pauseMenuItem = createMenuItem(text("menu.pause"), ActionDispatcher.PAUSE, text("menu.pause.icon"));
+		JMenuItem pauseMenuItem = createMenuItem(appText("menu.pause"), ActionDispatcher.PAUSE, appText("menu.pause.icon"));
 		playMenu.add(pauseMenuItem);
 
 		playMenu.add(new JSeparator());	
 
-		JMenuItem prevMenuItem = createMenuItem(text("menu.prev"), ActionDispatcher.PREV_TIME, text("menu.prev.icon"));
+		JMenuItem prevMenuItem = createMenuItem(appText("menu.prev"), ActionDispatcher.PREV_TIME, appText("menu.prev.icon"));
 		prevMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, 0));
 		playMenu.add(prevMenuItem);
 
-		JMenuItem nextMenuItem = createMenuItem(text("menu.next"), ActionDispatcher.NEXT_TIME, text("menu.next.icon"));
+		JMenuItem nextMenuItem = createMenuItem(appText("menu.next"), ActionDispatcher.NEXT_TIME, appText("menu.next.icon"));
 		nextMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F6, 0));
 		playMenu.add(nextMenuItem);
 
 		/************************* Setting Menu *************************/
-		JMenu settingMenu = new JMenu(text("menu.setting"));
+		JMenu settingMenu = new JMenu(appText("menu.setting"));
 		menuBar.add(settingMenu);
 		createNoteHeightMenu(settingMenu);
 		createClickPlayMenu(settingMenu);
 
 		/************************* Help Menu *************************/
-		JMenu helpMenu = new JMenu(text("menu.help"));
+		JMenu helpMenu = new JMenu(appText("menu.help"));
 		menuBar.add(helpMenu);
 
-		JMenuItem aboutMenuItem = createMenuItem(text("menu.about"), ActionDispatcher.ABOUT);
+		JMenuItem aboutMenuItem = createMenuItem(appText("menu.about"), ActionDispatcher.ABOUT);
 		helpMenu.add(aboutMenuItem);
 
 		return menuBar;
 	}
 
 	private void createNoteHeightMenu(JMenu settingMenu) {
-		JMenu noteHeightMenu = new JMenu(text("menu.noteHeight"));
+		JMenu noteHeightMenu = new JMenu(appText("menu.noteHeight"));
 		settingMenu.add(noteHeightMenu);
 
 		ButtonGroup group = new ButtonGroup();
@@ -462,15 +458,15 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 	 * @param settingMenu
 	 */
 	private void createClickPlayMenu(JMenu settingMenu) {
-		JMenu clickPlayMenu = new JMenu(text("clickPlayMenu"));
+		JMenu clickPlayMenu = new JMenu(appText("clickPlayMenu"));
 		settingMenu.add(clickPlayMenu);
 
 		ButtonGroup group = new ButtonGroup();
 
-		JCheckBoxMenuItem enableMenu = new JCheckBoxMenuItem(text("enable"));
+		JCheckBoxMenuItem enableMenu = new JCheckBoxMenuItem(appText("enable"));
 		clickPlayMenu.add(enableMenu);
 		group.add(enableMenu);
-		JCheckBoxMenuItem disableMenu = new JCheckBoxMenuItem(text("disable"));
+		JCheckBoxMenuItem disableMenu = new JCheckBoxMenuItem(appText("disable"));
 		clickPlayMenu.add(disableMenu);
 		group.add(disableMenu);
 

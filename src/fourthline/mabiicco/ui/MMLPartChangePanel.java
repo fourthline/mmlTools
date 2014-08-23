@@ -45,7 +45,7 @@ public final class MMLPartChangePanel extends JPanel {
 	private static final long serialVersionUID = 8558159209741558854L;
 	private JTable table;
 	private final JDialog dialog;
-	private final JButton applyButton = new JButton(AppResource.getText("part_change.apply"));
+	private final JButton applyButton = new JButton(AppResource.appText("part_change.apply"));
 
 	private final IMMLManager mmlManager;
 	private final MMLEditor editor;
@@ -65,7 +65,7 @@ public final class MMLPartChangePanel extends JPanel {
 	}
 
 	public MMLPartChangePanel(Frame parentFrame, IMMLManager mmlManager, MMLEditor editor) {
-		this.dialog = new JDialog(parentFrame, AppResource.getText("part_change"), true);
+		this.dialog = new JDialog(parentFrame, AppResource.appText("part_change"), true);
 		this.mmlManager = mmlManager;
 		this.editor = editor;
 		initializePanel(mmlManager.getMMLScore().getTrackList());
@@ -82,7 +82,7 @@ public final class MMLPartChangePanel extends JPanel {
 			dialog.setVisible(false);
 		});
 
-		JButton closeButton = new JButton(AppResource.getText("part_change.cancel"));
+		JButton closeButton = new JButton(AppResource.appText("part_change.cancel"));
 		closeButton.setBounds(317, 335, 90, 29);
 		add(closeButton);
 		closeButton.setFocusable(false);
@@ -92,18 +92,18 @@ public final class MMLPartChangePanel extends JPanel {
 
 		/* 入れ替え元 */
 		JPanel applyPanel = new JPanel();
-		applyPanel.setBorder(new TitledBorder(new LineBorder(new Color(128, 128, 128), 1, true), AppResource.getText("part_change.src"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		applyPanel.setBorder(new TitledBorder(new LineBorder(new Color(128, 128, 128), 1, true), AppResource.appText("part_change.src"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		applyPanel.setBounds(12, 10, 414, 63);
 		applyPanel.setLayout(null);
 		add(applyPanel);
 		ButtonGroup applyGroup = new ButtonGroup();
 
-		radioSelectArea = new JRadioButton(AppResource.getText("part_change.selectArea"));
+		radioSelectArea = new JRadioButton(AppResource.appText("part_change.selectArea"));
 		radioSelectArea.setBounds(8, 22, 113, 21);
 		applyPanel.add(radioSelectArea);
 		applyGroup.add(radioSelectArea);
 
-		radioAllArea = new JRadioButton(AppResource.getText("part_change.all"));
+		radioAllArea = new JRadioButton(AppResource.appText("part_change.all"));
 		radioAllArea.setBounds(138, 22, 113, 21);
 		applyPanel.add(radioAllArea);
 		applyGroup.add(radioAllArea);
@@ -119,16 +119,16 @@ public final class MMLPartChangePanel extends JPanel {
 
 		/* 入れ替え先 */
 		JPanel destSelectPanel = new JPanel();
-		destSelectPanel.setBorder(new TitledBorder(new LineBorder(new Color(128, 128, 128), 1, true), AppResource.getText("part_change.dest"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		destSelectPanel.setBorder(new TitledBorder(new LineBorder(new Color(128, 128, 128), 1, true), AppResource.appText("part_change.dest"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		destSelectPanel.setBounds(12, 83, 414, 169);
 		destSelectPanel.setLayout(null);
 		add(destSelectPanel);
 
-		JLabel label1 = new JLabel(AppResource.getText("track"));
+		JLabel label1 = new JLabel(AppResource.appText("track"));
 		label1.setBounds(12, 23, 172, 13);
 		destSelectPanel.add(label1);
 
-		JLabel label2 = new JLabel(AppResource.getText("part"));
+		JLabel label2 = new JLabel(AppResource.appText("part"));
 		label2.setBounds(12, 139, 64, 13);
 		destSelectPanel.add(label2);
 
@@ -155,24 +155,24 @@ public final class MMLPartChangePanel extends JPanel {
 
 		/* 実行内容 */
 		JPanel executePanel = new JPanel();
-		executePanel.setBorder(new TitledBorder(new LineBorder(new Color(128, 128, 128), 1, true), AppResource.getText("part_change.method"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		executePanel.setBorder(new TitledBorder(new LineBorder(new Color(128, 128, 128), 1, true), AppResource.appText("part_change.method"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		executePanel.setBounds(12, 262, 414, 63);
 		executePanel.setLayout(null);
 		add(executePanel);
 		ButtonGroup executeGroup = new ButtonGroup();
 
-		radioChange = new JRadioButton(AppResource.getText("part_change.swap"));
+		radioChange = new JRadioButton(AppResource.appText("part_change.swap"));
 		radioChange.setBounds(8, 22, 113, 21);
 		radioChange.setSelected(true);
 		executePanel.add(radioChange);
 		executeGroup.add(radioChange);
 
-		radioMove = new JRadioButton(AppResource.getText("part_change.move"));
+		radioMove = new JRadioButton(AppResource.appText("part_change.move"));
 		radioMove.setBounds(139, 22, 113, 21);
 		executePanel.add(radioMove);
 		executeGroup.add(radioMove);
 
-		radioCopy = new JRadioButton(AppResource.getText("part_change.copy"));
+		radioCopy = new JRadioButton(AppResource.appText("part_change.copy"));
 		radioCopy.setBounds(256, 22, 113, 21);
 		executePanel.add(radioCopy);
 		executeGroup.add(radioCopy);

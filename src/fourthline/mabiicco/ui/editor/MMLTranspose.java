@@ -45,9 +45,9 @@ public final class MMLTranspose {
 	}
 
 	private int showTransposeDialog(Frame parentFrame) {
-		String title = AppResource.getText("edit.transpose");
+		String title = AppResource.appText("edit.transpose");
 		JPanel panel = new JPanel();
-		panel.add(new JLabel(AppResource.getText("edit.transpose.text")));
+		panel.add(new JLabel(AppResource.appText("edit.transpose.text")));
 		JSpinner spinner = new JSpinner();
 		spinner.setModel(new SpinnerNumberModel(0, -12, 12, 1));
 		spinner.setFocusable(false);

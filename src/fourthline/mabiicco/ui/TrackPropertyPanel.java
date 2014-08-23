@@ -40,7 +40,7 @@ public final class TrackPropertyPanel extends JPanel {
 		setBounds(100, 100, 363, 285);
 		setLayout(null);
 
-		JLabel lblNewLabel = new JLabel(AppResource.getText("track_property.trackname"));
+		JLabel lblNewLabel = new JLabel(AppResource.appText("track_property.trackname"));
 		lblNewLabel.setBounds(30, 39, 70, 13);
 		add(lblNewLabel);
 
@@ -61,7 +61,7 @@ public final class TrackPropertyPanel extends JPanel {
 		panpotSlider.setBounds(100, 97, 200, 23);
 		add(panpotSlider);
 
-		JLabel label = new JLabel(AppResource.getText("track_property.panpot"));
+		JLabel label = new JLabel(AppResource.appText("track_property.panpot"));
 		label.setBounds(30, 97, 70, 13);
 		add(label);
 	}
@@ -83,7 +83,7 @@ public final class TrackPropertyPanel extends JPanel {
 
 		int status = JOptionPane.showConfirmDialog(parentFrame, 
 				this,
-				AppResource.getText("track_property"), 
+				AppResource.appText("track_property"), 
 				JOptionPane.OK_CANCEL_OPTION,
 				JOptionPane.PLAIN_MESSAGE);
 

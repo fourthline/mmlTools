@@ -14,7 +14,7 @@ import fourthline.mmlTools.core.ResourceLoader;
 public final class AppResource {
 	private final static String RESOURCE_NAME = "appResource";
 	private static Manifest mf;
-	private static ResourceBundle bundle = ResourceBundle.getBundle(RESOURCE_NAME, new ResourceLoader());
+	private final static ResourceBundle bundle = ResourceBundle.getBundle(RESOURCE_NAME, new ResourceLoader());
 
 	private AppResource() {}
 
@@ -23,6 +23,7 @@ public final class AppResource {
 				+ " build" + AppResource.getManifestValue("Implementation-Build");
 		return versionText;
 	}
+
 	public static String getManifestValue(String key) {
 		if (mf == null) {
 			try {
@@ -37,7 +38,7 @@ public final class AppResource {
 		return mf.getMainAttributes().getValue(key);
 	}
 
-	public static String getText(String key) {
+	public static String appText(String key) {
 		try {
 			return bundle.getString(key);
 		} catch (java.util.MissingResourceException e) {

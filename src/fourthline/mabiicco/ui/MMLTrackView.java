@@ -43,10 +43,10 @@ public final class MMLTrackView extends JPanel implements ActionListener, Docume
 	 */
 	private static final long serialVersionUID = 4955513242349170508L;
 	public static final String MMLPART_NAME[] = {
-		AppResource.getText("melody"),
-		AppResource.getText("chord1"),
-		AppResource.getText("chord2"),
-		AppResource.getText("song")
+		AppResource.appText("melody"),
+		AppResource.appText("chord1"),
+		AppResource.appText("chord2"),
+		AppResource.appText("song")
 	};
 	private JToggleButton partButton[];
 	private JTextField mmlText[];
@@ -62,7 +62,7 @@ public final class MMLTrackView extends JPanel implements ActionListener, Docume
 
 	private IMMLManager mmlManager;
 
-	private final InstClass noUseSongEx = new InstClass(AppResource.getText("instrument.nouse_chorus"), -1, -1, null);
+	private final InstClass noUseSongEx = new InstClass(AppResource.appText("instrument.nouse_chorus"), -1, -1, null);
 	private int trackIndex;
 
 	/**
@@ -174,15 +174,15 @@ public final class MMLTrackView extends JPanel implements ActionListener, Docume
 		}
 
 		muteButton = new JButton("");
-		muteButton.setToolTipText(AppResource.getText("mmltrack.mute"));
+		muteButton.setToolTipText(AppResource.appText("mmltrack.mute"));
 		toolBar.add(muteButton);
 		soloButton = new JButton("");
-		soloButton.setIcon(new ImageIcon(this.getClass().getResource(AppResource.getText("mmltrack.solo.icon"))));
-		soloButton.setToolTipText(AppResource.getText("mmltrack.solo"));
+		soloButton.setIcon(new ImageIcon(this.getClass().getResource(AppResource.appText("mmltrack.solo.icon"))));
+		soloButton.setToolTipText(AppResource.appText("mmltrack.solo"));
 		toolBar.add(soloButton);
 		allButton = new JButton("");
-		allButton.setIcon(new ImageIcon(this.getClass().getResource(AppResource.getText("mmltrack.all.icon"))));
-		allButton.setToolTipText(AppResource.getText("mmltrack.all"));
+		allButton.setIcon(new ImageIcon(this.getClass().getResource(AppResource.appText("mmltrack.all.icon"))));
+		allButton.setToolTipText(AppResource.appText("mmltrack.all"));
 		toolBar.add(allButton);
 		muteButton.addActionListener(this);
 		soloButton.addActionListener(this);
@@ -209,9 +209,9 @@ public final class MMLTrackView extends JPanel implements ActionListener, Docume
 
 	public void updateMuteButton() {
 		if (MabiDLS.getInstance().getChannel(trackIndex).getMute()) {
-			muteButton.setIcon(new ImageIcon(this.getClass().getResource(AppResource.getText("mmltrack.mute.on.icon"))));
+			muteButton.setIcon(new ImageIcon(this.getClass().getResource(AppResource.appText("mmltrack.mute.on.icon"))));
 		} else {
-			muteButton.setIcon(new ImageIcon(this.getClass().getResource(AppResource.getText("mmltrack.mute.off.icon"))));
+			muteButton.setIcon(new ImageIcon(this.getClass().getResource(AppResource.appText("mmltrack.mute.off.icon"))));
 		}
 	}
 

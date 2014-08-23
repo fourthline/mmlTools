@@ -53,16 +53,16 @@ public final class MMLInputPanel extends JPanel {
 		setLayout(null);
 
 		JPanel panel1 = new JPanel();
-		panel1.setBorder(new TitledBorder(new LineBorder(new Color(128, 128, 128), 1, true), AppResource.getText("mml.input.method"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel1.setBorder(new TitledBorder(new LineBorder(new Color(128, 128, 128), 1, true), AppResource.appText("mml.input.method"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel1.setBounds(26, 28, 275, 87);
 		add(panel1);
 		panel1.setLayout(null);
 
-		overrideButton = new JRadioButton(AppResource.getText("mml.input.method.override"));
+		overrideButton = new JRadioButton(AppResource.appText("mml.input.method.override"));
 		overrideButton.setBounds(8, 51, 174, 21);
 		panel1.add(overrideButton);
 
-		newTrackButton = new JRadioButton(AppResource.getText("mml.input.method.new"));
+		newTrackButton = new JRadioButton(AppResource.appText("mml.input.method.new"));
 		newTrackButton.setBounds(8, 23, 144, 21);
 		panel1.add(newTrackButton);
 
@@ -72,7 +72,7 @@ public final class MMLInputPanel extends JPanel {
 		newTrackButton.setSelected(true);
 
 		JPanel panel2 = new JPanel();
-		panel2.setBorder(new TitledBorder(new LineBorder(new Color(128, 128, 128), 1, true), AppResource.getText("mml.input.instrument"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel2.setBorder(new TitledBorder(new LineBorder(new Color(128, 128, 128), 1, true), AppResource.appText("mml.input.instrument"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel2.setBounds(26, 140, 275, 75);
 		add(panel2);
 		panel2.setLayout(null);
@@ -91,7 +91,7 @@ public final class MMLInputPanel extends JPanel {
 		panel2.add(comboBox);
 
 		JPanel panel3 = new JPanel();
-		panel3.setBorder(new TitledBorder(new LineBorder(new Color(128, 128, 128), 1, true), AppResource.getText("mml.input.trackname"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel3.setBorder(new TitledBorder(new LineBorder(new Color(128, 128, 128), 1, true), AppResource.appText("mml.input.trackname"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel3.setBounds(26, 249, 275, 75);
 		add(panel3);
 		panel3.setLayout(null);
@@ -128,7 +128,7 @@ public final class MMLInputPanel extends JPanel {
 
 		int status = JOptionPane.showConfirmDialog(parentFrame, 
 				this,
-				AppResource.getText("mml.input"), 
+				AppResource.appText("mml.input"), 
 				JOptionPane.OK_CANCEL_OPTION,
 				JOptionPane.PLAIN_MESSAGE);
 
