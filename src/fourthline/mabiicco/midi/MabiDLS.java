@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.sound.midi.*;
@@ -95,10 +96,15 @@ public final class MabiDLS {
 		}
 
 		// load required Instruments
+		List<Instrument> loadedList = Arrays.asList(synthesizer.getLoadedInstruments());
 		for (InstClass inst : requiredInsts) {
 			try {
-				synthesizer.loadInstrument(inst.getInstrument());
+				Instrument instrument = inst.getInstrument();
+				if (!loadedList.contains(instrument)) {
+					synthesizer.loadInstrument(instrument);
+				}
 			} catch (OutOfMemoryError e) {
+				// FIXME: エラー処理
 				System.exit(1);
 			}
 		}

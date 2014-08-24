@@ -301,18 +301,15 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		fileMenu.add(saveMenuItem);
 
 		JMenuItem saveAsMenuItem = createMenuItem(appText("menu.saveAsFile"), ActionDispatcher.SAVEAS_FILE);
-		noplayFunctions.add(saveAsMenuItem);
 		saveAsMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK | InputEvent.SHIFT_DOWN_MASK));
 		fileMenu.add(saveAsMenuItem);
 
 		fileMenu.add(new JSeparator());
 
 		JMenuItem midiExportItem = createMenuItem(appText("menu.midiExport"), ActionDispatcher.MIDI_EXPORT);
-		noplayFunctions.add(midiExportItem);
 		fileMenu.add(midiExportItem);
 
 		JMenuItem scorePropertyMenu = createMenuItem(appText("menu.scoreProperty"), ActionDispatcher.SCORE_PROPERTY);
-		noplayFunctions.add(scorePropertyMenu);
 		fileMenu.add(scorePropertyMenu);
 
 		fileMenu.add(new JSeparator());
