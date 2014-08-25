@@ -40,6 +40,7 @@ public final class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFil
 		saveState();
 	}
 
+	@Override
 	public void saveState() {
 		MMLScore score = mmlManager.getMMLScore();
 		byte state[] = score.getObjectState();

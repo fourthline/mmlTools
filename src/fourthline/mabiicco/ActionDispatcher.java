@@ -321,10 +321,6 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	}
 
 	private void saveAsMMLFileAction() {
-		if (MabiDLS.getInstance().getSequencer().isRunning()) {
-			return;
-		}
-
 		SwingUtilities.invokeLater(() -> {
 			showDialogSaveFile();
 			notifyUpdateFileState();
@@ -441,7 +437,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 
 	private void scorePropertyAction() {
 		MMLScorePropertyPanel propertyPanel = new MMLScorePropertyPanel();
-		propertyPanel.showDialog(mainFrame, mmlSeqView.getMMLScore());
+		propertyPanel.showDialog(mainFrame, mmlSeqView.getMMLScore(), mmlSeqView.getFileState());
 		mmlSeqView.repaint();
 	}
 

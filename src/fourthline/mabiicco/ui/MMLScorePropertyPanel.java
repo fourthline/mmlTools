@@ -12,6 +12,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import fourthline.mabiicco.AppResource;
+import fourthline.mabiicco.IFileState;
 import fourthline.mmlTools.MMLScore;
 
 import javax.swing.JTextField;
@@ -99,7 +100,7 @@ public final class MMLScorePropertyPanel extends JPanel {
 	/**
 	 * ダイアログを表示する.
 	 */
-	public void showDialog(JFrame parent, MMLScore score) {
+	public void showDialog(JFrame parent, MMLScore score, IFileState fileState) {
 		titleField.setText(score.getTitle());
 		authorField.setText(score.getAuthor());
 		initialComboBox(score.getBaseTime());
@@ -116,6 +117,7 @@ public final class MMLScorePropertyPanel extends JPanel {
 
 			String time = timeCount.getSelectedItem()+"/"+timeBase.getSelectedItem();
 			score.setBaseTime(time);
+			fileState.saveState();
 		}
 	}
 }
