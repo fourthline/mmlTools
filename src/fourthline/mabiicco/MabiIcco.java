@@ -58,7 +58,8 @@ public final class MabiIcco extends Application {
 			File file = new File( appProperties.getDlsFile() );
 			if ( !file.exists() ) {
 				/* DLSファイルがない場合 */
-				JFileChooser fileChooser = new JFileChooser();
+				JOptionPane.showMessageDialog(null, AppResource.appText("msg.dls_title.detail"), AppResource.appText("msg.dls_title"), JOptionPane.INFORMATION_MESSAGE);
+				JFileChooser fileChooser = new JFileChooser(".");
 				FileFilter dlsFilter = new FileNameExtensionFilter(AppResource.appText("file.dls"), "dls");
 				fileChooser.addChoosableFileFilter(dlsFilter);
 				fileChooser.setFileFilter(dlsFilter);

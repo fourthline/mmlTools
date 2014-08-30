@@ -383,7 +383,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			try {
 				MidiSystem.write(MabiDLS.getInstance().createSequence(mmlSeqView.getMMLScore()), 1, file);
 			} catch (IOException | InvalidMidiDataException e) {
-				e.printStackTrace();
+				JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}

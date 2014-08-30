@@ -47,6 +47,8 @@ public final class MMSFile implements IMMLFileParser {
 				throw(new MMLParseException());
 			}
 
+			String rythmNum  = "4";
+			String rythmBase = "4";
 			while ( (s = reader.readLine()) != null ) {
 				if ( s.matches("\\[part[0-9]+\\]") ) {
 					/* MMLパート */
@@ -55,9 +57,17 @@ public final class MMSFile implements IMMLFileParser {
 					System.out.println(track.getMML());
 					System.out.println(track.getProgram());
 					score.addTrack(track);
+				} else if ( s.startsWith("title=") ) {
+					score.setTitle(s.substring("title=".length()));
+				} else if ( s.startsWith("auther=")  ) {
+					score.setAuthor(s.substring("auther=".length()));
+				} else if ( s.startsWith("rythmNum=")  ) {
+					rythmNum = s.substring("rythmNum=".length());
+				} else if ( s.startsWith("rythmBase=")  ) {
+					rythmBase = s.substring("rythmBase=".length());
 				}
-			}
-
+ 			}
+			score.setBaseTime(rythmNum+"/"+rythmBase);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

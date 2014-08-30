@@ -99,6 +99,8 @@ public final class PianoRollView extends JPanel {
 	private static final Color barBorder = new Color(0.5f, 0.5f, 0.5f);
 	private static final Color darkBarBorder = new Color(0.3f, 0.2f, 0.3f);
 
+	private static final int DRAW_START_MARGIN = 192;
+
 	/**
 	 * Create the panel.
 	 */
@@ -489,7 +491,7 @@ public final class PianoRollView extends JPanel {
 		MMLNoteEvent prevNote = mmlManager.getActiveMMLPart().searchPrevNoteOnTickOffset(0);
 		// 現在のView範囲のみを描画する.
 		for (MMLNoteEvent noteEvent : mmlPart) {
-			if (noteEvent.getEndTick() < startViewTick) {
+			if ( (noteEvent.getEndTick() < startViewTick) && (noteEvent.getTickOffset() < startViewTick - DRAW_START_MARGIN) ) {
 				prevNote = noteEvent;
 				continue;
 			}
