@@ -26,6 +26,7 @@ public final class MabiDLS {
 	private MidiChannel channel[];
 	private ArrayList<MMLNoteEvent[]> playNoteList;
 	private static final int MAX_CHANNEL_PLAY_NOTE = 4;
+	private static final int MAX_MIDI_PART = 12;
 	private InstClass insts[];
 
 	public static final String DEFALUT_DLS_PATH = "C:/Nexon/Mabinogi/mp3/MSXspirit.dls";
@@ -267,6 +268,9 @@ public final class MabiDLS {
 		for (MMLTrack mmlTrack : score.getTrackList()) {
 			convertMidiTrack(sequence.createTrack(), mmlTrack, trackCount);
 			trackCount++;
+			if (trackCount >= MAX_MIDI_PART) {
+				break;
+			}
 		}
 
 		// グローバルテンポ
@@ -282,8 +286,8 @@ public final class MabiDLS {
 		}
 
 		// コーラスパートの作成
-		createVoiceMidiTrack(sequence, score, 11, 100); // 男声コーラス
-		createVoiceMidiTrack(sequence, score, 12, 110); // 女声コーラス
+		createVoiceMidiTrack(sequence, score, 13, 100); // 男声コーラス
+		createVoiceMidiTrack(sequence, score, 14, 110); // 女声コーラス
 
 		return sequence;
 	}
@@ -314,6 +318,9 @@ public final class MabiDLS {
 	 */
 	private void convertMidiTrack(Track track, MMLTrack mmlTrack, int channel) throws InvalidMidiDataException {
 		int program = mmlTrack.getProgram();
+		if (channel >= 9) {
+			channel++;
+		}
 		ShortMessage pcMessage = new ShortMessage(ShortMessage.PROGRAM_CHANGE, 
 				channel,
 				program,

@@ -30,7 +30,7 @@ public final class MMLScore implements IMMLFileParser {
 	private final List<MMLTrack> trackList = new ArrayList<>();
 	private final List<MMLTempoEvent> globalTempoList = new ArrayList<>();
 
-	private static final int MAX_TRACK = 8;
+	private static final int MAX_TRACK = 12;
 
 	private String title = "";
 	private String author = "";

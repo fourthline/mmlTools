@@ -12,20 +12,21 @@ import javax.swing.Icon;
 public final class PartButtonIconArray extends PartButtonIcon {
 
 	private final static PartButtonIconArray instance[][];
+	private final static int indexSize;
 
 	static {
 		int pattern = MMLTrackView.MMLPART_NAME.length;
-		int size = ColorPalette.MELODY.size();
-		instance = new PartButtonIconArray[pattern][size];
+		indexSize = ColorPalette.MELODY.size();
+		instance = new PartButtonIconArray[pattern][indexSize];
 		for (int i = 0; i < pattern; i++) {
-			for (int j = 0; j < size; j++) {
+			for (int j = 0; j < indexSize; j++) {
 				instance[i][j] = new PartButtonIconArray(i, j);
 			}
 		}
 	}
 
 	public static Icon getInstance(int part, int index) {
-		return instance[part][index];
+		return instance[part][index%indexSize];
 	}
 
 	private PartButtonIconArray() {}
