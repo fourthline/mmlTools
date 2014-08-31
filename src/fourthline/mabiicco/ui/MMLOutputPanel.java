@@ -116,6 +116,7 @@ public final class MMLOutputPanel extends JPanel {
 
 		TableColumnModel columnModel = jTable.getColumnModel();
 		columnModel.getColumn(2).setPreferredWidth(180);
+		jTable.getTableHeader().setReorderingAllowed(false);
 
 		return jTable;
 	}

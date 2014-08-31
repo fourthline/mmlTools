@@ -23,6 +23,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.About;
+import fourthline.mabiicco.ui.MMLImportPanel;
 import fourthline.mabiicco.ui.MMLScorePropertyPanel;
 import fourthline.mabiicco.ui.MMLSeqView;
 import fourthline.mabiicco.ui.MainFrame;
@@ -74,6 +75,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	public static final String TRANSPOSE = "transpose";
 	public static final String ABOUT = "about";
 	public static final String MIDI_EXPORT = "midi_export";
+	public static final String FILE_IMPORT = "file_import";
 
 	private final HashMap<String, Runnable> actionMap = new HashMap<>();
 
@@ -219,6 +221,9 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(MIDI_EXPORT, () -> {
 			midiExportAction();
 		});
+		actionMap.put(FILE_IMPORT, () -> {
+			fileImportAction();
+		});
 	}
 
 	public void setMainFrame(MainFrame mainFrame) {
@@ -247,7 +252,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		}
 	}
 
-	public void openMMLFile(File file) {
+	private MMLScore fileParse(File file) {
+		MMLScore score = null;
 		try {
 			IMMLFileParser fileParser;
 			if (file.toString().endsWith(".mms")) {
@@ -255,17 +261,24 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			} else {
 				fileParser = new MMLScore();
 			}
-			MMLScore score = fileParser.parse(new FileInputStream(file));
+			score = fileParser.parse(new FileInputStream(file));
+		} catch (FileNotFoundException e) {
+			JOptionPane.showMessageDialog(mainFrame, AppResource.appText("error.read"), AppResource.appText("error.nofile"), JOptionPane.WARNING_MESSAGE);
+		} catch (MMLParseException e) {
+			JOptionPane.showMessageDialog(mainFrame, AppResource.appText("error.read"), AppResource.appText("error.invalid_file"), JOptionPane.WARNING_MESSAGE);
+		}
+		return score;
+	}
+
+	public void openMMLFile(File file) {
+		MMLScore score = fileParse(file);
+		if (score != null) {
 			mmlSeqView.setMMLScore(score);
 
 			openedFile = file;
 			notifyUpdateFileState();
 			MabiIccoProperties.getInstance().setRecentFile(file.getPath());
 			MabiDLS.getInstance().all();
-		} catch (FileNotFoundException e) {
-			JOptionPane.showMessageDialog(mainFrame, AppResource.appText("error.read"), AppResource.appText("error.nofile"), JOptionPane.WARNING_MESSAGE);
-		} catch (MMLParseException e) {
-			JOptionPane.showMessageDialog(mainFrame, AppResource.appText("error.read"), AppResource.appText("error.invalid_file"), JOptionPane.WARNING_MESSAGE);
 		}
 	}
 
@@ -308,16 +321,24 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		}
 
 		SwingUtilities.invokeLater(() -> {
-			String recentPath = MabiIccoProperties.getInstance().getRecentFile();
-			openFileChooser.setCurrentDirectory(new File(recentPath));
-			openFileChooser.setFileFilter(allFilter);
-			openFileChooser.setAcceptAllFileFilterUsed(false);
-			int status = openFileChooser.showOpenDialog(mainFrame);
-			if (status == JFileChooser.APPROVE_OPTION) {
-				File file = openFileChooser.getSelectedFile();
+			File file = fileOpenDialog();
+			if (file != null) {
 				openMMLFile(file);
 			}
 		});
+	}
+
+	private File fileOpenDialog() {
+		String recentPath = MabiIccoProperties.getInstance().getRecentFile();
+		openFileChooser.setCurrentDirectory(new File(recentPath));
+		openFileChooser.setFileFilter(allFilter);
+		openFileChooser.setAcceptAllFileFilterUsed(false);
+		int status = openFileChooser.showOpenDialog(mainFrame);
+		if (status == JFileChooser.APPROVE_OPTION) {
+			File file = openFileChooser.getSelectedFile();
+			return file;
+		}
+		return null;
 	}
 
 	private void saveAsMMLFileAction() {
@@ -384,6 +405,19 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 				MidiSystem.write(MabiDLS.getInstance().createSequence(mmlSeqView.getMMLScore()), 1, file);
 			} catch (IOException | InvalidMidiDataException e) {
 				JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+			}
+		}
+	}
+
+	/**
+	 * ファイルからTrack単位のインポートを行う.
+	 */
+	private void fileImportAction() {
+		File file = fileOpenDialog();
+		if (file != null) {
+			MMLScore score = fileParse(file);
+			if (score != null) {
+				new MMLImportPanel(mainFrame, score, mmlSeqView).showDialog();
 			}
 		}
 	}

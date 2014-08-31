@@ -306,6 +306,10 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 
 		fileMenu.add(new JSeparator());
 
+		JMenuItem fileImportItem = createMenuItem(appText("mml.input.import"), ActionDispatcher.FILE_IMPORT);
+		noplayFunctions.add(fileImportItem);
+		fileMenu.add(fileImportItem);
+
 		JMenuItem midiExportItem = createMenuItem(appText("menu.midiExport"), ActionDispatcher.MIDI_EXPORT);
 		fileMenu.add(midiExportItem);
 

@@ -120,6 +120,7 @@ public final class MabiDLS {
 	}
 
 	public MidiChannel getChannel(int ch) {
+		ch = convertMidiChannel(ch);
 		return channel[ch];
 	}
 
@@ -213,14 +214,17 @@ public final class MabiDLS {
 	}
 
 	public void toggleMute(int ch) {
+		ch = convertMidiChannel(ch);
 		channel[ch].setMute(!channel[ch].getMute());
 	}
 
 	public void setMute(int ch, boolean mute) {
+		ch = convertMidiChannel(ch);
 		channel[ch].setMute(mute);
 	}
 
 	public void solo(int ch) {
+		ch = convertMidiChannel(ch);
 		for (MidiChannel c : channel) {
 			c.setMute(true);
 		}
@@ -318,9 +322,7 @@ public final class MabiDLS {
 	 */
 	private void convertMidiTrack(Track track, MMLTrack mmlTrack, int channel) throws InvalidMidiDataException {
 		int program = mmlTrack.getProgram();
-		if (channel >= 9) {
-			channel++;
-		}
+		channel = convertMidiChannel(channel);
 		ShortMessage pcMessage = new ShortMessage(ShortMessage.PROGRAM_CHANGE, 
 				channel,
 				program,
@@ -377,5 +379,12 @@ public final class MabiDLS {
 
 	private int convertNoteMML2Midi(int mml_note) {
 		return (mml_note + 12);
+	}
+
+	private int convertMidiChannel(int channel) {
+		if (channel >= 9) {
+			channel++;
+		}
+		return channel;
 	}
 }

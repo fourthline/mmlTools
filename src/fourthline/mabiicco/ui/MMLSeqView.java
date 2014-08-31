@@ -525,6 +525,10 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	}
 
 	private void updateAllMMLPart() {
+		if (tabbedPane.getComponentCount() != mmlScore.getTrackCount()) {
+			resetTrackView();
+			updateProgramSelect();
+		}
 		// すべての全パートMMLテキストを更新します. 
 		int count = tabbedPane.getComponentCount();
 		for (int i = 0; i < count; i++) {
