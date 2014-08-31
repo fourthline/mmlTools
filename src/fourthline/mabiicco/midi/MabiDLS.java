@@ -382,8 +382,8 @@ public final class MabiDLS {
 	}
 
 	private int convertMidiChannel(int channel) {
-		if (channel >= 9) {
-			channel++;
+		if (channel == 9) {
+			return MAX_MIDI_PART;
 		}
 		return channel;
 	}

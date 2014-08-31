@@ -79,18 +79,21 @@ public final class MMLImportPanel extends JPanel implements MouseListener, Mouse
 		table = MMLOutputPanel.createJTableFromMMLTrack(trackList);
 		table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		scrollPane.setViewportView(table);
-		
+
 		JLabel lblNewLabel = new JLabel(AppResource.appText("mml.input.import.possibleImport")+": "+possibleImportTrackCount);
 		lblNewLabel.setBounds(22, 189, 300, 13);
 		add(lblNewLabel);
 
 		table.setDefaultEditor(Object.class, null);
 		table.setFocusable(false);
-		table.setRowSelectionInterval(0, possibleImportTrackCount-1);
+		if (possibleImportTrackCount > 0) {
+			table.setRowSelectionInterval(0, possibleImportTrackCount-1);
+		}
 		table.addMouseListener(this);
 		table.addMouseMotionListener(this);
+		updateImportAllowed();
 	}
-	
+
 	private void importMMLTrack() {
 		MMLScore targetScore = mmlManager.getMMLScore();
 		for (int rowIndex : table.getSelectedRows()) {
@@ -98,13 +101,15 @@ public final class MMLImportPanel extends JPanel implements MouseListener, Mouse
 		}
 		mmlManager.updateActivePart();
 	}
-	
+
 	private void updateImportAllowed() {
-		if (table.getSelectedRows().length <= possibleImportTrackCount) {
-			importButton.setEnabled(true);
-		} else {
-			importButton.setEnabled(false);
+		if (possibleImportTrackCount > 0) {
+			if (table.getSelectedRows().length <= possibleImportTrackCount) {
+				importButton.setEnabled(true);
+				return;
+			}
 		}
+		importButton.setEnabled(false);
 	}
 
 	@Override
