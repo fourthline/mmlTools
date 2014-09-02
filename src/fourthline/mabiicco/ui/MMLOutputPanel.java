@@ -19,25 +19,16 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTable;
 import javax.swing.JButton;
 import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
-import javax.swing.table.DefaultTableModel;
-
-
-import javax.swing.table.TableColumnModel;
 import javax.swing.JScrollPane;
 
 import fourthline.mabiicco.AppResource;
-import fourthline.mabiicco.midi.InstClass;
-import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mmlTools.MMLTrack;
-import fourthline.mmlTools.core.MMLTools;
 
 public final class MMLOutputPanel extends JPanel {
 	private static final long serialVersionUID = 8558159209741558854L;
-	private JTable table;
+	private TrackListTable table;
 	private final JDialog dialog;
 	private final JButton copyButton = new JButton(AppResource.appText("mml.output.copyButton"));
 
@@ -75,13 +66,8 @@ public final class MMLOutputPanel extends JPanel {
 		scrollPane.setBounds(12, 10, 372, 169);
 		add(scrollPane);
 
-		table = createJTableFromMMLTrack(trackList);
-		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		table = new TrackListTable(trackList);
 		scrollPane.setViewportView(table);
-
-		table.setDefaultEditor(Object.class, null);
-		table.setFocusable(false);
-		table.setRowSelectionInterval(0, 0);
 
 		InputMap imap = dialog.getRootPane().getInputMap(
 				JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
@@ -93,32 +79,6 @@ public final class MMLOutputPanel extends JPanel {
 			public void actionPerformed(ActionEvent arg0) {
 				dialog.setVisible(false);
 			}});
-	}
-
-	public static JTable createJTableFromMMLTrack(List<MMLTrack> trackList) {
-		String columnNames[] = {
-				AppResource.appText("mml.output.trackName"),
-				AppResource.appText("mml.output.instrument"),
-				AppResource.appText("mml.output.rank")
-		};
-		DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
-		JTable jTable = new JTable(tableModel);
-		if (trackList != null) {
-			for (MMLTrack track : trackList) {
-				MMLTools tools = new MMLTools( track.getMMLString() );
-				InstClass inst = MabiDLS.getInstance().getInstByProgram(track.getProgram());
-				String rowData[] = {
-						track.getTrackName(), inst.toString(), tools.mmlRankFormat()
-				};
-				tableModel.addRow(rowData);
-			}
-		}
-
-		TableColumnModel columnModel = jTable.getColumnModel();
-		columnModel.getColumn(2).setPreferredWidth(180);
-		jTable.getTableHeader().setReorderingAllowed(false);
-
-		return jTable;
 	}
 
 	private void copyToClipboard(String text) {

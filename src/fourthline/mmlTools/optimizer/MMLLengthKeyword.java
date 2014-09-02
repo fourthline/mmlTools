@@ -88,4 +88,18 @@ public final class MMLLengthKeyword {
 
 		return list;
 	}
+
+	private static boolean enablePrint = false;
+	public static void setEnablePrint(boolean b) {
+		enablePrint = b;
+	}
+	public static void printList(List<MMLLengthKeyword> list) {
+		if (!enablePrint) {
+			return;
+		}
+		for (MMLLengthKeyword key : list) {
+			System.out.print(key);
+		}
+		System.out.println();
+	}
 }

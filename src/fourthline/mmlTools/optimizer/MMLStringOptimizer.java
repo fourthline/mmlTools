@@ -326,8 +326,11 @@ public final class MMLStringOptimizer {
 	private String getOptimizedString() {
 		if (optimizedString == null) {
 			optimizedLengthArray();
+			MMLLengthKeyword.printList(stack);
 			sectionForwardMerge();
+			MMLLengthKeyword.printList(stack);
 			sectionForwardMerge2();
+			MMLLengthKeyword.printList(stack);
 			trimSection();
 			optimizedString = optimizeMMLString();
 		}

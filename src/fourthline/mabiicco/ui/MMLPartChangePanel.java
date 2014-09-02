@@ -19,10 +19,8 @@ import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
-import javax.swing.JTable;
 import javax.swing.JButton;
 import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
 import javax.swing.JScrollPane;
 
 import fourthline.mabiicco.AppResource;
@@ -43,7 +41,7 @@ import java.awt.Color;
  */
 public final class MMLPartChangePanel extends JPanel {
 	private static final long serialVersionUID = 8558159209741558854L;
-	private JTable table;
+	private TrackListTable table;
 	private final JDialog dialog;
 	private final JButton applyButton = new JButton(AppResource.appText("part_change.apply"));
 
@@ -140,12 +138,9 @@ public final class MMLPartChangePanel extends JPanel {
 		scrollPane.setBounds(12, 46, 372, 83);
 		destSelectPanel.add(scrollPane);
 
-		table = MMLOutputPanel.createJTableFromMMLTrack(trackList);
-		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		table = new TrackListTable(trackList);
 		scrollPane.setViewportView(table);
 
-		table.setDefaultEditor(Object.class, null);
-		table.setFocusable(false);
 		table.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
@@ -176,7 +171,6 @@ public final class MMLPartChangePanel extends JPanel {
 		radioCopy.setBounds(256, 22, 113, 21);
 		executePanel.add(radioCopy);
 		executeGroup.add(radioCopy);
-		table.setRowSelectionInterval(0, 0);
 
 		InputMap imap = dialog.getRootPane().getInputMap(
 				JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);

@@ -6,27 +6,22 @@ package fourthline.mabiicco.ui;
 
 import java.awt.Dimension;
 import java.awt.Frame;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.util.List;
 
 import javax.swing.JDialog;
 import javax.swing.JPanel;
-import javax.swing.JTable;
 import javax.swing.JButton;
-import javax.swing.ListSelectionModel;
 import javax.swing.JScrollPane;
+import javax.swing.JLabel;
 
 import fourthline.mabiicco.AppResource;
 import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTrack;
 
-import javax.swing.JLabel;
 
-public final class MMLImportPanel extends JPanel implements MouseListener, MouseMotionListener {
+public final class MMLImportPanel extends JPanel {
 	private static final long serialVersionUID = -1504636951822574399L;
-	private JTable table;
+	private TrackListTable table;
 	private final JDialog dialog;
 	private final JButton importButton = new JButton(AppResource.appText("mml.input.import"));
 
@@ -73,11 +68,11 @@ public final class MMLImportPanel extends JPanel implements MouseListener, Mouse
 		});
 
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(12, 10, 372, 169);
+		scrollPane.setBounds(12, 10, 422, 169);
 		add(scrollPane);
 
-		table = MMLOutputPanel.createJTableFromMMLTrack(trackList);
-		table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		table = new TrackListTable(trackList, true);
+		table.setInitialCheck(possibleImportTrackCount);
 		scrollPane.setViewportView(table);
 
 		JLabel lblNewLabel = new JLabel(AppResource.appText("mml.input.import.possibleImport")+": "+possibleImportTrackCount);
@@ -85,36 +80,22 @@ public final class MMLImportPanel extends JPanel implements MouseListener, Mouse
 		add(lblNewLabel);
 
 		table.setDefaultEditor(Object.class, null);
-		table.setFocusable(false);
-		if (possibleImportTrackCount > 0) {
-			table.setRowSelectionInterval(0, possibleImportTrackCount-1);
-		}
-		table.addMouseListener(this);
-		table.addMouseMotionListener(this);
-		updateImportAllowed();
 	}
 
 	private void importMMLTrack() {
 		MMLScore targetScore = mmlManager.getMMLScore();
-		for (int rowIndex : table.getSelectedRows()) {
-			targetScore.addTrack(trackList.get(rowIndex));
+		boolean checkList[] = table.getCheckList();
+		for (int i = 0; i < trackList.size(); i++) {
+			if (checkList[i]) {
+				targetScore.addTrack(trackList.get(i));
+			}
 		}
 		mmlManager.updateActivePart();
 	}
 
-	private void updateImportAllowed() {
-		if (possibleImportTrackCount > 0) {
-			if (table.getSelectedRows().length <= possibleImportTrackCount) {
-				importButton.setEnabled(true);
-				return;
-			}
-		}
-		importButton.setEnabled(false);
-	}
-
 	@Override
 	public Dimension getPreferredSize() {
-		return new Dimension(390, 240);
+		return new Dimension(440, 240);
 	}
 
 	/**
@@ -126,40 +107,5 @@ public final class MMLImportPanel extends JPanel implements MouseListener, Mouse
 		dialog.setResizable(false);
 		dialog.setLocationRelativeTo(null);
 		dialog.setVisible(true);
-	}
-
-	@Override
-	public void mouseDragged(MouseEvent event) {
-		updateImportAllowed();
-	}
-
-	@Override
-	public void mouseMoved(MouseEvent event) {
-		updateImportAllowed();
-	}
-
-	@Override
-	public void mouseClicked(MouseEvent event) {
-		updateImportAllowed();
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent event) {
-		updateImportAllowed();
-	}
-
-	@Override
-	public void mouseExited(MouseEvent event) {
-		updateImportAllowed();
-	}
-
-	@Override
-	public void mousePressed(MouseEvent event) {
-		updateImportAllowed();
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent event) {
-		updateImportAllowed();
 	}
 }

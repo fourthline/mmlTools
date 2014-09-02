@@ -6,6 +6,8 @@ package fourthline.mmlTools.optimizer;
 
 import static org.junit.Assert.*;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import fourthline.mmlTools.MMLEventList;
@@ -17,6 +19,15 @@ import fourthline.mmlTools.MMLEventList;
 public class MMLStringOptimizerTest {
 
 	private static final int TIMEOUT = 100;
+
+	@Before
+	public void setup() {
+		MMLLengthKeyword.setEnablePrint(true);
+	}
+	@After
+	public void tearDown() {
+		MMLLengthKeyword.setEnablePrint(false);
+	}
 
 	@Test(timeout=TIMEOUT)
 	public void test0() {
@@ -121,6 +132,13 @@ public class MMLStringOptimizerTest {
 	public void testOptimize_amp_L_0() {
 		String input  = "c2&c8d8d8d8d8d8d8";
 		String expect = "c2l8&cdddddd";
+		checkMMLStringOptimize(input, expect);
+	}
+
+	// next fix
+	public void testOptimize_x1_1() {
+		String input  = "r1.r1.r1.r1.r1.r1.r1.c4a2c4a2c4a2c4a2c4a2c4a2c4a2r1.r1.r1.r1.r1.r1.r1.r1.r1.";
+		String expect = "l1.rrrrrrrl4ca2ca2ca2ca2ca2ca2ca2l1.rrrrrrrrr";
 		checkMMLStringOptimize(input, expect);
 	}
 }
