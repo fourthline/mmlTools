@@ -17,6 +17,7 @@ import javax.swing.JTextField;
 import javax.swing.JButton;
 
 import fourthline.mabiicco.ActionDispatcher;
+import fourthline.mabiicco.AppResource;
 import static fourthline.mabiicco.AppResource.appText;
 import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mabiicco.midi.INotifyTrackEnd;
@@ -42,16 +43,13 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
+import javax.swing.JToolBar;
+import javax.swing.JComboBox;
 
+import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.InputEvent;
 
-import javax.swing.ImageIcon;
-import javax.swing.JToolBar;
-
-import java.awt.Color;
-
-import javax.swing.JComboBox;
 
 
 public final class MainFrame extends JFrame implements ComponentListener, INotifyTrackEnd, ActionListener {
@@ -107,7 +105,7 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 
 		JButton newFileButton = new JButton("");
 		newFileButton.setToolTipText(appText("menu.newFile"));
-		newFileButton.setIcon(new ImageIcon(MainFrame.class.getResource(appText("menu.newFile.icon"))));
+		newFileButton.setIcon(AppResource.getImageIcon(appText("menu.newFile.icon")));
 		noplayFunctions.add(newFileButton);
 		newFileButton.setFocusable(false);
 		newFileButton.addActionListener(listener);
@@ -116,7 +114,7 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 
 		JButton openFileButton = new JButton("");
 		openFileButton.setToolTipText(appText("menu.openFile"));
-		openFileButton.setIcon(new ImageIcon(MainFrame.class.getResource(appText("menu.openFile.icon"))));
+		openFileButton.setIcon(AppResource.getImageIcon(appText("menu.openFile.icon")));
 		noplayFunctions.add(openFileButton);
 		openFileButton.setFocusable(false);
 		openFileButton.addActionListener(listener);
@@ -128,7 +126,7 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		JButton startPositionButton = new JButton("");
 		toolBar.add(startPositionButton);
 		startPositionButton.setToolTipText(appText("menu.head"));
-		startPositionButton.setIcon(new ImageIcon(MainFrame.class.getResource(appText("menu.head.icon"))));
+		startPositionButton.setIcon(AppResource.getImageIcon(appText("menu.head.icon")));
 		startPositionButton.setFocusable(false);
 		startPositionButton.addActionListener(listener);
 		startPositionButton.setActionCommand(ActionDispatcher.SET_START_POSITION);
@@ -136,7 +134,7 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		JButton prevPositionButton = new JButton("");
 		toolBar.add(prevPositionButton);
 		prevPositionButton.setToolTipText(appText("menu.prev"));
-		prevPositionButton.setIcon(new ImageIcon(MainFrame.class.getResource(appText("menu.prev.icon"))));
+		prevPositionButton.setIcon(AppResource.getImageIcon(appText("menu.prev.icon")));
 		prevPositionButton.setFocusable(false);
 		prevPositionButton.addActionListener(listener);
 		prevPositionButton.setActionCommand(ActionDispatcher.PREV_TIME);
@@ -144,7 +142,7 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		JButton playButton = new JButton("");
 		toolBar.add(playButton);
 		playButton.setToolTipText(appText("menu.play"));
-		playButton.setIcon(new ImageIcon(MainFrame.class.getResource(appText("menu.play.icon"))));
+		playButton.setIcon(AppResource.getImageIcon(appText("menu.play.icon")));
 		playButton.setFocusable(false);
 		playButton.addActionListener(listener);
 		playButton.setActionCommand(ActionDispatcher.PLAY);
@@ -152,14 +150,14 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		JButton nextPositionButton = new JButton("");
 		toolBar.add(nextPositionButton);
 		nextPositionButton.setToolTipText(appText("menu.next"));
-		nextPositionButton.setIcon(new ImageIcon(MainFrame.class.getResource(appText("menu.next.icon"))));
+		nextPositionButton.setIcon(AppResource.getImageIcon(appText("menu.next.icon")));
 		nextPositionButton.setFocusable(false);
 		nextPositionButton.addActionListener(listener);
 		nextPositionButton.setActionCommand(ActionDispatcher.NEXT_TIME);
 
 		JButton pauseButton = new JButton("");
 		pauseButton.setToolTipText(appText("menu.pause"));
-		pauseButton.setIcon(new ImageIcon(MainFrame.class.getResource(appText("menu.pause.icon"))));
+		pauseButton.setIcon(AppResource.getImageIcon(appText("menu.pause.icon")));
 		pauseButton.setFocusable(false);
 		pauseButton.addActionListener(listener);
 		pauseButton.setActionCommand(ActionDispatcher.PAUSE);
@@ -168,7 +166,7 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		JButton stopButton = new JButton();
 		toolBar.add(stopButton);
 		stopButton.setToolTipText(appText("menu.stop"));
-		stopButton.setIcon(new ImageIcon(MainFrame.class.getResource(appText("menu.stop.icon"))));
+		stopButton.setIcon(AppResource.getImageIcon(appText("menu.stop.icon")));
 		stopButton.setFocusable(false);
 		stopButton.addActionListener(listener);
 		stopButton.setActionCommand(ActionDispatcher.STOP);
@@ -177,7 +175,7 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 
 		JButton inputClipButton = new JButton();
 		inputClipButton.setToolTipText(appText("menu.inputMML"));
-		inputClipButton.setIcon(new ImageIcon(MainFrame.class.getResource(appText("menu.inputMML.icon"))));
+		inputClipButton.setIcon(AppResource.getImageIcon(appText("menu.inputMML.icon")));
 		noplayFunctions.add(inputClipButton);
 		inputClipButton.setFocusable(false);
 		inputClipButton.addActionListener(listener);
@@ -186,7 +184,7 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 
 		JButton outputClipButton = new JButton();
 		outputClipButton.setToolTipText(appText("menu.outputMML"));
-		outputClipButton.setIcon(new ImageIcon(MainFrame.class.getResource(appText("menu.outputMML.icon"))));
+		outputClipButton.setIcon(AppResource.getImageIcon(appText("menu.outputMML.icon")));
 		outputClipButton.setFocusable(false);
 		outputClipButton.addActionListener(listener);
 		outputClipButton.setActionCommand(ActionDispatcher.OUTPUT_TO_CLIPBOARD);
@@ -268,7 +266,7 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 	private JMenuItem createMenuItem(String name, String actionCommand, String iconName) {
 		JMenuItem menuItem = createMenuItem(name, actionCommand);
 		try {
-			menuItem.setIcon(new ImageIcon(MainFrame.class.getResource(iconName)));
+			menuItem.setIcon(AppResource.getImageIcon(iconName));
 		} catch (NullPointerException e) {}
 
 		return menuItem;

@@ -5,7 +5,6 @@
 package fourthline.mabiicco.ui;
 
 import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
@@ -177,11 +176,11 @@ public final class MMLTrackView extends JPanel implements ActionListener, Docume
 		muteButton.setToolTipText(AppResource.appText("mmltrack.mute"));
 		toolBar.add(muteButton);
 		soloButton = new JButton("");
-		soloButton.setIcon(new ImageIcon(this.getClass().getResource(AppResource.appText("mmltrack.solo.icon"))));
+		soloButton.setIcon(AppResource.getImageIcon(AppResource.appText("mmltrack.solo.icon")));
 		soloButton.setToolTipText(AppResource.appText("mmltrack.solo"));
 		toolBar.add(soloButton);
 		allButton = new JButton("");
-		allButton.setIcon(new ImageIcon(this.getClass().getResource(AppResource.appText("mmltrack.all.icon"))));
+		allButton.setIcon(AppResource.getImageIcon(AppResource.appText("mmltrack.all.icon")));
 		allButton.setToolTipText(AppResource.appText("mmltrack.all"));
 		toolBar.add(allButton);
 		muteButton.addActionListener(this);
@@ -209,9 +208,9 @@ public final class MMLTrackView extends JPanel implements ActionListener, Docume
 
 	public void updateMuteButton() {
 		if (MabiDLS.getInstance().getChannel(trackIndex).getMute()) {
-			muteButton.setIcon(new ImageIcon(this.getClass().getResource(AppResource.appText("mmltrack.mute.on.icon"))));
+			muteButton.setIcon(AppResource.getImageIcon(AppResource.appText("mmltrack.mute.on.icon")));
 		} else {
-			muteButton.setIcon(new ImageIcon(this.getClass().getResource(AppResource.appText("mmltrack.mute.off.icon"))));
+			muteButton.setIcon(AppResource.getImageIcon(AppResource.appText("mmltrack.mute.off.icon")));
 		}
 	}
 

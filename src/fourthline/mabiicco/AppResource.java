@@ -6,8 +6,11 @@ package fourthline.mabiicco;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.ResourceBundle;
 import java.util.jar.Manifest;
+
+import javax.swing.ImageIcon;
 
 import fourthline.mmlTools.core.ResourceLoader;
 
@@ -44,5 +47,16 @@ public final class AppResource {
 		} catch (java.util.MissingResourceException e) {
 			return key;
 		}
+	}
+
+	private static HashMap<String, ImageIcon> iconMap = new HashMap<>();
+	public static ImageIcon getImageIcon(String path) {
+		ImageIcon icon = iconMap.get(path);
+		if (icon == null) {
+			icon = new ImageIcon(AppResource.class.getResource(path));
+			iconMap.put(path, icon);
+		}
+
+		return icon;
 	}
 }
