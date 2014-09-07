@@ -16,16 +16,16 @@ import fourthline.mmlTools.MMLTrack;
 public final class MMLFile implements IMMLFileParser {
 
 	private static final class SectionContents {
-		String name;
-		StringBuilder buffer = new StringBuilder();
+		private String name;
+		private StringBuilder buffer = new StringBuilder();
 		private SectionContents(String name) {
 			this.name = name;
 		}
 	}
 
-	SectionContents section = null;
-	ArrayList<SectionContents> contentsList = new ArrayList<>();
-	
+	private SectionContents section = null;
+	private ArrayList<SectionContents> contentsList = new ArrayList<>();
+
 	@Override
 	public MMLScore parse(InputStream istream) throws MMLParseException {
 		MMLScore score = new MMLScore();
@@ -39,8 +39,8 @@ public final class MMLFile implements IMMLFileParser {
 			}
 		});
 
-		LinkedList<String> mmlParts = new LinkedList<>();
 		// channel sections
+		LinkedList<String> mmlParts = new LinkedList<>();
 		contentsList.stream().filter(s -> s.name.matches("\\[Channel[0-9]*\\]")).forEach(s -> {
 			String text = s.buffer.toString();
 			text = text.replaceAll("//.*\n", "\n").replaceAll("/\\*.*\\*/", "").replaceAll("[ \t\n]", "");

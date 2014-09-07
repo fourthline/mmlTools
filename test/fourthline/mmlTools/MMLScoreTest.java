@@ -7,19 +7,18 @@ package fourthline.mmlTools;
 import static org.junit.Assert.*;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.InputStream;
 
 import org.junit.Test;
 
-public class MMLScoreTest {
+import fourthline.FileSelect;
+
+public class MMLScoreTest extends FileSelect {
 
 	private void checkMMLFileOutput(MMLScore score, String expectFileName, String expectMML[]) {
 		try {
 			/* MMLScore.writeToOutputStream() */
-			File file = new File("test/"+expectFileName);
-			System.out.println("Read: "+file.getAbsolutePath());
-			FileInputStream inputStream = new FileInputStream(file);
+			InputStream inputStream = fileSelect(expectFileName);
 			int size = inputStream.available();
 			byte expectBuf[] = new byte[size];
 			inputStream.read(expectBuf);
@@ -27,11 +26,10 @@ public class MMLScoreTest {
 
 			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 			score.writeToOutputStream(outputStream);
-
 			assertEquals(new String(expectBuf), outputStream.toString("UTF-8"));
 
 			/* MMLScore.parse() */
-			inputStream = new FileInputStream(file);
+			inputStream = fileSelect(expectFileName);
 			MMLScore inputScore = new MMLScore().parse(inputStream);
 			inputStream.close();
 			int i = 0;
