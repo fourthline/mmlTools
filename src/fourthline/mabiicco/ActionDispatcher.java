@@ -30,6 +30,7 @@ import fourthline.mabiicco.ui.MainFrame;
 import fourthline.mabiicco.ui.editor.MMLTranspose;
 import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.parser.IMMLFileParser;
+import fourthline.mmlTools.parser.MMLFile;
 import fourthline.mmlTools.parser.MMLParseException;
 import fourthline.mmlTools.parser.MMSFile;
 
@@ -83,6 +84,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 
 	private final FileFilter mmsFilter = new FileNameExtensionFilter(AppResource.appText("file.mms"), "mms");
 	private final FileFilter mmiFilter = new FileNameExtensionFilter(AppResource.appText("file.mmi"), "mmi");
+	private final FileFilter mmlFilter = new FileNameExtensionFilter(AppResource.appText("file.mml"), "mml");
 	private final FileFilter allFilter = new FileNameExtensionFilter(AppResource.appText("file.all"), "mmi", "mms");
 	private final FileFilter midFilter = new FileNameExtensionFilter(AppResource.appText("file.mid"), "mid");
 
@@ -107,6 +109,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		openFileChooser.addChoosableFileFilter(allFilter);
 		openFileChooser.addChoosableFileFilter(mmiFilter);
 		openFileChooser.addChoosableFileFilter(mmsFilter);
+		openFileChooser.addChoosableFileFilter(mmlFilter);
 		saveFileChooser.addChoosableFileFilter(mmiFilter);
 		exportFileChooser.addChoosableFileFilter(midFilter);
 	}
@@ -258,6 +261,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			IMMLFileParser fileParser;
 			if (file.toString().endsWith(".mms")) {
 				fileParser = new MMSFile();
+			} else if (file.toString().endsWith(".mml")) {
+				fileParser = new MMLFile();
 			} else {
 				fileParser = new MMLScore();
 			}

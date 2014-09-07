@@ -1,0 +1,13 @@
+[Settings]
+Encoding=shift_jis
+Title=test2
+Source=
+Memo=
+[Channel1]
+/* track1 */
+cde
+[Channel2]
+// track2
+rrr
+fga
+
