@@ -227,7 +227,7 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		southPanel.add(statusField, BorderLayout.SOUTH);
 		statusField.setColumns(10);
 
-		MabiDLS.getInstance().setTrackEndNotifier(this);
+		MabiDLS.getInstance().addTrackEndNotifier(this);
 
 		noteTypeSelect.addActionListener(this); // MainFrameでAction処理します.
 		noteTypeSelect.setSelectedIndex(MMLEditor.DEFAULT_ALIGN_INDEX);

@@ -7,7 +7,7 @@ package fourthline.mabiicco.midi;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.EnumSet;
+import java.util.List;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -84,34 +84,13 @@ public final class InstClass {
 		return this.inst;
 	}
 
-	public static InstClass[] filterInstArray(InstClass[] array, EnumSet<InstType> e) {
-		ArrayList<InstClass> resultArray = new ArrayList<>();
-		for (InstClass inst : array) {
-			if (e.contains(inst.type)) {
-				resultArray.add(inst);
-			}
-		}
-		return resultArray.toArray(new InstClass[resultArray.size()]);
-	}
-
-	public static InstClass searchInstAtProgram(InstClass insts[], int program) {
-		for (InstClass inst : insts) {
-			if (inst.getProgram() == program) {
-				return inst;
-			}
-		}
-
-		return null;
-	}
-
 	/**
 	 * プログラム番号上で有効なパート情報を取得する.
 	 * @param program
 	 * @return
 	 */
 	public static boolean[] getEnablePartByProgram(int program) {
-		InstClass insts[] = MabiDLS.getInstance().getInsts();
-		InstClass inst = InstClass.searchInstAtProgram(insts, program);
+		InstClass inst = MabiDLS.getInstance().getInstByProgram(program);
 		if (inst != null) {
 			return inst.getType().getEnablePart();
 		}
@@ -144,7 +123,7 @@ public final class InstClass {
 		}
 	}
 
-	public static InstClass[] loadDLS(File dlsFile) throws InvalidMidiDataException, IOException {
+	public static List<InstClass> loadDLS(File dlsFile) throws InvalidMidiDataException, IOException {
 		Soundbank sb = MidiSystem.getSoundbank(dlsFile);
 
 		ArrayList<InstClass> instArray = new ArrayList<>();
@@ -163,8 +142,6 @@ public final class InstClass {
 			}
 		}
 
-		InstClass insts[] = new InstClass[instArray.size()];
-		insts = instArray.toArray(insts);
-		return insts;
+		return instArray;
 	}
 }

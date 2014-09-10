@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 
 import javax.sound.midi.*;
@@ -24,14 +25,14 @@ public final class MabiDLS {
 	private Synthesizer synthesizer;
 	private Sequencer sequencer;
 	private MidiChannel channel[];
-	private ArrayList<MMLNoteEvent[]> playNoteList;
+	private ArrayList<MMLNoteEvent[]> playNoteList = new ArrayList<>();
 	private static final int MAX_CHANNEL_PLAY_NOTE = 4;
 	private static final int MAX_MIDI_PART = 12;
-	private InstClass insts[];
+	private List<InstClass> insts;
 
 	public static final String DEFALUT_DLS_PATH = "C:/Nexon/Mabinogi/mp3/MSXspirit.dls";
 
-	private INotifyTrackEnd notifier = null;
+	private ArrayList<INotifyTrackEnd> notifier = new ArrayList<>();
 
 	public static MabiDLS getInstance() {
 		if (instance == null) {
@@ -64,15 +65,15 @@ public final class MabiDLS {
 				sequencer.setTempoInMPQ(ByteBuffer.wrap(metaData).getInt());
 			} else if (type == 0x2f) {
 				// トラック終端
-				if (notifier != null) {
-					notifier.trackEndNotify();
+				for (INotifyTrackEnd n : notifier) {
+					n.trackEndNotify();
 				}
 			}
 		});
 	}
 
-	public void setTrackEndNotifier(INotifyTrackEnd n) {
-		notifier = n;
+	public void addTrackEndNotifier(INotifyTrackEnd n) {
+		notifier.add(n);
 	}
 
 	public void initializeSound(File dlsFile) throws MidiUnavailableException, InvalidMidiDataException, IOException {
@@ -126,7 +127,6 @@ public final class MabiDLS {
 
 	private Receiver initializeSynthesizer() throws InvalidMidiDataException, IOException, MidiUnavailableException {
 		this.channel = this.synthesizer.getChannels();
-		this.playNoteList = new ArrayList<>();
 		for (int i = 0; i < this.channel.length; i++) {
 			this.playNoteList.add(new MMLNoteEvent[MAX_CHANNEL_PLAY_NOTE]);
 		}
@@ -144,9 +144,10 @@ public final class MabiDLS {
 		return receiver;
 	}
 
-
-	public InstClass[] getInsts() {
-		return insts;
+	public InstClass[] getAvailableInstByInstType(EnumSet<InstType> e) {
+		return insts.stream()
+				.filter(inst -> e.contains(inst.getType()))
+				.toArray(size -> new InstClass[size]);
 	}
 
 	public InstClass getInstByProgram(int program) {
@@ -309,7 +310,7 @@ public final class MabiDLS {
 				continue;
 			}
 
-			InstType instType = InstClass.searchInstAtProgram(insts, program).getType();
+			InstType instType = getInstByProgram(program).getType();
 			convertMidiPart(track, mmlTrack.getMMLEventAtIndex(3), channel, instType);
 		}
 	}

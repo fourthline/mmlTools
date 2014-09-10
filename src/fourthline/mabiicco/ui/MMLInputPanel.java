@@ -20,12 +20,14 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+import java.util.EnumSet;
 
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 
 import fourthline.mabiicco.AppResource;
 import fourthline.mabiicco.midi.InstClass;
+import fourthline.mabiicco.midi.InstType;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mmlTools.MMLTrack;
 
@@ -77,15 +79,8 @@ public final class MMLInputPanel extends JPanel {
 		add(panel2);
 		panel2.setLayout(null);
 
-		InstClass insts[] = null;
-		try {
-			insts = MabiDLS.getInstance().getInsts();
-		} catch (NullPointerException e) {}
-		if (insts == null) {
-			comboBox = new JComboBox<>();
-		} else {
-			comboBox = new JComboBox<>(insts);
-		}
+
+		comboBox = new JComboBox<>( MabiDLS.getInstance().getAvailableInstByInstType(EnumSet.of(InstType.NORMAL, InstType.DRUMS, InstType.VOICE)) );
 		comboBox.setBounds(25, 33, 193, 19);
 		comboBox.setMaximumRowCount(30);
 		panel2.add(comboBox);

@@ -96,19 +96,11 @@ public final class MMLTrackView extends JPanel implements ActionListener, Docume
 		gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		centerPanel.setLayout(gridBagLayout);
 
-		InstClass insts[] = null;
-		try {
-			insts = MabiDLS.getInstance().getInsts();
-		} catch (NullPointerException e) {}
-		if (insts == null) {
-			comboBox = new JComboBox<>();
-			songComboBox = new JComboBox<>();
-		} else {
-			comboBox = new JComboBox<>( InstClass.filterInstArray(insts, EnumSet.of(InstType.NORMAL, InstType.DRUMS, InstType.VOICE)) );
-			songComboBox = new JComboBox<>( InstClass.filterInstArray(insts, EnumSet.of(InstType.CHORUS)) );
-			songComboBox.addItem(noUseSongEx);
-			songComboBox.setSelectedItem(noUseSongEx);
-		}
+		comboBox = new JComboBox<>( MabiDLS.getInstance().getAvailableInstByInstType(EnumSet.of(InstType.NORMAL, InstType.DRUMS, InstType.VOICE)) );
+		songComboBox = new JComboBox<>( MabiDLS.getInstance().getAvailableInstByInstType(EnumSet.of(InstType.CHORUS)) );
+		songComboBox.addItem(noUseSongEx);
+		songComboBox.setSelectedItem(noUseSongEx);
+
 		northLPanel.add(comboBox);
 		comboBox.addActionListener(this);
 		comboBox.setMaximumRowCount(30);
@@ -285,15 +277,13 @@ public final class MMLTrackView extends JPanel implements ActionListener, Docume
 	}
 
 	private void setInstProgram(int program, int songProgram) {
-		InstClass insts[] = MabiDLS.getInstance().getInsts();
-
-		InstClass inst = InstClass.searchInstAtProgram(insts, program);
+		InstClass inst = MabiDLS.getInstance().getInstByProgram(program);
 		if (inst != null) {
 			comboBox.setSelectedItem(inst);
 		} else {
-			comboBox.setSelectedItem(insts[0]);
+			comboBox.setSelectedIndex(0);
 		}
-		InstClass songInst = InstClass.searchInstAtProgram(insts, songProgram);
+		InstClass songInst = MabiDLS.getInstance().getInstByProgram(songProgram);
 		if ( (songInst != null) && (songInst.getType() == InstType.CHORUS) ) {
 			songComboBox.setSelectedItem(songInst);
 		} else {
