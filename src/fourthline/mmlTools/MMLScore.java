@@ -21,6 +21,7 @@ import fourthline.mmlTools.core.MMLTicks;
 import fourthline.mmlTools.parser.IMMLFileParser;
 import fourthline.mmlTools.parser.MMLParseException;
 import fourthline.mmlTools.parser.MMSFile;
+import fourthline.mmlTools.parser.TextParser;
 
 
 /**
@@ -88,6 +89,13 @@ public final class MMLScore implements IMMLFileParser {
 	 */
 	public MMLTrack getTrack(int index) {
 		return trackList.get(index);
+	}
+
+	private MMLTrack getLastTrack() {
+		if (trackList.isEmpty()) {
+			return null;
+		}
+		return trackList.get( trackList.size() - 1 );
 	}
 
 	/**
@@ -263,28 +271,16 @@ public final class MMLScore implements IMMLFileParser {
 			}
 
 			// mml-track
-			MMLTrack track = null;
 			while ( (s = reader.readLine()) != null ) {
-				if ( s.startsWith("mml-track=") ) {
-					track = new MMLTrack(s.substring("mml-track=".length()));
-					this.addTrack(track);
-				} else if ( s.startsWith("name=") ) {
-					track.setTrackName(s.substring("name=".length()));
-				} else if ( s.startsWith("program=") ) {
-					track.setProgram(Integer.parseInt(s.substring("program=".length())));
-				} else if ( s.startsWith("songProgram=") ) {
-					track.setSongProgram(Integer.parseInt(s.substring("songProgram=".length())));
-				} else if ( s.startsWith("panpot=") ) {
-					track.setPanpot(Integer.parseInt(s.substring("panpot=".length())));
-				} else if ( s.startsWith("title=") ) {
-					/* 曲名 */
-					setTitle(s.substring("title=".length()));
-				} else if ( s.startsWith("author=") ) {
-					/* 作者 */
-					setAuthor(s.substring("author=".length()));
-				} else if ( s.startsWith("time=") ) {
-					/* 拍子 */
-					setBaseTime(s.substring("time=".length()));
+				TextParser textParser = TextParser.text(s);
+				if (        textParser.startsWith("mml-track=",   t -> this.addTrack(new MMLTrack(t)) )) {
+				} else if ( textParser.startsWith("name=",        t -> this.getLastTrack().setTrackName(t) )) {
+				} else if ( textParser.startsWith("program=",     t -> this.getLastTrack().setProgram(Integer.parseInt(t)) )) {
+				} else if ( textParser.startsWith("songProgram=", t -> this.getLastTrack().setSongProgram(Integer.parseInt(t)) )) {
+				} else if ( textParser.startsWith("panpot=",      t -> this.getLastTrack().setPanpot(Integer.parseInt(t)) )) {
+				} else if ( textParser.startsWith("title=",       t -> setTitle(t) )) {
+				} else if ( textParser.startsWith("author=",      t -> setAuthor(t) )) {
+				} else if ( textParser.startsWith("time=",        t -> setBaseTime(t) )) {
 				}
 			}
 		} catch (Exception e) {

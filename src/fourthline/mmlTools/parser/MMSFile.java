@@ -47,9 +47,9 @@ public final class MMSFile implements IMMLFileParser {
 				throw(new MMLParseException());
 			}
 
-			String rythmNum  = "4";
-			String rythmBase = "4";
+			final String rythm[] = { "4", "4" };
 			while ( (s = reader.readLine()) != null ) {
+				TextParser textParser = TextParser.text(s);
 				if ( s.matches("\\[part[0-9]+\\]") ) {
 					/* MMLパート */
 					System.out.println("part");
@@ -57,17 +57,13 @@ public final class MMSFile implements IMMLFileParser {
 					System.out.println(track.getMML());
 					System.out.println(track.getProgram());
 					score.addTrack(track);
-				} else if ( s.startsWith("title=") ) {
-					score.setTitle(s.substring("title=".length()));
-				} else if ( s.startsWith("auther=")  ) {
-					score.setAuthor(s.substring("auther=".length()));
-				} else if ( s.startsWith("rythmNum=")  ) {
-					rythmNum = s.substring("rythmNum=".length());
-				} else if ( s.startsWith("rythmBase=")  ) {
-					rythmBase = s.substring("rythmBase=".length());
+				} else if ( textParser.startsWith("title=",     t -> score.setTitle(t)) ) {
+				} else if ( textParser.startsWith("auther=",    t -> score.setAuthor(t)) ) {
+				} else if ( textParser.startsWith("rythmNum=",  t-> rythm[0] = t) ) {
+				} else if ( textParser.startsWith("rythmBase=", t -> rythm[1] = t) ) {
 				}
- 			}
-			score.setBaseTime(rythmNum+"/"+rythmBase);
+			}
+			score.setBaseTime(rythm[0]+"/"+rythm[1]);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -83,62 +79,47 @@ public final class MMSFile implements IMMLFileParser {
 		return score;
 	}
 
+	/* MMS->programへの変換テーブル */
+	static final int mmsInstTable[] = {
+		0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 
+		10, 11, 12, 13, 14, 15, 16, 17, 18, 66, 
+		67, 68,	69, 70, 71, 72, 73, 74, 75, 76, 
+		18
+	};
+
 	/**
 	 * mmsファイルのinstrument値は、DLSのものではないので変換を行います.
 	 * @param mmsInst
 	 * @return DLSのprogram値
 	 */
 	private int convertInstProgram(int mmsInst) {
-		/* MMS->programへの変換テーブル */
-		int table[] = new int[] {
-				0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 
-				10, 11, 12, 13, 14, 15, 16, 17, 18, 66, 
-				67, 68,	69, 70, 71, 72, 73, 74, 75, 76, 
-				18
-		};
-
-		return table[mmsInst];
+		return mmsInstTable[mmsInst];
 	}
 
+
 	private MMLTrack parseMMSPart(BufferedReader reader) throws IOException {
-		String name = null;
-		String mml1 = null;
-		String mml2 = null;
-		String mml3 = null;
-		int program = 0;
-		int panpot = 64;
+		final int intValue[] = { 0, 0 };
+		final String stringValue[] = { "", "", "", "" };
 
 		String s;
 		while ( (s = reader.readLine()) != null ) {
-			if ( s.startsWith("instrument=") ) {
-				String str = s.substring("instrument=".length());
-				program = Integer.parseInt(str);
-				program = convertInstProgram(program);
-			}
-			else if ( s.startsWith("panpot=") ) {
-				String str = s.substring("panpot=".length());
-				panpot = Integer.parseInt(str);
-				panpot += 64;
-			}
-			else if ( s.startsWith("name=") ) {
-				name = s.substring("name=".length());
-			}
-			else if ( s.startsWith("ch0_mml=") ) {
-				mml1 = s.substring("ch0_mml=".length());
-			}
-			else if ( s.startsWith("ch1_mml=") ) {
-				mml2 = s.substring("ch1_mml=".length());
-			}
-			else if ( s.startsWith("ch2_mml=") ) {
-				mml3 = s.substring("ch2_mml=".length());
+			TextParser textParser = TextParser.text(s);
+			if ( textParser.startsWith("instrument=",
+					t -> intValue[0] = convertInstProgram(Integer.parseInt(t)) )) {
+			} else if ( textParser.startsWith("panpot=",
+					t -> intValue[1] = Integer.parseInt(t) + 64 )) {
+			} else if ( textParser.startsWith("name=",    t -> stringValue[0] = t) ) {
+			} else if ( textParser.startsWith("ch0_mml=", t -> stringValue[1] = t) ) {
+			} else if ( textParser.startsWith("ch1_mml=", t -> stringValue[2] = t) ) {
+			} else if ( textParser.startsWith("ch2_mml=", t -> stringValue[3] = t) ) {
 				break;
 			}
 		}
 
-		MMLTrack track = new MMLTrack(mml1, mml2, mml3, "");
-		track.setProgram(program);
-		track.setTrackName(name);
-		track.setPanpot(panpot);
+		MMLTrack track = new MMLTrack(stringValue[1], stringValue[2], stringValue[3], "");
+		track.setTrackName(stringValue[0]);
+		track.setProgram(intValue[0]);
+		track.setPanpot(intValue[1]);
 		return track;
 	}
 }
