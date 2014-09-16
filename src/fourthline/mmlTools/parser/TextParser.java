@@ -15,8 +15,8 @@ public final class TextParser {
 		this.text = text;
 	}
 
-	public static TextParser text(String s) {
-		return new TextParser(s);
+	public static TextParser text(String test) {
+		return new TextParser(test);
 	}
 
 	public boolean startsWith(String s, Consumer<String> func) {

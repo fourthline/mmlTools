@@ -4,11 +4,8 @@
 
 package fourthline.mmlTools.parser;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.util.List;
 
 import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTrack;
@@ -19,60 +16,27 @@ import fourthline.mmlTools.MMLTrack;
  *
  */
 public final class MMSFile implements IMMLFileParser {
+	private final MMLScore score = new MMLScore();
 
 	@Override
 	public MMLScore parse(InputStream istream) throws MMLParseException {
-		MMLScore score = new MMLScore();
-		BufferedReader reader = null;
-		try {
-			InputStreamReader isReader = new InputStreamReader(istream, "Shift_JIS");
-			reader = new BufferedReader(isReader);
+		List<SectionContents> contentsList = SectionContents.makeSectionContentsByInputStream(istream, "Shift_JIS");
+		if (contentsList.isEmpty()) {
+			throw(new MMLParseException());
+		}
 
-			String s;
-			while (true) {
-				s = reader.readLine();
-				if (s == null) {
-					throw(new MMLParseException());
-				}
+		for (SectionContents section : contentsList) {
+			String sectionName = section.getName();
 
-				/* ヘッダチェック */
-				if (s.equals("[mms-file]")) {
-					break;
-				}
-			}
-
-			/* バージョン */
-			s = reader.readLine();
-			if ( s == null ) {
-				throw(new MMLParseException());
-			}
-
-			final String rythm[] = { "4", "4" };
-			while ( (s = reader.readLine()) != null ) {
-				TextParser textParser = TextParser.text(s);
-				if ( s.matches("\\[part[0-9]+\\]") ) {
-					/* MMLパート */
-					System.out.println("part");
-					MMLTrack track = parseMMSPart(reader);
-					System.out.println(track.getMML());
-					System.out.println(track.getProgram());
-					score.addTrack(track);
-				} else if ( textParser.startsWith("title=",     t -> score.setTitle(t)) ) {
-				} else if ( textParser.startsWith("auther=",    t -> score.setAuthor(t)) ) {
-				} else if ( textParser.startsWith("rythmNum=",  t-> rythm[0] = t) ) {
-				} else if ( textParser.startsWith("rythmBase=", t -> rythm[1] = t) ) {
-				}
-			}
-			score.setBaseTime(rythm[0]+"/"+rythm[1]);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (reader != null) {
-				try {
-					reader.close();
-				} catch (IOException e) {}
+			if ( sectionName.matches("\\[part[0-9]+\\]") ) {
+				/* MMLパート */
+				System.out.println("part");
+				MMLTrack track = parseMMSPart(section.getContents());
+				System.out.println(track.getMML());
+				System.out.println(track.getProgram());
+				score.addTrack(track);
+			} else if (sectionName.equals("[infomation]")) {
+				parseInfomation(section.getContents());
 			}
 		}
 
@@ -96,13 +60,24 @@ public final class MMSFile implements IMMLFileParser {
 		return mmsInstTable[mmsInst];
 	}
 
+	private void parseInfomation(String contents) {
+		final String rythm[] = { "4", "4" };
+		for (String s : contents.split("\n")) {
+			TextParser textParser = TextParser.text(s);
+			if ( textParser.startsWith("title=",     t -> score.setTitle(t)) ) {
+			} else if ( textParser.startsWith("auther=",    t -> score.setAuthor(t)) ) {
+			} else if ( textParser.startsWith("rythmNum=",  t -> rythm[0] = t) ) {
+			} else if ( textParser.startsWith("rythmBase=", t -> rythm[1] = t) ) {
+			}
+		}
+		score.setBaseTime(rythm[0]+"/"+rythm[1]);
+	}
 
-	private MMLTrack parseMMSPart(BufferedReader reader) throws IOException {
+	private MMLTrack parseMMSPart(String contents) {
 		final int intValue[] = { 0, 0 };
 		final String stringValue[] = { "", "", "", "" };
 
-		String s;
-		while ( (s = reader.readLine()) != null ) {
+		for (String s : contents.split("\n")) {
 			TextParser textParser = TextParser.text(s);
 			if ( textParser.startsWith("instrument=",
 					t -> intValue[0] = convertInstProgram(Integer.parseInt(t)) )) {
