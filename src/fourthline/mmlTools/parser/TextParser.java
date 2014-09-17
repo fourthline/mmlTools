@@ -19,6 +19,12 @@ public final class TextParser {
 		return new TextParser(test);
 	}
 
+	/**
+	 * 指定された文字列で開始するテキストであれば、funcに開始文字列以外の部分を引数として渡し実行します.
+	 * @param s
+	 * @param func
+	 * @return 指定されたテキストで、funcを実行した場合には trueを返します.
+	 */
 	public boolean startsWith(String s, Consumer<String> func) {
 		if (text.startsWith(s)) {
 			func.accept( text.substring(s.length()) );

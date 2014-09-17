@@ -1,0 +1,15 @@
+[mml-score]
+version=1
+title=test
+author=noname
+time=3/4
+mml-track=MML@cdefgab>c2,,;
+name=メインパート
+program=5
+songProgram=-1
+panpot=64
+[marker]
+192=マーカー1
+480=マーカー2
+480=マーカー3
+768=マーカー4

@@ -9,8 +9,6 @@ import java.io.Serializable;
 
 /**
  * MMLEvent
- * @author fourthline
- *
  */
 public abstract class MMLEvent implements Serializable {
 	private static final long serialVersionUID = -6142467143073639266L;

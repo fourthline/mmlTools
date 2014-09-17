@@ -5,15 +5,15 @@
 package fourthline.mmlTools.parser;
 
 import java.io.InputStream;
+import java.util.LinkedList;
 import java.util.List;
 
 import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTrack;
+import fourthline.mmlTools.Marker;
 
 /**
  * まきまびしーくさんのファイルフォーマットを扱います.
- * @author fourthline
- *
  */
 public final class MMSFile implements IMMLFileParser {
 	private final MMLScore score = new MMLScore();
@@ -37,6 +37,8 @@ public final class MMSFile implements IMMLFileParser {
 				score.addTrack(track);
 			} else if (sectionName.equals("[infomation]")) {
 				parseInfomation(section.getContents());
+			} else if (sectionName.equals("[marker]")) {
+				parseMarker(section.getContents());
 			}
 		}
 
@@ -60,6 +62,10 @@ public final class MMSFile implements IMMLFileParser {
 		return mmsInstTable[mmsInst];
 	}
 
+	/**
+	 * parse [information] contents
+	 * @param contents
+	 */
 	private void parseInfomation(String contents) {
 		final String rythm[] = { "4", "4" };
 		for (String s : contents.split("\n")) {
@@ -73,6 +79,29 @@ public final class MMSFile implements IMMLFileParser {
 		score.setBaseTime(rythm[0]+"/"+rythm[1]);
 	}
 
+	/**
+	 * parse [marker] contents
+	 * @param contens
+	 */
+	private void parseMarker(String contents) {
+		LinkedList<Marker> markerList = new LinkedList<>();
+		for (String s : contents.split("\n")) {
+			TextParser textParser = TextParser.text(s);
+			if ( textParser.startsWith("label", t -> markerList.add(new Marker(0, t.substring(5)))) ) {
+			} else if ( textParser.startsWith("position", t -> {
+				int tickOffset = Integer.parseInt(t.substring(5));
+				markerList.getLast().setTickOffset( tickOffset );
+			})) {
+			}
+		}
+		score.getMarkerList().addAll(markerList);
+	}
+
+	/**
+	 * parse [part*] contents
+	 * @param contents
+	 * @return
+	 */
 	private MMLTrack parseMMSPart(String contents) {
 		final int intValue[] = { 0, 0 };
 		final String stringValue[] = { "", "", "", "" };

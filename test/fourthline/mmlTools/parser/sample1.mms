@@ -18,3 +18,16 @@ ch1_color=ffff5b5b
 ch1_mml=
 ch2_color=ffffa0a0
 ch2_mml=
+[marker]
+label0000=マーカー1
+position0000=192
+color0000=ffff8080
+label0001=マーカー2
+position0001=480
+color0001=ff8080ff
+label0002=マーカー3
+position0002=480
+color0002=ff8080ff
+label0003=マーカー4
+position0003=768
+color0003=ff8080ff

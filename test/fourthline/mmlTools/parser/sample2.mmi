@@ -3,10 +3,8 @@ version=1
 title=
 author=
 time=4/4
-mml-track=MML@aaa,bbb,ccc,dd1;
-name=track1
+mml-track=MML@cde,r2.fga,;
+name=Track1
 program=0
 songProgram=-1
 panpot=64
-[marker]
-96=marker1

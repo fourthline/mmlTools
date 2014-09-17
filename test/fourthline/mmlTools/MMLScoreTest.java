@@ -6,6 +6,7 @@ package fourthline.mmlTools;
 
 import static org.junit.Assert.*;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
@@ -15,18 +16,34 @@ import fourthline.FileSelect;
 
 public class MMLScoreTest extends FileSelect {
 
-	private void checkMMLFileOutput(MMLScore score, String expectFileName, String expectMML[]) {
+	public static void checkMMLScoreWriteToOutputStream(MMLScore score, InputStream inputStream) {
 		try {
-			/* MMLScore.writeToOutputStream() */
-			InputStream inputStream = fileSelect(expectFileName);
 			int size = inputStream.available();
 			byte expectBuf[] = new byte[size];
 			inputStream.read(expectBuf);
 			inputStream.close();
 
+			// MMLScore -> mmi check
 			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 			score.writeToOutputStream(outputStream);
-			assertEquals(new String(expectBuf), outputStream.toString("UTF-8"));
+			String mmiOutput = outputStream.toString("UTF-8");
+			assertEquals(new String(expectBuf), mmiOutput);
+
+			// mmi -> re-parse check
+			ByteArrayInputStream bis = new ByteArrayInputStream(mmiOutput.getBytes());
+			MMLScore reparseScore = new MMLScore().parse(bis);
+			assertEquals(mmiOutput, new String(reparseScore.getObjectState()));
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	private void checkMMLFileOutput(MMLScore score, String expectFileName, String expectMML[]) {
+		try {
+			/* MMLScore.writeToOutputStream() */
+			InputStream inputStream = fileSelect(expectFileName);
+			checkMMLScoreWriteToOutputStream(score, inputStream);
 
 			/* MMLScore.parse() */
 			inputStream = fileSelect(expectFileName);
@@ -48,6 +65,7 @@ public class MMLScoreTest extends FileSelect {
 		MMLTrack track = new MMLTrack("MML@aaa,bbb,ccc,dd1;");
 		track.setTrackName("track1");
 		score.addTrack(track);
+		score.getMarkerList().add(new Marker(96, "marker1"));
 
 		String mml[] = { "MML@aaa,bbb,ccc,dd1;" };
 
