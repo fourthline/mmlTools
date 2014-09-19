@@ -170,7 +170,8 @@ public final class KeyboardView extends JPanel {
 
 	public void offNote() {
 		playNote = -1;
-		MabiDLS.getInstance().playNote(playNote, 0, PLAY_CHANNEL);
+		int program = mmlManager.getActivePartProgram();
+		MabiDLS.getInstance().playNote(playNote, program, PLAY_CHANNEL);
 
 		repaint();
 	}

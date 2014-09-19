@@ -37,9 +37,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 
 public final class MMLTrackView extends JPanel implements ActionListener, DocumentListener {
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 4955513242349170508L;
 	public static final String MMLPART_NAME[] = {
 		AppResource.appText("melody"),
@@ -276,18 +274,24 @@ public final class MMLTrackView extends JPanel implements ActionListener, Docume
 		trackComposeLabel.setText( getRankText() );
 	}
 
-	private void setInstProgram(int program, int songProgram) {
+	private void setInstProgram(MMLTrack track) {
+		int program = track.getProgram();
+		int songProgram = track.getSongProgram();
 		InstClass inst = MabiDLS.getInstance().getInstByProgram(program);
 		if (inst != null) {
 			comboBox.setSelectedItem(inst);
 		} else {
 			comboBox.setSelectedIndex(0);
+			program = ((InstClass) comboBox.getSelectedItem()).getProgram();
+			track.setProgram(program);
 		}
 		InstClass songInst = MabiDLS.getInstance().getInstByProgram(songProgram);
 		if ( (songInst != null) && (songInst.getType() == InstType.CHORUS) ) {
 			songComboBox.setSelectedItem(songInst);
 		} else {
 			songComboBox.setSelectedItem(noUseSongEx);
+			songProgram = ((InstClass) songComboBox.getSelectedItem()).getProgram();
+			track.setSongProgram(songProgram);
 		}
 
 		updateProgramChangeStatus();
@@ -354,7 +358,7 @@ public final class MMLTrackView extends JPanel implements ActionListener, Docume
 		mmlText[2].setText( track.getChord2() );
 		mmlText[3].setText( track.getSongEx() );
 
-		setInstProgram( track.getProgram(), track.getSongProgram() );
+		setInstProgram( track );
 	}
 
 	public void setActivePartMMLString(String mml) {
