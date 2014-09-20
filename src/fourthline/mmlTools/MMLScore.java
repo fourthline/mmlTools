@@ -302,7 +302,7 @@ public final class MMLScore implements IMMLFileParser {
 			// <tickOffset>=<name>
 			String tickString = s.substring(0, s.indexOf('='));
 			String name = s.substring(s.indexOf('=')+1);
-			markerList.add( new Marker(Integer.parseInt(tickString), name) );
+			markerList.add( new Marker(name, Integer.parseInt(tickString)) );
 		}
 	}
 

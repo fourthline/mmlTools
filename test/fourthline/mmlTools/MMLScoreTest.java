@@ -65,7 +65,7 @@ public class MMLScoreTest extends FileSelect {
 		MMLTrack track = new MMLTrack("MML@aaa,bbb,ccc,dd1;");
 		track.setTrackName("track1");
 		score.addTrack(track);
-		score.getMarkerList().add(new Marker(96, "marker1"));
+		score.getMarkerList().add(new Marker("marker1", 96));
 
 		String mml[] = { "MML@aaa,bbb,ccc,dd1;" };
 

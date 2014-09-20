@@ -87,7 +87,7 @@ public final class MMSFile implements IMMLFileParser {
 		LinkedList<Marker> markerList = new LinkedList<>();
 		for (String s : contents.split("\n")) {
 			TextParser textParser = TextParser.text(s);
-			if ( textParser.startsWith("label", t -> markerList.add(new Marker(0, t.substring(5)))) ) {
+			if ( textParser.startsWith("label", t -> markerList.add(new Marker(t.substring(5), 0))) ) {
 			} else if ( textParser.startsWith("position", t -> {
 				int tickOffset = Integer.parseInt(t.substring(5));
 				markerList.getLast().setTickOffset( tickOffset );
