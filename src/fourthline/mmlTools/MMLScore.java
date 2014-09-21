@@ -14,6 +14,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import fourthline.mmlTools.core.MMLTicks;
 import fourthline.mmlTools.parser.IMMLFileParser;
@@ -287,7 +288,7 @@ public final class MMLScore implements IMMLFileParser {
 	 * @param contents
 	 */
 	private void parseMMLScore(String contents) {
-		for (String s : contents.split("\n")) {
+		Pattern.compile("\n").splitAsStream(contents).forEachOrdered((s) -> {
 			TextParser textParser = TextParser.text(s);
 			if (        textParser.startsWith("mml-track=",   t -> this.addTrack(new MMLTrack(t)) )) {
 			} else if ( textParser.startsWith("name=",        t -> this.trackList.getLast().setTrackName(t) )) {
@@ -298,7 +299,7 @@ public final class MMLScore implements IMMLFileParser {
 			} else if ( textParser.startsWith("author=",      this::setAuthor )) {
 			} else if ( textParser.startsWith("time=",        this::setBaseTime )) {
 			}
-		}
+		});
 	}
 
 	/**

@@ -99,10 +99,12 @@ public final class MabiIccoProperties {
 
 	public void setDlsFile(File fileArray[]) {
 		StringBuilder sb = new StringBuilder();
-		for (File file : fileArray) {
-			sb.append(file.getPath()).append(',');
+		if (fileArray != null) {
+			for (File file : fileArray) {
+				sb.append(file.getPath()).append(',');
+			}
+			sb.deleteCharAt(sb.length()-1);
 		}
-		sb.deleteCharAt(sb.length()-1);
 		properties.setProperty(DLS_FILE, sb.toString());
 		save();
 	}

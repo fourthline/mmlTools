@@ -77,6 +77,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	public static final String ABOUT = "about";
 	public static final String MIDI_EXPORT = "midi_export";
 	public static final String FILE_IMPORT = "file_import";
+	public static final String CLEAR_DLS = "clear_dls";
 
 	private final HashMap<String, Runnable> actionMap = new HashMap<>();
 
@@ -101,6 +102,20 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	}
 
 	private ActionDispatcher() {
+	}
+
+	public ActionDispatcher setMainFrame(MainFrame mainFrame) {
+		this.mainFrame = mainFrame;
+		this.mmlSeqView = mainFrame.getMMLSeqView();
+		this.fileState = this.mmlSeqView.getFileState();
+		this.editState = this.mmlSeqView.getEditState();
+
+		this.fileState.setFileStateObserver(this);
+		this.editState.setEditStateObserver(this);
+		return this;
+	}
+
+	public void initialize() {
 		initializeFileChooser();
 		initializeActionMap();
 	}
@@ -171,16 +186,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(ABOUT, () -> new About().show(mainFrame));
 		actionMap.put(MIDI_EXPORT, this::midiExportAction);
 		actionMap.put(FILE_IMPORT, this::fileImportAction);
-	}
-
-	public void setMainFrame(MainFrame mainFrame) {
-		this.mainFrame = mainFrame;
-		this.mmlSeqView = mainFrame.getMMLSeqView();
-		this.fileState = this.mmlSeqView.getFileState();
-		this.editState = this.mmlSeqView.getEditState();
-
-		this.fileState.setFileStateObserver(this);
-		this.editState.setEditStateObserver(this);
+		actionMap.put(CLEAR_DLS, this::clearDLSInformation);
 	}
 
 	@Override
@@ -441,6 +447,23 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		} else {
 			mmlSeqView.startSequence();
 			mainFrame.disableNoplayItems();
+		}
+	}
+
+	private void clearDLSInformation() {
+		MabiIccoProperties properties = MabiIccoProperties.getInstance();
+		StringBuilder sb = new StringBuilder(AppResource.appText("message.clear_dls"));
+		properties.getDlsFile().stream().forEach(t -> {
+			sb.append("\n * ").append(t.getName());
+		});
+		int status = JOptionPane.showConfirmDialog(mainFrame, 
+				sb.toString(), 
+				AppResource.appText("menu.clear_dls"), 
+				JOptionPane.OK_CANCEL_OPTION, 
+				JOptionPane.WARNING_MESSAGE);
+		if (status == JOptionPane.OK_OPTION) {
+			properties.setDlsFile(null);
+			System.out.println("clearDLSInformation");
 		}
 	}
 

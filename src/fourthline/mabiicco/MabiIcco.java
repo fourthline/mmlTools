@@ -72,7 +72,7 @@ public final class MabiIcco extends Application {
 			ActionDispatcher dispatcher = ActionDispatcher.getInstance();
 			MainFrame mainFrame = new MainFrame(dispatcher);
 			notifyPreloader(new MabiIccoPreloaderNotification("", 100));
-			dispatcher.setMainFrame(mainFrame);
+			dispatcher.setMainFrame(mainFrame).initialize();
 			List<String> args = getParameters().getRaw();
 			if (args.size() > 0) {
 				dispatcher.openMMLFile(new File(args.get(0)));

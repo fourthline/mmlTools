@@ -7,6 +7,7 @@ package fourthline.mmlTools.parser;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTrack;
@@ -67,14 +68,14 @@ public final class MMSFile implements IMMLFileParser {
 	 * @param contents
 	 */
 	private void parseInfomation(String contents) {
-		for (String s : contents.split("\n")) {
+		Pattern.compile("\n").splitAsStream(contents).forEachOrdered((s) -> {
 			TextParser textParser = TextParser.text(s);
 			if ( textParser.startsWith("title=", score::setTitle) ) {
 			} else if ( textParser.startsWith("auther=", score::setAuthor) ) {
 			} else if ( textParser.startsWith("rythmNum=",  t -> score.setTimeCountOnly(Integer.valueOf(t)) )) {
 			} else if ( textParser.startsWith("rythmBase=", t -> score.setBaseOnly(Integer.valueOf(t)) )) {
 			}
-		}
+		});
 	}
 
 	/**
@@ -83,7 +84,7 @@ public final class MMSFile implements IMMLFileParser {
 	 */
 	private void parseMarker(String contents) {
 		LinkedList<Marker> markerList = new LinkedList<>();
-		for (String s : contents.split("\n")) {
+		Pattern.compile("\n").splitAsStream(contents).forEachOrdered((s) -> {
 			TextParser textParser = TextParser.text(s);
 			if ( textParser.startsWith("label", t -> markerList.add(new Marker(t.substring(5), 0))) ) {
 			} else if ( textParser.startsWith("position", t -> {
@@ -91,7 +92,7 @@ public final class MMSFile implements IMMLFileParser {
 				markerList.getLast().setTickOffset( tickOffset );
 			})) {
 			}
-		}
+		});
 		score.getMarkerList().addAll(markerList);
 	}
 
@@ -104,7 +105,7 @@ public final class MMSFile implements IMMLFileParser {
 		final int intValue[] = { 0, 0 };
 		final String stringValue[] = { "", "", "", "" };
 
-		for (String s : contents.split("\n")) {
+		Pattern.compile("\n").splitAsStream(contents).forEachOrdered((s) -> {
 			TextParser textParser = TextParser.text(s);
 			if ( textParser.startsWith("instrument=",
 					t -> intValue[0] = convertInstProgram(Integer.parseInt(t)) )) {
@@ -114,9 +115,9 @@ public final class MMSFile implements IMMLFileParser {
 			} else if ( textParser.startsWith("ch0_mml=", t -> stringValue[1] = t) ) {
 			} else if ( textParser.startsWith("ch1_mml=", t -> stringValue[2] = t) ) {
 			} else if ( textParser.startsWith("ch2_mml=", t -> stringValue[3] = t) ) {
-				break;
+				return;
 			}
-		}
+		});
 
 		MMLTrack track = new MMLTrack(stringValue[1], stringValue[2], stringValue[3], "");
 		track.setTrackName(stringValue[0]);
