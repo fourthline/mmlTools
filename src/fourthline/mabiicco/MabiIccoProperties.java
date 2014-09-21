@@ -24,6 +24,36 @@ public final class MabiIccoProperties {
 
 	private static final MabiIccoProperties instance = new MabiIccoProperties();
 
+	/** 最近開いたファイル */
+	private static final String RECENT_FILE = "app.recent_file";
+
+	/** DLSファイル */
+	private static final String DLS_FILE = "app.dls_file";
+
+	/** ウィンドウ最大化 */
+	private static final String WINDOW_MAXIMIZE = "window.maximize";
+
+	/** ウィンドウ位置 x座標 */
+	private static final String WINDOW_X = "window.x";
+
+	/** ウィンドウ位置 y座標 */
+	private static final String WINDOW_Y = "window.y";
+
+	/** ウィンドウ位置 幅 */
+	private static final String WINDOW_WIDTH = "window.width";
+
+	/** ウィンドウ位置 高さ */
+	private static final String WINDOW_HEIGHT = "window.height";
+
+	/** ピアノロール表示の高さスケール */
+	private static final String HEIGHT_SCALE = "view.pianoRoll.heightScale";
+
+	/** クリック再生機能の有効/無効 */
+	private static final String ENABLE_CLICK_PLAY = "function.enable_click_play";
+
+	/** マーカー表示の有効/無効 */
+	private static final String ENABLE_VIEW_MARKER = "function.enable_view_marker";
+
 	public static MabiIccoProperties getInstance() {
 		return instance;
 	}
@@ -48,17 +78,17 @@ public final class MabiIccoProperties {
 	}
 
 	public String getRecentFile() {
-		String str = properties.getProperty("app.recent_file", "");
+		String str = properties.getProperty(RECENT_FILE, "");
 		return str;
 	}
 
 	public void setRecentFile(String path) {
-		properties.setProperty("app.recent_file", path);
+		properties.setProperty(RECENT_FILE, path);
 		save();
 	}
 
 	public List<File> getDlsFile() {
-		String str = properties.getProperty("app.dls_file", MabiDLS.DEFALUT_DLS_PATH);
+		String str = properties.getProperty(DLS_FILE, MabiDLS.DEFALUT_DLS_PATH);
 		String filenames[] = str.split(",");
 		ArrayList<File> fileArray = new ArrayList<>();
 		for (String filename : filenames) {
@@ -73,25 +103,25 @@ public final class MabiIccoProperties {
 			sb.append(file.getPath()).append(',');
 		}
 		sb.deleteCharAt(sb.length()-1);
-		properties.setProperty("app.dls_file", sb.toString());
+		properties.setProperty(DLS_FILE, sb.toString());
 		save();
 	}
 
 	public boolean getWindowMaximize() {
-		String str = properties.getProperty("window.maximize", "false");
+		String str = properties.getProperty(WINDOW_MAXIMIZE, "false");
 		return Boolean.parseBoolean(str);
 	}
 
 	public void setWindowMaximize(boolean b) {
-		properties.setProperty("window.maximize", Boolean.toString(b));
+		properties.setProperty(WINDOW_MAXIMIZE, Boolean.toString(b));
 		save();
 	}
 
 	public Rectangle getWindowRect() {
-		String x = properties.getProperty("window.x", "-1");
-		String y = properties.getProperty("window.y", "-1");
-		String width = properties.getProperty("window.width", "-1");
-		String height = properties.getProperty("window.height", "-1");
+		String x = properties.getProperty(WINDOW_X, "-1");
+		String y = properties.getProperty(WINDOW_Y, "-1");
+		String width = properties.getProperty(WINDOW_WIDTH, "-1");
+		String height = properties.getProperty(WINDOW_HEIGHT, "-1");
 
 		Rectangle rect = new Rectangle(
 				Integer.parseInt(x), 
@@ -104,15 +134,15 @@ public final class MabiIccoProperties {
 	}
 
 	public void setWindowRect(Rectangle rect) {
-		properties.setProperty("window.x", Integer.toString((int)rect.getX()));
-		properties.setProperty("window.y", Integer.toString((int)rect.getY()));
-		properties.setProperty("window.width", Integer.toString((int)rect.getWidth()));
-		properties.setProperty("window.height", Integer.toString((int)rect.getHeight()));
+		properties.setProperty(WINDOW_X, Integer.toString((int)rect.getX()));
+		properties.setProperty(WINDOW_Y, Integer.toString((int)rect.getY()));
+		properties.setProperty(WINDOW_WIDTH, Integer.toString((int)rect.getWidth()));
+		properties.setProperty(WINDOW_HEIGHT, Integer.toString((int)rect.getHeight()));
 		save();
 	}
 
 	public int getPianoRollViewHeightScaleProperty() {
-		String s = properties.getProperty("view.pianoRoll.heightScale", "1");
+		String s = properties.getProperty(HEIGHT_SCALE, "1");
 		int index = Integer.parseInt(s);
 		if ( (index < 0) || (index >= PianoRollView.NOTE_HEIGHT_TABLE.length) ) {
 			index = 1;
@@ -122,17 +152,27 @@ public final class MabiIccoProperties {
 	}
 
 	public void setPianoRollViewHeightScaleProperty(int index) {
-		properties.setProperty("view.pianoRoll.heightScale", ""+index);
+		properties.setProperty(HEIGHT_SCALE, ""+index);
 		save();
 	}
 
 	public boolean getEnableClickPlay() {
-		String str = properties.getProperty("function.enable_click_play", "true");
+		String str = properties.getProperty(ENABLE_CLICK_PLAY, "true");
 		return Boolean.parseBoolean(str);
 	}
 
 	public void setEnableClickPlay(boolean b) {
-		properties.setProperty("function.enable_click_play", Boolean.toString(b));
+		properties.setProperty(ENABLE_CLICK_PLAY, Boolean.toString(b));
+		save();
+	}
+
+	public boolean getEnableViewMarker() {
+		String str = properties.getProperty(ENABLE_VIEW_MARKER, "true");
+		return Boolean.parseBoolean(str);
+	}
+
+	public void setEnableViewMarker(boolean b) {
+		properties.setProperty(ENABLE_VIEW_MARKER, Boolean.toString(b));
 		save();
 	}
 }

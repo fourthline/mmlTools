@@ -33,6 +33,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
@@ -274,7 +276,7 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 
 	private JMenuBar createMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
-		// FIXME:
+
 		/************************* File Menu *************************/
 		JMenu fileMenu = new JMenu(appText("menu.file"));
 		fileMenu.setMnemonic('F');
@@ -418,10 +420,12 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		playMenu.add(nextMenuItem);
 
 		/************************* Setting Menu *************************/
+		MabiIccoProperties properties = MabiIccoProperties.getInstance();
 		JMenu settingMenu = new JMenu(appText("menu.setting"));
 		menuBar.add(settingMenu);
 		createNoteHeightMenu(settingMenu);
-		createClickPlayMenu(settingMenu);
+		createCheckMenu(settingMenu, "clickPlayMenu", properties::getEnableClickPlay, properties::setEnableClickPlay);
+		createCheckMenu(settingMenu, "view.marker", properties::getEnableViewMarker, properties::setEnableViewMarker);
 
 		/************************* Help Menu *************************/
 		JMenu helpMenu = new JMenu(appText("menu.help"));
@@ -453,39 +457,22 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 	}
 
 	/**
-	 * TODO: まとめられるんじゃないかなぁ・・・
+	 * 有効/無効の設定ボタンを作成します.
 	 * @param settingMenu
 	 */
-	private void createClickPlayMenu(JMenu settingMenu) {
-		JMenu clickPlayMenu = new JMenu(appText("clickPlayMenu"));
+	private void createCheckMenu(JMenu settingMenu, String itemName, Supplier<Boolean> getter, Consumer<Boolean> setter) {
+		JCheckBoxMenuItem clickPlayMenu = new JCheckBoxMenuItem(appText(itemName));
 		settingMenu.add(clickPlayMenu);
 
-		ButtonGroup group = new ButtonGroup();
+		clickPlayMenu.setSelected( getter.get() );
 
-		JCheckBoxMenuItem enableMenu = new JCheckBoxMenuItem(appText("enable"));
-		clickPlayMenu.add(enableMenu);
-		group.add(enableMenu);
-		JCheckBoxMenuItem disableMenu = new JCheckBoxMenuItem(appText("disable"));
-		clickPlayMenu.add(disableMenu);
-		group.add(disableMenu);
-
-		if (MabiIccoProperties.getInstance().getEnableClickPlay()) {
-			enableMenu.setSelected(true);
-			disableMenu.setSelected(false);
-		} else {
-			enableMenu.setSelected(false);
-			disableMenu.setSelected(true);
-		}
-
-		enableMenu.addActionListener((e) -> {
-			MabiIccoProperties.getInstance().setEnableClickPlay(true);
-			enableMenu.setSelected(true);
-			disableMenu.setSelected(false);
-		});
-		disableMenu.addActionListener((e) -> {
-			MabiIccoProperties.getInstance().setEnableClickPlay(false);
-			enableMenu.setSelected(false);
-			disableMenu.setSelected(true);
+		clickPlayMenu.addActionListener((e) -> {
+			boolean b = getter.get();
+			setter.accept(!b);
+			clickPlayMenu.setSelected(!b);
+			if (mmlSeqView != null) {
+				mmlSeqView.repaint();
+			}
 		});
 	}
 

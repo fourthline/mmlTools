@@ -35,7 +35,8 @@ public final class MMLScore implements IMMLFileParser {
 
 	private String title = "";
 	private String author = "";
-	private String baseTime = "4/4";
+	private int numTime = 4;
+	private int baseTime = 4;
 
 	/**
 	 * 新たにトラックを追加します.
@@ -133,21 +134,29 @@ public final class MMLScore implements IMMLFileParser {
 	}
 
 	public void setBaseTime(String baseTime) {
-		this.baseTime = baseTime;
+		String s[] = baseTime.split("/");
+		this.numTime = Integer.parseInt(s[0]);
+		this.baseTime = Integer.parseInt(s[1]);
 	}
 
 	public String getBaseTime() {
-		return this.baseTime;
+		return numTime + "/" + baseTime;
 	}
 
 	public String getBaseOnly() {
-		String s[] = this.baseTime.split("/");
-		return s[1];
+		return String.valueOf(baseTime);
+	}
+
+	public void setBaseOnly(int base) {
+		baseTime = base;
 	}
 
 	public int getTimeCountOnly() {
-		String s[] = this.baseTime.split("/");
-		return Integer.parseInt(s[0]);
+		return numTime;
+	}
+
+	public void setTimeCountOnly(int value) {
+		numTime = value;
 	}
 
 	public int getMeasureTick() {
@@ -285,9 +294,9 @@ public final class MMLScore implements IMMLFileParser {
 			} else if ( textParser.startsWith("program=",     t -> this.trackList.getLast().setProgram(Integer.parseInt(t)) )) {
 			} else if ( textParser.startsWith("songProgram=", t -> this.trackList.getLast().setSongProgram(Integer.parseInt(t)) )) {
 			} else if ( textParser.startsWith("panpot=",      t -> this.trackList.getLast().setPanpot(Integer.parseInt(t)) )) {
-			} else if ( textParser.startsWith("title=",       t -> setTitle(t) )) {
-			} else if ( textParser.startsWith("author=",      t -> setAuthor(t) )) {
-			} else if ( textParser.startsWith("time=",        t -> setBaseTime(t) )) {
+			} else if ( textParser.startsWith("title=",       this::setTitle )) {
+			} else if ( textParser.startsWith("author=",      this::setAuthor )) {
+			} else if ( textParser.startsWith("time=",        this::setBaseTime )) {
 			}
 		}
 	}

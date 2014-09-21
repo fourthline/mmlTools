@@ -47,15 +47,7 @@
 		<copy todir="${dest}">
 			<fileset dir="${src}">
 				<include name="**/*.png" />
-			</fileset>
-		</copy>
-		<copy todir="${dest}">
-			<fileset dir="${src}">
 				<include name="**/*.fxml" />
-			</fileset>
-		</copy>
-		<copy todir="${dest}">
-			<fileset dir="${src}">
 				<include name="**/*.css" />
 			</fileset>
 		</copy>

@@ -23,7 +23,9 @@ public final class MMLFile implements IMMLFileParser {
 
 		// channel sections
 		LinkedList<String> mmlParts = new LinkedList<>();
-		contentsList.stream().filter(s -> s.getName().matches("\\[Channel[0-9]*\\]")).forEach(s -> {
+		contentsList.stream()
+		.filter(s -> s.getName().matches("\\[Channel[0-9]*\\]"))
+		.forEach(s -> {
 			String text = s.getContents();
 			text = text.replaceAll("//.*\n", "\n").replaceAll("/\\*.*\\*/", "").replaceAll("[ \t\n]", "");
 			mmlParts.add(text);

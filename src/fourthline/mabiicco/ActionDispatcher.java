@@ -127,9 +127,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			MabiDLS.getInstance().getSequencer().stop();
 			mainFrame.enableNoplayItems();
 		});
-		actionMap.put(PAUSE, () -> {
-			pauseAction();
-		});
+		actionMap.put(PAUSE, this::pauseAction);
 		actionMap.put(FILE_OPEN, () -> {
 			if (checkCloseModifiedFileState()) {
 				openMMLFileAction();
@@ -140,93 +138,39 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 				newMMLFileAction();
 			}
 		});
-		actionMap.put(RELOAD_FILE, () -> {
-			reloadMMLFileAction();
-		});
+		actionMap.put(RELOAD_FILE, this::reloadMMLFileAction);
 		actionMap.put(QUIT, () -> {
 			//  閉じる前に、変更が保存されていなければダイアログ表示する.
 			if (checkCloseModifiedFileState()) {
 				System.exit(0);
 			}
 		});
-		actionMap.put(ADD_TRACK, () -> {
-			mmlSeqView.addMMLTrack(null);
-		});
-		actionMap.put(REMOVE_TRACK, () -> {
-			mmlSeqView.removeMMLTrack();
-		});
-		actionMap.put(TRACK_PROPERTY, () -> {
-			mmlSeqView.editTrackPropertyAction(mainFrame);
-		});
-		actionMap.put(SET_START_POSITION, () -> {
-			mmlSeqView.setStartPosition();
-		});
-		actionMap.put(PLAY, () -> {
-			playAction();
-		});
-		actionMap.put(INPUT_FROM_CLIPBOARD, () -> {
-			mmlSeqView.inputClipBoardAction(mainFrame);
-		});
-		actionMap.put(OUTPUT_TO_CLIPBOARD, () -> {
-			mmlSeqView.outputClipBoardAction(mainFrame);
-		});
-		actionMap.put(UNDO, () -> {
-			mmlSeqView.undo();
-		});
-		actionMap.put(REDO, () -> {
-			mmlSeqView.redo();
-		});
-		actionMap.put(SAVE_FILE, () -> {
-			saveMMLFile(openedFile);
-		});
-		actionMap.put(SAVEAS_FILE, () -> {
-			saveAsMMLFileAction();
-		});
-		actionMap.put(CUT, () -> {
-			editState.selectedCut();
-		});
-		actionMap.put(COPY, () -> {
-			editState.selectedCopy();
-		});
-		actionMap.put(PASTE, () -> {
-			editPasteAction();
-		});
-		actionMap.put(DELETE, () -> {
-			editState.selectedDelete();
-		});
-		actionMap.put(SCORE_PROPERTY, () -> {
-			scorePropertyAction();
-		});
-		actionMap.put(NEXT_TIME, () -> {
-			mmlSeqView.nextStepTimeTo(true);
-		});
-		actionMap.put(PREV_TIME, () -> {
-			mmlSeqView.nextStepTimeTo(false);
-		});
-		actionMap.put(PART_CHANGE, () -> {
-			mmlSeqView.partChange(mainFrame);
-		});
-		actionMap.put(ADD_MEASURE, () -> {
-			mmlSeqView.addMeasure();
-		});
-		actionMap.put(REMOVE_MEASURE, () -> {
-			mmlSeqView.removeMeasure();
-		});
-		actionMap.put(NOTE_PROPERTY, () -> {
-			editState.noteProperty();
-		});
-		actionMap.put(TRANSPOSE, () -> {
-			new MMLTranspose().execute(mainFrame, mmlSeqView);
-		});
-		actionMap.put(ABOUT, () -> {
-			new About().show(mainFrame);
-		});
-		actionMap.put(MIDI_EXPORT, () -> {
-			midiExportAction();
-		});
-		actionMap.put(FILE_IMPORT, () -> {
-			fileImportAction();
-		});
+		actionMap.put(ADD_TRACK, () -> mmlSeqView.addMMLTrack(null));
+		actionMap.put(REMOVE_TRACK, mmlSeqView::removeMMLTrack);
+		actionMap.put(TRACK_PROPERTY, () -> mmlSeqView.editTrackPropertyAction(mainFrame));
+		actionMap.put(SET_START_POSITION, mmlSeqView::setStartPosition);
+		actionMap.put(PLAY, this::playAction);
+		actionMap.put(INPUT_FROM_CLIPBOARD, () -> mmlSeqView.inputClipBoardAction(mainFrame));
+		actionMap.put(OUTPUT_TO_CLIPBOARD, () -> mmlSeqView.outputClipBoardAction(mainFrame));
+		actionMap.put(UNDO, mmlSeqView::undo);
+		actionMap.put(REDO, mmlSeqView::redo);
+		actionMap.put(SAVE_FILE, () -> saveMMLFile(openedFile));
+		actionMap.put(SAVEAS_FILE, this::saveAsMMLFileAction);
+		actionMap.put(CUT, editState::selectedCut);
+		actionMap.put(COPY, editState::selectedCopy);
+		actionMap.put(PASTE, this::editPasteAction);
+		actionMap.put(DELETE, editState::selectedDelete);
+		actionMap.put(SCORE_PROPERTY, this::scorePropertyAction);
+		actionMap.put(NEXT_TIME, () -> mmlSeqView.nextStepTimeTo(true));
+		actionMap.put(PREV_TIME, () -> mmlSeqView.nextStepTimeTo(false));
+		actionMap.put(PART_CHANGE, () -> mmlSeqView.partChange(mainFrame));
+		actionMap.put(ADD_MEASURE, mmlSeqView::addMeasure);
+		actionMap.put(REMOVE_MEASURE, mmlSeqView::removeMeasure);
+		actionMap.put(NOTE_PROPERTY, editState::noteProperty);
+		actionMap.put(TRANSPOSE, () -> new MMLTranspose().execute(mainFrame, mmlSeqView));
+		actionMap.put(ABOUT, () -> new About().show(mainFrame));
+		actionMap.put(MIDI_EXPORT, this::midiExportAction);
+		actionMap.put(FILE_IMPORT, this::fileImportAction);
 	}
 
 	public void setMainFrame(MainFrame mainFrame) {

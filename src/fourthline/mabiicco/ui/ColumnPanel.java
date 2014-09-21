@@ -123,12 +123,14 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 	}
 
 	private void paintMarker(Graphics2D g) {
-		MMLScore score = mmlManager.getMMLScore();
+		if (MabiIccoProperties.getInstance().getEnableViewMarker()) {
+			MMLScore score = mmlManager.getMMLScore();
 
-		for (Marker marker : score.getMarkerList()) {
-			int tick = marker.getTickOffset();
-			int x = pianoRollView.convertTicktoX(tick);
-			drawMarker(g, marker.getName(), x, MAKER_FILL_COLOR);
+			for (Marker marker : score.getMarkerList()) {
+				int tick = marker.getTickOffset();
+				int x = pianoRollView.convertTicktoX(tick);
+				drawMarker(g, marker.getName(), x, MAKER_FILL_COLOR);
+			}
 		}
 	}
 

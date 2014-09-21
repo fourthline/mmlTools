@@ -67,16 +67,14 @@ public final class MMSFile implements IMMLFileParser {
 	 * @param contents
 	 */
 	private void parseInfomation(String contents) {
-		final String rythm[] = { "4", "4" };
 		for (String s : contents.split("\n")) {
 			TextParser textParser = TextParser.text(s);
-			if ( textParser.startsWith("title=",     t -> score.setTitle(t)) ) {
-			} else if ( textParser.startsWith("auther=",    t -> score.setAuthor(t)) ) {
-			} else if ( textParser.startsWith("rythmNum=",  t -> rythm[0] = t) ) {
-			} else if ( textParser.startsWith("rythmBase=", t -> rythm[1] = t) ) {
+			if ( textParser.startsWith("title=", score::setTitle) ) {
+			} else if ( textParser.startsWith("auther=", score::setAuthor) ) {
+			} else if ( textParser.startsWith("rythmNum=",  t -> score.setTimeCountOnly(Integer.valueOf(t)) )) {
+			} else if ( textParser.startsWith("rythmBase=", t -> score.setBaseOnly(Integer.valueOf(t)) )) {
 			}
 		}
-		score.setBaseTime(rythm[0]+"/"+rythm[1]);
 	}
 
 	/**
