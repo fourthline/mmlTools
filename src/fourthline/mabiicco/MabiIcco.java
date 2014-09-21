@@ -7,15 +7,19 @@ package fourthline.mabiicco;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 
+import javax.sound.midi.InvalidMidiDataException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import fourthline.mabiicco.midi.InstType;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.preloader.MabiIccoPreloaderNotification;
 import fourthline.mabiicco.ui.MainFrame;
@@ -35,8 +39,6 @@ public final class MabiIcco extends Application {
 	}
 
 	public void initialize() {
-		MabiIccoProperties appProperties = MabiIccoProperties.getInstance();
-
 		try {
 			// font
 			String fontName = AppResource.appText("ui.font");
@@ -55,26 +57,10 @@ public final class MabiIcco extends Application {
 			notifyPreloader(new MabiIccoPreloaderNotification("OK\n", 20));
 
 			notifyPreloader(new MabiIccoPreloaderNotification(AppResource.appText("init.dls"), 20));
-			File file = new File( appProperties.getDlsFile() );
-			if ( !file.exists() ) {
-				/* DLSファイルがない場合 */
-				JOptionPane.showMessageDialog(null, AppResource.appText("msg.dls_title.detail"), AppResource.appText("msg.dls_title"), JOptionPane.INFORMATION_MESSAGE);
-				JFileChooser fileChooser = new JFileChooser(".");
-				FileFilter dlsFilter = new FileNameExtensionFilter(AppResource.appText("file.dls"), "dls");
-				fileChooser.addChoosableFileFilter(dlsFilter);
-				fileChooser.setFileFilter(dlsFilter);
-				fileChooser.setAcceptAllFileFilterUsed(false);
-				int status = fileChooser.showOpenDialog(null);
-				if (status == JFileChooser.APPROVE_OPTION) {
-					file = fileChooser.getSelectedFile();
-				} else {
-					JOptionPane.showMessageDialog(null, AppResource.appText("error.needDls"), "ERROR", JOptionPane.ERROR_MESSAGE);
-					System.exit(1);
-				}
+			if ( !loadDLSFiles() ) {
+				JOptionPane.showMessageDialog(null, AppResource.appText("error.needDls"), "ERROR", JOptionPane.ERROR_MESSAGE);
+				System.exit(1);
 			}
-
-			MabiDLS.getInstance().initializeSound(file);
-			appProperties.setDlsFile(file.getPath());
 			notifyPreloader(new MabiIccoPreloaderNotification("OK\n", 90));
 		} catch (Exception | Error e) {
 			e.printStackTrace();
@@ -94,6 +80,53 @@ public final class MabiIcco extends Application {
 			notifyPreloader(new Preloader.StateChangeNotification(Preloader.StateChangeNotification.Type.BEFORE_START));
 			mainFrame.setVisible(true);
 		});
+	}
+
+	/**
+	 * DLSのロードを行います. 初回に失敗した場合は、DLSファイル選択ダイアログを表示します.
+	 * @return 1つ以上のInstrumentをロードできれば true.
+	 * @throws InvalidMidiDataException
+	 * @throws IOException
+	 */
+	private boolean loadDLSFiles() throws InvalidMidiDataException, IOException {
+		MabiIccoProperties appProperties = MabiIccoProperties.getInstance();
+		if (tryloadDLSFiles()) {
+			return true;
+		}
+		JOptionPane.showMessageDialog(null, AppResource.appText("msg.dls_title.detail"), AppResource.appText("msg.dls_title"), JOptionPane.INFORMATION_MESSAGE);
+		JFileChooser fileChooser = new JFileChooser(".");
+		FileFilter dlsFilter = new FileNameExtensionFilter(AppResource.appText("file.dls"), "dls");
+		fileChooser.addChoosableFileFilter(dlsFilter);
+		fileChooser.setFileFilter(dlsFilter);
+		fileChooser.setMultiSelectionEnabled(true);
+		fileChooser.setAcceptAllFileFilterUsed(false);
+		int status = fileChooser.showOpenDialog(null);
+		if (status == JFileChooser.APPROVE_OPTION) {
+			appProperties.setDlsFile( fileChooser.getSelectedFiles() );
+		} else {
+			return false;
+		}
+
+		return tryloadDLSFiles();
+	}
+
+	/**
+	 * DLSファイルのロードを試みます.
+	 * @return 1つ以上のInstrumentをロードできれば true.
+	 * @throws InvalidMidiDataException
+	 * @throws IOException
+	 */
+	private boolean tryloadDLSFiles() throws InvalidMidiDataException, IOException {
+		MabiDLS dls = MabiDLS.getInstance();
+		MabiIccoProperties appProperties = MabiIccoProperties.getInstance();
+		for (File file : appProperties.getDlsFile()) {
+			dls.loadingDLSFile(file);
+		}
+
+		if (dls.getAvailableInstByInstType(EnumSet.of(InstType.NORMAL, InstType.DRUMS)).length > 0) {
+			return true;
+		}
+		return false;
 	}
 
 	private static void setUIFont(javax.swing.plaf.FontUIResource resource) {

@@ -5,11 +5,14 @@
 package fourthline.mabiicco;
 
 import java.awt.Rectangle;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.InvalidPropertiesFormatException;
+import java.util.List;
 import java.util.Properties;
 
 import fourthline.mabiicco.midi.MabiDLS;
@@ -54,13 +57,23 @@ public final class MabiIccoProperties {
 		save();
 	}
 
-	public String getDlsFile() {
+	public List<File> getDlsFile() {
 		String str = properties.getProperty("app.dls_file", MabiDLS.DEFALUT_DLS_PATH);
-		return str;
+		String filenames[] = str.split(",");
+		ArrayList<File> fileArray = new ArrayList<>();
+		for (String filename : filenames) {
+			fileArray.add(new File(filename));
+		}
+		return fileArray;
 	}
 
-	public void setDlsFile(String path) {
-		properties.setProperty("app.dls_file", path);
+	public void setDlsFile(File fileArray[]) {
+		StringBuilder sb = new StringBuilder();
+		for (File file : fileArray) {
+			sb.append(file.getPath()).append(',');
+		}
+		sb.deleteCharAt(sb.length()-1);
+		properties.setProperty("app.dls_file", sb.toString());
 		save();
 	}
 

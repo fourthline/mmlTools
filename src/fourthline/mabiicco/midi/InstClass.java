@@ -56,8 +56,18 @@ public final class InstClass {
 		this.program = program;
 	}
 
+	@Override
 	public String toString() {
 		return this.name;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof InstClass) {
+			InstClass obj = (InstClass) o;
+			return (bank == obj.bank) && (program == obj.program);
+		}
+		return false;
 	}
 
 	public int getBank() {
