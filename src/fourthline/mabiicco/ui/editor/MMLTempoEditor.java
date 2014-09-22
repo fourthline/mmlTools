@@ -5,7 +5,7 @@
 package fourthline.mabiicco.ui.editor;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
+import java.util.List;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -27,13 +27,8 @@ import fourthline.mmlTools.MMLTempoEvent;
  */
 public final class MMLTempoEditor extends AbstractMarkerEditor<MMLTempoEvent> {
 
-	private final IEditAlign editAlign;
-	private final IMMLManager mmlManager;
-
 	public MMLTempoEditor(IMMLManager mmlManager, IEditAlign editAlign) {
-		super("tempo");
-		this.editAlign = editAlign;
-		this.mmlManager = mmlManager;
+		super("tempo", mmlManager, editAlign);
 	}
 
 	private int showTempoInputDialog(String title, int tempo) {
@@ -55,30 +50,35 @@ public final class MMLTempoEditor extends AbstractMarkerEditor<MMLTempoEvent> {
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		String actionCommand = e.getActionCommand();
-		if (actionCommand.equals(insertCommand)) {
-			int tempo = showTempoInputDialog(AppResource.appText("edit."+insertCommand), 120);
-			if (tempo < 0) {
-				return;
-			}
+	protected List<MMLTempoEvent> getEventList() {
+		return mmlManager.getMMLScore().getTempoEventList();
+	}
 
-			// tempo align
-			int tick = targetTick - (targetTick % this.editAlign.getEditAlign());
-			MMLTempoEvent insertTempo = new MMLTempoEvent(tempo, tick);
-			insertTempo.appendToListElement(eventList);
-			System.out.println("insert tempo." + tempo);
-		} else if (actionCommand.equals(editCommand)) {
-			int tempo = showTempoInputDialog(AppResource.appText("edit."+editCommand), targetEvent.getTempo());
-			if (tempo < 0) {
-				return;
-			}
-			targetEvent.setTempo(tempo);
-		} else if (actionCommand.equals(deleteCommand)) {
-			eventList.remove(targetEvent);
-			System.out.println("delete tempo.");
+	@Override
+	protected void insertAction() {
+		int tempo = showTempoInputDialog(AppResource.appText("edit."+insertCommand), 120);
+		if (tempo < 0) {
+			return;
 		}
 
-		mmlManager.updateActivePart();
+		// tempo align
+		MMLTempoEvent insertTempo = new MMLTempoEvent(tempo, targetTick);
+		insertTempo.appendToListElement(getEventList());
+		System.out.println("insert tempo." + tempo);
+	}
+
+	@Override
+	protected void editAction() {
+		int tempo = showTempoInputDialog(AppResource.appText("edit."+editCommand), targetEvent.getTempo());
+		if (tempo < 0) {
+			return;
+		}
+		targetEvent.setTempo(tempo);
+	}
+
+	@Override
+	protected void deleteAction() {
+		getEventList().remove(targetEvent);
+		System.out.println("delete tempo.");
 	}
 }

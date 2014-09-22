@@ -4,6 +4,7 @@
 
 package fourthline.mabiicco.ui.editor;
 
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.List;
 import javax.swing.JMenuItem;
 
 import fourthline.mabiicco.AppResource;
+import fourthline.mabiicco.ui.IMMLManager;
 import fourthline.mmlTools.MMLEvent;
 
 /**
@@ -23,7 +25,7 @@ import fourthline.mmlTools.MMLEvent;
  * @see MMLTempoEditor
  * @see MarkerEditor
  */
-public abstract class AbstractMarkerEditor<T extends MMLEvent> implements ActionListener {
+public abstract class AbstractMarkerEditor<T extends MMLEvent> implements IMarkerEditor, ActionListener {
 
 	private final JMenuItem insertMenu;
 	private final JMenuItem editMenu;
@@ -34,11 +36,19 @@ public abstract class AbstractMarkerEditor<T extends MMLEvent> implements Action
 	protected final String editCommand;
 	protected final String deleteCommand;
 
-	public AbstractMarkerEditor(String suffix) {
+	private final IEditAlign editAlign;
+	protected final IMMLManager mmlManager;
+
+	protected T targetEvent;
+	protected int targetTick;
+
+	public AbstractMarkerEditor(String suffix, IMMLManager mmlManager, IEditAlign editAlign) {
 		this.suffix = suffix;
 		this.insertCommand = "insert_" + suffix;
 		this.editCommand   = "edit_" + suffix;
 		this.deleteCommand = "delete_" + suffix;
+		this.mmlManager = mmlManager;
+		this.editAlign = editAlign;
 
 		insertMenu = newMenuItem(AppResource.appText("edit."+insertCommand));
 		insertMenu.setActionCommand(insertCommand);
@@ -48,6 +58,7 @@ public abstract class AbstractMarkerEditor<T extends MMLEvent> implements Action
 		deleteMenu.setActionCommand(deleteCommand);
 	}
 
+	@Override
 	public List<JMenuItem> getMenuItems() {
 		return Arrays.asList(insertMenu, editMenu, deleteMenu);
 	}
@@ -58,13 +69,10 @@ public abstract class AbstractMarkerEditor<T extends MMLEvent> implements Action
 		return menu;
 	}
 
-	protected T targetEvent;
-	protected List<T> eventList;
-	protected int targetTick;
-	public void activateEditMenuItem(List<T> eventList, int baseTick, int delta) {
-		this.eventList = eventList;
-		this.targetTick = baseTick;
-		targetEvent = getTempoEventOnTick(eventList, baseTick, delta);
+	@Override
+	public void activateEditMenuItem(int baseTick, int delta) {
+		this.targetTick = baseTick - (baseTick % this.editAlign.getEditAlign());
+		targetEvent = getTempoEventOnTick(baseTick, delta);
 
 		// 指定範囲内にイベントがなければ、挿入のみを有効にします.
 		if (targetEvent == null) {
@@ -78,9 +86,9 @@ public abstract class AbstractMarkerEditor<T extends MMLEvent> implements Action
 		}
 	}
 
-	private T getTempoEventOnTick(List<T> eventList, int baseTick, int delta) {
+	private T getTempoEventOnTick(int baseTick, int delta) {
 		System.out.println(baseTick+" "+delta);
-		for (T event : eventList) {
+		for (T event : getEventList()) {
 			int tick = event.getTickOffset();
 			if ( (tick > baseTick - delta) && 
 					(tick < baseTick + delta) ) {
@@ -89,4 +97,23 @@ public abstract class AbstractMarkerEditor<T extends MMLEvent> implements Action
 		}
 		return null;
 	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		String actionCommand = e.getActionCommand();
+		if (actionCommand.equals(insertCommand)) {
+			insertAction();
+		} else if (actionCommand.equals(editCommand)) {
+			editAction();
+		} else if (actionCommand.equals(deleteCommand)) {
+			deleteAction();
+		}
+
+		mmlManager.updateActivePart();
+	}
+
+	protected abstract List<T> getEventList();
+	protected abstract void insertAction();
+	protected abstract void editAction();
+	protected abstract void deleteAction();
 }

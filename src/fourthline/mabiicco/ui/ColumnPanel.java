@@ -12,6 +12,7 @@ import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
 
 import javax.sound.midi.Sequencer;
 import javax.swing.JPanel;
@@ -21,6 +22,7 @@ import javax.swing.SwingUtilities;
 import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.editor.IEditAlign;
+import fourthline.mabiicco.ui.editor.IMarkerEditor;
 import fourthline.mabiicco.ui.editor.MarkerEditor;
 import fourthline.mabiicco.ui.editor.MMLTempoEditor;
 import fourthline.mmlTools.MMLEventList;
@@ -43,8 +45,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 	private final IEditAlign editAlign;
 
 	private final JPopupMenu popupMenu = new JPopupMenu();
-	private final MMLTempoEditor tempoEditor;
-	private final MarkerEditor markerEditor;
+	private final ArrayList<IMarkerEditor> markerEditor = new ArrayList<>();
 
 	public ColumnPanel(PianoRollView pianoRollView, IMMLManager mmlManager, IEditAlign editAlign) {
 		super();
@@ -54,12 +55,11 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 		addMouseListener(this);
 		addMouseMotionListener(this);
 
-		tempoEditor = new MMLTempoEditor(mmlManager, editAlign);
-		markerEditor = new MarkerEditor(mmlManager, editAlign);
+		markerEditor.add( new MMLTempoEditor(mmlManager, editAlign) );
+		markerEditor.add( new MarkerEditor(mmlManager, editAlign) );
 
 		// popupMenu に各MenuItemを登録する.
-		tempoEditor.getMenuItems().forEach(t -> popupMenu.add(t));
-		markerEditor.getMenuItems().forEach(t -> popupMenu.add(t));
+		markerEditor.forEach(t -> t.getMenuItems().forEach(popupMenu::add));
 	}
 
 	@Override
@@ -198,14 +198,12 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 	}
 
 	private void popupAction(Component component, int x, int y) {
-		int targetTick = (int)pianoRollView.convertXtoTick(x);
-		targetTick -= targetTick % 6;
+		int baseTick = (int)pianoRollView.convertXtoTick(x);
+		int targetTick = baseTick - (baseTick % 6);
 		int delta = (int)pianoRollView.convertXtoTick(6);
 
 		// クリックした位置に、テンポ/マーカー イベントがあれば削除モードになります.
-		MMLScore score =  mmlManager.getMMLScore();
-		tempoEditor.activateEditMenuItem(score.getTempoEventList(), targetTick, delta);
-		markerEditor.activateEditMenuItem(score.getMarkerList(), targetTick, delta);
+		markerEditor.forEach(t -> t.activateEditMenuItem(targetTick, delta));
 
 		popupMenu.show(component, x, y);
 		System.out.println("targetTick: " + targetTick);

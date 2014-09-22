@@ -1,7 +1,11 @@
+/*
+ * Copyright (C) 2014 たんらる
+ */
+
 package fourthline.mabiicco.ui.editor;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
+import java.util.List;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -23,13 +27,8 @@ import fourthline.mmlTools.Marker;
  */
 public final class MarkerEditor extends AbstractMarkerEditor<Marker> {
 
-	private final IEditAlign editAlign;
-	private final IMMLManager mmlManager;
-
 	public MarkerEditor(IMMLManager mmlManager, IEditAlign editAlign) {
-		super("marker");
-		this.editAlign = editAlign;
-		this.mmlManager = mmlManager;
+		super("marker", mmlManager, editAlign);
 	}
 
 	private String showTextInputDialog(String title, String text) {
@@ -49,28 +48,33 @@ public final class MarkerEditor extends AbstractMarkerEditor<Marker> {
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		String actionCommand = e.getActionCommand();
-		if (actionCommand.equals(insertCommand)) {
-			String text = showTextInputDialog(AppResource.appText("edit."+insertCommand), AppResource.appText("edit.new.marker"));
-			if ((text == null) || (text.length() == 0)) {
-				return;
-			}
+	protected List<Marker> getEventList() {
+		return mmlManager.getMMLScore().getMarkerList();
+	}
 
-			// tempo align
-			int tick = targetTick - (targetTick % this.editAlign.getEditAlign());
-			Marker marker = new Marker(text, tick);
-			eventList.add(marker);
-		} else if (actionCommand.equals(editCommand)) {
-			String text = showTextInputDialog(AppResource.appText("edit."+insertCommand), targetEvent.getName());
-			if (text == null) {
-				return;
-			}
-			targetEvent.setName(text);
-		} else if (actionCommand.equals(deleteCommand)) {
-			eventList.remove(targetEvent);
+	@Override
+	protected void insertAction() {
+		String text = showTextInputDialog(AppResource.appText("edit."+insertCommand), AppResource.appText("edit.new.marker"));
+		if ((text == null) || (text.length() == 0)) {
+			return;
 		}
 
-		mmlManager.updateActivePart();
+		// tempo align
+		Marker marker = new Marker(text, targetTick);
+		getEventList().add(marker);
+	}
+
+	@Override
+	protected void editAction() {
+		String text = showTextInputDialog(AppResource.appText("edit."+editCommand), targetEvent.getName());
+		if (text == null) {
+			return;
+		}
+		targetEvent.setName(text);
+	}
+
+	@Override
+	protected void deleteAction() {
+		getEventList().remove(targetEvent);
 	}
 }

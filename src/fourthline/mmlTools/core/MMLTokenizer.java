@@ -49,7 +49,7 @@ public final class MMLTokenizer implements Iterator<String> {
 	 * @return 解析位置
 	 */
 	public int[] getIndex() {
-		return new int[] { startIndex, endIndex} ;
+		return new int[] { startIndex, endIndex };
 	}
 
 	static public boolean isToken(char ch) {
