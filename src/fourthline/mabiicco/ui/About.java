@@ -12,7 +12,9 @@ import fourthline.mabiicco.AppResource;
 public final class About {
 	public void show(Frame parentFrame) {
 		String title = AppResource.appText("menu.about");
-		String text = "Version: " + AppResource.getVersionText();
-		JOptionPane.showMessageDialog(parentFrame, text, title, JOptionPane.PLAIN_MESSAGE);
+		StringBuilder sb = new StringBuilder();
+		sb.append("Version:  ").append(AppResource.getVersionText()).append('\n');
+		sb.append("Runtime: ").append(AppResource.getRuntimeVersion());
+		JOptionPane.showMessageDialog(parentFrame, sb.toString(), title, JOptionPane.PLAIN_MESSAGE);
 	}
 }

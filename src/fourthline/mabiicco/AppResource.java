@@ -27,6 +27,10 @@ public final class AppResource {
 		return versionText;
 	}
 
+	public static String getRuntimeVersion() {
+		return System.getProperties().get("java.runtime.version").toString();
+	}
+
 	public static String getManifestValue(String key) {
 		if (mf == null) {
 			try {
@@ -58,5 +62,9 @@ public final class AppResource {
 		}
 
 		return icon;
+	}
+
+	public static void main(String args[]) {
+		System.getProperties().forEach((s1, s2) -> System.out.println(s1+": "+s2));
 	}
 }
