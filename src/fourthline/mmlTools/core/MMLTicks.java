@@ -169,12 +169,17 @@ public final class MMLTicks {
 	}
 
 	static public int getTick(String gt) throws UndefinedTickException {
-		try {
-			int tick = tickTable.get(gt);
-			return tick;
-		} catch (NullPointerException e) {
-			throw new UndefinedTickException(gt);
+		String str = gt;
+		while (!tickTable.containsKey(str)) {
+			int len = str.length();
+			if (len > 1) {
+				str = str.substring(0, len - 1);
+			} else {
+				throw new UndefinedTickException(gt);
+			}
 		}
+
+		return tickTable.get(str);
 	}
 
 	static public int minimumTick() {

@@ -264,6 +264,24 @@ public final class MMLScore implements IMMLFileParser {
 		} catch (UnsupportedEncodingException e) {}
 	}
 
+	public List<MMLNoteEvent[]> getNoteListOnTickOffset(long tick) {
+		ArrayList<MMLNoteEvent[]> noteListArray = new ArrayList<>();
+		for (MMLTrack track : this.getTrackList()) {
+			int partIndex = 0;
+			MMLNoteEvent noteList[] = new MMLNoteEvent[4];
+			for (MMLEventList eventList : track.getMMLEventList()) {
+				if (partIndex == 3) {
+					continue;
+				}
+				noteList[partIndex] = eventList.searchOnTickOffset(tick);
+				partIndex++;
+			}
+			noteListArray.add(noteList);
+		}
+
+		return noteListArray;
+	}
+
 	@Override
 	public MMLScore parse(InputStream istream) throws MMLParseException {
 		this.globalTempoList.clear();

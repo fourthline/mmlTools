@@ -16,7 +16,7 @@ public final class MMLFile implements IMMLFileParser {
 	@Override
 	public MMLScore parse(InputStream istream) throws MMLParseException {
 		MMLScore score = new MMLScore();
-		List<SectionContents> contentsList = SectionContents.makeSectionContentsByInputStream(istream);
+		List<SectionContents> contentsList = SectionContents.makeSectionContentsByInputStream(istream, "Shift_JIS");
 		if (contentsList.isEmpty()) {
 			throw(new MMLParseException());
 		}
@@ -26,7 +26,7 @@ public final class MMLFile implements IMMLFileParser {
 		contentsList.stream()
 		.filter(s -> s.getName().matches("\\[Channel[0-9]*\\]"))
 		.map(s -> s.getContents())
-		.map(s -> s.replaceAll("//.*\n", "\n").replaceAll("/\\*.*\\*/", "").replaceAll("[ \t\n]", ""))
+		.map(s -> s.replaceAll("//.*\n", "\n").replaceAll("[ \t\n]", "").replaceAll("/\\*/?([^/]|[^*]/)*\\*/", ""))
 		.forEach(s -> mmlParts.add(s));
 
 		while (!mmlParts.isEmpty()) {

@@ -13,6 +13,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.sound.midi.Sequencer;
 import javax.swing.JPanel;
@@ -25,11 +26,9 @@ import fourthline.mabiicco.ui.editor.IEditAlign;
 import fourthline.mabiicco.ui.editor.IMarkerEditor;
 import fourthline.mabiicco.ui.editor.MarkerEditor;
 import fourthline.mabiicco.ui.editor.MMLTempoEditor;
-import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLNoteEvent;
 import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTempoEvent;
-import fourthline.mmlTools.MMLTrack;
 import fourthline.mmlTools.Marker;
 
 
@@ -173,22 +172,15 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 			return;
 		}
 		if (!sequencer.isRunning()) {
+			MMLScore score = mmlManager.getMMLScore();
 			long tick = pianoRollView.convertXtoTick(x);
 			int trackIndex = 0;
-			for (MMLTrack track : mmlManager.getMMLScore().getTrackList()) {
-				int partIndex = 0;
-				int program = track.getProgram();
+			List<MMLNoteEvent[]> noteListArray = score.getNoteListOnTickOffset(tick);
+			for (MMLNoteEvent[] noteList : noteListArray) {
+				int program = score.getTrack(trackIndex).getProgram();
 				if (x < 0) {
 					MabiDLS.getInstance().playNotes(null, program, trackIndex);
 				} else {
-					MMLNoteEvent noteList[] = new MMLNoteEvent[4];
-					for (MMLEventList eventList : track.getMMLEventList()) {
-						if (partIndex == 3) {
-							continue;
-						}
-						noteList[partIndex] = eventList.searchOnTickOffset(tick);
-						partIndex++;
-					}
 					MabiDLS.getInstance().playNotes(noteList, program, trackIndex);
 				}
 

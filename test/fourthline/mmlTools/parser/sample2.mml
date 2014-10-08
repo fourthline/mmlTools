@@ -4,7 +4,9 @@ Title=test2
 Source=
 Memo=
 [Channel1]
-/* track1 */
+/* 
+ * track1 
+ */
 cde
 [Channel2]
 // track2
