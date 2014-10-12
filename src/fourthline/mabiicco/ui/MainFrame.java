@@ -60,8 +60,8 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 	private final JPanel contentPane;
 	private final JTextField statusField;
 	private final MMLSeqView mmlSeqView;
-	private final JComboBox<NoteAlign> noteTypeSelect;
-	private final JLabel timeView;
+	private final JComboBox<NoteAlign> noteTypeSelect = new JComboBox<>(MMLEditor.createAlignList());
+	private final JLabel timeView = new JLabel("time MM:SS/MM:SS (120)");
 
 	private final ActionListener listener;
 
@@ -101,120 +101,9 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		contentPane.add(northPanel, BorderLayout.NORTH);
 
-		JToolBar toolBar = new JToolBar();
+		JToolBar toolBar = createToolBar();
 		toolBar.setFloatable(false);
 		northPanel.add(toolBar);
-
-		JButton newFileButton = new JButton("");
-		newFileButton.setToolTipText(appText("menu.newFile"));
-		newFileButton.setIcon(AppResource.getImageIcon(appText("menu.newFile.icon")));
-		noplayFunctions.add(newFileButton);
-		newFileButton.setFocusable(false);
-		newFileButton.addActionListener(listener);
-		newFileButton.setActionCommand(ActionDispatcher.NEW_FILE);
-		toolBar.add(newFileButton);
-
-		JButton openFileButton = new JButton("");
-		openFileButton.setToolTipText(appText("menu.openFile"));
-		openFileButton.setIcon(AppResource.getImageIcon(appText("menu.openFile.icon")));
-		noplayFunctions.add(openFileButton);
-		openFileButton.setFocusable(false);
-		openFileButton.addActionListener(listener);
-		openFileButton.setActionCommand(ActionDispatcher.FILE_OPEN);
-		toolBar.add(openFileButton);
-
-		toolBar.add(newToolBarSeparator());
-
-		JButton startPositionButton = new JButton("");
-		toolBar.add(startPositionButton);
-		startPositionButton.setToolTipText(appText("menu.head"));
-		startPositionButton.setIcon(AppResource.getImageIcon(appText("menu.head.icon")));
-		startPositionButton.setFocusable(false);
-		startPositionButton.addActionListener(listener);
-		startPositionButton.setActionCommand(ActionDispatcher.SET_START_POSITION);
-
-		JButton prevPositionButton = new JButton("");
-		toolBar.add(prevPositionButton);
-		prevPositionButton.setToolTipText(appText("menu.prev"));
-		prevPositionButton.setIcon(AppResource.getImageIcon(appText("menu.prev.icon")));
-		prevPositionButton.setFocusable(false);
-		prevPositionButton.addActionListener(listener);
-		prevPositionButton.setActionCommand(ActionDispatcher.PREV_TIME);
-
-		JButton playButton = new JButton("");
-		toolBar.add(playButton);
-		playButton.setToolTipText(appText("menu.play"));
-		playButton.setIcon(AppResource.getImageIcon(appText("menu.play.icon")));
-		playButton.setFocusable(false);
-		playButton.addActionListener(listener);
-		playButton.setActionCommand(ActionDispatcher.PLAY);
-
-		JButton nextPositionButton = new JButton("");
-		toolBar.add(nextPositionButton);
-		nextPositionButton.setToolTipText(appText("menu.next"));
-		nextPositionButton.setIcon(AppResource.getImageIcon(appText("menu.next.icon")));
-		nextPositionButton.setFocusable(false);
-		nextPositionButton.addActionListener(listener);
-		nextPositionButton.setActionCommand(ActionDispatcher.NEXT_TIME);
-
-		JButton pauseButton = new JButton("");
-		pauseButton.setToolTipText(appText("menu.pause"));
-		pauseButton.setIcon(AppResource.getImageIcon(appText("menu.pause.icon")));
-		pauseButton.setFocusable(false);
-		pauseButton.addActionListener(listener);
-		pauseButton.setActionCommand(ActionDispatcher.PAUSE);
-		toolBar.add(pauseButton);
-
-		JButton stopButton = new JButton();
-		toolBar.add(stopButton);
-		stopButton.setToolTipText(appText("menu.stop"));
-		stopButton.setIcon(AppResource.getImageIcon(appText("menu.stop.icon")));
-		stopButton.setFocusable(false);
-		stopButton.addActionListener(listener);
-		stopButton.setActionCommand(ActionDispatcher.STOP);
-
-		toolBar.add(newToolBarSeparator());
-
-		JButton inputClipButton = new JButton();
-		inputClipButton.setToolTipText(appText("menu.inputMML"));
-		inputClipButton.setIcon(AppResource.getImageIcon(appText("menu.inputMML.icon")));
-		noplayFunctions.add(inputClipButton);
-		inputClipButton.setFocusable(false);
-		inputClipButton.addActionListener(listener);
-		inputClipButton.setActionCommand(ActionDispatcher.INPUT_FROM_CLIPBOARD);
-		toolBar.add(inputClipButton);
-
-		JButton outputClipButton = new JButton();
-		outputClipButton.setToolTipText(appText("menu.outputMML"));
-		outputClipButton.setIcon(AppResource.getImageIcon(appText("menu.outputMML.icon")));
-		outputClipButton.setFocusable(false);
-		outputClipButton.addActionListener(listener);
-		outputClipButton.setActionCommand(ActionDispatcher.OUTPUT_TO_CLIPBOARD);
-		toolBar.add(outputClipButton);
-
-		toolBar.add(newToolBarSeparator());
-
-		// ビューの拡大/縮小ツールボタン
-		JButton expandButton = new JButton(appText("view.scale.up"));
-		expandButton.setFocusable(false);
-		expandButton.addActionListener(listener);
-		expandButton.setActionCommand(ActionDispatcher.VIEW_SCALE_UP);
-		toolBar.add(expandButton);
-
-		JButton reduceButton = new JButton(appText("view.scale.down"));
-		reduceButton.setFocusable(false);
-		reduceButton.addActionListener(listener);
-		reduceButton.setActionCommand(ActionDispatcher.VIEW_SCALE_DOWN);
-		toolBar.add(reduceButton);
-
-		noteTypeSelect = new JComboBox<>(MMLEditor.createAlignList());
-		noteTypeSelect.setFocusable(false);
-		toolBar.add(noteTypeSelect);
-
-		toolBar.add(newToolBarSeparator());
-		timeView = new JLabel("time MM:SS/MM:SS (120)");
-		timeView.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-		toolBar.add(timeView);
 
 		mmlSeqView = new MMLSeqView();
 		mmlSeqView.setTimeView(timeView);
@@ -477,6 +366,80 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 				mmlSeqView.repaint();
 			}
 		});
+	}
+
+	private JButton createToolButton(String title, String iconName, String command) {
+		JButton button = new JButton("");
+		if (iconName == null) {
+			button.setText(appText(title));
+		} else {
+			button.setToolTipText(appText(title));
+			button.setIcon(AppResource.getImageIcon(appText(iconName)));
+		}
+		button.setFocusable(false);
+		button.addActionListener(listener);
+		button.setActionCommand(command);
+
+		return button;
+	}
+
+	private JToolBar createToolBar() {
+		JToolBar toolBar = new JToolBar();
+
+		JButton newFileButton = createToolButton("menu.newFile", "menu.newFile.icon", ActionDispatcher.NEW_FILE);
+		noplayFunctions.add(newFileButton);
+		toolBar.add(newFileButton);
+
+		JButton openFileButton = createToolButton("menu.openFile", "menu.openFile.icon", ActionDispatcher.FILE_OPEN);
+		noplayFunctions.add(openFileButton);
+		toolBar.add(openFileButton);
+
+		toolBar.add(newToolBarSeparator());
+
+		JButton startPositionButton = createToolButton("menu.head", "menu.head.icon", ActionDispatcher.SET_START_POSITION);
+		toolBar.add(startPositionButton);
+
+		JButton prevPositionButton = createToolButton("menu.prev", "menu.prev.icon", ActionDispatcher.PREV_TIME);
+		toolBar.add(prevPositionButton);
+
+		JButton playButton = createToolButton("menu.play", "menu.play.icon", ActionDispatcher.PLAY);
+		toolBar.add(playButton);
+
+		JButton nextPositionButton = createToolButton("menu.next", "menu.next.icon", ActionDispatcher.NEXT_TIME);
+		toolBar.add(nextPositionButton);
+
+		JButton pauseButton = createToolButton("menu.pause", "menu.pause.icon", ActionDispatcher.PAUSE);
+		toolBar.add(pauseButton);
+
+		JButton stopButton = createToolButton("menu.stop", "menu.stop.icon", ActionDispatcher.STOP);
+		toolBar.add(stopButton);
+
+		toolBar.add(newToolBarSeparator());
+
+		JButton inputClipButton = createToolButton("menu.inputMML", "menu.inputMML.icon", ActionDispatcher.INPUT_FROM_CLIPBOARD);
+		noplayFunctions.add(inputClipButton);
+		toolBar.add(inputClipButton);
+
+		JButton outputClipButton = createToolButton("menu.outputMML", "menu.outputMML.icon", ActionDispatcher.OUTPUT_TO_CLIPBOARD);
+		toolBar.add(outputClipButton);
+
+		toolBar.add(newToolBarSeparator());
+
+		// ビューの拡大/縮小ツールボタン
+		JButton expandButton = createToolButton("view.scale.up", null, ActionDispatcher.VIEW_SCALE_UP);
+		toolBar.add(expandButton);
+
+		JButton reduceButton = createToolButton("view.scale.down", null, ActionDispatcher.VIEW_SCALE_DOWN);
+		toolBar.add(reduceButton);
+
+		noteTypeSelect.setFocusable(false);
+		toolBar.add(noteTypeSelect);
+
+		toolBar.add(newToolBarSeparator());
+		timeView.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+		toolBar.add(timeView);
+
+		return toolBar;
 	}
 
 	private JSeparator newToolBarSeparator() {
