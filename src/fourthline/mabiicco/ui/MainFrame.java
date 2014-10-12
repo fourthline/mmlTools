@@ -22,6 +22,7 @@ import static fourthline.mabiicco.AppResource.appText;
 import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mabiicco.midi.INotifyTrackEnd;
 import fourthline.mabiicco.midi.MabiDLS;
+import fourthline.mabiicco.ui.PianoRollView.PaintMode;
 import fourthline.mabiicco.ui.editor.MMLEditor;
 import fourthline.mabiicco.ui.editor.NoteAlign;
 
@@ -61,6 +62,7 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 	private final JTextField statusField;
 	private final MMLSeqView mmlSeqView;
 	private final JComboBox<NoteAlign> noteTypeSelect = new JComboBox<>(MMLEditor.createAlignList());
+	private final JComboBox<PaintMode> paintModeSelect = new JComboBox<>(PaintMode.values());
 	private final JLabel timeView = new JLabel("time MM:SS/MM:SS (120)");
 
 	private final ActionListener listener;
@@ -101,13 +103,13 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		contentPane.add(northPanel, BorderLayout.NORTH);
 
-		JToolBar toolBar = createToolBar();
-		toolBar.setFloatable(false);
-		northPanel.add(toolBar);
-
 		mmlSeqView = new MMLSeqView();
 		mmlSeqView.setTimeView(timeView);
 		contentPane.add(mmlSeqView.getPanel(), BorderLayout.CENTER);
+
+		JToolBar toolBar = createToolBar();
+		toolBar.setFloatable(false);
+		northPanel.add(toolBar);
 
 		JPanel southPanel = new JPanel();
 		contentPane.add(southPanel, BorderLayout.SOUTH);
@@ -119,10 +121,6 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		statusField.setColumns(10);
 
 		MabiDLS.getInstance().addTrackEndNotifier(this);
-
-		noteTypeSelect.addActionListener(this); // MainFrameでAction処理します.
-		noteTypeSelect.setSelectedIndex(MMLEditor.DEFAULT_ALIGN_INDEX);
-		setEditAlign();
 
 		setCanReloadFile(false);
 		setCanUndo(false);
@@ -432,8 +430,18 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		JButton reduceButton = createToolButton("view.scale.down", null, ActionDispatcher.VIEW_SCALE_DOWN);
 		toolBar.add(reduceButton);
 
+		// 編集ノートタイプ
 		noteTypeSelect.setFocusable(false);
+		noteTypeSelect.addActionListener(this); // MainFrameでAction処理します.
+		noteTypeSelect.setSelectedIndex(MMLEditor.DEFAULT_ALIGN_INDEX);
+		setEditAlign();
 		toolBar.add(noteTypeSelect);
+
+		// Paint Mode
+		paintModeSelect.setFocusable(false);
+		paintModeSelect.addActionListener(this);
+		paintModeSelect.setSelectedItem( mmlSeqView.getPaintMode() );
+		toolBar.add(paintModeSelect);
 
 		toolBar.add(newToolBarSeparator());
 		timeView.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
@@ -546,6 +554,10 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 
 		if (source.equals(noteTypeSelect)) {
 			setEditAlign();
+		} else if (source.equals(paintModeSelect)) {
+			PaintMode mode = (PaintMode) paintModeSelect.getSelectedItem();
+			mmlSeqView.setPaintMode(mode);
+			mmlSeqView.repaint();
 		}
 	}
 

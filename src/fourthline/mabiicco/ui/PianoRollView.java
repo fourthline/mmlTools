@@ -18,6 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JViewport;
 import javax.swing.event.MouseInputListener;
 
+import fourthline.mabiicco.AppResource;
 import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.MabiDLS;
@@ -100,6 +101,29 @@ public final class PianoRollView extends JPanel {
 	private static final Color darkBarBorder = new Color(0.3f, 0.2f, 0.3f);
 
 	private static final int DRAW_START_MARGIN = 192;
+
+	public enum PaintMode {
+		ALL_TRACK("paintMode.all_track"), 
+		ACTIVE_TRACK("paintMode.active_track"),
+		ACTIVE_PART("paintMode.active_part");
+
+		final private String resourceName;
+		private PaintMode(String name) {
+			resourceName = name;
+		}
+		public String toString() {
+			return AppResource.appText(resourceName);
+		}
+	}
+	private PaintMode paintMode = PaintMode.ALL_TRACK;
+
+	public PaintMode getPaintMode() {
+		return paintMode;
+	}
+
+	public void setPaintMode(PaintMode mode) {
+		paintMode = mode;
+	}
 
 	/**
 	 * Create the panel.
@@ -304,8 +328,6 @@ public final class PianoRollView extends JPanel {
 		super.paintComponent(g);
 		updateViewTick();
 
-		MMLScore mmlScore = mmlManager.getMMLScore();
-
 		// FIXME: しぼったほうがいいかも？
 		updateViewWidthTrackLength();
 
@@ -317,15 +339,7 @@ public final class PianoRollView extends JPanel {
 		paintMeasure(g2);
 		paintPitchRangeBorder(g2);
 
-		if (mmlScore != null) {
-			for (int i = 0; i < mmlScore.getTrackCount(); i++) {
-				MMLTrack track = mmlScore.getTrack(i);
-				if (track != mmlScore.getTrack(mmlManager.getActiveTrackIndex())) {
-					paintMMLTrack(g2, i, track);
-				}
-			}
-		}
-
+		paintOtherTrack(g2);
 		paintActiveTrack(g2);
 		paintSelectedNote(g2);
 		paintSelectingArea(g2);
@@ -531,12 +545,29 @@ public final class PianoRollView extends JPanel {
 
 	private void paintActiveTrack(Graphics2D g) {
 		int trackIndex = mmlManager.getActiveTrackIndex();
-		paintMMLTrack(g, trackIndex, mmlManager.getMMLScore().getTrack(trackIndex));
+		if (paintMode != PaintMode.ACTIVE_PART) {
+			paintMMLTrack(g, trackIndex, mmlManager.getMMLScore().getTrack(trackIndex));
+		}
 		MMLEventList activePart = mmlManager.getActiveMMLPart();
 
 		Color rectColor = ColorPalette.ACTIVE.getRectColor(trackIndex);
 		Color fillColor = ColorPalette.ACTIVE.getFillColor(trackIndex);
 		paintMMLPart(g, activePart.getMMLNoteEventList(), rectColor, fillColor, true);
+	}
+
+	private void paintOtherTrack(Graphics2D g) {
+		MMLScore mmlScore = mmlManager.getMMLScore();
+		if (paintMode != PaintMode.ALL_TRACK) {
+			return;
+		}
+		if (mmlScore != null) {
+			for (int i = 0; i < mmlScore.getTrackCount(); i++) {
+				MMLTrack track = mmlScore.getTrack(i);
+				if (track != mmlScore.getTrack(mmlManager.getActiveTrackIndex())) {
+					paintMMLTrack(g, i, track);
+				}
+			}
+		}
 	}
 
 	private void paintSelectedNote(Graphics2D g) {

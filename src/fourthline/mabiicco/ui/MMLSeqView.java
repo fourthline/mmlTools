@@ -19,6 +19,7 @@ import fourthline.mabiicco.IEditState;
 import fourthline.mabiicco.IFileState;
 import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.MabiDLS;
+import fourthline.mabiicco.ui.PianoRollView.PaintMode;
 import fourthline.mabiicco.ui.editor.MMLEditor;
 import fourthline.mabiicco.ui.editor.MMLScoreUndoEdit;
 import fourthline.mmlTools.MMLEventList;
@@ -290,6 +291,14 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	@Override
 	public MMLScore getMMLScore() {
 		return mmlScore;
+	}
+
+	public PaintMode getPaintMode() {
+		return pianoRollView.getPaintMode();
+	}
+
+	public void setPaintMode(PaintMode mode) {
+		pianoRollView.setPaintMode(mode);
 	}
 
 	public void editTrackPropertyAction(Frame parentFrame) {
