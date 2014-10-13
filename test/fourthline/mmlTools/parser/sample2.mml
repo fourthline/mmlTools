@@ -1,15 +1,26 @@
 [Settings]
 Encoding=shift_jis
 Title=test2
-Source=
+Source=tester
 Memo=
 [Channel1]
 /* 
  * track1 
  */
-cde
+c
+/* 
+ * comment
+ */
+de
 [Channel2]
 // track2
 rrr
 fga
 
+[Channel3]
+aba
+[3MLE EXTENSION]
+/* DO NOT EDIT!! DATA VOID IF "3MLE EXTENSION" IS EDITED. */
+c=2114764377
+d=/QAAAFyEzNwBAAAAQlpoOTFBWSZTWRbOssUAAEf/i/700gQCQHkAQBAEAG4KEABAAECAQAoABKAAkhGqNMgGgAAAY1BiRT0eqA2oHqPUGIBpkkLboWa7oB7Q84kWO8ma
+d=MejE71NQQIHBEFcWJFFpRFFXOGOpGqYSYCs+dDGSAogMxQdCqykGa2MaZOcRwG4NC7Fv1qBtCVKicIUGYi80eJLwIwRSol/F3JFOFCQFs6yxQA==
