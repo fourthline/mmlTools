@@ -29,10 +29,10 @@ public final class MMLFile implements IMMLFileParser {
 			throw(new MMLParseException());
 		}
 		parseSection(contentsList);
-
-		if (trackList != null) {
-			createTrack();
+		if ( (trackList == null) || (trackList.size() == 0) ) {
+			throw new MMLParseException();
 		}
+		createTrack();
 		return score;
 	}
 

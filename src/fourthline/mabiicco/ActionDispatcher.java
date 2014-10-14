@@ -218,9 +218,14 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			}
 			score = fileParser.parse(new FileInputStream(file));
 		} catch (FileNotFoundException e) {
-			JOptionPane.showMessageDialog(mainFrame, AppResource.appText("error.read"), AppResource.appText("error.nofile"), JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(mainFrame, 
+					AppResource.appText("error.read"), 
+					AppResource.appText("error.nofile"), 
+					JOptionPane.WARNING_MESSAGE);
 		} catch (MMLParseException e) {
-			JOptionPane.showMessageDialog(mainFrame, AppResource.appText("error.read"), AppResource.appText("error.invalid_file"), JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(mainFrame, 
+					AppResource.appText("error.read"), 
+					AppResource.appText("error.invalid_file"), JOptionPane.WARNING_MESSAGE);
 		}
 		return score;
 	}
@@ -244,7 +249,11 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 
 		if (openedFile != null) {
 			if (fileState.isModified()) {
-				int status = JOptionPane.showConfirmDialog(mainFrame, AppResource.appText("message.throw"), "", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+				int status = JOptionPane.showConfirmDialog(mainFrame, 
+						AppResource.appText("message.throw"), 
+						"", 
+						JOptionPane.YES_NO_OPTION, 
+						JOptionPane.QUESTION_MESSAGE);
 				if (status == JOptionPane.YES_OPTION) {
 					openMMLFile(openedFile);
 				}

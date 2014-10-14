@@ -17,10 +17,11 @@
 	<property name="app.vendor" value="fourthline" />
 	<property name="app.id" value="MabiIcco" />
 	<property name="app.name" value="MabiIcco" />
-	<property name="app.version" value="1.0-alpha14" />
+	<property name="app.version" value="1.0-alpha15" />
 	<property name="app.main-class" value="fourthline.mabiicco.MabiIcco" />
 	<property name="app.preloader-class" value="fourthline.mabiicco.preloader.MabiIccoPreloader" />
 	<property name="splash.image" value="img/title.png" />
+	<property name="class.path" value="lib/commons-compress/commons-compress-1.9.jar" />
 
 	<!-- clean task -->
 	<target name="clean">
@@ -34,6 +35,7 @@
 		<javac
 			srcdir="${src}"
 			destdir="${dest}"
+			classpath="${class.path}"
 			excludes="**/package-info.java"
 			encoding="UTF-8"
 			listfiles="yes"
@@ -79,6 +81,7 @@
 				<attribute name="Implementation-Version" value="${app.version}" />
 				<attribute name="Implementation-Build" value="${build.number}" />
 				<attribute name="SplashScreen-Image" value="${splash.image}" />
+				<attribute name="Class-Path" value="${class.path}" />
 			</manifest>
 			<fileset dir="${dest}" />
 		</fx:jar>
