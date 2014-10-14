@@ -8,12 +8,11 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Base64;
-import java.util.LinkedList;
 import java.util.Base64.Decoder;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
@@ -25,11 +24,11 @@ import fourthline.mmlTools.Marker;
 /**
  * "[3MLE EXTENSION]" parser
  */
-public class Extension3mleTrack {
-
+public final class Extension3mleTrack {
 	private int instrument;
 	private int panpot;
 	private int trackCount;
+	private int trackLimit;
 	private int group;
 	private String trackName;
 
@@ -38,17 +37,15 @@ public class Extension3mleTrack {
 		this.group = group;
 		this.panpot = panpot;
 		this.trackName = trackName;
-		trackCount = 1;
+		this.trackCount = 1;
+		this.trackLimit = 0;
+		for (boolean b : InstClass.getEnablePartByProgram(instrument-1)) {
+			if (b) trackLimit++;
+		}
 	}
 
 	private boolean isLimit() {
-		int count = 0;
-		for (boolean b : InstClass.getEnablePartByProgram(instrument-1)) {
-			if (b) {
-				count++;
-			}
-		}
-		return (trackCount >= count);
+		return (trackCount >= trackLimit);
 	}
 
 	private void addTrack() {
@@ -204,7 +201,7 @@ public class Extension3mleTrack {
 		return "";
 	}
 
-	public static void main(String[] args) throws UnsupportedEncodingException {
+	public static void main(String[] args) {
 		String str = "d=4wAAAJvYl0oBAAAAQlpoOTFBWSZTWReDTXYAAEH/i/7U0AQCAHgAQAAEAGwIEABAAECAAAoABKAAcivUCaZGmRiAyNqDEgnqRpkPTUZGh5S6QfOGHRg+AfSJE3ebNDxInstECT3owI1yYiuIY5IwTCLAQz1oZyAogJFOhVYmv39cWsLxsbh0MkELhClECHm5wCBjLYz8XckU4UJAXg012A==";
 
 		List<Extension3mleTrack> trackList = Extension3mleTrack.parse3mleExtension(str, null);

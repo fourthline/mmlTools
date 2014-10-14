@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.InstType;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mmlTools.MMLScore;
@@ -59,9 +58,9 @@ public final class MMLFile implements IMMLFileParser {
 			for (int i = 0; i < track.getTrackCount(); i++) {
 				text[i] = mmlParts.pop();
 			}
-			InstClass instClass = MabiDLS.getInstance().getInstByProgram(program);
+			InstType instType = MabiDLS.getInstance().getInstByProgram(program).getType();
 			MMLTrack mmlTrack;
-			if ( (instClass.getType() == InstType.VOICE) || (instClass.getType() == InstType.CHORUS) ) {
+			if ( (instType == InstType.VOICE) || (instType == InstType.CHORUS) ) {
 				// 歌パート
 				mmlTrack = new MMLTrack("", "", "", text[0]);
 			} else {

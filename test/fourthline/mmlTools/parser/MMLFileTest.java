@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.sound.midi.InvalidMidiDataException;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -24,9 +26,8 @@ public class MMLFileTest extends FileSelect {
 	public static void setup() {
 		MabiDLS midi = MabiDLS.getInstance();
 		try {
-			midi.initializeMIDI();
 			midi.loadingDLSFile(new File(MabiDLS.DEFALUT_DLS_PATH));
-		} catch (Exception e) {
+		} catch (InvalidMidiDataException | IOException e) {
 			e.printStackTrace();
 		}
 	}
