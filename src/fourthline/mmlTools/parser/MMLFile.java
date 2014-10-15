@@ -11,8 +11,10 @@ import java.util.regex.Pattern;
 
 import fourthline.mabiicco.midi.InstType;
 import fourthline.mabiicco.midi.MabiDLS;
+import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTrack;
+import fourthline.mmlTools.Marker;
 
 public final class MMLFile implements IMMLFileParser {
 	private final MMLScore score = new MMLScore();
@@ -25,17 +27,18 @@ public final class MMLFile implements IMMLFileParser {
 	public MMLScore parse(InputStream istream) throws MMLParseException {
 		List<SectionContents> contentsList = SectionContents.makeSectionContentsByInputStream(istream, "Shift_JIS");
 		if (contentsList.isEmpty()) {
-			throw(new MMLParseException());
+			throw(new MMLParseException("no contents"));
 		}
 		parseSection(contentsList);
 		if ( (trackList == null) || (trackList.size() == 0) ) {
-			throw new MMLParseException();
+			throw new MMLParseException("no track");
 		}
 		createTrack();
+		setStartPosition();
 		return score;
 	}
 
-	private void parseSection(List<SectionContents> contentsList) {
+	private void parseSection(List<SectionContents> contentsList) throws MMLParseException {
 		for (SectionContents contents : contentsList) {
 			if (contents.getName().equals("[3MLE EXTENSION]")) {
 				trackList = Extension3mleTrack.parse3mleExtension(contents.getContents(), score.getMarkerList());
@@ -70,6 +73,27 @@ public final class MMLFile implements IMMLFileParser {
 			mmlTrack.setProgram(program);
 			mmlTrack.setPanpot(track.getPanpot());
 			mmlTrack.setTrackName(track.getTrackName());
+		}
+	}
+
+	/**
+	 * 再生開始位置を設定します.
+	 */
+	private void setStartPosition() {
+		if (score.getMarkerList().size() == 0) {
+			return;
+		}
+		for (int i = 0; i < trackList.size(); i++) {
+			Extension3mleTrack track = trackList.get(i);
+			MMLTrack mmlTrack = score.getTrack(i);
+			int markerId = track.getStartMarker();
+			if (markerId > 0) {
+				Marker marker = score.getMarkerList().get(markerId-1);
+				int tickOffset = marker.getTickOffset();
+				for (MMLEventList eventList : mmlTrack.getMMLEventList()) {
+					eventList.insertTick(0, tickOffset);
+				}
+			}
 		}
 	}
 

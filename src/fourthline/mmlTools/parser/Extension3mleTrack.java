@@ -14,6 +14,7 @@ import java.util.Base64;
 import java.util.Base64.Decoder;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.zip.CRC32;
 
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 
@@ -27,15 +28,17 @@ import fourthline.mmlTools.Marker;
 public final class Extension3mleTrack {
 	private int instrument;
 	private int panpot;
+	private int startMarker;
 	private int trackCount;
 	private int trackLimit;
 	private int group;
 	private String trackName;
 
-	private Extension3mleTrack(int instrument, int group, int panpot, String trackName) {
+	private Extension3mleTrack(int instrument, int group, int panpot, String trackName, int startMarker) {
 		this.instrument = instrument;
 		this.group = group;
 		this.panpot = panpot;
+		this.startMarker = startMarker;
 		this.trackName = trackName;
 		this.trackCount = 1;
 		this.trackLimit = 0;
@@ -58,6 +61,10 @@ public final class Extension3mleTrack {
 
 	public int getPanpot() {
 		return panpot;
+	}
+
+	public int getStartMarker() {
+		return startMarker;
 	}
 
 	public int getTrackCount() {
@@ -86,19 +93,27 @@ public final class Extension3mleTrack {
 	 * @param [OUT] markerList マーカーリスト 
 	 * @return トラック構成情報
 	 */
-	public static List<Extension3mleTrack> parse3mleExtension(String str, List<Marker> markerList) {
+	public static List<Extension3mleTrack> parse3mleExtension(String str, List<Marker> markerList) throws MMLParseException {
 		StringBuilder sb = new StringBuilder();
+		long c = 0;
 		for (String s : str.split("\n")) {
 			if (s.startsWith("d=")) {
 				sb.append(s.substring(2));
+			} else if (s.startsWith("c=")) {
+				c = Long.parseLong(s.substring(2));
 			}
 		}
 
-		byte data[] = decode(sb.toString());
+		byte data[] = decode(sb.toString(), c);
 		return parse(data, markerList);
 	}
 
-	private static byte[] decode(String dSection) {
+	private static byte[] decode(String dSection, long c) throws MMLParseException {
+		CRC32 crc = new CRC32();
+		crc.update(dSection.getBytes());
+		if (c != crc.getValue()) {
+			throw new MMLParseException("invalid c="+c+" <> "+crc.getValue());
+		}
 		Decoder decoder = Base64.getDecoder();
 		byte b[] = decoder.decode(dSection);
 
@@ -127,7 +142,7 @@ public final class Extension3mleTrack {
 	 */
 	private static List<Extension3mleTrack> parse(byte data[], List<Marker> markerList) {
 		LinkedList<Extension3mleTrack> trackList = new LinkedList<>();
-		trackList.add(new Extension3mleTrack(-1, -1, -1, null)); // dummy
+		trackList.add(new Extension3mleTrack(-1, -1, -1, null, 0)); // dummy
 
 		ByteArrayInputStream istream = new ByteArrayInputStream(data);
 		int b = 0;
@@ -135,7 +150,7 @@ public final class Extension3mleTrack {
 		while ( (b = istream.read()) != -1) {
 			if ( (hb == 0x02) && (b == 0x1c) ) {
 				parseTrack(trackList, istream);
-			} else if ( (hb == 0x09) && ( (b >= 0x10) && (b < 0x20) )) {
+			} else if ( (hb == 0x09) && ( (b > 0x00) && (b < 0x20) )) {
 				parseMarker(markerList, istream);
 			}
 
@@ -152,7 +167,9 @@ public final class Extension3mleTrack {
 		int trackNo = istream.read();
 		istream.skip(1); // volumn
 		int panpot = istream.read();
-		istream.skip(13);
+		istream.skip(5);
+		int startMarker = istream.read();
+		istream.skip(7);
 		int instrument = istream.read();
 		istream.skip(3);
 		int group = istream.read();
@@ -163,7 +180,7 @@ public final class Extension3mleTrack {
 		Extension3mleTrack lastTrack = trackList.getLast();
 		if ( (lastTrack.group != group) || (lastTrack.instrument != instrument) || (lastTrack.isLimit())) {
 			// new Track
-			trackList.add(new Extension3mleTrack(instrument, group, panpot, trackName));
+			trackList.add(new Extension3mleTrack(instrument, group, panpot, trackName, startMarker));
 		} else {
 			lastTrack.addTrack();
 		}
@@ -202,11 +219,15 @@ public final class Extension3mleTrack {
 	}
 
 	public static void main(String[] args) {
-		String str = "d=4wAAAJvYl0oBAAAAQlpoOTFBWSZTWReDTXYAAEH/i/7U0AQCAHgAQAAEAGwIEABAAECAAAoABKAAcivUCaZGmRiAyNqDEgnqRpkPTUZGh5S6QfOGHRg+AfSJE3ebNDxInstECT3owI1yYiuIY5IwTCLAQz1oZyAogJFOhVYmv39cWsLxsbh0MkELhClECHm5wCBjLYz8XckU4UJAXg012A==";
+		try {
+			String str = "c=3902331007\nd=4wAAAJvYl0oBAAAAQlpoOTFBWSZTWReDTXYAAEH/i/7U0AQCAHgAQAAEAGwIEABAAECAAAoABKAAcivUCaZGmRiAyNqDEgnqRpkPTUZGh5S6QfOGHRg+AfSJE3ebNDxInstECT3owI1yYiuIY5IwTCLAQz1oZyAogJFOhVYmv39cWsLxsbh0MkELhClECHm5wCBjLYz8XckU4UJAXg012A==";
 
-		List<Extension3mleTrack> trackList = Extension3mleTrack.parse3mleExtension(str, null);
-		for (Extension3mleTrack track : trackList) {
-			System.out.println(track);
+			List<Extension3mleTrack> trackList = Extension3mleTrack.parse3mleExtension(str, null);
+			for (Extension3mleTrack track : trackList) {
+				System.out.println(track);
+			}
+		} catch (MMLParseException e) {
+			e.printStackTrace();
 		}
 	}
 }

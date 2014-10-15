@@ -10,4 +10,8 @@ public final class MMLParseException extends Exception {
 	public MMLParseException() {
 		super();
 	}
+
+	public MMLParseException(String s) {
+		super(s);
+	}
 }
