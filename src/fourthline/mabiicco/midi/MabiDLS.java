@@ -201,7 +201,9 @@ public final class MabiDLS {
 			if (note != playNoteEvents[i]) {
 				InstType instType = getInstByProgram(program).getType();
 				int volumn = instType.convertVelocityMML2Midi(note.getVelocity());
-				midiChannel.noteOn( convertNoteMML2Midi(note.getNote()), volumn);
+				if (note.getNote() >= 0) {
+					midiChannel.noteOn( convertNoteMML2Midi(note.getNote()), volumn);
+				}
 				playNoteEvents[i] = note;
 			}
 		}
