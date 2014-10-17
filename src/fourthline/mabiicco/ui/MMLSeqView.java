@@ -251,7 +251,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		}
 
 		initialSetView();
-		pianoRollView.setSequenceX(0);
+		pianoRollView.setSequenceTick(0);
 		updateTrackTabIcon();
 		updateActivePart();
 		updateProgramSelect();
@@ -340,7 +340,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		Sequencer sequencer = MabiDLS.getInstance().getSequencer();
 		if (!sequencer.isRunning()) {
 			setViewPosition(0);
-			pianoRollView.setSequenceX(0);
+			pianoRollView.setSequenceTick(0);
 			panel.repaint();
 		} else {
 			sequencer.setTempoInBPM(120);
@@ -353,8 +353,9 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	 */
 	public void pauseTickPosition() {
 		Sequencer sequencer = MabiDLS.getInstance().getSequencer();
-		int x = pianoRollView.convertTicktoX( sequencer.getTickPosition() );
-		pianoRollView.setSequenceX(x);
+		long tick = sequencer.getTickPosition();
+		tick -= tick % MMLTicks.minimumTick();
+		pianoRollView.setSequenceTick(tick);
 	}
 
 	public void inputClipBoardAction(Frame parentFrame) {
@@ -499,7 +500,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 			}
 			tick -= tick % deltaTick;
 			if (!sequencer.isRunning()) {
-				pianoRollView.setSequenceX(pianoRollView.convertTicktoX(tick));
+				pianoRollView.setSequenceTick(tick);
 				panel.repaint();
 			} else {
 				// 移動先のテンポに設定する.

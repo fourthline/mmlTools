@@ -153,7 +153,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 		if (!sequencer.isRunning()) {
 			long tick = pianoRollView.convertXtoTick(x);
 			tick -= tick % editAlign.getEditAlign();
-			pianoRollView.setSequenceX(pianoRollView.convertTicktoX(tick));
+			pianoRollView.setSequenceTick(tick);
 			repaint();
 			pianoRollView.repaint();
 		} else {

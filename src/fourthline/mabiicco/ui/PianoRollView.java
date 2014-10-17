@@ -134,7 +134,7 @@ public final class PianoRollView extends JPanel {
 
 		MabiIccoProperties properties = MabiIccoProperties.getInstance();
 		setNoteHeightIndex( properties.getPianoRollViewHeightScaleProperty() );
-		setSequenceX(0);
+		setSequenceTick(0);
 	}
 
 	/**
@@ -299,15 +299,11 @@ public final class PianoRollView extends JPanel {
 		return position;
 	}
 
-	public void setSequenceX(int x) {
-		long tick = convertXtoTick(x);
-		tick -= tick % MMLTicks.minimumTick();
-
+	public void setSequenceTick(long tick) {
 		if (!MabiDLS.getInstance().getSequencer().isRunning()) {
 			sequencePosition = tick;
 		}
 	}
-
 
 	/**
 	 * 現在の描画位置 tick値を更新します.

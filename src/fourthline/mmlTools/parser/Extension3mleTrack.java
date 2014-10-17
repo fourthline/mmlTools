@@ -186,21 +186,25 @@ public final class Extension3mleTrack {
 		}
 	}
 
-	private static void parseMarker(List<Marker> markerList, ByteArrayInputStream istream) {
+	private static int readLEIntValue(InputStream istream) {
 		byte b[] = new byte[4];
 		try {
-			// parse Marker
-			istream.skip(7);
 			istream.read(b);
-			int tickOffset = ByteBuffer.wrap(b).order(ByteOrder.LITTLE_ENDIAN).getInt();
-			istream.skip(4);
-			String name = readString(istream);
-			System.out.println("Marker " + name + "=" + tickOffset);
-			if (markerList != null) {
-				markerList.add(new Marker(name, tickOffset));
-			}
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+		return ByteBuffer.wrap(b).order(ByteOrder.LITTLE_ENDIAN).getInt();
+	}
+
+	private static void parseMarker(List<Marker> markerList, ByteArrayInputStream istream) {
+		// parse Marker
+		istream.skip(7);
+		int tickOffset = readLEIntValue(istream);
+		istream.skip(4);
+		String name = readString(istream);
+		System.out.println("Marker " + name + "=" + tickOffset);
+		if (markerList != null) {
+			markerList.add(new Marker(name, tickOffset));
 		}
 	}
 
