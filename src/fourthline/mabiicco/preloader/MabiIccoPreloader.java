@@ -24,7 +24,7 @@ public final class MabiIccoPreloader extends Preloader {
 		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Startup.fxml"));
 		Parent root = (Parent) fxmlLoader.load();
 		controller = fxmlLoader.getController();
-		controller.versionLabel.setText(AppResource.getVersionText());
+		controller.setVersionText(AppResource.getVersionText());
 		return new Scene(root);
 	}
 
@@ -50,8 +50,8 @@ public final class MabiIccoPreloader extends Preloader {
 			MabiIccoPreloaderNotification notify = (MabiIccoPreloaderNotification) pn;
 			String message = notify.getMessage();
 			double progress = notify.getProgress();
-			controller.text.setText( controller.text.getText() + message );
-			controller.bar.setProgress(progress/100.0);
+			controller.addStatusText(message);
+			controller.updateProgress(progress);
 		} else if (pn instanceof StateChangeNotification) {
 			stage.hide();
 		}

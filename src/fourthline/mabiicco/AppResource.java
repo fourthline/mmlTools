@@ -21,6 +21,10 @@ public final class AppResource {
 
 	private AppResource() {}
 
+	public static ResourceBundle getResourceBundle() {
+		return bundle;
+	}
+
 	public static String getVersionText() {
 		String versionText = AppResource.getManifestValue("Implementation-Version")
 				+ " build" + AppResource.getManifestValue("Implementation-Build");

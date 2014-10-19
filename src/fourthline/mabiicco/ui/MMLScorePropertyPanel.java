@@ -77,11 +77,10 @@ public final class MMLScorePropertyPanel extends JPanel {
 	}
 
 	private void initialComboBox(String baseTime) {
-		String timeCountList[] = { "1", "2", "3", "4", "5", "6", "7", "8" };
 		String timeBaseList[]  = { "1", "2", "4", "8", "16" };
 
-		for (String s : timeCountList) {
-			timeCount.addItem(s);
+		for (int i = 1; i <= 32; i++) {
+			timeCount.addItem(Integer.toString(i));
 		}
 		for (String s : timeBaseList) {
 			timeBase.addItem(s);
