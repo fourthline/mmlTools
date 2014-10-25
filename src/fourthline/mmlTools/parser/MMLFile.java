@@ -128,7 +128,7 @@ public final class MMLFile implements IMMLFileParser {
 	 * @param [OUT] markerList マーカーリスト 
 	 * @return トラック構成情報
 	 */
-	public List<Extension3mleTrack> parse3mleExtension(String str) throws MMLParseException {
+	private List<Extension3mleTrack> parse3mleExtension(String str) throws MMLParseException {
 		StringBuilder sb = new StringBuilder();
 		long c = 0;
 		for (String s : str.split("\n")) {
@@ -182,12 +182,12 @@ public final class MMLFile implements IMMLFileParser {
 		ByteArrayInputStream istream = new ByteArrayInputStream(data);
 		int b = 0;
 		int hb = 0;
-		boolean doneTrack = false; // Track -> Marker の順
 		while ( (b = istream.read()) != -1) {
-			if ( (hb == 0x02) && (b == 0x1c) ) {
+			if ( (hb == 0x12) && (b == 0x10) ) {
+				parseHeader(istream);
+			} else if ( (hb == 0x02) && (b == 0x1c) ) {
 				parseTrack(trackList, istream);
-				doneTrack = true;
-			} else if ( (doneTrack) && (hb == 0x09) && ( (b > 0x00) && (b < 0x20) )) {
+			} else if ( (hb == 0x09) && ( (b > 0x00) && (b < 0x20) )) {
 				parseMarker(istream);
 			}
 
@@ -196,6 +196,12 @@ public final class MMLFile implements IMMLFileParser {
 
 		trackList.removeFirst();
 		return trackList;
+	}
+
+	private void parseHeader(ByteArrayInputStream istream) {
+		istream.skip(37);
+		int len = readLEIntValue(istream);
+		istream.skip(len);
 	}
 
 	private void parseTrack(LinkedList<Extension3mleTrack> trackList, ByteArrayInputStream istream) {
