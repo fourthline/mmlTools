@@ -4,10 +4,20 @@
 
 package fourthline.mmlTools.parser;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.Base64;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Base64.Decoder;
 import java.util.regex.Pattern;
+import java.util.zip.CRC32;
+
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 
 import fourthline.mabiicco.midi.InstType;
 import fourthline.mabiicco.midi.MabiDLS;
@@ -18,6 +28,7 @@ import fourthline.mmlTools.Marker;
 
 public final class MMLFile implements IMMLFileParser {
 	private final MMLScore score = new MMLScore();
+	private String encoding = "Shift_JIS";
 
 	// channel sections
 	private LinkedList<String> mmlParts = new LinkedList<>();
@@ -41,7 +52,7 @@ public final class MMLFile implements IMMLFileParser {
 	private void parseSection(List<SectionContents> contentsList) throws MMLParseException {
 		for (SectionContents contents : contentsList) {
 			if (contents.getName().equals("[3MLE EXTENSION]")) {
-				trackList = Extension3mleTrack.parse3mleExtension(contents.getContents(), score.getMarkerList());
+				trackList = parse3mleExtension(contents.getContents());
 			} else if (contents.getName().matches("\\[Channel[0-9]*\\]")) {
 				mmlParts.add( contents.getContents()
 						.replaceAll("//.*\n", "\n")
@@ -106,8 +117,161 @@ public final class MMLFile implements IMMLFileParser {
 			TextParser textParser = TextParser.text(s);
 			if ( textParser.startsWith("Title=", score::setTitle) ) {
 			} else if ( textParser.startsWith("Source=", score::setAuthor) ) {
-			} else if ( textParser.startsWith("Encoding=", (t) -> Extension3mleTrack.setEncoding(t)) ) {
+			} else if ( textParser.startsWith("Encoding=", (t) -> this.encoding = t) ) {
 			}
 		});
+	}
+
+	/**
+	 * [3MLE EXTENSION] をパースし, トラック構成情報を取得します.
+	 * @param [IN]  str [3MLE EXTENSION] セクションのコンテンツ
+	 * @param [OUT] markerList マーカーリスト 
+	 * @return トラック構成情報
+	 */
+	public List<Extension3mleTrack> parse3mleExtension(String str) throws MMLParseException {
+		StringBuilder sb = new StringBuilder();
+		long c = 0;
+		for (String s : str.split("\n")) {
+			if (s.startsWith("d=")) {
+				sb.append(s.substring(2));
+			} else if (s.startsWith("c=")) {
+				c = Long.parseLong(s.substring(2));
+			}
+		}
+
+		byte data[] = decode(sb.toString(), c);
+		return parse(data);
+	}
+
+	private static byte[] decode(String dSection, long c) throws MMLParseException {
+		CRC32 crc = new CRC32();
+		crc.update(dSection.getBytes());
+		if (c != crc.getValue()) {
+			throw new MMLParseException("invalid c="+c+" <> "+crc.getValue());
+		}
+		Decoder decoder = Base64.getDecoder();
+		byte b[] = decoder.decode(dSection);
+
+		int dataLength = ByteBuffer.wrap(b, 0, 4).order(ByteOrder.LITTLE_ENDIAN).getInt();
+		byte data[] = new byte[dataLength];
+
+		try {
+			BZip2CompressorInputStream bz2istream = new BZip2CompressorInputStream(new ByteArrayInputStream(b, 12, b.length-12));
+			bz2istream.read(data);
+			bz2istream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		for (int i = 0; i < dataLength; i++) {
+			System.out.printf("%02x ", data[i]);
+		}
+		System.out.println();
+		return data;
+	}
+
+	/**
+	 * @param [IN]  data decompress済みのバイト列
+	 * @param [OUT] markerList マーカーリスト 
+	 * @return トラック構成情報
+	 */
+	private List<Extension3mleTrack> parse(byte data[]) {
+		LinkedList<Extension3mleTrack> trackList = new LinkedList<>();
+		trackList.add(new Extension3mleTrack(-1, -1, -1, null, 0)); // dummy
+
+		ByteArrayInputStream istream = new ByteArrayInputStream(data);
+		int b = 0;
+		int hb = 0;
+		boolean doneTrack = false; // Track -> Marker の順
+		while ( (b = istream.read()) != -1) {
+			if ( (hb == 0x02) && (b == 0x1c) ) {
+				parseTrack(trackList, istream);
+				doneTrack = true;
+			} else if ( (doneTrack) && (hb == 0x09) && ( (b > 0x00) && (b < 0x20) )) {
+				parseMarker(istream);
+			}
+
+			hb = b;
+		}
+
+		trackList.removeFirst();
+		return trackList;
+	}
+
+	private void parseTrack(LinkedList<Extension3mleTrack> trackList, ByteArrayInputStream istream) {
+		// parse Track
+		istream.skip(3);
+		int trackNo = istream.read();
+		istream.skip(1); // volumn
+		int panpot = istream.read();
+		istream.skip(5);
+		int startMarker = istream.read();
+		istream.skip(7);
+		int instrument = istream.read();
+		istream.skip(3);
+		int group = istream.read();
+		istream.skip(13);
+		String trackName = readString(istream);
+		System.out.println(trackNo+" "+instrument+" "+trackName);
+
+		Extension3mleTrack lastTrack = trackList.getLast();
+		if ( (lastTrack.getGroup() != group) || (lastTrack.getInstrument() != instrument) || (lastTrack.isLimit())) {
+			// new Track
+			trackList.add(new Extension3mleTrack(instrument, group, panpot, trackName, startMarker));
+		} else {
+			lastTrack.addTrack();
+		}
+	}
+
+	private int readLEIntValue(InputStream istream) {
+		byte b[] = new byte[4];
+		try {
+			istream.read(b);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return ByteBuffer.wrap(b).order(ByteOrder.LITTLE_ENDIAN).getInt();
+	}
+
+	private void parseMarker(ByteArrayInputStream istream) {
+		List<Marker> markerList = score.getMarkerList();
+
+		// parse Marker
+		istream.skip(7);
+		int tickOffset = readLEIntValue(istream);
+		istream.skip(4);
+		String name = readString(istream);
+		System.out.println("Marker " + name + "=" + tickOffset);
+		if (markerList != null) {
+			markerList.add(new Marker(name, tickOffset));
+		}
+	}
+
+	private String readString(InputStream istream) {
+		ByteArrayOutputStream ostream = new ByteArrayOutputStream();
+		int b;
+		try {
+			while ( (b = istream.read()) != 0 ) {
+				ostream.write(b);
+			}
+			return new String(ostream.toByteArray(), encoding);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return "";
+	}
+
+	public static void main(String[] args) {
+		try {
+			String str = "c=3902331007\nd=4wAAAJvYl0oBAAAAQlpoOTFBWSZTWReDTXYAAEH/i/7U0AQCAHgAQAAEAGwIEABAAECAAAoABKAAcivUCaZGmRiAyNqDEgnqRpkPTUZGh5S6QfOGHRg+AfSJE3ebNDxInstECT3owI1yYiuIY5IwTCLAQz1oZyAogJFOhVYmv39cWsLxsbh0MkELhClECHm5wCBjLYz8XckU4UJAXg012A==";
+
+			MMLFile mmlFile = new MMLFile();
+			List<Extension3mleTrack> trackList = mmlFile.parse3mleExtension(str);
+			for (Extension3mleTrack track : trackList) {
+				System.out.println(track);
+			}
+		} catch (MMLParseException e) {
+			e.printStackTrace();
+		}
 	}
 }
