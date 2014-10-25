@@ -87,6 +87,11 @@ public final class Extension3mleTrack {
 		return sb.toString();
 	}
 
+	private static String encoding = "Shift_JIS";
+	public static void setEncoding(String encoding) {
+		Extension3mleTrack.encoding = encoding;
+	}
+
 	/**
 	 * [3MLE EXTENSION] をパースし, トラック構成情報を取得します.
 	 * @param [IN]  str [3MLE EXTENSION] セクションのコンテンツ
@@ -147,10 +152,12 @@ public final class Extension3mleTrack {
 		ByteArrayInputStream istream = new ByteArrayInputStream(data);
 		int b = 0;
 		int hb = 0;
+		boolean doneTrack = false; // Track -> Marker の順
 		while ( (b = istream.read()) != -1) {
 			if ( (hb == 0x02) && (b == 0x1c) ) {
 				parseTrack(trackList, istream);
-			} else if ( (hb == 0x09) && ( (b > 0x00) && (b < 0x20) )) {
+				doneTrack = true;
+			} else if ( (doneTrack) && (hb == 0x09) && ( (b > 0x00) && (b < 0x20) )) {
 				parseMarker(markerList, istream);
 			}
 
@@ -215,7 +222,7 @@ public final class Extension3mleTrack {
 			while ( (b = istream.read()) != 0 ) {
 				ostream.write(b);
 			}
-			return new String(ostream.toByteArray(), "Shift_JIS");
+			return new String(ostream.toByteArray(), encoding);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

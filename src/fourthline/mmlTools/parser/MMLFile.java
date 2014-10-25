@@ -106,6 +106,7 @@ public final class MMLFile implements IMMLFileParser {
 			TextParser textParser = TextParser.text(s);
 			if ( textParser.startsWith("Title=", score::setTitle) ) {
 			} else if ( textParser.startsWith("Source=", score::setAuthor) ) {
+			} else if ( textParser.startsWith("Encoding=", (t) -> Extension3mleTrack.setEncoding(t)) ) {
 			}
 		});
 	}
