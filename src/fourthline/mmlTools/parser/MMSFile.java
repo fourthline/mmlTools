@@ -33,7 +33,7 @@ public final class MMSFile implements IMMLFileParser {
 				/* MMLパート */
 				System.out.println("part");
 				MMLTrack track = parseMMSPart(section.getContents());
-				System.out.println(track.getMML());
+				System.out.println(track.getOriginalMML());
 				System.out.println(track.getProgram());
 				score.addTrack(track);
 			} else if (sectionName.equals("[infomation]")) {
@@ -119,7 +119,7 @@ public final class MMSFile implements IMMLFileParser {
 			}
 		});
 
-		MMLTrack track = new MMLTrack(stringValue[1], stringValue[2], stringValue[3], "");
+		MMLTrack track = new MMLTrack().setMML(stringValue[1], stringValue[2], stringValue[3], "");
 		track.setTrackName(stringValue[0]);
 		track.setProgram(intValue[0]);
 		track.setPanpot(intValue[1]);

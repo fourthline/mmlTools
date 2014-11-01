@@ -246,7 +246,7 @@ public final class MMLScore implements IMMLFileParser {
 			stream.println("time="+getBaseTime());
 
 			for (MMLTrack track : trackList) {
-				stream.println("mml-track="+track.getMMLString(false, false));
+				stream.println("mml-track="+track.getOriginalMML());
 				stream.println("name="+track.getTrackName());
 				stream.println("program="+track.getProgram());
 				stream.println("songProgram="+track.getSongProgram());
@@ -308,7 +308,7 @@ public final class MMLScore implements IMMLFileParser {
 	private void parseMMLScore(String contents) {
 		Pattern.compile("\n").splitAsStream(contents).forEachOrdered((s) -> {
 			TextParser textParser = TextParser.text(s);
-			if (        textParser.startsWith("mml-track=",   t -> this.addTrack(new MMLTrack(t)) )) {
+			if (        textParser.startsWith("mml-track=",   t -> this.addTrack(new MMLTrack().setMML(t)) )) {
 			} else if ( textParser.startsWith("name=",        t -> this.trackList.getLast().setTrackName(t) )) {
 			} else if ( textParser.startsWith("program=",     t -> this.trackList.getLast().setProgram(Integer.parseInt(t)) )) {
 			} else if ( textParser.startsWith("songProgram=", t -> this.trackList.getLast().setSongProgram(Integer.parseInt(t)) )) {
@@ -332,6 +332,13 @@ public final class MMLScore implements IMMLFileParser {
 			String name = s.substring(s.indexOf('=')+1);
 			markerList.add( new Marker(name, Integer.parseInt(tickString)) );
 		}
+	}
+
+	public MMLScore generateAll() {
+		for (MMLTrack track : trackList) {
+			track.generate();
+		}
+		return this;
 	}
 
 	public static void main(String args[]) {

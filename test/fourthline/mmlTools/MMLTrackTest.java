@@ -21,7 +21,7 @@ public class MMLTrackTest {
 	 */
 	@Test
 	public void testGetMMLStrings() {
-		MMLTrack track = new MMLTrack("MML@aaa,bbb,ccc,ddd;");
+		MMLTrack track = new MMLTrack().setMML("MML@aaa,bbb,ccc,ddd;");
 		String expect[] = {
 				"a8t150&a8aa", // melodyパートのみテンポ指定.
 				"b8&b8bb",
@@ -29,14 +29,14 @@ public class MMLTrackTest {
 				"d8t150&d8dd"
 		};
 		new MMLTempoEvent(150, 48).appendToListElement(track.getGlobalTempoList());
-		String mml[] = track.getMMLStrings();
+		String mml[] = track.generate().getMabiMMLArray();
 
 		assertArrayEquals(expect, mml);
 	}
 
 
 	private void checkPlayTimeAndMabinogiTime(String mml) {
-		MMLTrack track = new MMLTrack(mml);
+		MMLTrack track = new MMLTrack().setMML(mml);
 		MMLTools tools = new MMLTools(mml);
 		try {
 			tools.parseMMLforMabinogi();
@@ -101,8 +101,8 @@ public class MMLTrackTest {
 		String mml       = "MML@t90cccccccccccct150cccc,eeeeeeeeeeeeeeeedddd,;";
 		String expectMML = "MML@t90cccccccccccct150ccccr1,eeeeeeeeeeeeeeeedddd,;";
 
-		MMLTrack track = new MMLTrack(mml);
-		assertEquals(expectMML, track.getMMLString());
+		MMLTrack track = new MMLTrack().setMML(mml);
+		assertEquals(expectMML, track.generate().getMabiMML());
 	}
 
 	/**
@@ -113,8 +113,8 @@ public class MMLTrackTest {
 		String mml =       "MML@t150cccccccccccct90cccc,eeeeeeeeeeeeeeee,;";
 		String expectMML = "MML@t150cccccccccccct90cccct150,eeeeeeeeeeeeeeee,;";
 
-		MMLTrack track = new MMLTrack(mml);
-		assertEquals(expectMML, track.getMMLString());
+		MMLTrack track = new MMLTrack().setMML(mml);
+		assertEquals(expectMML, track.generate().getMabiMML());
 	}
 
 	/**
@@ -125,8 +125,8 @@ public class MMLTrackTest {
 		String mml =       "MML@t150cccccccccccct90c,eeeeeeeeeeeeeeee;";
 		String expectMML = "MML@t150cccccccccccct90cr2.v0c64t150,eeeeeeeeeeeeeeee,;";
 
-		MMLTrack track = new MMLTrack(mml);
-		assertEquals(expectMML, track.getMMLString());
+		MMLTrack track = new MMLTrack().setMML(mml);
+		assertEquals(expectMML, track.generate().getMabiMML());
 	}
 
 	/**
@@ -137,8 +137,8 @@ public class MMLTrackTest {
 		String mml =       "MML@ggt150gg,rr8r16.a24aa;";
 		String expectMML = "MML@ggt150ggr64,rr8r16.a32&a64aa,;";
 
-		MMLTrack track = new MMLTrack(mml);
-		assertEquals(expectMML, track.getMMLString());
+		MMLTrack track = new MMLTrack().setMML(mml);
+		assertEquals(expectMML, track.generate().getMabiMML());
 	}
 
 	/**
@@ -150,8 +150,8 @@ public class MMLTrackTest {
 		String expectMML1 = "MML@t150l1rrt120rrt130,l1cccccc,;";
 		String expectMML2 = "MML@t150v0l1cct120cct130rrv0c64t150,l1cccccc,;";
 
-		MMLTrack track = new MMLTrack(mml);
-		assertEquals(expectMML1, track.getMMLString(false, false));
-		assertEquals(expectMML2, track.getMMLString());
+		MMLTrack track = new MMLTrack().setMML(mml);
+		assertEquals(expectMML1, track.generate().getOriginalMML());
+		assertEquals(expectMML2, track.generate().getMabiMML());
 	}
 }

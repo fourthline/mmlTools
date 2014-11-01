@@ -142,7 +142,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	 */
 	public void addMMLTrack(MMLTrack newTrack) {
 		if (newTrack == null) {
-			newTrack = new MMLTrack("");
+			newTrack = new MMLTrack();
 			newTrack.setTrackName( getNewTrackName() );
 		}
 
@@ -545,7 +545,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 			MMLTrackView view = (MMLTrackView) tabbedPane.getComponentAt(i);
 			MMLTrack track = mmlScore.getTrack(i);
 
-			String mmlStrings[] = track.getMMLStrings();
+			String mmlStrings[] = track.getMabiMMLArray();
 			for (int j = 0; j < mmlStrings.length; j++) {
 				view.setPartMMLString(j, mmlStrings[j]);
 			}

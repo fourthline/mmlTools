@@ -353,10 +353,10 @@ public final class MMLTrackView extends JPanel implements ActionListener, Docume
 	}
 
 	public void setMMLTrack(MMLTrack track) {
-		mmlText[0].setText( track.getMelody() );
-		mmlText[1].setText( track.getChord1() );
-		mmlText[2].setText( track.getChord2() );
-		mmlText[3].setText( track.getSongEx() );
+		String mml[] = track.getMabiMMLArray();
+		for (int i = 0; (i < mml.length) && (i < mmlText.length); i++) {
+			mmlText[i].setText(mml[i]);
+		}
 
 		setInstProgram( track );
 	}

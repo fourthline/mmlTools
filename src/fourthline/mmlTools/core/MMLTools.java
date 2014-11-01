@@ -12,9 +12,7 @@ import fourthline.mmlTools.UndefinedTickException;
 
 
 /**
- * MML基本ツール.
- * {@code MML@aaa,bbb,ccc;} 形式を扱います。
- * @author たんらる
+ * MMLツール（旧式）
  */
 public class MMLTools {
 

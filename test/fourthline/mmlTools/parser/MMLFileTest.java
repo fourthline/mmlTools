@@ -39,17 +39,17 @@ public class MMLFileTest extends FileSelect {
 			assertEquals(2, score.getTrackCount());
 
 			// Track1 & Track2
-			assertEquals("MML@cde,rrrfga,;", score.getTrack(0).getMML());
+			assertEquals("MML@cde,rrrfga,;", score.getTrack(0).getOriginalMML());
 			assertEquals("Track1", score.getTrack(0).getTrackName());
 			assertEquals(0, score.getTrack(0).getProgram());
 
 			// Track3
-			assertEquals("MML@aba,,;", score.getTrack(1).getMML());
+			assertEquals("MML@aba,,;", score.getTrack(1).getOriginalMML());
 			assertEquals("Track3", score.getTrack(1).getTrackName());
 			assertEquals(1, score.getTrack(1).getProgram());
 
 			InputStream inputStream = fileSelect("sample2.mmi");
-			MMLScoreTest.checkMMLScoreWriteToOutputStream(score, inputStream);
+			MMLScoreTest.checkMMLScoreWriteToOutputStream(score.generateAll(), inputStream);
 		} catch (MMLParseException | IOException e) {
 			fail(e.getMessage());
 		}
@@ -62,27 +62,27 @@ public class MMLFileTest extends FileSelect {
 			assertEquals(5, score.getTrackCount());
 
 			// Track1
-			assertEquals("MML@,,,aaa;", score.getTrack(0).getMML());
+			assertEquals("MML@,,,aaa;", score.getTrack(0).getOriginalMML());
 			assertEquals("Track1", score.getTrack(0).getTrackName());
 			assertEquals(120, score.getTrack(0).getProgram());
 
 			// Track2
-			assertEquals("MML@,,,bbb;", score.getTrack(1).getMML());
+			assertEquals("MML@,,,bbb;", score.getTrack(1).getOriginalMML());
 			assertEquals("Track2", score.getTrack(1).getTrackName());
 			assertEquals(121, score.getTrack(1).getProgram());
 
 			// Track3
-			assertEquals("MML@,,,ccc;", score.getTrack(2).getMML());
+			assertEquals("MML@,,,ccc;", score.getTrack(2).getOriginalMML());
 			assertEquals("Track3", score.getTrack(2).getTrackName());
 			assertEquals(121, score.getTrack(2).getProgram());
 
 			// Track4
-			assertEquals("MML@ggg,,;", score.getTrack(3).getMML());
+			assertEquals("MML@ggg,,;", score.getTrack(3).getOriginalMML());
 			assertEquals("Track4", score.getTrack(3).getTrackName());
 			assertEquals(66, score.getTrack(3).getProgram());
 
 			// Track5
-			assertEquals("MML@fff,,;", score.getTrack(4).getMML());
+			assertEquals("MML@fff,,;", score.getTrack(4).getOriginalMML());
 			assertEquals("Track5", score.getTrack(4).getTrackName());
 			assertEquals(66, score.getTrack(4).getProgram());
 

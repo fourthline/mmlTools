@@ -76,9 +76,9 @@ public final class MMLFile implements IMMLFileParser {
 			MMLTrack mmlTrack;
 			if ( (instType == InstType.VOICE) || (instType == InstType.CHORUS) ) {
 				// 歌パート
-				mmlTrack = new MMLTrack("", "", "", text[0]);
+				mmlTrack = new MMLTrack().setMML("", "", "", text[0]);
 			} else {
-				mmlTrack = new MMLTrack(text[0], text[1], text[2], "");
+				mmlTrack = new MMLTrack().setMML(text[0], text[1], text[2], "");
 			}
 			score.addTrack(mmlTrack);
 			mmlTrack.setProgram(program);

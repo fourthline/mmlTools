@@ -8,49 +8,90 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import fourthline.mmlTools.core.MMLText;
 import fourthline.mmlTools.core.MMLTicks;
-import fourthline.mmlTools.core.MMLTools;
 import fourthline.mmlTools.optimizer.MMLStringOptimizer;
 
-public final class MMLTrack extends MMLTools implements Serializable {
+public final class MMLTrack implements Serializable {
 	private static final long serialVersionUID = 2006880378975808647L;
 
-	private List<MMLEventList> mmlParts;
+	private static final int PART_COUNT = 4;
+	private List<MMLEventList> mmlParts = new ArrayList<>();
 	private List<MMLTempoEvent> globalTempoList = new ArrayList<>();
 
 	private int program = 0;
 	private String trackName;
 	private int panpot = 64;
 
+	// for MML input
+	private MMLText originalMML = new MMLText();
+
+	// for MML output
+	private MMLText mabiMML = new MMLText();
+
 	// コーラスオプション (楽器＋歌）
 	private int songProgram = -1;  // コーラスを使用しない.
 
-	private static final int PART_COUNT = 4;
 
-	public MMLTrack(String mml) {
-		super(mml);
-
+	public MMLTrack() {
 		mmlParse();
 	}
 
-	public MMLTrack(String mml1, String mml2, String mml3, String mml4) {
-		super(mml1, mml2, mml3, mml4);
+	public MMLTrack setMML(String mml) {
+		originalMML.setMMLText(mml);
+		mabiMML.setMMLText(mml);
 
 		mmlParse();
+		return this;
+	}
+
+	public MMLTrack setMML(String mml1, String mml2, String mml3, String mml4) {
+		originalMML.setMMLText(mml1, mml2, mml3, mml4);
+		mabiMML.setMMLText(mml1, mml2, mml3, mml4);
+
+		mmlParse();
+		return this;
 	}
 
 	private void mmlParse() {
-		mmlParts = new ArrayList<>(PART_COUNT);
-		String mml[] = {
-				getMelody(),
-				getChord1(),
-				getChord2(),
-				getSongEx()
-		};
+		mmlParts.clear();
 
-		for (String s : mml) {
+		for (int i = 0; i < PART_COUNT; i++) {
+			String s = originalMML.getText(i);
 			mmlParts.add( new MMLEventList(s, globalTempoList) );
 		}
+	}
+
+	public boolean isEmpty() {
+		return originalMML.isEmpty();
+	}
+
+	public String getOriginalMML() {
+		return originalMML.getMML();
+	}
+	
+	public String getMabiMML() {
+		return mabiMML.getMML();
+	}
+
+	/**
+	 * 出力用のMMLランク
+	 * @return　フォーマット済みRank文字列
+	 */
+	public String mmlRankFormat() {
+		return mabiMML.mmlRankFormat();
+	}
+
+	/**
+	 * 出力用のMMLを取得する.
+	 * @return　各パートのMML文字列
+	 */
+	public String[] getMabiMMLArray() {
+		String mml[] = new String[ PART_COUNT ];
+		for (int i = 0; i < mml.length; i++) {
+			mml[i] = mabiMML.getText(i);
+		}
+		return mml;
 	}
 
 	public void setGlobalTempoList(List<MMLTempoEvent> globalTempoList) {
@@ -126,22 +167,13 @@ public final class MMLTrack extends MMLTools implements Serializable {
 		return max;
 	}
 
-	public String getMMLString() {
-		return getMMLString(true, true);
+	public MMLTrack generate() {
+		originalMML.setMMLText(getMMLStrings(false, false));
+		mabiMML.setMMLText(getMMLStrings(true, true));
+		return this;
 	}
-
-	public String getMMLString(boolean tailFix, boolean mabiTempo) {
-		String mml[] = getMMLStrings(tailFix, mabiTempo);
-		MMLTools tools = new MMLTools(mml[0], mml[1], mml[2], mml[3]);
-
-		return tools.getMML();
-	}
-
-	public String[] getMMLStrings() {
-		return getMMLStrings(true, true);
-	}
-
-	public String[] getMMLStrings(boolean tailFix, boolean mabiTempo) {
+	
+	private String[] getMMLStrings(boolean tailFix, boolean mabiTempo) {
 		int count = mmlParts.size();
 		String mml[] = new String[count];
 		int totalTick = (int)this.getMaxTickLength();

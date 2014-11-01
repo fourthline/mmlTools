@@ -39,7 +39,7 @@ public final class TrackListTable extends JTable {
 			checkValue = new boolean[trackList.size()];
 			dataList = new ArrayList<>();
 			for (MMLTrack track : trackList) {
-				MMLTools tools = new MMLTools( track.getMMLString() );
+				MMLTools tools = new MMLTools( track.getMabiMML() );
 				InstClass inst = MabiDLS.getInstance().getInstByProgram(track.getProgram());
 				dataList.add(new String[] {
 						track.getTrackName(),

@@ -89,7 +89,7 @@ public final class MMLOutputPanel extends JPanel {
 
 	private void currentSelectedPartMMLOutput() {
 		int row = table.getSelectedRow();
-		String mmlText = trackList.get(row).getMMLString();
+		String mmlText = trackList.get(row).getMabiMML();
 		copyToClipboard(mmlText);
 		JOptionPane.showMessageDialog(this, AppResource.appText("mml.output.done"));
 

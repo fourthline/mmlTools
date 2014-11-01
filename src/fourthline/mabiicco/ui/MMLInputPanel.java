@@ -110,12 +110,9 @@ public final class MMLInputPanel extends JPanel {
 
 		String mml = getClipboardString();
 
-		track = new MMLTrack(mml);
+		track = new MMLTrack().setMML(mml);
 		// 各パートが全て空であれば、ダイアログ表示しない。
-		if ( (track.getMelody().length() == 0) &&
-				(track.getChord1().length() == 0) &&
-				(track.getChord2().length() == 0) &&
-				(track.getSongEx().length() == 0) ) {
+		if ( track.isEmpty() ) {
 			return;
 		}
 
