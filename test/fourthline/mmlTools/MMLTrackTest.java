@@ -18,9 +18,10 @@ public class MMLTrackTest {
 
 	/**
 	 * Test method for {@link fourthline.mmlTools.MMLTrack#getMMLStrings()}.
+	 * @throws UndefinedTickException
 	 */
 	@Test
-	public void testGetMMLStrings() {
+	public void testGetMMLStrings() throws UndefinedTickException {
 		MMLTrack track = new MMLTrack().setMML("MML@aaa,bbb,ccc,ddd;");
 		String expect[] = {
 				"a8t150&a8aa", // melodyパートのみテンポ指定.
@@ -130,10 +131,11 @@ public class MMLTrackTest {
 	}
 
 	/**
-	 * テンポを跨ぐ場合の分割Tick-Undefined（最小Tick近似）
+	 * テンポを跨ぐ場合の分割Tick-Undefined（最小Tick近似） = Exception
+	 * @throws UndefinedTickException
 	 */
-	@Test
-	public void testGeneric00() {
+	@Test(expected=UndefinedTickException.class)
+	public void testGeneric00() throws UndefinedTickException {
 		String mml =       "MML@ggt150gg,rr8r16.a24aa;";
 		String expectMML = "MML@ggt150ggr64,rr8r16.a32&a64aa,;";
 

@@ -29,6 +29,7 @@ import fourthline.mabiicco.ui.MMLSeqView;
 import fourthline.mabiicco.ui.MainFrame;
 import fourthline.mabiicco.ui.editor.MMLTranspose;
 import fourthline.mmlTools.MMLScore;
+import fourthline.mmlTools.UndefinedTickException;
 import fourthline.mmlTools.parser.IMMLFileParser;
 import fourthline.mmlTools.parser.MMLFile;
 import fourthline.mmlTools.parser.MMLParseException;
@@ -182,7 +183,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(ADD_MEASURE, mmlSeqView::addMeasure);
 		actionMap.put(REMOVE_MEASURE, mmlSeqView::removeMeasure);
 		actionMap.put(NOTE_PROPERTY, editState::noteProperty);
-		actionMap.put(TRANSPOSE, () -> new MMLTranspose().execute(mainFrame, mmlSeqView));
+		actionMap.put(TRANSPOSE, () -> new MMLTranspose(mmlSeqView.getFileState()).execute(mainFrame, mmlSeqView));
 		actionMap.put(ABOUT, () -> new About().show(mainFrame));
 		actionMap.put(MIDI_EXPORT, this::midiExportAction);
 		actionMap.put(FILE_IMPORT, this::fileImportAction);
@@ -261,15 +262,24 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		}
 	}
 
-	private void saveMMLFile(File file) {
+	/**
+	 * @param file
+	 * @return　保存に成功した場合は true, 失敗した場合は false を返す.
+	 */
+	private boolean saveMMLFile(File file) {
 		try {
+			// generateできないデータは保存させない.
+			mmlSeqView.getMMLScore().generateAll();
 			FileOutputStream outputStream = new FileOutputStream(file);
 			mmlSeqView.getMMLScore().writeToOutputStream(outputStream);
 			mainFrame.setTitleAndFileName(file.getName());
 			fileState.setOriginalBase();
 			notifyUpdateFileState();
 			MabiIccoProperties.getInstance().setRecentFile(file.getPath());
-		} catch (Exception e) {}
+		} catch (UndefinedTickException | IOException e) {
+			return false;
+		}
+		return true;
 	}
 
 	private void newMMLFileAction() {
@@ -351,8 +361,11 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		saveFileChooser.setFileFilter(mmiFilter);
 		File file = showSaveDialog(saveFileChooser, "mmi");
 		if (file != null) {
-			saveMMLFile(file);
-			openedFile = file;
+			if (saveMMLFile(file)) {
+				openedFile = file;
+			} else {
+				JOptionPane.showMessageDialog(mainFrame, AppResource.appText("fail.saveFile"), "ERROR", JOptionPane.ERROR_MESSAGE);
+			}
 			return true;
 		}
 		return false;

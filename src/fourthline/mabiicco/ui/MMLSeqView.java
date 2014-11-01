@@ -88,9 +88,9 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		panel.add(tabbedPane, BorderLayout.SOUTH);
 
 		// create mml editor
-		editor = new MMLEditor(keyboardView, pianoRollView, this);
+		editor = new MMLEditor(keyboardView, pianoRollView, this, undoEdit);
 		pianoRollView.addMouseInputListener(editor);
-		columnView = new ColumnPanel(pianoRollView, this, editor);
+		columnView = new ColumnPanel(pianoRollView, this, editor, undoEdit);
 
 		scrollPane.setRowHeaderView(keyboardView);
 		scrollPane.setColumnHeaderView(columnView);

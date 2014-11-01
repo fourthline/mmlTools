@@ -298,6 +298,11 @@ public final class MMLScore implements IMMLFileParser {
 				parseMarker(section.getContents());
 			}
 		}
+		try {
+			generateAll();
+		} catch (UndefinedTickException e) {
+			throw new MMLParseException(e.getMessage());
+		}
 		return this;
 	}
 
@@ -334,7 +339,7 @@ public final class MMLScore implements IMMLFileParser {
 		}
 	}
 
-	public MMLScore generateAll() {
+	public MMLScore generateAll() throws UndefinedTickException {
 		for (MMLTrack track : trackList) {
 			track.generate();
 		}

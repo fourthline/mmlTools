@@ -30,5 +30,5 @@ public abstract class MMLEvent implements Serializable {
 
 	public abstract String toString();
 
-	public abstract String toMMLString();
+	public abstract String toMMLString() throws UndefinedTickException;
 }

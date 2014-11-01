@@ -51,7 +51,7 @@ public class MMLNoteEventTest {
 	}
 
 	@Test
-	public void testTuningNote() {
+	public void testTuningNote() throws UndefinedTickException {
 		MMLEventList eventList = new MMLEventList("c1");
 		String expected = "c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64";
 		MMLNoteEvent noteEvent = eventList.getMMLNoteEventList().get(0);

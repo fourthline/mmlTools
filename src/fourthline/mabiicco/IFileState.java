@@ -9,6 +9,7 @@ public interface IFileState {
 	public boolean canUndo();
 	public boolean canRedo();
 	public void saveState();
+	public void revertState();
 
 	public void setOriginalBase();
 	public void setFileStateObserver(IFileStateObserver observer);

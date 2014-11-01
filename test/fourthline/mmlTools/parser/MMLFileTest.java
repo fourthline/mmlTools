@@ -19,6 +19,7 @@ import fourthline.FileSelect;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLScoreTest;
+import fourthline.mmlTools.UndefinedTickException;
 
 public class MMLFileTest extends FileSelect {
 
@@ -50,7 +51,7 @@ public class MMLFileTest extends FileSelect {
 
 			InputStream inputStream = fileSelect("sample2.mmi");
 			MMLScoreTest.checkMMLScoreWriteToOutputStream(score.generateAll(), inputStream);
-		} catch (MMLParseException | IOException e) {
+		} catch (MMLParseException | UndefinedTickException | IOException e) {
 			fail(e.getMessage());
 		}
 	}

@@ -22,6 +22,7 @@ import fourthline.mabiicco.ActionDispatcher;
 import fourthline.mabiicco.AppResource;
 import fourthline.mabiicco.IEditState;
 import fourthline.mabiicco.IEditStateObserver;
+import fourthline.mabiicco.IFileState;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.IMMLManager;
 import fourthline.mabiicco.ui.KeyboardView;
@@ -54,6 +55,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	private final PianoRollView pianoRollView;
 	private final KeyboardView keyboardView;
 	private final IMMLManager mmlManager;
+	private final IFileState fileState;
 
 	private final JPopupMenu popupMenu = new JPopupMenu();
 
@@ -86,10 +88,11 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		return list.toArray(new NoteAlign[list.size()]);
 	}
 
-	public MMLEditor(KeyboardView keyboard, PianoRollView pianoRoll, IMMLManager mmlManager) {
+	public MMLEditor(KeyboardView keyboard, PianoRollView pianoRoll, IMMLManager mmlManager, IFileState fileState) {
 		this.keyboardView = keyboard;
 		this.pianoRollView = pianoRoll;
 		this.mmlManager = mmlManager;
+		this.fileState = fileState;
 
 		pianoRoll.setSelectNote(selectedNote);
 
@@ -166,6 +169,19 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 				selectedNote.add(noteEvent);
 			}
 		}
+	}
+
+	/**
+	 * 編集結果をMML文字列に反映させる. 失敗時はREVERT.
+	 */
+	private void mmlGenerate() {
+		try {
+			mmlManager.getMMLScore().generateAll();
+		} catch (UndefinedTickException e) {
+			System.out.println("REVERT: " + e.getMessage());
+			fileState.revertState();
+		}
+		mmlManager.updateActivePart();
 	}
 
 	/**
@@ -281,7 +297,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		if (!select) {
 			selectNote(null);
 		}
-		mmlManager.updateActivePart();
+		mmlGenerate();
 		keyboardView.offNote();
 	}
 
@@ -460,7 +476,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		}
 
 		editObserver.notifyUpdateEditState();
-		mmlManager.updateActivePart();
+		mmlGenerate();
 	}
 
 	@Override
@@ -473,7 +489,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 
 		selectNote(null);
 		editObserver.notifyUpdateEditState();
-		mmlManager.updateActivePart();
+		mmlGenerate();
 	}
 
 	@Override
@@ -494,7 +510,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 
 		selectNote(null);
 		editObserver.notifyUpdateEditState();
-		mmlManager.updateActivePart();
+		mmlGenerate();
 	}
 
 	@Override
@@ -504,7 +520,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		}
 
 		new MMLNotePropertyPanel(selectedNote.toArray(new MMLNoteEvent[selectedNote.size()]), editEventList).showDialog();
-		mmlManager.updateActivePart();
+		mmlGenerate();
 	}
 
 	public void changePart(MMLEventList from, MMLEventList to, boolean useSelectedNoteList, ChangePartAction action) {

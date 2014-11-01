@@ -222,7 +222,7 @@ public class MMLEventListTest {
 	}
 
 	@Test
-	public void testToMMLString_0() {
+	public void testToMMLString_0() throws UndefinedTickException {
 		MMLEventList eventList = new MMLEventList("ara");
 
 		String mml = eventList.toMMLString();
@@ -233,9 +233,10 @@ public class MMLEventListTest {
 
 	/**
 	 * オクターブ変化を付けたMMLの双方向変換のテスト.
+	 * @throws UndefinedTickException
 	 */
 	@Test
-	public void testToMMLString_1() {
+	public void testToMMLString_1() throws UndefinedTickException {
 		MMLEventList eventList = new MMLEventList("cdef-gab>cdef+gab+<c1");
 
 		String mml = eventList.toMMLString();
@@ -246,9 +247,10 @@ public class MMLEventListTest {
 
 	/**
 	 * tieによる連結が必要な音価さん.
+	 * @throws UndefinedTickException
 	 */
 	@Test
-	public void testToMMLString_2() {
+	public void testToMMLString_2() throws UndefinedTickException {
 		MMLEventList eventList = new MMLEventList("c4&c16g2&g8d1.&d1.&d1.&d24");
 
 		String mml = eventList.toMMLString();
@@ -259,9 +261,10 @@ public class MMLEventListTest {
 
 	/**
 	 * tempo, velocity を含むMML.
+	 * @throws UndefinedTickException
 	 */
 	@Test
-	public void testToMMLString_3() {
+	public void testToMMLString_3() throws UndefinedTickException {
 		MMLEventList eventList = new MMLEventList("T150v10c8.g16e4v8g-<at120<b-");
 
 		String mml = eventList.toMMLString(true, true);
@@ -272,9 +275,10 @@ public class MMLEventListTest {
 
 	/**
 	 * tempo, velocity を含むMML. (テンポを跨ぐNoteがある)
+	 * @throws UndefinedTickException
 	 */
 	@Test
-	public void testToMMLString_4() {
+	public void testToMMLString_4() throws UndefinedTickException {
 		MMLEventList eventList = new MMLEventList("c4d4");
 		List<MMLTempoEvent> globalTempoList = new ArrayList<MMLTempoEvent>();
 		String expectMML = "c8t150&c8d4";
@@ -289,9 +293,10 @@ public class MMLEventListTest {
 
 	/**
 	 * tempo, velocity を含むMML. (テンポ指定が最終ノートより後方にある)
+	 * @throws UndefinedTickException
 	 */
 	@Test
-	public void testToMMLString_5() {
+	public void testToMMLString_5() throws UndefinedTickException {
 		MMLEventList eventList = new MMLEventList("c4d4");
 		String expectMML = "c4d4v0c1.c1.t150";
 		List<MMLTempoEvent> globalTempoList = new ArrayList<MMLTempoEvent>();
@@ -306,9 +311,10 @@ public class MMLEventListTest {
 
 	/**
 	 * tempo, velocity を含むMML. (rTn式)
+	 * @throws UndefinedTickException
 	 */
 	@Test
-	public void testToMMLString_7() {
+	public void testToMMLString_7() throws UndefinedTickException {
 		MMLEventList eventList = new MMLEventList("c1r1t150c1");
 		String expectMML = "c1v0c1t150v8c1";
 
@@ -320,9 +326,10 @@ public class MMLEventListTest {
 
 	/**
 	 * tempo, velocity を含むMML. (r前のv)
+	 * @throws UndefinedTickException
 	 */
 	@Test
-	public void testToMMLString_8() {
+	public void testToMMLString_8() throws UndefinedTickException {
 		MMLEventList eventList = new MMLEventList("v12rc");
 		String expectMML = "v12r4c4";
 
@@ -334,9 +341,10 @@ public class MMLEventListTest {
 
 	/**
 	 * 調律符の判定テスト.
+	 * @throws UndefinedTickException
 	 */
 	@Test
-	public void testTuningNote() {
+	public void testTuningNote() throws UndefinedTickException {
 		MMLEventList eventList = new MMLEventList("c64&c64&c64&c64");
 		String expectMML = "c64&c64&c64&c64";
 
@@ -372,9 +380,10 @@ public class MMLEventListTest {
 
 	/**
 	 * テンポ＋休符のテスト.
+	 * @throws UndefinedTickException
 	 */
 	@Test
-	public void testTempoAndR() {
+	public void testTempoAndR() throws UndefinedTickException {
 		MMLEventList eventList = new MMLEventList("v12t110rt60rt90c");
 		String expectMML = "t110v0c4t60c4t90v12c4";
 
@@ -512,9 +521,10 @@ public class MMLEventListTest {
 
 	/**
 	 * swap
+	 * @throws UndefinedTickException
 	 */
 	@Test
-	public void testSwap0() {
+	public void testSwap0() throws UndefinedTickException {
 		MMLEventList eventList1 = new MMLEventList("rcrc");
 		MMLEventList eventList2 = new MMLEventList("r.c2");
 
@@ -532,9 +542,10 @@ public class MMLEventListTest {
 
 	/**
 	 * move
+	 * @throws UndefinedTickException
 	 */
 	@Test
-	public void testMove0() {
+	public void testMove0() throws UndefinedTickException {
 		MMLEventList eventList1 = new MMLEventList("rcrc");
 		MMLEventList eventList2 = new MMLEventList("r.c2");
 
@@ -551,9 +562,10 @@ public class MMLEventListTest {
 
 	/**
 	 * copy
+	 * @throws UndefinedTickException
 	 */
 	@Test
-	public void testCopy0() {
+	public void testCopy0() throws UndefinedTickException {
 		MMLEventList eventList1 = new MMLEventList("rcrc");
 		MMLEventList eventList2 = new MMLEventList("r.c2");
 

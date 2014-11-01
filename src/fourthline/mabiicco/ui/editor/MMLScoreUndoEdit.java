@@ -63,6 +63,12 @@ public final class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFil
 	}
 
 	@Override
+	public void revertState() {
+		MMLScore score = mmlManager.getMMLScore();
+		score.putObjectState(undoState.lastElement());
+	}
+
+	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
 

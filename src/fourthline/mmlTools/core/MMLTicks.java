@@ -232,74 +232,64 @@ public final class MMLTicks {
 	/**
 	 * noteNameとtickをMMLの文字列に変換します.
 	 * needTieがtrueのときは、'&'による連結を行います.
+	 * @throws UndefinedTickException
 	 */
-	public String toString() {
-		try {
-			int remTick = tick;
-			StringBuilder sb = new StringBuilder();
+	public String toMMLText() throws UndefinedTickException {
+		int remTick = tick;
+		StringBuilder sb = new StringBuilder();
 
-			// "1."
-			int mTick = getTick("1.");
-			int tick1 = getTick("1");
-			while (remTick > (tick1*2)) {
-				sb.append( mmlNotePart("1.") );
-				remTick -= mTick;
-			}
-
-			// 1~64の分割
-			for (int base = 1; base <= 64; base *= 2) {
-				int baseTick = getTick(""+base);
-				if (tickInvTable.containsKey(remTick)) {
-					sb.append( mmlNotePart(tickInvTable.get(remTick)) );
-					remTick = 0;
-					break;
-				}
-				while (remTick >= baseTick) {
-					sb.append( mmlNotePart(""+base) );
-					remTick -= baseTick;
-				}
-			}
-			if (remTick > 0) {
-				sb.append( mmlNotePart(tickInvTable.get(minimumTick())) );
-			}
-
-			if (needTie) {
-				return sb.substring(1);
-			} else {
-				return sb.toString();
-			}
-		} catch (UndefinedTickException e) {
-			e.printStackTrace();
+		// "1."
+		int mTick = getTick("1.");
+		int tick1 = getTick("1");
+		while (remTick > (tick1*2)) {
+			sb.append( mmlNotePart("1.") );
+			remTick -= mTick;
 		}
 
-		return null;
+		// 1~64の分割
+		for (int base = 1; base <= 64; base *= 2) {
+			int baseTick = getTick(""+base);
+			if (tickInvTable.containsKey(remTick)) {
+				sb.append( mmlNotePart(tickInvTable.get(remTick)) );
+				remTick = 0;
+				break;
+			}
+			while (remTick >= baseTick) {
+				sb.append( mmlNotePart(""+base) );
+				remTick -= baseTick;
+			}
+		}
+		if (remTick > 0) {
+			throw new UndefinedTickException(remTick + "/" + tick);
+		}
+
+		if (needTie) {
+			return sb.substring(1);
+		} else {
+			return sb.toString();
+		}
 	}
 
 	/**
 	 * L64を使って変換します.　（調律用）
 	 * @return
+	 * @throws UndefinedTickException
 	 */
-	public String toStringByL64() {
-		try {
-			int remTick = tick;
-			StringBuilder sb = new StringBuilder();
+	public String toMMLTextByL64() throws UndefinedTickException {
+		int remTick = tick;
+		StringBuilder sb = new StringBuilder();
 
-			int base = 64;
-			int baseTick = getTick(""+base);
-			while (remTick >= baseTick) {
-				sb.append( mmlNotePart(""+base) );
-				remTick -= baseTick;
-			}
-
-			if (needTie) {
-				return sb.substring(1);
-			} else {
-				return sb.toString();
-			}
-		} catch (UndefinedTickException e) {
-			e.printStackTrace();
+		int base = 64;
+		int baseTick = getTick(""+base);
+		while (remTick >= baseTick) {
+			sb.append( mmlNotePart(""+base) );
+			remTick -= baseTick;
 		}
 
-		return null;
+		if (needTie) {
+			return sb.substring(1);
+		} else {
+			return sb.toString();
+		}
 	}
 }

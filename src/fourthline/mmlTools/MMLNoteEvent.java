@@ -93,17 +93,17 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 	}
 
 	@Override
-	public String toMMLString() {
+	public String toMMLString() throws UndefinedTickException {
 		String noteName = getNoteName();
 		MMLTicks mmlTick = new MMLTicks(noteName, tick);
 		if (isTuningNote) {
-			return mmlTick.toStringByL64();
+			return mmlTick.toMMLTextByL64();
 		} else {
-			return mmlTick.toString();
+			return mmlTick.toMMLText();
 		}
 	}
 
-	public String toMMLString(MMLNoteEvent prevNoteEvent) {
+	public String toMMLString(MMLNoteEvent prevNoteEvent) throws UndefinedTickException {
 		StringBuilder sb = new StringBuilder();
 
 		// 前のノートとの差を見て、休符を挿入する.
@@ -122,11 +122,11 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 	 * @param prevNoteEvent
 	 * @return
 	 */
-	private String createMMLSpaceString(MMLNoteEvent prevNoteEvent) {
+	private String createMMLSpaceString(MMLNoteEvent prevNoteEvent) throws UndefinedTickException {
 		int noteSpaceTick = getTickOffset() - prevNoteEvent.getEndTick();
 		if ( noteSpaceTick > 0 ) {
 			MMLTicks mmlTick = new MMLTicks("r", noteSpaceTick, false);
-			return mmlTick.toString();
+			return mmlTick.toMMLText();
 		}
 
 		return "";

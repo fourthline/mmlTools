@@ -60,7 +60,7 @@ public class MMLScoreTest extends FileSelect {
 	}
 
 	@Test
-	public void testMMLFileFormat0() {
+	public void testMMLFileFormat0() throws UndefinedTickException {
 		MMLScore score = new MMLScore();
 		MMLTrack track = new MMLTrack().setMML("MML@aaa,bbb,ccc,dd1;");
 		track.setTrackName("track1");
@@ -73,7 +73,7 @@ public class MMLScoreTest extends FileSelect {
 	}
 
 	@Test
-	public void testMMLFileFormat1() {
+	public void testMMLFileFormat1() throws UndefinedTickException {
 		MMLScore score = new MMLScore();
 		MMLTrack track1 = new MMLTrack().setMML("MML@at150aa1,bbb,ccc,dd1;");
 		track1.setTrackName("track1");
@@ -93,7 +93,7 @@ public class MMLScoreTest extends FileSelect {
 	}
 
 	@Test
-	public void testMMLFileFormat_r0() {
+	public void testMMLFileFormat_r0() throws UndefinedTickException {
 		MMLScore score = new MMLScore();
 		MMLTrack track = new MMLTrack().setMML("MML@r1t180c8;");
 		track.setTrackName("track1");
@@ -105,7 +105,7 @@ public class MMLScoreTest extends FileSelect {
 	}
 
 	@Test
-	public void testMMLFileFormat_r1() {
+	public void testMMLFileFormat_r1() throws UndefinedTickException {
 		MMLScore score = new MMLScore();
 		MMLTrack track1 = new MMLTrack().setMML("MML@r1>f+1t120&f+1;");
 		track1.setTrackName("track1");

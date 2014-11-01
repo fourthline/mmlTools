@@ -205,15 +205,16 @@ public final class MMLEventList implements Serializable, Cloneable {
 		noteList.remove(deleteItem);
 	}
 
-	public String toMMLString() {
+	public String toMMLString() throws UndefinedTickException {
 		return toMMLString(false, 0, true);
 	}
 
-	public String toMMLString(boolean withTempo, boolean mabiTempo) {
+	public String toMMLString(boolean withTempo, boolean mabiTempo) throws UndefinedTickException {
 		return toMMLString(withTempo, 0, mabiTempo);
 	}
 
-	private MMLNoteEvent insertTempoMML(StringBuilder sb, MMLNoteEvent prevNoteEvent, MMLTempoEvent tempoEvent, boolean mabiTempo) {
+	private MMLNoteEvent insertTempoMML(StringBuilder sb, MMLNoteEvent prevNoteEvent, MMLTempoEvent tempoEvent, boolean mabiTempo)
+			throws UndefinedTickException {
 		if (prevNoteEvent.getEndTick() != tempoEvent.getTickOffset()) {
 			int tickLength = tempoEvent.getTickOffset() - prevNoteEvent.getEndTick();
 			int tickOffset = prevNoteEvent.getEndTick();
@@ -225,12 +226,12 @@ public final class MMLEventList implements Serializable, Cloneable {
 				if (prevNoteEvent.getVelocity() != 0) {
 					sb.append("v0");
 				}
-				sb.append(ticks.toString());
+				sb.append(ticks.toMMLText());
 				prevNoteEvent = new MMLNoteEvent(note, tickLength, tickOffset, 0);
 			} else {
 				MMLTicks ticks = new MMLTicks("r", tickLength, false);
 				prevNoteEvent = new MMLNoteEvent(prevNoteEvent.getNote(), tickLength, tickOffset, prevNoteEvent.getVelocity());
-				sb.append(ticks.toString());
+				sb.append(ticks.toMMLText());
 			}
 		}
 		sb.append(tempoEvent.toMMLString());
@@ -245,7 +246,8 @@ public final class MMLEventList implements Serializable, Cloneable {
 	 * @param totalTick 最大tick長. これに満たない場合は、末尾を休符分で埋めます.
 	 * @return
 	 */
-	public String toMMLString(boolean withTempo, int totalTick, boolean mabiTempo) {
+	public String toMMLString(boolean withTempo, int totalTick, boolean mabiTempo)
+			throws UndefinedTickException {
 		//　テンポ
 		Iterator<MMLTempoEvent> tempoIterator = null;
 		MMLTempoEvent tempoEvent = null;

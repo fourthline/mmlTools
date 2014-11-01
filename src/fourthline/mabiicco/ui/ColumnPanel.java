@@ -20,6 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
+import fourthline.mabiicco.IFileState;
 import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.editor.IEditAlign;
@@ -46,7 +47,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 	private final JPopupMenu popupMenu = new JPopupMenu();
 	private final ArrayList<IMarkerEditor> markerEditor = new ArrayList<>();
 
-	public ColumnPanel(PianoRollView pianoRollView, IMMLManager mmlManager, IEditAlign editAlign) {
+	public ColumnPanel(PianoRollView pianoRollView, IMMLManager mmlManager, IEditAlign editAlign, IFileState fileState) {
 		super();
 		this.pianoRollView = pianoRollView;
 		this.mmlManager = mmlManager;
@@ -54,8 +55,8 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 		addMouseListener(this);
 		addMouseMotionListener(this);
 
-		markerEditor.add( new MMLTempoEditor(mmlManager, editAlign) );
-		markerEditor.add( new MarkerEditor(mmlManager, editAlign) );
+		markerEditor.add( new MMLTempoEditor(mmlManager, editAlign, fileState) );
+		markerEditor.add( new MarkerEditor(mmlManager, editAlign, fileState) );
 
 		// popupMenu に各MenuItemを登録する.
 		markerEditor.forEach(t -> t.getMenuItems().forEach(popupMenu::add));
