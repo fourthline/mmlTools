@@ -19,7 +19,7 @@ public final class MMLTempoEvent extends MMLEvent {
 	public MMLTempoEvent(int tempo, int tickOffset) throws IllegalArgumentException {
 		super(tickOffset);
 		if ( (tempo < 32) || (tempo > 255) ) {
-			throw new IllegalArgumentException("tempo 32-255");
+			throw new IllegalArgumentException("tempo "+tempo);
 		}
 		this.tempo = tempo;
 	}

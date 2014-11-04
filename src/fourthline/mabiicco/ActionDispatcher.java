@@ -270,6 +270,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		try {
 			// generateできないデータは保存させない.
 			mmlSeqView.getMMLScore().generateAll();
+			mmlSeqView.updateActivePart();
 			FileOutputStream outputStream = new FileOutputStream(file);
 			mmlSeqView.getMMLScore().writeToOutputStream(outputStream);
 			mainFrame.setTitleAndFileName(file.getName());

@@ -152,7 +152,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		}
 
 		// トラックビューの追加
-		tabbedPane.add(newTrack.getTrackName(), MMLTrackView.getInstance(newTrack, trackIndex, this, this));
+		tabbedPane.add(newTrack.getTrackName(), MMLTrackView.getInstance(trackIndex, this, this));
 		tabbedPane.setSelectedIndex(trackIndex);
 		updateTrackTabIcon();
 
@@ -246,7 +246,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 				name = "Track"+(trackCount+1);
 			}
 
-			tabbedPane.add(name, MMLTrackView.getInstance(track, trackCount, this, this));
+			tabbedPane.add(name, MMLTrackView.getInstance(trackCount, this, this));
 			trackCount++;
 		}
 
@@ -270,7 +270,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 
 		// 表示を更新
 		MMLTrackView view = (MMLTrackView)tabbedPane.getComponentAt(index);
-		view.setMMLTrack(mml);
+		view.updateTrack();
 		updateSelectedTrackAndMMLPart();
 		updateActivePart();
 	}
@@ -379,7 +379,6 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 			pianoRollView.setPitchRange(MabiDLS.getInstance().getInstByProgram(program));
 
 			pianoRollView.repaint();
-			System.out.printf("stateChanged(): %d, %d\n", mmlPartIndex, program);
 		}
 	}
 
@@ -448,7 +447,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		tabbedPane.removeAll();
 		int i = 0;
 		for (MMLTrack track : mmlScore.getTrackList()) {
-			tabbedPane.add(track.getTrackName(), MMLTrackView.getInstance(track, i, this, this));
+			tabbedPane.add(track.getTrackName(), MMLTrackView.getInstance(i, this, this));
 			i++;
 		}
 
@@ -543,12 +542,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		int count = tabbedPane.getComponentCount();
 		for (int i = 0; i < count; i++) {
 			MMLTrackView view = (MMLTrackView) tabbedPane.getComponentAt(i);
-			MMLTrack track = mmlScore.getTrack(i);
-
-			String mmlStrings[] = track.getMabiMMLArray();
-			for (int j = 0; j < mmlStrings.length; j++) {
-				view.setPartMMLString(j, mmlStrings[j]);
-			}
+			view.updateTrack();
 		}
 
 		MabiDLS.getInstance().updatePanpot(mmlScore);

@@ -28,7 +28,6 @@ import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.InstType;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mmlTools.MMLTrack;
-import fourthline.mmlTools.core.MMLTools;
 
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -158,10 +157,6 @@ public final class MMLTrackView extends JPanel implements ActionListener, Docume
 		this();
 		this.trackIndex = trackIndex;
 
-		for (int i = 0; i < MMLPART_NAME.length; i++) {
-			partButton[i].addActionListener(actionListener);
-		}
-
 		muteButton = new JButton("");
 		muteButton.setToolTipText(AppResource.appText("mmltrack.mute"));
 		toolBar.add(muteButton);
@@ -173,13 +168,16 @@ public final class MMLTrackView extends JPanel implements ActionListener, Docume
 		allButton.setIcon(AppResource.getImageIcon(AppResource.appText("mmltrack.all.icon")));
 		allButton.setToolTipText(AppResource.appText("mmltrack.all"));
 		toolBar.add(allButton);
+
+		for (int i = 0; i < partButton.length; i++) {
+			partButton[i].addActionListener(actionListener);
+		}
 		muteButton.addActionListener(this);
 		soloButton.addActionListener(this);
 		allButton.addActionListener(this);
 	}
-
 	private static HashMap<Integer, MMLTrackView> instanceList = new HashMap<>();
-	public static MMLTrackView getInstance(MMLTrack track, int trackIndex, ActionListener actionListener, IMMLManager mmlManager) {
+	public static MMLTrackView getInstance(int trackIndex, ActionListener actionListener, IMMLManager mmlManager) {
 		MMLTrackView view;
 		if (instanceList.containsKey(trackIndex)) {
 			view = instanceList.get(trackIndex);
@@ -187,10 +185,8 @@ public final class MMLTrackView extends JPanel implements ActionListener, Docume
 			view = new MMLTrackView(trackIndex, actionListener);
 			instanceList.put(trackIndex, view);
 		}
-		view.mmlManager = null;
-		view.setMMLTrack(track);
 		view.mmlManager = mmlManager;
-		view.trackComposeLabel.setText(track.mmlRankFormat());
+		view.updateTrack();
 		view.updateMuteButton();
 		view.updatePartButtonStatus();
 		return view;
@@ -202,16 +198,6 @@ public final class MMLTrackView extends JPanel implements ActionListener, Docume
 		} else {
 			muteButton.setIcon(AppResource.getImageIcon(AppResource.appText("mmltrack.mute.off.icon")));
 		}
-	}
-
-	public String getMMLText() {
-		MMLTools tools = new MMLTools(
-				mmlText[0].getText(),
-				mmlText[1].getText(),
-				mmlText[2].getText(),
-				mmlText[3].getText()
-				);
-		return tools.getMML();
 	}
 
 	/**
@@ -254,24 +240,19 @@ public final class MMLTrackView extends JPanel implements ActionListener, Docume
 	public void changedUpdate(DocumentEvent event) {
 	}
 
-	/**
-	 * 保持しているMMLテキストの作曲ランク文字列を取得します.
-	 * @return 作曲ランクのフォーマットされた文字列.
-	 */
-	private String getRankText() {
-		MMLTools tools = new MMLTools(
-				mmlText[0].getText(),
-				mmlText[1].getText(),
-				mmlText[2].getText(),
-				mmlText[3].getText()
-				);
+	public void updateTrack() {
+		MMLTrack mmlTrack = mmlManager.getMMLScore().getTrack(trackIndex);
+		String mml[] = mmlTrack.getMabiMMLArray();
+		for (int i = 0; i < mmlText.length; i++) {
+			if (i < mml.length) {
+				mmlText[i].setText(mml[i]);
+			} else {
+				mmlText[i].setText("");
+			}
+		}
 
-		String rank = tools.mmlRankFormat();
-		return rank;
-	}
-
-	private void updateComposeRank() {
-		trackComposeLabel.setText( getRankText() );
+		setInstProgram(mmlTrack);
+		trackComposeLabel.setText(mmlTrack.mmlRankFormat());
 	}
 
 	private void setInstProgram(MMLTrack track) {
@@ -317,12 +298,13 @@ public final class MMLTrackView extends JPanel implements ActionListener, Docume
 		InstClass songInst = ((InstClass) songComboBox.getSelectedItem());
 		int program = inst.getProgram();
 		int songProgram = songInst.getProgram();
+		MMLTrack track = mmlManager.getMMLScore().getTrack(trackIndex);
+		if ( (track.getProgram() == program) && (track.getSongProgram() == songProgram) ) {
+			return;
+		}
 
 		updatePartButtonStatus();
-
-		if (mmlManager != null) {
-			mmlManager.updateActiveTrackProgram(trackIndex, program, songProgram);
-		}
+		mmlManager.updateActiveTrackProgram(trackIndex, program, songProgram);
 	}
 
 	private void updatePartButtonStatus() {
@@ -350,26 +332,6 @@ public final class MMLTrackView extends JPanel implements ActionListener, Docume
 				}
 			}
 		}
-	}
-
-	public void setMMLTrack(MMLTrack track) {
-		String mml[] = track.getMabiMMLArray();
-		for (int i = 0; (i < mml.length) && (i < mmlText.length); i++) {
-			mmlText[i].setText(mml[i]);
-		}
-
-		setInstProgram( track );
-	}
-
-	public void setActivePartMMLString(String mml) {
-		int index = getSelectedMMLPartIndex();
-
-		setPartMMLString(index, mml);
-	}
-
-	public void setPartMMLString(int index, String mml) {
-		mmlText[index].setText(mml);
-		updateComposeRank();
 	}
 
 	@Override

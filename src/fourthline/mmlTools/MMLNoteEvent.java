@@ -24,7 +24,7 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 	public MMLNoteEvent(int note, int tickLength, int tickOffset, int velocity) {
 		super(tickOffset);
 		if ( (velocity < 0) || (velocity > 15) ) {
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("velocity  "+velocity);
 		}
 
 		this.note = note;

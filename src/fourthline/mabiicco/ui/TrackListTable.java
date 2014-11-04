@@ -15,7 +15,6 @@ import fourthline.mabiicco.AppResource;
 import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mmlTools.MMLTrack;
-import fourthline.mmlTools.core.MMLTools;
 
 public final class TrackListTable extends JTable {
 	private static final long serialVersionUID = -710966050907225119L;
@@ -39,12 +38,11 @@ public final class TrackListTable extends JTable {
 			checkValue = new boolean[trackList.size()];
 			dataList = new ArrayList<>();
 			for (MMLTrack track : trackList) {
-				MMLTools tools = new MMLTools( track.getMabiMML() );
 				InstClass inst = MabiDLS.getInstance().getInstByProgram(track.getProgram());
 				dataList.add(new String[] {
 						track.getTrackName(),
 						inst.toString(),
-						tools.mmlRankFormat()
+						track.mmlRankFormat()
 				});
 			}
 		}

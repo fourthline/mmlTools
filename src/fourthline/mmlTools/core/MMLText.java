@@ -23,10 +23,10 @@ public class MMLText {
 		}
 	}
 
-	public void setMMLText(String mml) {
+	public MMLText setMMLText(String mml) {
 		if (!mml.startsWith("MML@")) {
 			mml = "";
-			return;
+			return this;
 		}
 
 		int start = 4;
@@ -38,27 +38,32 @@ public class MMLText {
 
 		String parts[] = mml.split(",");
 		setMMLText(parts);
+		return this;
 	}
 
-	public void setMMLText(int index, String text) {
+	public MMLText setMMLText(int index, String text) {
 		if (index < this.text.length) {
 			this.text[index] = text;
 		}
+		return this;
 	}
 
-	public void setMMLText(String parts[]) {
+	public MMLText setMMLText(String parts[]) {
 		for (int i = 0; (i < parts.length) && (i < this.text.length); i++) {
 			this.text[i] = parts[i];
 		}
+		return this;
 	}
 
-	public void setMMLText(String melody, String chord1, String chord2) {
+	public MMLText setMMLText(String melody, String chord1, String chord2) {
 		setMMLText(melody, chord1, chord2, "");
+		return this;
 	}
 
-	public void setMMLText(String melody, String chord1, String chord2, String songEx) {
+	public MMLText setMMLText(String melody, String chord1, String chord2, String songEx) {
 		String parts[] = { melody, chord1, chord2, songEx };
 		setMMLText(parts);
+		return this;
 	}
 
 	public boolean isEmpty() {

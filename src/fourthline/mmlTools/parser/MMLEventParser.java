@@ -57,7 +57,10 @@ public final class MMLEventParser extends MelodyParser implements Iterator<MMLEv
 			}
 			if ( (firstC == 'v') || (firstC == 'V') ) {
 				try {
-					volumn = Integer.parseInt( token.substring(1) );
+					int nextVolumn = Integer.parseInt( token.substring(1) );
+					if ( (nextVolumn >= 0) && (nextVolumn <= 15) ) {
+						volumn = nextVolumn;
+					}
 					continue;
 				} catch (NumberFormatException e) {
 					e.printStackTrace();

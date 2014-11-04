@@ -18,6 +18,7 @@ public final class MMLTrack implements Serializable {
 	private static final int PART_COUNT = 4;
 	private List<MMLEventList> mmlParts = new ArrayList<>();
 	private List<MMLTempoEvent> globalTempoList = new ArrayList<>();
+	private boolean generated = false;
 
 	private int program = 0;
 	private String trackName;
@@ -55,6 +56,7 @@ public final class MMLTrack implements Serializable {
 
 	private void mmlParse() {
 		mmlParts.clear();
+		generated = false;
 
 		for (int i = 0; i < PART_COUNT; i++) {
 			String s = originalMML.getText(i);
@@ -79,7 +81,7 @@ public final class MMLTrack implements Serializable {
 	 * @return　フォーマット済みRank文字列
 	 */
 	public String mmlRankFormat() {
-		return mabiMML.mmlRankFormat();
+		return (generated ? "" : "*") + mabiMML.mmlRankFormat();
 	}
 
 	/**
@@ -170,6 +172,7 @@ public final class MMLTrack implements Serializable {
 	public MMLTrack generate() throws UndefinedTickException {
 		originalMML.setMMLText(getMMLStrings(false, false));
 		mabiMML.setMMLText(getMMLStrings(true, true));
+		generated = true;
 		return this;
 	}
 
