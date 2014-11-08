@@ -7,16 +7,48 @@ package fourthline.mmlTools.parser;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 
 import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTrack;
 import fourthline.mmlTools.Marker;
+import fourthline.mmlTools.core.ResourceLoader;
 
 /**
  * まきまびしーくさんのファイルフォーマットを扱います.
  */
 public final class MMSFile implements IMMLFileParser {
+	private static final String PATCH_NAME = "mms_instPatch";
+
+	/* MMS->programへの変換テーブル */
+	static private int mmsInstTable[] = {
+		0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 
+		10, 11, 12, 13, 14, 15, 16, 17, 65, 66, 
+		67, 68,	69, 70, 71, 72, 73, 74, 75, 76, 
+		18
+	};
+
+	static {
+		try {
+			ResourceBundle instPatch = ResourceBundle.getBundle(PATCH_NAME, new ResourceLoader());
+
+			// パッチファイルがある場合は、変換テーブルを更新します.
+			for (String key : instPatch.keySet()) {
+				String newInst = instPatch.getString(key).replaceAll("#.*", "");
+				int keyInt = Integer.parseInt(key.trim());
+				int newInstInt = Integer.parseInt(newInst.trim());
+				System.out.println("[MMS-PATCH] " + keyInt + " -> " + newInstInt);
+				for (int i = 0; i < mmsInstTable.length; i++) {
+					if (mmsInstTable[i] == keyInt) {
+						mmsInstTable[i] = newInstInt;
+					}
+				}
+			}
+		} catch (MissingResourceException e) {}
+	}
+
 	private final MMLScore score = new MMLScore();
 
 	@Override
@@ -45,14 +77,6 @@ public final class MMSFile implements IMMLFileParser {
 
 		return score;
 	}
-
-	/* MMS->programへの変換テーブル */
-	static final int mmsInstTable[] = {
-		0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 
-		10, 11, 12, 13, 14, 15, 16, 17, 18, 66, 
-		67, 68,	69, 70, 71, 72, 73, 74, 75, 76, 
-		18
-	};
 
 	/**
 	 * mmsファイルのinstrument値は、DLSのものではないので変換を行います.
