@@ -4,15 +4,23 @@
 
 package fourthline.mabiicco.ui;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.List;
 
+import javax.swing.AbstractAction;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JLabel;
+import javax.swing.KeyStroke;
 
 import fourthline.mabiicco.AppResource;
 import fourthline.mmlTools.MMLScore;
@@ -23,7 +31,6 @@ public final class MMLImportPanel extends JPanel {
 	private static final long serialVersionUID = -1504636951822574399L;
 	private TrackListTable table;
 	private final JDialog dialog;
-	private final JButton importButton = new JButton(AppResource.appText("mml.input.import"));
 
 	private List<MMLTrack> trackList;
 	private IMMLManager mmlManager;
@@ -50,18 +57,22 @@ public final class MMLImportPanel extends JPanel {
 
 	private void initializePanel(List<MMLTrack> trackList) {
 		this.trackList = trackList;
-		setLayout(null);
+		setLayout(new BorderLayout());
+		JPanel buttonPanel = new JPanel();
+		JPanel p = new JPanel();
+		p.setLayout(null);
 
-		importButton.setBounds(142, 214, 90, 29);
-		add(importButton);
+		JButton importButton = new JButton(AppResource.appText("mml.input.import"));
+		importButton.setMargin(new Insets(5, 10, 5, 10));
+		buttonPanel.add(importButton);
 		importButton.addActionListener((event) -> {
 			importMMLTrack();
 			dialog.setVisible(false);
 		});
 
 		JButton closeButton = new JButton(AppResource.appText("mml.output.closeButton"));
-		closeButton.setBounds(258, 214, 90, 29);
-		add(closeButton);
+		closeButton.setMargin(new Insets(5, 10, 5, 10));
+		buttonPanel.add(closeButton);
 		closeButton.setFocusable(false);
 		closeButton.addActionListener((event) -> {
 			dialog.setVisible(false);
@@ -69,7 +80,7 @@ public final class MMLImportPanel extends JPanel {
 
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(12, 10, 422, 169);
-		add(scrollPane);
+		p.add(scrollPane);
 
 		table = new TrackListTable(trackList, true);
 		table.setInitialCheck(possibleImportTrackCount);
@@ -77,9 +88,23 @@ public final class MMLImportPanel extends JPanel {
 
 		JLabel lblNewLabel = new JLabel(AppResource.appText("mml.input.import.possibleImport")+": "+possibleImportTrackCount);
 		lblNewLabel.setBounds(22, 189, 300, 13);
-		add(lblNewLabel);
+		p.add(lblNewLabel);
 
 		table.setDefaultEditor(Object.class, null);
+
+		InputMap imap = dialog.getRootPane().getInputMap(
+				JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "close-it");
+		dialog.getRootPane().getActionMap().put("close-it", new AbstractAction() {
+			private static final long serialVersionUID = -4495368209645211523L;
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				dialog.setVisible(false);
+			}});
+
+		add(buttonPanel, BorderLayout.SOUTH);
+		add(p, BorderLayout.CENTER);
 	}
 
 	private void importMMLTrack() {

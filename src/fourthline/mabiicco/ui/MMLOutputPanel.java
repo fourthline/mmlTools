@@ -4,8 +4,10 @@
 
 package fourthline.mabiicco.ui;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -30,7 +32,6 @@ public final class MMLOutputPanel extends JPanel {
 	private static final long serialVersionUID = 8558159209741558854L;
 	private TrackListTable table;
 	private final JDialog dialog;
-	private final JButton copyButton = new JButton(AppResource.appText("mml.output.copyButton"));
 
 	private List<MMLTrack> trackList;
 
@@ -46,17 +47,21 @@ public final class MMLOutputPanel extends JPanel {
 
 	private void initializePanel(List<MMLTrack> trackList) {
 		this.trackList = trackList;
-		setLayout(null);
+		setLayout(new BorderLayout());
+		JPanel buttonPanel = new JPanel();
+		JPanel p = new JPanel();
+		p.setLayout(null);
 
-		copyButton.setBounds(141, 189, 90, 29);
-		add(copyButton);
+		JButton copyButton = new JButton(AppResource.appText("mml.output.copyButton"));
+		copyButton.setMargin(new Insets(5, 10, 5, 10));
+		buttonPanel.add(copyButton);
 		copyButton.addActionListener((event) -> {
 			currentSelectedPartMMLOutput();
 		});
 
 		JButton closeButton = new JButton(AppResource.appText("mml.output.closeButton"));
-		closeButton.setBounds(257, 189, 90, 29);
-		add(closeButton);
+		closeButton.setMargin(new Insets(5, 10, 5, 10));
+		buttonPanel.add(closeButton);
 		closeButton.setFocusable(false);
 		closeButton.addActionListener((event) -> {
 			dialog.setVisible(false);
@@ -64,7 +69,7 @@ public final class MMLOutputPanel extends JPanel {
 
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(12, 10, 372, 169);
-		add(scrollPane);
+		p.add(scrollPane);
 
 		table = new TrackListTable(trackList);
 		scrollPane.setViewportView(table);
@@ -79,6 +84,9 @@ public final class MMLOutputPanel extends JPanel {
 			public void actionPerformed(ActionEvent arg0) {
 				dialog.setVisible(false);
 			}});
+
+		add(buttonPanel, BorderLayout.SOUTH);
+		add(p, BorderLayout.CENTER);
 	}
 
 	private void copyToClipboard(String text) {
