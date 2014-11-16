@@ -111,9 +111,9 @@ public final class ComposeRank {
 		return rank;
 	}
 
+	@Override
 	public String toString() {
 		String result = "Rank " + rank + " ( " + melody + ", " + chord1 + ", " + chord2 + " )";
-
 		return result;
 	}
 }

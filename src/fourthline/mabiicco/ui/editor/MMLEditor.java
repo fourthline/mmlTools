@@ -70,6 +70,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 				"editor.note_16",
 				"editor.note_32",
 				"editor.note_64",
+				"editor.note_6",
 				"editor.note_12",
 				"editor.note_24",
 				"editor.note_48"
@@ -178,8 +179,10 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		try {
 			mmlManager.getMMLScore().generateAll();
 		} catch (UndefinedTickException e) {
-			System.out.println("REVERT: " + e.getMessage());
+			System.err.println("REVERT: " + e.getMessage());
 			fileState.revertState();
+			this.editEventList = mmlManager.getActiveMMLPart();
+			selectNote(null);
 		}
 		mmlManager.updateActivePart();
 	}
