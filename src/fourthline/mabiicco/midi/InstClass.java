@@ -16,6 +16,7 @@ import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Soundbank;
 
+import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mmlTools.core.ResourceLoader;
 import fourthline.mmlTools.parser.MMLEventParser;
 
@@ -134,7 +135,13 @@ public final class InstClass {
 	}
 
 	public static List<InstClass> loadDLS(File dlsFile) throws InvalidMidiDataException, IOException {
-		Soundbank sb = MidiSystem.getSoundbank(dlsFile);
+		Soundbank sb = null;
+		try {
+			sb = MidiSystem.getSoundbank(dlsFile);
+		} catch (Exception e) {
+			MabiIccoProperties.getInstance().setDlsFile(null);
+			throw new IOException("loadDLS: "+dlsFile.getName());
+		}
 
 		ArrayList<InstClass> instArray = new ArrayList<>();
 		for (Instrument inst : sb.getInstruments()) {
