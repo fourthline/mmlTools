@@ -30,7 +30,6 @@ public class MMLOptToolsTest {
 			"6",
 			"12",
 			"24"
-
 	};
 
 	public int[] mmlTimeTest(String mml1, String mml2) {

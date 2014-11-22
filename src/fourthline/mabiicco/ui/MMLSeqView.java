@@ -372,10 +372,8 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		if (view != null) {
 			view.updateMuteButton();
 			int program = getActivePartProgram();
-			int mmlPartIndex = view.getSelectedMMLPartIndex();
 
-			// ピアノロールビューにアクティブトラックとアクティブパートを設定します.
-			editor.setMMLEventList(getSelectedTrack().getMMLEventAtIndex(mmlPartIndex));
+			editor.reset();
 			pianoRollView.setPitchRange(MabiDLS.getInstance().getInstByProgram(program));
 
 			pianoRollView.repaint();
