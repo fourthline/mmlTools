@@ -161,16 +161,18 @@ public final class MMLScore implements IMMLFileParser {
 	}
 
 	public int getMeasureTick() {
+		return (getTimeCountOnly() * getBeatTick());
+	}
+
+	public int getBeatTick() {
 		try {
-			int step = MMLTicks.getTick(getBaseOnly());
-			return (getTimeCountOnly() * step);
+			return MMLTicks.getTick(getBaseOnly());
 		} catch (UndefinedTickException e) {
-			e.printStackTrace();
 			throw new AssertionError();
 		}
 	}
 
-	public void addMeasure(int tickPosition, int tick) {
+	public void addTicks(int tickPosition, int tick) {
 		for (MMLTrack track : getTrackList()) {
 			for (MMLEventList eventList : track.getMMLEventList()) {
 				eventList.insertTick(tickPosition, tick);
@@ -185,7 +187,7 @@ public final class MMLScore implements IMMLFileParser {
 		}
 	}
 
-	public void removeMeasure(int tickPosition, int tick) {
+	public void removeTicks(int tickPosition, int tick) {
 		for (MMLTrack track : getTrackList()) {
 			for (MMLEventList eventList : track.getMMLEventList()) {
 				eventList.removeTick(tickPosition, tick);

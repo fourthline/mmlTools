@@ -259,6 +259,14 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		noplayFunctions.add(removeMeasureMenu);
 		editMenu.add(removeMeasureMenu);
 
+		JMenuItem addBeatMenu = createMenuItem(appText("menu.addBeat"), ActionDispatcher.ADD_BEAT);
+		noplayFunctions.add(addBeatMenu);
+		editMenu.add(addBeatMenu);
+
+		JMenuItem removeBeatMenu = createMenuItem(appText("menu.removeBeat"), ActionDispatcher.REMOVE_BEAT);
+		noplayFunctions.add(removeBeatMenu);
+		editMenu.add(removeBeatMenu);
+
 		JMenuItem transposeMenu = createMenuItem(appText("edit.transpose"), ActionDispatcher.TRANSPOSE);
 		noplayFunctions.add(transposeMenu);
 		editMenu.add(transposeMenu);

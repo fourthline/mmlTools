@@ -73,6 +73,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	public static final String CHANGE_NOTE_HEIGHT_INT = "change_note_height_";
 	public static final String ADD_MEASURE = "add_measure";
 	public static final String REMOVE_MEASURE = "remove_measure";
+	public static final String ADD_BEAT = "add_beat";
+	public static final String REMOVE_BEAT = "remove_beat";
 	public static final String NOTE_PROPERTY = "note_property";
 	public static final String TRANSPOSE = "transpose";
 	public static final String ABOUT = "about";
@@ -181,8 +183,10 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(NEXT_TIME, () -> mmlSeqView.nextStepTimeTo(true));
 		actionMap.put(PREV_TIME, () -> mmlSeqView.nextStepTimeTo(false));
 		actionMap.put(PART_CHANGE, () -> mmlSeqView.partChange(mainFrame));
-		actionMap.put(ADD_MEASURE, mmlSeqView::addMeasure);
-		actionMap.put(REMOVE_MEASURE, mmlSeqView::removeMeasure);
+		actionMap.put(ADD_MEASURE, this::addMeasure);
+		actionMap.put(REMOVE_MEASURE, this::removeMeasure);
+		actionMap.put(ADD_BEAT, this::addBeat);
+		actionMap.put(REMOVE_BEAT, this::removeBeat);
 		actionMap.put(NOTE_PROPERTY, editState::noteProperty);
 		actionMap.put(TRANSPOSE, () -> new MMLTranspose(mmlSeqView.getFileState()).execute(mainFrame, mmlSeqView));
 		actionMap.put(ABOUT, () -> new About().show(mainFrame));
@@ -495,6 +499,22 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	private void selectAll() {
 		editState.selectAll();
 		mmlSeqView.repaint();
+	}
+
+	private void addMeasure() {
+		mmlSeqView.addTicks( mmlSeqView.getMMLScore().getMeasureTick() );
+	}
+
+	private void addBeat() {
+		mmlSeqView.addTicks( mmlSeqView.getMMLScore().getBeatTick() );
+	}
+
+	private void removeMeasure() {
+		mmlSeqView.removeTicks( mmlSeqView.getMMLScore().getMeasureTick() );
+	}
+
+	private void removeBeat() {
+		mmlSeqView.removeTicks( mmlSeqView.getMMLScore().getBeatTick() );
 	}
 
 	@Override

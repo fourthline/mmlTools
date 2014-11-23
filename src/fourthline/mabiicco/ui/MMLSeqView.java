@@ -596,17 +596,15 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		return pianoRollView.getSequencePosition();
 	}
 
-	public void addMeasure() {
+	public void addTicks(int tick) {
 		int tickPosition = (int) pianoRollView.getSequencePosition();
-		int tick = mmlScore.getMeasureTick();
-		mmlScore.addMeasure(tickPosition, tick);
+		mmlScore.addTicks(tickPosition, tick);
 		updateAllMMLPart();
 	}
 
-	public void removeMeasure() {
+	public void removeTicks(int tick) {
 		int tickPosition = (int) pianoRollView.getSequencePosition();
-		int tick = mmlScore.getMeasureTick();
-		mmlScore.removeMeasure(tickPosition, tick);
+		mmlScore.removeTicks(tickPosition, tick);
 		updateAllMMLPart();
 	}
 
