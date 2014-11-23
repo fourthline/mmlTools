@@ -499,6 +499,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	private void selectAll() {
 		editState.selectAll();
 		mmlSeqView.repaint();
+		notifyUpdateEditState();
 	}
 
 	private void addMeasure() {
