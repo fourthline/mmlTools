@@ -5,6 +5,8 @@
 package fourthline.mabiicco.ui;
 
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -20,17 +22,20 @@ import javax.swing.SpinnerNumberModel;
 
 /**
  * ノートプロパティを編集するためのダイアログ表示で用いるPanelです.
+ *
+ * onlySelectedNoteOption
+ *   TRUE： 選択した音符のみを変更
+ * 音量コマンド（onlySelectedNoteOptionがFALSE時のみ）
+ *   FALSE：  一つ前の音符と同じ音量に後続の音符も変更する = 音量コマンド削除
+ *   TRUE:    後続の音符も変更（音量コマンドを挿入する）
  */
-public final class MMLNotePropertyPanel extends JPanel {
-
-	/**
-	 * 
-	 */
+public final class MMLNotePropertyPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 646262293010195918L;
 
 	private JSpinner velocityValueField;
-	private JCheckBox velocityCheckBox;
+	private JCheckBox velocityCheckBox; // 音量コマンド
 	private JCheckBox tuningNoteCheckBox;
+	private JCheckBox onlySelectedNoteOption;
 	private MMLNoteEvent noteEvent[];
 	private MMLEventList eventList;
 
@@ -67,15 +72,22 @@ public final class MMLNotePropertyPanel extends JPanel {
 
 		velocityCheckBox = new JCheckBox(AppResource.appText("note.properties.velocity"));
 		velocityCheckBox.setBounds(42, 36, 150, 21);
+		velocityCheckBox.addActionListener(this);
 		add(velocityCheckBox);
 
+		onlySelectedNoteOption = new JCheckBox(AppResource.appText("note.properties.onlySelectedNoteOption"));
+		onlySelectedNoteOption.setBounds(62, 60, 200, 21);
+		onlySelectedNoteOption.addActionListener(this);
+		add(onlySelectedNoteOption);
+
 		tuningNoteCheckBox = new JCheckBox(AppResource.appText("note.properties.tuning"));
-		tuningNoteCheckBox.setBounds(43, 99, 220, 21);
+		tuningNoteCheckBox.setBounds(42, 99, 220, 21);
 		add(tuningNoteCheckBox);
 
 		this.noteEvent = noteEvent;
 		this.eventList = eventList;
 		setNoteEvent();
+		updateView();
 	}
 
 	private void setNoteEvent() {
@@ -107,16 +119,22 @@ public final class MMLNotePropertyPanel extends JPanel {
 			}
 
 			Integer value = (Integer) velocityValueField.getValue();
-			int prevVelocity = targetNote.getVelocity();
-			if (!velocityCheckBox.isSelected()) {
+			int beforeVelocity = targetNote.getVelocity();
+			if (onlySelectedNoteOption.isSelected()) {
 				targetNote.setVelocity(value.intValue());
 			} else {
+				int prevVelocity = MMLNoteEvent.INIT_VOL;
 				for (MMLNoteEvent note : eventList.getMMLNoteEventList()) {
 					if (note.getTickOffset() < targetNote.getTickOffset()) {
+						prevVelocity = note.getVelocity();
 						continue;
 					}
-					if (prevVelocity == note.getVelocity()) {
-						note.setVelocity(value);
+					if (beforeVelocity == note.getVelocity()) {
+						if (velocityCheckBox.isSelected()) {
+							note.setVelocity(value);
+						} else {
+							note.setVelocity(prevVelocity);
+						}
 					} else {
 						break;
 					}
@@ -125,8 +143,22 @@ public final class MMLNotePropertyPanel extends JPanel {
 		}
 	}
 
+	private void updateView() {
+		velocityCheckBox.setEnabled( !onlySelectedNoteOption.isSelected() );
+		if ( velocityCheckBox.isSelected() || onlySelectedNoteOption.isSelected() ) {
+			velocityValueField.setEnabled( true );
+		} else {
+			velocityValueField.setEnabled( false );
+		}
+	}
+
 	@Override
 	public Dimension getPreferredSize() {
 		return new Dimension(350, 150);
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		updateView();
 	}
 }
