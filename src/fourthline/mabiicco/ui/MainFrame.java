@@ -241,6 +241,12 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 
 		editMenu.add(new JSeparator());
 
+		JMenuItem selectAllMenu = createMenuItem(appText("menu.selectAll"), ActionDispatcher.SELECT_ALL);
+		selectAllMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_MASK));
+		editMenu.add(selectAllMenu);
+
+		editMenu.add(new JSeparator());
+
 		JMenuItem partChangeMenu = createMenuItem(appText("menu.changePart"), ActionDispatcher.PART_CHANGE);
 		noplayFunctions.add(partChangeMenu);
 		editMenu.add(partChangeMenu);

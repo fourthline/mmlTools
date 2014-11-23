@@ -12,6 +12,7 @@ public interface IEditState {
 	public void selectedCopy();
 	public void selectedDelete();
 	public void noteProperty();
+	public void selectAll();
 
 	public void setEditStateObserver(IEditStateObserver observer);
 }

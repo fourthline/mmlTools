@@ -79,6 +79,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	public static final String MIDI_EXPORT = "midi_export";
 	public static final String FILE_IMPORT = "file_import";
 	public static final String CLEAR_DLS = "clear_dls";
+	public static final String SELECT_ALL = "select_all";
 
 	private final HashMap<String, Runnable> actionMap = new HashMap<>();
 
@@ -188,6 +189,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(MIDI_EXPORT, this::midiExportAction);
 		actionMap.put(FILE_IMPORT, this::fileImportAction);
 		actionMap.put(CLEAR_DLS, this::clearDLSInformation);
+		actionMap.put(SELECT_ALL, this::selectAll);
 	}
 
 	@Override
@@ -488,6 +490,11 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			properties.setDlsFile(null);
 			System.out.println("clearDLSInformation");
 		}
+	}
+
+	private void selectAll() {
+		editState.selectAll();
+		mmlSeqView.repaint();
 	}
 
 	@Override

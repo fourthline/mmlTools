@@ -531,6 +531,12 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		mmlGenerate();
 	}
 
+	@Override
+	public void selectAll() {
+		selectedNote.clear();
+		selectedNote.addAll(mmlManager.getActiveMMLPart().getMMLNoteEventList());
+	}
+
 	public void changePart(MMLEventList from, MMLEventList to, boolean useSelectedNoteList, ChangePartAction action) {
 		int startTick = 0;
 		int endTick;
