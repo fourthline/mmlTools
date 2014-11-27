@@ -12,10 +12,8 @@ import java.util.List;
 import javax.swing.JMenuItem;
 
 import fourthline.mabiicco.AppResource;
-import fourthline.mabiicco.IFileState;
 import fourthline.mabiicco.ui.IMMLManager;
 import fourthline.mmlTools.MMLEvent;
-import fourthline.mmlTools.UndefinedTickException;
 
 /**
  * Marker (for MMLEvent) Editor
@@ -39,20 +37,18 @@ public abstract class AbstractMarkerEditor<T extends MMLEvent> implements IMarke
 	protected final String deleteCommand;
 
 	private final IEditAlign editAlign;
-	private final IFileState fileState;
 	protected final IMMLManager mmlManager;
 
 	protected T targetEvent;
 	protected int targetTick;
 
-	public AbstractMarkerEditor(String suffix, IMMLManager mmlManager, IEditAlign editAlign, IFileState fileState) {
+	public AbstractMarkerEditor(String suffix, IMMLManager mmlManager, IEditAlign editAlign) {
 		this.suffix = suffix;
 		this.insertCommand = "insert_" + suffix;
 		this.editCommand   = "edit_" + suffix;
 		this.deleteCommand = "delete_" + suffix;
 		this.mmlManager = mmlManager;
 		this.editAlign = editAlign;
-		this.fileState = fileState;
 
 		insertMenu = newMenuItem(AppResource.appText("edit."+insertCommand));
 		insertMenu.setActionCommand(insertCommand);
@@ -112,13 +108,8 @@ public abstract class AbstractMarkerEditor<T extends MMLEvent> implements IMarke
 		} else if (actionCommand.equals(deleteCommand)) {
 			deleteAction();
 		}
-		
-		try {
-			mmlManager.getMMLScore().generateAll();
-		} catch (UndefinedTickException e) {
-			fileState.revertState();
-		}
-		mmlManager.updateActivePart();
+
+		mmlManager.updateActivePart(true);
 	}
 
 	protected abstract List<T> getEventList();

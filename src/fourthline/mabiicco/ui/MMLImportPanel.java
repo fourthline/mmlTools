@@ -115,7 +115,7 @@ public final class MMLImportPanel extends JPanel {
 				targetScore.addTrack(trackList.get(i));
 			}
 		}
-		mmlManager.updateActivePart();
+		mmlManager.updateActivePart(false);
 	}
 
 	@Override

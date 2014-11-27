@@ -88,9 +88,9 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		panel.add(tabbedPane, BorderLayout.SOUTH);
 
 		// create mml editor
-		editor = new MMLEditor(keyboardView, pianoRollView, this, undoEdit);
+		editor = new MMLEditor(keyboardView, pianoRollView, this);
 		pianoRollView.addMouseInputListener(editor);
-		columnView = new ColumnPanel(pianoRollView, this, editor, undoEdit);
+		columnView = new ColumnPanel(pianoRollView, this, editor);
 
 		scrollPane.setRowHeaderView(keyboardView);
 		scrollPane.setColumnHeaderView(columnView);
@@ -157,7 +157,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		updateTrackTabIcon();
 
 		// エディタ更新
-		updateActivePart();
+		updateActivePart(false);
 		updateSelectedTrackAndMMLPart();
 		updateProgramSelect();
 	}
@@ -253,7 +253,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		initialSetView();
 		pianoRollView.setSequenceTick(0);
 		updateTrackTabIcon();
-		updateActivePart();
+		updateActivePart(false);
 		updateProgramSelect();
 	}
 
@@ -272,7 +272,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		MMLTrackView view = (MMLTrackView)tabbedPane.getComponentAt(index);
 		view.updateTrack();
 		updateSelectedTrackAndMMLPart();
-		updateActivePart();
+		updateActivePart(false);
 	}
 
 	/**
@@ -471,7 +471,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 			undoEdit.undo();
 			resetTrackView();
 			updateSelectedTrackAndMMLPart();
-			updateActivePart();
+			updateActivePart(false);
 		}
 	}
 
@@ -480,7 +480,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 			undoEdit.redo();
 			resetTrackView();
 			updateSelectedTrackAndMMLPart();
-			updateActivePart();
+			updateActivePart(false);
 		}
 	}
 
@@ -527,7 +527,17 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	}
 
 	@Override
-	public void updateActivePart() {
+	public void updateActivePart(boolean generate) {
+		if (generate) {
+			try {
+				mmlScore.generateAll();
+			} catch (UndefinedTickException e) {
+				System.err.println("REVERT: " + e.getMessage());
+				undoEdit.revertState();
+				editor.reset();
+			}
+		}
+
 		updateAllMMLPart();
 	}
 
@@ -599,13 +609,13 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	public void addTicks(int tick) {
 		int tickPosition = (int) pianoRollView.getSequencePosition();
 		mmlScore.addTicks(tickPosition, tick);
-		updateAllMMLPart();
+		updateActivePart(true);
 	}
 
 	public void removeTicks(int tick) {
 		int tickPosition = (int) pianoRollView.getSequencePosition();
 		mmlScore.removeTicks(tickPosition, tick);
-		updateAllMMLPart();
+		updateActivePart(true);
 	}
 
 	// TimeViewを更新するためのスレッドを開始します.

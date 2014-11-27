@@ -76,7 +76,7 @@ public final class MMLPartChangePanel extends JPanel {
 		add(applyButton);
 		applyButton.addActionListener((event) -> {
 			changePartAction();
-			mmlManager.updateActivePart();
+			mmlManager.updateActivePart(true);
 			dialog.setVisible(false);
 		});
 

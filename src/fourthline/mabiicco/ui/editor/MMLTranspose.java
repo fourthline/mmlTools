@@ -14,20 +14,15 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import fourthline.mabiicco.AppResource;
-import fourthline.mabiicco.IFileState;
 import fourthline.mabiicco.midi.InstType;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.IMMLManager;
 import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLNoteEvent;
 import fourthline.mmlTools.MMLTrack;
-import fourthline.mmlTools.UndefinedTickException;
 
 public final class MMLTranspose {
-	private final IFileState fileState;
-
-	public MMLTranspose(IFileState fileState) {
-		this.fileState = fileState;
+	public MMLTranspose() {
 	}
 
 	public void execute(Frame parentFrame, IMMLManager mmlManager) {
@@ -49,12 +44,7 @@ public final class MMLTranspose {
 			}
 		}
 
-		try {
-			mmlManager.getMMLScore().generateAll();
-		} catch (UndefinedTickException e) {
-			fileState.revertState();
-		}
-		mmlManager.updateActivePart();
+		mmlManager.updateActivePart(true);
 	}
 
 	private int showTransposeDialog(Frame parentFrame) {

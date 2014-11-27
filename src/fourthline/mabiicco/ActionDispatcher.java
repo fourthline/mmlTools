@@ -188,7 +188,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(ADD_BEAT, this::addBeat);
 		actionMap.put(REMOVE_BEAT, this::removeBeat);
 		actionMap.put(NOTE_PROPERTY, editState::noteProperty);
-		actionMap.put(TRANSPOSE, () -> new MMLTranspose(mmlSeqView.getFileState()).execute(mainFrame, mmlSeqView));
+		actionMap.put(TRANSPOSE, () -> new MMLTranspose().execute(mainFrame, mmlSeqView));
 		actionMap.put(ABOUT, () -> new About().show(mainFrame));
 		actionMap.put(MIDI_EXPORT, this::midiExportAction);
 		actionMap.put(FILE_IMPORT, this::fileImportAction);
@@ -276,7 +276,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		try {
 			// generateできないデータは保存させない.
 			mmlSeqView.getMMLScore().generateAll();
-			mmlSeqView.updateActivePart();
+			mmlSeqView.updateActivePart(false);
 			FileOutputStream outputStream = new FileOutputStream(file);
 			mmlSeqView.getMMLScore().writeToOutputStream(outputStream);
 			mainFrame.setTitleAndFileName(file.getName());
