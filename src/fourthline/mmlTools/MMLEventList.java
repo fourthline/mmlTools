@@ -398,7 +398,7 @@ public final class MMLEventList implements Serializable, Cloneable {
 	public void copy(MMLEventList list2, int startTick, int endTick) {
 		for (MMLNoteEvent noteEvent : noteList) {
 			if ( (noteEvent.getTickOffset() >= startTick) && (noteEvent.getEndTick() <= endTick) ) {
-				list2.addMMLNoteEvent(noteEvent);
+				list2.addMMLNoteEvent( noteEvent.clone() );
 			}
 		}
 	}
