@@ -721,4 +721,10 @@ public class MMLEventListTest {
 		MMLEventList eventList = new MMLEventList("l64c&c&c&c&c&c&c&c");
 		assertArrayEquals( new int[]{3, 18}, eventList.indexOfMMLString(0) );
 	}
+
+	@Test
+	public void testV0_4() throws UndefinedTickException {
+		MMLEventList eventList = new MMLEventList("v0cdcd");
+		assertEquals("v0c4d4c4d4", eventList.toMMLString());
+	}
 }

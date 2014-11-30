@@ -280,7 +280,7 @@ public final class MMLEventList implements Serializable, Cloneable {
 			if ( (noteVelocity >= 0) && (noteVelocity != volumn) ) {
 				volumn = noteVelocity;
 				sb.append(noteEvent.getVelocityString());
-			} else if (prevNoteEvent.getVelocity() == 0) {
+			} else if ( (prevNoteEvent.getVelocity() == 0) && (noteVelocity != 0) ) {
 				// テンポ処理で音量がゼロになっている場合は元に戻す.
 				sb.append("v"+volumn);
 			}
