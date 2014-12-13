@@ -402,36 +402,29 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	}
 
 
+	private int viewScaleIndex = 0;
+	private final double viewScaleTable[] = { 6, 5, 4, 3, 2, 1, 0.75, 0.5 };
+
 	/**
 	 * ピアノロールビューの表示を1段階拡大します.
 	 */
 	public void expandPianoViewWide() {
-		double scale = pianoRollView.getWideScale();
-		if ( (3.0 < scale) && (scale <= 6.0) ) {
-			scale -= 3.0;
-		} else if ( (1.0 < scale) && (scale <= 3.0) ) {
-			scale -= 2.0;
-		} else if (scale == 1.0) {
-			scale = 0.5;
+		if (viewScaleIndex+1 < viewScaleTable.length) {
+			viewScaleIndex++;
 		}
 
-		pianoRollView.setWideScale(scale);
+		pianoRollView.setWideScale(viewScaleTable[viewScaleIndex]);
 	}
 
 	/**
 	 * ピアノロールビューの表示を1段階縮小します.
 	 */
 	public void reducePianoViewWide() {
-		double scale = pianoRollView.getWideScale();
-		if ( (3.0 <= scale) && (scale < 6.0) ) {
-			scale += 3.0;
-		} else if ( (1.0 <= scale) && (scale < 3.0) ) {
-			scale += 2.0;
-		} else if (scale == 0.5) {
-			scale = 1.0;
+		if (viewScaleIndex-1 >= 0) {
+			viewScaleIndex--;
 		}
 
-		pianoRollView.setWideScale(scale);
+		pianoRollView.setWideScale(viewScaleTable[viewScaleIndex]);
 	}
 
 	/**

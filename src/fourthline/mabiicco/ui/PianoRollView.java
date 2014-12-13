@@ -193,6 +193,10 @@ public final class PianoRollView extends JPanel {
 	 * @param scale
 	 */
 	public void setWideScale(double scale) {
+		if ( (scale > 6.0) || (scale < 0.5) ) {
+			return;
+		}
+
 		// 拡大/縮小したときの表示位置を調整します.
 		Point p = viewport.getViewPosition();
 		p.setLocation(p.getX() * (this.wideScale / scale), p.getY());

@@ -92,12 +92,12 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 	 * ルーラを表示します。
 	 */
 	private void paintRuler(Graphics2D g) {
-		int width = getWidth();
+		long measure = mmlManager.getMMLScore().getMeasureTick();
+		long length = pianoRollView.convertXtoTick( getWidth() );
 		g.setColor(BEAT_BORDER_COLOR);
-		int incr = pianoRollView.getMeasureWidth();
 		int count = 0;
-		for (int i = 0; i < width; i += incr) {
-			int x = i;
+		for (long i = 0; i < length; i += measure) {
+			int x = pianoRollView.convertTicktoX(i);
 			int y1 = 0;
 			int y2 = getHeight();
 			g.drawLine(x, y1, x, y2);
