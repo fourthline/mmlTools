@@ -254,14 +254,11 @@ public final class MMLEventList implements Serializable, Cloneable {
 		tempoIterator = tempoList.iterator();
 		tempoEvent = (MMLTempoEvent) nextEvent(tempoIterator);
 
-		//　ボリューム
-		int volumn = MMLNoteEvent.INITIAL_VOLUMN;
-
 		StringBuilder sb = new StringBuilder();
 		int noteCount = noteList.size();
 
 		// initial note: octave 4, tick 0, offset 0, velocity 8
-		MMLNoteEvent noteEvent = new MMLNoteEvent(12*4, 0, 0, 8);
+		MMLNoteEvent noteEvent = new MMLNoteEvent(12*4, 0, 0, MMLNoteEvent.INITIAL_VOLUMN);
 		MMLNoteEvent prevNoteEvent = noteEvent;
 		for (int i = 0; i < noteCount; i++) {
 			noteEvent = noteList.get(i);
@@ -273,16 +270,6 @@ public final class MMLEventList implements Serializable, Cloneable {
 					prevNoteEvent = insertTempoMML(sb, prevNoteEvent, tempoEvent, mabiTempo);
 				}
 				tempoEvent = (MMLTempoEvent) nextEvent(tempoIterator);
-			}
-
-			// 音量のMML挿入判定
-			int noteVelocity = noteEvent.getVelocity();
-			if ( (noteVelocity >= 0) && (noteVelocity != volumn) ) {
-				volumn = noteVelocity;
-				sb.append(noteEvent.getVelocityString());
-			} else if ( (prevNoteEvent.getVelocity() == 0) && (noteVelocity != 0) ) {
-				// テンポ処理で音量がゼロになっている場合は元に戻す.
-				sb.append("v"+volumn);
 			}
 
 			// endTickOffsetがTempoを跨いでいたら、'&'でつなげる.

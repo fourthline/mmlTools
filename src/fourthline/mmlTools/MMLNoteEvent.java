@@ -64,10 +64,6 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 		return velocity;
 	}
 
-	public String getVelocityString() {
-		return "v" + velocity;
-	}
-
 	public void setVelocity(int velocity) {
 		this.velocity = velocity;
 	}
@@ -114,6 +110,11 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 
 		// 前のノートとのオクターブ差分をみて、オクターブ変化を挿入する.
 		sb.append( changeOctaveinMMLString(prevNoteEvent.getOctave()) );
+
+		// 前のノートとの音量が違う場合、音量コマンドを挿入する.
+		if (prevNoteEvent.getVelocity() != velocity) {
+			sb.append("v"+velocity);
+		}
 
 		sb.append( toMMLString() );
 

@@ -325,13 +325,13 @@ public class MMLEventListTest {
 	}
 
 	/**
-	 * tempo, velocity を含むMML. (r前のv)
+	 * tempo, velocity を含むMML. (r後のv)
 	 * @throws UndefinedTickException
 	 */
 	@Test
 	public void testToMMLString_8() throws UndefinedTickException {
 		MMLEventList eventList = new MMLEventList("v12rc");
-		String expectMML = "v12r4c4";
+		String expectMML = "r4v12c4";
 
 		String mml = eventList.toMMLString(true, true);
 		System.out.println(mml);
