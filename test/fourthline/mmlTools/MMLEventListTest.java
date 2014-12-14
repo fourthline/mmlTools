@@ -581,48 +581,6 @@ public class MMLEventListTest {
 	}
 
 	/**
-	 * insertTick
-	 * @throws UndefinedTickException 
-	 */
-	@Test
-	public void testInsertTick0() throws UndefinedTickException {
-		MMLEventList eventList1 = new MMLEventList("aabb");
-		MMLEventList eventList2 = new MMLEventList("aar1bb");
-
-		eventList1.insertTick(MMLTicks.getTick("2"), MMLTicks.getTick("1"));
-
-		assertEquals(eventList2.toMMLString(), eventList1.toMMLString());
-	}
-
-	/**
-	 * removeTick
-	 * @throws UndefinedTickException 
-	 */
-	@Test
-	public void testRemoveTick0() throws UndefinedTickException {
-		MMLEventList eventList1 = new MMLEventList("aac1bb");
-		MMLEventList eventList2 = new MMLEventList("aar8r9b");
-
-		eventList1.removeTick(MMLTicks.getTick("2"), MMLTicks.getTick("1")+MMLTicks.getTick("64"));
-
-		assertEquals(eventList2.toMMLString(), eventList1.toMMLString());
-	}
-
-	/**
-	 * removeTick
-	 * @throws UndefinedTickException 
-	 */
-	@Test
-	public void testRemoveTick1() throws UndefinedTickException {
-		MMLEventList eventList1 = new MMLEventList("aac1bb");
-		MMLEventList eventList2 = new MMLEventList("aabb");
-
-		eventList1.removeTick(MMLTicks.getTick("2")-MMLTicks.getTick("64"), MMLTicks.getTick("1"));
-
-		assertEquals(eventList2.toMMLString(), eventList1.toMMLString());
-	}
-
-	/**
 	 * 音符の重複の演奏補正（なし）
 	 */
 	@Test

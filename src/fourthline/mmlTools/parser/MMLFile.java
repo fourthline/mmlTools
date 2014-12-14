@@ -21,6 +21,7 @@ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 
 import fourthline.mabiicco.midi.InstType;
 import fourthline.mabiicco.midi.MabiDLS;
+import fourthline.mmlTools.MMLEvent;
 import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTrack;
@@ -102,7 +103,7 @@ public final class MMLFile implements IMMLFileParser {
 				Marker marker = score.getMarkerList().get(markerId-1);
 				int tickOffset = marker.getTickOffset();
 				for (MMLEventList eventList : mmlTrack.getMMLEventList()) {
-					eventList.insertTick(0, tickOffset);
+					MMLEvent.insertTick(eventList.getMMLNoteEventList(), 0, tickOffset);
 				}
 			}
 		}

@@ -175,39 +175,29 @@ public final class MMLScore implements IMMLFileParser {
 	public void addTicks(int tickPosition, int tick) {
 		for (MMLTrack track : getTrackList()) {
 			for (MMLEventList eventList : track.getMMLEventList()) {
-				eventList.insertTick(tickPosition, tick);
+				MMLEvent.insertTick(eventList.getMMLNoteEventList(), tickPosition, tick);
 			}
 		}
-		// テンポはカーソル上のは移動せずに, 後方のものを反映.
-		for (MMLTempoEvent tempo : globalTempoList) {
-			int tempoTick = tempo.getTickOffset();
-			if (tempoTick > tickPosition) {
-				tempo.setTickOffset(tempoTick+tick);
-			}
-		}
+
+		// テンポ
+		MMLEvent.insertTick(globalTempoList, tickPosition, tick);
+
+		// マーカー
+		MMLEvent.insertTick(markerList, tickPosition, tick);
 	}
 
 	public void removeTicks(int tickPosition, int tick) {
 		for (MMLTrack track : getTrackList()) {
 			for (MMLEventList eventList : track.getMMLEventList()) {
-				eventList.removeTick(tickPosition, tick);
+				MMLEvent.removeTick(eventList.getMMLNoteEventList(), tickPosition, tick);
 			}
 		}
-		ArrayList<MMLTempoEvent> deleteTempo = new ArrayList<>();
-		for (MMLTempoEvent tempo : globalTempoList) {
-			int tempoTick = tempo.getTickOffset();
-			// テンポはカーソル上のは消さずに, 後方のものを消す.
-			if (tempoTick > tickPosition) {
-				if (tempoTick <= tickPosition+tick) {
-					deleteTempo.add(tempo);
-				} else {
-					tempo.setTickOffset(tempoTick-tick);
-				}
-			}
-		}
-		for (MMLTempoEvent tempo : deleteTempo) {
-			globalTempoList.remove(tempo);
-		}
+
+		// テンポ
+		MMLEvent.removeTick(globalTempoList, tickPosition, tick);
+
+		// マーカー
+		MMLEvent.removeTick(markerList, tickPosition, tick);
 	}
 
 	public int getTotalTickLength() {
