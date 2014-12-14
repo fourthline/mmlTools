@@ -10,6 +10,7 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 	private static final long serialVersionUID = 4372538748155995529L;
 
 	public static final int INIT_VOL = 8;
+	public static final int MAX_VOL = 15; 
 	private int note;
 	private int tick;
 	private boolean isTuningNote = false;
@@ -23,7 +24,7 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 
 	public MMLNoteEvent(int note, int tickLength, int tickOffset, int velocity) {
 		super(tickOffset);
-		if ( (velocity < 0) || (velocity > 15) ) {
+		if ( (velocity < 0) || (velocity > MAX_VOL) ) {
 			throw new IllegalArgumentException("velocity  "+velocity);
 		}
 
@@ -65,6 +66,11 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 	}
 
 	public void setVelocity(int velocity) {
+		if (velocity < 0) {
+			velocity = 0;
+		} else if (velocity > MAX_VOL) {
+			velocity = MAX_VOL;
+		}
 		this.velocity = velocity;
 	}
 
