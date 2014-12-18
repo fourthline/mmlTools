@@ -5,6 +5,7 @@
 package fourthline.mmlTools;
 
 import fourthline.mmlTools.core.MMLTicks;
+import fourthline.mmlTools.core.TuningBase;
 
 public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 	private static final long serialVersionUID = 4372538748155995529L;
@@ -13,7 +14,7 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 	public static final int MAX_VOL = 15; 
 	private int note;
 	private int tick;
-	private boolean isTuningNote = false;
+	private TuningBase tuningBase = null;
 	private int velocity;
 	private int indexOfMMLString[] = null; // { startIndex, endIndex }
 	public static final int INITIAL_VOLUMN = 8;
@@ -54,11 +55,11 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 	}
 
 	public boolean isTuningNote() {
-		return isTuningNote;
+		return (tuningBase != null);
 	}
 
-	public void setTuningNote(boolean isTuningNote) {
-		this.isTuningNote = isTuningNote;
+	public void setTuningNote(TuningBase base) {
+		this.tuningBase = base;
 	}
 
 	public int getVelocity() {
@@ -101,8 +102,8 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 	public String toMMLString() throws UndefinedTickException {
 		String noteName = getNoteName();
 		MMLTicks mmlTick = new MMLTicks(noteName, tick);
-		if (isTuningNote) {
-			return mmlTick.toMMLTextByL64();
+		if (tuningBase != null) {
+			return mmlTick.toMMLTextByBase(tuningBase);
 		} else {
 			return mmlTick.toMMLText();
 		}

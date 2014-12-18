@@ -8,6 +8,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import fourthline.mmlTools.core.TuningBase;
+
 
 /**
  * @author fourthline
@@ -55,7 +57,7 @@ public class MMLNoteEventTest {
 		MMLEventList eventList = new MMLEventList("c1");
 		String expected = "c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64";
 		MMLNoteEvent noteEvent = eventList.getMMLNoteEventList().get(0);
-		noteEvent.setTuningNote(true);
+		noteEvent.setTuningNote(TuningBase.L64);
 
 		System.out.println(noteEvent.toMMLString());
 		assertEquals(expected, noteEvent.toMMLString());

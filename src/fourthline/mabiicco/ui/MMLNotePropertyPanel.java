@@ -19,6 +19,7 @@ import javax.swing.SpinnerListModel;
 import fourthline.mabiicco.AppResource;
 import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLNoteEvent;
+import fourthline.mmlTools.core.TuningBase;
 
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
@@ -180,7 +181,7 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 
 			// 調律設定が有効な場合は、調律属性も更新する.
 			if (tuningNoteCheckBox.isEnabled()) {
-				targetNote.setTuningNote( tuningNoteCheckBox.isSelected() );
+				targetNote.setTuningNote( tuningNoteCheckBox.isSelected() ? TuningBase.L64 : null );
 			}
 		}
 	}
