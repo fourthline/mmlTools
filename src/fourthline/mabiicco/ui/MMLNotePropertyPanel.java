@@ -133,11 +133,15 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 			return;
 		}
 
-		// 調律設定が反映されるのは、単音のみ.
-		if (noteEvent.length == 1) {
-			tuningNoteCheckBox.setSelected( noteEvent[0].isTuningNote() );
-		} else {
-			tuningNoteCheckBox.setEnabled(false);
+		// すべての調律属性が同じであれば 編集を可能にする.
+		boolean first = noteEvent[0].isTuningNote();
+		tuningNoteCheckBox.setEnabled(true);
+		tuningNoteCheckBox.setSelected(first);
+		for (MMLNoteEvent note : noteEvent) {
+			if (note.isTuningNote() != first) {
+				tuningNoteCheckBox.setEnabled(false);
+				break;
+			}
 		}
 
 		MMLNoteEvent prevNote = eventList.searchPrevNoteOnTickOffset(noteEvent[0].getTickOffset());
@@ -154,39 +158,29 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 	 * パネルの情報をノートに反映します.
 	 */
 	public void applyProperty() {
-		if (noteEvent.length == 1) {
-			// 調律設定が反映されるのは、単音のみ.
-			noteEvent[0].setTuningNote( tuningNoteCheckBox.isSelected() );
-		}
-
 		int incDecrValue = Integer.parseInt((String) velocityValueField2.getValue());
 		for (MMLNoteEvent targetNote : noteEvent) {
 			Integer value = (Integer) velocityValueField.getValue();
-			int beforeVelocity = targetNote.getVelocity();
 			if (onlySelectedNoteOption.isSelected()) {
 				if (!incDecrVelocityEditOption.isSelected()) {
+					// 選択されたノートのみの音量を変更
 					targetNote.setVelocity(value.intValue());
 				} else {
+					// 増減量による音量変更
 					targetNote.setVelocity( targetNote.getVelocity() + incDecrValue );
 				}
 			} else {
-				// 音量コマンド編集
-				int prevVelocity = MMLNoteEvent.INIT_VOL;
-				for (MMLNoteEvent note : eventList.getMMLNoteEventList()) {
-					if (note.getTickOffset() < targetNote.getTickOffset()) {
-						prevVelocity = note.getVelocity();
-						continue;
-					}
-					if (beforeVelocity == note.getVelocity()) {
-						if (velocityCheckBox.isSelected()) {
-							note.setVelocity(value);
-						} else {
-							note.setVelocity(prevVelocity);
-						}
-					} else {
-						break;
-					}
+				// 音量コマンドにより後続のノートも更新する
+				if (velocityCheckBox.isSelected()) {
+					eventList.setVelocityCommand(targetNote, value.intValue());
+				} else {
+					eventList.unsetVelocityCommand(targetNote);
 				}
+			}
+
+			// 調律設定が有効な場合は、調律属性も更新する.
+			if (tuningNoteCheckBox.isEnabled()) {
+				targetNote.setTuningNote( tuningNoteCheckBox.isSelected() );
 			}
 		}
 	}

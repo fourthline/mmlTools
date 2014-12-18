@@ -205,6 +205,38 @@ public final class MMLEventList implements Serializable, Cloneable {
 		noteList.remove(deleteItem);
 	}
 
+	/**
+	 * 指定されたノートに音量コマンドを設定する.
+	 * 後続の同音量のノートも更新する.
+	 */
+	public void setVelocityCommand(MMLNoteEvent targetNote, int velocity) {
+		setUnsetVelocityCommand(targetNote, velocity, true);
+	}
+
+	/**
+	 * 指定されたノートに音量コマンドを解除する.
+	 * 後続の同音量のノートも更新する.
+	 */
+	public void unsetVelocityCommand(MMLNoteEvent targetNote) {
+		setUnsetVelocityCommand(targetNote, 0, false);
+	}
+
+	private void setUnsetVelocityCommand(MMLNoteEvent targetNote, int velocity, boolean isON) {
+		int beforeVelocity = targetNote.getVelocity();
+		int prevVelocity = MMLNoteEvent.INIT_VOL;
+		for (MMLNoteEvent note : noteList) {
+			if (note.getTickOffset() >= targetNote.getTickOffset()) {
+				if (beforeVelocity == note.getVelocity()) {
+					note.setVelocity(isON ? velocity : prevVelocity);
+				} else {
+					break;
+				}
+			} else {
+				prevVelocity = note.getVelocity();
+			}
+		}
+	}
+
 	public String toMMLString() throws UndefinedTickException {
 		return toMMLString(false, 0, true);
 	}

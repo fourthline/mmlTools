@@ -685,4 +685,19 @@ public class MMLEventListTest {
 		MMLEventList eventList = new MMLEventList("v0cdcd");
 		assertEquals("v0c4d4c4d4", eventList.toMMLString());
 	}
+
+	@Test
+	public void testSetUnsetVelocity_0() throws UndefinedTickException {
+		MMLEventList eventList = new MMLEventList("v12cdefv7g");
+		MMLEventList eventList2 = new MMLEventList("v12cdv10efv7g");
+		MMLEventList eventList3 = new MMLEventList("v12cdefv7g");
+
+		MMLNoteEvent target = eventList.getMMLNoteEventList().get(2);
+
+		eventList.setVelocityCommand(target, 10);
+		assertEquals(eventList2.toMMLString(), eventList.toMMLString());
+
+		eventList.unsetVelocityCommand(target);
+		assertEquals(eventList3.toMMLString(), eventList.toMMLString());
+	}
 }
