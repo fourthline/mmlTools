@@ -53,7 +53,7 @@ public class MMLNoteEventTest {
 	}
 
 	@Test
-	public void testTuningNote() throws UndefinedTickException {
+	public void testTuningNote_64() throws UndefinedTickException {
 		MMLEventList eventList = new MMLEventList("c1");
 		String expected = "c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64";
 		MMLNoteEvent noteEvent = eventList.getMMLNoteEventList().get(0);
@@ -61,6 +61,34 @@ public class MMLNoteEventTest {
 
 		System.out.println(noteEvent.toMMLString());
 		assertEquals(expected, noteEvent.toMMLString());
+
+		assertEquals(TuningBase.L64, new MMLEventList(expected).getMMLNoteEventList().get(0).getTuningBase());
+	}
+
+	@Test
+	public void testTuningNote_32() throws UndefinedTickException {
+		MMLEventList eventList = new MMLEventList("c1");
+		String expected = "c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32";
+		MMLNoteEvent noteEvent = eventList.getMMLNoteEventList().get(0);
+		noteEvent.setTuningNote(TuningBase.L32);
+
+		System.out.println(noteEvent.toMMLString());
+		assertEquals(expected, noteEvent.toMMLString());
+
+		assertEquals(TuningBase.L32, new MMLEventList(expected).getMMLNoteEventList().get(0).getTuningBase());
+	}
+
+	@Test
+	public void testTuningNote_16() throws UndefinedTickException {
+		MMLEventList eventList = new MMLEventList("c1");
+		String expected = "c16&c16&c16&c16&c16&c16&c16&c16&c16&c16&c16&c16&c16&c16&c16&c16";
+		MMLNoteEvent noteEvent = eventList.getMMLNoteEventList().get(0);
+		noteEvent.setTuningNote(TuningBase.L16);
+
+		System.out.println(noteEvent.toMMLString());
+		assertEquals(expected, noteEvent.toMMLString());
+
+		assertEquals(TuningBase.L16, new MMLEventList(expected).getMMLNoteEventList().get(0).getTuningBase());
 	}
 
 	@Test
@@ -70,6 +98,4 @@ public class MMLNoteEventTest {
 
 		assertEquals(eventList1.toString(), eventList2.toString());
 	}
-
-
 }

@@ -58,6 +58,10 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 		return (tuningBase != null);
 	}
 
+	public TuningBase getTuningBase() {
+		return tuningBase;
+	}
+
 	public void setTuningNote(TuningBase base) {
 		this.tuningBase = base;
 	}

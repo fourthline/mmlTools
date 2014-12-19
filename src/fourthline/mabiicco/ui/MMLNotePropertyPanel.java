@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JCheckBox;
@@ -43,6 +44,7 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 	private JCheckBox tuningNoteCheckBox;
 	private JCheckBox onlySelectedNoteOption;
 	private JCheckBox incDecrVelocityEditOption;
+	private JComboBox<TuningBase> tuningBaseList;
 	private MMLNoteEvent noteEvent[];
 	private MMLEventList eventList;
 
@@ -98,8 +100,12 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 		add(velocityValueField2);
 
 		tuningNoteCheckBox = new JCheckBox(AppResource.appText("note.properties.tuning"));
-		tuningNoteCheckBox.setBounds(42, 110, 220, 21);
+		tuningNoteCheckBox.setBounds(42, 110, 180, 21);
 		add(tuningNoteCheckBox);
+
+		tuningBaseList = new JComboBox<>(TuningBase.values());
+		tuningBaseList.setBounds(230, 110, 50, 21);
+		add(tuningBaseList);
 
 		this.noteEvent = noteEvent;
 		this.eventList = eventList;
@@ -136,6 +142,9 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 
 		// すべての調律属性が同じであれば 編集を可能にする.
 		boolean first = noteEvent[0].isTuningNote();
+		if (first) {
+			tuningBaseList.setSelectedItem(noteEvent[0].getTuningBase());
+		}
 		tuningNoteCheckBox.setEnabled(true);
 		tuningNoteCheckBox.setSelected(first);
 		for (MMLNoteEvent note : noteEvent) {
@@ -181,7 +190,8 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 
 			// 調律設定が有効な場合は、調律属性も更新する.
 			if (tuningNoteCheckBox.isEnabled()) {
-				targetNote.setTuningNote( tuningNoteCheckBox.isSelected() ? TuningBase.L64 : null );
+				TuningBase base = tuningBaseList.getItemAt(tuningBaseList.getSelectedIndex());
+				targetNote.setTuningNote( tuningNoteCheckBox.isSelected() ? base : null );
 			}
 		}
 	}
