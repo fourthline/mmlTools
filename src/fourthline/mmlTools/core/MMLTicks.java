@@ -271,15 +271,6 @@ public final class MMLTicks {
 	}
 
 	/**
-	 * L64を使って変換します.　（調律用）
-	 * @return
-	 * @throws UndefinedTickException
-	 */
-	public String toMMLTextByL64() throws UndefinedTickException {
-		return toMMLTextByBase(TuningBase.L64);
-	}
-
-	/**
 	 * Base長を使って変換します.　（調律用）
 	 * @return
 	 * @throws UndefinedTickException
@@ -292,6 +283,9 @@ public final class MMLTicks {
 		while (remTick >= baseTick) {
 			sb.append( mmlNotePart(base.getBase()) );
 			remTick -= baseTick;
+		}
+		if (remTick > 0) {
+			throw new UndefinedTickException(""+remTick);
 		}
 
 		if (needTie) {

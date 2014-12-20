@@ -222,7 +222,7 @@ public final class MMLFile implements IMMLFileParser {
 		System.out.println(trackNo+" "+instrument+" "+trackName);
 
 		Extension3mleTrack lastTrack = trackList.getLast();
-		if ( (lastTrack.getGroup() != group) || (lastTrack.getInstrument() != instrument) || (lastTrack.isLimit())) {
+		if ( (lastTrack.getGroup() != group) || (lastTrack.getInstrument() != instrument) || (lastTrack.getPanpot() != panpot) || (lastTrack.isLimit())) {
 			// new Track
 			trackList.add(new Extension3mleTrack(instrument, group, panpot, trackName, startMarker));
 		} else {

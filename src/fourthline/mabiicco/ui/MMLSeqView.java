@@ -498,6 +498,8 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 				sequencer.setTickPosition(tick);
 				sequencer.setTempoInBPM(tempo);
 			}
+
+			updatePianoRollView();
 		} catch (UndefinedTickException e) {}
 	}
 
@@ -660,39 +662,37 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				updatePianoRollView();
+				if (MabiDLS.getInstance().getSequencer().isRunning()) {
+					EventQueue.invokeLater(() -> {
+						updatePianoRollView();
+					});
+				}
 			}
 		});
 		updateViewThread.start();
 	}
 
-	// TODO: Play方式をリアルタイム式にすれば、これを統合可能.
 	private void updatePianoRollView() {
-		Sequencer sequencer = MabiDLS.getInstance().getSequencer();
-		if (sequencer.isRunning()) {
-			EventQueue.invokeLater(() -> {
-				pianoRollView.updateRunningSequencePosition();
-				int measure = pianoRollView.getMeasureWidth();
-				long position = pianoRollView.getSequencePlayPosition();
-				position = pianoRollView.convertTicktoX(position);
+		pianoRollView.updateRunningSequencePosition();
+		int measure = pianoRollView.getMeasureWidth();
+		long position = pianoRollView.getSequencePlayPosition();
+		position = pianoRollView.convertTicktoX(position);
+		position -= position % measure;
+		JViewport viewport = scrollPane.getViewport();
+		Point point = viewport.getViewPosition();
+		Dimension dim = viewport.getExtentSize();
+		int x1 = point.x;
+		int x2 = x1 + dim.width - measure;
+		if ( (position < x1) || (position > x2) ) {
+			/* ビュー外にあるので、現在のポジションにあわせる */
+			if (position + dim.width > pianoRollView.getWidth()) {
+				position = (pianoRollView.getWidth() - dim.width);
 				position -= position % measure;
-				JViewport viewport = scrollPane.getViewport();
-				Point point = viewport.getViewPosition();
-				Dimension dim = viewport.getExtentSize();
-				int x1 = point.x;
-				int x2 = x1 + dim.width - measure;
-				if ( (position < x1) || (position > x2) ) {
-					/* ビュー外にあるので、現在のポジションにあわせる */
-					if (position + dim.width > pianoRollView.getWidth()) {
-						position = (pianoRollView.getWidth() - dim.width);
-						position -= position % measure;
-					}
-					point.setLocation(position, point.getY());
-					viewport.setViewPosition(point);
-				}
-				scrollPane.repaint();
-			});
+			}
+			point.setLocation(position, point.getY());
+			viewport.setViewPosition(point);
 		}
+		scrollPane.repaint();
 	}
 
 	@Override

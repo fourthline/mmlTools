@@ -48,6 +48,9 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 	private MMLNoteEvent noteEvent[];
 	private MMLEventList eventList;
 
+	// 調律属性は指定されたノートの調律属性がすべて同じ場合に編集可能
+	private boolean enableTuningEdit;
+
 	public void showDialog() {
 		int status = JOptionPane.showConfirmDialog(null, 
 				this,
@@ -101,6 +104,7 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 
 		tuningNoteCheckBox = new JCheckBox(AppResource.appText("note.properties.tuning"));
 		tuningNoteCheckBox.setBounds(42, 110, 180, 21);
+		tuningNoteCheckBox.addActionListener(this);
 		add(tuningNoteCheckBox);
 
 		tuningBaseList = new JComboBox<>(TuningBase.values());
@@ -140,16 +144,19 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 			return;
 		}
 
-		// すべての調律属性が同じであれば 編集を可能にする.
-		boolean first = noteEvent[0].isTuningNote();
-		if (first) {
-			tuningBaseList.setSelectedItem(noteEvent[0].getTuningBase());
+		// 調律音
+		TuningBase first = noteEvent[0].getTuningBase();
+		if (first != null) {
+			tuningNoteCheckBox.setSelected(true);
+			tuningBaseList.setSelectedItem(first);
+		} else {
+			tuningNoteCheckBox.setSelected(false);
 		}
-		tuningNoteCheckBox.setEnabled(true);
-		tuningNoteCheckBox.setSelected(first);
+		enableTuningEdit = true;
 		for (MMLNoteEvent note : noteEvent) {
-			if (note.isTuningNote() != first) {
-				tuningNoteCheckBox.setEnabled(false);
+			if ((first == null) && (note.getTuningBase() != null) || 
+					(first != null) && (!first.equals(note.getTuningBase()))) {
+				enableTuningEdit = false;
 				break;
 			}
 		}
@@ -212,6 +219,9 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 
 		// 増減入力欄
 		velocityValueField2.setEnabled( onlySelect && incrDecrValue );
+
+		tuningNoteCheckBox.setEnabled(enableTuningEdit);
+		tuningBaseList.setEnabled( (enableTuningEdit && tuningNoteCheckBox.isSelected()) );
 	}
 
 	@Override
