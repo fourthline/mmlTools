@@ -50,7 +50,7 @@ public final class MabiIcco extends Application {
 				System.out.println(info.getClassName());
 			}
 
-			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+			UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
 
 			// initialize
 			MabiDLS.getInstance().initializeMIDI();
