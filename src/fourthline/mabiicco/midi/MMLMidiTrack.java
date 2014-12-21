@@ -57,26 +57,20 @@ public class MMLMidiTrack {
 			MMLNoteEvent prevEvent = noteEventList.get( targetIndex - 1 );
 			if (addEvent.getNote() == prevEvent.getNote()) {
 				if ( prevEvent.getTickOffset() == targetTick ) {
-					// 開始位置が同じときには, 元あったノートの長さを最小にして, 追加するノートの開始位置をずらす.
-					// 前の音とテンポ指定がある場合は元あったノートのほうをずらす.
+					// 開始位置が同じときには, 後発音で更新する.
+					// 前の音とテンポ指定がある場合は元あったノートのまま.
+					// 後発音が V0 の場合は l64音に更新する.
 					if (MMLTempoEvent.searchEqualsTick(tempoList, targetTick)) {
-						addEvent.setTick( MMLTicks.minimumTick() );
-						prevEvent.setTick( prevEvent.getTick() - MMLTicks.minimumTick() );
-						prevEvent.setTickOffset( addEvent.getTickOffset() + MMLTicks.minimumTick() );
-						if (prevEvent.getTick() <= 0) {
-							targetIndex--;
-							noteEventList.remove(targetIndex);
+						if (addEvent.getVelocity() == 0) {
+							prevEvent.setTick(MMLTicks.minimumTick());
 						}
+						return;
 					} else {
-						prevEvent.setTick( MMLTicks.minimumTick() );
-						addEvent.setTick( addEvent.getTick() - MMLTicks.minimumTick() );;
-						addEvent.setTickOffset( addEvent.getTickOffset() + MMLTicks.minimumTick() );
-						// ずらした開始位置にもノートがある場合は、古いほうを消す.
-						if ( targetIndex < noteEventList.size() ) {
-							if (addEvent.getTickOffset() == noteEventList.get(targetIndex).getTickOffset()) {
-								noteEventList.remove(targetIndex);
-							}
+						if (prevEvent.getVelocity() == 0) {
+							addEvent.setTick(MMLTicks.minimumTick());
 						}
+						targetIndex--;
+						noteEventList.remove(targetIndex);
 					}
 				} else {
 					trimOverlapNote(prevEvent, addEvent);
