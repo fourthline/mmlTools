@@ -321,7 +321,7 @@ public final class MabiDLS {
 			}
 
 			InstType instType = getInstByProgram(program).getType();
-			convertMidiPart(track, mmlTrack.getMMLEventAtIndex(3), channel, instType);
+			convertMidiPart(track, mmlTrack.getMMLEventAtIndex(3).getMMLNoteEventList(), channel, instType);
 		}
 	}
 
@@ -342,22 +342,21 @@ public final class MabiDLS {
 		boolean enablePart[] = InstClass.getEnablePartByProgram(program);
 		InstType instType = getInstByProgram(mmlTrack.getProgram()).getType();
 
-		ArrayList<MMLEventList> registedPart = new ArrayList<>();
+		MMLMidiTrack midiTrack = new MMLMidiTrack(mmlTrack.getGlobalTempoList());
 		for (int i = 0; i < enablePart.length; i++) {
 			if (enablePart[i]) {
 				MMLEventList eventList = mmlTrack.getMMLEventAtIndex(i);
-				MMLEventList playList = eventList.clone().emulateMabiPlay(registedPart, mmlTrack.getGlobalTempoList());
-				convertMidiPart(track, playList, channel, instType);
-				registedPart.add(eventList);
+				midiTrack.add(eventList.getMMLNoteEventList());
 			}
 		}
+		convertMidiPart(track, midiTrack.getNoteEventList(), channel, instType);
 	}
 
-	private void convertMidiPart(Track track, MMLEventList eventList, int channel, InstType inst) {
+	private void convertMidiPart(Track track, List<MMLNoteEvent> eventList, int channel, InstType inst) {
 		int volumn = MMLNoteEvent.INITIAL_VOLUMN;
 
 		// Noteイベントの変換
-		for ( MMLNoteEvent noteEvent : eventList.getMMLNoteEventList() ) {
+		for ( MMLNoteEvent noteEvent : eventList ) {
 			int note = noteEvent.getNote();
 			int tick = noteEvent.getTick();
 			int tickOffset = noteEvent.getTickOffset() + 1;

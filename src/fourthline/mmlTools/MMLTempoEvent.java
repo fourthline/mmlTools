@@ -91,6 +91,17 @@ public final class MMLTempoEvent extends MMLEvent {
 		return tempo;
 	}
 
+	public static boolean searchEqualsTick(List<MMLTempoEvent> tempoList, long tickOffset) {
+		for (MMLTempoEvent tempo : tempoList) {
+			if (tempo.getTickOffset() == tickOffset) {
+				return true;
+			} else if (tempo.getTickOffset() > tickOffset) {
+				break;
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * 指定したtickオフセット位置の先頭からの時間を返します.
 	 * @param tempoList
