@@ -6,7 +6,7 @@ package fourthline.mmlTools;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import fourthline.mmlTools.core.MMLTicks;
@@ -77,14 +77,6 @@ public final class MMLEventList implements Serializable, Cloneable {
 
 	public List<MMLNoteEvent> getMMLNoteEventList() {
 		return noteList;
-	}
-
-	private Object nextEvent(Iterator<? extends MMLEvent> iterator) {
-		if (iterator.hasNext()) {
-			return iterator.next();
-		} else {
-			return null;
-		}
 	}
 
 	/**
@@ -271,6 +263,38 @@ public final class MMLEventList implements Serializable, Cloneable {
 		return prevNoteEvent;
 	}
 
+	private void insertNoteWithTempo(StringBuilder sb, LinkedList<MMLTempoEvent> localTempoList,
+			MMLNoteEvent prevNoteEvent, MMLNoteEvent noteEvent,
+			boolean withTempo) throws UndefinedTickException {
+		MMLNoteEvent divNoteEvent = noteEvent.clone();
+
+		// endTickOffsetがTempoを跨いでいたら、'&'でつなげる.
+		while ( (!localTempoList.isEmpty()) &&
+				(divNoteEvent.getTickOffset() < localTempoList.getFirst().getTickOffset()) &&
+				(localTempoList.getFirst().getTickOffset() < divNoteEvent.getEndTick()) ) {
+			int tick = localTempoList.getFirst().getTickOffset() - divNoteEvent.getTickOffset();
+
+			MMLNoteEvent partNoteEvent = new MMLNoteEvent(divNoteEvent.getNote(), tick, divNoteEvent.getTickOffset(), divNoteEvent.getVelocity());
+			sb.append( partNoteEvent.toMMLString(prevNoteEvent) );
+
+			if (withTempo) {
+				sb.append( localTempoList.getFirst().toMMLString() );
+			}
+			localTempoList.removeFirst();
+
+			divNoteEvent.setTick(divNoteEvent.getTick() - tick);
+			divNoteEvent.setTickOffset(divNoteEvent.getTickOffset() + tick);
+			prevNoteEvent = partNoteEvent;
+			if (divNoteEvent.getTick() > 0) {
+				sb.append('&');
+			}
+		}
+
+		if (divNoteEvent.getTick() > 0){
+			sb.append( divNoteEvent.toMMLString(prevNoteEvent) );
+		}
+	}
+
 	/**
 	 * テンポ出力を行うかどうかを指定してMML文字列を作成する.
 	 * TODO: 長いなぁ。
@@ -281,57 +305,35 @@ public final class MMLEventList implements Serializable, Cloneable {
 	public String toMMLString(boolean withTempo, int totalTick, boolean mabiTempo)
 			throws UndefinedTickException {
 		//　テンポ
-		Iterator<MMLTempoEvent> tempoIterator = null;
-		MMLTempoEvent tempoEvent = null;
-		tempoIterator = tempoList.iterator();
-		tempoEvent = (MMLTempoEvent) nextEvent(tempoIterator);
-
+		LinkedList<MMLTempoEvent> localTempoList = new LinkedList<>(tempoList);
 		StringBuilder sb = new StringBuilder();
-		int noteCount = noteList.size();
 
 		// initial note: octave 4, tick 0, offset 0, velocity 8
 		MMLNoteEvent noteEvent = new MMLNoteEvent(12*4, 0, 0, MMLNoteEvent.INITIAL_VOLUMN);
 		MMLNoteEvent prevNoteEvent = noteEvent;
-		for (int i = 0; i < noteCount; i++) {
+		for (int i = 0; i < noteList.size(); i++) {
 			noteEvent = noteList.get(i);
 
 			// テンポのMML挿入判定
-			while ( (tempoEvent != null) && (tempoEvent.getTickOffset() <= noteEvent.getTickOffset()) ) {
+			while ( (!localTempoList.isEmpty()) && (localTempoList.getFirst().getTickOffset() <= noteEvent.getTickOffset()) ) {
 				if (withTempo) {
 					// tempo挿入 (rrrT***N の処理)
-					prevNoteEvent = insertTempoMML(sb, prevNoteEvent, tempoEvent, mabiTempo);
+					prevNoteEvent = insertTempoMML(sb, prevNoteEvent, localTempoList.getFirst(), mabiTempo);
 				}
-				tempoEvent = (MMLTempoEvent) nextEvent(tempoIterator);
+				localTempoList.removeFirst();
 			}
 
-			// endTickOffsetがTempoを跨いでいたら、'&'でつなげる.
-			if ( (tempoEvent != null) && (noteEvent.getTickOffset() < tempoEvent.getTickOffset()) && (tempoEvent.getTickOffset() < noteEvent.getEndTick()) ) {
-				int tick = tempoEvent.getTickOffset() - noteEvent.getTickOffset();
-				int tick2 = noteEvent.getTick() - tick;
-
-				MMLNoteEvent divNoteEvent = new MMLNoteEvent(noteEvent.getNote(), tick, noteEvent.getTickOffset(), noteEvent.getVelocity());
-				sb.append( divNoteEvent.toMMLString(prevNoteEvent) );
-
-				if (withTempo) {
-					sb.append( tempoEvent.toMMLString() );
-				}
-				tempoEvent = (MMLTempoEvent) nextEvent(tempoIterator);
-
-				divNoteEvent.setTick(tick2);
-				sb.append('&').append( divNoteEvent.toMMLString() );
-			} else {
-				sb.append( noteEvent.toMMLString(prevNoteEvent) );
-			}
+			insertNoteWithTempo(sb, localTempoList, prevNoteEvent, noteEvent, withTempo);
 			prevNoteEvent = noteEvent;
 		}
 
 		// テンポがまだ残っていれば、その分をつなげる.
-		while ( (tempoEvent != null) ) {
+		while (!localTempoList.isEmpty()) {
 			if (withTempo) {
 				// tempo挿入 (rrrT***N の処理)
-				prevNoteEvent = insertTempoMML(sb, prevNoteEvent, tempoEvent, mabiTempo);
+				prevNoteEvent = insertTempoMML(sb, prevNoteEvent, localTempoList.getFirst(), mabiTempo);
 			}
-			tempoEvent = (MMLTempoEvent) nextEvent(tempoIterator);
+			localTempoList.removeFirst();
 		}
 
 		return sb.toString();
