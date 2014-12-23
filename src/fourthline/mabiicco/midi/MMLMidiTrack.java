@@ -47,7 +47,7 @@ public class MMLMidiTrack {
 				break;
 			}
 			targetIndex++;
-			if (noteEvent.getTickOffset() == targetTick) {
+			if ( (noteEvent.getTickOffset() == targetTick) && (noteEvent.getNote() == addEvent.getNote())) {
 				break;
 			}
 		}

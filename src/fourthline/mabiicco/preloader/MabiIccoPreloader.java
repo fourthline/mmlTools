@@ -34,14 +34,12 @@ public final class MabiIccoPreloader extends Preloader {
 		stage.initStyle(StageStyle.UNDECORATED);
 		stage.setScene(createPreloaderScene());
 		SplashScreen splashScreen = SplashScreen.getSplashScreen();
-		stage.show();
 		if (splashScreen != null) {
 			Rectangle rect = splashScreen.getBounds();
-			if ( (stage.getWidth() == rect.width) && (stage.getHeight() == rect.height) ) {
-				stage.setX(rect.x);
-				stage.setY(rect.y);
-			}
+			stage.setX(rect.x);
+			stage.setY(rect.y);
 		}
+		stage.show();
 	}
 
 	@Override

@@ -78,37 +78,37 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 		setLayout(null);
 
 		velocityValueField = new JSpinner(new SpinnerNumberModel(8, 0, MMLNoteEvent.MAX_VOL, 1));
-		velocityValueField.setBounds(230, 20, 50, 19);
+		velocityValueField.setBounds(240, 20, 50, 19);
 		add(velocityValueField);
 
 		velocityCheckBox = new JCheckBox(AppResource.appText("note.properties.velocity"));
-		velocityCheckBox.setBounds(42, 20, 150, 21);
+		velocityCheckBox.setBounds(40, 20, 150, 21);
 		velocityCheckBox.addActionListener(this);
 		add(velocityCheckBox);
 
 		onlySelectedNoteOption = new JCheckBox(AppResource.appText("note.properties.onlySelectedNoteOption"));
-		onlySelectedNoteOption.setBounds(62, 50, 200, 21);
+		onlySelectedNoteOption.setBounds(60, 50, 200, 21);
 		onlySelectedNoteOption.addActionListener(this);
 		add(onlySelectedNoteOption);
 
 		incDecrVelocityEditOption = new JCheckBox(AppResource.appText("note.properties.incdecr"));
-		incDecrVelocityEditOption.setBounds(62, 80, 140, 21);
+		incDecrVelocityEditOption.setBounds(60, 80, 180, 21);
 		incDecrVelocityEditOption.addActionListener(this);
 		add(incDecrVelocityEditOption);
 
 		velocityValueField2 = new JSpinner(new SpinnerListModel(createIncDecrVelocityValues()));
 		velocityValueField2.getModel().setValue("0");
 		velocityValueField2.setEditor(new IncDecrVelocityEditor(velocityValueField2));
-		velocityValueField2.setBounds(230, 80, 50, 19);
+		velocityValueField2.setBounds(240, 80, 50, 19);
 		add(velocityValueField2);
 
 		tuningNoteCheckBox = new JCheckBox(AppResource.appText("note.properties.tuning"));
-		tuningNoteCheckBox.setBounds(42, 110, 180, 21);
+		tuningNoteCheckBox.setBounds(40, 110, 180, 21);
 		tuningNoteCheckBox.addActionListener(this);
 		add(tuningNoteCheckBox);
 
 		tuningBaseList = new JComboBox<>(TuningBase.values());
-		tuningBaseList.setBounds(230, 110, 50, 21);
+		tuningBaseList.setBounds(240, 110, 50, 21);
 		add(tuningBaseList);
 
 		this.noteEvent = noteEvent;

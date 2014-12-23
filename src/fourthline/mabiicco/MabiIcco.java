@@ -77,7 +77,9 @@ public final class MabiIcco extends Application {
 			if (args.size() > 0) {
 				dispatcher.openMMLFile(new File(args.get(0)));
 			}
-			notifyPreloader(new Preloader.StateChangeNotification(Preloader.StateChangeNotification.Type.BEFORE_START));
+			try {
+				notifyPreloader(new Preloader.StateChangeNotification(Preloader.StateChangeNotification.Type.BEFORE_START));
+			} catch (IllegalStateException e) {}
 			mainFrame.setVisible(true);
 		});
 	}
