@@ -173,4 +173,18 @@ public final class MMLTempoEvent extends MMLEvent {
 
 		return maxEvent;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof MMLTempoEvent)) {
+			return false;
+		}
+
+		MMLTempoEvent tempoEvent = (MMLTempoEvent) obj;
+		if ((this.tempo == tempoEvent.tempo) &&
+				(super.equals(tempoEvent))) {
+			return true;
+		}
+		return false;
+	}
 }

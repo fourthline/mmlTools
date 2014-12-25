@@ -198,7 +198,6 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 		markerEditor.forEach(t -> t.activateEditMenuItem(targetTick, delta));
 
 		popupMenu.show(component, x, y);
-		System.out.println("targetTick: " + targetTick);
 	}
 
 	@Override

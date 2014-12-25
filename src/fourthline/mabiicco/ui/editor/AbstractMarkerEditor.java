@@ -87,7 +87,6 @@ public abstract class AbstractMarkerEditor<T extends MMLEvent> implements IMarke
 	}
 
 	private T getTempoEventOnTick(int baseTick, int delta) {
-		System.out.println(baseTick+" "+delta);
 		for (T event : getEventList()) {
 			int tick = event.getTickOffset();
 			if ( (tick > baseTick - delta) && 

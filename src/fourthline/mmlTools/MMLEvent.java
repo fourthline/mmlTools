@@ -72,4 +72,17 @@ public abstract class MMLEvent implements Serializable {
 			list.remove(event);
 		}
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof MMLEvent)) {
+			return false;
+		}
+
+		MMLEvent event = (MMLEvent) obj;
+		if (this.tickOffset == event.tickOffset) {
+			return true;
+		}
+		return false;
+	}
 }

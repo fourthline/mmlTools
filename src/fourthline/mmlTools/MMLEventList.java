@@ -6,6 +6,7 @@ package fourthline.mmlTools;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -422,5 +423,19 @@ public final class MMLEventList implements Serializable, Cloneable {
 				list2.addMMLNoteEvent( noteEvent.clone() );
 			}
 		}
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof MMLEventList)) {
+			return false;
+		}
+
+		MMLEventList eventList = (MMLEventList) obj;
+		if ( Arrays.equals(this.noteList.toArray(), eventList.noteList.toArray()) &&
+				Arrays.equals(this.tempoList.toArray(), eventList.tempoList.toArray()) ) {
+			return true;
+		}
+		return false;
 	}
 }

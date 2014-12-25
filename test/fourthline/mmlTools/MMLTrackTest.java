@@ -156,4 +156,22 @@ public class MMLTrackTest {
 		assertEquals(expectMML1, track.generate().getOriginalMML());
 		assertEquals(expectMML2, track.generate().getMabiMML());
 	}
+
+	@Test
+	public void testEquals_0() {
+		MMLTrack track1 = new MMLTrack().setMML("MML@aaa");
+		MMLTrack track2 = new MMLTrack().setMML("MML@aaa");
+		MMLTrack track3 = new MMLTrack().setMML("MML@aab");
+		MMLTrack track4 = new MMLTrack().setMML("MML@at150aa");
+		MMLTrack track5 = new MMLTrack().setMML("MML@aav10a");;
+		MMLTrack track6 = new MMLTrack().setMML("MML@aaa.");
+		MMLTrack track7 = new MMLTrack().setMML("MML@t120aaa");
+
+		assertTrue( track1.equals(track2) );
+		assertFalse( track1.equals(track3) );
+		assertFalse( track1.equals(track4) );
+		assertFalse( track1.equals(track5) );
+		assertFalse( track1.equals(track6) );
+		assertFalse( track1.equals(track7) );
+	}
 }

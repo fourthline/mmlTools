@@ -6,6 +6,7 @@ package fourthline.mmlTools;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import fourthline.mmlTools.core.MMLText;
@@ -171,6 +172,9 @@ public final class MMLTrack implements Serializable {
 
 	public MMLTrack generate() throws UndefinedTickException {
 		originalMML.setMMLText(getMMLStrings(false, false));
+		if (!(new MMLTrack().setMML(getOriginalMML()).equals(this))) {
+			new UndefinedTickException("Verify error.");
+		}
 		mabiMML.setMMLText(getMMLStrings(true, true));
 		generated = true;
 		return this;
@@ -266,5 +270,22 @@ public final class MMLTrack implements Serializable {
 		}
 
 		return maxTime/1000.0;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof MMLTrack)) {
+			return false;
+		}
+		MMLTrack mmlTrack = (MMLTrack) obj;
+		if (this.mmlParts.size() != mmlTrack.mmlParts.size()) {
+			return false;
+		}
+
+		if (Arrays.equals(this.mmlParts.toArray(), mmlTrack.mmlParts.toArray())) {
+			return true;
+		}
+
+		return false;
 	}
 }

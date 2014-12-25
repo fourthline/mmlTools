@@ -178,4 +178,25 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 			throw new AssertionError();
 		}
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof MMLNoteEvent)) {
+			return false;
+		}
+
+		MMLNoteEvent noteEvent = (MMLNoteEvent) obj;
+		if ((this.tick == noteEvent.tick) &&
+				(this.note == noteEvent.note) &&
+				(this.velocity == noteEvent.velocity) &&
+				(this.tick == noteEvent.tick) &&
+				(super.equals(noteEvent))) {
+			if ((this.tuningBase == null) && (noteEvent.tuningBase == null)) {
+				return true;
+			} else if ((this.tuningBase != null) && this.tuningBase.equals(noteEvent.tuningBase)) {
+				return true;
+			}
+		}
+		return false;
+	}
 }
