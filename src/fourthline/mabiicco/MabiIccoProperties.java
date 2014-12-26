@@ -15,7 +15,6 @@ import java.util.InvalidPropertiesFormatException;
 import java.util.List;
 import java.util.Properties;
 
-import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.PianoRollView;
 
 public final class MabiIccoProperties {
@@ -88,7 +87,7 @@ public final class MabiIccoProperties {
 	}
 
 	public List<File> getDlsFile() {
-		String str = properties.getProperty(DLS_FILE, MabiDLS.DEFALUT_DLS_PATH);
+		String str = properties.getProperty(DLS_FILE, AppResource.appText("default.dls_file"));
 		String filenames[] = str.split(",");
 		ArrayList<File> fileArray = new ArrayList<>();
 		for (String filename : filenames) {
