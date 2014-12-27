@@ -40,17 +40,13 @@ public final class MabiIcco extends Application {
 
 	public void initialize() {
 		try {
+			UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
+
 			// font
 			String fontName = AppResource.appText("ui.font");
 			if (!fontName.equals("ui.font")) {
 				setUIFont(new javax.swing.plaf.FontUIResource(fontName, Font.PLAIN, 11));
 			}
-			UIManager.LookAndFeelInfo infos[] = UIManager.getInstalledLookAndFeels();
-			for (UIManager.LookAndFeelInfo info : infos) {
-				System.out.println(info.getClassName());
-			}
-
-			UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
 
 			// initialize
 			MabiDLS.getInstance().initializeMIDI();

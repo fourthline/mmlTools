@@ -20,8 +20,6 @@ import java.awt.Insets;
 
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
 import fourthline.mabiicco.AppResource;
 import fourthline.mabiicco.midi.InstClass;
@@ -35,7 +33,7 @@ import java.awt.event.ActionListener;
 import java.util.EnumSet;
 import java.util.HashMap;
 
-public final class MMLTrackView extends JPanel implements ActionListener, DocumentListener {
+public final class MMLTrackView extends JPanel implements ActionListener {
 
 	private static final long serialVersionUID = 4955513242349170508L;
 	public static final String MMLPART_NAME[] = {
@@ -131,7 +129,6 @@ public final class MMLTrackView extends JPanel implements ActionListener, Docume
 			mmlText[i] = new JTextField();
 			mmlText[i].setEditable(false);
 			mmlText[i].setFont(new Font("Monospaced", Font.PLAIN, 12));
-			mmlText[i].getDocument().addDocumentListener(this);
 			mmlText[i].setColumns(10);
 
 			GridBagConstraints gbc_mmlText = new GridBagConstraints();
@@ -229,17 +226,6 @@ public final class MMLTrackView extends JPanel implements ActionListener, Docume
 		partButton[index].setSelected(true);
 	}
 
-	@Override
-	public void removeUpdate(DocumentEvent event) {
-	}
-	@Override
-	public void insertUpdate(DocumentEvent event) {
-	}
-
-	@Override
-	public void changedUpdate(DocumentEvent event) {
-	}
-
 	public void updateTrack() {
 		MMLTrack mmlTrack = mmlManager.getMMLScore().getTrack(trackIndex);
 		String mml[] = mmlTrack.getMabiMMLArray();
@@ -294,6 +280,7 @@ public final class MMLTrackView extends JPanel implements ActionListener, Docume
 		} else {
 			songComboBox.setVisible(true);
 		}
+		updatePartButtonStatus();
 
 		InstClass songInst = ((InstClass) songComboBox.getSelectedItem());
 		int program = inst.getProgram();
@@ -303,7 +290,6 @@ public final class MMLTrackView extends JPanel implements ActionListener, Docume
 			return;
 		}
 
-		updatePartButtonStatus();
 		mmlManager.updateActiveTrackProgram(trackIndex, program, songProgram);
 	}
 
