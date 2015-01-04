@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2013 たんらる
+ * Copyright (C) 2013-2015 たんらる
  */
 
 package fourthline.mmlTools;
+
+import java.util.Objects;
 
 import fourthline.mmlTools.core.MMLTicks;
 import fourthline.mmlTools.core.TuningBase;
@@ -190,12 +192,9 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 				(this.note == noteEvent.note) &&
 				(this.velocity == noteEvent.velocity) &&
 				(this.tick == noteEvent.tick) &&
-				(super.equals(noteEvent))) {
-			if ((this.tuningBase == null) && (noteEvent.tuningBase == null)) {
-				return true;
-			} else if ((this.tuningBase != null) && this.tuningBase.equals(noteEvent.tuningBase)) {
-				return true;
-			}
+				(super.equals(noteEvent)) &&
+				(Objects.equals(this.tuningBase, noteEvent.tuningBase))) {
+			return true;
 		}
 		return false;
 	}

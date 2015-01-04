@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 たんらる
+ * Copyright (C) 2014-2015 たんらる
  */
 
 package fourthline.mabiicco;
@@ -13,6 +13,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 import javax.sound.midi.InvalidMidiDataException;
+import javax.swing.Action;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -67,11 +68,12 @@ public final class MabiIcco extends Application {
 		EventQueue.invokeLater(() -> {
 			ActionDispatcher dispatcher = ActionDispatcher.getInstance();
 			MainFrame mainFrame = new MainFrame(dispatcher);
+			mainFrame.setTransferHandler(new FileTransferHandler(dispatcher));
 			notifyPreloader(new MabiIccoPreloaderNotification("", 100));
 			dispatcher.setMainFrame(mainFrame).initialize();
 			List<String> args = getParameters().getRaw();
 			if (args.size() > 0) {
-				dispatcher.openMMLFile(new File(args.get(0)));
+				dispatcher.checkAndOpenMMLFile(new File(args.get(0)));
 			}
 			try {
 				notifyPreloader(new Preloader.StateChangeNotification(Preloader.StateChangeNotification.Type.BEFORE_START));
@@ -92,7 +94,8 @@ public final class MabiIcco extends Application {
 			return true;
 		}
 		JOptionPane.showMessageDialog(null, AppResource.appText("msg.dls_title.detail"), AppResource.appText("msg.dls_title"), JOptionPane.INFORMATION_MESSAGE);
-		JFileChooser fileChooser = new JFileChooser(".");
+		JFileChooser fileChooser = createFileChooser();
+		fileChooser.setCurrentDirectory(new File("."));
 		FileFilter dlsFilter = new FileNameExtensionFilter(AppResource.appText("file.dls"), "dls");
 		fileChooser.addChoosableFileFilter(dlsFilter);
 		fileChooser.setFileFilter(dlsFilter);
@@ -134,6 +137,16 @@ public final class MabiIcco extends Application {
 				UIManager.put(key, resource);
 			}
 		}
+	}
+
+	public static JFileChooser createFileChooser() {
+		JFileChooser chooser = new JFileChooser();
+		Action detailsAction = chooser.getActionMap().get("viewTypeDetails");
+		if (detailsAction != null) {
+			detailsAction.actionPerformed(null);
+		}
+
+		return chooser;
 	}
 
 	public static void main(String args[]) {

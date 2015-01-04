@@ -1,11 +1,12 @@
 /*
- * Copyright (C) 2014 たんらる
+ * Copyright (C) 2014-2015 たんらる
  */
 
 package fourthline.mabiicco.ui;
 
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -59,17 +60,17 @@ public final class MMLPartChangePanel extends JPanel {
 		this.dialog = null;
 		this.mmlManager = null;
 		this.editor = null;
-		initializePanel(null);
+		initializePanel(null, 0);
 	}
 
 	public MMLPartChangePanel(Frame parentFrame, IMMLManager mmlManager, MMLEditor editor) {
 		this.dialog = new JDialog(parentFrame, AppResource.appText("part_change"), true);
 		this.mmlManager = mmlManager;
 		this.editor = editor;
-		initializePanel(mmlManager.getMMLScore().getTrackList());
+		initializePanel(mmlManager.getMMLScore().getTrackList(), mmlManager.getActiveTrackIndex());
 	}
 
-	private void initializePanel(List<MMLTrack> trackList) {
+	private void initializePanel(List<MMLTrack> trackList, int initialIndex) {
 		setLayout(null);
 
 		applyButton.setBounds(202, 335, 90, 29);
@@ -140,6 +141,10 @@ public final class MMLPartChangePanel extends JPanel {
 
 		table = new TrackListTable(trackList);
 		scrollPane.setViewportView(table);
+		table.setRowSelectionInterval(initialIndex, initialIndex);
+		Point p = scrollPane.getViewport().getViewPosition();
+		p.y = initialIndex * table.getRowHeight();
+		scrollPane.getViewport().setViewPosition(p);
 
 		table.addMouseListener(new MouseAdapter() {
 			@Override

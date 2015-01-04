@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 たんらる
+ * Copyright (C) 2014-2015 たんらる
  */
 
 package fourthline.mabiicco;
@@ -93,9 +93,9 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	private final FileFilter allFilter = new FileNameExtensionFilter(AppResource.appText("file.all"), "mmi", "mms", "mml");
 	private final FileFilter midFilter = new FileNameExtensionFilter(AppResource.appText("file.mid"), "mid");
 
-	private final JFileChooser openFileChooser = new JFileChooser();
-	private final JFileChooser saveFileChooser = new JFileChooser();
-	private final JFileChooser exportFileChooser = new JFileChooser();
+	private final JFileChooser openFileChooser;
+	private final JFileChooser saveFileChooser;
+	private final JFileChooser exportFileChooser;
 
 	private static ActionDispatcher instance = null;
 	public static ActionDispatcher getInstance() {
@@ -106,6 +106,9 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	}
 
 	private ActionDispatcher() {
+		openFileChooser = MabiIcco.createFileChooser();
+		saveFileChooser = MabiIcco.createFileChooser();
+		exportFileChooser = MabiIcco.createFileChooser();
 	}
 
 	public ActionDispatcher setMainFrame(MainFrame mainFrame) {
@@ -136,11 +139,9 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	private void initializeActionMap() {
 		actionMap.put(VIEW_SCALE_UP, () -> {
 			mmlSeqView.expandPianoViewWide();
-			mmlSeqView.repaint();
 		});
 		actionMap.put(VIEW_SCALE_DOWN, () -> {
 			mmlSeqView.reducePianoViewWide();
-			mmlSeqView.repaint();
 		});
 		actionMap.put(STOP, () -> {
 			MabiDLS.getInstance().getSequencer().stop();
@@ -237,7 +238,13 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		return score;
 	}
 
-	public void openMMLFile(File file) {
+	public void checkAndOpenMMLFile(File file) {
+		if (checkCloseModifiedFileState()) {
+			openMMLFile(file);
+		}
+	}
+
+	private void openMMLFile(File file) {
 		MMLScore score = fileParse(file);
 		if (score != null) {
 			mmlSeqView.setMMLScore(score);

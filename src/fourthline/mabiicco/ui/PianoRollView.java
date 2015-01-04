@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 たんらる
+ * Copyright (C) 2013-2015 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -41,7 +41,7 @@ public final class PianoRollView extends JPanel {
 	/**
 	 * ノートの表示高さ
 	 */
-	public static int NOTE_HEIGHT_TABLE[] = { 4, 6, 9, 12 };
+	public static int NOTE_HEIGHT_TABLE[] = { 6, 8, 10, 12, 14 };
 	private int noteHeight = NOTE_HEIGHT_TABLE[3];
 	public int getNoteHeight() {
 		return noteHeight;

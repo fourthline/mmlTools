@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 たんらる
+ * Copyright (C) 2013-2015 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -37,9 +37,12 @@ import java.awt.Frame;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.List;
 
-public final class MMLSeqView implements IMMLManager, ChangeListener, ActionListener {
+public final class MMLSeqView implements IMMLManager, ChangeListener, ActionListener, MouseWheelListener {
 	private static final int INITIAL_TRACK_COUNT = 1;
 
 	private int trackCounter;
@@ -90,6 +93,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		// create mml editor
 		editor = new MMLEditor(keyboardView, pianoRollView, this);
 		pianoRollView.addMouseInputListener(editor);
+		pianoRollView.addMouseWheelListener(this);
 		columnView = new ColumnPanel(pianoRollView, this, editor);
 
 		scrollPane.setRowHeaderView(keyboardView);
@@ -414,6 +418,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		}
 
 		pianoRollView.setWideScale(viewScaleTable[viewScaleIndex]);
+		repaint();
 	}
 
 	/**
@@ -425,6 +430,24 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		}
 
 		pianoRollView.setWideScale(viewScaleTable[viewScaleIndex]);
+		repaint();
+	}
+
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent e) {
+		int modifiers = e.getModifiers();
+		int rotation = e.getWheelRotation();
+		if (modifiers == InputEvent.CTRL_MASK) {
+			if (rotation > 0) {
+				expandPianoViewWide();
+			} else {
+				reducePianoViewWide();
+			}
+		} else {
+			for (MouseWheelListener listener : scrollPane.getMouseWheelListeners()) {
+				listener.mouseWheelMoved(e);
+			}
+		}
 	}
 
 	/**
@@ -565,19 +588,23 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 
 	@Override
 	public boolean selectTrackOnExistNote(int note, int tickOffset) {
+		PaintMode mode = pianoRollView.getPaintMode();
 		int trackIndex = 0;
 		for (MMLTrack track : mmlScore.getTrackList()) {
 			int partIndex = 0;
-			for (MMLEventList eventList : track.getMMLEventList()) {
-				MMLNoteEvent noteEvent = eventList.searchOnTickOffset(tickOffset);
-				if ( (noteEvent != null) && (note == noteEvent.getNote()) ) {
-					tabbedPane.setSelectedIndex(trackIndex);
-					MMLTrackView view = (MMLTrackView) tabbedPane.getSelectedComponent();
-					view.setSelectMMLPartOfIndex(partIndex);
-					updateSelectedTrackAndMMLPart();
-					return true;
+			if ( (mode == PaintMode.ALL_TRACK) || 
+					( (mode == PaintMode.ACTIVE_TRACK) && (track == getSelectedTrack()))) {
+				for (MMLEventList eventList : track.getMMLEventList()) {
+					MMLNoteEvent noteEvent = eventList.searchOnTickOffset(tickOffset);
+					if ( (noteEvent != null) && (note == noteEvent.getNote()) ) {
+						tabbedPane.setSelectedIndex(trackIndex);
+						MMLTrackView view = (MMLTrackView) tabbedPane.getSelectedComponent();
+						view.setSelectMMLPartOfIndex(partIndex);
+						updateSelectedTrackAndMMLPart();
+						return true;
+					}
+					partIndex++;
 				}
-				partIndex++;
 			}
 			trackIndex++;
 		}

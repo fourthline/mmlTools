@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 たんらる
+ * Copyright (C) 2013-2015 たんらる
  */
 
 package fourthline.mmlTools;
@@ -160,12 +160,14 @@ public class MMLTrackTest {
 	@Test
 	public void testEquals_0() {
 		MMLTrack track1 = new MMLTrack().setMML("MML@aaa");
-		MMLTrack track2 = new MMLTrack().setMML("MML@aaa");
+		MMLTrack track2 = new MMLTrack().setMML("MML@a8.&a16aa");
 		MMLTrack track3 = new MMLTrack().setMML("MML@aab");
 		MMLTrack track4 = new MMLTrack().setMML("MML@at150aa");
 		MMLTrack track5 = new MMLTrack().setMML("MML@aav10a");;
 		MMLTrack track6 = new MMLTrack().setMML("MML@aaa.");
 		MMLTrack track7 = new MMLTrack().setMML("MML@t120aaa");
+		MMLTrack track8 = new MMLTrack().setMML("MML@l16a&a&a&al4aa");
+		MMLTrack track9 = new MMLTrack().setMML("MML@l16a&a&a&al4aa");
 
 		assertTrue( track1.equals(track2) );
 		assertFalse( track1.equals(track3) );
@@ -173,5 +175,7 @@ public class MMLTrackTest {
 		assertFalse( track1.equals(track5) );
 		assertFalse( track1.equals(track6) );
 		assertFalse( track1.equals(track7) );
+		assertFalse( track1.equals(track8) );
+		assertTrue( track8.equals(track9) );
 	}
 }

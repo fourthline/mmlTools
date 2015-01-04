@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 たんらる
+ * Copyright (C) 2014-2015 たんらる
  */
 
 package fourthline.mabiicco.midi;
@@ -60,7 +60,7 @@ public class MMLMidiTrack {
 					// 開始位置が同じときには, 後発音で更新する.
 					// 前の音とテンポ指定がある場合は元あったノートのまま.
 					// 後発音が V0 の場合は l64音に更新する.
-					if (MMLTempoEvent.searchEqualsTick(tempoList, targetTick)) {
+					if (!MMLTempoEvent.searchEqualsTick(tempoList, targetTick)) {
 						if (addEvent.getVelocity() == 0) {
 							prevEvent.setTick(MMLTicks.minimumTick());
 						}

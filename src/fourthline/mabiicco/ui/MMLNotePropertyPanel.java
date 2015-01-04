@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 たんらる
+ * Copyright (C) 2013-2015 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
@@ -154,8 +155,7 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 		}
 		enableTuningEdit = true;
 		for (MMLNoteEvent note : noteEvent) {
-			if ((first == null) && (note.getTuningBase() != null) || 
-					(first != null) && (!first.equals(note.getTuningBase()))) {
+			if (Objects.equals(first, note.getTuningBase())) {
 				enableTuningEdit = false;
 				break;
 			}
