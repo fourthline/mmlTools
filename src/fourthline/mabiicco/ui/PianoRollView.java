@@ -193,7 +193,7 @@ public final class PianoRollView extends JPanel {
 	 * @param scale
 	 */
 	public void setWideScale(double scale) {
-		if ( (scale > 6.0) || (scale < 0.5) ) {
+		if ( (scale > 6.0) || (scale < 0.1) ) {
 			return;
 		}
 

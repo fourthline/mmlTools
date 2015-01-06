@@ -12,6 +12,10 @@ import java.util.List;
 
 import javax.swing.TransferHandler;
 
+/**
+ * ファイルドロップ: 開く
+ * Ctrl+ファイルドロップ: インポート
+ */
 public class FileTransferHandler extends TransferHandler {
 	private static final long serialVersionUID = 7618330769836269887L;
 
@@ -20,11 +24,15 @@ public class FileTransferHandler extends TransferHandler {
 	public FileTransferHandler(ActionDispatcher dispatcher) {
 		super();
 		this.dispacher = dispatcher;
-	}
+}
 
 	@Override
 	public boolean canImport(TransferSupport support) {
-		return support.isDataFlavorSupported(DataFlavor.javaFileListFlavor);
+		int action = support.getDropAction();
+		if ( (action == MOVE) || (action == COPY) ) {
+			return support.isDataFlavorSupported(DataFlavor.javaFileListFlavor);
+		}
+		return false;
 	}
 
 	@Override
@@ -32,13 +40,18 @@ public class FileTransferHandler extends TransferHandler {
 		if (!canImport(support)) {
 			return false;
 		}
+		int action = support.getDropAction();
 
 		try {
-			for (Object obj: (List<?>) support.getTransferable().getTransferData(DataFlavor.javaFileListFlavor)) {
+			for (Object obj : (List<?>) support.getTransferable().getTransferData(DataFlavor.javaFileListFlavor)) {
 				if (obj instanceof File) {
 					File file = (File) obj;
 					if (file.isFile()) {
-						dispacher.checkAndOpenMMLFile(file);
+						if (action == MOVE) {
+							dispacher.checkAndOpenMMLFile(file);
+						} else {
+							dispacher.fileImport(file);
+						}
 						return true;
 					}
 				}

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 たんらる
+ * Copyright (C) 2013-2015 たんらる
  */
 
 package fourthline.mabiicco.ui.editor;
@@ -93,6 +93,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		pianoRoll.setSelectNote(selectedNote);
 
 		newPopupMenu(AppResource.appText("part_change"), ActionDispatcher.PART_CHANGE);
+		newPopupMenu(AppResource.appText("menu.delete"), ActionDispatcher.DELETE, AppResource.appText("menu.delete.icon"));
 		newPopupMenu(AppResource.appText("note.properties"), ActionDispatcher.NOTE_PROPERTY);
 	}
 
@@ -360,7 +361,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		MMLNoteEvent noteEvent = editEventList.searchOnTickOffset( tickOffset );
 
 		if ( (noteEvent != null) && (noteEvent.getNote() == note) ) {
-			if (noteEvent.getEndTick() <= tickOffset +(editAlign/2) ) {
+			if (noteEvent.getEndTick() <= tickOffset + (noteEvent.getTick() / 5) ) {
 				return true;
 			}
 		}
@@ -563,6 +564,15 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		return menu;
 	}
 
+	private JMenuItem newPopupMenu(String name, String command, String iconName) {
+		JMenuItem menu = newPopupMenu(name, command);
+		try {
+			menu.setIcon(AppResource.getImageIcon(iconName));
+		} catch (NullPointerException e) {}
+
+		return menu;
+	}
+
 	@Override
 	public void showPopupMenu(Point point) {
 		if (MabiDLS.getInstance().getSequencer().isRecording()) {
@@ -570,6 +580,9 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		}
 		int x = (int)point.getX();
 		int y = (int)point.getY();
-		popupMenu.show(pianoRollView, x, y);
+
+		if (hasSelectedNote()) {
+			popupMenu.show(pianoRollView, x, y);
+		}
 	}
 }

@@ -405,6 +405,10 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	 */
 	private void fileImportAction() {
 		File file = fileOpenDialog();
+		fileImport(file);
+	}
+
+	public void fileImport(File file) {
 		if (file != null) {
 			MMLScore score = fileParse(file);
 			if (score != null) {

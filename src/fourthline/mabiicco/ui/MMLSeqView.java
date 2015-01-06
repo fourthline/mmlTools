@@ -407,7 +407,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 
 
 	private int viewScaleIndex = 0;
-	private final double viewScaleTable[] = { 6, 5, 4, 3, 2, 1, 0.75, 0.5 };
+	private final double viewScaleTable[] = { 6, 5, 4, 3, 2, 1.5, 1, 0.75, 0.5, 0.375, 0.25 };
 
 	/**
 	 * ピアノロールビューの表示を1段階拡大します.

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 たんらる
+ * Copyright (C) 2013-2015 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -235,7 +235,7 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		pasteMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_MASK));
 		editMenu.add(pasteMenu);
 
-		deleteMenu = createMenuItem(appText("menu.delete"), ActionDispatcher.DELETE);
+		deleteMenu = createMenuItem(appText("menu.delete"), ActionDispatcher.DELETE, appText("menu.delete.icon"));
 		deleteMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
 		editMenu.add(deleteMenu);
 
