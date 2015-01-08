@@ -67,8 +67,6 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 
 	private final ActionListener listener;
 
-	private final String DEFAULT_TITLE = " * MabiIcco *";
-
 	/** シーケンス再生中に無効化する機能のリスト */
 	private final ArrayList<JComponent> noplayFunctions = new ArrayList<>();
 
@@ -475,7 +473,7 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		if (filename != null) {
 			fileTitle = filename;
 		}
-		setTitle(DEFAULT_TITLE + " [" + fileTitle + "]");
+		setTitle(AppResource.getAppTitle() + " [" + fileTitle + "]");
 	}
 
 	private void loadWindowPeoperties() {

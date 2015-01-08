@@ -16,7 +16,7 @@ import javax.swing.TransferHandler;
  * ファイルドロップ: 開く
  * Ctrl+ファイルドロップ: インポート
  */
-public class FileTransferHandler extends TransferHandler {
+public final class FileTransferHandler extends TransferHandler {
 	private static final long serialVersionUID = 7618330769836269887L;
 
 	private final ActionDispatcher dispacher;
@@ -24,7 +24,7 @@ public class FileTransferHandler extends TransferHandler {
 	public FileTransferHandler(ActionDispatcher dispatcher) {
 		super();
 		this.dispacher = dispatcher;
-}
+	}
 
 	@Override
 	public boolean canImport(TransferSupport support) {

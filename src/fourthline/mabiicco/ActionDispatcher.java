@@ -428,7 +428,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		}
 
 		// 保存するかどうかのダイアログ表示
-		int status = JOptionPane.showConfirmDialog(mainFrame, AppResource.appText("message.modifiedClose"), "", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+		int status = JOptionPane.showConfirmDialog(mainFrame, AppResource.appText("message.modifiedClose"), AppResource.getAppTitle(), JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 		if (status == JOptionPane.CANCEL_OPTION) {
 			return false;
 		} else if (status == JOptionPane.NO_OPTION) {

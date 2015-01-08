@@ -15,6 +15,7 @@ import javax.swing.ImageIcon;
 import fourthline.mmlTools.core.ResourceLoader;
 
 public final class AppResource {
+	private final static String APP_TITLE = " * MabiIcco * ";
 	private final static String RESOURCE_NAME = "appResource";
 	private static Manifest mf;
 	private final static ResourceBundle bundle = ResourceBundle.getBundle(RESOURCE_NAME, new ResourceLoader());
@@ -26,9 +27,13 @@ public final class AppResource {
 	}
 
 	public static String getVersionText() {
-		String versionText = AppResource.getManifestValue("Implementation-Version")
-				+ " build" + AppResource.getManifestValue("Implementation-Build");
+		String versionText = getManifestValue("Implementation-Version")
+				+ " build" + getManifestValue("Implementation-Build");
 		return versionText;
+	}
+
+	public static String getAppTitle() {
+		return APP_TITLE;
 	}
 
 	public static String getRuntimeVersion() {
