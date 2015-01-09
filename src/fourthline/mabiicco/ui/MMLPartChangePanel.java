@@ -196,6 +196,9 @@ public final class MMLPartChangePanel extends JPanel {
 			return;
 		}
 		MMLEventList activePart = mmlManager.getActiveMMLPart();
+		if (activePart == null) {
+			return;
+		}
 		int trackIndex = table.getSelectedRow();
 		partSelectComboBox.removeAllItems();
 		MMLTrack selectedTrack = mmlManager.getMMLScore().getTrack(trackIndex);
@@ -222,6 +225,9 @@ public final class MMLPartChangePanel extends JPanel {
 		}
 
 		MMLEventList fromPart = mmlManager.getActiveMMLPart();
+		if (fromPart == null) {
+			return;
+		}
 		MMLEventList toPart = selectedTrack.getMMLEventAtIndex(partIndex);
 		editor.changePart(fromPart, toPart, radioSelectArea.isSelected(), action);
 	}
@@ -235,10 +241,12 @@ public final class MMLPartChangePanel extends JPanel {
 	 * ダイアログを表示する.
 	 */
 	public void showDialog() {
-		dialog.getContentPane().add(this);
-		dialog.pack();
-		dialog.setResizable(false);
-		dialog.setLocationRelativeTo(null);
-		dialog.setVisible(true);
+		if (mmlManager.getActiveMMLPart() != null) {
+			dialog.getContentPane().add(this);
+			dialog.pack();
+			dialog.setResizable(false);
+			dialog.setLocationRelativeTo(null);
+			dialog.setVisible(true);
+		}
 	}
 }

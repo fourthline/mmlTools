@@ -310,7 +310,7 @@ public final class MMLEventList implements Serializable, Cloneable {
 		StringBuilder sb = new StringBuilder();
 
 		// initial note: octave 4, tick 0, offset 0, velocity 8
-		MMLNoteEvent noteEvent = new MMLNoteEvent(12*4, 0, 0, MMLNoteEvent.INITIAL_VOLUMN);
+		MMLNoteEvent noteEvent = new MMLNoteEvent(12*4, 0, 0, MMLNoteEvent.INIT_VOL);
 		MMLNoteEvent prevNoteEvent = noteEvent;
 		for (int i = 0; i < noteList.size(); i++) {
 			noteEvent = noteList.get(i);

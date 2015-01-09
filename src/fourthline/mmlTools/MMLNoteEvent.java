@@ -19,7 +19,6 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 	private TuningBase tuningBase = null;
 	private int velocity;
 	private int indexOfMMLString[] = null; // { startIndex, endIndex }
-	public static final int INITIAL_VOLUMN = 8;
 
 	public MMLNoteEvent(int note, int tickLength, int tickOffset) {
 		this(note, tickLength, tickOffset, INIT_VOL);

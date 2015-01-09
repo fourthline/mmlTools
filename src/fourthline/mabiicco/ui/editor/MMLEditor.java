@@ -158,6 +158,9 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 
 		selectedNote.clear();
 		MMLEventList editEventList = mmlManager.getActiveMMLPart();
+		if (editEventList == null) {
+			return;
+		}
 		for (MMLNoteEvent noteEvent : editEventList.getMMLNoteEventList()) {
 			if ( (noteEvent.getNote() >= note[0]) && (noteEvent.getNote() <= note[1]) 
 					&& (noteEvent.getEndTick() > tickOffset[0])
@@ -178,6 +181,9 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 			int note = pianoRollView.convertY2Note(point.y);
 			long tickOffset = pianoRollView.convertXtoTick(point.x);
 			MMLEventList editEventList = mmlManager.getActiveMMLPart();
+			if (editEventList == null) {
+				return;
+			}
 			MMLNoteEvent noteEvent = editEventList.searchOnTickOffset(tickOffset);
 			if (noteEvent.getNote() != note) {
 				return;
@@ -201,6 +207,9 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		long tickOffset = pianoRollView.convertXtoTick(p.x);
 		long alignedTickOffset = tickOffset - (tickOffset % editAlign);
 		MMLEventList editEventList = mmlManager.getActiveMMLPart();
+		if (editEventList == null) {
+			return;
+		}
 		MMLNoteEvent prevNote = editEventList.searchPrevNoteOnTickOffset(tickOffset);
 
 		MMLNoteEvent noteEvent = new MMLNoteEvent(note, editAlign, (int)alignedTickOffset, prevNote.getVelocity());
@@ -213,6 +222,9 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	 */
 	@Override
 	public void updateSelectedNoteAndTick(Point p, boolean updateNote) {
+		if (selectedNote.size() <= 0) {
+			return;
+		}
 		pianoRollView.onViewScrollPoint(p);
 		MMLNoteEvent noteEvent = selectedNote.get(0);
 		int note = pianoRollView.convertY2Note(p.y);
@@ -275,8 +287,11 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	 */
 	@Override
 	public void applyEditNote(boolean select) {
+		MMLEventList editEventList = mmlManager.getActiveMMLPart();
+		if (editEventList == null) {
+			return;
+		}
 		for (MMLNoteEvent noteEvent : selectedNote) {
-			MMLEventList editEventList = mmlManager.getActiveMMLPart();
 			editEventList.deleteMMLEvent(noteEvent);
 			editEventList.addMMLNoteEvent(noteEvent);
 		}
@@ -335,6 +350,9 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		int note = pianoRollView.convertY2Note( point.y );
 		int tickOffset = (int)pianoRollView.convertXtoTick( point.x );
 		MMLEventList editEventList = mmlManager.getActiveMMLPart();
+		if (editEventList == null) {
+			return false;
+		}
 		MMLNoteEvent noteEvent = editEventList.searchOnTickOffset(tickOffset);
 
 		if ( (noteEvent != null) && (note == noteEvent.getNote()) ) {
@@ -358,6 +376,9 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		int note = pianoRollView.convertY2Note( point.y );
 		int tickOffset = (int)pianoRollView.convertXtoTick( point.x );
 		MMLEventList editEventList = mmlManager.getActiveMMLPart();
+		if (editEventList == null) {
+			return false;
+		}
 		MMLNoteEvent noteEvent = editEventList.searchOnTickOffset( tickOffset );
 
 		if ( (noteEvent != null) && (noteEvent.getNote() == note) ) {
@@ -453,13 +474,16 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 			return;
 		}
 
+		MMLEventList editEventList = mmlManager.getActiveMMLPart();
+		if (editEventList == null) {
+			return;
+		}
 		selectNote(null);
 		long offset = clipEventList.getMMLNoteEventList().get(0).getTickOffset();
 		for (MMLNoteEvent noteEvent : clipEventList.getMMLNoteEventList()) {
 			long tickOffset = noteEvent.getTickOffset() - offset + startTick;
 			MMLNoteEvent addNote = new MMLNoteEvent(noteEvent.getNote(), noteEvent.getTick(), (int)tickOffset, 0);
 			addNote.setVelocity(noteEvent.getVelocity());
-			MMLEventList editEventList = mmlManager.getActiveMMLPart();
 			editEventList.addMMLNoteEvent(addNote);
 			selectNote(addNote, true);
 		}
@@ -470,10 +494,13 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 
 	@Override
 	public void selectedCut() {
+		MMLEventList editEventList = mmlManager.getActiveMMLPart();
+		if (editEventList == null) {
+			return;
+		}
 		clipEventList = new MMLEventList("");
 		for (MMLNoteEvent noteEvent : selectedNote) {
 			clipEventList.addMMLNoteEvent(noteEvent);
-			MMLEventList editEventList = mmlManager.getActiveMMLPart();
 			editEventList.deleteMMLEvent(noteEvent);
 		}
 
@@ -494,8 +521,11 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 
 	@Override
 	public void selectedDelete() {
+		MMLEventList editEventList = mmlManager.getActiveMMLPart();
+		if (editEventList == null) {
+			return;
+		}
 		for (MMLNoteEvent noteEvent : selectedNote) {
-			MMLEventList editEventList = mmlManager.getActiveMMLPart();
 			editEventList.deleteMMLEvent(noteEvent);
 		}
 
@@ -511,14 +541,19 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		}
 
 		MMLEventList editEventList = mmlManager.getActiveMMLPart();
-		new MMLNotePropertyPanel(selectedNote.toArray(new MMLNoteEvent[selectedNote.size()]), editEventList).showDialog();
-		mmlManager.updateActivePart(true);
+		if (editEventList != null) {
+			new MMLNotePropertyPanel(selectedNote.toArray(new MMLNoteEvent[selectedNote.size()]), editEventList).showDialog();
+			mmlManager.updateActivePart(true);
+		}
 	}
 
 	@Override
 	public void selectAll() {
-		selectedNote.clear();
-		selectedNote.addAll(mmlManager.getActiveMMLPart().getMMLNoteEventList());
+		MMLEventList editEventList = mmlManager.getActiveMMLPart();
+		if (editEventList != null) {
+			selectedNote.clear();
+			selectedNote.addAll(editEventList.getMMLNoteEventList());
+		}
 	}
 
 	public void changePart(MMLEventList from, MMLEventList to, boolean useSelectedNoteList, ChangePartAction action) {

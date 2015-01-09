@@ -353,7 +353,7 @@ public final class MabiDLS {
 	}
 
 	private void convertMidiPart(Track track, List<MMLNoteEvent> eventList, int channel, InstType inst) {
-		int volumn = MMLNoteEvent.INITIAL_VOLUMN;
+		int volumn = MMLNoteEvent.INIT_VOL;
 
 		// Noteイベントの変換
 		for ( MMLNoteEvent noteEvent : eventList ) {

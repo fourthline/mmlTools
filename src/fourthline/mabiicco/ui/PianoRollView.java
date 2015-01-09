@@ -487,7 +487,7 @@ public final class PianoRollView extends JPanel {
 		if (drawOption) {
 			// velocityの描画.
 			int velocity = noteEvent.getVelocity();
-			if (prevNote.getVelocity() != velocity) {
+			if ( (prevNote == null) || (prevNote.getVelocity() != velocity) ) {
 				String s = "V" + velocity;
 				g.setColor(Color.DARK_GRAY);
 				g.drawString(s, x, y);
@@ -502,7 +502,7 @@ public final class PianoRollView extends JPanel {
 	 * @return
 	 */
 	private void paintMMLPart(Graphics2D g, List<MMLNoteEvent> mmlPart, Color rectColor, Color fillColor, boolean drawOption) {
-		MMLNoteEvent prevNote = mmlManager.getActiveMMLPart().searchPrevNoteOnTickOffset(0);
+		MMLNoteEvent prevNote = new MMLNoteEvent(0, 0, 0, MMLNoteEvent.INIT_VOL);
 		// 現在のView範囲のみを描画する.
 		for (MMLNoteEvent noteEvent : mmlPart) {
 			if ( (noteEvent.getEndTick() < startViewTick) && (noteEvent.getTickOffset() < startViewTick - DRAW_START_MARGIN) ) {
@@ -549,10 +549,11 @@ public final class PianoRollView extends JPanel {
 			paintMMLTrack(g, trackIndex, mmlManager.getMMLScore().getTrack(trackIndex));
 		}
 		MMLEventList activePart = mmlManager.getActiveMMLPart();
-
-		Color rectColor = ColorPalette.ACTIVE.getRectColor(trackIndex);
-		Color fillColor = ColorPalette.ACTIVE.getFillColor(trackIndex);
-		paintMMLPart(g, activePart.getMMLNoteEventList(), rectColor, fillColor, true);
+		if (activePart != null) {
+			Color rectColor = ColorPalette.ACTIVE.getRectColor(trackIndex);
+			Color fillColor = ColorPalette.ACTIVE.getFillColor(trackIndex);
+			paintMMLPart(g, activePart.getMMLNoteEventList(), rectColor, fillColor, true);
+		}
 	}
 
 	private void paintOtherTrack(Graphics2D g) {
