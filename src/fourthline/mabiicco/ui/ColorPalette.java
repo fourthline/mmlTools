@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 たんらる
+ * Copyright (C) 2014-2015 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -66,11 +66,15 @@ public final class ColorPalette {
 		new Color(200, 0, 0),
 		new Color(0, 200, 0),
 		new Color(0, 0, 200),
-		Color.ORANGE.darker(),
-		Color.CYAN.darker(),
-		Color.MAGENTA.darker(),
-		Color.YELLOW.darker(),
+		Color.decode("#FF4400"),
+		Color.decode("#00AAFF"),
+		Color.decode("#FF00D0"),
+		Color.decode("#009933"),
 		Color.decode("#FF5564"),
+		Color.decode("#8100FF"),
+		Color.decode("#891D1D"),
+		Color.decode("#A78100"),
+		Color.decode("#00600B"),
 	};
 
 	private static ArrayList<ColorPalette> instanceList = null;
@@ -92,14 +96,26 @@ public final class ColorPalette {
 		return instanceList.get(index);
 	}
 
+	private Color baseColor;
 	private final ArrayList<Color> rectColorTable = new ArrayList<>();
 	private final ArrayList<Color> fillColorTable = new ArrayList<>();
 
-	private ColorPalette(Color baseColor) {
+	public ColorPalette(Color baseColor) {
+		setColor(baseColor);
+	}
+
+	public void setColor(Color baseColor) {
+		rectColorTable.clear();
+		fillColorTable.clear();
+		this.baseColor = baseColor;
 		for (ColorPattern pattern : ColorPattern.values()) {
 			rectColorTable.add( pattern.getRectColor(baseColor) );
 			fillColorTable.add( pattern.getFillColor(baseColor) );
 		}
+	}
+
+	public Color getBaseColor() {
+		return this.baseColor;
 	}
 
 	private Color getColor(List<Color> colorList, ColorPattern pattern) {
