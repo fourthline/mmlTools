@@ -533,12 +533,12 @@ public final class PianoRollView extends JPanel {
 			if (targetPart == activePart) {
 				continue;
 			}
-			ColorPalette partColor = ColorPalette.getColorType(i);
+			ColorPalette partColor = ColorPalette.getInstance(index);
+			Color rectColor = partColor.getPartRectColor(i);
+			Color fillColor = partColor.getPartFillColor(i);
 			if ( !instEnable[i] && !songExEnable[i] ) {
-				partColor = ColorPalette.UNUSED;
+				fillColor = partColor.getUnusedFillColor();
 			}
-			Color rectColor = partColor.getRectColor(index);
-			Color fillColor = partColor.getFillColor(index);
 			paintMMLPart(g, track.getMMLEventList().get(i).getMMLNoteEventList(), rectColor, fillColor, false);
 		}
 	}
@@ -550,8 +550,9 @@ public final class PianoRollView extends JPanel {
 		}
 		MMLEventList activePart = mmlManager.getActiveMMLPart();
 		if (activePart != null) {
-			Color rectColor = ColorPalette.ACTIVE.getRectColor(trackIndex);
-			Color fillColor = ColorPalette.ACTIVE.getFillColor(trackIndex);
+			ColorPalette colorPalette = ColorPalette.getInstance(trackIndex);
+			Color rectColor = colorPalette.getActiveRectColor();
+			Color fillColor = colorPalette.getActiveFillColor();
 			paintMMLPart(g, activePart.getMMLNoteEventList(), rectColor, fillColor, true);
 		}
 	}

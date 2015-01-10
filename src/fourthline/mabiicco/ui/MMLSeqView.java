@@ -198,7 +198,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		int len = tabbedPane.getTabCount();
 
 		for (int i = 0; i < len; i++) {
-			tabbedPane.setIconAt(i, PartButtonIconArray.getInstance(1, i));
+			tabbedPane.setIconAt(i, PartButtonIcon.getInstance(1, i));
 		}
 	}
 

@@ -306,8 +306,8 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 			mmlText[i].setEnabled(b);
 			partButton[i].setIcon(
 					(b) 
-					? (PartButtonIconArray.getInstance(i, trackIndex)) : 
-						(PartButtonIcon.getInstance()) );
+					? (PartButtonIcon.getInstance(i, trackIndex)) : 
+						(PartButtonIcon.getDefautIcon()) );
 		}
 
 		if (!partButton[getSelectedMMLPartIndex()].isEnabled()) {
