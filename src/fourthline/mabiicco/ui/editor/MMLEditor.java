@@ -93,6 +93,8 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		pianoRoll.setSelectNote(selectedNote);
 
 		newPopupMenu(AppResource.appText("part_change"), ActionDispatcher.PART_CHANGE);
+		newPopupMenu(AppResource.appText("edit.select_previous_all"), ActionDispatcher.SELECT_PREVIOUS_ALL);
+		newPopupMenu(AppResource.appText("edit.select_after_all"), ActionDispatcher.SELECT_AFTER_ALL);
 		newPopupMenu(AppResource.appText("menu.delete"), ActionDispatcher.DELETE, AppResource.appText("menu.delete.icon"));
 		newPopupMenu(AppResource.appText("note.properties"), ActionDispatcher.NOTE_PROPERTY);
 	}
@@ -556,6 +558,33 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		}
 	}
 
+	@Override
+	public void selectPreviousAll() {
+		System.out.println("selectPreviousAll");
+		MMLEventList editEventList = mmlManager.getActiveMMLPart();
+		if (editEventList != null) {
+			for (MMLNoteEvent note : editEventList.getMMLNoteEventList()) {
+				if (note.getTickOffset() < popupTargetNote.getTickOffset()) {
+					selectedNote.add(note);
+				} else {
+					break;
+				}
+			}
+		}
+	}
+
+	@Override
+	public void selectAfterAll() {
+		MMLEventList editEventList = mmlManager.getActiveMMLPart();
+		if (editEventList != null) {
+			for (MMLNoteEvent note : editEventList.getMMLNoteEventList()) {
+				if (note.getTickOffset() > popupTargetNote.getTickOffset()) {
+					selectedNote.add(note);
+				}
+			}
+		}
+	}
+
 	public void changePart(MMLEventList from, MMLEventList to, boolean useSelectedNoteList, ChangePartAction action) {
 		int startTick = 0;
 		int endTick;
@@ -608,16 +637,23 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		return menu;
 	}
 
+
+	private MMLNoteEvent popupTargetNote;
 	@Override
 	public void showPopupMenu(Point point) {
 		if (MabiDLS.getInstance().getSequencer().isRecording()) {
 			return;
 		}
-		int x = (int)point.getX();
-		int y = (int)point.getY();
+
+		int tickOffset = (int)pianoRollView.convertXtoTick( point.x );
+		MMLEventList editEventList = mmlManager.getActiveMMLPart();
+		if (editEventList == null) {
+			return;
+		}
+		popupTargetNote = editEventList.searchOnTickOffset(tickOffset);
 
 		if (hasSelectedNote()) {
-			popupMenu.show(pianoRollView, x, y);
+			popupMenu.show(pianoRollView, point.x, point.y);
 		}
 	}
 }

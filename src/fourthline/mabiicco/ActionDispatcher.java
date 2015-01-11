@@ -82,6 +82,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	public static final String FILE_IMPORT = "file_import";
 	public static final String CLEAR_DLS = "clear_dls";
 	public static final String SELECT_ALL = "select_all";
+	public static final String SELECT_PREVIOUS_ALL = "select_previous_all";
+	public static final String SELECT_AFTER_ALL = "select_after_all";
 
 	private final HashMap<String, Runnable> actionMap = new HashMap<>();
 
@@ -195,6 +197,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(FILE_IMPORT, this::fileImportAction);
 		actionMap.put(CLEAR_DLS, this::clearDLSInformation);
 		actionMap.put(SELECT_ALL, this::selectAll);
+		actionMap.put(SELECT_PREVIOUS_ALL, this::selectPreviousAll);
+		actionMap.put(SELECT_AFTER_ALL, this::selectAfterAll);
 	}
 
 	@Override
@@ -509,6 +513,20 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 
 	private void selectAll() {
 		editState.selectAll();
+		mmlSeqView.repaint();
+		notifyUpdateEditState();
+	}
+
+	// 前方向のノートを選択する.
+	private void selectPreviousAll() {
+		editState.selectPreviousAll();
+		mmlSeqView.repaint();
+		notifyUpdateEditState();
+	}
+
+	// 後ろ方向のノートを選択する.
+	private void selectAfterAll() {
+		editState.selectAfterAll();
 		mmlSeqView.repaint();
 		notifyUpdateEditState();
 	}

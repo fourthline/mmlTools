@@ -13,6 +13,8 @@ public interface IEditState {
 	public void selectedDelete();
 	public void noteProperty();
 	public void selectAll();
+	public void selectPreviousAll();
+	public void selectAfterAll();
 
 	public void setEditStateObserver(IEditStateObserver observer);
 }

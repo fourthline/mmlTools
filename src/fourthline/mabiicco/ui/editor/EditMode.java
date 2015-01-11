@@ -21,6 +21,7 @@ enum EditMode {
 			startPoint = e.getPoint();
 			if (SwingUtilities.isRightMouseButton(e)) {
 				if (context.onExistNote(startPoint, false)) {
+					context.selectNoteByPoint(startPoint, 0);
 					context.showPopupMenu(startPoint);
 				} else {
 					context.changeState(AREA).executeEvent(context, e);
@@ -43,8 +44,8 @@ enum EditMode {
 		public void executeEvent(IEditContext context, MouseEvent e) {
 			int cursorType = Cursor.DEFAULT_CURSOR;
 			Point p = e.getPoint();
-			boolean onAlt = (e.getModifiers() & ActionEvent.ALT_MASK) != 0;
-			if (context.onExistNote(p, onAlt)) {
+			boolean onOption = (e.getModifiers() == ActionEvent.SHIFT_MASK + ActionEvent.CTRL_MASK);
+			if (context.onExistNote(p, onOption)) {
 				if (context.isEditLengthPosition(p)) {
 					cursorType = Cursor.E_RESIZE_CURSOR;
 				} else {
