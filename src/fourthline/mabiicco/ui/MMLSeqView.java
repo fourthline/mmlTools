@@ -17,6 +17,7 @@ import javax.swing.event.ChangeListener;
 
 import fourthline.mabiicco.IEditState;
 import fourthline.mabiicco.IFileState;
+import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.PianoRollView.PaintMode;
@@ -31,6 +32,7 @@ import fourthline.mmlTools.UndefinedTickException;
 import fourthline.mmlTools.core.MMLTicks;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Frame;
@@ -106,7 +108,19 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		startTimeViewUpdateThread();
 	}
 
+	private boolean currentEditMode = true;
 	public void repaint() {
+		boolean editMode = MabiIccoProperties.getInstance().getEnableEdit();
+		if (currentEditMode != editMode) {
+			currentEditMode = editMode;
+			for (Component c : tabbedPane.getComponents()) {
+				MMLTrackView view = (MMLTrackView) c;
+				view.setVisibleMMLTextPanel(currentEditMode);
+			}
+			resetTrackView();
+			tabbedPane.setPreferredSize(new Dimension(0, currentEditMode ? 200 : 60));
+		}
+
 		panel.repaint();
 	}
 
@@ -392,6 +406,9 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 
 	@Override
 	public MMLEventList getActiveMMLPart() {
+		if (!currentEditMode) {
+			return null;
+		}
 		MMLTrackView view = (MMLTrackView) tabbedPane.getSelectedComponent();
 		int mmlPartIndex = view.getSelectedMMLPartIndex();
 		MMLTrack track = mmlScore.getTrack(getActiveTrackIndex());

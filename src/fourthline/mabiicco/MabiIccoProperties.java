@@ -53,6 +53,13 @@ public final class MabiIccoProperties {
 	/** マーカー表示の有効/無効 */
 	private static final String ENABLE_VIEW_MARKER = "function.enable_view_marker";
 
+	/** 編集モード. 非編集時はアクティブパートなし, MMLのTextPanel非表示. */
+
+	private static final String ENABLE_EDIT = "function.enable_edit";
+
+	/** 音源境界 */
+	private static final String VIEW_RANGE = "view.pianoRoll.range";
+
 	public static MabiIccoProperties getInstance() {
 		return instance;
 	}
@@ -174,6 +181,26 @@ public final class MabiIccoProperties {
 
 	public void setEnableViewMarker(boolean b) {
 		properties.setProperty(ENABLE_VIEW_MARKER, Boolean.toString(b));
+		save();
+	}
+
+	public boolean getEnableEdit() {
+		String str = properties.getProperty(ENABLE_EDIT, "true");
+		return Boolean.parseBoolean(str);
+	}
+
+	public void setEnableEdit(boolean b) {
+		properties.setProperty(ENABLE_EDIT, Boolean.toString(b));
+		save();
+	}
+
+	public boolean getViewRage() {
+		String str = properties.getProperty(VIEW_RANGE, "true");
+		return Boolean.parseBoolean(str);
+	}
+
+	public void setViewRage(boolean b) {
+		properties.setProperty(VIEW_RANGE, Boolean.toString(b));
 		save();
 	}
 }

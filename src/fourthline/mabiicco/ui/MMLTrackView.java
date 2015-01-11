@@ -59,6 +59,16 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 	private final InstClass noUseSongEx = new InstClass(AppResource.appText("instrument.nouse_chorus"), -1, -1, null);
 	private int trackIndex;
 
+	private JPanel mmlTextPanel = new JPanel();
+
+	public void setVisibleMMLTextPanel(boolean b) {
+		if (b) {
+			add(mmlTextPanel, BorderLayout.CENTER);
+		} else {
+			remove(mmlTextPanel);
+		}
+	}
+
 	/**
 	 * Create the panel.
 	 */
@@ -71,15 +81,13 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 		JPanel northLPanel = new JPanel();
 		northLPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-		JPanel centerPanel = new JPanel();
-		add(centerPanel, BorderLayout.CENTER);
-
 		JPanel northRPanel = new JPanel();
-		add(northRPanel, BorderLayout.SOUTH);
 
 		northPanel.add(northLPanel, BorderLayout.WEST);
 		northPanel.add(northRPanel, BorderLayout.EAST);
 		add(northPanel, BorderLayout.NORTH);
+
+		setVisibleMMLTextPanel(true);
 
 		trackComposeLabel = new JLabel("");
 		northRPanel.add(trackComposeLabel);
@@ -89,7 +97,7 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 		gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
 		gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		centerPanel.setLayout(gridBagLayout);
+		mmlTextPanel.setLayout(gridBagLayout);
 
 		comboBox = new JComboBox<>( MabiDLS.getInstance().getAvailableInstByInstType(EnumSet.of(InstType.NORMAL, InstType.DRUMS, InstType.VOICE)) );
 		songComboBox = new JComboBox<>( MabiDLS.getInstance().getAvailableInstByInstType(EnumSet.of(InstType.CHORUS)) );
@@ -122,7 +130,7 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 			gbc_label.insets = new Insets(0, 0, 5, 5);
 			gbc_label.gridx = 1;
 			gbc_label.gridy = gridy;
-			centerPanel.add(partButton[i], gbc_label);
+			mmlTextPanel.add(partButton[i], gbc_label);
 			bGroup.add(partButton[i]);
 
 			// パートのテキストフィールド
@@ -136,7 +144,7 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 			gbc_mmlText.fill = GridBagConstraints.HORIZONTAL;
 			gbc_mmlText.gridx = 3;
 			gbc_mmlText.gridy = gridy;
-			centerPanel.add(mmlText[i], gbc_mmlText);
+			mmlTextPanel.add(mmlText[i], gbc_mmlText);
 		}
 
 		// 一番上のパートが初期の選択パート.

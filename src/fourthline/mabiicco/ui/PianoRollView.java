@@ -359,7 +359,9 @@ public final class PianoRollView extends JPanel {
 			int line = octave*12 + (11-i);
 			Color fillColor = keyColors[i];
 			if ( (line < lowerNote) || (line > upperNote) ) {
-				fillColor = noSoundColor;
+				if (MabiIccoProperties.getInstance().getViewRage()) {
+					fillColor = noSoundColor;
+				}
 			}
 			g.setColor(fillColor);
 			g.fillRect(0, i*noteHeight+y, width, noteHeight);
@@ -375,12 +377,14 @@ public final class PianoRollView extends JPanel {
 	}
 
 	private void paintPitchRangeBorder(Graphics2D g) {
-		int width = getWidth();
-		int y1 = convertNote2Y(lowerNote-1);
-		int y2 = convertNote2Y(upperNote);
-		g.setColor(pitchRangeBorderColor);
-		g.drawLine(0, y1, width, y1);
-		g.drawLine(0, y2, width, y2);
+		if (MabiIccoProperties.getInstance().getViewRage()) {
+			int width = getWidth();
+			int y1 = convertNote2Y(lowerNote-1);
+			int y2 = convertNote2Y(upperNote);
+			g.setColor(pitchRangeBorderColor);
+			g.drawLine(0, y1, width, y1);
+			g.drawLine(0, y2, width, y2);
+		}
 	}
 
 	public void paintSequenceLine(Graphics2D g, int height) {
@@ -462,16 +466,7 @@ public final class PianoRollView extends JPanel {
 		}
 	}
 
-	private void drawNote(Graphics2D g, MMLNoteEvent noteEvent, Color rectColor, Color fillColor, boolean drawOption, MMLNoteEvent prevNote) {
-		int note = noteEvent.getNote();
-		int tick = noteEvent.getTick();
-		int offset = noteEvent.getTickOffset();
-		int x = convertTicktoX(offset);
-		int y = convertNote2Y(note) +1;
-		int width = convertTicktoX(tick) -1;
-		int height = noteHeight-2;
-		if (width > 1) width--;
-
+	private void drawRect(Graphics2D g, Color rectColor, Color fillColor, int x, int y, int width, int height) {
 		g.setColor(fillColor);
 		if (width != 0) {
 			g.fillRect(x+1, y+1, width, height-1);
@@ -483,6 +478,23 @@ public final class PianoRollView extends JPanel {
 		g.drawLine(x+width+1, y+height-1, x+width+1, y+1);
 		g.drawLine(x+2, y, x+width, y);
 		g.drawLine(x+width, y+height, x+2, y+height);
+	}
+
+	private void drawNote(Graphics2D g, MMLNoteEvent noteEvent, Color rectColor, Color fillColor, boolean drawOption, MMLNoteEvent prevNote) {
+		int note = noteEvent.getNote();
+		int tick = noteEvent.getTick();
+		int offset = noteEvent.getTickOffset();
+		int x = convertTicktoX(offset);
+		int y = convertNote2Y(note) +1;
+		int width = convertTicktoX(tick) -1;
+		int height = noteHeight-2;
+		if (width > 1) width--;
+
+		if (drawOption) {
+			// shadow
+			drawRect(g, Color.GRAY, Color.GRAY, x+2, y+2, width, height);
+		}
+		drawRect(g, rectColor, fillColor, x, y, width, height);
 
 		if (drawOption) {
 			// velocityの描画.

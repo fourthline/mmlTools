@@ -325,6 +325,8 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		createNoteHeightMenu(settingMenu);
 		createCheckMenu(settingMenu, "clickPlayMenu", properties::getEnableClickPlay, properties::setEnableClickPlay);
 		createCheckMenu(settingMenu, "view.marker", properties::getEnableViewMarker, properties::setEnableViewMarker);
+		createCheckMenu(settingMenu, "view.range", properties::getViewRage, properties::setViewRage);
+		createCheckMenu(settingMenu, "edit.enable", properties::getEnableEdit, properties::setEnableEdit);
 
 		JMenuItem clearDLSMenu = createMenuItem(appText("menu.clear_dls"), ActionDispatcher.CLEAR_DLS);
 		settingMenu.add(clearDLSMenu);
