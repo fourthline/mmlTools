@@ -140,10 +140,10 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 
 	private void initializeActionMap() {
 		actionMap.put(VIEW_SCALE_UP, () -> {
-			mmlSeqView.expandPianoViewWide();
+			mmlSeqView.expandPianoViewWide(0);
 		});
 		actionMap.put(VIEW_SCALE_DOWN, () -> {
-			mmlSeqView.reducePianoViewWide();
+			mmlSeqView.reducePianoViewWide(0);
 		});
 		actionMap.put(STOP, () -> {
 			MabiDLS.getInstance().getSequencer().stop();
@@ -322,9 +322,10 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 
 	private File fileOpenDialog() {
 		String recentPath = MabiIccoProperties.getInstance().getRecentFile();
-		openFileChooser.setCurrentDirectory(new File(recentPath));
 		openFileChooser.setFileFilter(allFilter);
 		openFileChooser.setAcceptAllFileFilterUsed(false);
+		openFileChooser.setSelectedFile(null);
+		openFileChooser.setCurrentDirectory(new File(new File(recentPath).getParent()));
 		int status = openFileChooser.showOpenDialog(mainFrame);
 		if (status == JFileChooser.APPROVE_OPTION) {
 			File file = openFileChooser.getSelectedFile();
@@ -349,7 +350,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		if (openedFile != null) {
 			fileChooser.setSelectedFile(openedFile);
 		} else {
-			fileChooser.setCurrentDirectory(new File(recentPath));
+			fileChooser.setSelectedFile(null);
+			fileChooser.setCurrentDirectory(new File(new File(recentPath).getParent()));
 		}
 		fileChooser.setAcceptAllFileFilterUsed(false);
 		int status = fileChooser.showSaveDialog(mainFrame);

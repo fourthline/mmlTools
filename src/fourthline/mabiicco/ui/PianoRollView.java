@@ -100,6 +100,8 @@ public final class PianoRollView extends JPanel {
 	private static final Color barBorder = new Color(0.5f, 0.5f, 0.5f);
 	private static final Color darkBarBorder = new Color(0.3f, 0.2f, 0.3f);
 
+	private static final Color shadowColor = Color.GRAY;
+
 	private static final int DRAW_START_MARGIN = 192;
 
 	public enum PaintMode {
@@ -196,16 +198,9 @@ public final class PianoRollView extends JPanel {
 		if ( (scale > 6.0) || (scale < 0.1) ) {
 			return;
 		}
-
-		// 拡大/縮小したときの表示位置を調整します.
-		Point p = viewport.getViewPosition();
-		p.setLocation(p.getX() * (this.wideScale / scale), p.getY());
-
 		// 拡大/縮小したときの表示幅を調整します.
 		this.wideScale = scale;
 		updateViewWidthTrackLength();
-
-		viewport.setViewPosition(p);
 	}
 
 	/**
@@ -492,7 +487,7 @@ public final class PianoRollView extends JPanel {
 
 		if (drawOption) {
 			// shadow
-			drawRect(g, Color.GRAY, Color.GRAY, x+2, y+2, width, height);
+			drawRect(g, shadowColor, shadowColor, x+2, y+2, width, height);
 		}
 		drawRect(g, rectColor, fillColor, x, y, width, height);
 

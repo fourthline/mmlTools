@@ -429,40 +429,56 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	/**
 	 * ピアノロールビューの表示を1段階拡大します.
 	 */
-	public void expandPianoViewWide() {
+	public void expandPianoViewWide(int xOffset) {
 		if (viewScaleIndex+1 < viewScaleTable.length) {
 			viewScaleIndex++;
 		}
 
+		double scale1 = pianoRollView.getWideScale();
 		pianoRollView.setWideScale(viewScaleTable[viewScaleIndex]);
-		repaint();
+		repositionChangeScaleView(scale1, pianoRollView.getWideScale(), xOffset);
 	}
 
 	/**
 	 * ピアノロールビューの表示を1段階縮小します.
 	 */
-	public void reducePianoViewWide() {
+	public void reducePianoViewWide(int xOffset) {
 		if (viewScaleIndex-1 >= 0) {
 			viewScaleIndex--;
 		}
 
+		double scale1 = pianoRollView.getWideScale();
 		pianoRollView.setWideScale(viewScaleTable[viewScaleIndex]);
-		repaint();
+		repositionChangeScaleView(scale1, pianoRollView.getWideScale(), xOffset);
+	}
+
+	// TODO: 応急措置, 拡大時に表示位置を保持できていない.
+	private void repositionChangeScaleView(double scale1, double scale2, int xOffset) {
+		JViewport viewport = scrollPane.getViewport();
+		Point p = viewport.getViewPosition();
+
+		// 拡大/縮小したときの表示位置を調整します.
+		p.x = (int)((p.x + xOffset) * scale1 / scale2) - xOffset;
+		viewport.updateUI();
+		viewport.setViewPosition(p);
+		if ( (viewport.getViewPosition().x != p.x) || (viewport.getViewPosition().y != p.y)) {
+			viewport.setViewPosition(p);
+		}
 	}
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
+		JViewport viewport = scrollPane.getViewport();
+		Point p = viewport.getViewPosition();
 		int modifiers = e.getModifiers();
 		int rotation = e.getWheelRotation();
 		if (modifiers == InputEvent.CTRL_MASK) {
 			if (rotation < 0) {
-				expandPianoViewWide();
+				expandPianoViewWide( e.getX() - p.x );
 			} else {
-				reducePianoViewWide();
+				reducePianoViewWide( e.getX() - p.x );
 			}
 		} else if (modifiers == InputEvent.SHIFT_MASK) {
-			JViewport viewport = scrollPane.getViewport();
-			Point p = viewport.getViewPosition();
 			p.x += (rotation * 16);
 			if (p.x < 0) {
 				p.x = 0;
