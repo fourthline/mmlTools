@@ -289,6 +289,18 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		trackPropertyMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.ALT_MASK));
 		trackMenu.add(trackPropertyMenu);
 
+		trackMenu.add(new JSeparator());
+
+		JMenuItem mmlImportMenu = createMenuItem(appText("menu.mml_import"), ActionDispatcher.MML_IMPORT);
+		noplayFunctions.add(mmlImportMenu);
+		mmlImportMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK));
+		trackMenu.add(mmlImportMenu);
+
+		JMenuItem mmlExportMenu = createMenuItem(appText("menu.mml_export"), ActionDispatcher.MML_EXPORT);
+		noplayFunctions.add(mmlExportMenu);
+		mmlExportMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK));
+		trackMenu.add(mmlExportMenu);
+
 		/************************* Play Menu *************************/
 		JMenu playMenu = new JMenu(appText("menu.operate"));
 		menuBar.add(playMenu);

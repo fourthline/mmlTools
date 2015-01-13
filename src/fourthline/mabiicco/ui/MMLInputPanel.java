@@ -139,7 +139,7 @@ public final class MMLInputPanel extends JPanel {
 		}
 	}
 
-	private String getClipboardString() {
+	public static String getClipboardString() {
 		Toolkit kit = Toolkit.getDefaultToolkit();
 		Clipboard clip = kit.getSystemClipboard();
 

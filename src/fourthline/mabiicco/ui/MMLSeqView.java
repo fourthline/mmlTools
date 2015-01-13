@@ -385,6 +385,21 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		outputPanel.showDialog();
 	}
 
+	public void mmlImport(Frame parentFrame) {
+		String text = MMLInputPanel.getClipboardString();
+		if (!new MMLTrack().setMML(text).isEmpty()) {
+			getSelectedTrack().setMML(text);
+			resetTrackView();
+			undoEdit.saveState();
+		}
+	}
+
+	public void mmlExport(Frame parentFrame) {
+		int index = getActiveTrackIndex();
+		String text = getMMLScore().getTrack(index).getMabiMML();
+		MMLOutputPanel.copyToClipboard(parentFrame, text);
+	}
+
 	private void updateSelectedTrackAndMMLPart() {
 		MMLTrackView view = (MMLTrackView) tabbedPane.getSelectedComponent();
 		if (view != null) {

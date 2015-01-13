@@ -19,7 +19,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 
-public class ColorPicker implements ColorSelectionModel {
+public final class ColorPicker implements ColorSelectionModel {
 	private JColorChooser chooser;
 	private PreviewPane pane;
 	private ArrayList<ChangeListener> listener = new ArrayList<>();

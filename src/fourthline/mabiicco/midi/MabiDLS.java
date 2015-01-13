@@ -215,6 +215,7 @@ public final class MabiDLS {
 			midiChannel.programChange(0, program);
 		}
 	}
+
 	/**
 	 * 指定したチャンネルのパンポットを設定します.
 	 * @param ch_num

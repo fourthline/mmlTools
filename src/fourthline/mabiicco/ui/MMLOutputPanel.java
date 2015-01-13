@@ -32,16 +32,19 @@ public final class MMLOutputPanel extends JPanel {
 	private static final long serialVersionUID = 8558159209741558854L;
 	private TrackListTable table;
 	private final JDialog dialog;
+	private final Frame parentFrame;
 
 	private List<MMLTrack> trackList;
 
 	public MMLOutputPanel(Frame parentFrame) {
 		this.dialog = null;
+		this.parentFrame = parentFrame;
 		initializePanel(null);
 	}
 
 	public MMLOutputPanel(Frame parentFrame, List<MMLTrack> trackList) {
 		this.dialog = new JDialog(parentFrame, AppResource.appText("mml.output"), true);
+		this.parentFrame = parentFrame;
 		initializePanel(trackList);
 	}
 
@@ -56,7 +59,7 @@ public final class MMLOutputPanel extends JPanel {
 		copyButton.setMargin(new Insets(5, 10, 5, 10));
 		buttonPanel.add(copyButton);
 		copyButton.addActionListener((event) -> {
-			currentSelectedPartMMLOutput();
+			currentSelectedTrackMMLOutput();
 		});
 
 		JButton closeButton = new JButton(AppResource.appText("mml.output.closeButton"));
@@ -89,17 +92,17 @@ public final class MMLOutputPanel extends JPanel {
 		add(p, BorderLayout.CENTER);
 	}
 
-	private void copyToClipboard(String text) {
+	public static void copyToClipboard(Frame parent, String text) {
 		Toolkit kit = Toolkit.getDefaultToolkit();
 		Clipboard clip = kit.getSystemClipboard();
 		clip.setContents(new StringSelection(text), null);
+		JOptionPane.showMessageDialog(parent, AppResource.appText("mml.output.done"));
 	}
 
-	private void currentSelectedPartMMLOutput() {
+	private void currentSelectedTrackMMLOutput() {
 		int row = table.getSelectedRow();
 		String mmlText = trackList.get(row).getMabiMML();
-		copyToClipboard(mmlText);
-		JOptionPane.showMessageDialog(this, AppResource.appText("mml.output.done"));
+		copyToClipboard(parentFrame, mmlText);
 
 		row++;
 		if (row >= trackList.size()) {
