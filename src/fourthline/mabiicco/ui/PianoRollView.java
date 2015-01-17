@@ -407,14 +407,17 @@ public final class PianoRollView extends JPanel {
 		}
 	}
 
+	/**
+	 * 補助線の描画.
+	 */
+	private static final float dash[] = { 2.0f, 4.0f };
+	private static final BasicStroke dashStroke = new BasicStroke(1.0f, 
+			BasicStroke.CAP_BUTT, 
+			BasicStroke.JOIN_MITER, 
+			10.0f, 
+			dash, 
+			0.0f);
 	private void paintHalfMeasure(Graphics2D g, int offset, int w) {
-		final float dash[] = { 2.0f, 4.0f };
-		final BasicStroke dashStroke = new BasicStroke(1.0f, 
-				BasicStroke.CAP_BUTT, 
-				BasicStroke.JOIN_MITER, 
-				10.0f, 
-				dash, 
-				0.0f);
 		int y = convertNote2Y(-1);
 		Stroke oldStroke = g.getStroke();
 		g.setStroke(dashStroke);

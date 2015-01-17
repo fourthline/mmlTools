@@ -329,7 +329,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		openFileChooser.setFileFilter(allFilter);
 		openFileChooser.setAcceptAllFileFilterUsed(false);
 		openFileChooser.setSelectedFile(null);
-		openFileChooser.setCurrentDirectory(new File(new File(recentPath).getParent()));
+		openFileChooser.setCurrentDirectory(new File(recentPath).getParentFile());
 		int status = openFileChooser.showOpenDialog(mainFrame);
 		if (status == JFileChooser.APPROVE_OPTION) {
 			File file = openFileChooser.getSelectedFile();

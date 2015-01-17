@@ -96,7 +96,7 @@ public final class MMLOutputPanel extends JPanel {
 		Toolkit kit = Toolkit.getDefaultToolkit();
 		Clipboard clip = kit.getSystemClipboard();
 		clip.setContents(new StringSelection(text), null);
-		JOptionPane.showMessageDialog(parent, AppResource.appText("mml.output.done"));
+		JOptionPane.showMessageDialog(parent, AppResource.appText("mml.output.done"), AppResource.getAppTitle(), JOptionPane.PLAIN_MESSAGE);
 	}
 
 	private void currentSelectedTrackMMLOutput() {

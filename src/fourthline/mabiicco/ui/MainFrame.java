@@ -37,6 +37,7 @@ import java.util.Collections;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
@@ -95,6 +96,7 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		setJMenuBar(createMenuBar());
 
 		contentPane = new JPanel();
+		initKeyAction();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(new BorderLayout(0, 0));
@@ -165,7 +167,6 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 
 		/************************* File Menu *************************/
 		JMenu fileMenu = new JMenu(appText("menu.file"));
-		fileMenu.setMnemonic('F');
 		menuBar.add(fileMenu);
 
 		JMenuItem newFileMenuItem = createMenuItem(appText("menu.newFile"), ActionDispatcher.NEW_FILE, appText("menu.newFile.icon"));
@@ -209,7 +210,6 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 
 		/************************* Edit Menu *************************/
 		JMenu editMenu = new JMenu(appText("menu.edit"));
-		fileMenu.setMnemonic('E');
 		menuBar.add(editMenu);
 
 		undoMenu = createMenuItem(appText("menu.undo"), ActionDispatcher.UNDO);
@@ -298,7 +298,6 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		trackMenu.add(mmlImportMenu);
 
 		JMenuItem mmlExportMenu = createMenuItem(appText("menu.mml_export"), ActionDispatcher.MML_EXPORT);
-		noplayFunctions.add(mmlExportMenu);
 		mmlExportMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK));
 		trackMenu.add(mmlExportMenu);
 
@@ -579,8 +578,7 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) 
-	{
+	public void actionPerformed(ActionEvent e) {
 		Object source = e.getSource();
 
 		if (source.equals(noteTypeSelect)) {
@@ -632,5 +630,38 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 
 	public void setPasteEnable(boolean b) {
 		pasteMenu.setEnabled(b);
+	}
+
+	private void initKeyAction() {
+		createKeyAction("select_paintMode.activePart",
+				KeyStroke.getKeyStroke(KeyEvent.VK_F10, 0),
+				() -> paintModeSelect.setSelectedItem(PaintMode.ACTIVE_PART));
+		createKeyAction("select_paintMode.activeTrack",
+				KeyStroke.getKeyStroke(KeyEvent.VK_F11, 0),
+				() -> paintModeSelect.setSelectedItem(PaintMode.ACTIVE_TRACK));
+		createKeyAction("select_paintMode.allTrack",
+				KeyStroke.getKeyStroke(KeyEvent.VK_F12, 0),
+				() -> paintModeSelect.setSelectedItem(PaintMode.ALL_TRACK));
+	}
+
+	private void createKeyAction(String name, KeyStroke stroke, Runnable func) {
+		new KeyAction(name, stroke, contentPane, func);
+	}
+
+	private final class KeyAction extends AbstractAction {
+		private static final long serialVersionUID = -5439131294063926971L;
+		private Runnable function;
+		private KeyAction() {}
+		private KeyAction(String name, KeyStroke stroke, JComponent rootPane, Runnable func) {
+			this.function = func;
+			rootPane.getInputMap().put(stroke, name);
+			rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(stroke, name);
+			rootPane.getActionMap().put(name, this);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			this.function.run();
+		}
 	}
 }
