@@ -38,6 +38,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import javax.swing.ButtonGroup;
+import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -394,11 +395,15 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 
 	private JButton createToolButton(String title, String iconName, String command) {
 		JButton button = new JButton("");
-		if (iconName == null) {
+		Icon icon = null;
+		if (iconName != null) {
+			icon = AppResource.getImageIcon(appText(iconName));
+		}
+		if (icon == null) {
 			button.setText(appText(title));
 		} else {
 			button.setToolTipText(appText(title));
-			button.setIcon(AppResource.getImageIcon(appText(iconName)));
+			button.setIcon(icon);
 		}
 		button.setFocusable(false);
 		button.addActionListener(listener);
@@ -450,10 +455,10 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		toolBar.add(newToolBarSeparator());
 
 		// ビューの拡大/縮小ツールボタン
-		JButton expandButton = createToolButton("view.scale.up", null, ActionDispatcher.VIEW_SCALE_UP);
+		JButton expandButton = createToolButton("view.scale.up", "view.scale.up.icon", ActionDispatcher.VIEW_SCALE_UP);
 		toolBar.add(expandButton);
 
-		JButton reduceButton = createToolButton("view.scale.down", null, ActionDispatcher.VIEW_SCALE_DOWN);
+		JButton reduceButton = createToolButton("view.scale.down", "view.scale.down.icon", ActionDispatcher.VIEW_SCALE_DOWN);
 		toolBar.add(reduceButton);
 
 		// 編集ノートタイプ

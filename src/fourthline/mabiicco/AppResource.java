@@ -6,6 +6,7 @@ package fourthline.mabiicco;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 import java.util.jar.Manifest;
@@ -66,8 +67,13 @@ public final class AppResource {
 	public static ImageIcon getImageIcon(String path) {
 		ImageIcon icon = iconMap.get(path);
 		if (icon == null) {
-			icon = new ImageIcon(AppResource.class.getResource(path));
-			iconMap.put(path, icon);
+			URL url = AppResource.class.getResource(path);
+			if (url == null) {
+				System.err.println("not found icon: " + path + " > " + url);
+			} else {
+				icon = new ImageIcon(url);
+				iconMap.put(path, icon);
+			}
 		}
 
 		return icon;

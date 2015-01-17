@@ -474,6 +474,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 
 		// 拡大/縮小したときの表示位置を調整します.
 		p.x = (int)((p.x + xOffset) * scale1 / scale2) - xOffset;
+		repaint();
 		viewport.updateUI();
 		viewport.setViewPosition(p);
 		if ( (viewport.getViewPosition().x != p.x) || (viewport.getViewPosition().y != p.y)) {
