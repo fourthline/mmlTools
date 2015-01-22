@@ -126,6 +126,7 @@ public final class ColorPalette {
 	public Color getActiveRectColor() {
 		return getColor( rectColorTable, ColorPattern.ACTIVE );
 	}
+
 	public Color getActiveFillColor() {
 		return getColor( fillColorTable, ColorPattern.ACTIVE );
 	}
@@ -133,9 +134,11 @@ public final class ColorPalette {
 	public Color getPartRectColor(int part) {
 		return getColor( rectColorTable, getColorType(part) );
 	}
+
 	public Color getPartFillColor(int part) {
 		return getColor( fillColorTable, getColorType(part) );
 	}
+
 	public Color getUnusedFillColor() {
 		return getColor( fillColorTable, ColorPattern.UNUSED );
 	}

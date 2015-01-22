@@ -18,7 +18,7 @@ import fourthline.mmlTools.UndefinedTickException;
  * MML解析
  * @author たんらる
  */
-public class MelodyParser {
+public final class MelodyParser {
 	private String mml_src;
 	private String mml_L;
 	private int mml_length = -1; // for tick
@@ -34,7 +34,7 @@ public class MelodyParser {
 	private int minNote = -1;
 	private int maxNote = -1;
 
-	protected int noteNumber = -1;
+	private int noteNumber = -1;
 	private String gt;
 
 	public MelodyParser(String mml) {

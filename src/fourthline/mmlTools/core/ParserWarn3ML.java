@@ -16,5 +16,3 @@ public final class ParserWarn3ML extends Exception {
 		super("ParserWarn3ML - ");
 	}
 }
-
-

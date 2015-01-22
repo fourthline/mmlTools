@@ -7,7 +7,6 @@ package fourthline.mmlTools.parser;
 import java.util.function.Consumer;
 
 public final class TextParser {
-
 	private String text;
 	private TextParser() {}
 

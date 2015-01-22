@@ -75,11 +75,8 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-
 		Graphics2D g2 = (Graphics2D)g.create();
-		/**
-		 * メジャーを表示します。
-		 */
+
 		paintRuler(g2);
 		paintMarker(g2);
 		paintTempoEvents(g2);
@@ -212,12 +209,10 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 	}
 
 	@Override
-	public void mouseEntered(MouseEvent e) {
-	}
+	public void mouseEntered(MouseEvent e) {}
 
 	@Override
-	public void mouseExited(MouseEvent e) {
-	}
+	public void mouseExited(MouseEvent e) {}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
@@ -245,6 +240,5 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 	}
 
 	@Override
-	public void mouseMoved(MouseEvent e) {
-	}
+	public void mouseMoved(MouseEvent e) {}
 }

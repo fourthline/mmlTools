@@ -33,14 +33,14 @@ import fourthline.mmlTools.MMLTrack;
 
 public final class MMLInputPanel extends JPanel {
 	private static final long serialVersionUID = -2517820687250637949L;
-	private JTextField textField;
-	private JComboBox<InstClass> comboBox;
+	private final JTextField textField;
+	private final JComboBox<InstClass> comboBox;
 
-	JRadioButton overrideButton;
-	JRadioButton newTrackButton;
+	private final JRadioButton overrideButton;
+	private final JRadioButton newTrackButton;
 
-	MMLSeqView parent;
-	MMLTrack track;
+	private final MMLSeqView parent;
+	private MMLTrack track;
 
 	public MMLInputPanel() {
 		this(null);

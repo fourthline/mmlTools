@@ -41,8 +41,7 @@ public final class MabiDLS {
 		return instance;
 	}
 
-	private MabiDLS() {
-	}
+	private MabiDLS() {}
 
 	/**
 	 * initialize
@@ -57,7 +56,7 @@ public final class MabiDLS {
 
 		this.sequencer = MidiSystem.getSequencer();
 		this.sequencer.open();
-		this.sequencer.addMetaEventListener((meta) -> {
+		this.sequencer.addMetaEventListener(meta -> {
 			int type = meta.getType();
 			if (type == MMLTempoEvent.META) {
 				// テンポイベントを処理します.
@@ -65,9 +64,7 @@ public final class MabiDLS {
 				sequencer.setTempoInMPQ(ByteBuffer.wrap(metaData).getInt());
 			} else if (type == 0x2f) {
 				// トラック終端
-				for (INotifyTrackEnd n : notifier) {
-					n.trackEndNotify();
-				}
+				notifier.forEach(t -> t.trackEndNotify());
 			}
 		});
 

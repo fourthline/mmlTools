@@ -19,27 +19,26 @@ import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.SwingUtilities;
 
 import fourthline.mabiicco.midi.InstType;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.preloader.MabiIccoPreloaderNotification;
 import fourthline.mabiicco.ui.MainFrame;
+
 import javafx.application.Application;
 import javafx.application.Preloader;
 import javafx.stage.Stage;
 
-import javax.swing.SwingUtilities;
 
 public final class MabiIcco extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {
 		notifyPreloader(new MabiIccoPreloaderNotification(AppResource.appText("init.midi"), 10));
-		SwingUtilities.invokeLater(() -> {
-			initialize();
-		});
+		SwingUtilities.invokeLater(this::initialize);
 	}
 
-	public void initialize() {
+	private void initialize() {
 		try {
 			UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
 

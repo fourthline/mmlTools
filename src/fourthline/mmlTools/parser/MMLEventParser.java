@@ -15,12 +15,13 @@ import fourthline.mmlTools.core.MelodyParser;
 import fourthline.mmlTools.core.ParserWarn3ML;
 import fourthline.mmlTools.core.TuningBase;
 
-public final class MMLEventParser extends MelodyParser implements Iterator<MMLEvent> {
+public final class MMLEventParser implements Iterator<MMLEvent> {
 	private final MMLTokenizer tokenizer;
+	private final MelodyParser parser;
 
 	public MMLEventParser(String mml) {
-		super(mml);
 		tokenizer = new MMLTokenizer(mml);
+		parser = new MelodyParser(mml);
 	}
 
 	public static int firstNoteNumber(String mml) {
@@ -78,19 +79,19 @@ public final class MMLEventParser extends MelodyParser implements Iterator<MMLEv
 				return nextItem;
 			}
 			try {
-				int tick = this.noteGT(token);
+				int tick = parser.noteGT(token);
 				if (MMLTokenizer.isNote(firstC)) {
 					/* tie でかつ、同じノートであれば、前のNoteEventにTickを加算する */
-					if ( (hasTie) && (prevNoteEvent != null) && (prevNoteEvent.getNote() == this.noteNumber)) {
+					if ( (hasTie) && (prevNoteEvent != null) && (prevNoteEvent.getNote() == parser.getNoteNumber())) {
 						int prevTick = prevNoteEvent.getTick();
 						if ( (prevTick == tick) && (TuningBase.getInstance(tick) != null) ) {
 							prevNoteEvent.setTuningNote(TuningBase.getInstance(tick));
 						}
 						prevNoteEvent.setTick( prevTick + tick);
 						prevNoteEvent.getIndexOfMMLString()[1] = tokenizer.getIndex()[1];
-					} else if (this.noteNumber >= 0) {
+					} else if (parser.getNoteNumber() >= 0) {
 						nextItem = prevNoteEvent;
-						prevNoteEvent = new MMLNoteEvent(this.noteNumber, tick, totalTick, volumn);
+						prevNoteEvent = new MMLNoteEvent(parser.getNoteNumber(), tick, totalTick, volumn);
 						prevNoteEvent.setIndexOfMMLString(tokenizer.getIndex());
 					}
 
@@ -113,8 +114,6 @@ public final class MMLEventParser extends MelodyParser implements Iterator<MMLEv
 
 		return nextItem;
 	}
-
-
 
 	@Override
 	public boolean hasNext() {

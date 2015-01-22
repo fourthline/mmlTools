@@ -20,9 +20,9 @@ import javax.swing.event.ChangeListener;
 
 
 public final class ColorPicker implements ColorSelectionModel {
-	private JColorChooser chooser;
-	private PreviewPane pane;
-	private ArrayList<ChangeListener> listener = new ArrayList<>();
+	private final JColorChooser chooser;
+	private final PreviewPane pane;
+	private final ArrayList<ChangeListener> listener = new ArrayList<>();
 
 	private ColorPicker() {
 		pane = new PreviewPane(this);

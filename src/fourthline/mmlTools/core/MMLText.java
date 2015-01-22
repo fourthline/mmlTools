@@ -11,8 +11,7 @@ import fourthline.mmlTools.ComposeRank;
  * MML基本ツール.
  * {@code MML@aaa,bbb,ccc;} 形式を扱います。
  */
-public class MMLText {
-
+public final class MMLText {
 	private static int DEFAULT_PART_NUM = 4;
 	private String text[];
 

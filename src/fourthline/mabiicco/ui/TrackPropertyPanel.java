@@ -24,7 +24,7 @@ public final class TrackPropertyPanel extends JPanel {
 	private JSlider panpotSlider;
 	private final IMMLManager mmlManager;
 
-	MMLTrack track;
+	private final MMLTrack track;
 
 	/**
 	 * Create the dialog.
