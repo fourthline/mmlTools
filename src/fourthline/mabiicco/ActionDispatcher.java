@@ -354,7 +354,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			fileChooser.setSelectedFile(openedFile);
 		} else {
 			fileChooser.setSelectedFile(null);
-			fileChooser.setCurrentDirectory(new File(new File(recentPath).getParent()));
+			fileChooser.setCurrentDirectory(new File(recentPath).getParentFile());
 		}
 		fileChooser.setAcceptAllFileFilterUsed(false);
 		int status = fileChooser.showSaveDialog(mainFrame);
