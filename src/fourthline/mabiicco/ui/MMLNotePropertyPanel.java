@@ -155,7 +155,7 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 		}
 		enableTuningEdit = true;
 		for (MMLNoteEvent note : noteEvent) {
-			if (Objects.equals(first, note.getTuningBase())) {
+			if (!Objects.equals(first, note.getTuningBase())) {
 				enableTuningEdit = false;
 				break;
 			}
