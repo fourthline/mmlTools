@@ -272,7 +272,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			if (fileState.isModified()) {
 				int status = JOptionPane.showConfirmDialog(mainFrame, 
 						AppResource.appText("message.throw"), 
-						"", 
+						AppResource.getAppTitle(), 
 						JOptionPane.YES_NO_OPTION, 
 						JOptionPane.QUESTION_MESSAGE);
 				if (status == JOptionPane.YES_OPTION) {
@@ -367,7 +367,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			status = JOptionPane.YES_OPTION;
 			if (file.exists()) {
 				// すでにファイルが存在する場合の上書き警告表示.
-				status = JOptionPane.showConfirmDialog(mainFrame, AppResource.appText("message.override"), "", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+				status = JOptionPane.showConfirmDialog(mainFrame, AppResource.appText("message.override"), AppResource.getAppTitle(), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 			}
 			if (status == JOptionPane.YES_OPTION) {
 				return file;

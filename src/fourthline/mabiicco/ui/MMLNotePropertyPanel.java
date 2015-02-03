@@ -214,12 +214,13 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 		// 音量入力欄
 		velocityValueField.setEnabled( (velocityCommand && !onlySelect) || (!incrDecrValue && (velocityCommand || onlySelect)) );
 
-		// 増減入力チェックBox		
+		// 増減入力チェックBox
 		incDecrVelocityEditOption.setEnabled( onlySelect );
 
 		// 増減入力欄
 		velocityValueField2.setEnabled( onlySelect && incrDecrValue );
 
+		// 調律チェックBox
 		tuningNoteCheckBox.setEnabled(enableTuningEdit);
 		tuningBaseList.setEnabled( (enableTuningEdit && tuningNoteCheckBox.isSelected()) );
 	}
