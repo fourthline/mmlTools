@@ -65,15 +65,18 @@ public final class KeyboardView extends JPanel {
 	 */
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
+		int height = pianoRollView.getTotalHeight()-1;
 
 		Graphics2D g2 = (Graphics2D)g.create();
+		g2.setColor(Color.WHITE);
+		g2.fillRect(0, 0, width, height);
+
 		for (int i = 0; i < PianoRollView.OCTNUM; i++) {
 			paintOctPianoLine(g2, i, (char)('0'+PianoRollView.OCTNUM-i-1));
 		}
 
 		g2.setColor(Color.BLUE);
-		g2.drawLine(width-1, 0, width-1, pianoRollView.getTotalHeight()-1);
-
+		g2.drawLine(width-1, 0, width-1, height);
 		paintPlayNote(g2);
 
 		g2.dispose();

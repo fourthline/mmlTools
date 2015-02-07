@@ -31,9 +31,7 @@ import fourthline.mabiicco.ui.editor.MMLTranspose;
 import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.UndefinedTickException;
 import fourthline.mmlTools.parser.IMMLFileParser;
-import fourthline.mmlTools.parser.MMLFile;
 import fourthline.mmlTools.parser.MMLParseException;
-import fourthline.mmlTools.parser.MMSFile;
 
 public final class ActionDispatcher implements ActionListener, IFileStateObserver, IEditStateObserver {
 	private MainFrame mainFrame;
@@ -223,14 +221,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	private MMLScore fileParse(File file) {
 		MMLScore score = null;
 		try {
-			IMMLFileParser fileParser;
-			if (file.toString().endsWith(".mms")) {
-				fileParser = new MMSFile();
-			} else if (file.toString().endsWith(".mml")) {
-				fileParser = new MMLFile();
-			} else {
-				fileParser = new MMLScore();
-			}
+			IMMLFileParser fileParser = IMMLFileParser.getParser(file);
 			score = fileParser.parse(new FileInputStream(file));
 		} catch (FileNotFoundException e) {
 			JOptionPane.showMessageDialog(mainFrame, 
