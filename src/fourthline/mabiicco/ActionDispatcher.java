@@ -23,11 +23,11 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.About;
-import fourthline.mabiicco.ui.MMLImportPanel;
-import fourthline.mabiicco.ui.MMLScorePropertyPanel;
 import fourthline.mabiicco.ui.MMLSeqView;
 import fourthline.mabiicco.ui.MainFrame;
 import fourthline.mabiicco.ui.editor.MMLTranspose;
+import fourthline.mabiicco.ui.mml.MMLImportPanel;
+import fourthline.mabiicco.ui.mml.MMLScorePropertyPanel;
 import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.UndefinedTickException;
 import fourthline.mmlTools.parser.IMMLFileParser;
@@ -244,7 +244,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 
 	private void openMMLFile(File file) {
 		MMLScore score = fileParse(file);
-		if (score != null) {
+		if ( (score != null) && (score.getTrackCount() > 0) ) {
 			mmlSeqView.setMMLScore(score);
 
 			openedFile = file;

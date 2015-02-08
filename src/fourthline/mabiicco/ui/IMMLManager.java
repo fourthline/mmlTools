@@ -6,6 +6,7 @@ package fourthline.mabiicco.ui;
 
 import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLScore;
+import fourthline.mmlTools.MMLTrack;
 
 /**
  *
@@ -18,4 +19,6 @@ public interface IMMLManager {
 	public void updateActiveTrackProgram(int trackIndex, int program, int songProgram);
 	public int getActivePartProgram();
 	public boolean selectTrackOnExistNote(int note, int tickOffset);
+	public void setMMLselectedTrack(MMLTrack track);
+	public void addMMLTrack(MMLTrack track);
 }

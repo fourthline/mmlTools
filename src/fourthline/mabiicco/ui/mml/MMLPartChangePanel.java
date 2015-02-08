@@ -2,7 +2,7 @@
  * Copyright (C) 2014-2015 たんらる
  */
 
-package fourthline.mabiicco.ui;
+package fourthline.mabiicco.ui.mml;
 
 import java.awt.Dimension;
 import java.awt.Frame;
@@ -25,6 +25,8 @@ import javax.swing.KeyStroke;
 import javax.swing.JScrollPane;
 
 import fourthline.mabiicco.AppResource;
+import fourthline.mabiicco.ui.IMMLManager;
+import fourthline.mabiicco.ui.MMLTrackView;
 import fourthline.mabiicco.ui.editor.MMLEditor;
 import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLTrack;

@@ -1,9 +1,8 @@
 /*
- * Copyright (C) 2013-2014 たんらる
+ * Copyright (C) 2013-2015 たんらる
  */
 
-package fourthline.mabiicco.ui;
-
+package fourthline.mabiicco.ui.mml;
 
 import java.awt.Dimension;
 import java.awt.Frame;
@@ -15,6 +14,7 @@ import javax.swing.JTextField;
 import javax.swing.JSlider;
 
 import fourthline.mabiicco.AppResource;
+import fourthline.mabiicco.ui.IMMLManager;
 import fourthline.mmlTools.MMLTrack;
 
 
@@ -59,6 +59,16 @@ public final class TrackPropertyPanel extends JPanel {
 		panpotSlider.setMaximum(128);
 		panpotSlider.setBounds(100, 97, 200, 23);
 		add(panpotSlider);
+
+		JLabel panpotL = new JLabel("L64");
+		panpotL.setBounds(100, 120, 30, 23);
+		add(panpotL);
+		JLabel panpotC = new JLabel("0");
+		panpotC.setBounds(197, 120, 30, 23);
+		add(panpotC);
+		JLabel panpotR = new JLabel("R64");
+		panpotR.setBounds(282, 120, 30, 23);
+		add(panpotR);
 
 		JLabel label = new JLabel(AppResource.appText("track_property.panpot"));
 		label.setBounds(30, 97, 70, 13);

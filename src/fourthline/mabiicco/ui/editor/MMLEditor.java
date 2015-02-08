@@ -25,7 +25,6 @@ import fourthline.mabiicco.IEditStateObserver;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.IMMLManager;
 import fourthline.mabiicco.ui.KeyboardView;
-import fourthline.mabiicco.ui.MMLNotePropertyPanel;
 import fourthline.mabiicco.ui.PianoRollView;
 import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLNoteEvent;

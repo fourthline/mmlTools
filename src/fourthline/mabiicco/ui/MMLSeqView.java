@@ -23,6 +23,10 @@ import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.PianoRollView.PaintMode;
 import fourthline.mabiicco.ui.editor.MMLEditor;
 import fourthline.mabiicco.ui.editor.MMLScoreUndoEdit;
+import fourthline.mabiicco.ui.mml.MMLInputPanel;
+import fourthline.mabiicco.ui.mml.MMLOutputPanel;
+import fourthline.mabiicco.ui.mml.MMLPartChangePanel;
+import fourthline.mabiicco.ui.mml.TrackPropertyPanel;
 import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLNoteEvent;
 import fourthline.mmlTools.MMLScore;
@@ -158,6 +162,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	/**
 	 * トラックの追加。作成したトラックを選択状態にします。
 	 */
+	@Override
 	public void addMMLTrack(MMLTrack newTrack) {
 		if (newTrack == null) {
 			newTrack = new MMLTrack();
@@ -278,6 +283,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	/**
 	 * 現在のトラックにMMLを設定する。
 	 */
+	@Override
 	public void setMMLselectedTrack(MMLTrack mml) {
 		if (mmlScore.getTrackCount() == 1) {
 			mmlScore.getTempoEventList().clear();

@@ -2,7 +2,7 @@
  * Copyright (C) 2013-2014 たんらる
  */
 
-package fourthline.mabiicco.ui;
+package fourthline.mabiicco.ui.mml;
 
 import java.awt.Dimension;
 import java.awt.Frame;
@@ -29,6 +29,7 @@ import fourthline.mabiicco.AppResource;
 import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.InstType;
 import fourthline.mabiicco.midi.MabiDLS;
+import fourthline.mabiicco.ui.IMMLManager;
 import fourthline.mmlTools.MMLTrack;
 
 public final class MMLInputPanel extends JPanel {
@@ -39,7 +40,7 @@ public final class MMLInputPanel extends JPanel {
 	private final JRadioButton overrideButton;
 	private final JRadioButton newTrackButton;
 
-	private final MMLSeqView parent;
+	private final IMMLManager mmlManager;
 	private MMLTrack track;
 
 	public MMLInputPanel() {
@@ -47,10 +48,10 @@ public final class MMLInputPanel extends JPanel {
 	}
 
 	/**
-	 * @param parent
+	 * @param mmlManager
 	 */
-	public MMLInputPanel(MMLSeqView parent) {
-		this.parent = parent;
+	public MMLInputPanel(IMMLManager mmlManager) {
+		this.mmlManager = mmlManager;
 
 		setLayout(null);
 
@@ -133,9 +134,9 @@ public final class MMLInputPanel extends JPanel {
 		track.setTrackName(textField.getText());
 
 		if (overrideButton.isSelected()) {
-			parent.setMMLselectedTrack(track);
+			mmlManager.setMMLselectedTrack(track);
 		} else {
-			parent.addMMLTrack(track);
+			mmlManager.addMMLTrack(track);
 		}
 	}
 

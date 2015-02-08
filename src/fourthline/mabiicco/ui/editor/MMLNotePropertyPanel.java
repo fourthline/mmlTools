@@ -2,7 +2,7 @@
  * Copyright (C) 2013-2015 たんらる
  */
 
-package fourthline.mabiicco.ui;
+package fourthline.mabiicco.ui.editor;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;

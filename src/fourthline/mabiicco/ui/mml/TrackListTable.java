@@ -2,7 +2,7 @@
  * Copyright (C) 2014 たんらる
  */
 
-package fourthline.mabiicco.ui;
+package fourthline.mabiicco.ui.mml;
 
 import java.util.ArrayList;
 import java.util.List;
