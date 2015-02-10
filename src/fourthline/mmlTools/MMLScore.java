@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -274,6 +275,22 @@ public final class MMLScore implements IMMLFileParser {
 		return noteListArray;
 	}
 
+	/**
+	 * generateした結果が同じであれば, generateした状態のMMLScoreにする.
+	 * @return
+	 */
+	public MMLScore toGeneratedScore() {
+		try {
+			MMLScore score = new MMLScore();
+			score.putObjectState( this.getObjectState() );
+			score.generateAll();
+			if ( Arrays.equals(this.getObjectState(), score.getObjectState()) ) {
+				return score;
+			}
+		} catch (UndefinedTickException e) {}
+		return this;
+	}
+
 	@Override
 	public MMLScore parse(InputStream istream) throws MMLParseException {
 		this.globalTempoList.clear();
@@ -289,11 +306,6 @@ public final class MMLScore implements IMMLFileParser {
 			} else if (section.getName().equals("[marker]")) {
 				parseMarker(section.getContents());
 			}
-		}
-		try {
-			generateAll();
-		} catch (UndefinedTickException e) {
-			throw new MMLParseException(e.getMessage());
 		}
 		return this;
 	}

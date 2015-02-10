@@ -29,7 +29,6 @@ import fourthline.mabiicco.ui.editor.MMLTranspose;
 import fourthline.mabiicco.ui.mml.MMLImportPanel;
 import fourthline.mabiicco.ui.mml.MMLScorePropertyPanel;
 import fourthline.mmlTools.MMLScore;
-import fourthline.mmlTools.UndefinedTickException;
 import fourthline.mmlTools.parser.IMMLFileParser;
 import fourthline.mmlTools.parser.MMLParseException;
 
@@ -233,7 +232,9 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 					AppResource.appText("error.read"), 
 					AppResource.appText("error.invalid_file"), JOptionPane.WARNING_MESSAGE);
 		}
-		return score;
+
+		// mabiicco由来のファイルであれば, generateされたものにする.
+		return score.toGeneratedScore();
 	}
 
 	public void checkAndOpenMMLFile(File file) {
@@ -279,16 +280,13 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	 */
 	private boolean saveMMLFile(File file) {
 		try {
-			// generateできないデータは保存させない.
-			mmlSeqView.getMMLScore().generateAll();
-			mmlSeqView.updateActivePart(false);
 			FileOutputStream outputStream = new FileOutputStream(file);
 			mmlSeqView.getMMLScore().writeToOutputStream(outputStream);
 			mainFrame.setTitleAndFileName(file.getName());
 			fileState.setOriginalBase();
 			notifyUpdateFileState();
 			MabiIccoProperties.getInstance().setRecentFile(file.getPath());
-		} catch (UndefinedTickException | IOException e) {
+		} catch (IOException e) {
 			return false;
 		}
 		return true;

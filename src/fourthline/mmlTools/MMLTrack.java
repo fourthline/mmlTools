@@ -34,9 +34,9 @@ public final class MMLTrack implements Serializable {
 	// コーラスオプション (楽器＋歌）
 	private int songProgram = -1;  // コーラスを使用しない.
 
-
 	public MMLTrack() {
 		mmlParse();
+		generated = true;
 	}
 
 	public MMLTrack setMML(String mml) {

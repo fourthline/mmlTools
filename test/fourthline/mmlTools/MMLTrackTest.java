@@ -178,4 +178,18 @@ public class MMLTrackTest {
 		assertFalse( track1.equals(track8) );
 		assertTrue( track8.equals(track9) );
 	}
+
+	@Test
+	public void test_generate0() {
+		MMLTrack track = new MMLTrack();
+		System.out.println(track.mmlRankFormat());
+		assertEquals('R', track.mmlRankFormat().charAt(0)); // generated mml
+	}
+
+	@Test
+	public void test_generate1() {
+		MMLTrack track = new MMLTrack().setMML("MML@a4a4a4a4");
+		System.out.println(track.mmlRankFormat());
+		assertEquals('*', track.mmlRankFormat().charAt(0)); // not generated mml
+	}
 }
