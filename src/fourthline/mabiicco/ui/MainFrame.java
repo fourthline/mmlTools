@@ -23,7 +23,6 @@ import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mabiicco.midi.INotifyTrackEnd;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.PianoRollView.PaintMode;
-import fourthline.mabiicco.ui.editor.MMLEditor;
 import fourthline.mabiicco.ui.editor.NoteAlign;
 
 import java.awt.event.ActionListener;
@@ -63,7 +62,7 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 	private final JPanel contentPane;
 	private final JTextField statusField;
 	private final MMLSeqView mmlSeqView;
-	private final JComboBox<NoteAlign> noteTypeSelect = new JComboBox<>(MMLEditor.createAlignList());
+	private final JComboBox<NoteAlign> noteTypeSelect = new JComboBox<>(NoteAlign.createAlignList());
 	private final JComboBox<PaintMode> paintModeSelect = new JComboBox<>(PaintMode.values());
 	private final JLabel timeView = new JLabel("time MM:SS/MM:SS (120)");
 
@@ -463,7 +462,7 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		// 編集ノートタイプ
 		noteTypeSelect.setFocusable(false);
 		noteTypeSelect.addActionListener(this); // MainFrameでAction処理します.
-		noteTypeSelect.setSelectedIndex(MMLEditor.DEFAULT_ALIGN_INDEX);
+		noteTypeSelect.setSelectedIndex(NoteAlign.DEFAULT_ALIGN_INDEX);
 		setEditAlign();
 		toolBar.add(noteTypeSelect);
 

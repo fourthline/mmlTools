@@ -28,7 +28,6 @@ import fourthline.mabiicco.ui.KeyboardView;
 import fourthline.mabiicco.ui.PianoRollView;
 import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLNoteEvent;
-import fourthline.mmlTools.UndefinedTickException;
 
 
 public final class MMLEditor implements MouseInputListener, IEditState, IEditContext, IEditAlign {
@@ -53,36 +52,6 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	private final IMMLManager mmlManager;
 
 	private final JPopupMenu popupMenu = new JPopupMenu();
-
-	public static int DEFAULT_ALIGN_INDEX = 2;
-
-	public static NoteAlign[] createAlignList() {
-		String keyList[] = {
-				"editor.note_1",
-				"editor.note_2",
-				"editor.note_4",
-				"editor.note_8",
-				"editor.note_16",
-				"editor.note_32",
-				"editor.note_64",
-				"editor.note_6",
-				"editor.note_12",
-				"editor.note_24",
-				"editor.note_48"
-		};
-		ArrayList<NoteAlign> list = new ArrayList<>();
-		for (String key : keyList) {
-			try {
-				String tickText = key.substring("editor.note_".length());
-				NoteAlign noteAlign = new NoteAlign(AppResource.appText(key), tickText);
-				list.add(noteAlign);
-			} catch (UndefinedTickException e) {
-				e.printStackTrace();
-			}
-		}
-
-		return list.toArray(new NoteAlign[list.size()]);
-	}
 
 	public MMLEditor(KeyboardView keyboard, PianoRollView pianoRoll, IMMLManager mmlManager) {
 		this.keyboardView = keyboard;

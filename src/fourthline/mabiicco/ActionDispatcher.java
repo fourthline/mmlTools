@@ -234,7 +234,10 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		}
 
 		// mabiicco由来のファイルであれば, generateされたものにする.
-		return score.toGeneratedScore();
+		if (score != null) {
+			score = score.toGeneratedScore();
+		}
+		return score;
 	}
 
 	public void checkAndOpenMMLFile(File file) {
