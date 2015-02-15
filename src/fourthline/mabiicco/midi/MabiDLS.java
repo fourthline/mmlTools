@@ -232,6 +232,10 @@ public final class MabiDLS {
 		channel[ch].setMute(mute);
 	}
 
+	public boolean getMute(int ch) {
+		return channel[ch].getMute();
+	}
+
 	public void solo(int ch) {
 		ch = convertMidiChannel(ch);
 		for (MidiChannel c : channel) {

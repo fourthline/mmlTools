@@ -143,9 +143,9 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	}
 
 	public void initializeMMLTrack() {
-		removeAllMMLTrack();
+		mmlScore = new MMLScore();
+		tabbedPane.removeAll();
 		trackCounter = 0;
-
 		for (int i = 0; i < INITIAL_TRACK_COUNT; i++) {
 			addMMLTrack(null);
 		}
@@ -178,16 +178,12 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		tabbedPane.add(newTrack.getTrackName(), MMLTrackView.getInstance(trackIndex, this, this));
 		tabbedPane.setSelectedIndex(trackIndex);
 		updateTrackTabIcon();
+		MabiDLS.getInstance().setMute(trackIndex, false);
 
 		// エディタ更新
 		updateActivePart(false);
 		updateSelectedTrackAndMMLPart();
 		updateProgramSelect();
-	}
-
-	private void removeAllMMLTrack() {
-		mmlScore = new MMLScore();
-		tabbedPane.removeAll();
 	}
 
 	/**
@@ -200,6 +196,12 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		mmlScore.removeTrack(index);
 		resetTrackView();
 		updateTrackTabIcon();
+
+		// mute設定へ反映.
+		for (int i = index; i < mmlScore.getTrackCount(); i++) {
+			MabiDLS mabiDLS = MabiDLS.getInstance();
+			mabiDLS.setMute(i, mabiDLS.getMute(i+1));
+		}
 
 		if (mmlScore.getTrackCount() == 0) {
 			addMMLTrack(null);
