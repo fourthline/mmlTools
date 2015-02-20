@@ -30,6 +30,9 @@ import fourthline.mmlTools.MMLTrack;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
 
@@ -138,6 +141,7 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 			mmlText[i].setEditable(false);
 			mmlText[i].setFont(new Font("Monospaced", Font.PLAIN, 12));
 			mmlText[i].setColumns(10);
+			mmlText[i].addMouseListener(new ButtonCombAdapter(partButton[i]));
 
 			GridBagConstraints gbc_mmlText = new GridBagConstraints();
 			gbc_mmlText.insets = new Insets(0, 0, 5, 5);
@@ -149,6 +153,24 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 
 		// 一番上のパートが初期の選択パート.
 		partButton[0].setSelected(true);
+	}
+
+	/**
+	 * マウスクリックで関連するボタンを選択状態にする.
+	 */
+	private class ButtonCombAdapter extends MouseAdapter {
+		private JToggleButton button;
+		private ButtonCombAdapter(JToggleButton b) {
+			button = b;
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+			if (button.isEnabled()) {
+				button.setSelected(true);
+				Arrays.asList(button.getActionListeners()).forEach(t -> t.actionPerformed(null));
+			}
+		}
 	}
 
 	/**
