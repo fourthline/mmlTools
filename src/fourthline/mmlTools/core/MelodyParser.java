@@ -153,7 +153,7 @@ public final class MelodyParser {
 			pre_elem = now_elem;
 		}
 
-		length_total /= (96.0);
+		length_total /= (double) MMLTickTable.TPQN;
 
 		return length_total;
 	}

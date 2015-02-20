@@ -19,6 +19,7 @@ import fourthline.mmlTools.MMLNoteEvent;
 import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTempoEvent;
 import fourthline.mmlTools.MMLTrack;
+import fourthline.mmlTools.core.MMLTickTable;
 
 public final class MabiDLS {
 	private static MabiDLS instance = null;
@@ -279,7 +280,7 @@ public final class MabiDLS {
 	 * @throws InvalidMidiDataException 
 	 */
 	public Sequence createSequence(MMLScore score) throws InvalidMidiDataException {
-		Sequence sequence = new Sequence(Sequence.PPQ, 96);
+		Sequence sequence = new Sequence(Sequence.PPQ, MMLTickTable.TPQN);
 
 		int trackCount = 0;
 		for (MMLTrack mmlTrack : score.getTrackList()) {

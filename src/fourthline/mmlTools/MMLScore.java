@@ -228,9 +228,9 @@ public final class MMLScore implements IMMLFileParser {
 		}
 	}
 
-	public void writeToOutputStream(OutputStream outputStreame) {
+	public void writeToOutputStream(OutputStream outputStream) {
 		try {
-			PrintStream stream = new PrintStream(outputStreame, false, "UTF-8");
+			PrintStream stream = new PrintStream(outputStream, false, "UTF-8");
 
 			stream.println("[mml-score]");
 			stream.println("version=1");

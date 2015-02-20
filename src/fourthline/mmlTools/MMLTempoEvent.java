@@ -8,6 +8,8 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 
+import fourthline.mmlTools.core.MMLTickTable;
+
 
 public final class MMLTempoEvent extends MMLEvent {
 	private static final long serialVersionUID = 8014294359518840951L;
@@ -129,7 +131,7 @@ public final class MMLTempoEvent extends MMLEvent {
 		}
 
 		totalTime += (tickOffset - currentTick) * 60 / tempo * 1000;
-		totalTime /= 96.0;
+		totalTime /= (double) MMLTickTable.TPQN;
 		return totalTime;
 	}
 
@@ -153,7 +155,7 @@ public final class MMLTempoEvent extends MMLEvent {
 			tick = tempoEvent.getTickOffset();
 		}
 
-		tick += (time - pointTime) * 96 * tempo / 60 / 1000;
+		tick += (time - pointTime) * MMLTickTable.TPQN * tempo / 60 / 1000;
 		return tick;
 	}
 
