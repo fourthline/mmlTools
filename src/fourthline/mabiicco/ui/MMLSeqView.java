@@ -654,6 +654,10 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 
 	@Override
 	public boolean selectTrackOnExistNote(int note, int tickOffset) {
+		if (!MabiIccoProperties.getInstance().getActivePartSwitch()) {
+			return false;
+		}
+
 		PaintMode mode = pianoRollView.getPaintMode();
 		int trackIndex = 0;
 		for (MMLTrack track : mmlScore.getTrackList()) {

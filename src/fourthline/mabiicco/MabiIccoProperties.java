@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 たんらる
+ * Copyright (C) 2013-2015 たんらる
  */
 
 package fourthline.mabiicco;
@@ -59,6 +59,9 @@ public final class MabiIccoProperties {
 
 	/** 音源境界 */
 	private static final String VIEW_RANGE = "view.pianoRoll.range";
+
+	/** ノートクリックによるアクティブパート切り替え */
+	private static final String ACTIVE_PART_SWITCH = "function.active_part_switch";
 
 	public static MabiIccoProperties getInstance() {
 		return instance;
@@ -201,6 +204,16 @@ public final class MabiIccoProperties {
 
 	public void setViewRage(boolean b) {
 		properties.setProperty(VIEW_RANGE, Boolean.toString(b));
+		save();
+	}
+
+	public boolean getActivePartSwitch() {
+		String str = properties.getProperty(ACTIVE_PART_SWITCH, "false");
+		return Boolean.parseBoolean(str);
+	}
+
+	public void setActivePartSwitch(boolean b) {
+		properties.setProperty(ACTIVE_PART_SWITCH, Boolean.toString(b));
 		save();
 	}
 }
