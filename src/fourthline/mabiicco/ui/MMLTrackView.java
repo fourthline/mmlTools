@@ -350,6 +350,27 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 		}
 	}
 
+	public void switchMMLPart(boolean toNext) {
+		int partIndex = 0;
+		for (int i = 0; i < partButton.length; i++) {
+			if (partButton[i].isSelected()) {
+				partIndex = i;
+				break;
+			}
+		}
+
+		if (toNext) {
+			if ( (partIndex+1 < partButton.length) && (partButton[partIndex+1].isEnabled()) ) {
+				partIndex++;
+			}
+		} else {
+			if ( (partIndex-1 >= 0) && (partButton[partIndex-1].isEnabled()) ) {
+				partIndex--;
+			}
+		}
+		partButton[partIndex].setSelected(true);
+	}
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object source = e.getSource();

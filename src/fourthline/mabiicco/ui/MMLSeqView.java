@@ -682,6 +682,27 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		return false;
 	}
 
+	public void switchTrack(boolean toNext) {
+		int trackIndex = tabbedPane.getSelectedIndex();
+		if (toNext) {
+			if (trackIndex+1 < tabbedPane.getComponentCount()) {
+				trackIndex++;
+			}
+		} else {
+			if (trackIndex-1 >= 0) {
+				trackIndex--;
+			}
+		}
+		tabbedPane.setSelectedIndex(trackIndex);
+		updateSelectedTrackAndMMLPart();
+	}
+
+	public void switchMMLPart(boolean toNext) {
+		MMLTrackView view = (MMLTrackView) tabbedPane.getSelectedComponent();
+		view.switchMMLPart(toNext);
+		updateSelectedTrackAndMMLPart();
+	}
+
 	public void setTimeView(JLabel timeView) {
 		this.timeView = timeView;
 	}

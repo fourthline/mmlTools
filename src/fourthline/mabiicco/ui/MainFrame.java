@@ -587,6 +587,20 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		createKeyAction("select_paintMode.allTrack",
 				KeyStroke.getKeyStroke(KeyEvent.VK_F12, 0),
 				() -> paintModeSelect.setSelectedItem(PaintMode.ALL_TRACK));
+
+		createKeyAction(ActionDispatcher.SWITCH_TRACK_NEXT,
+				KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.CTRL_MASK),
+				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.SWITCH_TRACK_NEXT)));
+		createKeyAction(ActionDispatcher.SWITCH_TRACK_PREV,
+				KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.CTRL_MASK),
+				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.SWITCH_TRACK_PREV)));
+
+		createKeyAction(ActionDispatcher.SWITCH_MMLPART_NEXT,
+				KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.CTRL_MASK),
+				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.SWITCH_MMLPART_NEXT)));
+		createKeyAction(ActionDispatcher.SWITCH_MMLPART_PREV,
+				KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_MASK),
+				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.SWITCH_MMLPART_PREV)));
 	}
 
 	private void createKeyAction(String name, KeyStroke stroke, Runnable func) {

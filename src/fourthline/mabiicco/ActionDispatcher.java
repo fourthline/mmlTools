@@ -82,6 +82,10 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	public static final String SELECT_AFTER_ALL = "select_after_all";
 	public static final String MML_IMPORT = "mml_import";
 	public static final String MML_EXPORT = "mml_export";
+	public static final String SWITCH_TRACK_NEXT = "switch_track_next";
+	public static final String SWITCH_TRACK_PREV = "switch_track_prev";
+	public static final String SWITCH_MMLPART_NEXT = "switch_mmlpart_next";
+	public static final String SWITCH_MMLPART_PREV = "switch_mmlpart_prev";
 
 	private final HashMap<String, Runnable> actionMap = new HashMap<>();
 
@@ -199,6 +203,10 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(SELECT_AFTER_ALL, this::selectAfterAll);
 		actionMap.put(MML_IMPORT, () -> mmlSeqView.mmlImport(mainFrame));
 		actionMap.put(MML_EXPORT, () -> mmlSeqView.mmlExport(mainFrame));
+		actionMap.put(SWITCH_TRACK_NEXT, () -> mmlSeqView.switchTrack(true));
+		actionMap.put(SWITCH_TRACK_PREV, () -> mmlSeqView.switchTrack(false));
+		actionMap.put(SWITCH_MMLPART_NEXT, () -> mmlSeqView.switchMMLPart(true));
+		actionMap.put(SWITCH_MMLPART_PREV, () -> mmlSeqView.switchMMLPart(false));
 	}
 
 	@Override
