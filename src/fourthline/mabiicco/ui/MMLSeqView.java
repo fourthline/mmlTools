@@ -7,6 +7,7 @@ package fourthline.mabiicco.ui;
 import javax.sound.midi.Sequence;
 import javax.sound.midi.Sequencer;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -15,6 +16,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import fourthline.mabiicco.AppResource;
 import fourthline.mabiicco.IEditState;
 import fourthline.mabiicco.IFileState;
 import fourthline.mabiicco.MabiIccoProperties;
@@ -34,6 +36,8 @@ import fourthline.mmlTools.MMLTempoEvent;
 import fourthline.mmlTools.MMLTrack;
 import fourthline.mmlTools.UndefinedTickException;
 import fourthline.mmlTools.core.MMLTicks;
+
+
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -616,6 +620,9 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 			try {
 				mmlScore.generateAll();
 			} catch (UndefinedTickException e) {
+				EventQueue.invokeLater(() -> {
+					JOptionPane.showMessageDialog(null, AppResource.appText("fail.mml_modify"), AppResource.getAppTitle(), JOptionPane.WARNING_MESSAGE);
+				});
 				System.err.println("REVERT: " + e.getMessage());
 				undoEdit.revertState();
 				editor.reset();
