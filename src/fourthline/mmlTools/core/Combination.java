@@ -7,7 +7,7 @@ package fourthline.mmlTools.core;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Combination<T> {
+public final class Combination<T> {
 	private List<List<T>> combinations;
 
 	/**

@@ -11,6 +11,8 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.SwingUtilities;
 
+import fourthline.mabiicco.MabiIccoProperties;
+
 /**
  * MMLEditorの編集状態と振る舞い.
  */
@@ -27,7 +29,8 @@ enum EditMode {
 					context.changeState(AREA).executeEvent(context, e);
 				}
 			} else if (SwingUtilities.isLeftMouseButton(e)) {
-				if (context.onExistNote(startPoint, true)) {
+				boolean partSwitch = MabiIccoProperties.getInstance().getActivePartSwitch();
+				if (context.onExistNote(startPoint, partSwitch)) {
 					// ノート上であれば、ノートを選択状態にする. 複数選択判定も.
 					context.selectNoteByPoint(startPoint, e.getModifiers());
 					if (context.isEditLengthPosition(startPoint)) {
