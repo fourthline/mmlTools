@@ -199,7 +199,6 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 
 		mmlScore.removeTrack(index);
 		resetTrackView();
-		updateTrackTabIcon();
 
 		// mute設定へ反映.
 		for (int i = index; i < mmlScore.getTrackCount(); i++) {
@@ -538,18 +537,20 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		if (selectedTab >= i) {
 			selectedTab = i-1;
 		}
-		MMLTrack track = mmlScore.getTrack(selectedTab);
-		int program = track.getProgram();
-		if (InstClass.getEnablePartByProgram(program)[selectedPart] == false) {
-			if ( (selectedPart == 3) && (track.getSongProgram() >= 0) ) {
-			} else {
-				selectedPart = InstClass.getFirstPartNumberOnProgram(program);
+		if (mmlScore.getTrackCount() > 0) {
+			MMLTrack track = mmlScore.getTrack(selectedTab);
+			int program = track.getProgram();
+			if (InstClass.getEnablePartByProgram(program)[selectedPart] == false) {
+				if ( (selectedPart == 3) && (track.getSongProgram() >= 0) ) {
+				} else {
+					selectedPart = InstClass.getFirstPartNumberOnProgram(program);
+				}
 			}
-		}
 
-		tabbedPane.setSelectedIndex(selectedTab);
-		((MMLTrackView) tabbedPane.getSelectedComponent()).setSelectMMLPartOfIndex(selectedPart);
-		updateTrackTabIcon();
+			tabbedPane.setSelectedIndex(selectedTab);
+			((MMLTrackView) tabbedPane.getSelectedComponent()).setSelectMMLPartOfIndex(selectedPart);
+			updateTrackTabIcon();
+		}
 	}
 
 	public void undo() {

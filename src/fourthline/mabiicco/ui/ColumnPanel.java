@@ -114,7 +114,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 			int tick = tempoEvent.getTickOffset();
 			int x = pianoRollView.convertTicktoX(tick);
 			String s = "t" + tempoEvent.getTempo();
-			drawMarker(g, s, x, TEMPO_MAKER_FILL_COLOR);
+			drawMarker(g, s, x, TEMPO_MAKER_FILL_COLOR, 0);
 		}
 	}
 
@@ -125,18 +125,21 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 			for (Marker marker : score.getMarkerList()) {
 				int tick = marker.getTickOffset();
 				int x = pianoRollView.convertTicktoX(tick);
-				drawMarker(g, marker.getName(), x, MAKER_FILL_COLOR);
+				drawMarker(g, marker.getName(), x, MAKER_FILL_COLOR, -5);
 			}
 		}
 	}
 
-	private void drawMarker(Graphics2D g, String s, int x, Color color) {
+	private void drawMarker(Graphics2D g, String s, int x, Color color, int dy) {
 		int xPoints[] = { x-3, x+3, x+3, x, x-3 };
 		int yPoints[] = { 16, 16, 22, 25, 22 };
+		for (int i = 0; i < yPoints.length; i++) {
+			yPoints[i] += dy;
+		}
 
 		// label
 		g.setColor(Color.DARK_GRAY);
-		g.drawString(s, x+6, 24);
+		g.drawString(s, x+6, 24+dy);
 
 		// icon
 		g.setColor(color);
@@ -187,8 +190,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 	}
 
 	private void popupAction(Component component, int x, int y) {
-		int baseTick = (int)pianoRollView.convertXtoTick(x);
-		int targetTick = baseTick - (baseTick % 6);
+		int targetTick = (int)pianoRollView.convertXtoTick(x);
 		int delta = (int)pianoRollView.convertXtoTick(6);
 
 		// クリックした位置に、テンポ/マーカー イベントがあれば削除モードになります.

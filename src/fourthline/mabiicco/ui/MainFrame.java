@@ -246,7 +246,8 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 
 		createMenuItem(trackMenu, "menu.addTrack", ActionDispatcher.ADD_TRACK, true,
 				KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_MASK));
-		createMenuItem(trackMenu, "menu.removeTrack", ActionDispatcher.REMOVE_TRACK, true);
+		createMenuItem(trackMenu, "menu.removeTrack", ActionDispatcher.REMOVE_TRACK, true,
+				KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK));
 
 		trackMenu.add(new JSeparator());
 
