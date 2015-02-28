@@ -265,7 +265,6 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 
 		pianoRollView.repaint();
 		tabbedPane.removeAll();
-		undoEdit.initState();
 
 		int trackCount = 0;
 		for (MMLTrack track : score.getTrackList()) {
@@ -278,6 +277,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 			trackCount++;
 		}
 
+		undoEdit.initState();
 		initialSetView();
 		pianoRollView.setSequenceTick(0);
 		updateTrackTabIcon();
