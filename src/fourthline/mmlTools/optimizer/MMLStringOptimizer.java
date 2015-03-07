@@ -37,6 +37,7 @@ public final class MMLStringOptimizer {
 	}
 
 	private String getOptimizedString() {
+		map.clear();
 		map.put("4", new StringBuilder());
 		parse();
 		return getMinString();

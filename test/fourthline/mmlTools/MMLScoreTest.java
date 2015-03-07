@@ -6,13 +6,25 @@ package fourthline.mmlTools;
 
 import static org.junit.Assert.*;
 
+
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+
 
 import org.junit.Test;
 
+
 import fourthline.FileSelect;
+import fourthline.mmlTools.core.MMLText;
+import fourthline.mmlTools.parser.IMMLFileParser;
+import fourthline.mmlTools.parser.MMLParseException;
 
 public class MMLScoreTest extends FileSelect {
 
@@ -126,5 +138,50 @@ public class MMLScoreTest extends FileSelect {
 		};
 
 		checkMMLFileOutput(score.generateAll(), "format_r1.mmi", mml);
+	}
+
+	/**
+	 * ファイルをparseして, 出力文字が増加していないか確認する.
+	 * @param filename
+	 */
+	private void mmlFileParse(String filename) {
+		File file = new File(filename);
+		if (file.exists()) {
+			IMMLFileParser fileParser = IMMLFileParser.getParser(file);
+			try {
+				MMLScore score = fileParser.parse(new FileInputStream(file));
+				System.out.println(filename);
+				score.getTrackList().forEach(t -> {
+					try {
+						String mml1 = t.getOriginalMML();
+						String rank1 = t.mmlRankFormat();
+						t.generate();
+						String mml2 = t.getOriginalMML();
+						String rank2 = new MMLText().setMMLText(mml2).mmlRankFormat();
+						String rank3 = t.mmlRankFormat();
+						System.out.println(rank1 + " -> " + rank2 + ", " + rank3);
+						assertTrue(mml1.length() >= mml2.length());
+					} catch (Exception e) {}
+				});
+			} catch (MMLParseException | FileNotFoundException e) {}
+		}
+	}
+
+	/**
+	 * ローカルのファイルを読み取って, MML最適化に劣化がないかどうかを確認するテスト.
+	 */
+	@Test
+	public void testLocalMMLParse() {
+		try {
+			InputStream stream = fileSelect("localMMLFileList.txt");
+			if (stream == null) {
+				return;
+			}
+			InputStreamReader reader = new InputStreamReader(stream, "UTF-8");
+			new BufferedReader(reader).lines().forEach(s -> {
+				System.out.println(s);
+				mmlFileParse(s);
+			});
+		} catch (IOException e) {}
 	}
 }
