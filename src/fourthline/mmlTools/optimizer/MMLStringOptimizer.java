@@ -1,23 +1,29 @@
 /*
- * Copyright (C) 2013-2014 たんらる
+ * Copyright (C) 2015 たんらる
  */
 
 package fourthline.mmlTools.optimizer;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 
 import fourthline.mmlTools.core.MMLTokenizer;
 
-
 /**
- * FIXME: 
- * Ln-section merge式
- * @author fourthline
+ * Ln-builder
  */
 public final class MMLStringOptimizer {
+
+	static private boolean debug = false;
+	static public void setDebug(boolean b) {
+		debug = b;
+	}
+
 	private String originalMML;
+
+	/**
+	 * Lの文字列と、生成中文字列のBuilder.
+	 */
+	private HashMap<String, StringBuilder> map = new HashMap<>();
 
 	/**
 	 * @param mml   MMLEventListで出力したMML文字列.
@@ -30,97 +36,85 @@ public final class MMLStringOptimizer {
 		return getOptimizedString();
 	}
 
-	private boolean updateCounter(HashMap<String, Integer> counter, String s) {
-		Integer count = counter.get(s);
-		boolean result = false;
-		if ( (count == null) || (count == 0) ) {
-			count = 0;
-			result = true;
-		}
-		count += s.length();
-		counter.put(s, count);
-
-		return result;
+	private String getOptimizedString() {
+		map.put("4", new StringBuilder());
+		parse();
+		return getMinString();
 	}
 
-	private boolean isMaxScore(HashMap<String, Integer> counter, String s) {
-		Collection<String> keys = counter.keySet();
-		int target = counter.get(s) - s.length() - 1;
-
-		if (target < 0) {
-			return false;
-		}
-
-		for (String key : keys) {
-			if (key.equals(s)) {
-				continue;
-			}
-			int score = counter.get(key);
-			if (key.equals(primaryLength)) {
-				score += primaryLength.length() + 1;
-			}
-			if (target <= score) {
-				return false;
-			}
-		}
-
-		return true;
+	private String getMinString() {
+		return map.values()
+				.stream()
+				.min((t1, t2) -> (t1.length() - t2.length()))
+				.get()
+				.toString();
 	}
 
-	private boolean updateScore(String s, int index) {
-		if (updateCounter(counter, s)) {
-			countStartIndex.put(s, index);
-		}
-		if (isMaxScore(counter, s)) {
-			primaryLength = s;
-			int score = counter.get(s);
-			stack.add(new MMLLengthKeyword(s, countStartIndex.get(s), score));
-			counter.clear();
-			return true;
-		}
-
-		return false;
-	}
-
-	private void endScore() {
-		Collection<String> keys = counter.keySet();
-		int maxScore = 0;
-		String s = null;
-		for (String key : keys) {
-			int score = counter.get(key);
-			if (maxScore < score) {
-				maxScore = score;
-				s = key;
-			}
-		}
-
-		if (s != null) {
-			stack.add(new MMLLengthKeyword(s, countStartIndex.get(s), maxScore));
+	private void printMap() {
+		if (debug) {
+			System.out.println(" --- ");
+			map.forEach((key, builder) -> System.out.println(key + ": " + builder.toString()));
 		}
 	}
 
-	private void primaryLengthScore() {
-		Collection<String> keys = counter.keySet();
-		int primaryScore = primaryLength.length();
-		for (String key : keys) {
-			int score = counter.get(key).intValue() - primaryScore;
-			if (score < 0) {
-				score = 0;
-			}
-			counter.put(key, score);
-		}
+	/**
+	 * すべてに文字列を無条件追加
+	 */
+	private void addString(String s) {
+		map.values().forEach(t -> t.append(s));
 	}
 
-	private String primaryLength;
-	private HashMap<String, Integer> counter = new HashMap<>();
-	private HashMap<String, Integer> countStartIndex = new HashMap<>();
-	private ArrayList<MMLLengthKeyword> stack = new ArrayList<>();
+	private StringBuilder newBuilder(String minString, String lenString, String s) {
+		StringBuilder changeBuilder = new StringBuilder( minString );
+		// Lの直前に '&' があると、効かなくなるため.
+		int len = changeBuilder.length();
+		if ( (len > 0) && (changeBuilder.charAt(len-1) == '&') ) {
+			changeBuilder.insert(len-1, "l"+lenString);
+		} else {
+			changeBuilder.append("l"+lenString);
+		}
+		changeBuilder.append(s);
+		return changeBuilder;
+	}
 
+	private void addString(String s, String lenString) {
+		HashMap<String, StringBuilder> newBuilderMap = new HashMap<>();
+		String minString = getMinString();
 
-	private String[] parseLengthArray() {
+		// 保有するbuilderを更新.
+		map.forEach((key, builder) -> {
+			if (key.equals(lenString)) {
+				builder.append(s);
+			} else {
+				builder.append(s);
+				if (lenString.equals(key+".")) {
+					builder.append(".");
+				} else {
+					builder.append(lenString);
+				}
+				newBuilderMap.put(lenString, newBuilder(minString, lenString, s));
+				if (lenString.endsWith(".")) {
+					String lenString2 = lenString.substring(0, lenString.length()-1);
+					newBuilderMap.put(lenString2, newBuilder(minString, lenString2, s+"."));
+				}
+			}
+		});
+
+		// 新規のbuilderで保有mapを更新.
+		newBuilderMap.forEach((key, builder) -> {
+			if (map.containsKey(key)) {
+				if ( builder.length() < map.get(key).length() ) {
+					map.put(key, builder);
+				}
+			} else {
+				map.put(key, builder);
+			}
+		});
+	}
+
+	private void parse() {
 		MMLTokenizer tokenizer = new MMLTokenizer(originalMML);
 		String section = "4";
-		ArrayList<String> list = new ArrayList<>();
 
 		while (tokenizer.hasNext()) {
 			String token = tokenizer.next();
@@ -133,218 +127,20 @@ public final class MMLStringOptimizer {
 				} else if (noteLength.equals(".")) {
 					noteLength = section + ".";
 				}
-				list.add(noteLength);
+				addString(s[0], noteLength);
 			} else if ( (firstC == 'l') || (firstC == 'L') ) {
 				section = MMLTokenizer.noteNames(token)[1];
-			}
-		}
-
-		String resultArray[] = new String[list.size()];
-		return list.toArray(resultArray);
-	}
-
-	private void optimizedLengthArray() {
-		String originalList[] = parseLengthArray();
-		if (originalList == null) {
-			return;
-		}
-		primaryLength = "4";
-		stack.add(new MMLLengthKeyword("4", 0, 0));
-		for (int i = 0; i < originalList.length; i++) {
-			String s = originalList[i];
-			if (s.equals(primaryLength)) {
-				if (stack.size() > 0) {
-					stack.get(stack.size()-1).incrScore();
-				}
-				primaryLengthScore();
 			} else {
-				if (!updateScore(s, i)) {
-					if (s.endsWith(".")) {
-						updateScore(s.substring(0, s.length()-1), i);
-					}
-				}
-			}
-		}
-
-		endScore();
-	}
-
-	private int searchNextSectionIndex(int startIndex) {
-		int count = stack.size();
-		String searchName = stack.get(startIndex).getSectionName();
-		for (int i = startIndex+1; i < count; i++) {
-			String sectionName = stack.get(i).getSectionName();
-			if (searchName.equals(sectionName)) {
-				return i;
-			}
-		}
-
-		return -1;
-	}
-
-	private int blockScore(int startIndex, int endIndex) {
-		int score = 0;
-		for (int i = startIndex+1; i < endIndex; i++) {
-			score += stack.get(i).getScore();
-		}
-
-		return score;
-	}
-
-	private int lCost(int startIndex, int endIndex) {
-		int lCost = 0;
-		for (int i = startIndex+1; i <= endIndex; i++) {
-			lCost += stack.get(i).getSectionName().length();
-			lCost += "L".length();
-		}
-
-		return lCost;
-	}
-
-	private void mergeSection(int startIndex, int endIndex) {
-		for (int i = startIndex+1; i < endIndex; i++) {
-			stack.get(i).setDeleteCandidate(true);
-		}
-	}
-
-	private void mergeSection2(int startIndex, int endIndex) {
-		MMLLengthKeyword lKey = stack.get(startIndex);
-		if (lKey.getDeleteCandidate()) {
-			// クロスセクションのスコア判定.
-			int score = lKey.getScore();
-			for (int i = startIndex+1; i < endIndex; i++) {
-				if (score < stack.get(i).getScore()) {
-					return;
-				}
-			}
-		}
-
-		// セクションマージ.
-		lKey.addScore(stack.get(endIndex));
-		for (int i = startIndex+1; i <= endIndex; i++) {
-			stack.remove(startIndex+1);
-		}
-	}
-
-	private boolean sectionForwardMerge() {
-		boolean result = false;
-		for (int i = stack.size()-2; i >= 0; i--) {
-			int nextIndex = searchNextSectionIndex(i);
-			if (nextIndex < 0) {
-				continue;
+				addString(token);
 			}
 
-			int score = blockScore(i, nextIndex);
-			int cost = lCost(i, nextIndex);
-
-			if (score <= cost) {
-				mergeSection(i, nextIndex);
-				result = true;
-			}
-		}
-
-		return result;
-	}
-
-	private void sectionForwardMerge2() {
-		for (int i = stack.size()-2; i >= 0; i--) {
-			int nextIndex = searchNextSectionIndex(i);
-			if (nextIndex < 0) {
-				continue;
-			}
-
-			int score = blockScore(i, nextIndex);
-			int cost = lCost(i, nextIndex);
-
-			if (score <= cost) {
-				mergeSection2(i, nextIndex);
-			}
+			printMap();
 		}
 	}
 
-	private void trimSection() {
-		if (stack.size() <= 0) {
-			return;
-		}
-		stack.remove(0);
-		int index = stack.size() - 1;
-		if (index < 0) {
-			return;
-		}
-		MMLLengthKeyword lKey = stack.get(index);
-		String section = lKey.getSectionName();
-		if (lKey.getScore() <= section.length()+1) {
-			stack.remove(index);
-		}
-	}
-
-	private String optimizeMMLString() {
-		StringBuilder sb = new StringBuilder();
-		MMLTokenizer tokenizer = new MMLTokenizer(originalMML);
-		String section = "4";
-		int noteCount = 0;
-		String prevToken = "";
-		String token = "";
-
-		while (tokenizer.hasNext()) {
-			prevToken = token;
-			token = tokenizer.next();
-			if (MMLTokenizer.isNote(token.charAt(0))) {
-				String s[] = MMLTokenizer.noteNames(token);
-				String noteName = s[0];
-				String noteLength = s[1];
-
-				if ( (stack.size() > 0) && 
-						(stack.get(0).getIndex()) <= noteCount) {
-					section = stack.get(0).getSectionName();
-					stack.remove(0);
-					sb.append("l" + section);
-					if (prevToken.equals("&")) {
-						/* Lの直前に '&' があると、効かなくなるため. */
-						sb.deleteCharAt(sb.length()-section.length()-2);
-						sb.append('&');
-					}
-				}
-
-				sb.append(noteName);
-				if (noteLength.equals(section)) {
-				} else if (noteLength.equals(section+".")) {
-					sb.append(".");
-				} else {
-					sb.append(noteLength);
-				}
-				noteCount++;
-			} else {
-				sb.append(token);
-			}
-		}
-
-		return sb.toString();
-	}
-
-	private String optimizedString = null;
-	private String getOptimizedString() {
-		if (optimizedString == null) {
-			optimizedLengthArray();
-			MMLLengthKeyword.printList(stack);
-			sectionForwardMerge();
-			MMLLengthKeyword.printList(stack);
-			sectionForwardMerge2();
-			MMLLengthKeyword.printList(stack);
-			trimSection();
-			optimizedString = optimizeMMLString();
-		}
-
-		return optimizedString;
-	}
-
-	public static void main(String args[]) {
-		String mml = "c8c8c8c8";
-		MMLStringOptimizer optimizer = new MMLStringOptimizer(mml);
-		String optimizedMML = optimizer.toString();
-
-		System.out.println("expect: "+MMLLengthKeyword.parseMMLLengthList(mml));
-		System.out.println("actual: "+MMLLengthKeyword.parseMMLLengthList(optimizedMML));
-		System.out.println(optimizedMML);
+	static public void main(String args[]) {
+		MMLStringOptimizer.setDebug(true);
+		String mml = "c8c8c8c8c8c8c8c8";
+		System.out.println( new MMLStringOptimizer(mml).toString() );
 	}
 }

@@ -6,11 +6,12 @@ package fourthline.mmlTools.optimizer;
 
 import static org.junit.Assert.*;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import fourthline.mmlTools.MMLEventList;
+import fourthline.mmlTools.UndefinedTickException;
+import fourthline.mmlTools.core.MMLTicks;
 
 /**
  * @author fourthline
@@ -21,12 +22,9 @@ public class MMLStringOptimizerTest {
 	private static final int TIMEOUT = 100;
 
 	@Before
-	public void setup() {
-		MMLLengthKeyword.setEnablePrint(true);
-	}
-	@After
-	public void tearDown() {
-		MMLLengthKeyword.setEnablePrint(false);
+	public void setup() throws UndefinedTickException {
+		MMLStringOptimizer.setDebug(true);
+		MMLTicks.getTick("64");
 	}
 
 	@Test(timeout=TIMEOUT)
@@ -36,6 +34,9 @@ public class MMLStringOptimizerTest {
 	}
 
 	private void checkMMLStringOptimize(String input, String expect) {
+		checkMMLStringOptimize(input, expect, false);
+	}
+	private void checkMMLStringOptimize(String input, String expect, boolean hardCheck) {
 		MMLStringOptimizer optimizer = new MMLStringOptimizer(input);
 		String mml = optimizer.toString();
 
@@ -45,6 +46,9 @@ public class MMLStringOptimizerTest {
 		System.out.printf("%d > %d\n", input.length(), mml.length());
 		System.out.printf("expect: %d\n", expect.length());
 		assertTrue(mml.length() <= expect.length());
+		if (hardCheck) {
+			assertEquals(expect, mml);
+		}
 
 		MMLEventList eventList1 = new MMLEventList(input);
 		MMLEventList eventList2 = new MMLEventList(mml);
@@ -132,10 +136,10 @@ public class MMLStringOptimizerTest {
 	public void testOptimize_amp_L_0() {
 		String input  = "c2&c8d8d8d8d8d8d8";
 		String expect = "c2l8&cdddddd";
-		checkMMLStringOptimize(input, expect);
+		checkMMLStringOptimize(input, expect, true);
 	}
 
-	// next fix
+	@Test(timeout=TIMEOUT)
 	public void testOptimize_x1_1() {
 		String input  = "r1.r1.r1.r1.r1.r1.r1.c4a2c4a2c4a2c4a2c4a2c4a2c4a2r1.r1.r1.r1.r1.r1.r1.r1.r1.";
 		String expect = "l1.rrrrrrrl4ca2ca2ca2ca2ca2ca2ca2l1.rrrrrrrrr";

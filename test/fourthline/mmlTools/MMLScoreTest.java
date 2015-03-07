@@ -122,7 +122,7 @@ public class MMLScoreTest extends FileSelect {
 		String mml[] = {
 				"MML@l1r>f+t120&f+,,;",
 				"MML@v0l1cct120v8a+,,;",
-				"MML@d1v0c1t120,,;"
+				"MML@l1dv0ct120,,;"
 		};
 
 		checkMMLFileOutput(score.generateAll(), "format_r1.mmi", mml);
