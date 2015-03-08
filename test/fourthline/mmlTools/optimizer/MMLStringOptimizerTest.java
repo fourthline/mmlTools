@@ -7,6 +7,7 @@ package fourthline.mmlTools.optimizer;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import fourthline.mmlTools.MMLEventList;
@@ -45,10 +46,10 @@ public class MMLStringOptimizerTest {
 		System.out.println(expect);
 		System.out.printf("%d > %d\n", input.length(), mml.length());
 		System.out.printf("expect: %d\n", expect.length());
-		assertTrue(mml.length() <= expect.length());
 		if (hardCheck) {
 			assertEquals(expect, mml);
 		}
+		assertTrue(mml.length() <= expect.length());
 
 		MMLEventList eventList1 = new MMLEventList(input);
 		MMLEventList eventList2 = new MMLEventList(mml);
@@ -144,5 +145,26 @@ public class MMLStringOptimizerTest {
 		String input  = "r1.r1.r1.r1.r1.r1.r1.c4a2c4a2c4a2c4a2c4a2c4a2c4a2r1.r1.r1.r1.r1.r1.r1.r1.r1.";
 		String expect = "l1.rrrrrrrl4ca2ca2ca2ca2ca2ca2ca2l1.rrrrrrrrr";
 		checkMMLStringOptimize(input, expect);
+	}
+
+	@Test @Ignore
+	public void testOptimize_oct() {
+		String input  = "o7c<<<c>>>c<<v12<c>>t121>c";
+		String expect = "o7co4co7co4c12co7t121c";
+		checkMMLStringOptimize(input, expect, true);
+	}
+
+	@Test @Ignore
+	public void testOptimize_cb_oct() {
+		String input  = "c<b>c<v10b>c<t121b";
+		String expect = "cc-cv10c-ct121c-";
+		checkMMLStringOptimize(input, expect, true);
+	}
+
+	@Test @Ignore
+	public void testOptimize_n() {
+		String input  = "o7co0co7c";
+		String expect = "o7cn0c";
+		checkMMLStringOptimize(input, expect, true);
 	}
 }

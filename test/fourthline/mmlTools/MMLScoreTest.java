@@ -173,8 +173,10 @@ public class MMLScoreTest extends FileSelect {
 	@Test
 	public void testLocalMMLParse() {
 		try {
-			InputStream stream = fileSelect("localMMLFileList.txt");
+			String listFile = "localMMLFileList.txt";
+			InputStream stream = fileSelect(listFile);
 			if (stream == null) {
+				fail("not found "+listFile);
 				return;
 			}
 			InputStreamReader reader = new InputStreamReader(stream, "UTF-8");
