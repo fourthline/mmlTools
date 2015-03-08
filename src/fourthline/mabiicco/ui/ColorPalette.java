@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public final class ColorPalette {
-	static private enum ColorPattern {
+	private static enum ColorPattern {
 		ACTIVE(250, 200, 0),
 		MELODY(0, 200, 0),
 		CHORD1(0, 200, 40),

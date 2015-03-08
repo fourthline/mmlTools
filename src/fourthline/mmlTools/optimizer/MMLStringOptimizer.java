@@ -13,8 +13,8 @@ import fourthline.mmlTools.core.MMLTokenizer;
  */
 public final class MMLStringOptimizer {
 
-	static private boolean debug = false;
-	static public void setDebug(boolean b) {
+	private static boolean debug = false;
+	public static void setDebug(boolean b) {
 		debug = b;
 	}
 
@@ -139,9 +139,9 @@ public final class MMLStringOptimizer {
 		}
 	}
 
-	static public void main(String args[]) {
+	public static void main(String args[]) {
 		MMLStringOptimizer.setDebug(true);
-		String mml = "c8c8c8c8c8c8c8c8";
+		String mml = "c8c2c1c8c2c1c8c2c1c8c2c1";
 		System.out.println( new MMLStringOptimizer(mml).toString() );
 	}
 }

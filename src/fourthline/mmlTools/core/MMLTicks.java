@@ -19,7 +19,7 @@ public final class MMLTicks {
 
 	private static final MMLTickTable tickTable = MMLTickTable.createTickTable();
 
-	static public int getTick(String gt) throws UndefinedTickException {
+	public static int getTick(String gt) throws UndefinedTickException {
 		String str = gt;
 		while (!tickTable.getTable().containsKey(str)) {
 			int len = str.length();
@@ -33,7 +33,7 @@ public final class MMLTicks {
 		return tickTable.getTable().get(str);
 	}
 
-	static public int minimumTick() {
+	public static int minimumTick() {
 		Integer minimum = null;
 		for (Integer i : tickTable.getTable().values()) {
 			if ( (minimum == null) || (i < minimum) ) {

@@ -12,8 +12,8 @@ import java.util.Iterator;
  * @author たんらる
  */
 public final class MMLTokenizer implements Iterator<String> {
-	static private final String noteString = "abcdefgABCDEFGnNrR";
-	static private final String tokenString = noteString + "tToOlLvV<>&";
+	private static final String noteString = "abcdefgABCDEFGnNrR";
+	private static final String tokenString = noteString + "tToOlLvV<>&";
 	private final String mml_src;
 	int startIndex = 0;
 	int endIndex = 0;
@@ -52,21 +52,21 @@ public final class MMLTokenizer implements Iterator<String> {
 		return new int[] { startIndex, endIndex };
 	}
 
-	static public boolean isToken(char ch) {
+	public static boolean isToken(char ch) {
 		if (tokenString.indexOf(ch) < 0)
 			return false;
 
 		return true;
 	}
 
-	static public boolean isNote(char ch) {
+	public static boolean isNote(char ch) {
 		if (noteString.indexOf(ch) < 0)
 			return false;
 
 		return true;
 	}
 
-	static public String noteName(String token) {
+	public static String noteName(String token) {
 		String noteName = ""+token.charAt(0);
 
 		if (token.length() > 1) {
@@ -79,7 +79,7 @@ public final class MMLTokenizer implements Iterator<String> {
 		return noteName;
 	}
 
-	static public String[] noteNames(String token) {
+	public static String[] noteNames(String token) {
 		char firstC = token.charAt(0);
 		String noteName = "" + firstC;
 		String noteLength = "";

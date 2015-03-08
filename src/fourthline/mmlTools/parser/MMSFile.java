@@ -23,7 +23,7 @@ public final class MMSFile implements IMMLFileParser {
 	private static final String PATCH_NAME = "mms_instPatch";
 
 	/* MMS->programへの変換テーブル */
-	static private int mmsInstTable[] = {
+	private static int mmsInstTable[] = {
 		0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 
 		10, 11, 12, 13, 14, 15, 16, 17, 65, 66, 
 		67, 68,	69, 70, 71, 72, 73, 74, 75, 76, 

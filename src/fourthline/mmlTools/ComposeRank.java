@@ -52,7 +52,7 @@ public final class ComposeRank {
 	 * @param songEx MMLの歌
 	 * @return ランクの文字
 	 */
-	static public String mmlRank(String melody, String chord1, String chord2, String songEx) {
+	public static String mmlRank(String melody, String chord1, String chord2, String songEx) {
 		for (ComposeRank rank : rankList) {
 			if (rank.compare(melody, chord1, chord2, songEx))
 				return rank.getRank();
