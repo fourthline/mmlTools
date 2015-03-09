@@ -163,9 +163,6 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 		} else if (changeOctave < 0) {
 			s = increaseOctave.substring(0, -changeOctave);
 		}
-		if (s.length() > 2) {
-			s = "o" + getOctave();
-		}
 
 		return s;
 	}

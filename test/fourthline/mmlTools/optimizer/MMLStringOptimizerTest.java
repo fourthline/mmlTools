@@ -141,10 +141,10 @@ public class MMLStringOptimizerTest {
 		checkMMLStringOptimize(input, expect);
 	}
 
-	@Test @Ignore
+	@Test
 	public void testOptimize_oct() {
-		String input  = ">c<<<c32.>>>c16.<<v12<c64>>t121>c";
-		String expect = ">co2c32.o5c16.v12o2c64t121o5c";
+		String input  = ">c<<<c32.>>>c16.<<v12<c64>>t121>co6d<<d";
+		String expect = ">co2c32.o5c16.o2v12c64o5t121c>d<<d";
 		checkMMLStringOptimize(input, expect);
 	}
 

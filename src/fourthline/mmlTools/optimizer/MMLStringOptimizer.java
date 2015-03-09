@@ -10,7 +10,7 @@ import java.util.HashMap;
 import fourthline.mmlTools.core.MMLTokenizer;
 
 /**
- * Lx-builder
+ * Lx-builder, Ox
  */
 public final class MMLStringOptimizer {
 
@@ -66,20 +66,32 @@ public final class MMLStringOptimizer {
 		map.values().forEach(t -> t.append(s));
 	}
 
-	private StringBuilder newBuilder(String minString, String lenString, String s) {
+	private void addString(String s, int insertBack) {
+		map.values().forEach(t -> {
+			int len = t.length();
+			t.insert(len-insertBack, s);
+		});
+	}
+
+	private StringBuilder newBuilder(String minString, String lenString, String s, int insertBack) {
 		StringBuilder changeBuilder = new StringBuilder( minString );
-		// Lの直前に '&' があると、効かなくなるため.
 		int len = changeBuilder.length();
-		if ( (len > 0) && (changeBuilder.charAt(len-1) == '&') ) {
-			changeBuilder.insert(len-1, "l"+lenString);
-		} else {
-			changeBuilder.append("l"+lenString);
-		}
+		// &や他の指示よりも前に配置する.
+		changeBuilder.insert(len-insertBack, "l"+lenString);
 		changeBuilder.append(s);
 		return changeBuilder;
 	}
 
-	private void addString(String s, String lenString) {
+	private void insertLxNote(String noteName, String noteLength, String section, int tokenStack) {
+		if (noteLength.equals("")) {
+			noteLength = section;
+		} else if (noteLength.equals(".")) {
+			noteLength = section + ".";
+		}
+		addNoteText(noteName, noteLength, tokenStack);
+	}
+
+	private void addNoteText(String s, String lenString, int insertBack) {
 		HashMap<String, StringBuilder> newBuilderMap = new HashMap<>();
 		String minString = getMinString();
 
@@ -94,10 +106,10 @@ public final class MMLStringOptimizer {
 				} else {
 					builder.append(lenString);
 				}
-				newBuilderMap.put(lenString, newBuilder(minString, lenString, s));
+				newBuilderMap.put(lenString, newBuilder(minString, lenString, s, insertBack));
 				if (lenString.endsWith(".")) {
 					String lenString2 = lenString.substring(0, lenString.length()-1);
-					newBuilderMap.put(lenString2, newBuilder(minString, lenString2, s+"."));
+					newBuilderMap.put(lenString2, newBuilder(minString, lenString2, s+".", insertBack));
 				}
 			}
 		});
@@ -125,26 +137,50 @@ public final class MMLStringOptimizer {
 		deleteKey.forEach(t -> map.remove(t));
 	}
 
+	private int insertOctaveChange(int prevOct, int octD, int insertBack) {
+		int nextOct = prevOct + octD;
+		if (octD < 0) {
+			octD = -octD;
+		}
+		if (octD > 2) {
+			addString("o"+nextOct, insertBack);
+		} else if (octD > 0) {
+			String s = ">>";
+			if (prevOct > nextOct) {
+				s = "<<";
+			}
+			addString(s.substring(s.length()-octD), insertBack);
+		}
+		return nextOct;
+	}
+
 	private void parse() {
 		MMLTokenizer tokenizer = new MMLTokenizer(originalMML);
 		String section = "4";
+		int octave = 4;
+		int octD = 0;
+		int tokenStack = 0;
 
 		while (tokenizer.hasNext()) {
 			String token = tokenizer.next();
-			char firstC = token.charAt(0);
+			char firstC = Character.toLowerCase( token.charAt(0) );
+			String s[] = MMLTokenizer.noteNames(token);
 			if (MMLTokenizer.isNote(token.charAt(0))) {
-				String s[] = MMLTokenizer.noteNames(token);
-				String noteLength = s[1];
-				if (noteLength.equals("")) {
-					noteLength = section;
-				} else if (noteLength.equals(".")) {
-					noteLength = section + ".";
-				}
-				addString(s[0], noteLength);
+				octave = insertOctaveChange(octave, octD, tokenStack);
+				insertLxNote(s[0], s[1], section, tokenStack);
 				cleanMap();
-			} else if ( (firstC == 'l') || (firstC == 'L') ) {
-				section = MMLTokenizer.noteNames(token)[1];
+				tokenStack = 0;
+				octD = 0;
+			} else if (firstC == 'l') {
+				section = s[1];
+			} else if (firstC == 'o') {
+				octD = Integer.parseInt(s[1]) - octave;
+			} else if (firstC == '>') {
+				octD++;
+			} else if (firstC == '<') {
+				octD--;
 			} else {
+				tokenStack += token.length();
 				addString(token);
 			}
 

@@ -133,7 +133,7 @@ public class MMLScoreTest extends FileSelect {
 
 		String mml[] = {
 				"MML@l1r>f+t120&f+,,;",
-				"MML@v0l1cct120v8a+,,;",
+				"MML@l1v0cct120v8a+,,;",
 				"MML@l1dv0ct120,,;"
 		};
 
