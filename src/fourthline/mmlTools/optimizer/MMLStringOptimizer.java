@@ -4,12 +4,13 @@
 
 package fourthline.mmlTools.optimizer;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import fourthline.mmlTools.core.MMLTokenizer;
 
 /**
- * Ln-builder
+ * Lx-builder
  */
 public final class MMLStringOptimizer {
 
@@ -113,6 +114,17 @@ public final class MMLStringOptimizer {
 		});
 	}
 
+	private void cleanMap() {
+		int minLength = getMinString().length();
+		ArrayList<String> deleteKey = new ArrayList<>();
+		map.forEach((key, builder) -> {
+			if (builder.length() > minLength+key.length()+1) {
+				deleteKey.add(key);
+			}
+		});
+		deleteKey.forEach(t -> map.remove(t));
+	}
+
 	private void parse() {
 		MMLTokenizer tokenizer = new MMLTokenizer(originalMML);
 		String section = "4";
@@ -129,6 +141,7 @@ public final class MMLStringOptimizer {
 					noteLength = section + ".";
 				}
 				addString(s[0], noteLength);
+				cleanMap();
 			} else if ( (firstC == 'l') || (firstC == 'L') ) {
 				section = MMLTokenizer.noteNames(token)[1];
 			} else {
