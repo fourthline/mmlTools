@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 たんらる
+ * Copyright (C) 2013-2015 たんらる
  */
 
 package fourthline.mmlTools;
@@ -172,8 +172,9 @@ public final class MMLTrack implements Serializable {
 
 	public MMLTrack generate() throws UndefinedTickException {
 		originalMML.setMMLText(getMMLStrings(false, false));
-		if (!(new MMLTrack().setMML(getOriginalMML()).equals(this))) {
-			new UndefinedTickException("Verify error.");
+		if (!this.equals(new MMLTrack().setMML(getOriginalMML()))) {
+			System.err.println("Verify error.");
+			throw new UndefinedTickException("Verify error.");
 		}
 		mabiMML.setMMLText(getMMLStrings(true, true));
 		generated = true;

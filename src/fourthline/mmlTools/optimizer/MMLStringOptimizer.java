@@ -40,7 +40,7 @@ public final class MMLStringOptimizer {
 	private String getOptimizedString() {
 		map.clear();
 		map.put("4", new StringBuilder());
-		parse();
+		optimize();
 		return getMinString();
 	}
 
@@ -82,34 +82,25 @@ public final class MMLStringOptimizer {
 		return changeBuilder;
 	}
 
-	private void insertLxNote(String noteName, String noteLength, String section, int tokenStack) {
-		if (noteLength.equals("")) {
-			noteLength = section;
-		} else if (noteLength.equals(".")) {
-			noteLength = section + ".";
-		}
-		addNoteText(noteName, noteLength, tokenStack);
-	}
-
-	private void addNoteText(String s, String lenString, int insertBack) {
+	private void addNoteText(String noteName, String lenString, int insertBack) {
 		HashMap<String, StringBuilder> newBuilderMap = new HashMap<>();
 		String minString = getMinString();
 
 		// 保有するbuilderを更新.
 		map.forEach((key, builder) -> {
 			if (key.equals(lenString)) {
-				builder.append(s);
+				builder.append(noteName);
 			} else {
-				builder.append(s);
+				builder.append(noteName);
 				if (lenString.equals(key+".")) {
 					builder.append(".");
 				} else {
 					builder.append(lenString);
 				}
-				newBuilderMap.put(lenString, newBuilder(minString, lenString, s, insertBack));
+				newBuilderMap.put(lenString, newBuilder(minString, lenString, noteName, insertBack));
 				if (lenString.endsWith(".")) {
 					String lenString2 = lenString.substring(0, lenString.length()-1);
-					newBuilderMap.put(lenString2, newBuilder(minString, lenString2, s+".", insertBack));
+					newBuilderMap.put(lenString2, newBuilder(minString, lenString2, noteName+".", insertBack));
 				}
 			}
 		});
@@ -137,51 +128,81 @@ public final class MMLStringOptimizer {
 		deleteKey.forEach(t -> map.remove(t));
 	}
 
-	private int insertOctaveChange(int prevOct, int octD, int insertBack) {
-		int nextOct = prevOct + octD;
-		if (octD < 0) {
-			octD = -octD;
+	private class OptimizeBuilder {
+		private String section = "4";
+		private int octave = 4;
+		private int octD = 0;
+
+		private void doPattern(String noteName, String lenString, int insertBack) {
+			insertOxPattern(insertBack);
+			insertLxPattern(noteName, lenString, insertBack);
 		}
-		if (octD > 2) {
-			addString("o"+nextOct, insertBack);
-		} else if (octD > 0) {
-			String s = ">>";
-			if (prevOct > nextOct) {
-				s = "<<";
+
+		private void insertLxPattern(String noteName, String lenString, int insertBack) {
+			if (lenString.equals("")) {
+				lenString = this.section;
+			} else if (lenString.equals(".")) {
+				lenString = this.section + ".";
 			}
-			addString(s.substring(s.length()-octD), insertBack);
+			addNoteText(noteName, lenString, insertBack);
 		}
-		return nextOct;
+
+		private void insertOxPattern(int insertBack) {
+			int nextOct = this.octave + this.octD;
+			int octRo = this.octD;
+			if (octRo < 0) {
+				octRo = -octRo;
+			}
+			if (octRo > 2) {
+				addString("o"+nextOct, insertBack);
+			} else if (octRo > 0) {
+				String s = ">>";
+				if (this.octave > nextOct) {
+					s = "<<";
+				}
+				addString(s.substring(0, octRo), insertBack);
+			}
+
+			this.octave = nextOct;
+			this.octD = 0;
+		}
+
+		private boolean doToken(char firstC, String lenString) {
+			if (firstC == 'o') {
+				octD = Integer.parseInt(lenString) - octave;
+			} else if (firstC == '>') {
+				octD++;
+			} else if (firstC == '<') {
+				octD--;
+			} else if (firstC == 'l') {
+				this.section = lenString;
+			} else {
+				return false;
+			}
+			return true;
+		}
 	}
 
-	private void parse() {
+	private void optimize() {
 		MMLTokenizer tokenizer = new MMLTokenizer(originalMML);
-		String section = "4";
-		int octave = 4;
-		int octD = 0;
+		OptimizeBuilder optimizer = new OptimizeBuilder();
 		int tokenStack = 0;
 
 		while (tokenizer.hasNext()) {
 			String token = tokenizer.next();
 			char firstC = Character.toLowerCase( token.charAt(0) );
 			String s[] = MMLTokenizer.noteNames(token);
-			if (MMLTokenizer.isNote(token.charAt(0))) {
-				octave = insertOctaveChange(octave, octD, tokenStack);
-				insertLxNote(s[0], s[1], section, tokenStack);
-				cleanMap();
+
+			if (MMLTokenizer.isNote(firstC)) {
+				optimizer.doPattern(s[0], s[1], tokenStack);
 				tokenStack = 0;
-				octD = 0;
-			} else if (firstC == 'l') {
-				section = s[1];
-			} else if (firstC == 'o') {
-				octD = Integer.parseInt(s[1]) - octave;
-			} else if (firstC == '>') {
-				octD++;
-			} else if (firstC == '<') {
-				octD--;
+				cleanMap();
 			} else {
-				tokenStack += token.length();
-				addString(token);
+				boolean patternDone = optimizer.doToken(firstC, s[1]);
+				if (!patternDone) {
+					tokenStack += token.length();
+					addString(token);
+				}
 			}
 
 			printMap();

@@ -6,7 +6,6 @@ package fourthline.mmlTools;
 
 import static org.junit.Assert.*;
 
-
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -17,8 +16,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-
 import org.junit.Test;
+
 
 
 import fourthline.FileSelect;
@@ -155,13 +154,18 @@ public class MMLScoreTest extends FileSelect {
 					try {
 						String mml1 = t.getOriginalMML();
 						String rank1 = t.mmlRankFormat();
+						System.out.println("mml1: "+mml1);
 						t.generate();
 						String mml2 = t.getOriginalMML();
+						System.out.println("mml2: "+mml2);
 						String rank2 = new MMLText().setMMLText(mml2).mmlRankFormat();
 						String rank3 = t.mmlRankFormat();
 						System.out.println(rank1 + " -> " + rank2 + ", " + rank3);
 						assertTrue(mml1.length() >= mml2.length());
-					} catch (Exception e) {}
+						assertEquals(new MMLTrack().setMML(mml1), new MMLTrack().setMML(mml2));
+					} catch (UndefinedTickException e) {
+						fail(e.getMessage());
+					}
 				});
 			} catch (MMLParseException | FileNotFoundException e) {}
 		}
