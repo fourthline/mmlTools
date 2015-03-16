@@ -171,9 +171,12 @@ public final class MMLTrack implements Serializable {
 	}
 
 	public MMLTrack generate() throws UndefinedTickException {
+		String mml1 = getOriginalMML();
 		originalMML.setMMLText(getMMLStrings(false, false));
 		if (!this.equals(new MMLTrack().setMML(getOriginalMML()))) {
 			System.err.println("Verify error.");
+			System.err.println(mml1);
+			System.err.println(getOriginalMML());
 			throw new UndefinedTickException("Verify error.");
 		}
 		mabiMML.setMMLText(getMMLStrings(true, true));

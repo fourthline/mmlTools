@@ -148,10 +148,10 @@ public class MMLStringOptimizerTest {
 		checkMMLStringOptimize(input, expect);
 	}
 
-	@Test @Ignore
+	@Test
 	public void testOptimize_cb_oct() {
-		String input  = "c<b>c<v10b>c<t121b";
-		String expect = "cc-cv10c-ct121<b";
+		String input  = "c<b>c<v10b>c<t121b>v12cd<<b>d>>c<g";
+		String expect = "cc-c<v10bb+t121b>v12cd<c-d>b+g";
 		checkMMLStringOptimize(input, expect);
 	}
 

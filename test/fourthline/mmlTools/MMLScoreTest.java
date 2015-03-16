@@ -12,11 +12,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import org.junit.Test;
+
 
 
 
@@ -143,7 +145,7 @@ public class MMLScoreTest extends FileSelect {
 	 * ファイルをparseして, 出力文字が増加していないか確認する.
 	 * @param filename
 	 */
-	private void mmlFileParse(String filename) {
+	private void mmlFileParse(String filename, boolean updateOption) {
 		File file = new File(filename);
 		if (file.exists()) {
 			IMMLFileParser fileParser = IMMLFileParser.getParser(file);
@@ -167,6 +169,15 @@ public class MMLScoreTest extends FileSelect {
 						fail(e.getMessage());
 					}
 				});
+
+				if (updateOption) {
+					try {
+						score.generateAll();
+						score.writeToOutputStream(new FileOutputStream(file));
+					} catch (UndefinedTickException e) {
+						fail(e.getMessage());
+					}
+				}
 			} catch (MMLParseException | FileNotFoundException e) {}
 		}
 	}
@@ -186,7 +197,7 @@ public class MMLScoreTest extends FileSelect {
 			InputStreamReader reader = new InputStreamReader(stream, "UTF-8");
 			new BufferedReader(reader).lines().forEach(s -> {
 				System.out.println(s);
-				mmlFileParse(s);
+				mmlFileParse(s, false);
 			});
 		} catch (IOException e) {}
 	}
