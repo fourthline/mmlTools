@@ -141,21 +141,21 @@ public class MMLStringOptimizerTest {
 		checkMMLStringOptimize(input, expect);
 	}
 
-	@Test
+	@Test(timeout=TIMEOUT)
 	public void testOptimize_oct() {
 		String input  = ">c<<<c32.>>>c16.<<v12<c64>>t121>co6d<<d";
 		String expect = ">co2c32.o5c16.o2v12c64o5t121c>d<<d";
 		checkMMLStringOptimize(input, expect);
 	}
 
-	@Test
+	@Test(timeout=TIMEOUT)
 	public void testOptimize_cb_oct() {
-		String input  = "c<b>c<v10b>c<t121b>v12cd<<b>d>>c<g";
-		String expect = "cc-c<v10bb+t121b>v12cd<c-d>b+g";
+		String input  = "c<b>c<v10b>c<t121b>v12cd<v11<b>d>>t118c<g";
+		String expect = "cc-cv10c-ct121c-v12cd<v11c-d>t118b+g";
 		checkMMLStringOptimize(input, expect);
 	}
 
-	@Test @Ignore
+	@Test(timeout=TIMEOUT) @Ignore
 	public void testOptimize_n() {
 		String input  = "o7co1co7c";
 		String expect = "o7cn12c";

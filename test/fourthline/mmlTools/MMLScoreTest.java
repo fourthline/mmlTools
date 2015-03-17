@@ -162,6 +162,9 @@ public class MMLScoreTest extends FileSelect {
 						System.out.println("mml2: "+mml2);
 						String rank2 = new MMLText().setMMLText(mml2).mmlRankFormat();
 						String rank3 = t.mmlRankFormat();
+						if (!mml1.equals(mml2)) {
+							System.out.print("#");
+						}
 						System.out.println(rank1 + " -> " + rank2 + ", " + rank3);
 						assertTrue(mml1.length() >= mml2.length());
 						assertEquals(new MMLTrack().setMML(mml1), new MMLTrack().setMML(mml2));

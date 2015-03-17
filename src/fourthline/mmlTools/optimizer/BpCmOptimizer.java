@@ -8,8 +8,8 @@ import fourthline.mmlTools.core.MMLTokenizer;
 
 
 /**
- * "<b?>" -> "c-?"
- * ">c?<" -> "b+?"
+ * "<b>" -> "c-"
+ * ">c<" -> "b+"
  */
 public final class BpCmOptimizer implements MMLStringOptimizer.Optimizer {
 
@@ -31,21 +31,24 @@ public final class BpCmOptimizer implements MMLStringOptimizer.Optimizer {
 		},
 		B1 {
 			/**
-			 * "<b?" -> B2
+			 * "<b" -> B2
 			 */
 			@Override
 			public BmCpState nextStatus(String token) {
-				if (token.equals("<")) {
-					return B1;
-				} else if (MMLTokenizer.noteNames(token)[0].toLowerCase().equals("b")) {
-					return B2;
+				if (MMLTokenizer.isNote(token.charAt(0))) {
+					if (MMLTokenizer.noteNames(token)[0].toLowerCase().equals("b")) {
+						return B2;
+					}
+					return NONE;
+				} else if (token.equals(">")) {
+					return C1;
 				}
-				return NONE;
+				return B1;
 			}
 		},
 		B2 {
 			/**
-			 * "<b?>" -> B3
+			 * "<b>" -> B3
 			 */
 			@Override
 			public BmCpState nextStatus(String token) {
@@ -54,32 +57,38 @@ public final class BpCmOptimizer implements MMLStringOptimizer.Optimizer {
 		},
 		B3 {
 			/**
-			 * "<b?>" -> "c-?"
+			 * "<b>" -> "c-"
 			 */
 			@Override
-			public String optimize(String s) {
-				return s.replaceAll("<b", "c-")
-						.replaceAll("<B", "C-")
-						.replace(">", "");
+			public String optimize(StringBuilder sb) {
+				sb.deleteCharAt( sb.lastIndexOf("<") );
+				sb.deleteCharAt( sb.lastIndexOf(">") );
+				String s = sb.toString()
+						.replace("b", "c-")
+						.replace("B", "C-");
+				return s;
 			}
 		},
 		C1 {
 			/**
-			 * ">c?" -> C2
+			 * ">c" -> C2
 			 */
 			@Override
 			public BmCpState nextStatus(String token) {
-				if (token.equals(">")) {
-					return C1;
-				} else if (MMLTokenizer.noteNames(token)[0].toLowerCase().equals("c")) {
-					return C2;
+				if (MMLTokenizer.isNote(token.charAt(0))) {
+					if (MMLTokenizer.noteNames(token)[0].toLowerCase().equals("c")) {
+						return C2;
+					}
+					return NONE;
+				} else if (token.equals("<")) {
+					return B1;
 				}
-				return NONE;
+				return C1;
 			}
 		},
 		C2 {
 			/**
-			 * ">c?<" -> C3
+			 * ">c<" -> C3
 			 */
 			@Override
 			public BmCpState nextStatus(String token) {
@@ -88,13 +97,16 @@ public final class BpCmOptimizer implements MMLStringOptimizer.Optimizer {
 		},
 		C3 {
 			/**
-			 * ">c?<" -> "b+?"
+			 * ">c<" -> "b+"
 			 */
 			@Override
-			public String optimize(String s) {
-				return s.replaceAll(">c", "b+")
-						.replaceAll(">C", "B+")
-						.replace("<", "");
+			public String optimize(StringBuilder sb) {
+				sb.deleteCharAt( sb.lastIndexOf("<") );
+				sb.deleteCharAt( sb.lastIndexOf(">") );
+				String s = sb.toString()
+						.replace("c", "b+")
+						.replace("C", "B+");
+				return s;
 			}
 		};
 
@@ -102,7 +114,7 @@ public final class BpCmOptimizer implements MMLStringOptimizer.Optimizer {
 			return NONE;
 		}
 
-		public String optimize(String s) {
+		public String optimize(StringBuilder sb) {
 			throw new AssertionError();
 		}
 	}
@@ -116,7 +128,7 @@ public final class BpCmOptimizer implements MMLStringOptimizer.Optimizer {
 		BmCpState prevStatus = state;
 		state = state.nextStatus(token);
 		if (MMLStringOptimizer.getDebug()) {
-			System.out.println(prevStatus + " - > " + state);
+			System.out.println(prevStatus + " - > " + state + ": " + token);
 		}
 
 		if (state == BmCpState.NONE) {
@@ -126,9 +138,9 @@ public final class BpCmOptimizer implements MMLStringOptimizer.Optimizer {
 		} else {
 			optBuilder.append(token);
 			if  ( (state == BmCpState.B3) || (state == BmCpState.C3) )  {
-				builder.append( state.optimize( optBuilder.toString() ));
+				builder.append( state.optimize( optBuilder ));
 				optBuilder.setLength(0);
-				state = state.nextStatus(null);
+				state = state.nextStatus(token);
 			}
 		}
 	}
