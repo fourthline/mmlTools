@@ -556,6 +556,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	public void undo() {
 		if (undoEdit.canUndo()) {
 			undoEdit.undo();
+			mmlScore = mmlScore.toGeneratedScore();
 			resetTrackView();
 			updateSelectedTrackAndMMLPart();
 			updateActivePart(false);
@@ -565,6 +566,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	public void redo() {
 		if (undoEdit.canRedo()) {
 			undoEdit.redo();
+			mmlScore = mmlScore.toGeneratedScore();
 			resetTrackView();
 			updateSelectedTrackAndMMLPart();
 			updateActivePart(false);
