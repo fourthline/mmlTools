@@ -298,15 +298,6 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 
 		createMenuItem(helpMenu, "menu.about", ActionDispatcher.ABOUT);
 
-		assert(reloadMenuItem != null);
-		assert(undoMenu != null);
-		assert(redoMenu != null);
-		assert(saveMenuItem != null);
-		assert(cutMenu != null);
-		assert(copyMenu != null);
-		assert(pasteMenu != null);
-		assert(deleteMenu != null);
-
 		return menuBar;
 	}
 

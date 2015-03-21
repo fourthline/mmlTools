@@ -30,6 +30,7 @@ public class MMLFileTest extends FileSelect {
 			midi.loadingDLSFile(new File(MabiDLS.DEFALUT_DLS_PATH));
 		} catch (InvalidMidiDataException | IOException e) {
 			e.printStackTrace();
+			fail(e.getMessage());
 		}
 	}
 

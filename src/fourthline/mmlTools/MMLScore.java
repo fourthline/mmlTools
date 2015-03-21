@@ -45,7 +45,7 @@ public final class MMLScore implements IMMLFileParser {
 	 * @param track
 	 * @return トラック数の上限を超えていて、追加できないときは -1. 追加できた場合は、追加したindex値を返します(0以上).
 	 */
-	public int addTrack(MMLTrack track) {
+	public synchronized int addTrack(MMLTrack track) {
 		if (trackList.size() >= MAX_TRACK) {
 			return -1;
 		}
@@ -65,7 +65,7 @@ public final class MMLScore implements IMMLFileParser {
 	 * 指定したindexのトラックを削除します.
 	 * @param index
 	 */
-	public void removeTrack(int index) {
+	public synchronized void removeTrack(int index) {
 		trackList.remove(index);
 	}
 
@@ -81,7 +81,7 @@ public final class MMLScore implements IMMLFileParser {
 	 * 保持しているトラックリストを返します.
 	 * @return MMLTrackの配列
 	 */
-	public List<MMLTrack> getTrackList() {
+	public synchronized List<MMLTrack> getTrackList() {
 		return trackList;
 	}
 

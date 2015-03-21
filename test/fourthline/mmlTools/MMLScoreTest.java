@@ -29,6 +29,13 @@ import fourthline.mmlTools.parser.MMLParseException;
 
 public class MMLScoreTest extends FileSelect {
 
+	/**
+	 * testLocalMMLParseでみているローカルのファイルに対して上書きします.
+	 * 最適化向上した際の更新用です.
+	 * 更新するばあい trueに設定.
+	 */
+	private static boolean overwriteToLocalMMLOption = false;
+
 	public static void checkMMLScoreWriteToOutputStream(MMLScore score, InputStream inputStream) {
 		try {
 			int size = inputStream.available();
@@ -200,7 +207,7 @@ public class MMLScoreTest extends FileSelect {
 			InputStreamReader reader = new InputStreamReader(stream, "UTF-8");
 			new BufferedReader(reader).lines().forEach(s -> {
 				System.out.println(s);
-				mmlFileParse(s, false);
+				mmlFileParse(s, overwriteToLocalMMLOption);
 			});
 		} catch (IOException e) {}
 	}

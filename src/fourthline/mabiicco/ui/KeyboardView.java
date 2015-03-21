@@ -15,9 +15,10 @@ import java.awt.event.MouseMotionAdapter;
 
 import javax.swing.JPanel;
 
+import fourthline.mabiicco.midi.IPlayNote;
 import fourthline.mabiicco.midi.MabiDLS;
 
-public final class KeyboardView extends JPanel {
+public final class KeyboardView extends JPanel implements IPlayNote {
 	private static final long serialVersionUID = -3850112420986284800L;
 
 	private int playNote = -1;
@@ -156,6 +157,7 @@ public final class KeyboardView extends JPanel {
 		g.drawLine(40, y, width, y);
 	}
 
+	@Override
 	public void playNote(int note) {
 		if (note < 0) {
 			offNote();
@@ -171,6 +173,7 @@ public final class KeyboardView extends JPanel {
 		repaint();
 	}
 
+	@Override
 	public void offNote() {
 		playNote = -1;
 		int program = mmlManager.getActivePartProgram();

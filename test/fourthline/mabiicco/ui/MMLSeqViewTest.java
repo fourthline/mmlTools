@@ -5,38 +5,52 @@
 package fourthline.mabiicco.ui;
 
 
+import java.awt.Dimension;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.stream.Stream;
 
-import javax.sound.midi.InvalidMidiDataException;
-import javax.sound.midi.MidiUnavailableException;
+import javax.imageio.ImageIO;
+import javax.swing.JViewport;
 
 import static org.junit.Assert.*;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import fourthline.mabiicco.midi.MabiDLS;
+import fourthline.mmlTools.MMLEventList;
+import fourthline.mmlTools.MMLNoteEvent;
 import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTrack;
 
-public class MMLSeqViewTest {
+public final class MMLSeqViewTest {
 
 	@BeforeClass
-	public static void initialize() {
+	public static void initialize() throws Exception {
 		MabiDLS midi = MabiDLS.getInstance();
-		try {
-			midi.initializeMIDI();
-			midi.loadingDLSFile(new File(MabiDLS.DEFALUT_DLS_PATH));
-		} catch (InvalidMidiDataException | IOException | MidiUnavailableException e) {
-			e.printStackTrace();
-		}
+		midi.initializeMIDI();
+		midi.loadingDLSFile(new File(MabiDLS.DEFALUT_DLS_PATH));
+	}
+
+	private MMLSeqView obj;
+
+	@Before
+	public void initilizeObj() {
+		obj = new MMLSeqView();
+	}
+
+	private Object getField(String fieldName) throws Exception {
+		Field f = MMLSeqView.class.getDeclaredField(fieldName);
+		f.setAccessible(true);
+		return f.get(obj);
 	}
 
 	@Test
-	public void test() {
-		MMLSeqView obj = new MMLSeqView();
+	public void testUndoRedo() {
 		MMLScore score = new MMLScore();
 
 		// rank9 のMML生成.
@@ -51,6 +65,7 @@ public class MMLSeqViewTest {
 		// redo, undoは無効.
 		assertEquals(false, obj.getFileState().canRedo());
 		assertEquals(false, obj.getFileState().canUndo());
+		assertEquals(false, obj.getFileState().isModified());
 
 		// generate前は *Rank表記.
 		assertEquals("*"+rank9, obj.getSelectedTrack().mmlRankFormat());
@@ -66,6 +81,7 @@ public class MMLSeqViewTest {
 		// redo, undoは無効.
 		assertEquals(false, obj.getFileState().canRedo());
 		assertEquals(false, obj.getFileState().canUndo());
+		assertEquals(false, obj.getFileState().isModified());
 
 		// Track追加.
 		Stream.iterate(0, i -> i++).limit(400).forEach(t -> sb.append('a'));
@@ -76,11 +92,14 @@ public class MMLSeqViewTest {
 		// undoは有効.
 		assertEquals(false, obj.getFileState().canRedo());
 		assertEquals(true, obj.getFileState().canUndo());
+		assertEquals(true, obj.getFileState().isModified());
 
 		// undo実行.
 		obj.undo();
 		assertEquals(true, obj.getFileState().canRedo());
 		assertEquals(false, obj.getFileState().canUndo());
+		assertEquals(false, obj.getFileState().isModified());
+		assertEquals(1, obj.getMMLScore().getTrackCount());
 
 		// Rank表記は generate後.
 		assertEquals(rank9, obj.getSelectedTrack().mmlRankFormat());
@@ -89,10 +108,291 @@ public class MMLSeqViewTest {
 		obj.redo();
 		assertEquals(false, obj.getFileState().canRedo());
 		assertEquals(true, obj.getFileState().canUndo());
+		assertEquals(true, obj.getFileState().isModified());
+		assertEquals(2, obj.getMMLScore().getTrackCount());
 
 		// 次のTrackを選択.
 		obj.switchTrack(true);
 		// Rank表記は generate後.
 		assertEquals(rank1, obj.getSelectedTrack().mmlRankFormat());
+	}
+
+	@Test
+	public void testAddRemoveTrack() {
+		assertEquals(1, obj.getMMLScore().getTrackCount());
+
+		// Track追加.
+		obj.addMMLTrack(null);
+		assertEquals(2, obj.getMMLScore().getTrackCount());
+		assertEquals("Track2", obj.getSelectedTrack().getTrackName());
+
+		// 9個ふやす.
+		Stream.iterate(0, i -> i++).limit(9).forEach(t -> {
+			obj.addMMLTrack(null);
+		});
+		assertEquals(11, obj.getMMLScore().getTrackCount());
+		assertEquals("Track11", obj.getSelectedTrack().getTrackName());
+
+		// 最大
+		obj.addMMLTrack(null);
+		assertEquals(12, obj.getMMLScore().getTrackCount());
+		assertEquals("Track12", obj.getSelectedTrack().getTrackName());
+
+		// 増えない.
+		obj.addMMLTrack(null);
+		assertEquals(12, obj.getMMLScore().getTrackCount());
+		assertEquals("Track12", obj.getSelectedTrack().getTrackName());
+
+		// 10個へらす.
+		Stream.iterate(0, i -> i++).limit(10).forEach(t -> {
+			obj.removeMMLTrack();
+		});
+		assertEquals(2, obj.getMMLScore().getTrackCount());
+		assertEquals("Track2", obj.getSelectedTrack().getTrackName());
+
+		// 最小
+		obj.removeMMLTrack();
+		assertEquals(1, obj.getMMLScore().getTrackCount());
+		assertEquals("Track1", obj.getSelectedTrack().getTrackName());
+
+		// へらない.
+		obj.removeMMLTrack();
+		assertEquals(1, obj.getMMLScore().getTrackCount());
+		assertEquals("Track14", obj.getSelectedTrack().getTrackName());
+	}
+
+	@Test
+	public void testMute() {
+		assertEquals(1, obj.getMMLScore().getTrackCount());
+
+		// Track追加.
+		obj.addMMLTrack(null);
+		obj.addMMLTrack(null);
+		obj.addMMLTrack(null);
+		assertEquals(4, obj.getMMLScore().getTrackCount());
+
+		// Track3をMute設定.
+		MabiDLS.getInstance().toggleMute(2);
+		assertEquals(false, MabiDLS.getInstance().getMute(0));
+		assertEquals(false, MabiDLS.getInstance().getMute(1));
+		assertEquals(true,  MabiDLS.getInstance().getMute(2));
+		assertEquals(false, MabiDLS.getInstance().getMute(3));
+
+		// Track2を選択.
+		obj.switchTrack(false);
+		obj.switchTrack(false);
+		assertEquals("Track2", obj.getSelectedTrack().getTrackName());
+
+		// Track削除.
+		obj.removeMMLTrack();
+
+		// Track2がMute, Track3はMute解除.
+		assertEquals(false, MabiDLS.getInstance().getMute(0));
+		assertEquals(true,  MabiDLS.getInstance().getMute(1));
+		assertEquals(false, MabiDLS.getInstance().getMute(2));
+		assertEquals(false, MabiDLS.getInstance().getMute(3));
+
+		// 新規TrackはMute解除.
+		MabiDLS.getInstance().toggleMute(3);
+		assertEquals(true, MabiDLS.getInstance().getMute(3));
+		obj.addMMLTrack(null);
+		assertEquals(false, MabiDLS.getInstance().getMute(3));
+	}
+
+	@Test
+	public void test_setMMLselectedTrack() {
+		MMLScore score = new MMLScore();
+		score.addTrack(new MMLTrack().setMML("MML@ct150cc"));
+		obj.setMMLScore(score);
+		assertEquals(1, obj.getMMLScore().getTrackCount());
+		assertEquals(150, obj.getMMLScore().getTempoOnTick(96));
+
+		// t150テンポがクリアされてることを確認する.
+		obj.setMMLselectedTrack(new MMLTrack().setMML("MML@t130ccc"));
+		assertEquals(1, obj.getMMLScore().getTrackCount());
+		assertEquals(130, obj.getMMLScore().getTempoOnTick(96));
+	}
+
+	private void check_nextStepTime(MMLSeqView obj, int time) {
+		int tick = 96 * time;
+		assertEquals(0, obj.getEditSequencePosition());
+		obj.nextStepTimeTo(true);
+		assertEquals(tick, obj.getEditSequencePosition());
+		obj.nextStepTimeTo(true);
+
+		// 右側はOver許容.
+		assertEquals(tick*2, obj.getEditSequencePosition());
+		obj.nextStepTimeTo(false);
+		assertEquals(tick, obj.getEditSequencePosition());
+		obj.nextStepTimeTo(false);
+		assertEquals(0, obj.getEditSequencePosition());
+
+		// 0が最小.
+		obj.nextStepTimeTo(false);
+		assertEquals(0, obj.getEditSequencePosition());
+	}
+
+	@Test
+	public void test_nextStepTimeTo() {
+		// 4/4
+		obj.setMMLselectedTrack(new MMLTrack().setMML("MML@c1"));
+		check_nextStepTime(obj, 4);
+
+		// 3/4
+		obj.getMMLScore().setTimeCountOnly(3);
+		check_nextStepTime(obj, 3);
+	}
+
+	@Test
+	public void test_addRemoveTicks() {
+		obj.setMMLselectedTrack(new MMLTrack().setMML("MML@cccc,dddd,eeee,ffff;"));
+		obj.addMMLTrack(new MMLTrack().setMML("MML@gggg,aaaa,bbbb,>cccc;"));
+		assertEquals(96*4, obj.getMMLScore().getTotalTickLength());
+
+		// 2拍目に1拍追加する.
+		obj.getMMLScore().setTimeCountOnly(2);
+		obj.nextStepTimeTo(true);
+		obj.addTicks(96);
+		assertEquals("MML@ccrcc,ddrdd,eeree,ffrff;", obj.getMMLScore().getTrack(0).getOriginalMML());
+		assertEquals("MML@ggrgg,aaraa,bbrbb,>ccrcc;", obj.getMMLScore().getTrack(1).getOriginalMML());
+		assertEquals(96*5, obj.getMMLScore().getTotalTickLength());
+
+		// 先頭の1拍を削除する.
+		obj.nextStepTimeTo(false);
+		obj.removeTicks(96);
+		assertEquals("MML@crcc,drdd,eree,frff;", obj.getMMLScore().getTrack(0).getOriginalMML());
+		assertEquals("MML@grgg,araa,brbb,>crcc;", obj.getMMLScore().getTrack(1).getOriginalMML());
+		assertEquals(96*4, obj.getMMLScore().getTotalTickLength());
+	}
+
+	private void checkImage(PianoRollView view, String filename) throws IOException {
+		JViewport viewport = new JViewport();
+		int width = view.convertTicktoX( obj.getMMLScore().getTotalTickLength() );
+		int height = view.getTotalHeight();
+		viewport.setExtentSize(new Dimension(width, height));
+		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+
+		view.setSize(width, height);
+		view.setViewportAndParent(viewport, obj);
+		view.paintComponent(image.getGraphics());
+		ImageIO.write(image, "png", new File(filename));
+	}
+
+	@Test
+	public void test_pianoRollView() throws Exception {
+		PianoRollView view = (PianoRollView) getField("pianoRollView");
+		obj.setMMLselectedTrack(new MMLTrack().setMML("MML@cccc,dddd,eeee,ffff;"));
+		obj.addMMLTrack(new MMLTrack().setMML("MML@>cccc,>dddd,>eeee,>ffff;"));
+		obj.addMMLTrack(new MMLTrack().setMML("MML@<cccc,<dddd,<eeee,<ffff;"));
+
+		// 拡大
+		assertEquals(6.0, view.getWideScale(), 0.001);
+		Stream.of(6.0, 5.0, 4.0, 3.0, 2.0, 1.5, 1.0, 0.75, 0.5, 0.375, 0.25) .forEach(t -> {
+			assertEquals(t.doubleValue(), view.getWideScale(), 0.001);
+			obj.expandPianoViewWide(0);
+		});
+		assertEquals(0.25, view.getWideScale(), 0.001);
+		checkImage(view, "sample1.png");
+
+		// 縮小
+		Stream.of(0.25, 0.375, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 6.0) .forEach(t -> {
+			assertEquals(t.doubleValue(), view.getWideScale(), 0.001);
+			obj.reducePianoViewWide(0);
+		});
+		assertEquals(6.0, view.getWideScale(), 0.001);
+		checkImage(view, "sample2.png");
+	}
+
+	/**
+	 * 編集できず REVERTする.
+	 */
+	@Test
+	public void test_editRevert() {
+		obj.getActiveMMLPart().addMMLNoteEvent(new MMLNoteEvent(10, 1, 0));
+		assertFalse(obj.getFileState().isModified());
+		assertEquals(1, obj.getActiveMMLPart().getMMLNoteEventList().size());
+		obj.updateActivePart(true);
+		assertEquals(0, obj.getActiveMMLPart().getMMLNoteEventList().size());
+		assertFalse(obj.getFileState().isModified());
+	}
+
+	/**
+	 * 楽器の変更.
+	 */
+	@Test
+	public void test_updateActiveTrackProgram() {
+		assertFalse(obj.getFileState().isModified());
+		obj.updateActiveTrackProgram(obj.getActiveTrackIndex(), obj.getActivePartProgram()+1, 0);
+		assertTrue(obj.getFileState().isModified());
+	}
+
+	/**
+	 * 任意のfuncを実行したあとのActiveTrackの検査する.
+	 */
+	private class TP1 {
+		private Runnable func;
+		private int track;
+		private int part;
+		/**
+		 * @param func 実行する内容.
+		 * @param track funcを実行したあとに期待するTrackのIndex.
+		 * @param part funcを実行したあとに期待するPartのIndex.
+		 */
+		private TP1(Runnable func, int track, int part) {
+			this.func = func;
+			this.track = track;
+			this.part = part;
+		}
+		private void check() {
+			func.run();
+			MMLEventList expect = obj.getMMLScore().getTrack(track).getMMLEventAtIndex(part);
+			MMLEventList actual = obj.getActiveMMLPart();
+			System.out.println(track+" "+part+" "+expect+" <=> "+actual);
+			assertTrue( expect == actual ); // 参照が同じことを確認するため equalsではない.
+		}
+	}
+
+	@Test
+	public void test_switchTrack() {
+		obj.setMMLselectedTrack(new MMLTrack().setMML("MML@c"));
+		obj.addMMLTrack(new MMLTrack().setMML("MML@d"));
+		obj.addMMLTrack(new MMLTrack().setMML("MML@e"));
+		Runnable toNext = () -> obj.switchTrack(true);
+		Runnable toPrev = () -> obj.switchTrack(false);
+
+		Stream.of(
+				new TP1(toNext, 2, 0),
+				new TP1(toPrev, 1, 0),
+				new TP1(toPrev, 0, 0),
+				new TP1(toPrev, 0, 0),
+				new TP1(toNext, 1, 0),
+				new TP1(toNext, 2, 0),
+				new TP1(toNext, 2, 0)).forEach(t -> t.check());
+	}
+
+	@Test
+	public void test_switchMMLPart() {
+		obj.setMMLselectedTrack(new MMLTrack().setMML("MML@a,b,c,d"));
+		obj.addMMLTrack(null);
+		obj.addMMLTrack(new MMLTrack().setMML("MML@e,f,g,a"));
+		Runnable toNext = () -> obj.switchMMLPart(true);
+		Runnable toPrev = () -> obj.switchMMLPart(false);
+
+		Stream.of(
+				new TP1(toNext, 2, 1),
+				new TP1(toNext, 2, 2),
+				new TP1(toNext, 2, 2),
+				new TP1(toPrev, 2, 1),
+				new TP1(toPrev, 2, 0),
+				new TP1(toPrev, 2, 0)).forEach(t -> t.check());
+
+		// コーラスパート有効.
+		obj.updateActiveTrackProgram(obj.getActiveTrackIndex(), 1, 100);
+		obj.updateActivePart(true);
+		Stream.of(
+				new TP1(toNext, 2, 1),
+				new TP1(toNext, 2, 2),
+				new TP1(toNext, 2, 3),
+				new TP1(toNext, 2, 3)).forEach(t -> t.check());
 	}
 }

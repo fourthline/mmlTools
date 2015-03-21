@@ -22,9 +22,9 @@ import fourthline.mabiicco.ActionDispatcher;
 import fourthline.mabiicco.AppResource;
 import fourthline.mabiicco.IEditState;
 import fourthline.mabiicco.IEditStateObserver;
+import fourthline.mabiicco.midi.IPlayNote;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.IMMLManager;
-import fourthline.mabiicco.ui.KeyboardView;
 import fourthline.mabiicco.ui.PianoRollView;
 import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLNoteEvent;
@@ -48,13 +48,13 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	private IEditStateObserver editObserver;
 
 	private final PianoRollView pianoRollView;
-	private final KeyboardView keyboardView;
+	private final IPlayNote notePlayer;
 	private final IMMLManager mmlManager;
 
 	private final JPopupMenu popupMenu = new JPopupMenu();
 
-	public MMLEditor(KeyboardView keyboard, PianoRollView pianoRoll, IMMLManager mmlManager) {
-		this.keyboardView = keyboard;
+	public MMLEditor(IPlayNote notePlayer, PianoRollView pianoRoll, IMMLManager mmlManager) {
+		this.notePlayer = notePlayer;
 		this.pianoRollView = pianoRoll;
 		this.mmlManager = mmlManager;
 
@@ -184,7 +184,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 
 		MMLNoteEvent noteEvent = new MMLNoteEvent(note, editAlign, (int)alignedTickOffset, prevNote.getVelocity());
 		selectNote(noteEvent);
-		keyboardView.playNote( note );
+		notePlayer.playNote( note );
 	}
 
 	/**
@@ -208,7 +208,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 			noteEvent.setNote(note);
 		}
 		noteEvent.setTick((int)newTick);
-		keyboardView.playNote(noteEvent.getNote());
+		notePlayer.playNote(noteEvent.getNote());
 	}
 
 	@Override
@@ -238,7 +238,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 			note2.setTickOffset(note1.getTickOffset() + (int)alignedTickOffsetDelta);
 		}
 
-		keyboardView.playNote( pianoRollView.convertY2Note(p.y) );
+		notePlayer.playNote( pianoRollView.convertY2Note(p.y) );
 	}
 
 	@Override
@@ -269,7 +269,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 			selectNote(null);
 		}
 		mmlManager.updateActivePart(true);
-		keyboardView.offNote();
+		notePlayer.offNote();
 	}
 
 	@Override
@@ -385,12 +385,10 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	}
 
 	@Override
-	public void mouseEntered(MouseEvent e) {
-	}
+	public void mouseEntered(MouseEvent e) {}
 
 	@Override
-	public void mouseExited(MouseEvent e) {
-	}
+	public void mouseExited(MouseEvent e) {}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
@@ -528,7 +526,6 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 
 	@Override
 	public void selectPreviousAll() {
-		System.out.println("selectPreviousAll");
 		MMLEventList editEventList = mmlManager.getActiveMMLPart();
 		if (editEventList != null) {
 			for (MMLNoteEvent note : editEventList.getMMLNoteEventList()) {

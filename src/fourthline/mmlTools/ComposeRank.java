@@ -53,6 +53,10 @@ public final class ComposeRank {
 	 * @return ランクの文字
 	 */
 	public static String mmlRank(String melody, String chord1, String chord2, String songEx) {
+		return mmlRank( melody.length(), chord1.length(), chord2.length(), songEx.length() );
+	}
+
+	public static String mmlRank(int melody, int chord1, int chord2, int songEx) {
 		for (ComposeRank rank : rankList) {
 			if (rank.compare(melody, chord1, chord2, songEx))
 				return rank.getRank();
@@ -85,11 +89,11 @@ public final class ComposeRank {
 		this.rank = rank;
 	}
 
-	public boolean compare(String melody, String chord1, String chord2, String songEx) {
-		if ( (melody.length() <= this.melody) &&
-				(chord1.length() <= this.chord1) &&
-				(chord2.length() <= this.chord2) &&
-				(songEx.length() <= this.melody))
+	public boolean compare(int melody, int chord1, int chord2, int songEx) {
+		if ( (melody <= this.melody) &&
+				(chord1 <= this.chord1) &&
+				(chord2 <= this.chord2) &&
+				(songEx <= this.melody))
 			return true;
 
 		return false;

@@ -92,7 +92,8 @@ public final class MabiDLS {
 
 	public synchronized void loadRequiredInstruments(MMLScore score) {
 		ArrayList<InstClass> requiredInsts = new ArrayList<>();
-		for (MMLTrack track : score.getTrackList()) {
+		ArrayList<MMLTrack> trackList = new ArrayList<>(score.getTrackList());
+		for (MMLTrack track : trackList) {
 			InstClass inst1 = getInstByProgram( track.getProgram() );
 			InstClass inst2 = getInstByProgram( track.getSongProgram() );
 			if ( (inst1 != null) && (!requiredInsts.contains(inst1)) ) {
