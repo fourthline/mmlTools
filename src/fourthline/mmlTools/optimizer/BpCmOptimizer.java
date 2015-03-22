@@ -35,7 +35,7 @@ public final class BpCmOptimizer implements MMLStringOptimizer.Optimizer {
 			 */
 			@Override
 			public BmCpState nextStatus(String token) {
-				if (MMLTokenizer.isNote(token.charAt(0))) {
+				if (isNoteWithoutR(token)) {
 					if (MMLTokenizer.noteNames(token)[0].toLowerCase().equals("b")) {
 						return B2;
 					}
@@ -52,7 +52,12 @@ public final class BpCmOptimizer implements MMLStringOptimizer.Optimizer {
 			 */
 			@Override
 			public BmCpState nextStatus(String token) {
-				return (token.equals(">")) ? B3 : NONE;
+				if (isNoteWithoutR(token)) {
+					return NONE;
+				} else if (token.equals(">")) {
+					return B3;
+				}
+				return B2;
 			}
 		},
 		B3 {
@@ -75,7 +80,7 @@ public final class BpCmOptimizer implements MMLStringOptimizer.Optimizer {
 			 */
 			@Override
 			public BmCpState nextStatus(String token) {
-				if (MMLTokenizer.isNote(token.charAt(0))) {
+				if (isNoteWithoutR(token)) {
 					if (MMLTokenizer.noteNames(token)[0].toLowerCase().equals("c")) {
 						return C2;
 					}
@@ -92,7 +97,12 @@ public final class BpCmOptimizer implements MMLStringOptimizer.Optimizer {
 			 */
 			@Override
 			public BmCpState nextStatus(String token) {
-				return (token.equals("<")) ? C3 : NONE;
+				if (isNoteWithoutR(token)) {
+					return NONE;
+				} else if (token.equals("<")) {
+					return C3;
+				}
+				return C2;
 			}
 		},
 		C3 {
@@ -116,6 +126,14 @@ public final class BpCmOptimizer implements MMLStringOptimizer.Optimizer {
 
 		public String optimize(StringBuilder sb) {
 			throw new AssertionError();
+		}
+
+		private static boolean isNoteWithoutR(String token) {
+			char firstC = Character.toLowerCase( token.charAt(0) );
+			if ("abcdefg".indexOf(firstC) >= 0) {
+				return true;
+			}
+			return false;
 		}
 	}
 

@@ -176,7 +176,7 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 		try {
 			return (MMLNoteEvent) super.clone();
 		} catch (CloneNotSupportedException e) {
-			throw new AssertionError();
+			throw new AssertionError(e.getMessage());
 		}
 	}
 

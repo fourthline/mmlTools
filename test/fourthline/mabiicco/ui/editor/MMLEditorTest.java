@@ -440,12 +440,12 @@ public class MMLEditorTest {
 		MouseEvent e1 = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON1_DOWN_MASK, x1+1, y1+1, 1, false);
 
 		// メロディーパート.
-		assertEquals(track.getMMLEventAtIndex(0), mmlManager.getActiveMMLPart());
+		assertTrue(track.getMMLEventAtIndex(0) == mmlManager.getActiveMMLPart());
 
 		editor.mousePressed(e1);
 		editor.mouseReleased(e1);
 
 		// 和音パート.
-		assertEquals(track.getMMLEventAtIndex(1), mmlManager.getActiveMMLPart());
+		assertTrue(track.getMMLEventAtIndex(1) == mmlManager.getActiveMMLPart());
 	}
 }

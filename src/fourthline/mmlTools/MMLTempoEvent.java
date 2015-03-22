@@ -11,7 +11,7 @@ import java.util.List;
 import fourthline.mmlTools.core.MMLTickTable;
 
 
-public final class MMLTempoEvent extends MMLEvent {
+public final class MMLTempoEvent extends MMLEvent implements Cloneable {
 	private static final long serialVersionUID = 8014294359518840951L;
 
 	private int tempo;
@@ -174,6 +174,11 @@ public final class MMLTempoEvent extends MMLEvent {
 		}
 
 		return maxEvent;
+	}
+
+	@Override
+	public MMLTempoEvent clone() throws CloneNotSupportedException {
+		return (MMLTempoEvent) super.clone();
 	}
 
 	@Override

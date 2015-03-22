@@ -8,7 +8,6 @@ package fourthline.mabiicco.ui;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.stream.Stream;
 
@@ -21,11 +20,13 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLNoteEvent;
 import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTrack;
+import fourthline.mmlTools.Marker;
 
 public final class MMLSeqViewTest {
 
@@ -34,6 +35,7 @@ public final class MMLSeqViewTest {
 		MabiDLS midi = MabiDLS.getInstance();
 		midi.initializeMIDI();
 		midi.loadingDLSFile(new File(MabiDLS.DEFALUT_DLS_PATH));
+		MabiIccoProperties.getInstance().setEnableViewMarker(true);
 	}
 
 	private MMLSeqView obj;
@@ -265,25 +267,43 @@ public final class MMLSeqViewTest {
 		assertEquals(96*4, obj.getMMLScore().getTotalTickLength());
 	}
 
-	private void checkImage(PianoRollView view, String filename) throws IOException {
+	private void checkImage(PianoRollView view, String filename) throws Exception {
 		JViewport viewport = new JViewport();
 		int width = view.convertTicktoX( obj.getMMLScore().getTotalTickLength() );
 		int height = view.getTotalHeight();
 		viewport.setExtentSize(new Dimension(width, height));
-		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
+		// PianoRollView画像の作成.
+		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		view.setSize(width, height);
 		view.setViewportAndParent(viewport, obj);
 		view.paintComponent(image.getGraphics());
-		ImageIO.write(image, "png", new File(filename));
+		ImageIO.write(image, "png", new File(filename+"_pianoRoll.png"));
+
+		// ColumnPanel画像の作成.
+		ColumnPanel columnView = (ColumnPanel) getField("columnView");
+		BufferedImage image2 = new BufferedImage(width, columnView.getPreferredSize().height, BufferedImage.TYPE_INT_ARGB);
+		columnView.setSize(width, columnView.getPreferredSize().height);
+		columnView.paintComponent(image2.getGraphics());
+		ImageIO.write(image2, "png", new File(filename+"_column.png"));
+
+		// KeyboardView画像の作成.
+		KeyboardView keyboardView = (KeyboardView) getField("keyboardView");
+		keyboardView.playNote(80);
+		BufferedImage image3 = new BufferedImage(keyboardView.getPreferredSize().width, height, BufferedImage.TYPE_INT_ARGB);
+		keyboardView.paintComponent(image3.getGraphics());
+		keyboardView.offNote();
+		ImageIO.write(image3, "png", new File(filename+"_keyboard.png"));
 	}
 
 	@Test
 	public void test_pianoRollView() throws Exception {
 		PianoRollView view = (PianoRollView) getField("pianoRollView");
-		obj.setMMLselectedTrack(new MMLTrack().setMML("MML@cccc,dddd,eeee,ffff;"));
-		obj.addMMLTrack(new MMLTrack().setMML("MML@>cccc,>dddd,>eeee,>ffff;"));
-		obj.addMMLTrack(new MMLTrack().setMML("MML@<cccc,<dddd,<eeee,<ffff;"));
+		obj.setMMLselectedTrack(new MMLTrack().setMML("MML@t160l1cccc,l1dddd,l1eeee,l1ffff;"));
+		obj.addMMLTrack(new MMLTrack().setMML("MML@>l1cccc,>l1dddd,>l1eeee,>l1ffff;"));
+		obj.addMMLTrack(new MMLTrack().setMML("MML@<l1cccc,<l1dddd,<l1eeee,<l1ffff;"));
+
+		obj.getMMLScore().getMarkerList().add(new Marker("Marker", 96*3));
 
 		// 拡大
 		assertEquals(6.0, view.getWideScale(), 0.001);
@@ -292,7 +312,7 @@ public final class MMLSeqViewTest {
 			obj.expandPianoViewWide(0);
 		});
 		assertEquals(0.25, view.getWideScale(), 0.001);
-		checkImage(view, "sample1.png");
+		checkImage(view, "sample1");
 
 		// 縮小
 		Stream.of(0.25, 0.375, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 6.0) .forEach(t -> {
@@ -300,7 +320,7 @@ public final class MMLSeqViewTest {
 			obj.reducePianoViewWide(0);
 		});
 		assertEquals(6.0, view.getWideScale(), 0.001);
-		checkImage(view, "sample2.png");
+		checkImage(view, "sample2");
 	}
 
 	/**
@@ -327,7 +347,7 @@ public final class MMLSeqViewTest {
 	}
 
 	/**
-	 * 任意のfuncを実行したあとのActiveTrackの検査する.
+	 * 任意のfuncを実行したあとのActiveTrackを検査する.
 	 */
 	private class TP1 {
 		private Runnable func;
@@ -348,7 +368,7 @@ public final class MMLSeqViewTest {
 			MMLEventList expect = obj.getMMLScore().getTrack(track).getMMLEventAtIndex(part);
 			MMLEventList actual = obj.getActiveMMLPart();
 			System.out.println(track+" "+part+" "+expect+" <=> "+actual);
-			assertTrue( expect == actual ); // 参照が同じことを確認するため equalsではない.
+			assertSame( expect, actual );
 		}
 	}
 

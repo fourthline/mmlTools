@@ -149,6 +149,20 @@ public class MMLStringOptimizerTest {
 	}
 
 	@Test(timeout=TIMEOUT)
+	public void testOptimize_oct2() {
+		String input  = "r.>cr16<a+r.>cr16<a+r.>cr16<a+r.";
+		String expect = "r.b+r16a+r.b+r16a+r.b+r16a+r.";
+		checkMMLStringOptimize(input, expect);
+	}
+
+	@Test(timeout=TIMEOUT)
+	public void testOptimize_oct3() {
+		String input  = "r.<br16>a+r.<br16>a+r.<br16>a+r.";
+		String expect = "r.c-r16a+r.c-r16a+r.c-r16a+r.";
+		checkMMLStringOptimize(input, expect);
+	}
+
+	@Test(timeout=TIMEOUT)
 	public void testOptimize_cb_oct() {
 		String input  = "c<b>c<v10b>c<t121b>v12cd<v11<b>d>>t118c<g";
 		String expect = "cc-cv10c-ct121c-v12cd<v11c-d>t118b+g";

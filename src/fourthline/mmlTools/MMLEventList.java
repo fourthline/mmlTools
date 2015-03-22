@@ -347,13 +347,16 @@ public final class MMLEventList implements Serializable, Cloneable {
 		try {
 			MMLEventList obj = (MMLEventList) super.clone();
 			obj.noteList = new ArrayList<>();
-			obj.tempoList = new ArrayList<>(tempoList);
 			for (MMLNoteEvent note : noteList) {
 				obj.noteList.add(note.clone());
 			}
+			obj.tempoList = new ArrayList<>();
+			for (MMLTempoEvent tempo : tempoList) {
+				obj.tempoList.add(tempo.clone());
+			}
 			return obj;
 		} catch (CloneNotSupportedException e) {
-			throw new AssertionError();
+			throw new AssertionError(e.getMessage());
 		}
 	}
 

@@ -1,10 +1,11 @@
 /*
- * Copyright (C) 2014 たんらる
+ * Copyright (C) 2014-2015 たんらる
  */
 
 package fourthline.mmlTools;
 
 import static org.junit.Assert.*;
+
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -17,7 +18,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import java.util.stream.Stream;
+
 import org.junit.Test;
+
 
 
 
@@ -210,5 +214,40 @@ public class MMLScoreTest extends FileSelect {
 				mmlFileParse(s, overwriteToLocalMMLOption);
 			});
 		} catch (IOException e) {}
+	}
+
+	/**
+	 * 指定Tickにあるノートをすべて取得する.
+	 */
+	@Test
+	public void test_getNoteListOnTickOffset() {
+		MMLScore score = new MMLScore();
+		score.addTrack(new MMLTrack().setMML("MML@c,,rd"));
+		score.addTrack(new MMLTrack().setMML("MML@rf,e"));
+		score.addTrack(new MMLTrack().setMML("MML@,ra,g"));
+
+		MMLNoteEvent expect1[] = {
+				new MMLNoteEvent(48, 96, 0),
+				new MMLNoteEvent(52, 96, 0),
+				new MMLNoteEvent(55, 96, 0)
+		};
+		MMLNoteEvent expect2[] = {
+				new MMLNoteEvent(50, 96, 96),
+				new MMLNoteEvent(53, 96, 96),
+				new MMLNoteEvent(57, 96, 96)
+		};
+
+		assertArrayEquals(expect1,
+				score.getNoteListOnTickOffset(0).stream()
+				.flatMap(t -> Stream.of(t))
+				.filter(t -> (t != null)).toArray());
+		assertArrayEquals(expect2,
+				score.getNoteListOnTickOffset(96).stream()
+				.flatMap(t -> Stream.of(t))
+				.filter(t -> (t != null)).toArray());
+		assertEquals(0,
+				score.getNoteListOnTickOffset(96+96).stream()
+				.flatMap(t -> Stream.of(t))
+				.filter(t -> (t != null)).count());
 	}
 }

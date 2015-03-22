@@ -9,6 +9,7 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import org.junit.Test;
 
@@ -638,5 +639,32 @@ public class MMLEventListTest {
 
 		eventList.unsetVelocityCommand(target);
 		assertEquals(eventList3.toMMLString(), eventList.toMMLString());
+	}
+
+	@Test
+	public void test_clone() throws CloneNotSupportedException {
+		MMLEventList eventList1 = new MMLEventList("t120cde");
+		MMLEventList eventList2 = eventList1.clone();
+
+		Objects.deepEquals(eventList1, eventList2);
+		assertEquals(
+				eventList1.getGlobalTempoList().get(0),
+				eventList2.getGlobalTempoList().get(0));
+		assertNotSame(
+				eventList1.getGlobalTempoList().get(0),
+				eventList2.getGlobalTempoList().get(0));
+		assertEquals(
+				eventList1.getMMLNoteEventList().get(0),
+				eventList2.getMMLNoteEventList().get(0));
+		assertNotSame(
+				eventList1.getMMLNoteEventList().get(0),
+				eventList2.getMMLNoteEventList().get(0));
+	}
+
+	@Test
+	public void test_plus() throws UndefinedTickException {
+		MMLEventList eventList1 = new MMLEventList("c+");
+		MMLEventList eventList2 = new MMLEventList("c#");
+		assertEquals(eventList1.toString(), eventList2.toString());
 	}
 }
