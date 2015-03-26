@@ -43,7 +43,8 @@ public final class MMLStringOptimizer {
 		String mml = originalMML;
 		Optimizer optimizerList[] = {
 				new OxLxOptimizer(),
-				new BpCmOptimizer()
+				new BpCmOptimizer(),
+				new NxOptimizer()
 		};
 
 		for (Optimizer optimizer : optimizerList) {

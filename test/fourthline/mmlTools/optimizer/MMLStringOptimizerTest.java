@@ -7,7 +7,6 @@ package fourthline.mmlTools.optimizer;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import fourthline.mmlTools.MMLEventList;
@@ -144,7 +143,7 @@ public class MMLStringOptimizerTest {
 	@Test(timeout=TIMEOUT)
 	public void testOptimize_oct() {
 		String input  = ">c<<<c32.>>>c16.<<v12<c64>>t121>co6d<<d";
-		String expect = ">co2c32.o5c16.o2v12c64o5t121c>d<<d";
+		String expect = ">co2c32.o5c16.v12o2c64t121o5c>d<<d";
 		checkMMLStringOptimize(input, expect);
 	}
 
@@ -165,14 +164,45 @@ public class MMLStringOptimizerTest {
 	@Test(timeout=TIMEOUT)
 	public void testOptimize_cb_oct() {
 		String input  = "c<b>c<v10b>c<t121b>v12cd<v11<b>d>>t118c<g";
-		String expect = "cc-cv10c-ct121c-v12cd<v11c-d>t118b+g";
+		String expect = "cc-cv10c-ct121c-v12cdv11<c-dt118>b+g";
 		checkMMLStringOptimize(input, expect);
 	}
 
-	@Test(timeout=TIMEOUT) @Ignore
+	@Test(timeout=TIMEOUT)
 	public void testOptimize_n() {
-		String input  = "o7co1co7c";
-		String expect = "o7cn12c";
+		String input  = "c<g+>c<g>>f<<a";
+		String expect = "c<g+b+gn65a";
+		checkMMLStringOptimize(input, expect);
+	}
+
+	@Test(timeout=TIMEOUT)
+	public void testOptimize_n2() {
+		String input  =  "o7cccc<<<<<c+>>>>cccc";
+		String expect =  "o7ccccn25<cccc";
+		// other:        "o7cccco2c+o6cccc"
+		checkMMLStringOptimize(input, expect);
+	}
+
+	@Test(timeout=TIMEOUT)
+	public void testOptimize_n3() {
+		String input  = "o7cccc<<<<<c+>>>>>cccc";
+		String expect = "o7ccccn25cccc";
+		checkMMLStringOptimize(input, expect);
+	}
+
+	@Test(timeout=TIMEOUT)
+	public void testOptimize_n4() {
+		String input  =  "o7cccc<<<<<c+c+>>>>>cccc";
+		String expect =  "o7ccccn25n25cccc";
+		// other:        "o7cccco2c+c+o7cccc"
+		checkMMLStringOptimize(input, expect);
+	}
+
+	@Test(timeout=TIMEOUT)
+	public void testOptimize_n5() {
+		String input  =  "o7cccc<<<<<c+>c+>>>>cccc";
+		String expect =  "o7ccccn25n37cccc";
+		// other:        "o7cccco2c+>c+o7cccc"
 		checkMMLStringOptimize(input, expect);
 	}
 }

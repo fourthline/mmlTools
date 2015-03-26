@@ -80,18 +80,8 @@ public final class MMLTokenizer implements Iterator<String> {
 	}
 
 	public static String[] noteNames(String token) {
-		char firstC = token.charAt(0);
-		String noteName = "" + firstC;
-		String noteLength = "";
-		if (token.length() > 1) {
-			char secondC = token.charAt(1);
-			if (!Character.isDigit(secondC)) {
-				noteName += secondC;
-				noteLength = token.substring(2);
-			} else {
-				noteLength = token.substring(1);
-			}
-		}
+		String noteName = noteName(token);
+		String noteLength = token.substring(noteName.length());
 
 		return new String[] { noteName, noteLength };
 	}

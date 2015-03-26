@@ -149,8 +149,8 @@ public class MMLTrackTest {
 	@Test
 	public void testTempo_all0() throws Exception {
 		String mml =        "MML@,t150c1c1t120c1c1t130c1c1;";
-		String expectMML1 = "MML@l1t150rrt120rrt130,l1cccccc,;";
-		String expectMML2 = "MML@l1t150v0cct120cct130rrv0c64t150,l1cccccc,;";
+		String expectMML1 = "MML@t150l1rrt120rrt130,l1cccccc,;";
+		String expectMML2 = "MML@t150v0l1cct120cct130rrv0c64t150,l1cccccc,;";
 
 		MMLTrack track = new MMLTrack().setMML(mml);
 		assertEquals(expectMML1, track.generate().getOriginalMML());

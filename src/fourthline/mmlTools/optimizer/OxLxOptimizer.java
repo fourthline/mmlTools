@@ -128,21 +128,22 @@ public final class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 		addNoteText(noteName, lenString, insertBack);
 	}
 
+	public static String getOctaveString(int prevOct, int nextOct) {
+		int delta = prevOct - nextOct;
+		if (Math.abs( delta ) > 2) {
+			return ("o"+nextOct);
+		} else {
+			String s = "<<";
+			if (delta < 0) {
+				s = ">>";
+			}
+			return (s.substring(0, Math.abs( delta )));
+		}
+	}
+
 	private void insertOxPattern(int insertBack) {
 		int nextOct = this.octave + this.octD;
-		int octRo = this.octD;
-		if (octRo < 0) {
-			octRo = -octRo;
-		}
-		if (octRo > 2) {
-			addString("o"+nextOct, insertBack);
-		} else if (octRo > 0) {
-			String s = ">>";
-			if (this.octave > nextOct) {
-				s = "<<";
-			}
-			addString(s.substring(0, octRo), insertBack);
-		}
+		addString(getOctaveString(this.octave, nextOct), insertBack);
 
 		this.octave = nextOct;
 		this.octD = 0;
@@ -175,8 +176,11 @@ public final class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 		} else {
 			boolean patternDone = doToken(firstC, s[1]);
 			if (!patternDone) {
-				tokenStack += token.length();
 				addString(token);
+			}
+			if (firstC == '&') {
+				// '&' 以外は順番どおり.
+				tokenStack += token.length();
 			}
 		}
 

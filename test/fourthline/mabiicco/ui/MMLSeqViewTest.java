@@ -16,6 +16,7 @@ import javax.swing.JViewport;
 
 import static org.junit.Assert.*;
 
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -30,12 +31,19 @@ import fourthline.mmlTools.Marker;
 
 public final class MMLSeqViewTest {
 
+	private static boolean viewMarker;
 	@BeforeClass
 	public static void initialize() throws Exception {
 		MabiDLS midi = MabiDLS.getInstance();
 		midi.initializeMIDI();
 		midi.loadingDLSFile(new File(MabiDLS.DEFALUT_DLS_PATH));
+		viewMarker = MabiIccoProperties.getInstance().getEnableViewMarker();
 		MabiIccoProperties.getInstance().setEnableViewMarker(true);
+	}
+
+	@AfterClass
+	public static void cleanup() {
+		MabiIccoProperties.getInstance().setEnableViewMarker(viewMarker);
 	}
 
 	private MMLSeqView obj;
