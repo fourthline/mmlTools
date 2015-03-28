@@ -295,6 +295,7 @@ public final class MMLScore implements IMMLFileParser {
 	public MMLScore parse(InputStream istream) throws MMLParseException {
 		this.globalTempoList.clear();
 		this.trackList.clear();
+		this.markerList.clear();
 
 		List<SectionContents> contentsList = SectionContents.makeSectionContentsByInputStream(istream, "UTF-8");
 		if (contentsList.isEmpty()) {
