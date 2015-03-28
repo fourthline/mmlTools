@@ -33,20 +33,24 @@ public class MMLStringOptimizerTest {
 	}
 
 	private void checkMMLStringOptimize(String input, String expect) {
-		MMLStringOptimizer optimizer = new MMLStringOptimizer(input);
-		String mml = optimizer.toString();
+		try {
+			MMLStringOptimizer optimizer = new MMLStringOptimizer(new MMLEventList(input).toMMLString(true, true));
+			String mml = optimizer.toString();
 
-		System.out.println(input);
-		System.out.println(mml);
-		System.out.println(expect);
-		System.out.printf("%d > %d\n", input.length(), mml.length());
-		System.out.printf("expect: %d\n", expect.length());
-		assertTrue(mml.length() <= expect.length());
-		assertEquals(expect, mml);
+			System.out.println(input);
+			System.out.println(mml);
+			System.out.println(expect);
+			System.out.printf("%d > %d\n", input.length(), mml.length());
+			System.out.printf("expect: %d\n", expect.length());
+			assertTrue(mml.length() <= expect.length());
+			assertEquals(expect, mml);
 
-		MMLEventList eventList1 = new MMLEventList(input);
-		MMLEventList eventList2 = new MMLEventList(mml);
-		assertEquals(eventList1.getMMLNoteEventList().toString(), eventList2.getMMLNoteEventList().toString());
+			MMLEventList eventList1 = new MMLEventList(input);
+			MMLEventList eventList2 = new MMLEventList(mml);
+			assertEquals(eventList1.getMMLNoteEventList().toString(), eventList2.getMMLNoteEventList().toString());
+		} catch (UndefinedTickException e) {
+			fail(e.getMessage());
+		}
 	}
 
 	@Test(timeout=TIMEOUT)
@@ -135,29 +139,29 @@ public class MMLStringOptimizerTest {
 
 	@Test(timeout=TIMEOUT)
 	public void testOptimize_x1_1() {
-		String input  = "r1.r1.r1.r1.r1.r1.r1.c4a2c4a2c4a2c4a2c4a2c4a2c4a2r1.r1.r1.r1.r1.r1.r1.r1.r1.";
-		String expect = "l1.rrrrrrrc4l2ac4ac4ac4ac4ac4ac4al1.rrrrrrrrr";
+		String input  = "r1.r1.r1.r1.r1.r1.r1.c4a2c4a2c4a2c4a2c4a2c4a2c4a2r1.r1.r1.r1.r1.r1.r1.r1.r1.b4";
+		String expect = "l1.rrrrrrrc4l2ac4ac4ac4ac4ac4ac4al1.rrrrrrrrrb4";
 		checkMMLStringOptimize(input, expect);
 	}
 
 	@Test(timeout=TIMEOUT)
 	public void testOptimize_oct() {
 		String input  = ">c<<<c32.>>>c16.<<v12<c64>>t121>co6d<<d";
-		String expect = ">co2c32.o5c16.v12o2c64t121o5c>d<<d";
+		String expect = ">co2c21o5c16.v12o2c64t121o5c>d<<d";
 		checkMMLStringOptimize(input, expect);
 	}
 
 	@Test(timeout=TIMEOUT)
 	public void testOptimize_oct2() {
-		String input  = "r.>cr16<a+r.>cr16<a+r.>cr16<a+r.";
-		String expect = "r.b+r16a+r.b+r16a+r.b+r16a+r.";
+		String input  = "r.>cr16<a+r.>cr16<a+r.>cr16<a+e.";
+		String expect = "r.b+r16a+r.b+r16a+r.b+r16a+e.";
 		checkMMLStringOptimize(input, expect);
 	}
 
 	@Test(timeout=TIMEOUT)
 	public void testOptimize_oct3() {
-		String input  = "r.<br16>a+r.<br16>a+r.<br16>a+r.";
-		String expect = "r.c-r16a+r.c-r16a+r.c-r16a+r.";
+		String input  = "r.<br16>a+r.<br16>a+r.<br16>a+g.";
+		String expect = "r.c-r16a+r.c-r16a+r.c-r16a+g.";
 		checkMMLStringOptimize(input, expect);
 	}
 
@@ -203,6 +207,13 @@ public class MMLStringOptimizerTest {
 		String input  =  "o7cccc<<<<<c+>c+>>>>cccc";
 		String expect =  "o7ccccn25n37cccc";
 		// other:        "o7cccco2c+>c+o7cccc"
+		checkMMLStringOptimize(input, expect);
+	}
+
+	@Test(timeout=TIMEOUT)
+	public void testOptimize_n6() {
+		String input  =  "n1n25n1c64n25n1n25n1n25";
+		String expect =  "n1n25n1c64n25n1n25n1n25";
 		checkMMLStringOptimize(input, expect);
 	}
 }

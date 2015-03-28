@@ -32,7 +32,7 @@ import fourthline.mmlTools.MMLNoteEvent;
 import fourthline.mmlTools.MMLTrack;
 import fourthline.mmlTools.UndefinedTickException;
 
-public class MMLEditorTest {
+public final class MMLEditorTest {
 
 	@BeforeClass
 	public static void initialize() throws Exception {

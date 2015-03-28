@@ -429,6 +429,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		if (file != null) {
 			MMLScore score = fileParse(file);
 			if (score != null) {
+				MabiIccoProperties.getInstance().setRecentFile(file.getPath());
 				new MMLImportPanel(mainFrame, score, mmlSeqView).showDialog();
 			}
 		}

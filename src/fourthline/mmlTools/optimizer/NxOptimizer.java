@@ -13,8 +13,9 @@ import fourthline.mmlTools.core.MMLTokenizer;
 import fourthline.mmlTools.core.MelodyParser;
 import fourthline.mmlTools.core.ParserWarn3ML;
 
+
 /**
- * 
+ * Nxを使用した最適化.
  */
 public final class NxOptimizer implements MMLStringOptimizer.Optimizer {
 
@@ -107,16 +108,20 @@ public final class NxOptimizer implements MMLStringOptimizer.Optimizer {
 		builderList.add(min);
 	}
 
-	private boolean doToken(String token) {
+	private void notePattern(String token, String noteLength) {
+		List<NxBuilder> prevList = listClone();
+		addNoteToken(token);
+		cleanList();
+		if (noteLength.length() == 0) {
+			addPattern(prevList);
+		}
+	}
+
+	private void doToken(String token) {
 		String s[] = MMLTokenizer.noteNames(token);
 		char firstC = Character.toLowerCase(s[0].charAt(0));
 		if ( (firstC >= 'a') && (firstC <= 'g') ) {
-			List<NxBuilder> prevList = listClone();
-			addNoteToken(token);
-			cleanList();
-			if (s[1].length() == 0) {
-				addPattern(prevList);
-			}
+			notePattern(token, s[1]);
 		} else if (firstC == '>') {
 			octave++;
 			addOctToken(token);
@@ -127,9 +132,8 @@ public final class NxOptimizer implements MMLStringOptimizer.Optimizer {
 			octave = Integer.parseInt(s[1]);
 			addOctToken(token);
 		} else {
-			return false;
+			addToken(token);
 		}
-		return true;
 	}
 
 	private void addNoteToken(String token) {
@@ -162,10 +166,7 @@ public final class NxOptimizer implements MMLStringOptimizer.Optimizer {
 			parser.noteGT(token);
 		} catch (UndefinedTickException | ParserWarn3ML e) {}
 
-		if (doToken(token)) {
-		} else {
-			addToken(token);
-		}
+		doToken(token);
 		printMap();
 	}
 

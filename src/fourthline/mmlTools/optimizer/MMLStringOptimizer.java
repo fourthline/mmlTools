@@ -7,7 +7,7 @@ package fourthline.mmlTools.optimizer;
 import fourthline.mmlTools.core.MMLTokenizer;
 
 /**
- * Lx-builder, Ox
+ * MMLEventListで出力したMMLに対して最適化を行う.
  */
 public final class MMLStringOptimizer {
 
@@ -59,7 +59,7 @@ public final class MMLStringOptimizer {
 		return mml;
 	}
 
-	public interface Optimizer {
+	interface Optimizer {
 		public void nextToken(String token);
 		public String getMinString();
 	}

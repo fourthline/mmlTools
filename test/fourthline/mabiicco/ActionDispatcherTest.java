@@ -14,7 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 
-public class ActionDispatcherTest {
+public final class ActionDispatcherTest {
 
 	private ActionDispatcher obj;
 

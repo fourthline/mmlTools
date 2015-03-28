@@ -93,8 +93,8 @@ public class MMLNoteEventTest {
 
 	@Test
 	public void testParse_0() {
-		MMLEventList eventList1 = new MMLEventList("v14l16o5aa");
-		MMLEventList eventList2 = new MMLEventList("V14L16O5aa");
+		MMLEventList eventList1 = new MMLEventList("v14l16o5aav16cv-1c");
+		MMLEventList eventList2 = new MMLEventList("V14L16O5aacc");
 
 		assertEquals(eventList1.toString(), eventList2.toString());
 	}

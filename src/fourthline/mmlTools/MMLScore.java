@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+
 import fourthline.mmlTools.core.MMLTicks;
 import fourthline.mmlTools.parser.IMMLFileParser;
 import fourthline.mmlTools.parser.MMLParseException;
@@ -345,8 +346,18 @@ public final class MMLScore implements IMMLFileParser {
 	}
 
 	public MMLScore generateAll() throws UndefinedTickException {
-		for (MMLTrack track : trackList) {
-			track.generate();
+		try {
+			trackList.parallelStream().forEach(t -> {
+				try {
+					t.generate();
+				} catch (UndefinedTickException e) {
+					throw new RuntimeException(e);
+				}
+			});
+		} catch (RuntimeException e) {
+			if (e.getCause() instanceof UndefinedTickException) {
+				throw (UndefinedTickException) e.getCause();
+			}
 		}
 		return this;
 	}

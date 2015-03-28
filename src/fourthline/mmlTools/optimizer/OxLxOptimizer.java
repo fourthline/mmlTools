@@ -11,6 +11,9 @@ import java.util.HashMap;
 import fourthline.mmlTools.core.MMLTokenizer;
 
 
+/**
+ * Ox, Lxを使用した最適化.
+ */
 public final class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 
 	/**

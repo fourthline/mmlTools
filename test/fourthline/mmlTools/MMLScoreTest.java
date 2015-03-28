@@ -184,6 +184,15 @@ public class MMLScoreTest extends FileSelect {
 					}
 				});
 
+				try {
+					long t1 = System.currentTimeMillis();
+					score.generateAll();
+					long t2 = System.currentTimeMillis();
+					System.out.println("MMLScore generateAll: "+(t2-t1)+"ms");
+				} catch (UndefinedTickException e) {
+					fail(e.getMessage());
+				}
+
 				if (updateOption) {
 					try {
 						score.generateAll();
