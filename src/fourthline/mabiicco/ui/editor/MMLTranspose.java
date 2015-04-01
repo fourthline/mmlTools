@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 たんらる
+ * Copyright (C) 2014-2015 たんらる
  */
 
 package fourthline.mabiicco.ui.editor;
@@ -14,12 +14,8 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import fourthline.mabiicco.AppResource;
-import fourthline.mabiicco.midi.InstType;
-import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.IMMLManager;
-import fourthline.mmlTools.MMLEventList;
-import fourthline.mmlTools.MMLNoteEvent;
-import fourthline.mmlTools.MMLTrack;
+
 
 public final class MMLTranspose {
 	public MMLTranspose() {
@@ -31,19 +27,7 @@ public final class MMLTranspose {
 			return;
 		}
 
-		MabiDLS dls = MabiDLS.getInstance();
-		for (MMLTrack track : mmlManager.getMMLScore().getTrackList()) {
-			// ドラムパートは移調対象外
-			if (dls.getInstByProgram(track.getProgram()).getType().equals(InstType.DRUMS)) {
-				continue;
-			}
-			for (MMLEventList eventList : track.getMMLEventList()) {
-				for (MMLNoteEvent note : eventList.getMMLNoteEventList()) {
-					note.setNote( note.getNote() + transpose );
-				}
-			}
-		}
-
+		mmlManager.getMMLScore().transpose(transpose);
 		mmlManager.updateActivePart(true);
 	}
 

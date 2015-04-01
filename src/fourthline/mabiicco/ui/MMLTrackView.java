@@ -102,8 +102,8 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 		gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		mmlTextPanel.setLayout(gridBagLayout);
 
-		comboBox = new JComboBox<>( MabiDLS.getInstance().getAvailableInstByInstType(EnumSet.of(InstType.NORMAL, InstType.DRUMS, InstType.VOICE)) );
-		songComboBox = new JComboBox<>( MabiDLS.getInstance().getAvailableInstByInstType(EnumSet.of(InstType.CHORUS)) );
+		comboBox = new JComboBox<>( MabiDLS.getInstance().getAvailableInstByInstType(InstType.getMainInstTypes()) );
+		songComboBox = new JComboBox<>( MabiDLS.getInstance().getAvailableInstByInstType(InstType.getChorusInstTypes()) );
 		songComboBox.addItem(noUseSongEx);
 		songComboBox.setSelectedItem(noUseSongEx);
 

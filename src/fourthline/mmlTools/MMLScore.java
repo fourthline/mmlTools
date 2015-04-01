@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 たんらる
+ * Copyright (C) 2013-2015 たんらる
  */
 
 package fourthline.mmlTools;
@@ -17,7 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-
+import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mmlTools.core.MMLTicks;
 import fourthline.mmlTools.parser.IMMLFileParser;
 import fourthline.mmlTools.parser.MMLParseException;
@@ -360,6 +360,24 @@ public final class MMLScore implements IMMLFileParser {
 			}
 		}
 		return this;
+	}
+
+	/**
+	 * 移調する.
+	 * @param transpose
+	 */
+	public void transpose(int transpose) {
+		MabiDLS dls = MabiDLS.getInstance();
+		for (MMLTrack track : trackList) {
+			// 移調ができる楽器の種類かを確認. 通常の打楽器は不可, シロフォンは可能.
+			if (dls.getInstByProgram(track.getProgram()).getType().allowTranspose()) {
+				for (MMLEventList eventList : track.getMMLEventList()) {
+					for (MMLNoteEvent note : eventList.getMMLNoteEventList()) {
+						note.setNote( note.getNote() + transpose );
+					}
+				}
+			}
+		}
 	}
 
 	public static void main(String args[]) {

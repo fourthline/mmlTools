@@ -259,4 +259,26 @@ public class MMLScoreTest extends FileSelect {
 				.flatMap(t -> Stream.of(t))
 				.filter(t -> (t != null)).count());
 	}
+
+	@Test
+	public void test_transpose1() throws UndefinedTickException {
+		MMLScore score = new MMLScore();
+		String mml    = "MML@cdcdccdd,,;";
+		String expect = "MML@c+d+c+d+c+c+d+d+,,;"; // 移調された場合.
+
+		// 普通の楽器.
+		score.addTrack(new MMLTrack().setMML(mml).setProgram(0));
+		// 大太鼓.
+		score.addTrack(new MMLTrack().setMML(mml).setProgram(66));
+		// シロフォン.
+		score.addTrack(new MMLTrack().setMML(mml).setProgram(77));
+
+		// 移調.
+		score.transpose(1);
+		score.generateAll();
+
+		assertEquals(expect, score.getTrack(0).getMabiMML());
+		assertEquals(mml   , score.getTrack(1).getMabiMML()); // 大太鼓のみ移調不可.
+		assertEquals(expect, score.getTrack(2).getMabiMML());
+	}
 }

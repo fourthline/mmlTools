@@ -109,8 +109,9 @@ public final class MMLTrack implements Serializable {
 		return this.globalTempoList;
 	}
 
-	public void setProgram(int program) {
+	public MMLTrack setProgram(int program) {
 		this.program = program;
+		return this;
 	}
 
 	public int getProgram() {

@@ -20,7 +20,6 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
-import java.util.EnumSet;
 
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
@@ -81,7 +80,7 @@ public final class MMLInputPanel extends JPanel {
 		panel2.setLayout(null);
 
 
-		comboBox = new JComboBox<>( MabiDLS.getInstance().getAvailableInstByInstType(EnumSet.of(InstType.NORMAL, InstType.DRUMS, InstType.VOICE)) );
+		comboBox = new JComboBox<>( MabiDLS.getInstance().getAvailableInstByInstType(InstType.getMainInstTypes()) );
 		comboBox.setBounds(25, 33, 193, 19);
 		comboBox.setMaximumRowCount(30);
 		panel2.add(comboBox);
