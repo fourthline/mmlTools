@@ -281,4 +281,42 @@ public class MMLScoreTest extends FileSelect {
 		assertEquals(mml   , score.getTrack(1).getMabiMML()); // 大太鼓のみ移調不可.
 		assertEquals(expect, score.getTrack(2).getMabiMML());
 	}
+
+	private void checkTranspose(String mml, String expect, int transpose) throws UndefinedTickException {
+		MMLScore score = new MMLScore();
+		score.addTrack(new MMLTrack().setMML(mml));
+
+		score.transpose(transpose);
+		score.generateAll();
+
+		assertEquals(expect, score.getTrack(0).getMabiMML());
+	}
+
+	@Test
+	public void test_transpose2() throws UndefinedTickException {
+		String mml    = "MML@o0c+,,;";
+		String expect = "MML@n0,,;";
+		checkTranspose(mml, expect, -1);
+	}
+
+	@Test(expected=UndefinedTickException.class)
+	public void test_transpose3() throws UndefinedTickException {
+		String mml    = "MML@o0c+,,;";
+		String expect = "MML@n-1,,;";
+		checkTranspose(mml, expect, -2);
+	}
+
+	@Test
+	public void test_transpose4() throws UndefinedTickException {
+		String mml    = "MML@o8b-,,;";
+		String expect = "MML@o8b,,;";
+		checkTranspose(mml, expect, +1);
+	}
+
+	@Test(expected=UndefinedTickException.class)
+	public void test_transpose5() throws UndefinedTickException {
+		String mml    = "MML@n0o8b-,,;";
+		String expect = "MML@n0o9c,,;";
+		checkTranspose(mml, expect, +2);
+	}
 }

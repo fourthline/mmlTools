@@ -97,14 +97,14 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 		"c", "c+", "d", "d+", "e", "f", "f+", "g", "g+", "a", "a+", "b"
 	};
 	private String getNoteName() throws UndefinedTickException {
-		if (note < 0) {
-			throw new UndefinedTickException("note = "+note);
-		}
 		return noteNameTable[ note%noteNameTable.length ];
 	}
 
 	@Override
 	public String toMMLString() throws UndefinedTickException {
+		if ( (note < 0) || (note >= 108) ) {
+			throw new UndefinedTickException("note = "+note);
+		}
 		String noteName = getNoteName();
 		MMLTicks mmlTick = new MMLTicks(noteName, tick);
 		if (tuningBase != null) {
@@ -115,6 +115,9 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 	}
 
 	public String toMMLString(MMLNoteEvent prevNoteEvent) throws UndefinedTickException {
+		if ( (note < 0) || (note >= 108) ) {
+			throw new UndefinedTickException("note = "+note);
+		}
 		StringBuilder sb = new StringBuilder();
 
 		// 前のノートとの差を見て、休符を挿入する.
