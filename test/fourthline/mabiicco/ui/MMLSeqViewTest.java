@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import fourthline.UseLoadingDLS;
 import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mmlTools.MMLEventList;
@@ -29,14 +30,11 @@ import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTrack;
 import fourthline.mmlTools.Marker;
 
-public final class MMLSeqViewTest {
+public final class MMLSeqViewTest extends UseLoadingDLS {
 
 	private static boolean viewMarker;
 	@BeforeClass
-	public static void initialize() throws Exception {
-		MabiDLS midi = MabiDLS.getInstance();
-		midi.initializeMIDI();
-		midi.loadingDLSFile(new File(MabiDLS.DEFALUT_DLS_PATH));
+	public static void initialize() {
 		viewMarker = MabiIccoProperties.getInstance().getEnableViewMarker();
 		MabiIccoProperties.getInstance().setEnableViewMarker(true);
 	}

@@ -80,7 +80,7 @@ public final class MMLInputPanel extends JPanel {
 		panel2.setLayout(null);
 
 
-		comboBox = new JComboBox<>( MabiDLS.getInstance().getAvailableInstByInstType(InstType.getMainInstTypes()) );
+		comboBox = new JComboBox<>( MabiDLS.getInstance().getAvailableInstByInstType(InstType.MAIN_INST_LIST) );
 		comboBox.setBounds(25, 33, 193, 19);
 		comboBox.setMaximumRowCount(30);
 		panel2.add(comboBox);

@@ -8,23 +8,14 @@ import static org.junit.Assert.*;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.lang.reflect.Field;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import fourthline.mabiicco.midi.MabiDLS;
+import fourthline.UseLoadingDLS;
 
 
-public final class MainFrameTest {
-
-	@BeforeClass
-	public static void initialize() throws Exception {
-		MabiDLS midi = MabiDLS.getInstance();
-		midi.initializeMIDI();
-		midi.loadingDLSFile(new File(MabiDLS.DEFALUT_DLS_PATH));
-	}
+public final class MainFrameTest extends UseLoadingDLS {
 
 	private void checkNotNullField(Object obj, String fieldName) throws Exception {
 		Field f = MainFrame.class.getDeclaredField(fieldName);

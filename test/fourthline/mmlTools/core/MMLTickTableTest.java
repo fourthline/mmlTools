@@ -30,6 +30,7 @@ public final class MMLTickTableTest extends FileSelect {
 
 		assertEquals(outputStream.toString(), outputStream2.toString());
 	}
+
 	@Test
 	public void test_invTable() throws IOException {
 		MMLTickTable tickTable1 = new MMLTickTable();

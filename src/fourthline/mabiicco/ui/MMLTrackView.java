@@ -33,7 +33,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.HashMap;
 
 public final class MMLTrackView extends JPanel implements ActionListener {
@@ -102,8 +101,8 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 		gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		mmlTextPanel.setLayout(gridBagLayout);
 
-		comboBox = new JComboBox<>( MabiDLS.getInstance().getAvailableInstByInstType(InstType.getMainInstTypes()) );
-		songComboBox = new JComboBox<>( MabiDLS.getInstance().getAvailableInstByInstType(InstType.getChorusInstTypes()) );
+		comboBox = new JComboBox<>( MabiDLS.getInstance().getAvailableInstByInstType(InstType.MAIN_INST_LIST) );
+		songComboBox = new JComboBox<>( MabiDLS.getInstance().getAvailableInstByInstType(InstType.SUB_INST_LIST) );
 		songComboBox.addItem(noUseSongEx);
 		songComboBox.setSelectedItem(noUseSongEx);
 

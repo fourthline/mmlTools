@@ -9,7 +9,6 @@ import static org.junit.Assert.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
-import java.io.File;
 import java.lang.reflect.Field;
 import java.util.List;
 
@@ -20,10 +19,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import fourthline.UseLoadingDLS;
 import fourthline.mabiicco.IEditStateObserver;
 import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mabiicco.midi.IPlayNote;
-import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.IMMLManager;
 import fourthline.mabiicco.ui.MMLSeqView;
 import fourthline.mabiicco.ui.PianoRollView;
@@ -32,18 +31,17 @@ import fourthline.mmlTools.MMLNoteEvent;
 import fourthline.mmlTools.MMLTrack;
 import fourthline.mmlTools.UndefinedTickException;
 
-public final class MMLEditorTest {
+public final class MMLEditorTest extends UseLoadingDLS {
 
+	private static boolean activePartSwitch;
 	@BeforeClass
-	public static void initialize() throws Exception {
-		MabiDLS midi = MabiDLS.getInstance();
-		midi.initializeMIDI();
-		midi.loadingDLSFile(new File(MabiDLS.DEFALUT_DLS_PATH));
+	public static void initialize() {
+		activePartSwitch = MabiIccoProperties.getInstance().getActivePartSwitch();
 	}
 
 	@AfterClass
 	public static void cleanup() {
-		MabiIccoProperties.getInstance().setActivePartSwitch(false);
+		MabiIccoProperties.getInstance().setActivePartSwitch( activePartSwitch );
 	}
 
 	private MMLEditor editor;

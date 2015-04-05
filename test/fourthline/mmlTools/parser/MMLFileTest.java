@@ -6,17 +6,14 @@ package fourthline.mmlTools.parser;
 
 import static org.junit.Assert.*;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-
-import javax.sound.midi.InvalidMidiDataException;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import fourthline.FileSelect;
-import fourthline.mabiicco.midi.MabiDLS;
+import fourthline.UseLoadingDLS;
 import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLScoreTest;
 import fourthline.mmlTools.UndefinedTickException;
@@ -25,13 +22,7 @@ public class MMLFileTest extends FileSelect {
 
 	@BeforeClass
 	public static void setup() {
-		MabiDLS midi = MabiDLS.getInstance();
-		try {
-			midi.loadingDLSFile(new File(MabiDLS.DEFALUT_DLS_PATH));
-		} catch (InvalidMidiDataException | IOException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
+		UseLoadingDLS.initializeDefaultDLS();
 	}
 
 	@Test

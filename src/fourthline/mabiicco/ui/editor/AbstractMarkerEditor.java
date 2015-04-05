@@ -25,7 +25,7 @@ import fourthline.mmlTools.MMLEvent;
  * @see MMLTempoEditor
  * @see MarkerEditor
  */
-public abstract class AbstractMarkerEditor<T extends MMLEvent> implements IMarkerEditor, ActionListener {
+abstract public class AbstractMarkerEditor<T extends MMLEvent> implements IMarkerEditor, ActionListener {
 
 	private final JMenuItem insertMenu;
 	private final JMenuItem editMenu;

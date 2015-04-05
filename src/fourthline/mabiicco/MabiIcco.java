@@ -9,7 +9,6 @@ import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
 
 import javax.sound.midi.InvalidMidiDataException;
@@ -25,7 +24,6 @@ import fourthline.mabiicco.midi.InstType;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.preloader.MabiIccoPreloaderNotification;
 import fourthline.mabiicco.ui.MainFrame;
-
 import javafx.application.Application;
 import javafx.application.Preloader;
 import javafx.stage.Stage;
@@ -123,7 +121,7 @@ public final class MabiIcco extends Application {
 			dls.loadingDLSFile(file);
 		}
 
-		if (dls.getAvailableInstByInstType(EnumSet.of(InstType.NORMAL, InstType.DRUMS)).length > 0) {
+		if (dls.getAvailableInstByInstType(InstType.MAIN_INST_LIST).length > 0) {
 			return true;
 		}
 		return false;

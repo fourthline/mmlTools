@@ -1,88 +1,157 @@
 /*
- * Copyright (C) 2014 たんらる
+ * Copyright (C) 2014-2015 たんらる
  */
 
 package fourthline.mabiicco.midi;
 
-import java.util.EnumSet;
+import java.util.Arrays;
+import java.util.List;
 
-public enum InstType {
-	NONE(false, false, false, false, true, true),
-	NORMAL(true, true, true, false, true, true),
+
+public interface InstType {
 	/**
-	 * 移調が出来ない打楽器.
+	 * 有効なパート情報を取得する. 
+	 * @return サイズは4の配列.
 	 */
-	DRUMS(true, false, false, false, false, false),
+	public boolean[] getEnablePart();
+
 	/**
-	 * 移調が可能な打楽器（鍵盤打楽器）.
+	 * @return 移調可能な場合は true, 移調できない場合は falseを返す.
 	 */
-	KPUR(true, false, false, false, false, true),
-	VOICE(false, false, false, true, true, true),
-	CHORUS(false, false, false, true, true, true);
+	public boolean allowTranspose();
 
-	public static EnumSet<InstType> getMainInstTypes() {
-		return EnumSet.of(InstType.NORMAL, InstType.DRUMS, InstType.KPUR, InstType.VOICE);
-	}
+	/**
+	 * mmlのV指定からMidiの音量値に変換する.
+	 * @param mml_velocity
+	 * @return midiの音量値.
+	 */
+	public int convertVelocityMML2Midi(int mml_velocity);
 
-	public static EnumSet<InstType> getChorusInstTypes() {
-		return EnumSet.of(InstType.CHORUS);
-	}
+	/** 使用不可な楽器 */
+	public InstType NONE = new NoneType();
+
+	/** 通常の楽器 [ melody, chord1, chord2 ]. */
+	public InstType NORMAL = new NormalType(true);
+
+	/** 打楽器楽器 [ melody ], 移調できない. */
+	public InstType DRUMS = new PercussionType(false);
+
+	/** 打楽器楽器 [ melody ], 移調できる. (シロフォン) */
+	public InstType KPUR = new PercussionType(true);
+
+	/** 歌 [ song ]. */
+	public InstType VOICE = new NormalType(false);
+
+	/** コーラス [ song ]. */
+	public InstType CHORUS = new NormalType(false);
+
+	/**
+	 * 単独で使用可能なメインの楽器のリスト.
+	 */
+	public List<InstType> MAIN_INST_LIST = Arrays.asList(NORMAL, DRUMS, KPUR, VOICE);
+
+	/**
+	 * 単独で使用不能なサブの楽器のリスト.
+	 */
+	public List<InstType> SUB_INST_LIST = Arrays.asList(CHORUS);
 
 	public static InstType getInstType(String s) {
-		if (s.equals("0")) {
-			return NONE;
+		switch (s) {
+		case "0": return NONE;
+		case "N": return NORMAL;
+		case "D": return DRUMS;
+		case "V": return VOICE;
+		case "C": return CHORUS;
+		case "K": return KPUR;
+		default : throw new AssertionError();
 		}
-		if (s.equals("N")) {
-			return NORMAL;
-		}
-		if (s.equals("D")) {
-			return DRUMS;
-		}
-		if (s.equals("V")) {
-			return VOICE;
-		}
-		if (s.equals("C")) {
-			return CHORUS;
-		}
-		if (s.equals("K")) {
-			return KPUR;
-		}
-
-		return null;
 	}
 
 	public static final int VOICE_PLAYBACK_CHANNEL = 10;
 
-	private final boolean enablePart[];
-	private final boolean allowV15;
-	private final boolean allowTranspose;
-	private InstType(boolean melody, boolean chord1, boolean chord2, boolean songEx, boolean allowV15, boolean allowTranspose) {
-		enablePart = new boolean[] {
-				melody, chord1, chord2, songEx
-		};
-		this.allowV15 = allowV15;
-		this.allowTranspose = allowTranspose;
+	class NoneType implements InstType {
+		private final boolean enablePart[] = new boolean[] { false, false, false, false };
+
+		@Override
+		public boolean[] getEnablePart() {
+			return this.enablePart;
+		}
+
+		@Override
+		public boolean allowTranspose() {
+			return true;
+		}
+
+		@Override
+		public int convertVelocityMML2Midi(int mml_velocity) {
+			return 0;
+		}
 	}
 
-	public boolean[] getEnablePart() {
-		return enablePart;
-	}
+	/**
+	 * 移調可能な通常音量の音源. [ melody, chord1, chord2 ] or [ song ]
+	 */
+	class NormalType implements InstType {
+		private final boolean enablePart[];
 
-	public boolean allowTranspose() {
-		return allowTranspose;
-	}
+		private NormalType(boolean isNormal) {
+			if (isNormal) {
+				this.enablePart = new boolean[] { true, true, true, false };
+			} else {
+				this.enablePart = new boolean[] { false, false, false, true };
+			}
+		}
 
-	public int convertVelocityMML2Midi(int mml_velocity) {
-		if (allowV15) {
+		@Override
+		public boolean[] getEnablePart() {
+			return this.enablePart;
+		}
+
+		@Override
+		public boolean allowTranspose() {
+			return true;
+		}
+
+		@Override
+		public int convertVelocityMML2Midi(int mml_velocity) {
 			// 通常の楽器.
 			if (mml_velocity > 15) {
 				mml_velocity = 15;
+			} else if (mml_velocity < 0) {
+				mml_velocity = 0;
 			}
 			return (mml_velocity * 8);
-		} else {
+		}
+	}
+
+	/**
+	 * 打楽器楽器 [ melody ], 移調可否を指定する.
+	 */
+	class PercussionType implements InstType {
+		private final boolean enablePart[] = new boolean[] { true, false, false, false };
+		private final boolean allowTranspose;
+
+		private PercussionType(boolean allowTranspose) {
+			this.allowTranspose = allowTranspose;
+		}
+
+		@Override
+		public boolean[] getEnablePart() {
+			return this.enablePart;
+		}
+
+		@Override
+		public boolean allowTranspose() {
+			return this.allowTranspose;
+		}
+
+		@Override
+		public int convertVelocityMML2Midi(int mml_velocity) {
 			// 打楽器系の楽器はv11がMAX.
 			if (mml_velocity > 11) {
 				mml_velocity = 11;
+			} else if (mml_velocity < 0) {
+				mml_velocity = 0;
 			}
 			return (mml_velocity * 11);
 		}

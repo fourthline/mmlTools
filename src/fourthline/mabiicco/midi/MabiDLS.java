@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.List;
 
 import javax.sound.midi.*;
@@ -151,7 +150,7 @@ public final class MabiDLS {
 		return receiver;
 	}
 
-	public InstClass[] getAvailableInstByInstType(EnumSet<InstType> e) {
+	public InstClass[] getAvailableInstByInstType(List<InstType> e) {
 		return insts.stream()
 				.filter(inst -> e.contains(inst.getType()))
 				.toArray(size -> new InstClass[size]);
@@ -295,7 +294,7 @@ public final class MabiDLS {
 		// グローバルテンポ
 		Track track = sequence.getTracks()[0];
 		List<MMLTempoEvent> globalTempoList = score.getTempoEventList();
-		for (MMLTempoEvent tempoEvent :  globalTempoList) {
+		for (MMLTempoEvent tempoEvent : globalTempoList) {
 			byte tempo[] = tempoEvent.getMetaData();
 			int tickOffset = tempoEvent.getTickOffset();
 
