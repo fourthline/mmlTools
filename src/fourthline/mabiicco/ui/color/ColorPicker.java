@@ -2,7 +2,7 @@
  * Copyright (C) 2015 たんらる
  */
 
-package fourthline.mabiicco.ui;
+package fourthline.mabiicco.ui.color;
 
 import java.awt.Color;
 import java.awt.Dimension;

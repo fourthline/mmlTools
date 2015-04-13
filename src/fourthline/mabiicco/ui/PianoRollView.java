@@ -22,6 +22,7 @@ import fourthline.mabiicco.AppResource;
 import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.MabiDLS;
+import fourthline.mabiicco.ui.color.ColorManager;
 import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLNoteEvent;
 import fourthline.mmlTools.MMLScore;
@@ -538,16 +539,18 @@ public final class PianoRollView extends JPanel {
 		boolean songExEnable[] = InstClass.getEnablePartByProgram(track.getSongProgram());
 		MMLEventList activePart = mmlManager.getActiveMMLPart();
 
+		int colorIndex = 0;
 		for (int i = 0; i < track.getMMLEventList().size(); i++) {
 			MMLEventList targetPart = track.getMMLEventAtIndex(i);
 			if (targetPart == activePart) {
 				continue;
 			}
-			ColorPalette partColor = ColorPalette.getInstance(index);
-			Color rectColor = partColor.getPartRectColor(i);
-			Color fillColor = partColor.getPartFillColor(i);
+			Color rectColor = ColorManager.defaultColor().getPartRectColor(index, colorIndex);
+			Color fillColor = ColorManager.defaultColor().getPartFillColor(index, colorIndex);
 			if ( !instEnable[i] && !songExEnable[i] ) {
-				fillColor = partColor.getUnusedFillColor();
+				fillColor = ColorManager.defaultColor().getUnusedFillColor();
+			} else {
+				colorIndex++;
 			}
 			paintMMLPart(g, track.getMMLEventList().get(i).getMMLNoteEventList(), rectColor, fillColor, false);
 		}
@@ -560,9 +563,8 @@ public final class PianoRollView extends JPanel {
 		}
 		MMLEventList activePart = mmlManager.getActiveMMLPart();
 		if (activePart != null) {
-			ColorPalette colorPalette = ColorPalette.getInstance(trackIndex);
-			Color rectColor = colorPalette.getActiveRectColor();
-			Color fillColor = colorPalette.getActiveFillColor();
+			Color rectColor = ColorManager.defaultColor().getActiveRectColor(trackIndex);
+			Color fillColor = ColorManager.defaultColor().getActiveFillColor(trackIndex);
 			paintMMLPart(g, activePart.getMMLNoteEventList(), rectColor, fillColor, true);
 		}
 	}

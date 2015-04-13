@@ -329,14 +329,15 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 		// 選択された楽器にあわせて、MMLパートの有効/無効化を行う.
 		boolean instEnable[] = inst.getType().getEnablePart();
 		boolean songExEnable[] = songInst.getType().getEnablePart();
+		int iconIndex = 0;
 		for (int i = 0; i < partButton.length; i++) {
 			boolean b = (instEnable[i] || songExEnable[i]);
 			partButton[i].setEnabled(b);
 			mmlText[i].setEnabled(b);
 			partButton[i].setIcon(
-					(b) 
-					? (PartButtonIcon.getInstance(i, trackIndex)) : 
-						(PartButtonIcon.getDefautIcon()) );
+					(b)
+					? PartButtonIcon.getInstance(iconIndex++, trackIndex) :
+						PartButtonIcon.getDefautIcon() );
 		}
 
 		if (!partButton[getSelectedMMLPartIndex()].isEnabled()) {

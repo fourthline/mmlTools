@@ -2,14 +2,14 @@
  * Copyright (C) 2014-2015 たんらる
  */
 
-package fourthline.mabiicco.ui;
+package fourthline.mabiicco.ui.color;
 
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public final class ColorPalette {
+final class ColorPalette {
 	private static enum ColorPattern {
 		ACTIVE(250, 200, 0),
 		MELODY(0, 200, 0),
