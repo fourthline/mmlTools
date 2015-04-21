@@ -543,6 +543,7 @@ public final class PianoRollView extends JPanel {
 		for (int i = 0; i < track.getMMLEventList().size(); i++) {
 			MMLEventList targetPart = track.getMMLEventAtIndex(i);
 			if (targetPart == activePart) {
+				colorIndex++;
 				continue;
 			}
 			Color rectColor = ColorManager.defaultColor().getPartRectColor(index, colorIndex);

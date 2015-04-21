@@ -6,6 +6,7 @@ package fourthline.mabiicco.preloader;
 
 import java.awt.Rectangle;
 import java.awt.SplashScreen;
+import java.io.IOException;
 
 import fourthline.mabiicco.AppResource;
 import javafx.application.Preloader;
@@ -20,16 +21,21 @@ public final class MabiIccoPreloader extends Preloader {
 	private StartupController controller;
 	private Stage stage;
 
-	private Scene createPreloaderScene() throws Exception {
-		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Startup.fxml"));
-		Parent root = (Parent) fxmlLoader.load();
-		controller = fxmlLoader.getController();
-		controller.setVersionText(AppResource.getVersionText());
-		return new Scene(root);
+	private Scene createPreloaderScene() {
+		try {
+			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Startup.fxml"));
+			Parent root = (Parent) fxmlLoader.load();
+			controller = fxmlLoader.getController();
+			controller.setVersionText(AppResource.getVersionText());
+			return new Scene(root);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		throw new AssertionError();
 	}
 
 	@Override
-	public void start(Stage stage) throws Exception {
+	public void start(Stage stage) {
 		this.stage = stage;
 		stage.initStyle(StageStyle.UNDECORATED);
 		stage.setScene(createPreloaderScene());

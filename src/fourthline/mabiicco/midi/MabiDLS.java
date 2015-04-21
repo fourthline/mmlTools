@@ -219,8 +219,9 @@ public final class MabiDLS {
 	 * @param ch_num
 	 * @param panpot
 	 */
-	public void setChannelPanpot(int ch_num, int panpot) {
-		channel[ch_num].controlChange(10, panpot);
+	public void setChannelPanpot(int ch, int panpot) {
+		ch = convertMidiChannel(ch);
+		channel[ch].controlChange(10, panpot);
 	}
 
 	public void toggleMute(int ch) {
@@ -234,6 +235,7 @@ public final class MabiDLS {
 	}
 
 	public boolean getMute(int ch) {
+		ch = convertMidiChannel(ch);
 		return channel[ch].getMute();
 	}
 
