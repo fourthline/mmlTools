@@ -126,11 +126,6 @@ public final class MabiDLS {
 		return synthesizer;
 	}
 
-	public MidiChannel getChannel(int ch) {
-		ch = convertMidiChannel(ch);
-		return channel[ch];
-	}
-
 	private Receiver initializeSynthesizer() throws InvalidMidiDataException, IOException, MidiUnavailableException {
 		this.channel = this.synthesizer.getChannels();
 		for (int i = 0; i < this.channel.length; i++) {
@@ -182,7 +177,7 @@ public final class MabiDLS {
 			return;
 		}
 		changeProgram(program, channel);
-		MidiChannel midiChannel = this.getChannel(channel);
+		MidiChannel midiChannel = this.channel[convertMidiChannel(channel)];
 		MMLNoteEvent[] playNoteEvents = this.playNoteList.get(channel);
 
 		for (int i = 0; i < playNoteEvents.length; i++) {
@@ -207,10 +202,10 @@ public final class MabiDLS {
 		}
 	}
 
-	public void changeProgram(int program, int channel) {
-		MidiChannel midiChannel = this.getChannel(channel);
-		if (midiChannel.getProgram() != program) {
-			midiChannel.programChange(0, program);
+	public void changeProgram(int program, int ch) {
+		ch = convertMidiChannel(ch);
+		if (channel[ch].getProgram() != program) {
+			channel[ch].programChange(0, program);
 		}
 	}
 

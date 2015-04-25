@@ -75,7 +75,7 @@ public final class MMLPartChangePanel extends JPanel {
 	private void initializePanel(List<MMLTrack> trackList, int initialIndex) {
 		setLayout(null);
 
-		applyButton.setBounds(202, 335, 90, 29);
+		applyButton.setBounds(204, 412, 90, 29);
 		add(applyButton);
 		applyButton.addActionListener((event) -> {
 			changePartAction();
@@ -84,7 +84,7 @@ public final class MMLPartChangePanel extends JPanel {
 		});
 
 		JButton closeButton = new JButton(AppResource.appText("part_change.cancel"));
-		closeButton.setBounds(317, 335, 90, 29);
+		closeButton.setBounds(319, 412, 90, 29);
 		add(closeButton);
 		closeButton.setFocusable(false);
 		closeButton.addActionListener((event) -> {
@@ -121,7 +121,7 @@ public final class MMLPartChangePanel extends JPanel {
 		/* 入れ替え先 */
 		JPanel destSelectPanel = new JPanel();
 		destSelectPanel.setBorder(new TitledBorder(new LineBorder(new Color(128, 128, 128), 1, true), AppResource.appText("part_change.dest"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		destSelectPanel.setBounds(12, 83, 414, 169);
+		destSelectPanel.setBounds(12, 83, 414, 246);
 		destSelectPanel.setLayout(null);
 		add(destSelectPanel);
 
@@ -130,15 +130,15 @@ public final class MMLPartChangePanel extends JPanel {
 		destSelectPanel.add(label1);
 
 		JLabel label2 = new JLabel(AppResource.appText("part"));
-		label2.setBounds(12, 139, 64, 13);
+		label2.setBounds(12, 209, 64, 13);
 		destSelectPanel.add(label2);
 
 		partSelectComboBox = new JComboBox<>();
-		partSelectComboBox.setBounds(100, 136, 131, 19);
+		partSelectComboBox.setBounds(100, 206, 131, 19);
 		destSelectPanel.add(partSelectComboBox);
 
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(12, 46, 372, 83);
+		scrollPane.setBounds(12, 46, 372, 142);
 		destSelectPanel.add(scrollPane);
 
 		table = new TrackListTable(trackList);
@@ -158,7 +158,7 @@ public final class MMLPartChangePanel extends JPanel {
 		/* 実行内容 */
 		JPanel executePanel = new JPanel();
 		executePanel.setBorder(new TitledBorder(new LineBorder(new Color(128, 128, 128), 1, true), AppResource.appText("part_change.method"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		executePanel.setBounds(12, 262, 414, 63);
+		executePanel.setBounds(12, 339, 414, 63);
 		executePanel.setLayout(null);
 		add(executePanel);
 		ButtonGroup executeGroup = new ButtonGroup();
@@ -236,7 +236,7 @@ public final class MMLPartChangePanel extends JPanel {
 
 	@Override
 	public Dimension getPreferredSize() {
-		return new Dimension(441, 380);
+		return new Dimension(440, 450);
 	}
 
 	/**

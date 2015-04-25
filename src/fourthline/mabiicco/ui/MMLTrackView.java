@@ -219,7 +219,7 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 	}
 
 	public void updateMuteButton() {
-		if (MabiDLS.getInstance().getChannel(trackIndex).getMute()) {
+		if (MabiDLS.getInstance().getMute(trackIndex)) {
 			muteButton.setIcon(AppResource.getImageIcon(AppResource.appText("mmltrack.mute.on.icon")));
 		} else {
 			muteButton.setIcon(AppResource.getImageIcon(AppResource.appText("mmltrack.mute.off.icon")));
