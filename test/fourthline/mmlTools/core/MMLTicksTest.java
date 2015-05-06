@@ -77,11 +77,11 @@ public final class MMLTicksTest {
 	}
 
 	/**
-	 * 指定調律長で分割できない.
+	 * 指定調律長で分割できない. -> 分割後, 生成できなければNG.
 	 */
 	@Test(expected = UndefinedTickException.class)
 	public void test_toMMLTextByBaseE() throws UndefinedTickException {
-		MMLTicks note = new MMLTicks("r", 96+6, false);
+		MMLTicks note = new MMLTicks("r", 96+5, false);
 		note.toMMLTextByBase(TuningBase.L16);
 	}
 

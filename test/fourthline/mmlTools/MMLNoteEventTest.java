@@ -54,8 +54,8 @@ public class MMLNoteEventTest {
 
 	@Test
 	public void testTuningNote_64() throws UndefinedTickException {
-		MMLEventList eventList = new MMLEventList("c1");
-		String expected = "c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64";
+		MMLEventList eventList = new MMLEventList("c1&c64");
+		String expected = "c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64";
 		MMLNoteEvent noteEvent = eventList.getMMLNoteEventList().get(0);
 		noteEvent.setTuningNote(TuningBase.L64);
 
@@ -67,8 +67,8 @@ public class MMLNoteEventTest {
 
 	@Test
 	public void testTuningNote_32() throws UndefinedTickException {
-		MMLEventList eventList = new MMLEventList("c1");
-		String expected = "c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32";
+		MMLEventList eventList = new MMLEventList("c1&c64");
+		String expected = "c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c64";
 		MMLNoteEvent noteEvent = eventList.getMMLNoteEventList().get(0);
 		noteEvent.setTuningNote(TuningBase.L32);
 
@@ -80,8 +80,8 @@ public class MMLNoteEventTest {
 
 	@Test
 	public void testTuningNote_16() throws UndefinedTickException {
-		MMLEventList eventList = new MMLEventList("c1");
-		String expected = "c16&c16&c16&c16&c16&c16&c16&c16&c16&c16&c16&c16&c16&c16&c16&c16";
+		MMLEventList eventList = new MMLEventList("c1&c64");
+		String expected = "c16&c16&c16&c16&c16&c16&c16&c16&c16&c16&c16&c16&c16&c16&c16&c16&c64";
 		MMLNoteEvent noteEvent = eventList.getMMLNoteEventList().get(0);
 		noteEvent.setTuningNote(TuningBase.L16);
 

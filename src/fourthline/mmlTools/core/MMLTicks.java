@@ -88,6 +88,33 @@ public final class MMLTicks {
 		return sb.toString();
 	}
 
+	private String makeMMLText(StringBuilder sb, int remTick) throws UndefinedTickException {
+		// 1~64の分割
+		if (remTick > 0) {
+			for (int base = 1; base <= 64; base *= 2) {
+				int baseTick = getTick(""+base);
+				if (tickTable.getInvTable().containsKey(remTick)) {
+					sb.append( mmlNotePart(tickTable.getInvTable().get(remTick)) );
+					remTick = 0;
+					break;
+				}
+				while (remTick >= baseTick) {
+					sb.append( mmlNotePart(""+base) );
+					remTick -= baseTick;
+				}
+			}
+			if (remTick > 0) {
+				throw new UndefinedTickException(remTick + "/" + tick);
+			}
+		}
+
+		if (needTie) {
+			return sb.substring(1);
+		} else {
+			return sb.toString();
+		}
+	}
+
 	/**
 	 * noteNameとtickをMMLの文字列に変換します.
 	 * needTieがtrueのときは、'&'による連結を行います.
@@ -105,28 +132,7 @@ public final class MMLTicks {
 			remTick -= mTick;
 		}
 
-		// 1~64の分割
-		for (int base = 1; base <= 64; base *= 2) {
-			int baseTick = getTick(""+base);
-			if (tickTable.getInvTable().containsKey(remTick)) {
-				sb.append( mmlNotePart(tickTable.getInvTable().get(remTick)) );
-				remTick = 0;
-				break;
-			}
-			while (remTick >= baseTick) {
-				sb.append( mmlNotePart(""+base) );
-				remTick -= baseTick;
-			}
-		}
-		if (remTick > 0) {
-			throw new UndefinedTickException(remTick + "/" + tick);
-		}
-
-		if (needTie) {
-			return sb.substring(1);
-		} else {
-			return sb.toString();
-		}
+		return makeMMLText(sb, remTick);
 	}
 
 	/**
@@ -143,14 +149,7 @@ public final class MMLTicks {
 			sb.append( mmlNotePart(base.getBase()) );
 			remTick -= baseTick;
 		}
-		if (remTick > 0) {
-			throw new UndefinedTickException(""+remTick);
-		}
 
-		if (needTie) {
-			return sb.substring(1);
-		} else {
-			return sb.toString();
-		}
+		return makeMMLText(sb, remTick);
 	}
 }
