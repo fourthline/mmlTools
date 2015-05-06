@@ -7,8 +7,8 @@ package fourthline.mabiicco.ui.editor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.Objects;
 
 import javax.swing.JComboBox;
@@ -16,7 +16,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JCheckBox;
 import javax.swing.JTextField;
-import javax.swing.SpinnerListModel;
 
 import fourthline.mabiicco.AppResource;
 import fourthline.mmlTools.MMLEventList;
@@ -71,6 +70,36 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 		this(null, null);
 	}
 
+	private JSpinner createNumberSpinner(int initial, int min, int max, int step) {
+		JSpinner obj = new JSpinner(new SpinnerNumberModel(initial, min, max, step));
+		JTextField t = ((JSpinner.DefaultEditor) obj.getEditor()).getTextField();
+		t.addKeyListener( new KeyListener() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+				e.consume();
+				char c = e.getKeyChar();
+				int value = Integer.parseInt(t.getText());
+				if (Character.isDigit(c)) {
+					value = Integer.parseInt(t.getText()+c);
+				} else if (c == '-') {
+					value = -Integer.parseInt(t.getText());
+				} else {
+					return;
+				}
+				while ( (value < min) || (value > max) ) {
+					value = Integer.parseInt(Integer.toString(value).substring(1));
+				}
+				t.setText(Integer.toString(value));
+			}
+			@Override
+			public void keyPressed(KeyEvent e) {}
+			@Override
+			public void keyReleased(KeyEvent e) {}
+		});
+
+		return obj;
+	}
+
 	/**
 	 * Create the panel.
 	 */
@@ -78,7 +107,7 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 		super();
 		setLayout(null);
 
-		velocityValueField = new JSpinner(new SpinnerNumberModel(8, 0, MMLNoteEvent.MAX_VOL, 1));
+		velocityValueField = createNumberSpinner(8, 0, MMLNoteEvent.MAX_VOL, 1);
 		velocityValueField.setBounds(240, 20, 50, 19);
 		add(velocityValueField);
 
@@ -97,9 +126,7 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 		incDecrVelocityEditOption.addActionListener(this);
 		add(incDecrVelocityEditOption);
 
-		velocityValueField2 = new JSpinner(new SpinnerListModel(createIncDecrVelocityValues()));
-		velocityValueField2.getModel().setValue("0");
-		velocityValueField2.setEditor(new IncDecrVelocityEditor(velocityValueField2));
+		velocityValueField2 = createNumberSpinner(0, -MMLNoteEvent.MAX_VOL, MMLNoteEvent.MAX_VOL, 1);
 		velocityValueField2.setBounds(240, 80, 50, 19);
 		add(velocityValueField2);
 
@@ -116,28 +143,6 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 		this.eventList = eventList;
 		setNoteEvent();
 		updateView();
-	}
-
-	private class IncDecrVelocityEditor extends JSpinner.ListEditor {
-		private static final long serialVersionUID = 5700739082350714367L;
-
-		public IncDecrVelocityEditor(JSpinner spinner) {
-			super(spinner);
-			getTextField().setHorizontalAlignment(JTextField.RIGHT);
-		}
-	}
-
-	private List<?> createIncDecrVelocityValues() {
-		ArrayList<String> list = new ArrayList<>();
-		for (int i = -MMLNoteEvent.MAX_VOL; i <= MMLNoteEvent.MAX_VOL; i++) {
-			if (i <= 0) {
-				list.add(""+i);
-			} else {
-				list.add("+"+i);
-			}
-		}
-
-		return list;
 	}
 
 	private void setNoteEvent() {
@@ -175,7 +180,7 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 	 * パネルの情報をノートに反映します.
 	 */
 	public void applyProperty() {
-		int incDecrValue = Integer.parseInt((String) velocityValueField2.getValue());
+		int incDecrValue = ((Integer) velocityValueField2.getValue()).intValue();
 		for (MMLNoteEvent targetNote : noteEvent) {
 			Integer value = (Integer) velocityValueField.getValue();
 			if (onlySelectedNoteOption.isSelected()) {
