@@ -57,10 +57,10 @@ public final class MMLTicksTest {
 	 */
 	@Test
 	public void test_toMMLTextByBase() throws UndefinedTickException {
-		MMLTicks note = new MMLTicks("c", 96);
-		String expect64 = "c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64";
-		String expect32 = "c32&c32&c32&c32&c32&c32&c32&c32";
-		String expect16 = "c16&c16&c16&c16";
+		MMLTicks note = new MMLTicks("c", 96+6);
+		String expect64 = "c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64";
+		String expect32 = "c32&c32&c32&c32&c32&c32&c32&c32&c64";
+		String expect16 = "c16&c16&c16&c16&c64";
 		assertEquals(expect64, note.toMMLTextByBase(TuningBase.L64));
 		assertEquals(expect32, note.toMMLTextByBase(TuningBase.L32));
 		assertEquals(expect16, note.toMMLTextByBase(TuningBase.L16));
@@ -77,7 +77,7 @@ public final class MMLTicksTest {
 	}
 
 	/**
-	 * 指定調律長で分割できない. -> 分割後, 生成できなければNG.
+	 * 指定調律長で分割後, 生成できなければNG.
 	 */
 	@Test(expected = UndefinedTickException.class)
 	public void test_toMMLTextByBaseE() throws UndefinedTickException {

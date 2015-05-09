@@ -7,11 +7,14 @@ package fourthline.mabiicco.ui.editor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Objects;
 
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JCheckBox;
@@ -70,36 +73,6 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 		this(null, null);
 	}
 
-	private JSpinner createNumberSpinner(int initial, int min, int max, int step) {
-		JSpinner obj = new JSpinner(new SpinnerNumberModel(initial, min, max, step));
-		JTextField t = ((JSpinner.DefaultEditor) obj.getEditor()).getTextField();
-		t.addKeyListener( new KeyListener() {
-			@Override
-			public void keyTyped(KeyEvent e) {
-				e.consume();
-				char c = e.getKeyChar();
-				int value = Integer.parseInt(t.getText());
-				if (Character.isDigit(c)) {
-					value = Integer.parseInt(t.getText()+c);
-				} else if (c == '-') {
-					value = -Integer.parseInt(t.getText());
-				} else {
-					return;
-				}
-				while ( (value < min) || (value > max) ) {
-					value = Integer.parseInt(Integer.toString(value).substring(1));
-				}
-				t.setText(Integer.toString(value));
-			}
-			@Override
-			public void keyPressed(KeyEvent e) {}
-			@Override
-			public void keyReleased(KeyEvent e) {}
-		});
-
-		return obj;
-	}
-
 	/**
 	 * Create the panel.
 	 */
@@ -107,14 +80,14 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 		super();
 		setLayout(null);
 
-		velocityValueField = createNumberSpinner(8, 0, MMLNoteEvent.MAX_VOL, 1);
-		velocityValueField.setBounds(240, 20, 50, 19);
-		add(velocityValueField);
-
 		velocityCheckBox = new JCheckBox(AppResource.appText("note.properties.velocity"));
 		velocityCheckBox.setBounds(40, 20, 150, 21);
 		velocityCheckBox.addActionListener(this);
 		add(velocityCheckBox);
+
+		velocityValueField = createNumberSpinner(8, 0, MMLNoteEvent.MAX_VOL, 1, velocityCheckBox);
+		velocityValueField.setBounds(240, 20, 50, 19);
+		add(velocityValueField);
 
 		onlySelectedNoteOption = new JCheckBox(AppResource.appText("note.properties.onlySelectedNoteOption"));
 		onlySelectedNoteOption.setBounds(60, 50, 200, 21);
@@ -126,7 +99,7 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 		incDecrVelocityEditOption.addActionListener(this);
 		add(incDecrVelocityEditOption);
 
-		velocityValueField2 = createNumberSpinner(0, -MMLNoteEvent.MAX_VOL, MMLNoteEvent.MAX_VOL, 1);
+		velocityValueField2 = createNumberSpinner(0, -MMLNoteEvent.MAX_VOL, MMLNoteEvent.MAX_VOL, 1, incDecrVelocityEditOption);
 		velocityValueField2.setBounds(240, 80, 50, 19);
 		add(velocityValueField2);
 
@@ -137,12 +110,61 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 
 		tuningBaseList = new JComboBox<>(TuningBase.values());
 		tuningBaseList.setBounds(240, 110, 50, 21);
+		addMousePressEnableAction(tuningBaseList, tuningNoteCheckBox);
 		add(tuningBaseList);
 
 		this.noteEvent = noteEvent;
 		this.eventList = eventList;
 		setNoteEvent();
 		updateView();
+	}
+
+	/**
+	 * コンポーネントをクリックしたときに, 関連するチェックボックスが有効にできるならば有効にする.
+	 * @param t
+	 * @param checkBox
+	 */
+	private void addMousePressEnableAction(JComponent t, JCheckBox checkBox) {
+		assert(checkBox != null);
+		t.addMouseListener( new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if (checkBox.isEnabled()) {
+					checkBox.setSelected(true);
+					t.requestFocus();
+					updateView();
+				}
+			}
+		});
+	}
+
+	private JSpinner createNumberSpinner(int initial, int min, int max, int step, JCheckBox checkBox) {
+		JSpinner obj = new JSpinner(new SpinnerNumberModel(initial, min, max, step));
+		JTextField t = ((JSpinner.DefaultEditor) obj.getEditor()).getTextField();
+		addMousePressEnableAction(t, checkBox);
+		t.addKeyListener( new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+				e.consume();
+				char c = e.getKeyChar();
+				int value = Integer.parseInt(t.getText());
+				if (Character.isDigit(c)) {
+					value = Integer.parseInt(t.getText()+c);
+				} else if (c == '-') {
+					value = (value < 0) ? value : -value;
+				} else if (c == '+') {
+					value = (value < 0) ? -value : value;
+				} else {
+					return;
+				}
+				while ( (value < min) || (value > max) ) {
+					value = Integer.parseInt(Integer.toString(value).substring(1));
+				}
+				t.setText(Integer.toString(value));
+			}
+		});
+
+		return obj;
 	}
 
 	private void setNoteEvent() {

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 import java.util.regex.Pattern;
 
 import fourthline.mabiicco.midi.MabiDLS;
@@ -346,18 +347,16 @@ public final class MMLScore implements IMMLFileParser {
 	}
 
 	public MMLScore generateAll() throws UndefinedTickException {
-		try {
-			trackList.parallelStream().forEach(t -> {
-				try {
-					t.generate();
-				} catch (UndefinedTickException e) {
-					throw new RuntimeException(e);
-				}
-			});
-		} catch (RuntimeException e) {
-			if (e.getCause() instanceof UndefinedTickException) {
-				throw (UndefinedTickException) e.getCause();
+		Stack<UndefinedTickException> exceptionStack = new Stack<>();
+		trackList.parallelStream().forEach(t -> {
+			try {
+				t.generate();
+			} catch (UndefinedTickException e) {
+				exceptionStack.push(e);
 			}
+		});
+		if (!exceptionStack.isEmpty()) {
+			throw exceptionStack.pop();
 		}
 		return this;
 	}

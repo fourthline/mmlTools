@@ -624,7 +624,8 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 				mmlScore.generateAll();
 			} catch (UndefinedTickException e) {
 				EventQueue.invokeLater(() -> {
-					JOptionPane.showMessageDialog(null, AppResource.appText("fail.mml_modify"), AppResource.getAppTitle(), JOptionPane.WARNING_MESSAGE);
+					String msg = AppResource.appText("fail.mml_modify") + "\n" + e.getMessage();
+					JOptionPane.showMessageDialog(null, msg, AppResource.getAppTitle(), JOptionPane.WARNING_MESSAGE);
 				});
 				System.err.println("REVERT: " + e.getMessage());
 				undoEdit.revertState();
