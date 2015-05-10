@@ -16,6 +16,7 @@ import javax.swing.JViewport;
 
 import static org.junit.Assert.*;
 
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -49,6 +50,13 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 	@Before
 	public void initilizeObj() {
 		obj = new MMLSeqView();
+	}
+
+	@Before @After
+	public void initMute() {
+		for (int i = 0; i < MabiDLS.MAX_MIDI_PART; i++) {
+			MabiDLS.getInstance().setMute(i, false);
+		}
 	}
 
 	private Object getField(String fieldName) throws Exception {
@@ -420,5 +428,40 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 				new TP1(toNext, 2, 2),
 				new TP1(toNext, 2, 3),
 				new TP1(toNext, 2, 3)).forEach(t -> t.check());
+	}
+
+	@Test
+	public void test_moveTrack1() {
+		MMLTrack track1 = new MMLTrack().setMML("MML@c");
+		MMLTrack track2 = new MMLTrack().setMML("MML@d");
+		MMLTrack track3 = new MMLTrack().setMML("MML@e");
+		obj.setMMLselectedTrack(track1);
+		obj.addMMLTrack(track2);
+		obj.addMMLTrack(track3);
+
+		MabiDLS dls = MabiDLS.getInstance();
+		dls.setMute(1, true);
+
+		assertEquals(false, dls.getMute(0));
+		assertEquals(true, dls.getMute(1));
+		assertEquals(false, dls.getMute(2));
+
+		obj.moveTrack(0); // 2 - 0
+
+		assertSame(track3, obj.getMMLScore().getTrack(0));
+		assertSame(track1, obj.getMMLScore().getTrack(1));
+		assertSame(track2, obj.getMMLScore().getTrack(2));
+		assertEquals(false, dls.getMute(0));
+		assertEquals(false, dls.getMute(1));
+		assertEquals(true, dls.getMute(2));
+
+		obj.moveTrack(2); // 0 - 2
+
+		assertSame(track1, obj.getMMLScore().getTrack(0));
+		assertSame(track2, obj.getMMLScore().getTrack(1));
+		assertSame(track3, obj.getMMLScore().getTrack(2));
+		assertEquals(false, dls.getMute(0));
+		assertEquals(true, dls.getMute(1));
+		assertEquals(false, dls.getMute(2));
 	}
 }

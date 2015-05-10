@@ -21,4 +21,5 @@ public interface IMMLManager {
 	public boolean selectTrackOnExistNote(int note, int tickOffset);
 	public void setMMLselectedTrack(MMLTrack track);
 	public void addMMLTrack(MMLTrack track);
+	public void moveTrack(int toIndex);
 }

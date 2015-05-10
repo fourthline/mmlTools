@@ -71,6 +71,12 @@ public final class MMLScore implements IMMLFileParser {
 		trackList.remove(index);
 	}
 
+	public synchronized void moveTrack(int fromIndex, int toIndex) {
+		MMLTrack mmlTrack = getTrack(fromIndex);
+		removeTrack(fromIndex);
+		trackList.add(toIndex, mmlTrack);
+	}
+
 	/**
 	 * 保持しているトラックの数を返します.
 	 * @return

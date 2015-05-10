@@ -27,7 +27,7 @@ public final class MabiDLS {
 	private MidiChannel channel[];
 	private ArrayList<MMLNoteEvent[]> playNoteList = new ArrayList<>();
 	private static final int MAX_CHANNEL_PLAY_NOTE = 4;
-	private static final int MAX_MIDI_PART = 12;
+	public static final int MAX_MIDI_PART = 12;
 	private ArrayList<InstClass> insts = new ArrayList<>();
 
 	public static final String DEFALUT_DLS_PATH = "C:/Nexon/Mabinogi/mp3/MSXspirit.dls";

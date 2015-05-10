@@ -37,8 +37,6 @@ import fourthline.mmlTools.MMLTrack;
 import fourthline.mmlTools.UndefinedTickException;
 import fourthline.mmlTools.core.MMLTicks;
 
-
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -95,7 +93,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		pianoRollView.setViewportAndParent(scrollPane.getViewport(), this);
 
 		// MMLTrackView (tab) - SOUTH
-		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane = new TrackTabbedPane(this);
 		tabbedPane.addChangeListener(this);
 		tabbedPane.setPreferredSize(new Dimension(0, 200));
 		panel.add(tabbedPane, BorderLayout.SOUTH);
@@ -188,6 +186,35 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		updateActivePart(false);
 		updateSelectedTrackAndMMLPart();
 		updateProgramSelect();
+	}
+
+	/**
+	 * 現在選択中のトラックを移動します.
+	 * @param toIndex 移動先index
+	 */
+	@Override
+	public void moveTrack(int toIndex) {
+		int fromIndex = tabbedPane.getSelectedIndex();
+		MabiDLS mabiDLS = MabiDLS.getInstance();
+
+		boolean mute = mabiDLS.getMute(fromIndex);
+		mmlScore.moveTrack(fromIndex, toIndex);
+
+		if (fromIndex < toIndex) {
+			for (int i = fromIndex+1; i < toIndex; i++) {
+				mabiDLS.setMute(i, mabiDLS.getMute(i+1));
+			}
+		} else {
+			for (int i = mmlScore.getTrackCount()-1; i > toIndex; i--) {
+				mabiDLS.setMute(i, mabiDLS.getMute(i-1));
+			}
+		}
+
+		mabiDLS.setMute(toIndex, mute);
+		tabbedPane.setSelectedIndex(toIndex);
+
+		resetTrackView();
+		updateActivePart(false);
 	}
 
 	/**
@@ -637,12 +664,12 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	}
 
 	private void updateAllMMLPart() {
-		if (tabbedPane.getComponentCount() != mmlScore.getTrackCount()) {
+		if (tabbedPane.getTabCount() != mmlScore.getTrackCount()) {
 			resetTrackView();
 			updateProgramSelect();
 		}
 		// すべての全パートMMLテキストを更新します. 
-		int count = tabbedPane.getComponentCount();
+		int count = tabbedPane.getTabCount();
 		for (int i = 0; i < count; i++) {
 			MMLTrackView view = (MMLTrackView) tabbedPane.getComponentAt(i);
 			view.updateTrack();
@@ -692,7 +719,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	public void switchTrack(boolean toNext) {
 		int trackIndex = tabbedPane.getSelectedIndex();
 		if (toNext) {
-			if (trackIndex+1 < tabbedPane.getComponentCount()) {
+			if (trackIndex+1 < tabbedPane.getTabCount()) {
 				trackIndex++;
 			}
 		} else {
