@@ -15,6 +15,7 @@ import javax.swing.SpinnerNumberModel;
 
 import fourthline.mabiicco.AppResource;
 import fourthline.mabiicco.ui.IMMLManager;
+import fourthline.mabiicco.ui.IViewTargetMarker;
 import fourthline.mmlTools.MMLTempoEvent;
 
 /**
@@ -27,8 +28,8 @@ import fourthline.mmlTools.MMLTempoEvent;
  */
 public final class MMLTempoEditor extends AbstractMarkerEditor<MMLTempoEvent> {
 
-	public MMLTempoEditor(IMMLManager mmlManager, IEditAlign editAlign) {
-		super("tempo", mmlManager, editAlign);
+	public MMLTempoEditor(IMMLManager mmlManager, IEditAlign editAlign, IViewTargetMarker viewTargetMarker) {
+		super("tempo", mmlManager, editAlign, viewTargetMarker);
 	}
 
 	private int showTempoInputDialog(String title, int tempo) {

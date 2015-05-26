@@ -14,6 +14,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalInt;
 
 import javax.sound.midi.Sequencer;
 import javax.swing.JPanel;
@@ -32,12 +33,13 @@ import fourthline.mmlTools.MMLTempoEvent;
 import fourthline.mmlTools.Marker;
 
 
-public final class ColumnPanel extends JPanel implements MouseListener, MouseMotionListener {
+public final class ColumnPanel extends JPanel implements MouseListener, MouseMotionListener, IViewTargetMarker {
 	private static final long serialVersionUID = -6609938350741425221L;
 
 	private static final Color BEAT_BORDER_COLOR = new Color(0.4f, 0.4f, 0.4f);
 	private static final Color TEMPO_MAKER_FILL_COLOR = new Color(0.4f, 0.8f, 0.8f);
 	private static final Color MAKER_FILL_COLOR = new Color(0.2f, 0.8f, 0.2f);
+	private static final Color TARGET_MAKER_FILL_COLOR = new Color(0.9f, 0.7f, 0.0f, 0.6f);
 
 	private final PianoRollView pianoRollView;
 	private final IMMLManager mmlManager;
@@ -45,6 +47,8 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 
 	private final JPopupMenu popupMenu = new JPopupMenu();
 	private final ArrayList<IMarkerEditor> markerEditor = new ArrayList<>();
+
+	private OptionalInt targetMarker = OptionalInt.empty();
 
 	public ColumnPanel(PianoRollView pianoRollView, IMMLManager mmlManager, IEditAlign editAlign) {
 		super();
@@ -54,8 +58,8 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 		addMouseListener(this);
 		addMouseMotionListener(this);
 
-		markerEditor.add( new MMLTempoEditor(mmlManager, editAlign) );
-		markerEditor.add( new MarkerEditor(mmlManager, editAlign) );
+		markerEditor.add( new MMLTempoEditor(mmlManager, editAlign, this) );
+		markerEditor.add( new MarkerEditor(mmlManager, editAlign, this) );
 
 		// popupMenu に各MenuItemを登録する.
 		markerEditor.forEach(t -> t.getMenuItems().forEach(popupMenu::add));
@@ -81,6 +85,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 		paintMarker(g2);
 		paintTempoEvents(g2);
 		pianoRollView.paintSequenceLine(g2, getHeight());
+		paintTargetMarker(g2);
 
 		g2.dispose();
 	}
@@ -143,6 +148,22 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 
 		// icon
 		g.setColor(color);
+		g.fillPolygon(xPoints, yPoints, xPoints.length);
+		g.setColor(BEAT_BORDER_COLOR);
+		g.drawPolygon(xPoints, yPoints, xPoints.length);
+	}
+
+	private void paintTargetMarker(Graphics2D g) {
+		if (!targetMarker.isPresent()) {
+			return;
+		}
+
+		int x = pianoRollView.convertTicktoX( targetMarker.getAsInt() );
+		int xPoints[] = { x-5, x+5, x+5, x, x-5 };
+		int yPoints[] = { 8, 8, 20, 25, 20 };
+
+		// icon
+		g.setColor(TARGET_MAKER_FILL_COLOR);
 		g.fillPolygon(xPoints, yPoints, xPoints.length);
 		g.setColor(BEAT_BORDER_COLOR);
 		g.drawPolygon(xPoints, yPoints, xPoints.length);
@@ -243,4 +264,16 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 
 	@Override
 	public void mouseMoved(MouseEvent e) {}
+
+	@Override
+	public void PaintOnTarget(int tickOffset) {
+		this.targetMarker = OptionalInt.of( tickOffset );
+		repaint();
+	}
+
+	@Override
+	public void PaintOff() {
+		this.targetMarker = OptionalInt.empty();
+		repaint();
+	}
 }

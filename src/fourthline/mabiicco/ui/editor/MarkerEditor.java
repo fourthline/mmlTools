@@ -14,6 +14,7 @@ import javax.swing.JTextField;
 
 import fourthline.mabiicco.AppResource;
 import fourthline.mabiicco.ui.IMMLManager;
+import fourthline.mabiicco.ui.IViewTargetMarker;
 import fourthline.mmlTools.Marker;
 
 /**
@@ -27,8 +28,8 @@ import fourthline.mmlTools.Marker;
  */
 public final class MarkerEditor extends AbstractMarkerEditor<Marker> {
 
-	public MarkerEditor(IMMLManager mmlManager, IEditAlign editAlign) {
-		super("marker", mmlManager, editAlign);
+	public MarkerEditor(IMMLManager mmlManager, IEditAlign editAlign, IViewTargetMarker viewTargetMarker) {
+		super("marker", mmlManager, editAlign, viewTargetMarker);
 	}
 
 	private String showTextInputDialog(String title, String text) {

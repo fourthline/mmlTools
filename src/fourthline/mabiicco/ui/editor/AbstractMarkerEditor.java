@@ -6,6 +6,8 @@ package fourthline.mabiicco.ui.editor;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.Arrays;
 import java.util.List;
 
@@ -13,6 +15,7 @@ import javax.swing.JMenuItem;
 
 import fourthline.mabiicco.AppResource;
 import fourthline.mabiicco.ui.IMMLManager;
+import fourthline.mabiicco.ui.IViewTargetMarker;
 import fourthline.mmlTools.MMLEvent;
 
 /**
@@ -38,17 +41,19 @@ abstract public class AbstractMarkerEditor<T extends MMLEvent> implements IMarke
 
 	private final IEditAlign editAlign;
 	protected final IMMLManager mmlManager;
+	private final IViewTargetMarker viewTargetMarker;
 
 	protected T targetEvent;
 	protected int targetTick;
 
-	public AbstractMarkerEditor(String suffix, IMMLManager mmlManager, IEditAlign editAlign) {
+	public AbstractMarkerEditor(String suffix, IMMLManager mmlManager, IEditAlign editAlign, IViewTargetMarker viewTargetMarker) {
 		this.suffix = suffix;
 		this.insertCommand = "insert_" + suffix;
 		this.editCommand   = "edit_" + suffix;
 		this.deleteCommand = "delete_" + suffix;
 		this.mmlManager = mmlManager;
 		this.editAlign = editAlign;
+		this.viewTargetMarker = viewTargetMarker;
 
 		insertMenu = newMenuItem(AppResource.appText("edit."+insertCommand));
 		insertMenu.setActionCommand(insertCommand);
@@ -63,9 +68,43 @@ abstract public class AbstractMarkerEditor<T extends MMLEvent> implements IMarke
 		return Arrays.asList(insertMenu, editMenu, deleteMenu);
 	}
 
+	private void viewTargetMarker(JMenuItem menu, boolean b) {
+		if (!b || !menu.isEnabled()) {
+			viewTargetMarker.PaintOff();
+		} else if (targetEvent != null) {
+			viewTargetMarker.PaintOnTarget(targetEvent.getTickOffset());
+		} else {
+			viewTargetMarker.PaintOnTarget(targetTick);
+		}
+	}
+
 	private JMenuItem newMenuItem(String name) {
 		JMenuItem menu = new JMenuItem(name);
 		menu.addActionListener(this);
+		menu.addMouseListener(new MouseListener() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				viewTargetMarker(menu, false);
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				viewTargetMarker(menu, false);
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				viewTargetMarker(menu, true);
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				viewTargetMarker(menu, true);
+			}
+
+			@Override
+			public void mouseClicked(MouseEvent e) {}
+		});
 		return menu;
 	}
 
