@@ -429,6 +429,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 			getSelectedTrack().setMML(text);
 			resetTrackView();
 			undoEdit.saveState();
+			panel.repaint();
 		}
 	}
 

@@ -327,9 +327,14 @@ public final class MMLEventList implements Serializable, Cloneable {
 
 		// テンポがまだ残っていれば、その分をつなげる.
 		while (!localTempoList.isEmpty()) {
+			MMLTempoEvent tempo = localTempoList.getFirst();
+			if (mabiTempo && (tempo.getTickOffset() >= totalTick)) {
+				// mabi-MMLであれば, 不要な終端テンポは付けない.
+				break;
+			}
 			if (withTempo) {
 				// tempo挿入 (rrrT***N の処理)
-				prevNoteEvent = insertTempoMML(sb, prevNoteEvent, localTempoList.getFirst(), mabiTempo);
+				prevNoteEvent = insertTempoMML(sb, prevNoteEvent, tempo, mabiTempo);
 			}
 			localTempoList.removeFirst();
 		}

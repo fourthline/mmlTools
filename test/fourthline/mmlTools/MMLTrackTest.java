@@ -157,6 +157,22 @@ public class MMLTrackTest {
 		assertEquals(expectMML2, track.generate().getMabiMML());
 	}
 
+	/**
+	 * tempo tail
+	 * v0c補正と重なっている音は鳴らない場合があります. (mabi)
+	 * @throws UndefinedTickException
+	 */
+	@Test
+	public void testTempo_tail0() throws UndefinedTickException {
+		String mml =        "MML@,c2t130&c1.t200r1t180";
+		String expectMML1 = "MML@r2t130l1r.t200rt180,c2&c1.,;";
+		String expectMML2 = "MML@v0c2t130r1.,c2&c1.,;";
+
+		MMLTrack track = new MMLTrack().setMML(mml);
+		assertEquals(expectMML1, track.generate().getOriginalMML());
+		assertEquals(expectMML2, track.generate().getMabiMML());
+	}
+
 	@Test
 	public void testEquals_0() {
 		MMLTrack track1 = new MMLTrack().setMML("MML@aaa");

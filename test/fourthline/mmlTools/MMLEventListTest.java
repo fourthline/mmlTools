@@ -300,12 +300,12 @@ public class MMLEventListTest {
 	@Test
 	public void testToMMLString_5() throws UndefinedTickException {
 		MMLEventList eventList = new MMLEventList("c4d4");
-		String expectMML = "c4d4v0c1.c1.t150";
+		String expectMML = "c4d4r1.r1.t150";
 		List<MMLTempoEvent> globalTempoList = new ArrayList<MMLTempoEvent>();
 		globalTempoList.add(new MMLTempoEvent(150, 96*2+96*12));
 		eventList.setGlobalTempoList(globalTempoList);
 
-		String mml = eventList.toMMLString(true, true);
+		String mml = eventList.toMMLString(true, false);
 		System.out.println(mml);
 
 		assertEquals(expectMML, mml);
