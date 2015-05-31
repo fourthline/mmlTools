@@ -7,6 +7,8 @@ package fourthline.mabiicco.midi;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,7 +32,7 @@ public final class MabiDLS {
 	public static final int MAX_MIDI_PART = 12;
 	private ArrayList<InstClass> insts = new ArrayList<>();
 
-	public static final String DEFALUT_DLS_PATH = "C:/Nexon/Mabinogi/mp3/MSXspirit.dls";
+	public static final String DEFALUT_DLS_PATH = "Nexon/Mabinogi/mp3/MSXspirit.dls";
 
 	private ArrayList<INotifyTrackEnd> notifier = new ArrayList<>();
 
@@ -79,6 +81,20 @@ public final class MabiDLS {
 	}
 
 	public void loadingDLSFile(File file) throws InvalidMidiDataException, IOException {
+		System.out.println("["+file.getName()+"]");
+		if (file.getName().equals("")) {
+			return;
+		}
+		if (!file.exists()) {
+			// 各Rootディレクトリを探索します.
+			for (Path path : FileSystems.getDefault().getRootDirectories()) {
+				File aFile = new File(path.toString() + file.getPath());
+				if (aFile.exists()) {
+					file = aFile;
+					break;
+				}
+			};
+		}
 		if (file.exists()) {
 			List<InstClass> loadList = InstClass.loadDLS(file);
 			for (InstClass inst : loadList) {

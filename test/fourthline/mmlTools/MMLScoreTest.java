@@ -6,7 +6,6 @@ package fourthline.mmlTools;
 
 import static org.junit.Assert.*;
 
-
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -17,21 +16,28 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
 import java.util.stream.Stream;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 
 
 
 
+
 import fourthline.FileSelect;
+import fourthline.UseLoadingDLS;
 import fourthline.mmlTools.core.MMLText;
 import fourthline.mmlTools.parser.IMMLFileParser;
 import fourthline.mmlTools.parser.MMLParseException;
 
 public class MMLScoreTest extends FileSelect {
+
+	@BeforeClass
+	public static void setup() {
+		UseLoadingDLS.initializeDefaultDLS();
+	}
 
 	/**
 	 * testLocalMMLParseでみているローカルのファイルに対して上書きします.

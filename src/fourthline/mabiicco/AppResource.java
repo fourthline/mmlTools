@@ -28,8 +28,7 @@ public final class AppResource {
 	}
 
 	public static String getVersionText() {
-		String versionText = getManifestValue("Implementation-Version")
-				+ " build" + getManifestValue("Implementation-Build");
+		String versionText = getManifestValue("Implementation-Version");
 		return versionText;
 	}
 

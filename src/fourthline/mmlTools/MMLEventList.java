@@ -301,6 +301,7 @@ public final class MMLEventList implements Serializable, Cloneable {
 	 * TODO: 長いなぁ。
 	 * @param withTempo trueを指定すると、tempo指定を含むMMLを返します.
 	 * @param totalTick 最大tick長. これに満たない場合は、末尾を休符分で埋めます.
+	 * @param mabiTempo MML for mabi
 	 * @return
 	 */
 	public String toMMLString(boolean withTempo, int totalTick, boolean mabiTempo)

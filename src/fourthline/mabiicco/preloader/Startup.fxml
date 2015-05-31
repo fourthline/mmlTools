@@ -12,7 +12,7 @@
 </font>
 <cursor>
 </cursor></TextArea><ProgressBar fx:id="bar" layoutX="14.0" layoutY="190.0" prefHeight="18.0" prefWidth="272.0" progress="0.0" />
-<Label fx:id="versionLabel" layoutX="168.0" layoutY="78.0" prefHeight="15.0" prefWidth="120.0" textAlignment="RIGHT">
+<Label fx:id="versionLabel" layoutX="222.0" layoutY="78.0" prefHeight="18.0" prefWidth="66.0" textAlignment="RIGHT">
 <font>
 <Font name="Meiryo" size="10.0" />
 </font></Label>
