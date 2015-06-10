@@ -266,11 +266,11 @@ public final class MMLEventList implements Serializable, Cloneable {
 
 	private void insertNoteWithTempo(StringBuilder sb, LinkedList<MMLTempoEvent> localTempoList,
 			MMLNoteEvent prevNoteEvent, MMLNoteEvent noteEvent,
-			boolean withTempo) throws UndefinedTickException {
+			boolean withTempo, boolean mabiTempo) throws UndefinedTickException {
 		MMLNoteEvent divNoteEvent = noteEvent.clone();
 
-		// endTickOffsetがTempoを跨いでいたら、'&'でつなげる.
-		while ( (!localTempoList.isEmpty()) &&
+		// endTickOffsetがTempoを跨いでいたら、'&'でつなげる. (withTempoのみ)
+		while ( withTempo && (!localTempoList.isEmpty()) &&
 				(divNoteEvent.getTickOffset() < localTempoList.getFirst().getTickOffset()) &&
 				(localTempoList.getFirst().getTickOffset() < divNoteEvent.getEndTick()) ) {
 			int tick = localTempoList.getFirst().getTickOffset() - divNoteEvent.getTickOffset();
@@ -286,13 +286,18 @@ public final class MMLEventList implements Serializable, Cloneable {
 			divNoteEvent.setTick(divNoteEvent.getTick() - tick);
 			divNoteEvent.setTickOffset(divNoteEvent.getTickOffset() + tick);
 			prevNoteEvent = partNoteEvent;
-			if (divNoteEvent.getTick() > 0) {
+			if (withTempo && mabiTempo) {
+				divNoteEvent.setVelocity(0);
+			} else if (divNoteEvent.getTick() > 0) {
 				sb.append('&');
 			}
 		}
 
 		if (divNoteEvent.getTick() > 0){
 			sb.append( divNoteEvent.toMMLString(prevNoteEvent) );
+		}
+		if (noteEvent.getVelocity() != divNoteEvent.getVelocity()) {
+			sb.append("v"+noteEvent.getVelocity());
 		}
 	}
 
@@ -322,7 +327,7 @@ public final class MMLEventList implements Serializable, Cloneable {
 				localTempoList.removeFirst();
 			}
 
-			insertNoteWithTempo(sb, localTempoList, prevNoteEvent, noteEvent, withTempo);
+			insertNoteWithTempo(sb, localTempoList, prevNoteEvent, noteEvent, withTempo, mabiTempo);
 			prevNoteEvent = noteEvent;
 		}
 

@@ -282,7 +282,7 @@ public class MMLEventListTest {
 	public void testToMMLString_4() throws UndefinedTickException {
 		MMLEventList eventList = new MMLEventList("c2d4");
 		List<MMLTempoEvent> globalTempoList = new ArrayList<MMLTempoEvent>();
-		String expectMML = "c8t150&c8t130&c4d4";
+		String expectMML = "c8t150v0c8t130c4v8d4";
 		globalTempoList.add(new MMLTempoEvent(150, 48));
 		globalTempoList.add(new MMLTempoEvent(130, 96));
 		eventList.setGlobalTempoList(globalTempoList);
