@@ -694,9 +694,12 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	@Override
 	public boolean selectTrackOnExistNote(int note, int tickOffset) {
 		PaintMode mode = pianoRollView.getPaintMode();
-		int trackIndex = 0;
-		for (MMLTrack track : mmlScore.getTrackList()) {
+		int activeTrackIndex = tabbedPane.getSelectedIndex();
+		int trackCount = mmlScore.getTrackCount();
+		for (int i = 0; i < trackCount; i++) {
 			int partIndex = 0;
+			int trackIndex = (i + activeTrackIndex) % trackCount;
+			MMLTrack track = mmlScore.getTrack(trackIndex);
 			if ( (mode == PaintMode.ALL_TRACK) || 
 					( (mode == PaintMode.ACTIVE_TRACK) && (track == getSelectedTrack()))) {
 				for (MMLEventList eventList : track.getMMLEventList()) {
@@ -711,7 +714,6 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 					partIndex++;
 				}
 			}
-			trackIndex++;
 		}
 
 		return false;

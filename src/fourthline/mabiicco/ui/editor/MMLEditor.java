@@ -447,11 +447,10 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 			return;
 		}
 		selectNote(null);
-		long offset = clipEventList.getMMLNoteEventList().get(0).getTickOffset();
+		int delta = (int)( startTick - clipEventList.getMMLNoteEventList().get(0).getTickOffset() );
 		for (MMLNoteEvent noteEvent : clipEventList.getMMLNoteEventList()) {
-			long tickOffset = noteEvent.getTickOffset() - offset + startTick;
-			MMLNoteEvent addNote = new MMLNoteEvent(noteEvent.getNote(), noteEvent.getTick(), (int)tickOffset, 0);
-			addNote.setVelocity(noteEvent.getVelocity());
+			MMLNoteEvent addNote = noteEvent.clone();
+			addNote.setTickOffset(noteEvent.getTickOffset() + delta);
 			editEventList.addMMLNoteEvent(addNote);
 			selectNote(addNote, true);
 		}

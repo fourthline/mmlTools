@@ -19,7 +19,7 @@ public final class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 	/**
 	 * Lの文字列と、生成中文字列のBuilder.
 	 */
-	private HashMap<String, StringBuilder> map = new HashMap<>();
+	private final HashMap<String, StringBuilder> map = new HashMap<>();
 
 	public OxLxOptimizer() {
 		map.clear();
