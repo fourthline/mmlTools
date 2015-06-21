@@ -151,10 +151,6 @@ public final class MMLTrack implements Serializable {
 		return mmlParts.get(index);
 	}
 
-	public int getMMLEventListSize() {
-		return mmlParts.size();
-	}
-
 	public List<MMLEventList> getMMLEventList() {
 		return mmlParts;
 	}
@@ -202,6 +198,10 @@ public final class MMLTrack implements Serializable {
 		}
 		if (tailFix) { // 終端補正
 			mml[0] = tailFix(mml[0]);
+		}
+		// for mabi MML, メロディ～和音2 までがカラの時にはメロディパートもカラにする.
+		if ( mabiTempo && mmlParts.get(0).getMMLNoteEventList().isEmpty() && mml[1].equals("") && mml[2].equals("") ) {
+			mml[0] = "";
 		}
 		for (int i = 0; i < count; i++) {
 			mml[i] = new MMLStringOptimizer(mml[i]).toString();
