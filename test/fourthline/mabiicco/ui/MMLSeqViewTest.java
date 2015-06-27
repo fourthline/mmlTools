@@ -49,7 +49,7 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 
 	@Before
 	public void initilizeObj() {
-		obj = new MMLSeqView();
+		obj = new MMLSeqView(null);
 	}
 
 	@Before @After

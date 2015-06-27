@@ -51,7 +51,7 @@ public final class MMLEditorTest extends UseLoadingDLS {
 
 	@Before
 	public void initializeObj() throws Exception {
-		this.mmlManager = new MMLSeqView();
+		this.mmlManager = new MMLSeqView(null);
 		Field f = MMLSeqView.class.getDeclaredField("pianoRollView");
 		f.setAccessible(true);
 		JViewport viewport = new JViewport();
@@ -59,7 +59,7 @@ public final class MMLEditorTest extends UseLoadingDLS {
 		int height = pianoRollView.getTotalHeight();
 		viewport.setBounds(0, 0, 200, height);
 		this.pianoRollView.setViewportAndParent(viewport, mmlManager);
-		this.editor = new MMLEditor(new IPlayNote() {
+		this.editor = new MMLEditor(null, new IPlayNote() {
 			@Override
 			public void playNote(int note) {
 				playingNote = note;

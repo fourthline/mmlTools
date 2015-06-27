@@ -180,11 +180,11 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		});
 		actionMap.put(ADD_TRACK, () -> mmlSeqView.addMMLTrack(null));
 		actionMap.put(REMOVE_TRACK, () -> mmlSeqView.removeMMLTrack());
-		actionMap.put(TRACK_PROPERTY, () -> mmlSeqView.editTrackPropertyAction(mainFrame));
+		actionMap.put(TRACK_PROPERTY, () -> mmlSeqView.editTrackPropertyAction());
 		actionMap.put(SET_START_POSITION, () -> mmlSeqView.setStartPosition());
 		actionMap.put(PLAY, this::playAction);
-		actionMap.put(INPUT_FROM_CLIPBOARD, () -> mmlSeqView.inputClipBoardAction(mainFrame));
-		actionMap.put(OUTPUT_TO_CLIPBOARD, () -> mmlSeqView.outputClipBoardAction(mainFrame));
+		actionMap.put(INPUT_FROM_CLIPBOARD, () -> mmlSeqView.inputClipBoardAction());
+		actionMap.put(OUTPUT_TO_CLIPBOARD, () -> mmlSeqView.outputClipBoardAction());
 		actionMap.put(UNDO, () -> mmlSeqView.undo());
 		actionMap.put(REDO, () -> mmlSeqView.redo());
 		actionMap.put(SAVE_FILE, () -> saveMMLFile(openedFile));
@@ -196,7 +196,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(SCORE_PROPERTY, this::scorePropertyAction);
 		actionMap.put(NEXT_TIME, () -> mmlSeqView.nextStepTimeTo(true));
 		actionMap.put(PREV_TIME, () -> mmlSeqView.nextStepTimeTo(false));
-		actionMap.put(PART_CHANGE, () -> mmlSeqView.partChange(mainFrame));
+		actionMap.put(PART_CHANGE, () -> mmlSeqView.partChange());
 		actionMap.put(ADD_MEASURE, this::addMeasure);
 		actionMap.put(REMOVE_MEASURE, this::removeMeasure);
 		actionMap.put(ADD_BEAT, this::addBeat);
@@ -210,8 +210,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(SELECT_ALL, this::selectAll);
 		actionMap.put(SELECT_PREVIOUS_ALL, this::selectPreviousAll);
 		actionMap.put(SELECT_AFTER_ALL, this::selectAfterAll);
-		actionMap.put(MML_IMPORT, () -> mmlSeqView.mmlImport(mainFrame));
-		actionMap.put(MML_EXPORT, () -> mmlSeqView.mmlExport(mainFrame));
+		actionMap.put(MML_IMPORT, () -> mmlSeqView.mmlImport());
+		actionMap.put(MML_EXPORT, () -> mmlSeqView.mmlExport());
 		actionMap.put(SWITCH_TRACK_NEXT, () -> mmlSeqView.switchTrack(true));
 		actionMap.put(SWITCH_TRACK_PREV, () -> mmlSeqView.switchTrack(false));
 		actionMap.put(SWITCH_MMLPART_NEXT, () -> mmlSeqView.switchMMLPart(true));

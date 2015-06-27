@@ -5,6 +5,7 @@
 package fourthline.mabiicco.ui.editor;
 
 import java.awt.BorderLayout;
+import java.awt.Frame;
 import java.util.List;
 
 import javax.swing.JLabel;
@@ -28,8 +29,11 @@ import fourthline.mmlTools.MMLTempoEvent;
  */
 public final class MMLTempoEditor extends AbstractMarkerEditor<MMLTempoEvent> {
 
-	public MMLTempoEditor(IMMLManager mmlManager, IEditAlign editAlign, IViewTargetMarker viewTargetMarker) {
+	private final Frame parentFrame;
+
+	public MMLTempoEditor(Frame parentFrame, IMMLManager mmlManager, IEditAlign editAlign, IViewTargetMarker viewTargetMarker) {
 		super("tempo", mmlManager, editAlign, viewTargetMarker);
+		this.parentFrame = parentFrame;
 	}
 
 	private int showTempoInputDialog(String title, int tempo) {
@@ -42,7 +46,7 @@ public final class MMLTempoEditor extends AbstractMarkerEditor<MMLTempoEvent> {
 		JPanel cPanel = new JPanel(new BorderLayout());
 		cPanel.add(panel, BorderLayout.CENTER);
 
-		int status = JOptionPane.showConfirmDialog(null, cPanel, title, JOptionPane.OK_CANCEL_OPTION);
+		int status = JOptionPane.showConfirmDialog(this.parentFrame, cPanel, title, JOptionPane.OK_CANCEL_OPTION);
 		if (status == JOptionPane.OK_OPTION) {
 			return ((Integer) spinner.getValue()).intValue();
 		}

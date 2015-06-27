@@ -18,8 +18,7 @@ import fourthline.mabiicco.ui.IMMLManager;
 
 
 public final class MMLTranspose {
-	public MMLTranspose() {
-	}
+	public MMLTranspose() {}
 
 	public void execute(Frame parentFrame, IMMLManager mmlManager) {
 		int transpose = showTransposeDialog(parentFrame);

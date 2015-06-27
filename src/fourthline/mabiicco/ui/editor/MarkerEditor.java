@@ -5,6 +5,7 @@
 package fourthline.mabiicco.ui.editor;
 
 import java.awt.BorderLayout;
+import java.awt.Frame;
 import java.util.List;
 
 import javax.swing.JLabel;
@@ -28,8 +29,11 @@ import fourthline.mmlTools.Marker;
  */
 public final class MarkerEditor extends AbstractMarkerEditor<Marker> {
 
-	public MarkerEditor(IMMLManager mmlManager, IEditAlign editAlign, IViewTargetMarker viewTargetMarker) {
+	private final Frame parentFrame;
+
+	public MarkerEditor(Frame parentFrame, IMMLManager mmlManager, IEditAlign editAlign, IViewTargetMarker viewTargetMarker) {
 		super("marker", mmlManager, editAlign, viewTargetMarker);
+		this.parentFrame = parentFrame;
 	}
 
 	private String showTextInputDialog(String title, String text) {
@@ -40,7 +44,7 @@ public final class MarkerEditor extends AbstractMarkerEditor<Marker> {
 		JPanel cPanel = new JPanel(new BorderLayout());
 		cPanel.add(panel, BorderLayout.CENTER);
 
-		int status = JOptionPane.showConfirmDialog(null, cPanel, title, JOptionPane.OK_CANCEL_OPTION);
+		int status = JOptionPane.showConfirmDialog(this.parentFrame, cPanel, title, JOptionPane.OK_CANCEL_OPTION);
 		if (status == JOptionPane.OK_OPTION) {
 			return textField.getText();
 		}

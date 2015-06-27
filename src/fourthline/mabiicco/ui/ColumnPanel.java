@@ -7,6 +7,7 @@ package fourthline.mabiicco.ui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
@@ -50,7 +51,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 
 	private OptionalInt targetMarker = OptionalInt.empty();
 
-	public ColumnPanel(PianoRollView pianoRollView, IMMLManager mmlManager, IEditAlign editAlign) {
+	public ColumnPanel(Frame parentFrame, PianoRollView pianoRollView, IMMLManager mmlManager, IEditAlign editAlign) {
 		super();
 		this.pianoRollView = pianoRollView;
 		this.mmlManager = mmlManager;
@@ -58,8 +59,8 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 		addMouseListener(this);
 		addMouseMotionListener(this);
 
-		markerEditor.add( new MMLTempoEditor(mmlManager, editAlign, this) );
-		markerEditor.add( new MarkerEditor(mmlManager, editAlign, this) );
+		markerEditor.add( new MMLTempoEditor(parentFrame, mmlManager, editAlign, this) );
+		markerEditor.add( new MarkerEditor(parentFrame, mmlManager, editAlign, this) );
 
 		// popupMenu に各MenuItemを登録する.
 		markerEditor.forEach(t -> t.getMenuItems().forEach(popupMenu::add));

@@ -105,7 +105,7 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		contentPane.add(northPanel, BorderLayout.NORTH);
 
-		mmlSeqView = new MMLSeqView();
+		mmlSeqView = new MMLSeqView(this);
 		mmlSeqView.setTimeView(timeView);
 		contentPane.add(mmlSeqView.getPanel(), BorderLayout.CENTER);
 

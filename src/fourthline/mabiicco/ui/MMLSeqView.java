@@ -71,11 +71,13 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	private JLabel timeView;
 	private Thread timeViewUpdateThread;
 
+	private final Frame parentFrame;
 
 	/**
 	 * Create the panel.
 	 */
-	public MMLSeqView() {
+	public MMLSeqView(Frame parentFrame) {
+		this.parentFrame = parentFrame;
 		panel = new JPanel(false);
 		panel.setLayout(new BorderLayout(0, 0));
 
@@ -98,10 +100,10 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		panel.add(tabbedPane, BorderLayout.SOUTH);
 
 		// create mml editor
-		editor = new MMLEditor(keyboardView, pianoRollView, this);
+		editor = new MMLEditor(parentFrame, keyboardView, pianoRollView, this);
 		pianoRollView.addMouseInputListener(editor);
 		pianoRollView.addMouseWheelListener(this);
-		columnView = new ColumnPanel(pianoRollView, this, editor);
+		columnView = new ColumnPanel(parentFrame, pianoRollView, this, editor);
 
 		scrollPane.setRowHeaderView(keyboardView);
 		scrollPane.setColumnHeaderView(columnView);
@@ -335,7 +337,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		pianoRollView.setPaintMode(mode);
 	}
 
-	public void editTrackPropertyAction(Frame parentFrame) {
+	public void editTrackPropertyAction() {
 		MMLTrack track = getSelectedTrack();
 		new TrackPropertyPanel(track, this).showDialog(parentFrame);
 		tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), track.getTrackName());
@@ -392,16 +394,16 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		pianoRollView.setSequenceTick(tick);
 	}
 
-	public void inputClipBoardAction(Frame parentFrame) {
+	public void inputClipBoardAction() {
 		dialog.showDialog(parentFrame, getNewTrackName());
 	}
 
-	public void outputClipBoardAction(Frame parentFrame) {
+	public void outputClipBoardAction() {
 		MMLOutputPanel outputPanel = new MMLOutputPanel(parentFrame, mmlScore.getTrackList());
 		outputPanel.showDialog();
 	}
 
-	public void mmlImport(Frame parentFrame) {
+	public void mmlImport() {
 		String text = MMLInputPanel.getClipboardString();
 		if (!new MMLTrack().setMML(text).isEmpty()) {
 			getSelectedTrack().setMML(text);
@@ -411,7 +413,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		}
 	}
 
-	public void mmlExport(Frame parentFrame) {
+	public void mmlExport() {
 		int index = getActiveTrackIndex();
 		String text = getMMLScore().getTrack(index).getMabiMML();
 		MMLOutputPanel.copyToClipboard(parentFrame, text);
@@ -605,7 +607,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		} catch (UndefinedTickException e) {}
 	}
 
-	public void partChange(Frame parentFrame) {
+	public void partChange() {
 		MMLPartChangePanel panel = new MMLPartChangePanel(parentFrame, this, editor);
 		panel.showDialog();
 	}
@@ -631,7 +633,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 			} catch (UndefinedTickException e) {
 				EventQueue.invokeLater(() -> {
 					String msg = AppResource.appText("fail.mml_modify") + "\n" + e.getMessage();
-					JOptionPane.showMessageDialog(null, msg, AppResource.getAppTitle(), JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(parentFrame, msg, AppResource.getAppTitle(), JOptionPane.WARNING_MESSAGE);
 				});
 				System.err.println("REVERT: " + e.getMessage());
 				undoEdit.revertState();

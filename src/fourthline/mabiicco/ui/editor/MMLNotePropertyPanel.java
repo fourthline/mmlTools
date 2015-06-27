@@ -5,6 +5,7 @@
 package fourthline.mabiicco.ui.editor;
 
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -54,8 +55,8 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 	// 調律属性は指定されたノートの調律属性がすべて同じ場合に編集可能
 	private boolean enableTuningEdit;
 
-	public void showDialog() {
-		int status = JOptionPane.showConfirmDialog(null, 
+	public void showDialog(Frame parentFrame) {
+		int status = JOptionPane.showConfirmDialog(parentFrame, 
 				this,
 				AppResource.appText("note.properties"),
 				JOptionPane.OK_CANCEL_OPTION,

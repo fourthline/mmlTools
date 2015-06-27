@@ -6,6 +6,7 @@ package fourthline.mabiicco.ui.editor;
 
 
 import java.awt.Cursor;
+import java.awt.Frame;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -53,10 +54,13 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 
 	private final JPopupMenu popupMenu = new JPopupMenu();
 
-	public MMLEditor(IPlayNote notePlayer, PianoRollView pianoRoll, IMMLManager mmlManager) {
+	private final Frame parentFrame;
+
+	public MMLEditor(Frame parentFrame, IPlayNote notePlayer, PianoRollView pianoRoll, IMMLManager mmlManager) {
 		this.notePlayer = notePlayer;
 		this.pianoRollView = pianoRoll;
 		this.mmlManager = mmlManager;
+		this.parentFrame = parentFrame;
 
 		pianoRoll.setSelectNote(selectedNote);
 
@@ -509,7 +513,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 
 		MMLEventList editEventList = mmlManager.getActiveMMLPart();
 		if (editEventList != null) {
-			new MMLNotePropertyPanel(selectedNote.toArray(new MMLNoteEvent[selectedNote.size()]), editEventList).showDialog();
+			new MMLNotePropertyPanel(selectedNote.toArray(new MMLNoteEvent[selectedNote.size()]), editEventList).showDialog(parentFrame);
 			mmlManager.updateActivePart(true);
 		}
 	}
