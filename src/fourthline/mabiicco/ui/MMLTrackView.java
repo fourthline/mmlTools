@@ -105,6 +105,8 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 		songComboBox = new JComboBox<>( MabiDLS.getInstance().getAvailableInstByInstType(InstType.SUB_INST_LIST) );
 		songComboBox.addItem(noUseSongEx);
 		songComboBox.setSelectedItem(noUseSongEx);
+		comboBox.setFocusable(false);
+		songComboBox.setFocusable(false);
 
 		northLPanel.add(comboBox);
 		comboBox.addActionListener(this);
@@ -128,6 +130,7 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 
 			// パートタイトル
 			partButton[i] = new JToggleButton( MMLPART_NAME[i] );
+			partButton[i].setFocusable(false);
 			GridBagConstraints gbc_label = new GridBagConstraints();
 			gbc_label.insets = new Insets(0, 0, 5, 5);
 			gbc_label.gridx = 1;
@@ -184,13 +187,16 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 		this.trackIndex = trackIndex;
 
 		muteButton = new JButton("");
+		muteButton.setFocusable(false);
 		muteButton.setToolTipText(AppResource.appText("mmltrack.mute"));
 		toolBar.add(muteButton);
 		soloButton = new JButton("");
+		soloButton.setFocusable(false);
 		soloButton.setIcon(AppResource.getImageIcon(AppResource.appText("mmltrack.solo.icon")));
 		soloButton.setToolTipText(AppResource.appText("mmltrack.solo"));
 		toolBar.add(soloButton);
 		allButton = new JButton("");
+		allButton.setFocusable(false);
 		allButton.setIcon(AppResource.getImageIcon(AppResource.appText("mmltrack.all.icon")));
 		allButton.setToolTipText(AppResource.appText("mmltrack.all"));
 		toolBar.add(allButton);

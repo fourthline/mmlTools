@@ -4,7 +4,6 @@
 
 package fourthline.mabiicco.ui;
 
-import javax.sound.midi.Sequence;
 import javax.sound.midi.Sequencer;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -254,33 +253,12 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	}
 
 	/**
-	 * 全トラックにおける、指定Tick位置のテンポを取得する。
-	 */
-	private int getTempoInSequenceAtTick(long tick) {
-		return mmlScore.getTempoOnTick(tick);
-	}
-
-	/**
 	 * 再生スタート（現在のシーケンス位置を使用）
 	 */
 	public void startSequence() {
 		new Thread(() -> {
-			try {
-				MabiDLS.getInstance().loadRequiredInstruments(mmlScore);
-				Sequencer sequencer = MabiDLS.getInstance().getSequencer();
-				Sequence sequence = MabiDLS.getInstance().createSequence(mmlScore);
-
-				// 再生開始が先頭でない場合、そこのテンポに設定する必要がある。
-				long startTick = pianoRollView.getSequencePosition();
-				int tempo = getTempoInSequenceAtTick(startTick);
-				System.out.printf("Sequence start: tick(%d), tempo(%d)\n", startTick, tempo);
-				sequencer.setSequence(sequence);
-				sequencer.setTickPosition(startTick);
-				sequencer.setTempoInBPM(tempo);
-				sequencer.start();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			long startTick = pianoRollView.getSequencePosition();
+			MabiDLS.getInstance().createSequenceAndStart(mmlScore, startTick);
 		}).start();
 	}
 

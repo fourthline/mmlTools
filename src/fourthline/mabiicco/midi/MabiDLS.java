@@ -66,7 +66,11 @@ public final class MabiDLS {
 				sequencer.setTempoInMPQ(ByteBuffer.wrap(metaData).getInt());
 			} else if (type == 0x2f) {
 				// トラック終端
-				notifier.forEach(t -> t.trackEndNotify());
+				if (loop) {
+					sequenceStart();
+				} else {
+					notifier.forEach(t -> t.trackEndNotify());
+				}
 			}
 		});
 
@@ -74,6 +78,44 @@ public final class MabiDLS {
 		Receiver receiver = initializeSynthesizer();
 		Transmitter transmitter = this.sequencer.getTransmitters().get(0);
 		transmitter.setReceiver(receiver);
+	}
+
+	// ループ再生時にも使用するパラメータ.
+	private boolean loop = false;
+	private long startTick;
+	private int startTempo;
+
+	public void setLoop(boolean b) {
+		this.loop = b;
+	}
+
+	public boolean isLoop() {
+		return this.loop;
+	}
+
+	/**
+	 * MMLScoreからMIDIシーケンスに変換して, 再生を開始する.
+	 * @param mmlScore
+	 * @param startTick
+	 * @param loop
+	 */
+	public void createSequenceAndStart(MMLScore mmlScore, long startTick) {
+		try {
+			MabiDLS.getInstance().loadRequiredInstruments(mmlScore);
+			Sequencer sequencer = MabiDLS.getInstance().getSequencer();
+			Sequence sequence = createSequence(mmlScore);
+
+			sequencer.setSequence(sequence);
+			this.startTick = startTick;
+			this.startTempo = mmlScore.getTempoOnTick(startTick);
+			sequenceStart();
+		} catch (InvalidMidiDataException e) {}
+	}
+
+	private void sequenceStart() {
+		sequencer.setTickPosition(startTick);
+		sequencer.setTempoInBPM(startTempo);
+		sequencer.start();
 	}
 
 	public void addTrackEndNotifier(INotifyTrackEnd n) {

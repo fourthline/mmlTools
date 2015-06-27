@@ -81,6 +81,8 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 	private JMenuItem pasteMenu = null;
 	private JMenuItem deleteMenu = null;
 
+	private JButton loopButton = null;
+
 	/**
 	 * Create the frame.
 	 */
@@ -340,7 +342,7 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		});
 	}
 
-	private void createToolButton(JComponent target, String title, String command, boolean noplayFunction) {
+	private JButton createToolButton(JComponent target, String title, String command, boolean noplayFunction) {
 		JButton button = new JButton("");
 		Icon icon = null;
 		String iconName = appText(title+".icon");
@@ -362,6 +364,7 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		}
 
 		target.add(button);
+		return button;
 	}
 
 	private JToolBar createToolBar() {
@@ -378,6 +381,7 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		createToolButton(toolBar, "menu.next", ActionDispatcher.NEXT_TIME, false);
 		createToolButton(toolBar, "menu.pause", ActionDispatcher.PAUSE, false);
 		createToolButton(toolBar, "menu.stop", ActionDispatcher.STOP, false);
+		loopButton = createToolButton(toolBar, "menu.loop", ActionDispatcher.TOGGLE_LOOP, false);
 
 		toolBar.add(newToolBarSeparator());
 
@@ -567,6 +571,10 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 
 	public void setPasteEnable(boolean b) {
 		pasteMenu.setEnabled(b);
+	}
+
+	public void updateLoop(boolean b) {
+		loopButton.setSelected(b);
 	}
 
 	private void initKeyAction() {

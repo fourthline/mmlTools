@@ -94,6 +94,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String SWITCH_TRACK_PREV = "switch_track_prev";
 	@Action public static final String SWITCH_MMLPART_NEXT = "switch_mmlpart_next";
 	@Action public static final String SWITCH_MMLPART_PREV = "switch_mmlpart_prev";
+	@Action public static final String TOGGLE_LOOP = "toggle_loop";
 
 	private final HashMap<String, Runnable> actionMap = new HashMap<>();
 
@@ -215,6 +216,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(SWITCH_TRACK_PREV, () -> mmlSeqView.switchTrack(false));
 		actionMap.put(SWITCH_MMLPART_NEXT, () -> mmlSeqView.switchMMLPart(true));
 		actionMap.put(SWITCH_MMLPART_PREV, () -> mmlSeqView.switchMMLPart(false));
+		actionMap.put(TOGGLE_LOOP, this::toggleLoop);
 	}
 
 	@Override
@@ -590,5 +592,11 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	public void notifyUpdateEditState() {
 		mainFrame.setSelectedEdit(editState.hasSelectedNote());
 		mainFrame.setPasteEnable(editState.canPaste());
+	}
+
+	private void toggleLoop() {
+		MabiDLS dls = MabiDLS.getInstance();
+		dls.setLoop( !dls.isLoop() );
+		mainFrame.updateLoop( dls.isLoop() );
 	}
 }
