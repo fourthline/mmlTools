@@ -27,7 +27,6 @@ import fourthline.mmlTools.MMLNoteEvent;
 import fourthline.mmlTools.core.TuningBase;
 
 import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
 
 
 /**
@@ -140,7 +139,7 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 	}
 
 	private JSpinner createNumberSpinner(int initial, int min, int max, int step, JCheckBox checkBox) {
-		JSpinner obj = new JSpinner(new SpinnerNumberModel(initial, min, max, step));
+		JSpinner obj = NumberSpinner.createSpinner(initial, min, max, step);
 		JTextField t = ((JSpinner.DefaultEditor) obj.getEditor()).getTextField();
 		addMousePressEnableAction(t, checkBox);
 		t.addKeyListener( new KeyAdapter() {

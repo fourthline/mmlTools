@@ -11,7 +11,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
 
 import fourthline.mabiicco.AppResource;
 import fourthline.mabiicco.ui.IMMLManager;
@@ -34,8 +33,7 @@ public final class MMLTranspose {
 		String title = AppResource.appText("edit.transpose");
 		JPanel panel = new JPanel();
 		panel.add(new JLabel(AppResource.appText("edit.transpose.text")));
-		JSpinner spinner = new JSpinner();
-		spinner.setModel(new SpinnerNumberModel(0, -12, 12, 1));
+		JSpinner spinner = NumberSpinner.createSpinner(0, -12, 12, 1);
 		spinner.setFocusable(false);
 		panel.add(spinner);
 		JPanel cPanel = new JPanel(new BorderLayout());

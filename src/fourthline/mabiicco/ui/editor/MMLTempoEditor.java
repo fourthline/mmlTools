@@ -12,7 +12,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
 
 import fourthline.mabiicco.AppResource;
 import fourthline.mabiicco.ui.IMMLManager;
@@ -39,8 +38,7 @@ public final class MMLTempoEditor extends AbstractMarkerEditor<MMLTempoEvent> {
 	private int showTempoInputDialog(String title, int tempo) {
 		JPanel panel = new JPanel();
 		panel.add(new JLabel(AppResource.appText("edit.label_"+suffix)));
-		JSpinner spinner = new JSpinner();
-		spinner.setModel(new SpinnerNumberModel(tempo, 32, 255, 1));
+		JSpinner spinner = NumberSpinner.createSpinner(tempo, 32, 255, 1);
 		spinner.setFocusable(false);
 		panel.add(spinner);
 		JPanel cPanel = new JPanel(new BorderLayout());
