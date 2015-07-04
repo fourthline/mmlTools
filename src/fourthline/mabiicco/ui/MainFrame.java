@@ -601,6 +601,10 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		createKeyAction(ActionDispatcher.SWITCH_MMLPART_PREV,
 				KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_MASK),
 				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.SWITCH_MMLPART_PREV)));
+
+		createKeyAction(ActionDispatcher.PLAY,
+				KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0),
+				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.PLAY)));
 	}
 
 	private void createKeyAction(String name, KeyStroke stroke, Runnable func) {

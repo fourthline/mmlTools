@@ -75,9 +75,9 @@ public final class MabiDLS {
 		});
 
 		// シーケンサとシンセサイザの初期化
-		Receiver receiver = initializeSynthesizer();
+		initializeSynthesizer();
 		Transmitter transmitter = this.sequencer.getTransmitters().get(0);
-		transmitter.setReceiver(receiver);
+		transmitter.setReceiver(this.synthesizer.getReceiver());
 	}
 
 	// ループ再生時にも使用するパラメータ.
@@ -184,23 +184,16 @@ public final class MabiDLS {
 		return synthesizer;
 	}
 
-	private Receiver initializeSynthesizer() throws InvalidMidiDataException, IOException, MidiUnavailableException {
+	private void initializeSynthesizer() throws InvalidMidiDataException, IOException, MidiUnavailableException {
 		this.channel = this.synthesizer.getChannels();
 		for (int i = 0; i < this.channel.length; i++) {
 			this.playNoteList.add(new MMLNoteEvent[MAX_CHANNEL_PLAY_NOTE]);
 		}
-		Receiver receiver = this.synthesizer.getReceiver();
 
-		// リバーブ設定
-		for (int i = 0; i < this.channel.length; i++) {
+		for (MidiChannel ch : this.channel) {
 			/* ctrl 91 汎用エフェクト 1(リバーブ) */
-			ShortMessage message = new ShortMessage(ShortMessage.CONTROL_CHANGE, 
-					i,
-					91,
-					0);			
-			receiver.send(message, 0);
+			ch.controlChange(91, 0);
 		}
-		return receiver;
 	}
 
 	public InstClass[] getAvailableInstByInstType(List<InstType> e) {
