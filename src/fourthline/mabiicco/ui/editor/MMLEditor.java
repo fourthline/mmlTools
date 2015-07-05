@@ -188,7 +188,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 
 		MMLNoteEvent noteEvent = new MMLNoteEvent(note, editAlign, (int)alignedTickOffset, prevNote.getVelocity());
 		selectNote(noteEvent);
-		notePlayer.playNote( note );
+		notePlayer.playNote( note, noteEvent.getVelocity() );
 	}
 
 	/**
@@ -212,7 +212,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 			noteEvent.setNote(note);
 		}
 		noteEvent.setTick((int)newTick);
-		notePlayer.playNote(noteEvent.getNote());
+		notePlayer.playNote(noteEvent.getNote(), noteEvent.getVelocity());
 	}
 
 	@Override
@@ -228,21 +228,26 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	@Override
 	public void moveSelectedMMLNote(Point start, Point p, boolean shiftOption) {
 		pianoRollView.onViewScrollPoint(p);
+		long targetTick = pianoRollView.convertXtoTick(start.x);
 		int noteDelta = pianoRollView.convertY2Note(p.y) - pianoRollView.convertY2Note(start.y);
-		long tickOffsetDelta = pianoRollView.convertXtoTick(p.x) - pianoRollView.convertXtoTick(start.x);
+		long tickOffsetDelta = pianoRollView.convertXtoTick(p.x) - targetTick;
 		long alignedTickOffsetDelta = tickOffsetDelta - (tickOffsetDelta % editAlign);
 		if (shiftOption) {
 			alignedTickOffsetDelta = 0;
 		}
 
+		int velocity = detachedNote.get(0).getVelocity();
 		for (int i = 0; i < selectedNote.size(); i++) {
 			MMLNoteEvent note1 = detachedNote.get(i);
 			MMLNoteEvent note2 = selectedNote.get(i);
 			note2.setNote(note1.getNote() + noteDelta);
 			note2.setTickOffset(note1.getTickOffset() + (int)alignedTickOffsetDelta);
+			if ( (note1.getTickOffset() <= targetTick) && (note1.getEndTick() > targetTick) ) {
+				velocity = note2.getVelocity();
+			}
 		}
 
-		notePlayer.playNote( pianoRollView.convertY2Note(p.y) );
+		notePlayer.playNote( pianoRollView.convertY2Note(p.y), velocity );
 	}
 
 	@Override

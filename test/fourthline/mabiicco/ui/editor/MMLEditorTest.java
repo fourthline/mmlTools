@@ -61,7 +61,7 @@ public final class MMLEditorTest extends UseLoadingDLS {
 		this.pianoRollView.setViewportAndParent(viewport, mmlManager);
 		this.editor = new MMLEditor(null, new IPlayNote() {
 			@Override
-			public void playNote(int note) {
+			public void playNote(int note, int velocity) {
 				playingNote = note;
 			}
 

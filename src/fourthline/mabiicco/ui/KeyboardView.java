@@ -24,6 +24,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 	private int playNote = -1;
 	private final int width = 60;
 	private final int PLAY_CHANNEL = 15;
+	private final int DEFAULT_VELOCITY = 11;
 	private final IMMLManager mmlManager;
 
 	private final PianoRollView pianoRollView;
@@ -40,7 +41,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				int note = pianoRollView.convertY2Note( e.getY() );
-				playNote( note );
+				playNote( note, DEFAULT_VELOCITY );
 			}
 			@Override
 			public void mouseReleased(MouseEvent e) {
@@ -51,7 +52,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 			@Override
 			public void mouseDragged(MouseEvent e) {
 				int note = pianoRollView.convertY2Note( e.getY() );
-				playNote( note );
+				playNote( note, DEFAULT_VELOCITY );
 			}
 		});
 	}
@@ -158,7 +159,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 	}
 
 	@Override
-	public void playNote(int note) {
+	public void playNote(int note, int velocity) {
 		if (note < 0) {
 			offNote();
 			return;
@@ -168,7 +169,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 		int program = mmlManager.getActivePartProgram();
 		MabiDLS.getInstance().loadRequiredInstruments(mmlManager.getMMLScore());
 		MabiDLS.getInstance().setMute(PLAY_CHANNEL, false);
-		MabiDLS.getInstance().playNote(playNote, program, PLAY_CHANNEL);
+		MabiDLS.getInstance().playNote(playNote, program, PLAY_CHANNEL, velocity);
 
 		repaint();
 	}
@@ -177,7 +178,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 	public void offNote() {
 		playNote = -1;
 		int program = mmlManager.getActivePartProgram();
-		MabiDLS.getInstance().playNote(playNote, program, PLAY_CHANNEL);
+		MabiDLS.getInstance().playNote(playNote, program, PLAY_CHANNEL, 0);
 
 		repaint();
 	}

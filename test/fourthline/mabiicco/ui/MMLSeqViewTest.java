@@ -303,7 +303,7 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 
 		// KeyboardView画像の作成.
 		KeyboardView keyboardView = (KeyboardView) getField("keyboardView");
-		keyboardView.playNote(80);
+		keyboardView.playNote(80, 11);
 		BufferedImage image3 = new BufferedImage(keyboardView.getPreferredSize().width, height, BufferedImage.TYPE_INT_ARGB);
 		keyboardView.paintComponent(image3.getGraphics());
 		keyboardView.offNote();

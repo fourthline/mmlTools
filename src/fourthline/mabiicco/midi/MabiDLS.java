@@ -213,10 +213,10 @@ public final class MabiDLS {
 	}
 
 	/** 単音再生 */
-	public void playNote(int note, int program, int channel) {
+	public void playNote(int note, int program, int channel, int velocity) {
 		MMLNoteEvent playNote = this.playNoteList.get(channel)[0];
 		if ( (playNote == null) || (playNote.getNote() != note) ) {
-			playNote = new MMLNoteEvent(note, 0, 0, 11);
+			playNote = new MMLNoteEvent(note, 0, 0, velocity);
 		}
 		playNotes(new MMLNoteEvent[] { playNote }, program, channel);
 	}
