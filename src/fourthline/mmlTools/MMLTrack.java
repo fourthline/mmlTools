@@ -197,7 +197,7 @@ public final class MMLTrack implements Serializable {
 			}
 		}
 		if (tailFix) { // 終端補正
-			mml[0] = tailFix(mml[0]);
+			mml[0] = tailFix(mml[0], mml[1], mml[2]);
 		}
 		// for mabi MML, メロディ～和音2 までがカラの時にはメロディパートもカラにする.
 		if ( mabiTempo && mmlParts.get(0).getMMLNoteEventList().isEmpty() && mml[1].equals("") && mml[2].equals("") ) {
@@ -213,10 +213,12 @@ public final class MMLTrack implements Serializable {
 		return mml;
 	}
 
-	private String tailFix(String s) throws UndefinedTickException {
-		long totalTick = this.getMaxTickLength();
-		double playTime = getPlayTime();
-		double mmlTime = getMabinogiTime();
+	private String tailFix(String melody, String chord1, String chord2) throws UndefinedTickException {
+		String s = melody;
+		MMLTrack partTrack = new MMLTrack().setMML(melody, chord1, chord2, "");
+		long totalTick = partTrack.getMaxTickLength();
+		double playTime = partTrack.getPlayTime();
+		double mmlTime = partTrack.getMabinogiTime();
 		int tick = (int)(totalTick - new MMLEventList(s).getTickLength());
 		if (playTime > mmlTime) {
 			// スキルが演奏の途中で止まるのを防ぎます.

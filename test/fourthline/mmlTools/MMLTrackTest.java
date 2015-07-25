@@ -208,4 +208,17 @@ public class MMLTrackTest {
 		System.out.println(track.mmlRankFormat());
 		assertEquals('*', track.mmlRankFormat().charAt(0)); // not generated mml
 	}
+
+	/**
+	 * 不要な終端テンポ（時間計算）.
+	 * @throws UndefinedTickException
+	 */
+	@Test
+	public void test_generateTailTempo0() throws UndefinedTickException {
+		String input  = "MML@t120ddddddddrrrrt60,cccccccc";
+		String expect = "MML@t120dddddddd,cccccccc,;";
+		MMLTrack track = new MMLTrack().setMML(input);
+		track.generate();
+		assertEquals(expect, track.getMabiMML());
+	}
 }

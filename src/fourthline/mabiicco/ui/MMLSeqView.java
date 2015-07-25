@@ -37,7 +37,6 @@ import fourthline.mmlTools.UndefinedTickException;
 import fourthline.mmlTools.core.MMLTicks;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Frame;
@@ -120,8 +119,8 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		boolean editMode = MabiIccoProperties.getInstance().getEnableEdit();
 		if (currentEditMode != editMode) {
 			currentEditMode = editMode;
-			for (Component c : tabbedPane.getComponents()) {
-				MMLTrackView view = (MMLTrackView) c;
+			for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+				MMLTrackView view = (MMLTrackView) tabbedPane.getComponentAt(i);
 				view.setVisibleMMLTextPanel(currentEditMode);
 			}
 			resetTrackView();
