@@ -27,6 +27,10 @@ import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTrack;
 import fourthline.mmlTools.Marker;
 
+
+/**
+ * "*.mml" (3mleさん) のファイルを扱います.
+ */
 public final class MMLFile implements IMMLFileParser {
 	private final MMLScore score = new MMLScore();
 	private String encoding = "Shift_JIS";

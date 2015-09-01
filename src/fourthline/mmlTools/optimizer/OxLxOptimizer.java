@@ -71,10 +71,8 @@ public final class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 
 		// 保有するbuilderを更新.
 		map.forEach((key, builder) -> {
-			if (key.equals(lenString)) {
-				builder.append(noteName);
-			} else {
-				builder.append(noteName);
+			builder.append(noteName);
+			if (!key.equals(lenString)) {
 				if (lenString.equals(key+".")) {
 					builder.append(".");
 				} else {

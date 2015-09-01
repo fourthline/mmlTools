@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 たんらる
+ * Copyright (C) 2014-2015 たんらる
  */
 
 package fourthline.mmlTools.core;
@@ -40,22 +40,10 @@ public final class MMLText {
 		return this;
 	}
 
-	public MMLText setMMLText(int index, String text) {
-		if (index < this.text.length) {
-			this.text[index] = text;
-		}
-		return this;
-	}
-
 	public MMLText setMMLText(String parts[]) {
 		for (int i = 0; (i < parts.length) && (i < this.text.length); i++) {
 			this.text[i] = parts[i];
 		}
-		return this;
-	}
-
-	public MMLText setMMLText(String melody, String chord1, String chord2) {
-		setMMLText(melody, chord1, chord2, "");
 		return this;
 	}
 

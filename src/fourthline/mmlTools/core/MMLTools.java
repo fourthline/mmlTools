@@ -6,7 +6,6 @@ package fourthline.mmlTools.core;
 
 import java.util.List;
 
-import fourthline.mmlTools.ComposeRank;
 import fourthline.mmlTools.UndefinedTickException;
 
 
@@ -83,8 +82,6 @@ public class MMLTools {
 		chord2Parser = new MelodyParser(mml_chord2, "4", chord1Parser.getTempo());
 		// TODO: 歌パートの扱いってどうなってるんだろ？
 	}
-
-
 
 	/**
 	 * 演奏時間の解析
@@ -184,31 +181,6 @@ public class MMLTools {
 		return mml;
 	}
 
-	public String mmlRank() {
-		return ComposeRank.mmlRank(mml_melody, mml_chord1, mml_chord2, mml_songEx);
-	}
-
-	/**
-	 * 作曲ランクを表す文字列をフォーマットして作成します.
-	 * 歌パートがある場合は、4つ分のパート表示を行います.
-	 * @return フォーマット済みの文字列
-	 */
-	public String mmlRankFormat() {
-		String str = "Rank "
-				+ this.mmlRank() + " "
-				+ "( " + this.mml_melody.length()
-				+ ", " + this.mml_chord1.length()
-				+ ", " + this.mml_chord2.length();
-		if ( hasSongPart() ) {
-			str += ", " + this.mml_songEx.length();
-		}
-
-		str += " )";
-		return str;
-	}
-
-
-
 	private String toStringFormatWarnList(List<Integer> list) {
 		String s = "";
 		for (int i = 0; i < list.size(); i++) {
@@ -239,5 +211,4 @@ public class MMLTools {
 			return false;
 		}
 	}
-
 }

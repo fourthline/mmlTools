@@ -221,4 +221,35 @@ public class MMLTrackTest {
 		track.generate();
 		assertEquals(expect, track.getMabiMML());
 	}
+
+	@Test
+	public void test_empty() {
+		MMLTrack track = new MMLTrack();
+		assertTrue( track.isEmpty() );
+
+		track.setMML("MML@aaa;");
+		assertFalse( track.isEmpty() );
+	}
+
+	@Test
+	public void test_setPanpot() {
+		MMLTrack track = new MMLTrack();
+		assertEquals(64, track.getPanpot());
+
+		track.setPanpot(-1);
+		assertEquals(0, track.getPanpot());
+
+		track.setPanpot(128);
+		assertEquals(127, track.getPanpot());
+	}
+
+	@Test
+	public void test_invalidMML() {
+		MMLTrack track = new MMLTrack();
+		assertEquals("MML@,,;", track.getOriginalMML());
+		assertEquals("MML@,,;", track.getMabiMML());
+		track.setMML("aaa");
+		assertEquals("MML@,,;", track.getOriginalMML());
+		assertEquals("MML@,,;", track.getMabiMML());
+	}
 }

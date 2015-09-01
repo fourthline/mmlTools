@@ -13,14 +13,14 @@ import fourthline.mmlTools.core.MMLTokenizer;
  */
 public final class BpCmOptimizer implements MMLStringOptimizer.Optimizer {
 
-	private enum BmCpState {
+	private enum BpCmState {
 		NONE {
 			/**
 			 * "<" -> B1
 			 * ">" -> C1
 			 */
 			@Override
-			public BmCpState nextStatus(String token) {
+			public BpCmState nextStatus(String token) {
 				if (token.equals("<")) {
 					return B1;
 				} else if (token.equals(">")) {
@@ -34,7 +34,7 @@ public final class BpCmOptimizer implements MMLStringOptimizer.Optimizer {
 			 * "<b" -> B2
 			 */
 			@Override
-			public BmCpState nextStatus(String token) {
+			public BpCmState nextStatus(String token) {
 				if (isNoteWithoutR(token)) {
 					if (MMLTokenizer.noteNames(token)[0].toLowerCase().equals("b")) {
 						return B2;
@@ -51,7 +51,7 @@ public final class BpCmOptimizer implements MMLStringOptimizer.Optimizer {
 			 * "<b>" -> B3
 			 */
 			@Override
-			public BmCpState nextStatus(String token) {
+			public BpCmState nextStatus(String token) {
 				if (isNoteWithoutR(token)) {
 					return NONE;
 				} else if (token.equals(">")) {
@@ -79,7 +79,7 @@ public final class BpCmOptimizer implements MMLStringOptimizer.Optimizer {
 			 * ">c" -> C2
 			 */
 			@Override
-			public BmCpState nextStatus(String token) {
+			public BpCmState nextStatus(String token) {
 				if (isNoteWithoutR(token)) {
 					if (MMLTokenizer.noteNames(token)[0].toLowerCase().equals("c")) {
 						return C2;
@@ -96,7 +96,7 @@ public final class BpCmOptimizer implements MMLStringOptimizer.Optimizer {
 			 * ">c<" -> C3
 			 */
 			@Override
-			public BmCpState nextStatus(String token) {
+			public BpCmState nextStatus(String token) {
 				if (isNoteWithoutR(token)) {
 					return NONE;
 				} else if (token.equals("<")) {
@@ -120,7 +120,7 @@ public final class BpCmOptimizer implements MMLStringOptimizer.Optimizer {
 			}
 		};
 
-		public BmCpState nextStatus(String token) {
+		public BpCmState nextStatus(String token) {
 			return NONE;
 		}
 
@@ -139,23 +139,23 @@ public final class BpCmOptimizer implements MMLStringOptimizer.Optimizer {
 
 	private StringBuilder builder = new StringBuilder();
 	private StringBuilder optBuilder = new StringBuilder();
-	private BmCpState state = BmCpState.NONE;
+	private BpCmState state = BpCmState.NONE;
 
 	@Override
 	public void nextToken(String token) {
-		BmCpState prevStatus = state;
+		BpCmState prevStatus = state;
 		state = state.nextStatus(token);
 		if (MMLStringOptimizer.getDebug()) {
 			System.out.println(prevStatus + " - > " + state + ": " + token);
 		}
 
-		if (state == BmCpState.NONE) {
+		if (state == BpCmState.NONE) {
 			builder.append(optBuilder);
 			optBuilder.setLength(0);
 			builder.append(token);
 		} else {
 			optBuilder.append(token);
-			if  ( (state == BmCpState.B3) || (state == BmCpState.C3) )  {
+			if  ( (state == BpCmState.B3) || (state == BpCmState.C3) )  {
 				builder.append( state.optimize( optBuilder ));
 				optBuilder.setLength(0);
 				state = state.nextStatus(token);

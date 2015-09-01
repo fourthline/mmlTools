@@ -12,6 +12,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.InvalidPropertiesFormatException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
@@ -63,6 +64,10 @@ public final class MabiIccoProperties {
 	/** ノートクリックによるアクティブパート切り替え */
 	private static final String ACTIVE_PART_SWITCH = "function.active_part_switch";
 
+	/** ファイル履歴 */
+	public static final int MAX_FILE_HISTORY = 8;
+	private static final String FILE_HISTORY = "file.history";
+
 	public static MabiIccoProperties getInstance() {
 		return instance;
 	}
@@ -70,6 +75,7 @@ public final class MabiIccoProperties {
 	private MabiIccoProperties() {
 		try {
 			properties.load(new FileInputStream(configFile));
+			initFileHistory();
 		} catch (InvalidPropertiesFormatException e) {
 		} catch (FileNotFoundException e) {
 		} catch (IOException e) {
@@ -214,6 +220,35 @@ public final class MabiIccoProperties {
 
 	public void setActivePartSwitch(boolean b) {
 		properties.setProperty(ACTIVE_PART_SWITCH, Boolean.toString(b));
+		save();
+	}
+
+	private final LinkedList<File> fileHistory = new LinkedList<>();
+	private void initFileHistory() {
+		for (int i = 0; i < MAX_FILE_HISTORY; i++) {
+			String s = properties.getProperty(FILE_HISTORY+i);
+			if (s != null) {
+				fileHistory.addLast( new File(s) );
+			}
+		}
+	}
+
+	public File[] getFileHistory() {
+		File list[] = new File[ fileHistory.size() ];
+		return fileHistory.toArray( list );
+	}
+
+	public void setFileHistory(File file) {
+		if (fileHistory.contains(file)) {
+			fileHistory.remove(file);
+		}
+		fileHistory.addFirst(file);
+		while (fileHistory.size() > MAX_FILE_HISTORY) {
+			fileHistory.removeLast();
+		}
+		for (int i = 0; i < fileHistory.size(); i++) {
+			properties.setProperty(FILE_HISTORY+i, fileHistory.get(i).getAbsolutePath());
+		}
 		save();
 	}
 }

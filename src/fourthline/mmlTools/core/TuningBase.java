@@ -39,7 +39,7 @@ public enum TuningBase {
 		return null;
 	}
 
-	public static TuningBase getInstance(String base) {
+	public static TuningBase getInstance1(String base) {
 		for (TuningBase obj : TuningBase.values()) {
 			if (obj.base == base) {
 				return obj;

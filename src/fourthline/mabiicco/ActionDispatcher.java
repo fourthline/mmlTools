@@ -16,6 +16,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.HashMap;
+import java.util.function.Consumer;
+import java.util.function.IntSupplier;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiSystem;
@@ -25,6 +27,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import fourthline.mabiicco.midi.INotifyTrackEnd;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.About;
 import fourthline.mabiicco.ui.MMLSeqView;
@@ -36,7 +39,7 @@ import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.parser.IMMLFileParser;
 import fourthline.mmlTools.parser.MMLParseException;
 
-public final class ActionDispatcher implements ActionListener, IFileStateObserver, IEditStateObserver {
+public final class ActionDispatcher implements ActionListener, IFileStateObserver, IEditStateObserver, INotifyTrackEnd {
 	private MainFrame mainFrame;
 	private MMLSeqView mmlSeqView;
 	private IFileState fileState;
@@ -74,7 +77,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String NEXT_TIME = "next_time";
 	@Action public static final String PREV_TIME = "prev_time";
 	@Action public static final String PART_CHANGE = "part_change";
-	public static final String CHANGE_NOTE_HEIGHT_INT = "change_note_height_";
+	@Action public static final String CHANGE_NOTE_HEIGHT_INT = "change_note_height";
 	@Action public static final String ADD_MEASURE = "add_measure";
 	@Action public static final String REMOVE_MEASURE = "remove_measure";
 	@Action public static final String ADD_BEAT = "add_beat";
@@ -95,8 +98,9 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String SWITCH_MMLPART_NEXT = "switch_mmlpart_next";
 	@Action public static final String SWITCH_MMLPART_PREV = "switch_mmlpart_prev";
 	@Action public static final String TOGGLE_LOOP = "toggle_loop";
+	@Action public static final String FILE_OPEN_WITH_HISTORY = "file_open_with_history";
 
-	private final HashMap<String, Runnable> actionMap = new HashMap<>();
+	private final HashMap<String, Consumer<Object>> actionMap = new HashMap<>();
 
 	private File openedFile = null;
 
@@ -138,6 +142,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	public void initialize() {
 		initializeFileChooser();
 		initializeActionMap();
+		MabiDLS.getInstance().addTrackEndNotifier(this);
 	}
 
 	private void initializeFileChooser() {
@@ -150,88 +155,71 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	}
 
 	private void initializeActionMap() {
-		actionMap.put(VIEW_SCALE_UP, () -> {
-			mmlSeqView.expandPianoViewWide(0);
-		});
-		actionMap.put(VIEW_SCALE_DOWN, () -> {
-			mmlSeqView.reducePianoViewWide(0);
-		});
-		actionMap.put(STOP, () -> {
-			MabiDLS.getInstance().getSequencer().stop();
-			mainFrame.enableNoplayItems();
-		});
-		actionMap.put(PAUSE, this::pauseAction);
-		actionMap.put(FILE_OPEN, () -> {
-			if (checkCloseModifiedFileState()) {
-				openMMLFileAction();
-			}
-		});
-		actionMap.put(NEW_FILE, () -> {
-			if (checkCloseModifiedFileState()) {
-				newMMLFileAction();
-			}
-		});
-		actionMap.put(RELOAD_FILE, this::reloadMMLFileAction);
-		actionMap.put(QUIT, () -> {
-			//  閉じる前に、変更が保存されていなければダイアログ表示する.
-			if (checkCloseModifiedFileState()) {
-				System.exit(0);
-			}
-		});
-		actionMap.put(ADD_TRACK, () -> mmlSeqView.addMMLTrack(null));
-		actionMap.put(REMOVE_TRACK, () -> mmlSeqView.removeMMLTrack());
-		actionMap.put(TRACK_PROPERTY, () -> mmlSeqView.editTrackPropertyAction());
-		actionMap.put(SET_START_POSITION, () -> mmlSeqView.setStartPosition());
-		actionMap.put(PLAY, this::playAction);
-		actionMap.put(INPUT_FROM_CLIPBOARD, () -> mmlSeqView.inputClipBoardAction());
-		actionMap.put(OUTPUT_TO_CLIPBOARD, () -> mmlSeqView.outputClipBoardAction());
-		actionMap.put(UNDO, () -> mmlSeqView.undo());
-		actionMap.put(REDO, () -> mmlSeqView.redo());
-		actionMap.put(SAVE_FILE, () -> saveMMLFile(openedFile));
-		actionMap.put(SAVEAS_FILE, this::saveAsMMLFileAction);
-		actionMap.put(CUT, () -> editState.selectedCut());
-		actionMap.put(COPY, () -> editState.selectedCopy());
-		actionMap.put(PASTE, this::editPasteAction);
-		actionMap.put(DELETE, () -> editState.selectedDelete());
-		actionMap.put(SCORE_PROPERTY, this::scorePropertyAction);
-		actionMap.put(NEXT_TIME, () -> mmlSeqView.nextStepTimeTo(true));
-		actionMap.put(PREV_TIME, () -> mmlSeqView.nextStepTimeTo(false));
-		actionMap.put(PART_CHANGE, () -> mmlSeqView.partChange());
-		actionMap.put(ADD_MEASURE, this::addMeasure);
-		actionMap.put(REMOVE_MEASURE, this::removeMeasure);
-		actionMap.put(ADD_BEAT, this::addBeat);
-		actionMap.put(REMOVE_BEAT, this::removeBeat);
-		actionMap.put(NOTE_PROPERTY, () -> editState.noteProperty());
-		actionMap.put(TRANSPOSE, () -> new MMLTranspose().execute(mainFrame, mmlSeqView));
-		actionMap.put(ABOUT, () -> new About().show(mainFrame));
-		actionMap.put(MIDI_EXPORT, this::midiExportAction);
-		actionMap.put(FILE_IMPORT, this::fileImportAction);
-		actionMap.put(CLEAR_DLS, this::clearDLSInformation);
-		actionMap.put(SELECT_ALL, this::selectAll);
-		actionMap.put(SELECT_PREVIOUS_ALL, this::selectPreviousAll);
-		actionMap.put(SELECT_AFTER_ALL, this::selectAfterAll);
-		actionMap.put(MML_IMPORT, () -> mmlSeqView.mmlImport());
-		actionMap.put(MML_EXPORT, () -> mmlSeqView.mmlExport());
-		actionMap.put(SWITCH_TRACK_NEXT, () -> mmlSeqView.switchTrack(true));
-		actionMap.put(SWITCH_TRACK_PREV, () -> mmlSeqView.switchTrack(false));
-		actionMap.put(SWITCH_MMLPART_NEXT, () -> mmlSeqView.switchMMLPart(true));
-		actionMap.put(SWITCH_MMLPART_PREV, () -> mmlSeqView.switchMMLPart(false));
-		actionMap.put(TOGGLE_LOOP, this::toggleLoop);
+		actionMap.put(VIEW_SCALE_UP, (t) -> mmlSeqView.expandPianoViewWide(0));
+		actionMap.put(VIEW_SCALE_DOWN, (t) -> mmlSeqView.reducePianoViewWide(0));
+		actionMap.put(STOP, (t) -> this.stopAction());
+		actionMap.put(PAUSE, (t) -> this.pauseAction());
+		actionMap.put(FILE_OPEN, (t) -> this.openMMLFileAction());
+		actionMap.put(NEW_FILE, (t) -> this.newMMLFileAction());
+		actionMap.put(RELOAD_FILE, (t) -> this.reloadMMLFileAction());
+		actionMap.put(QUIT, (t) -> this.quitAction());
+		actionMap.put(ADD_TRACK, (t) -> mmlSeqView.addMMLTrack(null));
+		actionMap.put(REMOVE_TRACK, (t) -> mmlSeqView.removeMMLTrack());
+		actionMap.put(TRACK_PROPERTY, (t) -> mmlSeqView.editTrackPropertyAction());
+		actionMap.put(SET_START_POSITION, (t) -> mmlSeqView.setStartPosition());
+		actionMap.put(PLAY, (t) -> this.playAction());
+		actionMap.put(INPUT_FROM_CLIPBOARD, (t) -> mmlSeqView.inputClipBoardAction());
+		actionMap.put(OUTPUT_TO_CLIPBOARD, (t) -> mmlSeqView.outputClipBoardAction());
+		actionMap.put(UNDO, (t) -> mmlSeqView.undo());
+		actionMap.put(REDO, (t) -> mmlSeqView.redo());
+		actionMap.put(SAVE_FILE, (t) -> saveMMLFile(openedFile));
+		actionMap.put(SAVEAS_FILE, (t) -> this.saveAsMMLFileAction());
+		actionMap.put(CUT, (t) -> editState.selectedCut());
+		actionMap.put(COPY, (t) -> editState.selectedCopy());
+		actionMap.put(PASTE, (t) -> this.editPasteAction());
+		actionMap.put(DELETE, (t) -> editState.selectedDelete());
+		actionMap.put(SCORE_PROPERTY, (t) -> this.scorePropertyAction());
+		actionMap.put(NEXT_TIME, (t) -> mmlSeqView.nextStepTimeTo(true));
+		actionMap.put(PREV_TIME, (t) -> mmlSeqView.nextStepTimeTo(false));
+		actionMap.put(PART_CHANGE, (t) -> mmlSeqView.partChange());
+		actionMap.put(ADD_MEASURE, (t) -> this.addMeasure());
+		actionMap.put(REMOVE_MEASURE, (t) -> this.removeMeasure());
+		actionMap.put(ADD_BEAT, (t) -> this.addBeat());
+		actionMap.put(REMOVE_BEAT, (t) -> this.removeBeat());
+		actionMap.put(NOTE_PROPERTY, (t) -> editState.noteProperty());
+		actionMap.put(TRANSPOSE, (t) -> new MMLTranspose().execute(mainFrame, mmlSeqView));
+		actionMap.put(ABOUT, (t) -> new About().show(mainFrame));
+		actionMap.put(MIDI_EXPORT, (t) -> this.midiExportAction());
+		actionMap.put(FILE_IMPORT, (t) -> this.fileImportAction());
+		actionMap.put(CLEAR_DLS, (t) -> this.clearDLSInformation());
+		actionMap.put(SELECT_ALL, (t) -> this.selectAll());
+		actionMap.put(SELECT_PREVIOUS_ALL, (t) -> this.selectPreviousAll());
+		actionMap.put(SELECT_AFTER_ALL, (t) -> this.selectAfterAll());
+		actionMap.put(MML_IMPORT, (t) -> mmlSeqView.mmlImport());
+		actionMap.put(MML_EXPORT, (t) -> mmlSeqView.mmlExport());
+		actionMap.put(SWITCH_TRACK_NEXT, (t) -> mmlSeqView.switchTrack(true));
+		actionMap.put(SWITCH_TRACK_PREV, (t) -> mmlSeqView.switchTrack(false));
+		actionMap.put(SWITCH_MMLPART_NEXT, (t) -> mmlSeqView.switchMMLPart(true));
+		actionMap.put(SWITCH_MMLPART_PREV, (t) -> mmlSeqView.switchMMLPart(false));
+		actionMap.put(TOGGLE_LOOP, (t) -> this.toggleLoop());
+		actionMap.put(CHANGE_NOTE_HEIGHT_INT, (t) -> this.changeNoteHeight(t));
+		actionMap.put(FILE_OPEN_WITH_HISTORY, (t) -> this.fileOpenWithHistory(t));
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String command = e.getActionCommand();
+		Consumer<Object> func = actionMap.get(command);
+		if (func != null) {
+			func.accept( e.getSource() );
+		}
+	}
 
-		if (command.startsWith(CHANGE_NOTE_HEIGHT_INT)) {
-			int index = Integer.parseInt( command.substring(CHANGE_NOTE_HEIGHT_INT.length()) );
+	private void changeNoteHeight(Object source) {
+		if (source instanceof IntSupplier) {
+			int index = ((IntSupplier)source).getAsInt();
 			mmlSeqView.setPianoRollHeightScaleIndex(index);
 			MabiIccoProperties.getInstance().setPianoRollViewHeightScaleProperty(index);
-		} else {
-			Runnable func = actionMap.get(command);
-			if (func != null) {
-				func.run();
-			}
 		}
 	}
 
@@ -258,6 +246,21 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		return score;
 	}
 
+	private void fileOpenWithHistory(Object o) {
+		if (o instanceof IntSupplier) {
+			int index = ((IntSupplier)o).getAsInt();
+			File file = MabiIccoProperties.getInstance().getFileHistory()[index];
+			if ( (file == null) || (!file.exists()) ) {
+				JOptionPane.showMessageDialog(mainFrame,
+						AppResource.appText("error.read"),
+						AppResource.appText("error.nofile"),
+						JOptionPane.WARNING_MESSAGE);
+			} else {
+				checkAndOpenMMLFile( file );
+			}
+		}
+	}
+
 	public void checkAndOpenMMLFile(File file) {
 		if (checkCloseModifiedFileState()) {
 			openMMLFile(file);
@@ -272,11 +275,13 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			openedFile = file;
 			notifyUpdateFileState();
 			MabiIccoProperties.getInstance().setRecentFile(file.getPath());
+			MabiIccoProperties.getInstance().setFileHistory(file);
+			mainFrame.updateFileHistoryMenu();
 			MabiDLS.getInstance().all();
 		}
 	}
 
-	public void reloadMMLFileAction() {
+	private void reloadMMLFileAction() {
 		if (MabiDLS.getInstance().getSequencer().isRunning()) {
 			return;
 		}
@@ -295,6 +300,13 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		}
 	}
 
+	private void quitAction() {
+		//  閉じる前に、変更が保存されていなければダイアログ表示する.
+		if (checkCloseModifiedFileState()) {
+			System.exit(0);
+		}
+	}
+
 	/**
 	 * @param file
 	 * @return　保存に成功した場合は true, 失敗した場合は false を返す.
@@ -307,6 +319,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			fileState.setOriginalBase();
 			notifyUpdateFileState();
 			MabiIccoProperties.getInstance().setRecentFile(file.getPath());
+			MabiIccoProperties.getInstance().setFileHistory(file);
+			mainFrame.updateFileHistoryMenu();
 		} catch (IOException e) {
 			return false;
 		}
@@ -314,10 +328,12 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	}
 
 	private void newMMLFileAction() {
-		openedFile = null;
-		mmlSeqView.initializeMMLTrack();
-		notifyUpdateFileState();
-		MabiDLS.getInstance().all();
+		if (checkCloseModifiedFileState()) {
+			openedFile = null;
+			mmlSeqView.initializeMMLTrack();
+			notifyUpdateFileState();
+			MabiDLS.getInstance().all();
+		}
 	}
 
 	private void openMMLFileAction() {
@@ -325,12 +341,14 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			return;
 		}
 
-		SwingUtilities.invokeLater(() -> {
-			File file = fileOpenDialog();
-			if (file != null) {
-				openMMLFile(file);
-			}
-		});
+		if (checkCloseModifiedFileState()) {
+			SwingUtilities.invokeLater(() -> {
+				File file = fileOpenDialog();
+				if (file != null) {
+					openMMLFile(file);
+				}
+			});
+		}
 	}
 
 	private File fileOpenDialog() {
@@ -495,10 +513,19 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		editState.paste(startTick);
 	}
 
-	private void pauseAction() {
+	@Override
+	public void trackEndNotify() {
+		stopAction();
+	}
+
+	private void stopAction() {
 		MabiDLS.getInstance().getSequencer().stop();
-		mmlSeqView.pauseTickPosition();
 		mainFrame.enableNoplayItems();
+	}
+
+	private void pauseAction() {
+		stopAction();
+		mmlSeqView.pauseTickPosition();
 	}
 
 	private void playAction() {

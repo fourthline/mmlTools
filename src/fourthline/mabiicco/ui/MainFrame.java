@@ -20,8 +20,6 @@ import fourthline.mabiicco.ActionDispatcher;
 import fourthline.mabiicco.AppResource;
 import static fourthline.mabiicco.AppResource.appText;
 import fourthline.mabiicco.MabiIccoProperties;
-import fourthline.mabiicco.midi.INotifyTrackEnd;
-import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.PianoRollView.PaintMode;
 import fourthline.mabiicco.ui.editor.NoteAlign;
 
@@ -34,6 +32,7 @@ import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.function.Consumer;
+import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
 import javax.swing.AbstractAction;
@@ -53,10 +52,11 @@ import javax.swing.JComboBox;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.InputEvent;
+import java.io.File;
 
 
 
-public final class MainFrame extends JFrame implements ComponentListener, INotifyTrackEnd, ActionListener {
+public final class MainFrame extends JFrame implements ComponentListener, ActionListener {
 	private static final long serialVersionUID = -7484797594534384422L;
 
 	private final JPanel contentPane;
@@ -82,6 +82,8 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 	private JMenuItem deleteMenu = null;
 
 	private JButton loopButton = null;
+
+	private MenuWithIndex fileHistory[] = new MenuWithIndex[ MabiIccoProperties.MAX_FILE_HISTORY ];
 
 	/**
 	 * Create the frame.
@@ -122,8 +124,6 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		southPanel.add(statusField, BorderLayout.SOUTH);
 		statusField.setColumns(10);
 
-		MabiDLS.getInstance().addTrackEndNotifier(this);
-
 		setCanReloadFile(false);
 		setCanUndo(false);
 		setCanRedo(false);
@@ -160,8 +160,6 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 
 	private JMenuItem createMenuItem(JMenu menu, String name, String actionCommand, boolean noplayFunction, KeyStroke keyStroke) {
 		JMenuItem menuItem = new JMenuItem(appText(name));
-		menuItem.addActionListener(listener);
-		menuItem.setActionCommand(actionCommand);
 		String iconName = appText(name+".icon");
 		if (!iconName.equals(name+".icon")) {
 			Icon icon = AppResource.getImageIcon(iconName);
@@ -169,6 +167,12 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 				menuItem.setIcon(icon);
 			}
 		}
+		return createMenuItem(menu, menuItem, actionCommand, noplayFunction, keyStroke);
+	}
+
+	private JMenuItem createMenuItem(JMenu menu, JMenuItem menuItem, String actionCommand, boolean noplayFunction, KeyStroke keyStroke) {
+		menuItem.addActionListener(listener);
+		menuItem.setActionCommand(actionCommand);
 
 		if (noplayFunction) {
 			noplayFunctions.add(menuItem);
@@ -203,6 +207,14 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		createMenuItem(fileMenu, "mml.input.import", ActionDispatcher.FILE_IMPORT, true);
 		createMenuItem(fileMenu, "menu.midiExport", ActionDispatcher.MIDI_EXPORT);
 		createMenuItem(fileMenu, "menu.scoreProperty", ActionDispatcher.SCORE_PROPERTY);
+
+		fileMenu.add(new JSeparator());
+
+		for (int i = 0; i < fileHistory.length; i++) {
+			fileHistory[i] = new MenuWithIndex();
+			createMenuItem(fileMenu, fileHistory[i], ActionDispatcher.FILE_OPEN_WITH_HISTORY, true, null);
+		}
+		updateFileHistoryMenu();
 
 		fileMenu.add(new JSeparator());
 
@@ -303,6 +315,34 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		return menuBar;
 	}
 
+	private class CheckBoxMenuWithIndex extends JCheckBoxMenuItem implements IntSupplier {
+		private static final long serialVersionUID = -2688552233736202101L;
+		private final int index;
+		private CheckBoxMenuWithIndex(String text, int index) {
+			super(text);
+			this.index = index;
+		}
+		@Override
+		public int getAsInt() {
+			return this.index;
+		}
+	}
+
+	private class MenuWithIndex extends JMenuItem implements IntSupplier {
+		private static final long serialVersionUID = -7944526274796801310L;
+		private int index;
+		private MenuWithIndex() {
+			super();
+		}
+		public void set(int index) {
+			this.index = index;
+		}
+		@Override
+		public int getAsInt() {
+			return this.index;
+		}
+	}
+
 	private void createNoteHeightMenu(JMenu settingMenu) {
 		JMenu noteHeightMenu = new JMenu(appText("menu.noteHeight"));
 		settingMenu.add(noteHeightMenu);
@@ -310,8 +350,8 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 		ButtonGroup group = new ButtonGroup();
 		int index = 0;
 		for (int value : PianoRollView.NOTE_HEIGHT_TABLE) {
-			JCheckBoxMenuItem menu = new JCheckBoxMenuItem(value+"px");
-			menu.setActionCommand(ActionDispatcher.CHANGE_NOTE_HEIGHT_INT+(index++));
+			CheckBoxMenuWithIndex menu = new CheckBoxMenuWithIndex(value+"px", index++);
+			menu.setActionCommand(ActionDispatcher.CHANGE_NOTE_HEIGHT_INT);
 			menu.addActionListener(listener);
 			noteHeightMenu.add(menu);
 			group.add(menu);
@@ -485,11 +525,6 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 	@Override
 	public void componentShown(ComponentEvent e) {}
 
-	@Override
-	public void trackEndNotify() {
-		enableNoplayItems();
-	}
-
 	/**
 	 * 再生中に各機能を無効化する。
 	 */
@@ -575,6 +610,19 @@ public final class MainFrame extends JFrame implements ComponentListener, INotif
 
 	public void updateLoop(boolean b) {
 		loopButton.setSelected(b);
+	}
+
+	public void updateFileHistoryMenu() {
+		File fileList[] = MabiIccoProperties.getInstance().getFileHistory();
+		for (int i = 0; i < fileHistory.length; i++) {
+			if ( (i < fileList.length) && (fileList[i] != null) ) {
+				fileHistory[i].setText( fileList[i].getName() );
+				fileHistory[i].set(i);
+				fileHistory[i].setVisible(true);
+			} else {
+				fileHistory[i].setVisible(false);
+			}
+		}
 	}
 
 	private void initKeyAction() {
