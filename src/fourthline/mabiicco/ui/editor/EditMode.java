@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 たんらる
+ * Copyright (C) 2014-2015 たんらる
  */
 
 package fourthline.mabiicco.ui.editor;
@@ -22,7 +22,7 @@ enum EditMode {
 		public void pressEvent(IEditContext context, MouseEvent e) {
 			startPoint = e.getPoint();
 			if (SwingUtilities.isRightMouseButton(e)) {
-				if (context.onExistNote(startPoint, false)) {
+				if (context.onExistNote(startPoint)) {
 					context.selectNoteByPoint(startPoint, 0);
 					context.showPopupMenu(startPoint);
 				} else {
@@ -30,7 +30,7 @@ enum EditMode {
 				}
 			} else if (SwingUtilities.isLeftMouseButton(e)) {
 				boolean partSwitch = MabiIccoProperties.getInstance().getActivePartSwitch();
-				if (context.onExistNote(startPoint, partSwitch)) {
+				if (context.onExistNote(startPoint)) {
 					// ノート上であれば、ノートを選択状態にする. 複数選択判定も.
 					context.selectNoteByPoint(startPoint, e.getModifiers());
 					if (context.isEditLengthPosition(startPoint)) {
@@ -38,6 +38,9 @@ enum EditMode {
 					} else {
 						context.changeState(MOVE).executeEvent(context, e);
 					}
+				} else if (partSwitch && context.selectTrackOnExistNote(startPoint)) {
+					// アクティブパートを変更したときには単一選択のみ.
+					context.selectNoteByPoint(startPoint, 0);
 				} else {
 					context.changeState(INSERT).executeEvent(context, e);
 				}
@@ -48,12 +51,14 @@ enum EditMode {
 			int cursorType = Cursor.DEFAULT_CURSOR;
 			Point p = e.getPoint();
 			boolean onOption = (e.getModifiers() == ActionEvent.SHIFT_MASK + ActionEvent.CTRL_MASK);
-			if (context.onExistNote(p, onOption)) {
+			if (context.onExistNote(p)) {
 				if (context.isEditLengthPosition(p)) {
 					cursorType = Cursor.E_RESIZE_CURSOR;
 				} else {
 					cursorType = Cursor.MOVE_CURSOR;
 				}
+			} else if (onOption) {
+				context.selectTrackOnExistNote(p);
 			}
 			context.setCursor(Cursor.getPredefinedCursor(cursorType));
 		}

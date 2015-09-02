@@ -318,14 +318,13 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		pianoRollView.setSelectingArea(null);
 	}
 
-
 	/**
 	 * Editスタートポイントがノート上であるかどうかを判定する.
 	 * @param point
 	 * @return ノート上の場合はtrue.
 	 */
 	@Override
-	public boolean onExistNote(Point point, boolean autoSelect) {
+	public boolean onExistNote(Point point) {
 		int note = pianoRollView.convertY2Note( point.y );
 		int tickOffset = (int)pianoRollView.convertXtoTick( point.x );
 		MMLEventList editEventList = mmlManager.getActiveMMLPart();
@@ -338,11 +337,22 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 			return true;
 		}
 
-		if (autoSelect) {
-			return mmlManager.selectTrackOnExistNote(note, tickOffset);
-		}
-
 		return false;
+	}
+
+	/**
+	 * pointの位置で他トラックにノートが配置されていれば、アクティブパートを変更します.
+	 * @param point
+	 * @return アクティブパートを変更した場合はtrue.
+	 */
+	@Override
+	public boolean selectTrackOnExistNote(Point point) {
+		if (onExistNote(point)) {
+			return false;
+		}
+		int note = pianoRollView.convertY2Note( point.y );
+		int tickOffset = (int)pianoRollView.convertXtoTick( point.x );
+		return mmlManager.selectTrackOnExistNote(note, tickOffset);
 	}
 
 	/**
