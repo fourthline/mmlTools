@@ -25,6 +25,7 @@ import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mabiicco.midi.IPlayNote;
 import fourthline.mabiicco.ui.IMMLManager;
 import fourthline.mabiicco.ui.MMLSeqView;
+import fourthline.mabiicco.ui.MMLTrackView;
 import fourthline.mabiicco.ui.PianoRollView;
 import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLNoteEvent;
@@ -52,6 +53,7 @@ public final class MMLEditorTest extends UseLoadingDLS {
 	@Before
 	public void initializeObj() throws Exception {
 		this.mmlManager = new MMLSeqView(null);
+		MMLTrackView.getInstance(0, null, mmlManager).setSelectMMLPartOfIndex(0);
 		Field f = MMLSeqView.class.getDeclaredField("pianoRollView");
 		f.setAccessible(true);
 		JViewport viewport = new JViewport();
@@ -445,5 +447,46 @@ public final class MMLEditorTest extends UseLoadingDLS {
 
 		// 和音パート.
 		assertTrue(track.getMMLEventAtIndex(1) == mmlManager.getActiveMMLPart());
+	}
+
+	/**
+	 * 右クリックして, 指定された処理を実行後のMMLをテストする.
+	 * @param input
+	 * @param expect
+	 * @param selectIndex 右クリックするノートindex
+	 * @param r
+	 */
+	private void checkOneSelectActionButton3(String input, String expect, int selectIndex, Runnable r) {
+		MMLTrack track = new MMLTrack().setMML(input);
+		mmlManager.setMMLselectedTrack(track);
+
+		// select
+		MMLNoteEvent note1 = track.getMMLEventAtIndex(0).getMMLNoteEventList().get(selectIndex);
+		int y1 = pianoRollView.convertNote2Y( note1.getNote() );
+		int x1 = pianoRollView.convertTicktoX( note1.getTickOffset() );
+		MouseEvent e1 = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON3_DOWN_MASK, x1+1, y1+1, 1, false);
+
+		editor.mousePressed(e1);
+		editor.mouseReleased(e1);
+
+		r.run();
+
+		assertEquals(expect, track.getOriginalMML());
+	}
+
+	@Test
+	public void test_selectPreviousAll() {
+		checkOneSelectActionButton3("MML@aabebaa;", "MML@r1baa,,;", 3, () -> {
+			editor.selectPreviousAll();
+			editor.selectedDelete();
+		});
+	}
+
+	@Test
+	public void test_selectAfterAll() {
+		checkOneSelectActionButton3("MML@aabebaa;", "MML@aab,,;", 3, () -> {
+			editor.selectAfterAll();
+			editor.selectedDelete();
+		});
 	}
 }

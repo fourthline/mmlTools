@@ -616,7 +616,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		File fileList[] = MabiIccoProperties.getInstance().getFileHistory();
 		for (int i = 0; i < fileHistory.length; i++) {
 			if ( (i < fileList.length) && (fileList[i] != null) ) {
-				fileHistory[i].setText( fileList[i].getName() );
+				fileHistory[i].setText( (i+1) + " " + fileList[i].getName() );
 				fileHistory[i].set(i);
 				fileHistory[i].setVisible(true);
 			} else {

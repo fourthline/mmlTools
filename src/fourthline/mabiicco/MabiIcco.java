@@ -20,6 +20,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.SwingUtilities;
 
+import sun.swing.FilePane;
 import fourthline.mabiicco.midi.InstType;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.preloader.MabiIccoPreloaderNotification;
@@ -138,7 +139,7 @@ public final class MabiIcco extends Application {
 
 	public static JFileChooser createFileChooser() {
 		JFileChooser chooser = new JFileChooser();
-		Action detailsAction = chooser.getActionMap().get("viewTypeDetails");
+		Action detailsAction = chooser.getActionMap().get(FilePane.ACTION_VIEW_DETAILS);
 		if (detailsAction != null) {
 			detailsAction.actionPerformed(null);
 		}

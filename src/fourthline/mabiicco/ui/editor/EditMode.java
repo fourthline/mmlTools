@@ -30,20 +30,21 @@ enum EditMode {
 				}
 			} else if (SwingUtilities.isLeftMouseButton(e)) {
 				boolean partSwitch = MabiIccoProperties.getInstance().getActivePartSwitch();
+				EditMode next = INSERT;
 				if (context.onExistNote(startPoint)) {
 					// ノート上であれば、ノートを選択状態にする. 複数選択判定も.
 					context.selectNoteByPoint(startPoint, e.getModifiers());
 					if (context.isEditLengthPosition(startPoint)) {
-						context.changeState(LENGTH).executeEvent(context, e);
+						next = LENGTH;
 					} else {
-						context.changeState(MOVE).executeEvent(context, e);
+						next = MOVE;
 					}
 				} else if (partSwitch && context.selectTrackOnExistNote(startPoint)) {
 					// アクティブパートを変更したときには単一選択のみ.
 					context.selectNoteByPoint(startPoint, 0);
-				} else {
-					context.changeState(INSERT).executeEvent(context, e);
+					next = SELECT;
 				}
+				context.changeState(next).executeEvent(context, e);
 			}
 		}
 		@Override

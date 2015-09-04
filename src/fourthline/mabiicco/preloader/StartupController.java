@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 たんらる
+ * Copyright (C) 2014-2015 たんらる
  */
 
 package fourthline.mabiicco.preloader;
@@ -23,7 +23,7 @@ public final class StartupController implements Initializable {
 	}
 
 	public void setVersionText(String s) {
-		versionLabel.setText(s);
+		versionLabel.setText("Version " + s);
 	}
 
 	public void addStatusText(String s) {

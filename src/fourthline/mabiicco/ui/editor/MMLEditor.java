@@ -7,6 +7,7 @@ package fourthline.mabiicco.ui.editor;
 
 import java.awt.Cursor;
 import java.awt.Frame;
+import java.awt.IllegalComponentStateException;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -620,7 +621,6 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		return menu;
 	}
 
-
 	private MMLNoteEvent popupTargetNote;
 	@Override
 	public void showPopupMenu(Point point) {
@@ -636,7 +636,9 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		popupTargetNote = editEventList.searchOnTickOffset(tickOffset);
 
 		if (hasSelectedNote()) {
-			popupMenu.show(pianoRollView, point.x, point.y);
+			try {
+				popupMenu.show(pianoRollView, point.x, point.y);
+			} catch (IllegalComponentStateException e) {}
 		}
 	}
 }

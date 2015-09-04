@@ -155,55 +155,55 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	}
 
 	private void initializeActionMap() {
-		actionMap.put(VIEW_SCALE_UP, (t) -> mmlSeqView.expandPianoViewWide(0));
-		actionMap.put(VIEW_SCALE_DOWN, (t) -> mmlSeqView.reducePianoViewWide(0));
-		actionMap.put(STOP, (t) -> this.stopAction());
-		actionMap.put(PAUSE, (t) -> this.pauseAction());
-		actionMap.put(FILE_OPEN, (t) -> this.openMMLFileAction());
-		actionMap.put(NEW_FILE, (t) -> this.newMMLFileAction());
-		actionMap.put(RELOAD_FILE, (t) -> this.reloadMMLFileAction());
-		actionMap.put(QUIT, (t) -> this.quitAction());
-		actionMap.put(ADD_TRACK, (t) -> mmlSeqView.addMMLTrack(null));
-		actionMap.put(REMOVE_TRACK, (t) -> mmlSeqView.removeMMLTrack());
-		actionMap.put(TRACK_PROPERTY, (t) -> mmlSeqView.editTrackPropertyAction());
-		actionMap.put(SET_START_POSITION, (t) -> mmlSeqView.setStartPosition());
-		actionMap.put(PLAY, (t) -> this.playAction());
-		actionMap.put(INPUT_FROM_CLIPBOARD, (t) -> mmlSeqView.inputClipBoardAction());
-		actionMap.put(OUTPUT_TO_CLIPBOARD, (t) -> mmlSeqView.outputClipBoardAction());
-		actionMap.put(UNDO, (t) -> mmlSeqView.undo());
-		actionMap.put(REDO, (t) -> mmlSeqView.redo());
-		actionMap.put(SAVE_FILE, (t) -> saveMMLFile(openedFile));
-		actionMap.put(SAVEAS_FILE, (t) -> this.saveAsMMLFileAction());
-		actionMap.put(CUT, (t) -> editState.selectedCut());
-		actionMap.put(COPY, (t) -> editState.selectedCopy());
-		actionMap.put(PASTE, (t) -> this.editPasteAction());
-		actionMap.put(DELETE, (t) -> editState.selectedDelete());
-		actionMap.put(SCORE_PROPERTY, (t) -> this.scorePropertyAction());
-		actionMap.put(NEXT_TIME, (t) -> mmlSeqView.nextStepTimeTo(true));
-		actionMap.put(PREV_TIME, (t) -> mmlSeqView.nextStepTimeTo(false));
-		actionMap.put(PART_CHANGE, (t) -> mmlSeqView.partChange());
-		actionMap.put(ADD_MEASURE, (t) -> this.addMeasure());
-		actionMap.put(REMOVE_MEASURE, (t) -> this.removeMeasure());
-		actionMap.put(ADD_BEAT, (t) -> this.addBeat());
-		actionMap.put(REMOVE_BEAT, (t) -> this.removeBeat());
-		actionMap.put(NOTE_PROPERTY, (t) -> editState.noteProperty());
-		actionMap.put(TRANSPOSE, (t) -> new MMLTranspose().execute(mainFrame, mmlSeqView));
-		actionMap.put(ABOUT, (t) -> new About().show(mainFrame));
-		actionMap.put(MIDI_EXPORT, (t) -> this.midiExportAction());
-		actionMap.put(FILE_IMPORT, (t) -> this.fileImportAction());
-		actionMap.put(CLEAR_DLS, (t) -> this.clearDLSInformation());
-		actionMap.put(SELECT_ALL, (t) -> this.selectAll());
-		actionMap.put(SELECT_PREVIOUS_ALL, (t) -> this.selectPreviousAll());
-		actionMap.put(SELECT_AFTER_ALL, (t) -> this.selectAfterAll());
-		actionMap.put(MML_IMPORT, (t) -> mmlSeqView.mmlImport());
-		actionMap.put(MML_EXPORT, (t) -> mmlSeqView.mmlExport());
-		actionMap.put(SWITCH_TRACK_NEXT, (t) -> mmlSeqView.switchTrack(true));
-		actionMap.put(SWITCH_TRACK_PREV, (t) -> mmlSeqView.switchTrack(false));
-		actionMap.put(SWITCH_MMLPART_NEXT, (t) -> mmlSeqView.switchMMLPart(true));
-		actionMap.put(SWITCH_MMLPART_PREV, (t) -> mmlSeqView.switchMMLPart(false));
-		actionMap.put(TOGGLE_LOOP, (t) -> this.toggleLoop());
-		actionMap.put(CHANGE_NOTE_HEIGHT_INT, (t) -> this.changeNoteHeight(t));
-		actionMap.put(FILE_OPEN_WITH_HISTORY, (t) -> this.fileOpenWithHistory(t));
+		actionMap.put(VIEW_SCALE_UP, t -> mmlSeqView.expandPianoViewWide(0));
+		actionMap.put(VIEW_SCALE_DOWN, t -> mmlSeqView.reducePianoViewWide(0));
+		actionMap.put(STOP, t -> this.stopAction());
+		actionMap.put(PAUSE, t -> this.pauseAction());
+		actionMap.put(FILE_OPEN, t -> this.openMMLFileAction());
+		actionMap.put(NEW_FILE, t -> this.newMMLFileAction());
+		actionMap.put(RELOAD_FILE, t -> this.reloadMMLFileAction());
+		actionMap.put(QUIT, t -> this.quitAction());
+		actionMap.put(ADD_TRACK, t -> mmlSeqView.addMMLTrack(null));
+		actionMap.put(REMOVE_TRACK, t -> mmlSeqView.removeMMLTrack());
+		actionMap.put(TRACK_PROPERTY, t -> mmlSeqView.editTrackPropertyAction());
+		actionMap.put(SET_START_POSITION, t -> mmlSeqView.setStartPosition());
+		actionMap.put(PLAY, t -> this.playAction());
+		actionMap.put(INPUT_FROM_CLIPBOARD, t -> mmlSeqView.inputClipBoardAction());
+		actionMap.put(OUTPUT_TO_CLIPBOARD, t -> mmlSeqView.outputClipBoardAction());
+		actionMap.put(UNDO, t -> mmlSeqView.undo());
+		actionMap.put(REDO, t -> mmlSeqView.redo());
+		actionMap.put(SAVE_FILE, t -> saveMMLFile(openedFile));
+		actionMap.put(SAVEAS_FILE, t -> this.saveAsMMLFileAction());
+		actionMap.put(CUT, t -> editState.selectedCut());
+		actionMap.put(COPY, t -> editState.selectedCopy());
+		actionMap.put(PASTE, t -> this.editPasteAction());
+		actionMap.put(DELETE, t -> editState.selectedDelete());
+		actionMap.put(SCORE_PROPERTY, t -> this.scorePropertyAction());
+		actionMap.put(NEXT_TIME, t -> mmlSeqView.nextStepTimeTo(true));
+		actionMap.put(PREV_TIME, t -> mmlSeqView.nextStepTimeTo(false));
+		actionMap.put(PART_CHANGE, t -> mmlSeqView.partChange());
+		actionMap.put(ADD_MEASURE, t -> this.addMeasure());
+		actionMap.put(REMOVE_MEASURE, t -> this.removeMeasure());
+		actionMap.put(ADD_BEAT, t -> this.addBeat());
+		actionMap.put(REMOVE_BEAT, t -> this.removeBeat());
+		actionMap.put(NOTE_PROPERTY, t -> editState.noteProperty());
+		actionMap.put(TRANSPOSE, t -> new MMLTranspose().execute(mainFrame, mmlSeqView));
+		actionMap.put(ABOUT, t -> new About().show(mainFrame));
+		actionMap.put(MIDI_EXPORT, t -> this.midiExportAction());
+		actionMap.put(FILE_IMPORT, t -> this.fileImportAction());
+		actionMap.put(CLEAR_DLS, t -> this.clearDLSInformation());
+		actionMap.put(SELECT_ALL, t -> this.selectAll());
+		actionMap.put(SELECT_PREVIOUS_ALL, t -> this.selectPreviousAll());
+		actionMap.put(SELECT_AFTER_ALL, t -> this.selectAfterAll());
+		actionMap.put(MML_IMPORT, t -> mmlSeqView.mmlImport());
+		actionMap.put(MML_EXPORT, t -> mmlSeqView.mmlExport());
+		actionMap.put(SWITCH_TRACK_NEXT, t -> mmlSeqView.switchTrack(true));
+		actionMap.put(SWITCH_TRACK_PREV, t -> mmlSeqView.switchTrack(false));
+		actionMap.put(SWITCH_MMLPART_NEXT, t -> mmlSeqView.switchMMLPart(true));
+		actionMap.put(SWITCH_MMLPART_PREV, t -> mmlSeqView.switchMMLPart(false));
+		actionMap.put(TOGGLE_LOOP, t -> this.toggleLoop());
+		actionMap.put(CHANGE_NOTE_HEIGHT_INT, t -> this.changeNoteHeight(t));
+		actionMap.put(FILE_OPEN_WITH_HISTORY, t -> this.fileOpenWithHistory(t));
 	}
 
 	@Override
@@ -215,6 +215,10 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		}
 	}
 
+	/**
+	 * ノートの表示している高さを変更する.
+	 * @param source    高さ設定indexのSupplier
+	 */
 	private void changeNoteHeight(Object source) {
 		if (source instanceof IntSupplier) {
 			int index = ((IntSupplier)source).getAsInt();

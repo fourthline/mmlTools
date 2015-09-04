@@ -62,7 +62,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	private MMLScore mmlScore = new MMLScore();
 	private final MMLScoreUndoEdit undoEdit = new MMLScoreUndoEdit(this);
 
-	private final MMLInputPanel dialog = new MMLInputPanel(this);
+	private final MMLInputPanel mmlInputDialog = new MMLInputPanel(this);
 
 	private final MMLEditor editor;
 
@@ -394,7 +394,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	}
 
 	public void inputClipBoardAction() {
-		dialog.showDialog(parentFrame, getNewTrackName());
+		mmlInputDialog.showDialog(parentFrame, getNewTrackName());
 	}
 
 	public void outputClipBoardAction() {
@@ -404,12 +404,14 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 
 	public void mmlImport() {
 		String text = MMLInputPanel.getClipboardString();
-		if (!new MMLTrack().setMML(text).isEmpty()) {
-			getSelectedTrack().setMML(text);
-			resetTrackView();
-			undoEdit.saveState();
-			panel.repaint();
+		if (new MMLTrack().setMML(text).isEmpty()) {
+			return;
 		}
+
+		getSelectedTrack().setMML(text);
+		resetTrackView();
+		undoEdit.saveState();
+		panel.repaint();
 	}
 
 	public void mmlExport() {
