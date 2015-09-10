@@ -59,7 +59,8 @@ public final class MMLTempoEditor extends AbstractMarkerEditor<MMLTempoEvent> {
 
 	@Override
 	protected void insertAction() {
-		int tempo = showTempoInputDialog(AppResource.appText("edit."+insertCommand), 120);
+		int tempo = mmlManager.getMMLScore().getTempoOnTick(targetTick);
+		tempo = showTempoInputDialog(AppResource.appText("edit."+insertCommand), tempo);
 		if (tempo < 0) {
 			return;
 		}
