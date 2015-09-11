@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.input.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="@/css/main.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fourthline.mabiicco.fx.MainController">
+<children><MenuBar>
+  <menus>
+    <Menu mnemonicParsing="false" text="%menu.file">
+      <items>
+        <MenuItem mnemonicParsing="false" text="%menu.newFile">
+          <accelerator>
+            <KeyCodeCombination alt="UP" code="N" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+          </accelerator>
+        </MenuItem>
+        <MenuItem mnemonicParsing="false" text="%menu.openFile">
+          <accelerator>
+            <KeyCodeCombination alt="UP" code="O" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+          </accelerator>
+        </MenuItem>
+        <MenuItem mnemonicParsing="false" text="%menu.reloadFile" />
+        <MenuItem mnemonicParsing="false" text="%menu.saveFile">
+          <accelerator>
+            <KeyCodeCombination alt="UP" code="S" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+          </accelerator>
+        </MenuItem>
+        <MenuItem mnemonicParsing="false" text="%menu.saveAsFile">
+          <accelerator>
+            <KeyCodeCombination alt="UP" code="S" control="UP" meta="UP" shift="DOWN" shortcut="DOWN" />
+          </accelerator>
+        </MenuItem>
+        <SeparatorMenuItem />
+        <MenuItem mnemonicParsing="false" text="%mml.input.import" />
+        <MenuItem mnemonicParsing="false" text="%menu.midiExport" />
+        <MenuItem mnemonicParsing="false" text="%menu.scoreProperty" />
+        <SeparatorMenuItem />
+        <MenuItem mnemonicParsing="false" text="history1" visible="false" />
+        <MenuItem mnemonicParsing="false" text="history2" visible="false" />
+        <MenuItem mnemonicParsing="false" text="history3" visible="false" />
+        <MenuItem mnemonicParsing="false" text="history4" visible="false" />
+        <MenuItem mnemonicParsing="false" text="history5" visible="false" />
+        <MenuItem mnemonicParsing="false" text="history6" visible="false" />
+        <MenuItem mnemonicParsing="false" text="history7" visible="false" />
+        <MenuItem mnemonicParsing="false" text="history8" visible="false" />
+        <SeparatorMenuItem />
+        <MenuItem mnemonicParsing="false" text="%menu.quit" />
+      </items>
+    </Menu>
+    <Menu mnemonicParsing="false" text="%menu.edit">
+      <items>
+        <MenuItem mnemonicParsing="false" text="%menu.undo">
+          <accelerator>
+            <KeyCodeCombination alt="UP" code="Z" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+          </accelerator>
+        </MenuItem>
+        <MenuItem mnemonicParsing="false" text="%menu.redo">
+          <accelerator>
+            <KeyCodeCombination alt="UP" code="Y" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+          </accelerator>
+        </MenuItem>
+        <SeparatorMenuItem />
+        <MenuItem mnemonicParsing="false" text="%menu.cut">
+          <accelerator>
+            <KeyCodeCombination alt="UP" code="X" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+          </accelerator>
+        </MenuItem>
+        <MenuItem mnemonicParsing="false" text="%menu.copy">
+          <accelerator>
+            <KeyCodeCombination alt="UP" code="C" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+          </accelerator>
+        </MenuItem>
+        <MenuItem mnemonicParsing="false" text="%menu.paste">
+          <accelerator>
+            <KeyCodeCombination alt="UP" code="V" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+          </accelerator>
+        </MenuItem>
+        <MenuItem mnemonicParsing="false" text="%menu.delete">
+          <accelerator>
+            <KeyCodeCombination alt="UP" code="DELETE" control="UP" meta="UP" shift="UP" shortcut="UP" />
+          </accelerator>
+        </MenuItem>
+        <SeparatorMenuItem />
+        <MenuItem mnemonicParsing="false" text="%menu.selectAll">
+          <accelerator>
+            <KeyCodeCombination alt="UP" code="A" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+          </accelerator>
+        </MenuItem>
+        <SeparatorMenuItem />
+        <MenuItem mnemonicParsing="false" text="%menu.changePart" />
+        <MenuItem mnemonicParsing="false" text="%menu.addMeasure" />
+        <MenuItem mnemonicParsing="false" text="%menu.removeMeasure" />
+        <MenuItem mnemonicParsing="false" text="%menu.addBeat" />
+        <MenuItem mnemonicParsing="false" text="%menu.removeBeat" />
+        <MenuItem mnemonicParsing="false" text="%edit.transpose" />
+      </items>
+    </Menu>
+    <Menu mnemonicParsing="false" text="%menu.track">
+      <items>
+        <MenuItem mnemonicParsing="false" text="%menu.addTrack">
+          <accelerator>
+            <KeyCodeCombination alt="UP" code="T" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+          </accelerator>
+        </MenuItem>
+        <MenuItem mnemonicParsing="false" text="%menu.removeTrack">
+          <accelerator>
+            <KeyCodeCombination alt="UP" code="T" control="UP" meta="UP" shift="DOWN" shortcut="DOWN" />
+          </accelerator>
+        </MenuItem>
+        <SeparatorMenuItem />
+        <MenuItem mnemonicParsing="false" text="%menu.trackProperty">
+          <accelerator>
+            <KeyCodeCombination alt="DOWN" code="ENTER" control="UP" meta="UP" shift="UP" shortcut="UP" />
+          </accelerator>
+        </MenuItem>
+        <SeparatorMenuItem />
+        <MenuItem mnemonicParsing="false" text="%menu.mml_import">
+          <accelerator>
+            <KeyCodeCombination alt="UP" code="V" control="UP" meta="UP" shift="DOWN" shortcut="DOWN" />
+          </accelerator>
+        </MenuItem>
+        <MenuItem mnemonicParsing="false" text="%menu.mml_export">
+          <accelerator>
+            <KeyCodeCombination alt="UP" code="C" control="UP" meta="UP" shift="DOWN" shortcut="DOWN" />
+          </accelerator>
+        </MenuItem>
+      </items>
+    </Menu>
+    <Menu mnemonicParsing="false" text="%menu.operate">
+      <items>
+        <MenuItem mnemonicParsing="false" text="%menu.head">
+          <accelerator>
+            <KeyCodeCombination alt="UP" code="F3" control="UP" meta="UP" shift="UP" shortcut="UP" />
+          </accelerator>
+        </MenuItem>
+        <MenuItem mnemonicParsing="false" text="%menu.play">
+          <accelerator>
+            <KeyCodeCombination alt="UP" code="F5" control="UP" meta="UP" shift="UP" shortcut="UP" />
+          </accelerator>
+        </MenuItem>
+        <MenuItem mnemonicParsing="false" text="%menu.stop">
+          <accelerator>
+            <KeyCodeCombination alt="UP" code="ESCAPE" control="UP" meta="UP" shift="UP" shortcut="UP" />
+          </accelerator>
+        </MenuItem>
+        <MenuItem mnemonicParsing="false" text="%menu.pause" />
+        <SeparatorMenuItem />
+        <MenuItem mnemonicParsing="false" text="%menu.prev">
+          <accelerator>
+            <KeyCodeCombination alt="UP" code="F4" control="UP" meta="UP" shift="UP" shortcut="UP" />
+          </accelerator>
+        </MenuItem>
+        <MenuItem mnemonicParsing="false" text="%menu.next">
+          <accelerator>
+            <KeyCodeCombination alt="UP" code="F6" control="UP" meta="UP" shift="UP" shortcut="UP" />
+          </accelerator>
+        </MenuItem>
+      </items>
+    </Menu>
+    <Menu mnemonicParsing="false" text="%menu.setting">
+      <items>
+        <Menu mnemonicParsing="false" text="%menu.noteHeight" />
+        <CheckMenuItem mnemonicParsing="false" text="%clickPlayMenu" />
+        <CheckMenuItem mnemonicParsing="false" text="%view.marker" />
+        <CheckMenuItem mnemonicParsing="false" text="%view.range" />
+        <CheckMenuItem mnemonicParsing="false" text="%edit.enable" />
+        <CheckMenuItem mnemonicParsing="false" text="%edit.active_part_switch" />
+        <MenuItem mnemonicParsing="false" text="%menu.clear_dls" />
+      </items>
+    </Menu>
+    <Menu mnemonicParsing="false" text="%menu.help">
+      <items>
+        <MenuItem mnemonicParsing="false" text="%menu.about" />
+      </items>
+    </Menu>
+  </menus>
+</MenuBar>
+</children></VBox>
