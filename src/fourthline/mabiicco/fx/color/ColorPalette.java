@@ -2,12 +2,13 @@
  * Copyright (C) 2014-2015 たんらる
  */
 
-package fourthline.mabiicco.ui.color;
+package fourthline.mabiicco.fx.color;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import javafx.scene.paint.Color;
 
 final class ColorPalette {
 	private static enum ColorPattern {
@@ -28,21 +29,21 @@ final class ColorPalette {
 					limit(color.getRed()+beta), 
 					limit(color.getGreen()+beta), 
 					limit(color.getBlue()+beta), 
-					color.getAlpha());
+					color.getOpacity());
 		}
-		private static int limit(int a) {
-			if (a > 255) return 255;
+		private static double limit(double a) {
+			if (a > 1.0) return 1.0;
 			if (a < 0)   return 0;
 			return a;
 		}
 
-		private final int rectAlpha;
-		private final int fillAlpha;
-		private final int beta;
+		private final double rectAlpha;
+		private final double fillAlpha;
+		private final double beta;
 		private ColorPattern(int rectAlpha, int fillAlpha, int beta) {
-			this.rectAlpha = rectAlpha;
-			this.fillAlpha = fillAlpha;
-			this.beta = beta;
+			this.rectAlpha = rectAlpha/250.0;
+			this.fillAlpha = fillAlpha/250.0;
+			this.beta = beta/250.0;
 		}
 
 		public Color getRectColor(Color baseColor) {
@@ -63,18 +64,18 @@ final class ColorPalette {
 	}
 
 	private static final Color trackBaseColor[] = {
-		new Color(200, 0, 0),
-		new Color(0, 200, 0),
-		new Color(0, 0, 200),
-		Color.decode("#FF4400"),
-		Color.decode("#00AAFF"),
-		Color.decode("#FF00D0"),
-		Color.decode("#009933"),
-		Color.decode("#FF5564"),
-		Color.decode("#8100FF"),
-		Color.decode("#891D1D"),
-		Color.decode("#A78100"),
-		Color.decode("#00600B"),
+		Color.color(0.9, 0, 0),
+		Color.color(0, 0.9, 0),
+		Color.color(0, 0, 0.9),
+		Color.web("#FF4400"),
+		Color.web("#00AAFF"),
+		Color.web("#FF00D0"),
+		Color.web("#009933"),
+		Color.web("#FF5564"),
+		Color.web("#8100FF"),
+		Color.web("#891D1D"),
+		Color.web("#A78100"),
+		Color.web("#00600B"),
 	};
 
 	private static ArrayList<ColorPalette> instanceList = null;
@@ -155,28 +156,5 @@ final class ColorPalette {
 			return ColorPattern.SONGEX;
 		}
 		return ColorPattern.UNUSED;
-	}
-
-	public static String toText(Color c) {
-		return String.format("%08x", c.getRGB());
-	}
-
-	public static Color toColor(String s) {
-		return new Color(Integer.parseUnsignedInt(s, 16), true);
-	}
-
-	public static void main(String[] args) {
-		ColorManager colorManager = ColorManager.defaultColor();
-		int track = 12;
-		int part = 4;
-		for (int i = 0; i < track; i++) {
-			System.out.println( "rectA="+ColorPalette.toText( colorManager.getActiveRectColor(i) ));
-			System.out.println( "fillA="+ColorPalette.toText( colorManager.getActiveFillColor(i) ));
-			for (int j = 0; j < part; j++) {
-				System.out.println( "rect"+j+"="+ColorPalette.toText( colorManager.getPartRectColor(i, j) ));
-				System.out.println( "fill"+j+"="+ColorPalette.toText( colorManager.getPartFillColor(i, j) ));
-			}
-		}
-		System.out.println( "unused="+ColorPalette.toText( colorManager.getUnusedFillColor() ));
 	}
 }
