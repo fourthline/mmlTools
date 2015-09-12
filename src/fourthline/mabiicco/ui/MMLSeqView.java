@@ -266,6 +266,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	/**
 	 * 新規で複数のトラックをセットする。
 	 */
+	@Override
 	public void setMMLScore(MMLScore score) {
 		mmlScore = score;
 

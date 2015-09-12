@@ -3,6 +3,7 @@
 <?import java.lang.*?>
 <?import javafx.scene.canvas.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.input.*?>
 <?import javafx.scene.layout.*?>
 
@@ -13,17 +14,19 @@
   <menus>
     <Menu mnemonicParsing="false" text="%menu.file">
       <items>
-        <MenuItem mnemonicParsing="false" text="%menu.newFile">
+        <MenuItem mnemonicParsing="false" onAction="#newFileAction" text="%menu.newFile">
           <accelerator>
             <KeyCodeCombination alt="UP" code="N" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
           </accelerator>
+          <graphic><ImageView><image><Image url="@/img/file.png" /></image></ImageView></graphic>
         </MenuItem>
-        <MenuItem mnemonicParsing="false" text="%menu.openFile">
+        <MenuItem mnemonicParsing="false" onAction="#openFileAction" text="%menu.openFile">
           <accelerator>
             <KeyCodeCombination alt="UP" code="O" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
           </accelerator>
+          <graphic><ImageView><image><Image url="@/img/open.png" /></image></ImageView></graphic>
         </MenuItem>
-        <MenuItem mnemonicParsing="false" text="%menu.reloadFile" />
+        <MenuItem mnemonicParsing="false" onAction="#reloadFileAction" text="%menu.reloadFile" />
         <MenuItem mnemonicParsing="false" text="%menu.saveFile">
           <accelerator>
             <KeyCodeCombination alt="UP" code="S" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
@@ -83,6 +86,7 @@
           <accelerator>
             <KeyCodeCombination alt="UP" code="DELETE" control="UP" meta="UP" shift="UP" shortcut="UP" />
           </accelerator>
+          <graphic><ImageView><image><Image url="@/img/delete.png" /></image></ImageView></graphic>
         </MenuItem>
         <SeparatorMenuItem />
         <MenuItem mnemonicParsing="false" text="%menu.selectAll">
@@ -92,10 +96,18 @@
         </MenuItem>
         <SeparatorMenuItem />
         <MenuItem mnemonicParsing="false" text="%menu.changePart" />
-        <MenuItem mnemonicParsing="false" text="%menu.addMeasure" />
-        <MenuItem mnemonicParsing="false" text="%menu.removeMeasure" />
-        <MenuItem mnemonicParsing="false" text="%menu.addBeat" />
-        <MenuItem mnemonicParsing="false" text="%menu.removeBeat" />
+        <MenuItem mnemonicParsing="false" text="%menu.addMeasure">
+          <graphic><ImageView><image><Image url="@/img/insertM.png" /></image></ImageView></graphic>
+        </MenuItem>
+        <MenuItem mnemonicParsing="false" text="%menu.removeMeasure">
+          <graphic><ImageView><image><Image url="@/img/deleteM.png" /></image></ImageView></graphic>
+        </MenuItem>
+        <MenuItem mnemonicParsing="false" text="%menu.addBeat">
+          <graphic><ImageView><image><Image url="@/img/insertB.png" /></image></ImageView></graphic>
+        </MenuItem>
+        <MenuItem mnemonicParsing="false" text="%menu.removeBeat">
+          <graphic><ImageView><image><Image url="@/img/deleteB.png" /></image></ImageView></graphic>
+        </MenuItem>
         <MenuItem mnemonicParsing="false" text="%edit.transpose" />
       </items>
     </Menu>
@@ -136,28 +148,35 @@
           <accelerator>
             <KeyCodeCombination alt="UP" code="F3" control="UP" meta="UP" shift="UP" shortcut="UP" />
           </accelerator>
+          <graphic><ImageView><image><Image url="@/img/head.png" /></image></ImageView></graphic>
         </MenuItem>
         <MenuItem mnemonicParsing="false" text="%menu.play">
           <accelerator>
             <KeyCodeCombination alt="UP" code="F5" control="UP" meta="UP" shift="UP" shortcut="UP" />
           </accelerator>
+          <graphic><ImageView><image><Image url="@/img/playButton.png" /></image></ImageView></graphic>
         </MenuItem>
         <MenuItem mnemonicParsing="false" text="%menu.stop">
           <accelerator>
             <KeyCodeCombination alt="UP" code="ESCAPE" control="UP" meta="UP" shift="UP" shortcut="UP" />
           </accelerator>
+          <graphic><ImageView><image><Image url="@/img/stop.png" /></image></ImageView></graphic>
         </MenuItem>
-        <MenuItem mnemonicParsing="false" text="%menu.pause" />
+        <MenuItem mnemonicParsing="false" text="%menu.pause">
+          <graphic><ImageView><image><Image url="@/img/pause.png" /></image></ImageView></graphic>
+        </MenuItem>
         <SeparatorMenuItem />
         <MenuItem mnemonicParsing="false" text="%menu.prev">
           <accelerator>
             <KeyCodeCombination alt="UP" code="F4" control="UP" meta="UP" shift="UP" shortcut="UP" />
           </accelerator>
+          <graphic><ImageView><image><Image url="@/img/prev.png" /></image></ImageView></graphic>
         </MenuItem>
         <MenuItem mnemonicParsing="false" text="%menu.next">
           <accelerator>
             <KeyCodeCombination alt="UP" code="F6" control="UP" meta="UP" shift="UP" shortcut="UP" />
           </accelerator>
+          <graphic><ImageView><image><Image url="@/img/next.png" /></image></ImageView></graphic>
         </MenuItem>
       </items>
     </Menu>
@@ -179,6 +198,16 @@
     </Menu>
   </menus>
 </MenuBar>
+<ToolBar>
+  <items>
+    <Button mnemonicParsing="false" onAction="#newFileAction">
+          <graphic><ImageView><image><Image url="@/img/file.png" /></image></ImageView></graphic>
+    </Button>
+    <Button mnemonicParsing="false" onAction="#openFileAction">
+          <graphic><ImageView><image><Image url="@/img/open.png" /></image></ImageView></graphic>
+    </Button>
+  </items>
+</ToolBar>
 </children></VBox>
 </top>
 <center><ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">

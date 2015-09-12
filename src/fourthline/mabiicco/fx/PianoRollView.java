@@ -10,7 +10,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-
+import javafx.scene.text.Font;
 import fourthline.mabiicco.AppResource;
 import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mabiicco.midi.InstClass;
@@ -39,6 +39,10 @@ public final class PianoRollView {
 		this.canvas = canvas;
 		this.mmlManager = mmlManager;
 		setNoteHeightIndex( MabiIccoProperties.getInstance().getPianoRollViewHeightScaleProperty() );
+		paint();
+	}
+
+	public void paint() {
 		GraphicsContext gc = canvas.getGraphicsContext2D();
 		paintComponent(gc);
 	}
@@ -352,16 +356,21 @@ public final class PianoRollView {
 
 	private void drawRect(GraphicsContext gc, Color rectColor, Color fillColor, int x, int y, int width, int height) {
 		gc.setFill(fillColor);
-		if (width != 0) {
-			gc.fillRect(x+1, y+1, width, height-1);
-		} else {
-			gc.fillRect(x+1, y+1, 1, y+height-1);
-		}
+		gc.fillRect(x+1, y+1, width, height-1);
+
 		gc.setFill(rectColor);
 		gc.fillRect(x+1, y+1, 1, height-1);
 		gc.fillRect(x+width+1, y+1, 1, height-1);
-		gc.fillRect(x+2, y, width, 1);
-		gc.fillRect(x+2, y+height, width, 1);
+		if (width > 1) {
+			gc.fillRect(x+2, y, width-1, 1);
+			gc.fillRect(x+2, y+height, width-1, 1);
+		} else if (width == 1) {
+			gc.fillRect(x+1, y, 2, 1);
+			gc.fillRect(x+1, y+height, 2, 1);
+		} else if (width == 0) {
+			gc.fillRect(x+0, y, 3, 1);
+			gc.fillRect(x+0, y+height, 3, 1);
+		}
 	}
 
 	private void drawNote(GraphicsContext gc, MMLNoteEvent noteEvent, Color rectColor, Color fillColor, boolean drawOption, MMLNoteEvent prevNote) {
@@ -385,8 +394,9 @@ public final class PianoRollView {
 			int velocity = noteEvent.getVelocity();
 			if ( (prevNote == null) || (prevNote.getVelocity() != velocity) ) {
 				String s = "V" + velocity;
-				gc.setStroke(Color.DARKGRAY);
-				gc.strokeText(s, x, y);
+				gc.setFont(Font.font(10));
+				gc.setFill(Color.BLACK);
+				gc.fillText(s, x, y);
 			}
 		}
 	}

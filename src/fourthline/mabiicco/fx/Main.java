@@ -25,10 +25,12 @@ import javafx.stage.WindowEvent;
 
 public final class Main extends Application {
 
-	private Scene createScene() {
+	private Scene createScene(Stage stage) {
 		try {
 			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Main.fxml"), AppResource.getResourceBundle());
 			Parent root = fxmlLoader.load();
+			MainController controller = fxmlLoader.getController();
+			controller.setStage(stage);
 			return new Scene(root);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -38,14 +40,14 @@ public final class Main extends Application {
 
 	@Override
 	public void start(Stage stage) {
-		stage.setScene(createScene());
+		stage.setScene(createScene(stage));
 		stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent t) {
-                Platform.exit();
-                System.exit(0);
-            }
-        });
+			@Override
+			public void handle(WindowEvent t) {
+				Platform.exit();
+				System.exit(0);
+			}
+		});
 		stage.show();
 	}
 

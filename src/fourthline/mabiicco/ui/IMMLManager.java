@@ -13,6 +13,7 @@ import fourthline.mmlTools.MMLTrack;
  */
 public interface IMMLManager {
 	public MMLScore getMMLScore();
+	public void setMMLScore(MMLScore score);
 	public int getActiveTrackIndex();
 	public MMLEventList getActiveMMLPart();
 	public void updateActivePart(boolean generate);
