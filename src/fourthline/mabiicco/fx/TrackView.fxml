@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<children><BorderPane>
+<left><HBox BorderPane.alignment="CENTER">
+<children><ComboBox prefWidth="150.0" /><ComboBox prefWidth="150.0" /><Button mnemonicParsing="false" text="Button" /><Button mnemonicParsing="false" text="Button" /><Button mnemonicParsing="false" text="Button" />
+</children></HBox>
+</left>
+<right><HBox BorderPane.alignment="CENTER">
+<children><Label text="Label" />
+</children></HBox>
+</right></BorderPane><GridPane>
+  <columnConstraints>
+    <ColumnConstraints halignment="CENTER" />
+    <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" />
+  </columnConstraints>
+  <rowConstraints>
+    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+  </rowConstraints>
+<children><ToggleButton mnemonicParsing="false" text="ToggleButton" /><ToggleButton mnemonicParsing="false" text="ToggleButton" GridPane.rowIndex="1" /><ToggleButton mnemonicParsing="false" text="ToggleButton" GridPane.rowIndex="2" /><ToggleButton mnemonicParsing="false" text="ToggleButton" GridPane.rowIndex="3" /><TextField GridPane.columnIndex="1" /><TextField GridPane.columnIndex="1" GridPane.rowIndex="1" /><TextField GridPane.columnIndex="1" GridPane.rowIndex="2" /><TextField GridPane.columnIndex="1" GridPane.rowIndex="3" />
+</children>
+</GridPane>
+</children></VBox>

@@ -213,4 +213,13 @@
 <center><ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
 <content><Canvas fx:id="canvas" height="400.0" width="400.0" />
 </content></ScrollPane>
-</center></BorderPane>
+</center>
+<bottom><VBox BorderPane.alignment="CENTER">
+<children><TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE">
+  <tabs>
+    <Tab text="Untitled Tab 1" />
+    <Tab text="Untitled Tab 2" />
+  </tabs>
+</TabPane>
+</children></VBox>
+</bottom></BorderPane>

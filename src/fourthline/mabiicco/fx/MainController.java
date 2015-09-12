@@ -7,6 +7,7 @@ package fourthline.mabiicco.fx;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -18,9 +19,13 @@ import fourthline.mmlTools.parser.IMMLFileParser;
 import fourthline.mmlTools.parser.MMLParseException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -31,6 +36,7 @@ public final class MainController implements Initializable {
 	@FXML private Canvas canvas;
 	
 	@FXML private MenuItem newFileMenu;
+	@FXML private TabPane tabPane;
 
 	private Stage stage;
 	private PianoRollView pianoRollView;
@@ -40,6 +46,19 @@ public final class MainController implements Initializable {
 	public void initialize(URL url, ResourceBundle resouceBundle) {
 		System.out.println(this.getClass().getName()+"["+resouceBundle.getLocale()+"]: "+url);
 		this.pianoRollView = new PianoRollView(canvas, mmlContents);
+		createTrackView(resouceBundle);
+	}
+
+	private void createTrackView(ResourceBundle resouceBundle) {
+		try {
+			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("TrackView.fxml"), resouceBundle);
+			Parent root = fxmlLoader.load();
+			tabPane.getTabs().clear();
+			Tab tab = new Tab("Track1", root);
+			tabPane.getTabs().add(tab);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public MainController() {
