@@ -14,7 +14,6 @@ import java.util.Base64;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Base64.Decoder;
-import java.util.regex.Pattern;
 import java.util.zip.CRC32;
 
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
@@ -118,13 +117,11 @@ public final class MMLFile implements IMMLFileParser {
 	 * @param contents
 	 */
 	private void parseSettings(String contents) {
-		Pattern.compile("\n").splitAsStream(contents).forEachOrdered((s) -> {
-			TextParser textParser = TextParser.text(s);
-			if ( textParser.startsWith("Title=", score::setTitle) ) {
-			} else if ( textParser.startsWith("Source=", score::setAuthor) ) {
-			} else if ( textParser.startsWith("Encoding=", (t) -> this.encoding = t) ) {
-			}
-		});
+		TextParser.text(contents)
+		.pattern("Title=",    t -> score.setTitle(t))
+		.pattern("Source=",   t -> score.setAuthor(t))
+		.pattern("Encoding=", t -> this.encoding = t)
+		.parse();
 	}
 
 	/**

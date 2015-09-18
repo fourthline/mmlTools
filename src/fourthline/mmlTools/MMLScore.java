@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
-import java.util.regex.Pattern;
 
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mmlTools.core.MMLTicks;
@@ -324,18 +323,16 @@ public final class MMLScore implements IMMLFileParser {
 	 * @param contents
 	 */
 	private void parseMMLScore(String contents) {
-		Pattern.compile("\n").splitAsStream(contents).forEachOrdered((s) -> {
-			TextParser textParser = TextParser.text(s);
-			if (        textParser.startsWith("mml-track=",   t -> this.addTrack(new MMLTrack().setMML(t)) )) {
-			} else if ( textParser.startsWith("name=",        t -> this.trackList.getLast().setTrackName(t) )) {
-			} else if ( textParser.startsWith("program=",     t -> this.trackList.getLast().setProgram(Integer.parseInt(t)) )) {
-			} else if ( textParser.startsWith("songProgram=", t -> this.trackList.getLast().setSongProgram(Integer.parseInt(t)) )) {
-			} else if ( textParser.startsWith("panpot=",      t -> this.trackList.getLast().setPanpot(Integer.parseInt(t)) )) {
-			} else if ( textParser.startsWith("title=",       this::setTitle )) {
-			} else if ( textParser.startsWith("author=",      this::setAuthor )) {
-			} else if ( textParser.startsWith("time=",        this::setBaseTime )) {
-			}
-		});
+		TextParser.text(contents)
+		.pattern("mml-track=",   t -> this.addTrack(new MMLTrack().setMML(t)) )
+		.pattern("name=",        t -> this.trackList.getLast().setTrackName(t) )
+		.pattern("program=",     t -> this.trackList.getLast().setProgram(Integer.parseInt(t)) )
+		.pattern("songProgram=", t -> this.trackList.getLast().setSongProgram(Integer.parseInt(t)) )
+		.pattern("panpot=",      t -> this.trackList.getLast().setPanpot(Integer.parseInt(t)) )
+		.pattern("title=",       this::setTitle )
+		.pattern("author=",      this::setAuthor )
+		.pattern("time=",        this::setBaseTime )
+		.parse();
 	}
 
 	/**

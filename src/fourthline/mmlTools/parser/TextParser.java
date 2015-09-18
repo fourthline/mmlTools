@@ -1,14 +1,15 @@
 /*
- * Copyright (C) 2014 たんらる
+ * Copyright (C) 2014-2015 たんらる
  */
 
 package fourthline.mmlTools.parser;
 
+import java.util.HashMap;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 
 public final class TextParser {
-	private String text;
-	private TextParser() {}
+	private final String text;
 
 	private TextParser(String text) {
 		this.text = text;
@@ -18,17 +19,20 @@ public final class TextParser {
 		return new TextParser(test);
 	}
 
-	/**
-	 * 指定された文字列で開始するテキストであれば、funcに開始文字列以外の部分を引数として渡し実行します.
-	 * @param s
-	 * @param func
-	 * @return 指定されたテキストで、funcを実行した場合には trueを返します.
-	 */
-	public boolean startsWith(String s, Consumer<String> func) {
-		if (text.startsWith(s)) {
-			func.accept( text.substring(s.length()) );
-			return true;
-		}
-		return false;
+	private HashMap<String, Consumer<String>> map = new HashMap<>();
+	public TextParser pattern(String s, Consumer<String> func) {
+		map.put(s, func);
+		return this;
+	}
+
+	public void parse() {
+		Pattern.compile("\n").splitAsStream(this.text).forEachOrdered((lineText) -> {
+			map.keySet().forEach(key -> {
+				if (lineText.startsWith(key)) {
+					map.get(key).accept( lineText.substring(key.length()) );
+					return;
+				}
+			});
+		});
 	}
 }

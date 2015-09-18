@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import java.util.regex.Pattern;
 
 import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTrack;
@@ -92,14 +91,12 @@ public final class MMSFile implements IMMLFileParser {
 	 * @param contents
 	 */
 	private void parseInfomation(String contents) {
-		Pattern.compile("\n").splitAsStream(contents).forEachOrdered((s) -> {
-			TextParser textParser = TextParser.text(s);
-			if ( textParser.startsWith("title=", score::setTitle) ) {
-			} else if ( textParser.startsWith("auther=", score::setAuthor) ) {
-			} else if ( textParser.startsWith("rythmNum=",  t -> score.setTimeCountOnly(Integer.valueOf(t)) )) {
-			} else if ( textParser.startsWith("rythmBase=", t -> score.setBaseOnly(Integer.valueOf(t)) )) {
-			}
-		});
+		TextParser.text(contents)
+		.pattern("title=", score::setTitle)
+		.pattern("auther=", score::setAuthor)
+		.pattern("rythmNum=",  t -> score.setTimeCountOnly(Integer.valueOf(t)) )
+		.pattern("rythmBase=", t -> score.setBaseOnly(Integer.valueOf(t)) )
+		.parse();
 	}
 
 	/**
@@ -108,15 +105,13 @@ public final class MMSFile implements IMMLFileParser {
 	 */
 	private void parseMarker(String contents) {
 		LinkedList<Marker> markerList = new LinkedList<>();
-		Pattern.compile("\n").splitAsStream(contents).forEachOrdered((s) -> {
-			TextParser textParser = TextParser.text(s);
-			if ( textParser.startsWith("label", t -> markerList.add(new Marker(t.substring(5), 0))) ) {
-			} else if ( textParser.startsWith("position", t -> {
-				int tickOffset = Integer.parseInt(t.substring(5));
-				markerList.getLast().setTickOffset( tickOffset );
-			})) {
-			}
-		});
+		TextParser.text(contents)
+		.pattern("label", t -> markerList.add(new Marker(t.substring(5), 0)))
+		.pattern("position", t -> {
+			int tickOffset = Integer.parseInt(t.substring(5));
+			markerList.getLast().setTickOffset( tickOffset );
+		})
+		.parse();
 		score.getMarkerList().addAll(markerList);
 	}
 
@@ -129,19 +124,14 @@ public final class MMSFile implements IMMLFileParser {
 		final int intValue[] = { 0, 0 };
 		final String stringValue[] = { "", "", "", "" };
 
-		Pattern.compile("\n").splitAsStream(contents).forEachOrdered((s) -> {
-			TextParser textParser = TextParser.text(s);
-			if ( textParser.startsWith("instrument=",
-					t -> intValue[0] = convertInstProgram(Integer.parseInt(t)) )) {
-			} else if ( textParser.startsWith("panpot=",
-					t -> intValue[1] = Integer.parseInt(t) + 64 )) {
-			} else if ( textParser.startsWith("name=",    t -> stringValue[0] = t) ) {
-			} else if ( textParser.startsWith("ch0_mml=", t -> stringValue[1] = t) ) {
-			} else if ( textParser.startsWith("ch1_mml=", t -> stringValue[2] = t) ) {
-			} else if ( textParser.startsWith("ch2_mml=", t -> stringValue[3] = t) ) {
-				return;
-			}
-		});
+		TextParser.text(contents)
+		.pattern("instrument=", t -> intValue[0] = convertInstProgram(Integer.parseInt(t)) )
+		.pattern("panpot=",     t -> intValue[1] = Integer.parseInt(t) + 64 )
+		.pattern("name=",       t -> stringValue[0] = t)
+		.pattern("ch0_mml=",    t -> stringValue[1] = t)
+		.pattern("ch1_mml=",    t -> stringValue[2] = t)
+		.pattern("ch2_mml=",    t -> stringValue[3] = t)
+		.parse();
 
 		MMLTrack track = new MMLTrack().setMML(stringValue[1], stringValue[2], stringValue[3], "");
 		track.setTrackName(stringValue[0]);
