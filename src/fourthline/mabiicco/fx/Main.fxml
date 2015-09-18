@@ -202,9 +202,11 @@
   <items>
     <Button mnemonicParsing="false" onAction="#newFileAction">
           <graphic><ImageView><image><Image url="@/img/file.png" /></image></ImageView></graphic>
+          <tooltip><Tooltip text="%menu.newFile"/></tooltip>
     </Button>
     <Button mnemonicParsing="false" onAction="#openFileAction">
           <graphic><ImageView><image><Image url="@/img/open.png" /></image></ImageView></graphic>
+          <tooltip><Tooltip text="%menu.openFile"/></tooltip>
     </Button>
   </items>
 </ToolBar>

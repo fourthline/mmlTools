@@ -34,7 +34,7 @@ import javafx.stage.Stage;
  */
 public final class MainController implements Initializable {
 	@FXML private Canvas canvas;
-	
+
 	@FXML private MenuItem newFileMenu;
 	@FXML private TabPane tabPane;
 
@@ -56,6 +56,8 @@ public final class MainController implements Initializable {
 			tabPane.getTabs().clear();
 			Tab tab = new Tab("Track1", root);
 			tabPane.getTabs().add(tab);
+			TrackViewController trackViewController = fxmlLoader.getController();
+			trackViewController.setMMLTrack(null, 0);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
