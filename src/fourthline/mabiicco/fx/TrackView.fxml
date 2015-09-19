@@ -8,7 +8,7 @@
 
 <VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fourthline.mabiicco.fx.TrackViewController">
 <children><BorderPane>
-<left><HBox BorderPane.alignment="CENTER">
+<left><HBox spacing="5.0" BorderPane.alignment="CENTER">
 <children>
 <ComboBox fx:id="instComboBox" prefWidth="150.0" />
 <ComboBox fx:id="songComboBox" prefWidth="150.0" />
@@ -25,11 +25,17 @@
   <graphic><ImageView><image><Image url="@/img/play_all.png" /></image></ImageView></graphic>
   <tooltip><Tooltip text="%mmltrack.all" /></tooltip>
 </Button>
-</children></HBox>
+</children>
+<padding>
+<Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+</padding></HBox>
 </left>
 <right><HBox BorderPane.alignment="CENTER">
-<children><Label text="Label" />
-</children></HBox>
+<children><Label fx:id="rankText" text="Label" />
+</children>
+<padding>
+<Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+</padding></HBox>
 </right></BorderPane><GridPane>
   <columnConstraints>
 <ColumnConstraints halignment="CENTER" minWidth="10.0" />

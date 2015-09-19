@@ -198,23 +198,43 @@
     </Menu>
   </menus>
 </MenuBar>
-<ToolBar>
-  <items>
+<HBox>
+  <children>
     <Button mnemonicParsing="false" onAction="#newFileAction">
           <graphic><ImageView><image><Image url="@/img/file.png" /></image></ImageView></graphic>
-          <tooltip><Tooltip text="%menu.newFile"/></tooltip>
+          <tooltip><Tooltip text="%menu.newFile" /></tooltip>
     </Button>
     <Button mnemonicParsing="false" onAction="#openFileAction">
           <graphic><ImageView><image><Image url="@/img/open.png" /></image></ImageView></graphic>
-          <tooltip><Tooltip text="%menu.openFile"/></tooltip>
+          <tooltip><Tooltip text="%menu.openFile" /></tooltip>
     </Button>
-  </items>
-</ToolBar>
+  </children>
+</HBox>
 </children></VBox>
 </top>
-<center><ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
+<center>
+<BorderPane>
+<center><GridPane BorderPane.alignment="CENTER">
+  <columnConstraints>
+    <ColumnConstraints hgrow="NEVER" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" />
+    <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+  </columnConstraints>
+  <rowConstraints>
+    <RowConstraints maxHeight="50.0" minHeight="50.0" prefHeight="50.0" vgrow="NEVER" />
+    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="ALWAYS" />
+  </rowConstraints>
+<children>
+<ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="1">
 <content><Canvas fx:id="canvas" height="400.0" width="400.0" />
+</content></ScrollPane><ScrollPane hbarPolicy="NEVER" vbarPolicy="NEVER" GridPane.columnIndex="1">
+<content><Canvas fx:id="columnCanvas" height="50.0" width="200.0" />
+</content></ScrollPane><ScrollPane hbarPolicy="NEVER" vbarPolicy="NEVER" GridPane.rowIndex="1">
+<content><Canvas fx:id="keyboardCanvas" height="200.0" width="100.0" />
 </content></ScrollPane>
+</children>
+</GridPane>
+</center>
+</BorderPane>
 </center>
 <bottom><VBox BorderPane.alignment="CENTER">
 <children><TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE">

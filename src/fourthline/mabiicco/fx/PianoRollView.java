@@ -300,7 +300,7 @@ public final class PianoRollView {
 		}
 	}
 
-	private void paintSequenceLine(GraphicsContext gc, int height) {
+	public void paintSequenceLine(GraphicsContext gc, int height) {
 		long position = getSequencePlayPosition();
 
 		Color color = Color.RED;

@@ -34,18 +34,24 @@ import javafx.stage.Stage;
  */
 public final class MainController implements Initializable {
 	@FXML private Canvas canvas;
+	@FXML private Canvas keyboardCanvas;
+	@FXML private Canvas columnCanvas;
 
 	@FXML private MenuItem newFileMenu;
 	@FXML private TabPane tabPane;
 
 	private Stage stage;
 	private PianoRollView pianoRollView;
+	private KeyboardView keyboardView;
+	private ColumnView columnView;
 	private final IMMLManager mmlContents = new MMLContents();
 
 	@Override
 	public void initialize(URL url, ResourceBundle resouceBundle) {
 		System.out.println(this.getClass().getName()+"["+resouceBundle.getLocale()+"]: "+url);
 		this.pianoRollView = new PianoRollView(canvas, mmlContents);
+		this.keyboardView = new KeyboardView(keyboardCanvas, pianoRollView);
+		this.columnView = new ColumnView(columnCanvas, pianoRollView, mmlContents);
 		createTrackView(resouceBundle);
 	}
 
@@ -57,7 +63,7 @@ public final class MainController implements Initializable {
 			Tab tab = new Tab("Track1", root);
 			tabPane.getTabs().add(tab);
 			TrackViewController trackViewController = fxmlLoader.getController();
-			trackViewController.setMMLTrack(null, 0);
+			trackViewController.setMMLTrack(new MMLTrack().setMML("MML@a,b,c,d;"), 0);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -65,7 +71,7 @@ public final class MainController implements Initializable {
 
 	public MainController() {
 		MMLScore mmlScore = mmlContents.getMMLScore();
-		mmlScore.addTrack(new MMLTrack().setMML("MML@o0v7ccccr1o4rc64rc32rc16rc8rc4rc2rc1,o0eeee,o0gggg,o0bbbb;"));
+		mmlScore.addTrack(new MMLTrack().setMML("MML@o0t150v7ccct112cr1o4rc64rc32rc16rc8rc4rc2rc1,o0eeee,o0gggg,o0bbbb;"));
 		mmlScore.addTrack(new MMLTrack().setMML("MML@o1cccc,o1eeee,o1gggg,o1bbbb;"));
 		mmlScore.addTrack(new MMLTrack().setMML("MML@o2cccc,o2eeee,o2gggg,o2bbbb;"));
 		mmlScore.addTrack(new MMLTrack().setMML("MML@o3cccc,o3eeee,o3gggg,o3bbbb;"));
