@@ -8,8 +8,8 @@ import java.util.OptionalInt;
 
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
-
 import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mabiicco.ui.IMMLManager;
 import fourthline.mabiicco.ui.IViewTargetMarker;
@@ -21,8 +21,6 @@ import fourthline.mmlTools.Marker;
 public final class ColumnView implements IViewTargetMarker {
 
 	private static final Color BEAT_BORDER_COLOR = Color.color(0.4f, 0.4f, 0.4f);
-	private static final Color TEMPO_MAKER_FILL_COLOR = Color.color(0.4f, 0.8f, 0.8f);
-	private static final Color MAKER_FILL_COLOR = Color.color(0.2f, 0.8f, 0.2f);
 	private static final Color TARGET_MAKER_FILL_COLOR = Color.color(0.9f, 0.7f, 0.0f, 0.6f);
 
 	private final PianoRollView pianoRollView;
@@ -31,6 +29,7 @@ public final class ColumnView implements IViewTargetMarker {
 	private OptionalInt targetMarker = OptionalInt.empty();
 
 	private Canvas canvas;
+	private final Image markerT = new Image("/img/markerT.png");
 
 	public ColumnView(Canvas canvas, PianoRollView pianoRollView, IMMLManager mmlManager) {
 		this.canvas = canvas;
@@ -87,9 +86,9 @@ public final class ColumnView implements IViewTargetMarker {
 
 		for (MMLTempoEvent tempoEvent : score.getTempoEventList()) {
 			int tick = tempoEvent.getTickOffset();
-			int x = pianoRollView.convertTicktoX(tick);
 			String s = "t" + tempoEvent.getTempo();
-			drawMarker(gc, s, x, TEMPO_MAKER_FILL_COLOR, 0);
+			int x = pianoRollView.convertTicktoX(tick);
+			drawMarker(gc, markerT, s, x, 0);
 		}
 	}
 
@@ -100,25 +99,20 @@ public final class ColumnView implements IViewTargetMarker {
 			for (Marker marker : score.getMarkerList()) {
 				int tick = marker.getTickOffset();
 				int x = pianoRollView.convertTicktoX(tick);
-				drawMarker(gc, marker.getName(), x, MAKER_FILL_COLOR, -5);
+				drawMarker(gc, markerT, marker.getName(), x, -5);
 			}
 		}
 	}
 
-	private void drawMarker(GraphicsContext gc, String s, int x, Color color, int dy) {
-		double xPoints[] = { x-3, x+3, x+3, x, x-3 };
-		double yPoints[] = { 16, 16, 22, 25, 22 };
-		for (int i = 0; i < yPoints.length; i++) {
-			yPoints[i] += dy;
-		}
+	private void drawMarker(GraphicsContext gc, Image image, String s, int x, int dy) {
+		double y = 24 + dy;
 
 		// label
 		gc.setFill(Color.BLACK);
-		gc.fillText(s, x+6, 24+dy);
+		gc.fillText(s, x+6, y);
 
 		// icon
-		gc.setFill(color);
-		gc.fillPolygon(xPoints, yPoints, xPoints.length);
+		gc.drawImage(image, x-(int)(image.getWidth()/2), y-image.getHeight()+2);
 	}
 
 	private void paintTargetMarker(GraphicsContext gc) {
@@ -141,5 +135,4 @@ public final class ColumnView implements IViewTargetMarker {
 
 	@Override
 	public void PaintOff() {}
-
 }

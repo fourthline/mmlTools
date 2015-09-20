@@ -36,7 +36,7 @@
 			srcdir="${src}"
 			destdir="${dest}"
 			classpath="${class.path}"
-			excludes="**/package-info.java,com/"
+			excludes="**/package-info.java,com/,fourthline/mabiicco/fx/"
 			encoding="UTF-8"
 			listfiles="yes"
 			includeantruntime="false" />
@@ -49,6 +49,7 @@
 				<include name="**/*.png" />
 				<include name="**/*.fxml" />
 				<include name="**/*.css" />
+				<exclude name="fourthline/mabiicco/fx/" />
 			</fileset>
 		</copy>
 	</target>
