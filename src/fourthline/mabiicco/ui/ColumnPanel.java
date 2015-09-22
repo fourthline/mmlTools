@@ -68,7 +68,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 
 	@Override
 	public Dimension getPreferredSize() {
-		return new Dimension(getWidth(), 26);
+		return new Dimension(getWidth(), 32);
 	}
 
 	@Override
@@ -131,21 +131,21 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 			for (Marker marker : score.getMarkerList()) {
 				int tick = marker.getTickOffset();
 				int x = pianoRollView.convertTicktoX(tick);
-				drawMarker(g, marker.getName(), x, MAKER_FILL_COLOR, -5);
+				drawMarker(g, marker.getName(), x, MAKER_FILL_COLOR, -11);
 			}
 		}
 	}
 
 	private void drawMarker(Graphics2D g, String s, int x, Color color, int dy) {
 		int xPoints[] = { x-3, x+3, x+3, x, x-3 };
-		int yPoints[] = { 16, 16, 22, 25, 22 };
+		int yPoints[] = { 22, 22, 28, 31, 28 };
 		for (int i = 0; i < yPoints.length; i++) {
 			yPoints[i] += dy;
 		}
 
 		// label
 		g.setColor(Color.DARK_GRAY);
-		g.drawString(s, x+6, 24+dy);
+		g.drawString(s, x+6, 30+dy);
 
 		// icon
 		g.setColor(color);
