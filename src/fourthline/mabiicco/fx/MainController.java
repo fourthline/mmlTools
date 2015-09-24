@@ -42,16 +42,14 @@ public final class MainController implements Initializable {
 
 	private Stage stage;
 	private PianoRollView pianoRollView;
-	private KeyboardView keyboardView;
-	private ColumnView columnView;
 	private final IMMLManager mmlContents = new MMLContents();
 
 	@Override
 	public void initialize(URL url, ResourceBundle resouceBundle) {
 		System.out.println(this.getClass().getName()+"["+resouceBundle.getLocale()+"]: "+url);
 		this.pianoRollView = new PianoRollView(canvas, mmlContents);
-		this.keyboardView = new KeyboardView(keyboardCanvas, pianoRollView);
-		this.columnView = new ColumnView(columnCanvas, pianoRollView, mmlContents);
+		new KeyboardView(keyboardCanvas, pianoRollView);
+		new ColumnView(columnCanvas, pianoRollView, mmlContents);
 		createTrackView(resouceBundle);
 	}
 

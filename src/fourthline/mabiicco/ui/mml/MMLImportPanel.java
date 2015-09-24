@@ -37,6 +37,8 @@ public final class MMLImportPanel extends JPanel {
 	private IMMLManager mmlManager;
 	private int possibleImportTrackCount;
 
+	private JButton importButton;
+
 	/**
 	 * @wbp.parser.constructor
 	 */
@@ -63,7 +65,7 @@ public final class MMLImportPanel extends JPanel {
 		JPanel p = new JPanel();
 		p.setLayout(null);
 
-		JButton importButton = new JButton(AppResource.appText("mml.input.import"));
+		importButton = new JButton(AppResource.appText("mml.input.import"));
 		importButton.setMargin(new Insets(5, 10, 5, 10));
 		buttonPanel.add(importButton);
 		importButton.addActionListener((event) -> {
@@ -85,6 +87,13 @@ public final class MMLImportPanel extends JPanel {
 
 		table = new TrackListTable(trackList, true);
 		table.setInitialCheck(possibleImportTrackCount);
+		table.addPropertyChangeListener(evt -> {
+			int count = 0;
+			for (boolean b : table.getCheckList()) {
+				if (b) count++;
+			}
+			importButton.setEnabled( count <= possibleImportTrackCount );
+		});
 		scrollPane.setViewportView(table);
 
 		JLabel lblNewLabel = new JLabel(AppResource.appText("mml.input.import.possibleImport")+": "+possibleImportTrackCount);

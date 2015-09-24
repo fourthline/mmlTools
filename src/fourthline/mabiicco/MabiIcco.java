@@ -52,7 +52,7 @@ public final class MabiIcco extends Application {
 			notifyPreloader(new MabiIccoPreloaderNotification("OK\n", 20));
 
 			notifyPreloader(new MabiIccoPreloaderNotification(AppResource.appText("init.dls"), 20));
-			if ( !loadDLSFiles() ) {
+			if ( !loadDLSFiles(20, 70) ) {
 				JOptionPane.showMessageDialog(null, AppResource.appText("error.needDls"), "ERROR", JOptionPane.ERROR_MESSAGE);
 				System.exit(1);
 			}
@@ -86,9 +86,9 @@ public final class MabiIcco extends Application {
 	 * @throws InvalidMidiDataException
 	 * @throws IOException
 	 */
-	private boolean loadDLSFiles() throws InvalidMidiDataException, IOException {
+	private boolean loadDLSFiles(double initialProgress, double endProgress) throws InvalidMidiDataException, IOException {
 		MabiIccoProperties appProperties = MabiIccoProperties.getInstance();
-		if (tryloadDLSFiles()) {
+		if (tryloadDLSFiles(initialProgress, endProgress)) {
 			return true;
 		}
 		JOptionPane.showMessageDialog(null, AppResource.appText("msg.dls_title.detail"), AppResource.appText("msg.dls_title"), JOptionPane.INFORMATION_MESSAGE);
@@ -106,7 +106,7 @@ public final class MabiIcco extends Application {
 			return false;
 		}
 
-		return tryloadDLSFiles();
+		return tryloadDLSFiles(initialProgress, endProgress);
 	}
 
 	/**
@@ -115,11 +115,16 @@ public final class MabiIcco extends Application {
 	 * @throws InvalidMidiDataException
 	 * @throws IOException
 	 */
-	private boolean tryloadDLSFiles() throws InvalidMidiDataException, IOException {
+	private boolean tryloadDLSFiles(double initialProgress, double endProgress) throws InvalidMidiDataException, IOException {
 		MabiDLS dls = MabiDLS.getInstance();
 		MabiIccoProperties appProperties = MabiIccoProperties.getInstance();
-		for (File file : appProperties.getDlsFile()) {
+		List<File> dlsFiles = appProperties.getDlsFile();
+		double progressStep = (endProgress - initialProgress) / dlsFiles.size();
+		double progress = initialProgress;
+		for (File file : dlsFiles) {
 			dls.loadingDLSFile(file);
+			progress += progressStep;
+			notifyPreloader(new MabiIccoPreloaderNotification("", progress));
 		}
 
 		if (dls.getAvailableInstByInstType(InstType.MAIN_INST_LIST).length > 0) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 たんらる
+ * Copyright (C) 2013-2015 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -41,6 +41,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 	private static final Color TEMPO_MAKER_FILL_COLOR = new Color(0.4f, 0.8f, 0.8f);
 	private static final Color MAKER_FILL_COLOR = new Color(0.2f, 0.8f, 0.2f);
 	private static final Color TARGET_MAKER_FILL_COLOR = new Color(0.9f, 0.7f, 0.0f, 0.6f);
+	private static final int DRAW_HEIGHT = 32;
 
 	private final PianoRollView pianoRollView;
 	private final IMMLManager mmlManager;
@@ -68,7 +69,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 
 	@Override
 	public Dimension getPreferredSize() {
-		return new Dimension(getWidth(), 32);
+		return new Dimension(getWidth(), DRAW_HEIGHT);
 	}
 
 	@Override
@@ -138,14 +139,14 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 
 	private void drawMarker(Graphics2D g, String s, int x, Color color, int dy) {
 		int xPoints[] = { x-3, x+3, x+3, x, x-3 };
-		int yPoints[] = { 22, 22, 28, 31, 28 };
+		int yPoints[] = { -10, -10, -4, -1, -4 };
 		for (int i = 0; i < yPoints.length; i++) {
-			yPoints[i] += dy;
+			yPoints[i] += DRAW_HEIGHT + dy;
 		}
 
 		// label
 		g.setColor(Color.DARK_GRAY);
-		g.drawString(s, x+6, 30+dy);
+		g.drawString(s, x+6, DRAW_HEIGHT-2+dy);
 
 		// icon
 		g.setColor(color);
@@ -161,7 +162,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 
 		int x = pianoRollView.convertTicktoX( targetMarker.getAsInt() );
 		int xPoints[] = { x-5, x+5, x+5, x, x-5 };
-		int yPoints[] = { 8, 8, 20, 25, 20 };
+		int yPoints[] = { 8, 8, DRAW_HEIGHT-5, DRAW_HEIGHT, DRAW_HEIGHT-5 };
 
 		// icon
 		g.setColor(TARGET_MAKER_FILL_COLOR);

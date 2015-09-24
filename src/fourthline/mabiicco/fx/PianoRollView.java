@@ -9,7 +9,6 @@ import java.util.List;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import fourthline.mabiicco.AppResource;
 import fourthline.mabiicco.MabiIccoProperties;
@@ -74,9 +73,6 @@ public final class PianoRollView {
 	// 選択中のノートイベント
 	private List<MMLNoteEvent> selectNoteList;
 
-	// 選択用の枠
-	private Rectangle selectingRect;
-
 	// draw pitch range
 	private int lowerNote = 0;
 	private int upperNote = 14;
@@ -131,10 +127,6 @@ public final class PianoRollView {
 
 	public void setSelectNote(List<MMLNoteEvent> list) {
 		selectNoteList = list;
-	}
-
-	public void setSelectingArea(Rectangle rect) {
-		selectingRect = rect;
 	}
 
 	/**
