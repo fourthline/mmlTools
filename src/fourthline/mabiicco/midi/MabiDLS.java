@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 たんらる
+ * Copyright (C) 2013-2015 たんらる
  */
 
 package fourthline.mabiicco.midi;
@@ -34,7 +34,7 @@ public final class MabiDLS {
 
 	public static final String DEFALUT_DLS_PATH = "Nexon/Mabinogi/mp3/MSXspirit.dls";
 
-	private ArrayList<INotifyTrackEnd> notifier = new ArrayList<>();
+	private ArrayList<Runnable> notifier = new ArrayList<>();
 
 	public static MabiDLS getInstance() {
 		if (instance == null) {
@@ -69,7 +69,7 @@ public final class MabiDLS {
 				if (loop) {
 					sequenceStart();
 				} else {
-					notifier.forEach(t -> t.trackEndNotify());
+					notifier.forEach(t -> t.run());
 				}
 			}
 		});
@@ -97,7 +97,6 @@ public final class MabiDLS {
 	 * MMLScoreからMIDIシーケンスに変換して, 再生を開始する.
 	 * @param mmlScore
 	 * @param startTick
-	 * @param loop
 	 */
 	public void createSequenceAndStart(MMLScore mmlScore, long startTick) {
 		try {
@@ -118,7 +117,7 @@ public final class MabiDLS {
 		sequencer.start();
 	}
 
-	public void addTrackEndNotifier(INotifyTrackEnd n) {
+	public void addTrackEndNotifier(Runnable n) {
 		notifier.add(n);
 	}
 
@@ -300,20 +299,6 @@ public final class MabiDLS {
 		}
 	}
 
-	public static void main(String args[]) {
-		try {
-			MabiDLS midi = new MabiDLS();
-			midi.initializeMIDI();
-			for (MidiDevice.Info info : MidiSystem.getMidiDeviceInfo()) {
-				System.out.println(info);
-			}
-			midi.loadingDLSFile(new File(DEFALUT_DLS_PATH));
-			System.exit(0);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
 	public void updatePanpot(MMLScore score) {
 		int trackCount = 0;
 		for (MMLTrack mmlTrack : score.getTrackList()) {
@@ -450,5 +435,19 @@ public final class MabiDLS {
 			new AssertionError();
 		}
 		return channel;
+	}
+
+	public static void main(String args[]) {
+		try {
+			MabiDLS midi = new MabiDLS();
+			midi.initializeMIDI();
+			for (MidiDevice.Info info : MidiSystem.getMidiDeviceInfo()) {
+				System.out.println(info);
+			}
+			midi.loadingDLSFile(new File(DEFALUT_DLS_PATH));
+			System.exit(0);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

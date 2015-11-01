@@ -27,7 +27,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import fourthline.mabiicco.midi.INotifyTrackEnd;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.About;
 import fourthline.mabiicco.ui.MMLSeqView;
@@ -39,7 +38,7 @@ import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.parser.IMMLFileParser;
 import fourthline.mmlTools.parser.MMLParseException;
 
-public final class ActionDispatcher implements ActionListener, IFileStateObserver, IEditStateObserver, INotifyTrackEnd {
+public final class ActionDispatcher implements ActionListener, IFileStateObserver, IEditStateObserver {
 	private MainFrame mainFrame;
 	private MMLSeqView mmlSeqView;
 	private IFileState fileState;
@@ -142,7 +141,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	public void initialize() {
 		initializeFileChooser();
 		initializeActionMap();
-		MabiDLS.getInstance().addTrackEndNotifier(this);
+		MabiDLS.getInstance().addTrackEndNotifier(() -> stopAction());
 	}
 
 	private void initializeFileChooser() {
@@ -515,11 +514,6 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	private void editPasteAction() {
 		long startTick = mmlSeqView.getEditSequencePosition();
 		editState.paste(startTick);
-	}
-
-	@Override
-	public void trackEndNotify() {
-		stopAction();
 	}
 
 	private void stopAction() {
