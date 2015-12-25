@@ -40,7 +40,7 @@ public final class MMLFile implements IMMLFileParser {
 
 	@Override
 	public MMLScore parse(InputStream istream) throws MMLParseException {
-		List<SectionContents> contentsList = SectionContents.makeSectionContentsByInputStream(istream, "Shift_JIS");
+		List<SectionContents> contentsList = SectionContents.makeSectionContentsByInputStream(istream, encoding);
 		if (contentsList.isEmpty()) {
 			throw(new MMLParseException("no contents"));
 		}
@@ -142,7 +142,7 @@ public final class MMLFile implements IMMLFileParser {
 		}
 
 		byte data[] = decode(sb.toString(), c);
-		return parse(data);
+		return parseData(data);
 	}
 
 	private static byte[] decode(String dSection, long c) throws MMLParseException {
@@ -177,7 +177,7 @@ public final class MMLFile implements IMMLFileParser {
 	 * @param [OUT] markerList マーカーリスト 
 	 * @return トラック構成情報
 	 */
-	private List<Extension3mleTrack> parse(byte data[]) {
+	private List<Extension3mleTrack> parseData(byte data[]) {
 		LinkedList<Extension3mleTrack> trackList = new LinkedList<>();
 		trackList.add(new Extension3mleTrack(-1, -1, -1, null, 0)); // dummy
 

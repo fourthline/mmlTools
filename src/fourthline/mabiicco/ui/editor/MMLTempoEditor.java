@@ -44,6 +44,7 @@ public final class MMLTempoEditor extends AbstractMarkerEditor<MMLTempoEvent> {
 		JPanel cPanel = new JPanel(new BorderLayout());
 		cPanel.add(panel, BorderLayout.CENTER);
 
+		setDefaultFocus(((JSpinner.NumberEditor)spinner.getEditor()).getTextField());
 		int status = JOptionPane.showConfirmDialog(this.parentFrame, cPanel, title, JOptionPane.OK_CANCEL_OPTION);
 		if (status == JOptionPane.OK_OPTION) {
 			return ((Integer) spinner.getValue()).intValue();
