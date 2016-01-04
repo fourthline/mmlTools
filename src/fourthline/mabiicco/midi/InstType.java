@@ -7,7 +7,9 @@ package fourthline.mabiicco.midi;
 import java.util.Arrays;
 import java.util.List;
 
-
+/**
+ * 楽器種別
+ */
 public interface InstType {
 	/**
 	 * 有効なパート情報を取得する. 

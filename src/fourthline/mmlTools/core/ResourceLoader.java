@@ -15,7 +15,9 @@ import java.util.ResourceBundle.Control;
 
 import fourthline.mmlTools.core.ResourceLoader;
 
-
+/**
+ * properties/ 配下のリソースファイルをUTF-8で読み取る.
+ */
 public final class ResourceLoader extends Control {
 	@Override
 	public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader, boolean reload) 

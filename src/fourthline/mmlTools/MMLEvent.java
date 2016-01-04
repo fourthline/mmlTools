@@ -37,8 +37,9 @@ public abstract class MMLEvent implements Serializable {
 
 	/**
 	 * tick長の空白を挿入します.
-	 * @param startTick
-	 * @param tick
+	 * @param list 空白を挿入するMMLEventリスト. MMLEventList以外のList構造も可.
+	 * @param startTick 挿入する位置
+	 * @param tick 挿入するtick長
 	 */
 	public static void insertTick(List<? extends MMLEvent> list, int startTick, int tick) {
 		for (MMLEvent event : list) {
@@ -51,8 +52,9 @@ public abstract class MMLEvent implements Serializable {
 
 	/**
 	 * tick長の部分を削除して詰めます.
-	 * @param startTick
-	 * @param tick
+	 * @param list 削除するMMLEventリスト. MMLEventList以外のList構造も可.
+	 * @param startTick 削除する位置
+	 * @param tick 削除するtick長
 	 */
 	public static void removeTick(List<? extends MMLEvent> list, int startTick, int tick) {
 		ArrayList<MMLEvent> deleteEvent = new ArrayList<>();

@@ -510,7 +510,6 @@ public final class PianoRollView extends JPanel {
 	 * MMLEventリストのロールを表示します。
 	 * @param g
 	 * @param mmlPart
-	 * @return
 	 */
 	private void paintMMLPart(Graphics2D g, List<MMLNoteEvent> mmlPart, Color rectColor, Color fillColor, boolean drawOption) {
 		MMLNoteEvent prevNote = new MMLNoteEvent(0, 0, 0, MMLNoteEvent.INIT_VOL);

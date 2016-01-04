@@ -427,7 +427,6 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 
 	/**
 	 * MIDI-exportダイアログ表示
-	 * @return 保存した場合は trueを返す.
 	 */
 	private void midiExportAction() {
 		File file = showSaveDialog(exportFileChooser, "mid");

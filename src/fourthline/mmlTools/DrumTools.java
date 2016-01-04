@@ -160,6 +160,7 @@ public class DrumTools extends MMLTools {
 	 * ボリュームを　2/3　にする。
 	 * 高速に処理するため、独自実装。
 	 * 分割前に実行すること。
+	 * @throws UndefinedTickException
 	 */
 	public String disDrumVolumn() throws UndefinedTickException {
 		MMLTokenizer mt = new MMLTokenizer(mml_melody);

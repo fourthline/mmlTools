@@ -22,6 +22,9 @@ import fourthline.mmlTools.MMLTempoEvent;
 import fourthline.mmlTools.MMLTrack;
 import fourthline.mmlTools.core.MMLTickTable;
 
+/**
+ * MabinogiのDLSファイルを使ってMIDIを扱います.
+ */
 public final class MabiDLS {
 	private static MabiDLS instance = null;
 	private Synthesizer synthesizer;
@@ -211,7 +214,9 @@ public final class MabiDLS {
 		return null;
 	}
 
-	/** 単音再生 */
+	/**
+	 * 単音再生
+	 */
 	public void playNote(int note, int program, int channel, int velocity) {
 		MMLNoteEvent playNote = this.playNoteList.get(channel)[0];
 		if ( (playNote == null) || (playNote.getNote() != note) ) {
@@ -261,7 +266,7 @@ public final class MabiDLS {
 
 	/**
 	 * 指定したチャンネルのパンポットを設定します.
-	 * @param ch_num
+	 * @param ch
 	 * @param panpot
 	 */
 	public void setChannelPanpot(int ch, int panpot) {

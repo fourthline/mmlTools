@@ -101,7 +101,7 @@ public final class MMSFile implements IMMLFileParser {
 
 	/**
 	 * parse [marker] contents
-	 * @param contens
+	 * @param contents
 	 */
 	private void parseMarker(String contents) {
 		LinkedList<Marker> markerList = new LinkedList<>();

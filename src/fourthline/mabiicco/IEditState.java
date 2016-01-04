@@ -4,6 +4,9 @@
 
 package fourthline.mabiicco;
 
+/**
+ * 編集関連の動作インタフェース.
+ */
 public interface IEditState {
 	public boolean hasSelectedNote();
 	public boolean canPaste();

@@ -37,7 +37,7 @@ public class MMLTools {
 	/**　
 	 * MMLの演奏時間を取得する.
 	 * @return 時間（秒）
-	 * @throws UndefinedTickException
+	 * @throws UndefinedTickException 変換に失敗した
 	 */
 	public double getPlayTime() throws UndefinedTickException  {
 		if (play_length < 0.0) {
@@ -51,7 +51,7 @@ public class MMLTools {
 	 * マビノギでの演奏スキル時間を取得する.
 	 * <p>演奏時間  － 0.6秒 ＜ スキル時間 であれば、切れずに演奏される</p>
 	 * @return 時間（秒）
-	 * @throws UndefinedTickException
+	 * @throws UndefinedTickException 変換に失敗した
 	 */
 	public double getMabinogiTime() throws UndefinedTickException {
 		if (mabinogi_length < 0.0) {
@@ -74,7 +74,7 @@ public class MMLTools {
 
 	/**
 	 * マビノギ演奏でのMML解析
-	 * @throws UndefinedTickException
+	 * @throws UndefinedTickException 変換に失敗した
 	 */
 	public void parseMMLforMabinogi() throws UndefinedTickException {
 		melodyParser = new MelodyParser(mml_melody);
@@ -85,8 +85,8 @@ public class MMLTools {
 
 	/**
 	 * 演奏時間の解析
-	 * @param drumMode
-	 * @throws UndefinedTickException
+	 * @param drumMode 打楽器モードの場合 trueを指定する.
+	 * @throws UndefinedTickException 変換に失敗した
 	 */
 	public void parsePlayMode(boolean drumMode) throws UndefinedTickException {
 		if (drumMode) {

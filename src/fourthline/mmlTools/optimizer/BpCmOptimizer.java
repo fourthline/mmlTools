@@ -8,8 +8,7 @@ import fourthline.mmlTools.core.MMLTokenizer;
 
 
 /**
- * "<b>" -> "c-"
- * ">c<" -> "b+"
+ * {@code "<c> -> b+"} と {@code ">b< -> c-"} を使った最適化を行います.
  */
 public final class BpCmOptimizer implements MMLStringOptimizer.Optimizer {
 

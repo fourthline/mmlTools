@@ -48,6 +48,21 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.List;
 
+/**
+ * 主表示部.
+ * 
+ * <pre>
+ * MMLSeqView
+ *  |
+ *  +- {@link PianoRollView} (JScrollPane 内）
+ *  |
+ *  +- {@link KeyboardView} (JScrollPane の行ヘッダ）
+ *  |
+ *  +- {@link ColumnPanel} (JScrollPane の列ヘッダ）
+ *  |
+ *  +- {@link MMLTrackView} ({@link TrackTabbedPane} extends JTabbedPane 内)
+ * </pre>
+ */
 public final class MMLSeqView implements IMMLManager, ChangeListener, ActionListener, MouseWheelListener {
 	private static final int INITIAL_TRACK_COUNT = 1;
 
@@ -74,6 +89,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 
 	/**
 	 * Create the panel.
+	 * @param parentFrame 関連付けるFrame
 	 */
 	public MMLSeqView(Frame parentFrame) {
 		this.parentFrame = parentFrame;
@@ -313,6 +329,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 
 	/**
 	 * 現在選択中のトラックを取得する。
+	 * @return 選択中のMMLTrack
 	 */
 	public MMLTrack getSelectedTrack() {
 		int index = tabbedPane.getSelectedIndex();
@@ -453,6 +470,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 
 	/**
 	 * 編集時の音符基準長を設定します.
+	 * @param alignTick 基準tick
 	 */
 	public void setEditAlign(int alignTick) {
 		editor.setEditAlign(alignTick);
@@ -464,6 +482,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 
 	/**
 	 * ピアノロールビューの表示を1段階拡大します.
+	 * @param xOffset 拡大基準
 	 */
 	public void expandPianoViewWide(int xOffset) {
 		if (viewScaleIndex+1 < viewScaleTable.length) {
@@ -477,6 +496,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 
 	/**
 	 * ピアノロールビューの表示を1段階縮小します.
+	 * @param xOffset 縮小基準
 	 */
 	public void reducePianoViewWide(int xOffset) {
 		if (viewScaleIndex-1 >= 0) {

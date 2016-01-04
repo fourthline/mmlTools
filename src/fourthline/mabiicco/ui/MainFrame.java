@@ -55,7 +55,10 @@ import java.awt.event.InputEvent;
 import java.io.File;
 
 
-
+/**
+ * メイン画面.
+ * Menu, ツールバー, 主表示部 {@link MMLSeqView} を生成する.
+ */
 public final class MainFrame extends JFrame implements ComponentListener, ActionListener {
 	private static final long serialVersionUID = -7484797594534384422L;
 
@@ -87,6 +90,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 
 	/**
 	 * Create the frame.
+	 * @param listener 関連付けるActionListener
 	 */
 	public MainFrame(ActionListener listener) {
 		this.listener = listener;
@@ -568,7 +572,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 
 	/**
 	 * 再読み込みUIの有効化
-	 * @param b
+	 * @param b trueで再読み込みUIが有効
 	 */
 	public void setCanReloadFile(boolean b) {
 		reloadMenuItem.setEnabled(b);
@@ -576,7 +580,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 
 	/**
 	 * Undo-UIの有効化
-	 * @param b
+	 * @param b trueでUndo-UIが有効
 	 */
 	public void setCanUndo(boolean b) {
 		undoMenu.setEnabled(b);
@@ -584,7 +588,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 
 	/**
 	 * Redo-UIの有効化
-	 * @param b
+	 * @param b trueでRedo-UIが有効
 	 */
 	public void setCanRedo(boolean b) {
 		redoMenu.setEnabled(b);
@@ -592,7 +596,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 
 	/**
 	 * 上書き保存UIの有効化
-	 * @param b
+	 * @param b trueで上書き保存UIが有効
 	 */
 	public void setCanSaveFile(boolean b) {
 		saveMenuItem.setEnabled(b);

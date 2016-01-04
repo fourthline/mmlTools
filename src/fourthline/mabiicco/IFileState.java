@@ -4,6 +4,9 @@
 
 package fourthline.mabiicco;
 
+/**
+ * ファイル操作関連の動作インタフェース.
+ */
 public interface IFileState {
 	public boolean isModified();
 	public boolean canUndo();

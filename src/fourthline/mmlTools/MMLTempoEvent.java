@@ -138,7 +138,7 @@ public final class MMLTempoEvent extends MMLEvent implements Cloneable {
 	/**
 	 * 指定した時間からtickオフセットを返します.
 	 * @param tempoList
-	 * @param ms
+	 * @param time
 	 * @return 先頭からの時間（ms）
 	 */
 	public static long getTickOffsetOnTime(List<MMLTempoEvent> tempoList, long time) {

@@ -30,6 +30,16 @@ import javafx.application.Preloader;
 import javafx.stage.Stage;
 
 
+/**
+ * MabiIccoアプリケーションクラス (Main).
+ * 
+ * MMLの処理は MMLTools を使用し, DLSを読み込んで音を鳴らす部分はMIDIを使用します.
+ * <pre>
+ * 1. Midi初期化.
+ * 2. DLSファイルの音源情報を読み込む. (Waveは読み込まない)
+ * 3. DLSファイルがない場合は, ファイル選択のダイアログを表示する.
+ * </pre>
+ */
 public final class MabiIcco extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {

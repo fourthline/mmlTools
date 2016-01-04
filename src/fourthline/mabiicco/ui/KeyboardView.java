@@ -31,6 +31,8 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 
 	/**
 	 * Create the panel.
+	 * @param manager 関連付けるIMMLManager
+	 * @param pianoRollView 関連付けるPianoRollView
 	 */
 	public KeyboardView(IMMLManager manager, final PianoRollView pianoRollView) {
 		this.mmlManager = manager;

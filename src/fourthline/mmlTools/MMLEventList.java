@@ -201,6 +201,8 @@ public final class MMLEventList implements Serializable, Cloneable {
 	/**
 	 * 指定されたノートに音量コマンドを設定する.
 	 * 後続の同音量のノートも更新する.
+	 * @param targetNote
+	 * @param velocity
 	 */
 	public void setVelocityCommand(MMLNoteEvent targetNote, int velocity) {
 		setUnsetVelocityCommand(targetNote, velocity, true);
@@ -209,6 +211,7 @@ public final class MMLEventList implements Serializable, Cloneable {
 	/**
 	 * 指定されたノートに音量コマンドを解除する.
 	 * 後続の同音量のノートも更新する.
+	 * @param targetNote
 	 */
 	public void unsetVelocityCommand(MMLNoteEvent targetNote) {
 		setUnsetVelocityCommand(targetNote, 0, false);
@@ -308,6 +311,7 @@ public final class MMLEventList implements Serializable, Cloneable {
 	 * @param totalTick 最大tick長. これに満たない場合は、末尾を休符分で埋めます.
 	 * @param mabiTempo MML for mabi
 	 * @return
+	 * @throws UndefinedTickException
 	 */
 	public String toMMLString(boolean withTempo, int totalTick, boolean mabiTempo)
 			throws UndefinedTickException {

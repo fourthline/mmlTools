@@ -126,8 +126,7 @@ public final class MMLFile implements IMMLFileParser {
 
 	/**
 	 * [3MLE EXTENSION] をパースし, トラック構成情報を取得します.
-	 * @param [IN]  str [3MLE EXTENSION] セクションのコンテンツ
-	 * @param [OUT] markerList マーカーリスト 
+	 * @param str [3MLE EXTENSION] セクションのコンテンツ
 	 * @return トラック構成情報
 	 */
 	private List<Extension3mleTrack> parse3mleExtension(String str) throws MMLParseException {
@@ -173,8 +172,7 @@ public final class MMLFile implements IMMLFileParser {
 	}
 
 	/**
-	 * @param [IN]  data decompress済みのバイト列
-	 * @param [OUT] markerList マーカーリスト 
+	 * @param data decompress済みのバイト列
 	 * @return トラック構成情報
 	 */
 	private List<Extension3mleTrack> parseData(byte data[]) {

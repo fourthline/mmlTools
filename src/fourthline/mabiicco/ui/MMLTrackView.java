@@ -176,11 +176,9 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 	}
 
 	/**
-	 * 
-	 * @param track
+	 * インデックス指定で MMLTrackViewを生成.
 	 * @param trackIndex TrackTabIconを各ボタンに設定するためのIndex値.
 	 * @param actionListener
-	 * @param mmlManager
 	 */
 	private MMLTrackView(int trackIndex, ActionListener actionListener) {
 		this();
@@ -234,7 +232,7 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 
 	/**
 	 * 選択中のMMLパートのindex値を返します.
-	 * @return
+	 * @return 選択中のindex
 	 */
 	public int getSelectedMMLPartIndex() {
 		int index = 0;

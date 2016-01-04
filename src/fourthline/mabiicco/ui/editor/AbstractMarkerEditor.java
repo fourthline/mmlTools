@@ -22,11 +22,14 @@ import fourthline.mabiicco.ui.IViewTargetMarker;
 import fourthline.mmlTools.MMLEvent;
 
 /**
- * Marker (for MMLEvent) Editor
- *   edit.insert_<suffix>
- *   edit.edit_<suffix>
- *   edit.delete_<suffix>
- *   edit.label_<suffix>
+ * Marker (for MMLEvent) Editor.
+ *
+ * <pre>
+ *   {@code edit.insert_<suffix>}
+ *   {@code edit.edit_<suffix>}
+ *   {@code edit.delete_<suffix>}
+ *   {@code edit.label_<suffix>}
+ * </pre>
  * @param <T>
  * @see MMLTempoEditor
  * @see MarkerEditor

@@ -52,8 +52,8 @@ public final class MMLTicks {
 
 	/**
 	 * tick長をMML文字列に変換します.
-	 * @param noteName
-	 * @param tick
+	 * @param noteName ノート名
+	 * @param tick tick長
 	 */
 	public MMLTicks(String noteName, int tick) {
 		this(noteName, tick, true);
@@ -61,8 +61,8 @@ public final class MMLTicks {
 
 	/**
 	 * tick長をMML文字列に変換します.
-	 * @param noteName
-	 * @param tick
+	 * @param noteName ノート名
+	 * @param tick tick長
 	 * @param needTie noteNameを連結するときに tie が必要かどうかを指定します. 休符 or 音量ゼロのときは, falseを指定してください.
 	 */
 	public MMLTicks(String noteName, int tick, boolean needTie) {
@@ -117,8 +117,9 @@ public final class MMLTicks {
 
 	/**
 	 * noteNameとtickをMMLの文字列に変換します.
-	 * needTieがtrueのときは、'&'による連結を行います.
-	 * @throws UndefinedTickException
+	 * needTieがtrueのときは、'&amp;' による連結を行います.
+	 * @return MML文字列
+	 * @throws UndefinedTickException 変換に失敗した
 	 */
 	public String toMMLText() throws UndefinedTickException {
 		int remTick = tick;
@@ -137,8 +138,9 @@ public final class MMLTicks {
 
 	/**
 	 * Base長を使って変換します.　（調律用）
-	 * @return
-	 * @throws UndefinedTickException
+	 * @param base 使用する調律指定
+	 * @return MML文字列
+	 * @throws UndefinedTickException 変換に失敗した
 	 */
 	public String toMMLTextByBase(TuningBase base) throws UndefinedTickException {
 		int remTick = tick;

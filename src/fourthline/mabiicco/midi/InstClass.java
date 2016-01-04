@@ -20,6 +20,9 @@ import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mmlTools.core.ResourceLoader;
 import fourthline.mmlTools.parser.MMLEventParser;
 
+/**
+ * 楽器に関する情報を扱います. (instrument.propertiesに対応)
+ */
 public final class InstClass {
 	private final String name;
 	private final int bank;

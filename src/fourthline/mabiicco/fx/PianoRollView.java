@@ -395,9 +395,11 @@ public final class PianoRollView {
 
 	/**
 	 * MMLEventリストのロールを表示します。
-	 * @param g
+	 * @param gc
 	 * @param mmlPart
-	 * @return
+	 * @param rectColor
+	 * @param fillColor
+	 * @param drawOption
 	 */
 	private void paintMMLPart(GraphicsContext gc, List<MMLNoteEvent> mmlPart, Color rectColor, Color fillColor, boolean drawOption) {
 		MMLNoteEvent prevNote = new MMLNoteEvent(0, 0, 0, MMLNoteEvent.INIT_VOL);
@@ -410,8 +412,9 @@ public final class PianoRollView {
 
 	/**
 	 * 1トラック分のロールを表示します。（アクティブトラックは表示しない）
-	 * @param g
+	 * @param gc
 	 * @param index トラックindex
+	 * @param track
 	 */
 	private void paintMMLTrack(GraphicsContext gc, int index, MMLTrack track) {
 		boolean instEnable[] = InstClass.getEnablePartByProgram(track.getProgram());
