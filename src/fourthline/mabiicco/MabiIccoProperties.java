@@ -61,6 +61,9 @@ public final class MabiIccoProperties {
 	/** 音源境界 */
 	private static final String VIEW_RANGE = "view.pianoRoll.range";
 
+	/** 音量線 */
+	private static final String VIEW_VELOCITY_LINE = "view.velocity.line";
+
 	/** ノートクリックによるアクティブパート切り替え */
 	private static final String ACTIVE_PART_SWITCH = "function.active_part_switch";
 
@@ -210,6 +213,16 @@ public final class MabiIccoProperties {
 
 	public void setViewRage(boolean b) {
 		properties.setProperty(VIEW_RANGE, Boolean.toString(b));
+		save();
+	}
+
+	public boolean getVelocityLine() {
+		String str = properties.getProperty(VIEW_VELOCITY_LINE, "true");
+		return Boolean.parseBoolean(str);
+	}
+
+	public void setVelocityLine(boolean b) {
+		properties.setProperty(VIEW_VELOCITY_LINE, Boolean.toString(b));
 		save();
 	}
 

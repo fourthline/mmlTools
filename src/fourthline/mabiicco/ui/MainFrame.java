@@ -306,6 +306,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createCheckMenu(settingMenu, "clickPlayMenu", properties::getEnableClickPlay, properties::setEnableClickPlay);
 		createCheckMenu(settingMenu, "view.marker", properties::getEnableViewMarker, properties::setEnableViewMarker);
 		createCheckMenu(settingMenu, "view.range", properties::getViewRage, properties::setViewRage);
+		createCheckMenu(settingMenu, "view.velocity", properties::getVelocityLine, properties::setVelocityLine);
 		createCheckMenu(settingMenu, "edit.enable", properties::getEnableEdit, properties::setEnableEdit);
 		createCheckMenu(settingMenu, "edit.active_part_switch", properties::getActivePartSwitch, properties::setActivePartSwitch);
 		createMenuItem(settingMenu, "menu.clear_dls", ActionDispatcher.CLEAR_DLS);

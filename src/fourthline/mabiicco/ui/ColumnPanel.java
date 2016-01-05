@@ -24,10 +24,12 @@ import javax.swing.SwingUtilities;
 
 import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mabiicco.midi.MabiDLS;
+import fourthline.mabiicco.ui.color.ColorManager;
 import fourthline.mabiicco.ui.editor.IEditAlign;
 import fourthline.mabiicco.ui.editor.IMarkerEditor;
 import fourthline.mabiicco.ui.editor.MarkerEditor;
 import fourthline.mabiicco.ui.editor.MMLTempoEditor;
+import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLNoteEvent;
 import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTempoEvent;
@@ -88,6 +90,10 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 		paintTempoEvents(g2);
 		pianoRollView.paintSequenceLine(g2, getHeight());
 		paintTargetMarker(g2);
+
+		if (MabiIccoProperties.getInstance().getVelocityLine()) {
+			paintVelocityLine(g2);
+		}
 
 		g2.dispose();
 	}
@@ -169,6 +175,27 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 		g.fillPolygon(xPoints, yPoints, xPoints.length);
 		g.setColor(BEAT_BORDER_COLOR);
 		g.drawPolygon(xPoints, yPoints, xPoints.length);
+	}
+
+	private void paintVelocityLine(Graphics2D g) {
+		MMLEventList activePart = mmlManager.getActiveMMLPart();
+		if (activePart == null) {
+			return;
+		}
+
+		int trackIndex = mmlManager.getActiveTrackIndex();
+		Color rectColor = ColorManager.defaultColor().getActiveRectColor(trackIndex);
+		g.setColor(rectColor);
+
+		for (MMLNoteEvent noteEvent : activePart.getMMLNoteEventList()) {
+			int x = pianoRollView.convertTicktoX( noteEvent.getTickOffset() );
+			int width = pianoRollView.convertTicktoX( noteEvent.getTick() );
+			int velocity = noteEvent.getVelocity();
+			if (velocity < 0)  velocity = 0;
+			if (velocity > 15) velocity = 15;
+			int y = DRAW_HEIGHT - velocity - 2;
+			g.drawLine(x, y, x+width-1, y);
+		}
 	}
 
 	private void setSequenceBar(int x) {
