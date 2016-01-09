@@ -22,6 +22,9 @@ public final class MMLTicks {
 	public static int getTick(String gt) throws UndefinedTickException {
 		String str = gt;
 		while (!tickTable.getTable().containsKey(str)) {
+			if (str.length() == 0) {
+				break;
+			}
 			char ch = str.charAt(str.length()-1);
 			if (!Character.isDigit(ch)) {
 				int len = str.length();

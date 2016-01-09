@@ -216,38 +216,42 @@ public final class MelodyParser {
 	}
 
 	private void mmlOperation(String note) throws ParserWarn3ML {
-		switch(note.charAt(0)) {
-		case 'l': 
-		case 'L':
-			mml_L = note.substring(1);
-			break;
-		case 't':
-		case 'T':
-			int temp = Integer.parseInt( note.substring(1) );
-			tempoList.put(mml_length, temp);
-			if ( (temp <= 255) && (temp >= 32) ) {
-				this.tempo = temp;
+		try {
+			switch(note.charAt(0)) {
+			case 'l': 
+			case 'L':
+				mml_L = note.substring(1);
+				break;
+			case 't':
+			case 'T':
+				int temp = Integer.parseInt( note.substring(1) );
+				tempoList.put(mml_length, temp);
+				if ( (temp <= 255) && (temp >= 32) ) {
+					this.tempo = temp;
+				}
+				if ( (this.playingNote == 'r') || (this.playingNote == 'R') ) {
+					throw new ParserWarn3ML();
+				}
+				break;
+			case 'o':
+			case 'O':
+				mml_oct = Integer.parseInt( note.substring(1) );
+				break;
+			case '<':
+				if (mml_oct > 0) {
+					mml_oct--;
+				}
+				break;
+			case '>':
+				if (mml_oct < 8) {
+					mml_oct++;
+				}
+				break;
+			default:
+				break;
 			}
-			if ( (this.playingNote == 'r') || (this.playingNote == 'R') ) {
-				throw new ParserWarn3ML();
-			}
-			break;
-		case 'o':
-		case 'O':
-			mml_oct = Integer.parseInt( note.substring(1) );
-			break;
-		case '<':
-			if (mml_oct > 0) {
-				mml_oct--;
-			}
-			break;
-		case '>':
-			if (mml_oct < 8) {
-				mml_oct++;
-			}
-			break;
-		default:
-			break;
+		} catch (NumberFormatException e) {
+			System.err.println("skip: "+note);
 		}
 	}
 
@@ -260,7 +264,11 @@ public final class MelodyParser {
 		this.playingNote = note.charAt(0);
 
 		if ( (this.playingNote == 'n') || (this.playingNote == 'N') ) {
-			noteNumber = Integer.parseInt(note.substring(1));
+			try {
+				noteNumber = Integer.parseInt(note.substring(1));
+			} catch (NumberFormatException e) {
+				throw new UndefinedTickException(note);
+			}
 			noteMinMax( noteNumber );
 			gt = "";
 			return mmlGT(mml_L);
@@ -278,9 +286,13 @@ public final class MelodyParser {
 				startIndex++;
 
 			if (startIndex < note.length()) {
-				gt = note.substring(startIndex);
-				if (gt.startsWith("."))
+				String s = note.substring(startIndex);
+				if ( (s.length() > 0) && (s.charAt(0) == '.' || Character.isDigit(s.charAt(0))) ) {
+					gt = s;
+				}
+				if (gt.startsWith(".")) {
 					gt = mml_L+".";
+				}
 			}
 		}
 

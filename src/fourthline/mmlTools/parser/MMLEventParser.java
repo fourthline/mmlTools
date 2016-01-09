@@ -70,8 +70,6 @@ public final class MMLEventParser implements Iterator<MMLEvent> {
 				try {
 					int tempo = Integer.parseInt( token.substring(1) );
 					nextItem = new MMLTempoEvent(tempo, totalTick);
-				} catch (NumberFormatException e) {
-					e.printStackTrace();
 				} catch (IllegalArgumentException e) {
 					continue;
 				}
@@ -101,10 +99,8 @@ public final class MMLEventParser implements Iterator<MMLEvent> {
 						return nextItem;
 					}
 				} 
-			} catch (UndefinedTickException e) {
-				e.printStackTrace();
-			} catch (ParserWarn3ML e) {
-				e.printStackTrace();
+			} catch (UndefinedTickException | ParserWarn3ML e) {
+				System.err.println(e.getMessage());
 			}
 
 		}

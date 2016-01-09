@@ -667,4 +667,13 @@ public class MMLEventListTest {
 		MMLEventList eventList2 = new MMLEventList("c#");
 		assertEquals(eventList1.toString(), eventList2.toString());
 	}
+
+	@Test
+	public void test_illegalMML() throws UndefinedTickException {
+		MMLEventList eventList1 = new MMLEventList("l8bNwMub+4.ebb+htt16b16c.cc+c2.");
+		System.out.println(eventList1.getTickLength());
+		MMLEventList eventList2 = new MMLEventList("l8bb+4.ebb+b16c.cc+c2.");
+		System.out.println(eventList2.getTickLength());
+		assertEquals(eventList1.toMMLString(), eventList2.toMMLString());
+	}
 }
