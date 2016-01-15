@@ -9,11 +9,11 @@ import java.util.Iterator;
 import fourthline.mmlTools.MMLEvent;
 import fourthline.mmlTools.MMLNoteEvent;
 import fourthline.mmlTools.MMLTempoEvent;
-import fourthline.mmlTools.UndefinedTickException;
 import fourthline.mmlTools.core.MMLTokenizer;
 import fourthline.mmlTools.core.MelodyParser;
 import fourthline.mmlTools.core.ParserWarn3ML;
 import fourthline.mmlTools.core.TuningBase;
+import fourthline.mmlTools.core.UndefinedTickException;
 
 public final class MMLEventParser implements Iterator<MMLEvent> {
 	private final MMLTokenizer tokenizer;

@@ -11,8 +11,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import fourthline.mmlTools.MMLEventList;
-import fourthline.mmlTools.UndefinedTickException;
 import fourthline.mmlTools.core.MMLTicks;
+import fourthline.mmlTools.core.UndefinedTickException;
 
 /**
  * MML最適化のテスト.

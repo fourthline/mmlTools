@@ -8,6 +8,7 @@ package fourthline.mmlTools;
 import java.util.Map;
 
 import fourthline.mmlTools.core.MMLTools;
+import fourthline.mmlTools.core.UndefinedTickException;
 
 
 /**

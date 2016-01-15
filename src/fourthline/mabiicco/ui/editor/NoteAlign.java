@@ -7,8 +7,8 @@ package fourthline.mabiicco.ui.editor;
 import java.util.ArrayList;
 
 import fourthline.mabiicco.AppResource;
-import fourthline.mmlTools.UndefinedTickException;
 import fourthline.mmlTools.core.MMLTicks;
+import fourthline.mmlTools.core.UndefinedTickException;
 
 
 

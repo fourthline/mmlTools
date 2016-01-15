@@ -217,7 +217,7 @@ public final class MabiIccoProperties {
 	}
 
 	public boolean getVelocityLine() {
-		String str = properties.getProperty(VIEW_VELOCITY_LINE, "true");
+		String str = properties.getProperty(VIEW_VELOCITY_LINE, "false");
 		return Boolean.parseBoolean(str);
 	}
 

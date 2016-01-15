@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 たんらる
+ * Copyright (C) 2013-2016 たんらる
  */
 
 package fourthline.mmlTools.core;
@@ -34,7 +34,6 @@ public final class MMLTokenizer implements Iterator<String> {
 	public String next() {
 		startIndex = endIndex;
 		endIndex = searchToken(endIndex+1);
-
 		return mml_src.substring(startIndex, endIndex);
 	}
 
@@ -71,7 +70,6 @@ public final class MMLTokenizer implements Iterator<String> {
 
 		if (token.length() > 1) {
 			char note2 = token.charAt(1);
-
 			if ( (note2 == '+') || (note2 == '-') || (note2 == '#') )
 				noteName += note2;
 		}

@@ -11,6 +11,7 @@ import java.util.List;
 
 import fourthline.mmlTools.core.MMLText;
 import fourthline.mmlTools.core.MMLTicks;
+import fourthline.mmlTools.core.UndefinedTickException;
 import fourthline.mmlTools.optimizer.MMLStringOptimizer;
 
 public final class MMLTrack implements Serializable {

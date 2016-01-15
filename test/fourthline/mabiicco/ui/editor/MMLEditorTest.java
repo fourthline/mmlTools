@@ -30,7 +30,7 @@ import fourthline.mabiicco.ui.PianoRollView;
 import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLNoteEvent;
 import fourthline.mmlTools.MMLTrack;
-import fourthline.mmlTools.UndefinedTickException;
+import fourthline.mmlTools.core.UndefinedTickException;
 
 public final class MMLEditorTest extends UseLoadingDLS {
 

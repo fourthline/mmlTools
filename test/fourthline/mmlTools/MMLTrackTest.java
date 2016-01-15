@@ -9,6 +9,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import fourthline.mmlTools.core.MMLTools;
+import fourthline.mmlTools.core.UndefinedTickException;
 
 /**
  * @author fourthline

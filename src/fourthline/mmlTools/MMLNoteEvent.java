@@ -8,6 +8,7 @@ import java.util.Objects;
 
 import fourthline.mmlTools.core.MMLTicks;
 import fourthline.mmlTools.core.TuningBase;
+import fourthline.mmlTools.core.UndefinedTickException;
 
 public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 	private static final long serialVersionUID = 4372538748155995529L;

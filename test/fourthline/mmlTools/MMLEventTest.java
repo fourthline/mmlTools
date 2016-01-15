@@ -5,8 +5,11 @@
 package fourthline.mmlTools;
 
 import static org.junit.Assert.*;
+
 import org.junit.Test;
+
 import fourthline.mmlTools.core.MMLTicks;
+import fourthline.mmlTools.core.UndefinedTickException;
 
 public class MMLEventTest {
 	/**

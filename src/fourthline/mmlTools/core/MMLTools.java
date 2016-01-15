@@ -6,8 +6,6 @@ package fourthline.mmlTools.core;
 
 import java.util.List;
 
-import fourthline.mmlTools.UndefinedTickException;
-
 
 
 /**

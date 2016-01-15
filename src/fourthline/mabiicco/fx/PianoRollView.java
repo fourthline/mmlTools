@@ -20,8 +20,8 @@ import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLNoteEvent;
 import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTrack;
-import fourthline.mmlTools.UndefinedTickException;
 import fourthline.mmlTools.core.MMLTicks;
+import fourthline.mmlTools.core.UndefinedTickException;
 
 
 /**

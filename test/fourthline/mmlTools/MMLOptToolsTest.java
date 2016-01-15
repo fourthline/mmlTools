@@ -10,6 +10,7 @@ import static org.junit.Assert.*;
 import org.junit.*;
 
 import fourthline.mmlTools.core.MelodyParser;
+import fourthline.mmlTools.core.UndefinedTickException;
 
 
 public class MMLOptToolsTest {

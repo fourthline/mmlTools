@@ -4,7 +4,6 @@
 
 package fourthline.mmlTools.core;
 
-import fourthline.mmlTools.UndefinedTickException;
 
 public enum TuningBase {
 	L64("64"),
@@ -33,15 +32,6 @@ public enum TuningBase {
 	public static TuningBase getInstance(int tick) {
 		for (TuningBase obj : TuningBase.values()) {
 			if (obj.tick == tick) {
-				return obj;
-			}
-		}
-		return null;
-	}
-
-	public static TuningBase getInstance1(String base) {
-		for (TuningBase obj : TuningBase.values()) {
-			if (obj.base == base) {
 				return obj;
 			}
 		}

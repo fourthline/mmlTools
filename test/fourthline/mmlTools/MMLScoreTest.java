@@ -26,9 +26,11 @@ import org.junit.Test;
 
 
 
+
 import fourthline.FileSelect;
 import fourthline.UseLoadingDLS;
 import fourthline.mmlTools.core.MMLText;
+import fourthline.mmlTools.core.UndefinedTickException;
 import fourthline.mmlTools.parser.IMMLFileParser;
 import fourthline.mmlTools.parser.MMLParseException;
 

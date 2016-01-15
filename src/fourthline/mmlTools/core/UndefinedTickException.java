@@ -2,7 +2,7 @@
  * Copyright (C) 2013-2014 たんらる
  */
 
-package fourthline.mmlTools;
+package fourthline.mmlTools.core;
 
 
 /**

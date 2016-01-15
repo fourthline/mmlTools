@@ -8,6 +8,7 @@ import fourthline.mmlTools.core.MMLTicks;
 import fourthline.mmlTools.core.MMLTokenizer;
 import fourthline.mmlTools.core.MMLTools;
 import fourthline.mmlTools.core.MelodyParser;
+import fourthline.mmlTools.core.UndefinedTickException;
 
 /**
  * ドラムの和音分割

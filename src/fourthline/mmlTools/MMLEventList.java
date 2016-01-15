@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import fourthline.mmlTools.core.MMLTicks;
+import fourthline.mmlTools.core.UndefinedTickException;
 import fourthline.mmlTools.parser.MMLEventParser;
 
 

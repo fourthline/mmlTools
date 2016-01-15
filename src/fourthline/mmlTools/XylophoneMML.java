@@ -5,6 +5,7 @@
 package fourthline.mmlTools;
 
 import fourthline.mmlTools.core.MMLTokenizer;
+import fourthline.mmlTools.core.UndefinedTickException;
 
 
 /**

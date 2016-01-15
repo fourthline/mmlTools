@@ -33,8 +33,8 @@ import fourthline.mmlTools.MMLNoteEvent;
 import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTempoEvent;
 import fourthline.mmlTools.MMLTrack;
-import fourthline.mmlTools.UndefinedTickException;
 import fourthline.mmlTools.core.MMLTicks;
+import fourthline.mmlTools.core.UndefinedTickException;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;

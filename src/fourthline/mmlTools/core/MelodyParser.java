@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
-import fourthline.mmlTools.UndefinedTickException;
-
 
 /**
  * MML解析

@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalInt;
 
-import fourthline.mmlTools.UndefinedTickException;
 import fourthline.mmlTools.core.MMLTokenizer;
 import fourthline.mmlTools.core.MelodyParser;
 import fourthline.mmlTools.core.ParserWarn3ML;
+import fourthline.mmlTools.core.UndefinedTickException;
 
 
 /**
