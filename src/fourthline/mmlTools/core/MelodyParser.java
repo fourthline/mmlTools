@@ -29,10 +29,12 @@ public final class MelodyParser {
 	private char playingNote = ' ';
 	private final List<Integer> warnIndex = new ArrayList<>();
 
-	private int minNote = -1;
-	private int maxNote = -1;
+	private final static int R_NOTE = Integer.MIN_VALUE;
 
-	private int noteNumber = -1;
+	private int minNote = R_NOTE;
+	private int maxNote = R_NOTE;
+
+	private int noteNumber = R_NOTE;
 	private String gt;
 
 	public MelodyParser(String mml) {
@@ -97,7 +99,7 @@ public final class MelodyParser {
 	}
 
 	public boolean checkPitch(int min, int max) {
-		if ( minNote < 0 && maxNote < 0 ) {
+		if ( minNote == R_NOTE && maxNote == R_NOTE ) {
 			return true;
 		}
 		if ( (minNote >= min ) && (maxNote <= max) ) {
@@ -167,11 +169,11 @@ public final class MelodyParser {
 	 * @param note
 	 */
 	private void noteMinMax(int note) {
-		if (note <= 0) {
+		if (note == Integer.MIN_VALUE) {
 			return;
 		}
 
-		if ( (minNote < 0) || (maxNote < 0) ) {
+		if ( (minNote == R_NOTE) || (maxNote == R_NOTE) ) {
 			minNote = maxNote = note;
 			return;
 		}
@@ -299,7 +301,7 @@ public final class MelodyParser {
 		if ( (note1 != 'r' ) && (note1 != 'R') ) {
 			noteMinMax( noteNumber );
 		} else {
-			noteNumber = -1;
+			noteNumber = R_NOTE;
 		}
 
 		return mmlGT(gt);

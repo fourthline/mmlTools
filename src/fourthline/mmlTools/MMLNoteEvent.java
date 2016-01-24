@@ -98,12 +98,15 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 		"c", "c+", "d", "d+", "e", "f", "f+", "g", "g+", "a", "a+", "b"
 	};
 	private String getNoteName() throws UndefinedTickException {
+		if (note == -1) {
+			return "c-";
+		}
 		return noteNameTable[ note%noteNameTable.length ];
 	}
 
 	@Override
 	public String toMMLString() throws UndefinedTickException {
-		if ( (note < 0) || (note >= 108) ) {
+		if ( (note < -1) || (note >= 108) ) {
 			throw new UndefinedTickException("note = "+note);
 		}
 		String noteName = getNoteName();
@@ -116,7 +119,7 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 	}
 
 	public String toMMLString(MMLNoteEvent prevNoteEvent) throws UndefinedTickException {
-		if ( (note < 0) || (note >= 108) ) {
+		if ( (note < -1) || (note >= 108) ) {
 			throw new UndefinedTickException("note = "+note);
 		}
 		StringBuilder sb = new StringBuilder();
@@ -172,6 +175,9 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 	}
 
 	public int getOctave() {
+		if (note < 0) {
+			return 0;
+		}
 		return (note /12);
 	}
 

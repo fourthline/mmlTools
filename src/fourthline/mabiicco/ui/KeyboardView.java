@@ -12,6 +12,7 @@ import java.awt.Graphics2D;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.util.OptionalInt;
 
 import javax.swing.JPanel;
 
@@ -21,7 +22,7 @@ import fourthline.mabiicco.midi.MabiDLS;
 public final class KeyboardView extends JPanel implements IPlayNote {
 	private static final long serialVersionUID = -3850112420986284800L;
 
-	private int playNote = -1;
+	private OptionalInt playNote = OptionalInt.empty();
 	private final int width = 60;
 	private final int PLAY_CHANNEL = 15;
 	private final int DEFAULT_VELOCITY = 11;
@@ -60,7 +61,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 	}
 
 	public void updateHeight() {
-		setPreferredSize(new Dimension(width, 12*PianoRollView.OCTNUM*pianoRollView.getNoteHeight()+1));
+		setPreferredSize(new Dimension(width, pianoRollView.getTotalHeight()));
 	}
 
 	/**
@@ -75,7 +76,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 		g2.setColor(Color.WHITE);
 		g2.fillRect(0, 0, width, height);
 
-		for (int i = 0; i < PianoRollView.OCTNUM; i++) {
+		for (int i = 0; i <= PianoRollView.OCTNUM; i++) {
 			paintOctPianoLine(g2, i, (char)('0'+PianoRollView.OCTNUM-i-1));
 		}
 
@@ -95,6 +96,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 		case 7:
 		case 9:
 		case 11:
+		case -1:
 			return true;
 		default:
 			return false;
@@ -103,15 +105,17 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 
 	private void paintPlayNote(Graphics2D g) {
 		int yAdd[] = { -2, -2, -1, -2, 1, -3, -2, -2, -1, 0, 0, 2 }; // 補正値
-		if (playNote < 0) {
+		if (!playNote.isPresent()) {
 			return;
 		}
 
 		int x = 15;
-		if ( isWhiteKey(playNote) ) {
+		int note = playNote.getAsInt();
+		if ( isWhiteKey(note) ) {
 			x += 20;
 		}
-		int y = pianoRollView.getTotalHeight() - ((playNote +1) * pianoRollView.getNoteHeight()) + yAdd[playNote%12];
+
+		int y = pianoRollView.convertNote2Y(note) + yAdd[(note+12)%12];
 		g.setColor(Color.RED);
 		g.fillOval(x, y, 4, 4);
 	}
@@ -162,25 +166,25 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 
 	@Override
 	public void playNote(int note, int velocity) {
-		if (note < 0) {
+		if (note < -1) {
 			offNote();
 			return;
 		}
-		playNote = note;
+		playNote = OptionalInt.of(note);
 
 		int program = mmlManager.getActivePartProgram();
 		MabiDLS.getInstance().loadRequiredInstruments(mmlManager.getMMLScore());
 		MabiDLS.getInstance().setMute(PLAY_CHANNEL, false);
-		MabiDLS.getInstance().playNote(playNote, program, PLAY_CHANNEL, velocity);
+		MabiDLS.getInstance().playNote(note, program, PLAY_CHANNEL, velocity);
 
 		repaint();
 	}
 
 	@Override
 	public void offNote() {
-		playNote = -1;
+		playNote = OptionalInt.empty();
 		int program = mmlManager.getActivePartProgram();
-		MabiDLS.getInstance().playNote(playNote, program, PLAY_CHANNEL, 0);
+		MabiDLS.getInstance().playNote(Integer.MIN_VALUE, program, PLAY_CHANNEL, 0);
 
 		repaint();
 	}

@@ -51,9 +51,7 @@ public final class MMLEventList implements Serializable, Cloneable {
 			if (event instanceof MMLTempoEvent) {
 				((MMLTempoEvent) event).appendToListElement(tempoList);
 			} else if (event instanceof MMLNoteEvent) {
-				if (((MMLNoteEvent) event).getNote() >= 0) {
-					noteList.add((MMLNoteEvent) event);
-				}
+				noteList.add((MMLNoteEvent) event);
 			}
 		}
 	}
@@ -144,7 +142,7 @@ public final class MMLEventList implements Serializable, Cloneable {
 	 */
 	public void addMMLNoteEvent(MMLNoteEvent addNoteEvent) {
 		int i;
-		if ((addNoteEvent.getNote() < 0) || (addNoteEvent.getTick() <= 0) || (addNoteEvent.getEndTick() <= 0)) {
+		if ((addNoteEvent.getNote() < -1) || (addNoteEvent.getTick() <= 0) || (addNoteEvent.getEndTick() <= 0)) {
 			return;
 		}
 		int offset = addNoteEvent.getTickOffset();

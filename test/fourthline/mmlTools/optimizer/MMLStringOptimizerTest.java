@@ -232,4 +232,11 @@ public class MMLStringOptimizerTest {
 		String expect =  "aaaaaaabl16&bccccccccc";
 		checkMMLStringOptimize(input, expect);
 	}
+
+	@Test(timeout=TIMEOUT)
+	public void test_o0cm() {
+		String input  =  "o4co0c-o4ccccco0c-c-c-c-cc-cc-c-cccc>ccc<c->ccc";
+		String expect =  "co0c-o4ccccco0c-c-c-c-cc-cc-c-cccc>ccc<c->ccc";
+		checkMMLStringOptimize(input, expect);
+	}
 }

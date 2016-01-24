@@ -53,7 +53,7 @@ public final class PianoRollView extends JPanel {
 		}
 	}
 	public int getTotalHeight() {
-		return (12*OCTNUM*noteHeight+1);
+		return (12*OCTNUM*noteHeight)+noteHeight;
 	}
 
 	private double wideScale = 6; // ピアノロールの拡大/縮小率 (1~6)
@@ -274,7 +274,6 @@ public final class PianoRollView extends JPanel {
 	public final int convertNote2Y(int note) {
 		int y = OCTNUM*12 - note - 1;
 		y *= noteHeight;
-
 		return y;
 	}
 
@@ -328,7 +327,7 @@ public final class PianoRollView extends JPanel {
 		updateViewWidthTrackLength();
 
 		Graphics2D g2 = (Graphics2D)g.create();
-		for (int i = 0; i < OCTNUM; i++) {
+		for (int i = 0; i <= OCTNUM; i++) {
 			paintOctPianoLine(g2, i, (char)('0'+OCTNUM-i-1));
 		}
 
@@ -339,7 +338,7 @@ public final class PianoRollView extends JPanel {
 		paintActiveTrack(g2);
 		paintSelectedNote(g2);
 		paintSelectingArea(g2);
-		paintSequenceLine(g2, convertNote2Y(-1));
+		paintSequenceLine(g2, getTotalHeight());
 
 		g2.dispose();
 	}
@@ -419,7 +418,7 @@ public final class PianoRollView extends JPanel {
 			dash, 
 			0.0f);
 	private void paintHalfMeasure(Graphics2D g, int offset, int w) {
-		int y = convertNote2Y(-1);
+		int y = getTotalHeight();
 		Stroke oldStroke = g.getStroke();
 		g.setStroke(dashStroke);
 		g.setColor(barBorder);
@@ -443,6 +442,7 @@ public final class PianoRollView extends JPanel {
 		try {
 			int sect = MMLTicks.getTick(mmlManager.getMMLScore().getBaseOnly());
 			int borderCount = mmlManager.getMMLScore().getTimeCountOnly();
+			int y = getTotalHeight();
 			for (int i = 0; i*sect < width; i++) {
 				if (i*sect < startViewTick-sect) {
 					continue;
@@ -456,7 +456,6 @@ public final class PianoRollView extends JPanel {
 					g.setColor(barBorder);
 				}
 				int x = convertTicktoX(i*sect);
-				int y = convertNote2Y(-1);
 				g.drawLine(x, 0, x, y);
 				paintHalfMeasure(g, x, convertTicktoX(sect));
 			}

@@ -302,15 +302,15 @@ public class MMLScoreTest extends FileSelect {
 
 	@Test
 	public void test_transpose2() throws UndefinedTickException {
-		String mml    = "MML@o0c+,,;";
-		String expect = "MML@n0,,;";
+		String mml    = "MML@o0c,,;";
+		String expect = "MML@o0c-,,;";
 		checkTranspose(mml, expect, -1);
 	}
 
 	@Test(expected=UndefinedTickException.class)
 	public void test_transpose3() throws UndefinedTickException {
-		String mml    = "MML@o0c+,,;";
-		String expect = "MML@n-1,,;";
+		String mml    = "MML@o0c,,;";
+		String expect = "MML@n-2,,;";
 		checkTranspose(mml, expect, -2);
 	}
 

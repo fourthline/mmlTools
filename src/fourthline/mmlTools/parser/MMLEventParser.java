@@ -87,7 +87,7 @@ public final class MMLEventParser implements Iterator<MMLEvent> {
 						}
 						prevNoteEvent.setTick( prevTick + tick);
 						prevNoteEvent.getIndexOfMMLString()[1] = tokenizer.getIndex()[1];
-					} else if (parser.getNoteNumber() >= 0) {
+					} else if (parser.getNoteNumber() >= -1) {
 						nextItem = prevNoteEvent;
 						prevNoteEvent = new MMLNoteEvent(parser.getNoteNumber(), tick, totalTick, volumn);
 						prevNoteEvent.setIndexOfMMLString(tokenizer.getIndex());

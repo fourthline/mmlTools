@@ -677,4 +677,10 @@ public class MMLEventListTest {
 		System.out.println(eventList2.getTickLength());
 		assertEquals(eventList1.toMMLString(), eventList2.toMMLString());
 	}
+
+	@Test
+	public void testParse_m1() throws UndefinedTickException {
+		MMLEventList eventList1 = new MMLEventList("o0c-");
+		assertEquals("<<<<c-4", eventList1.toMMLString());
+	}
 }
