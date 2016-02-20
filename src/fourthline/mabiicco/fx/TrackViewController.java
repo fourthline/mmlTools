@@ -42,7 +42,7 @@ public class TrackViewController implements Initializable {
 	private OptionalInt trackIndex = OptionalInt.empty();
 	private final MabiDLS dls = MabiDLS.getInstance();
 
-	private final InstClass noUseSongEx = new InstClass(appText("instrument.nouse_chorus"), -1, -1, null);
+	private final InstClass noUseSongEx = new InstClass(appText("instrument.nouse_chorus")+",0", -1, -1, null);
 
 	public void setMMLTrack(MMLTrack mmlTrack, int trackIndex) {
 		this.trackIndex = OptionalInt.of(trackIndex);

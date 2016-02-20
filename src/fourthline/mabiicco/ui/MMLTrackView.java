@@ -58,7 +58,7 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 
 	private IMMLManager mmlManager;
 
-	private final InstClass noUseSongEx = new InstClass(AppResource.appText("instrument.nouse_chorus"), -1, -1, null);
+	private final InstClass noUseSongEx = new InstClass(AppResource.appText("instrument.nouse_chorus")+",0", -1, -1, null);
 	private int trackIndex;
 
 	private JPanel mmlTextPanel = new JPanel();

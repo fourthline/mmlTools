@@ -6,6 +6,7 @@ package fourthline.mmlTools.optimizer;
 
 import static org.junit.Assert.*;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -25,6 +26,11 @@ public class MMLStringOptimizerTest {
 	public void setup() throws UndefinedTickException {
 		MMLStringOptimizer.setDebug(true);
 		MMLTicks.getTick("64");
+	}
+
+	@After
+	public void cleanup() {
+		MMLStringOptimizer.setDebug(false);
 	}
 
 	@Test(timeout=TIMEOUT)

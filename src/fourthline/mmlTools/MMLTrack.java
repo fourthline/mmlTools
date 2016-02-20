@@ -41,6 +41,25 @@ public final class MMLTrack implements Serializable {
 	}
 
 	public MMLTrack setMML(String mml) {
+		if (mml.indexOf('\n') >= 0) {
+			// ゲーム内からコピーされたフォーマットを読む.
+			String parts[] = mml.split("\n", 8);
+			boolean invalidFormat = false;
+			if (parts.length == 7) {
+				for (int i = 2; i < parts.length-1; i++) {
+					int startIndex = parts[i].indexOf(':');
+					if (startIndex < 0) {
+						invalidFormat = true;
+						break;
+					}
+					parts[i] = parts[i].substring(startIndex+1).trim();
+				}
+				if (!invalidFormat) {
+					return setMML(parts[2], parts[3], parts[4], parts[5]);
+				}
+			}
+		}
+
 		originalMML.setMMLText(mml);
 		mabiMML.setMMLText(mml);
 

@@ -253,4 +253,22 @@ public class MMLTrackTest {
 		assertEquals("MML@,,;", track.getOriginalMML());
 		assertEquals("MML@,,;", track.getMabiMML());
 	}
+
+	@Test
+	public void test_parseGameFormat() {
+		String mml = "タイトル : mml1\n作曲者 : author\nメロディー : AAA\n和音 1 : BBB\n和音 2 : CCC\n歌 : DDD\n";
+		String expect = "MML@AAA,BBB,CCC,DDD;";
+		MMLTrack track = new MMLTrack().setMML(mml);
+		assertEquals(expect, track.getOriginalMML());
+		assertEquals(expect, track.getMabiMML());
+	}
+
+	@Test
+	public void test_parseGameFormat_invalid() {
+		String mml = "タイトル : mml1\n作曲者 : author\nメロディー : AAA\n和音 1 : BBB\n和音 2 : CCC\nDDD\n";
+		String expect = "MML@,,;";
+		MMLTrack track = new MMLTrack().setMML(mml);
+		assertEquals(expect, track.getOriginalMML());
+		assertEquals(expect, track.getMabiMML());
+	}
 }
