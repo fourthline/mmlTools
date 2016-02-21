@@ -80,7 +80,8 @@ public final class MabiIcco extends Application {
 			notifyPreloader(new MabiIccoPreloaderNotification("", 100));
 			dispatcher.setMainFrame(mainFrame).initialize();
 			List<String> args = getParameters().getRaw();
-			if (args.size() > 0) {
+			if (dispatcher.recoveryCheck()) {
+			} else if (args.size() > 0) {
 				dispatcher.checkAndOpenMMLFile(new File(args.get(0)));
 			}
 			try {

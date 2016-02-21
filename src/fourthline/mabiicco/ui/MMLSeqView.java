@@ -130,6 +130,22 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		startTimeViewUpdateThread();
 	}
 
+	public boolean recovery(String s) {
+		boolean result = undoEdit.recover(s);
+		System.out.println("recover: "+result);
+		if (result) {
+			undoEdit.revertState();
+			updateTrackTabIcon();
+			updateActivePart(false);
+			updateProgramSelect();
+		}
+		return result;
+	}
+
+	public String getRecoveryData() {
+		return undoEdit.getBackupString();
+	}
+
 	private boolean currentEditMode = true;
 	public void repaint() {
 		boolean editMode = MabiIccoProperties.getInstance().getEnableEdit();

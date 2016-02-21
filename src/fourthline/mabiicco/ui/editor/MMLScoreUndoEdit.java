@@ -4,8 +4,17 @@
 
 package fourthline.mabiicco.ui.editor;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.io.StringReader;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Stack;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
@@ -27,6 +36,8 @@ public final class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFil
 
 	private final IMMLManager mmlManager;
 	private int originalIndex = 0; /** オリジナル位置. undo/redo範囲外になった場合は 負値. 0~size-1 */
+
+	private String backupString = null;
 
 	public MMLScoreUndoEdit(IMMLManager mmlManager) {
 		this.mmlManager = mmlManager;
@@ -60,6 +71,7 @@ public final class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFil
 			fileStateObserver.notifyUpdateFileState();
 
 		System.out.println("saveState() "+undoState.size());
+		makeBackup();
 	}
 
 	@Override
@@ -77,6 +89,7 @@ public final class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFil
 			byte nextState[] = undoState.pop();
 			score.putObjectState(undoState.lastElement());
 			redoState.push(nextState);
+			makeBackup();
 			if (fileStateObserver != null)
 				fileStateObserver.notifyUpdateFileState();
 		}
@@ -91,6 +104,7 @@ public final class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFil
 			byte state[] = redoState.pop();
 			score.putObjectState(state);
 			undoState.push(state);
+			makeBackup();
 			if (fileStateObserver != null)
 				fileStateObserver.notifyUpdateFileState();
 		}
@@ -127,5 +141,114 @@ public final class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFil
 	@Override
 	public void setFileStateObserver(IFileStateObserver observer) {
 		this.fileStateObserver = observer;
+	}
+
+	private void makeBackup() {
+		try {
+			backupString = compress(makeBackupString());
+		} catch (IOException e) {
+			backupString = null;
+		}
+	}
+
+	private void writeStack(PrintStream out, Stack<byte[]> data) throws IOException {
+		out.println(data.size());
+		for (int i = 0; i < data.size(); i++) {
+			out.println( Base64.getEncoder().encodeToString( data.get(i) ));
+		}
+	}
+
+	private void readStack(BufferedReader in, Stack<byte[]> data) throws IOException {
+		data.clear();
+		int count = Integer.parseInt(in.readLine());
+		for (int i = 0; i < count; i++) {
+			data.add( Base64.getDecoder().decode( in.readLine() ));
+		}
+	}
+
+	private String makeBackupString() throws IOException {
+		ByteArrayOutputStream bstream = new ByteArrayOutputStream();
+		PrintStream pstream = new PrintStream(bstream);
+		pstream.println(serialVersionUID);
+
+		// undoState@Stack<byte[]>
+		writeStack(pstream, undoState);
+
+		// redoState@Stack<byte[]>
+		writeStack(pstream, redoState);
+
+		// originalIndex@int
+		pstream.println(originalIndex);
+
+		pstream.close();
+		return new String( bstream.toByteArray() );
+	}
+
+	private boolean parseBackupString(String s) throws IOException, ClassNotFoundException, NumberFormatException {
+		BufferedReader breader = new BufferedReader(new StringReader(s));
+		long serial = Long.parseLong( breader.readLine() );
+		if (serial != serialVersionUID) {
+			return false;
+		}
+
+		// undoState@Stack<byte[]>
+		readStack(breader, undoState);
+
+		// redoState@Stack<byte[]>
+		readStack(breader, redoState);
+
+		// originalIndex@int
+		originalIndex = Integer.parseInt( breader.readLine() );
+
+		return true;
+	}
+
+	private String compress(String s) {
+		try {
+			ByteArrayOutputStream bstream = new ByteArrayOutputStream();
+			GZIPOutputStream out = new GZIPOutputStream( bstream );
+			out.write(s.getBytes());
+			out.close();
+			bstream.close();
+			return Base64.getEncoder().encodeToString(bstream.toByteArray());
+		} catch (IOException e) {
+			System.out.println(e.getMessage());
+		}
+		return null;
+	}
+
+	private String decompress(String s) {
+		try {
+			GZIPInputStream in = new GZIPInputStream(
+					new ByteArrayInputStream(
+							Base64.getDecoder().decode(s.getBytes())));
+			ByteArrayOutputStream bstream = new ByteArrayOutputStream();
+			while (in.available() != 0) {
+				int c = in.read();
+				if (c >= 0) {
+					bstream.write(c);
+				}
+			}
+			bstream.close();
+			return new String(bstream.toByteArray());
+		} catch (IOException e) {
+			System.out.println(e.getMessage());
+		}
+		return null;
+	}
+
+	public boolean recover(String s) {
+		try {
+			boolean result = parseBackupString(decompress(s));
+			makeBackup();
+			return result;
+		} catch (NumberFormatException | ClassNotFoundException | IOException e) {
+			System.out.println(e.getMessage());
+		}
+		return false;
+	}
+
+	public String getBackupString() {
+		return backupString;
 	}
 }

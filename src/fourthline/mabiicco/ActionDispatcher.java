@@ -6,11 +6,14 @@ package fourthline.mabiicco;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -622,5 +625,59 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		MabiDLS dls = MabiDLS.getInstance();
 		dls.setLoop( !dls.isLoop() );
 		mainFrame.updateLoop( dls.isLoop() );
+	}
+
+	/**
+	 * データ復旧.
+	 * @return 復旧処理を実行したとき trueを返す.
+	 */
+	public boolean recoveryCheck() {
+		File recoveryFile = new File(AppResource.appText("recover.filename"));
+		if (recoveryFile.exists()) {
+			int status = JOptionPane.showConfirmDialog(mainFrame, 
+					AppResource.appText("recover.message"), 
+					AppResource.appText("recover.title"), 
+					JOptionPane.YES_NO_OPTION);
+			if (status != JOptionPane.OK_OPTION) {
+				return false;
+			}
+			try {
+				BufferedReader reader = new BufferedReader(new FileReader(recoveryFile));
+				String filename = reader.readLine();
+				String data = reader.readLine();
+				reader.close();
+				recoveryFile.delete();
+				boolean result = mmlSeqView.recovery(data);
+				if (!result) {
+					JOptionPane.showMessageDialog(mainFrame,
+							"recover.fail", "recover.title", JOptionPane.WARNING_MESSAGE);
+				}
+				if ( result && (filename.length() > 0) ) {
+					openedFile = new File(filename);
+				}
+				notifyUpdateFileState();
+				return result;
+			} catch (IOException e) {}
+		}
+		return false;
+	}
+
+	/**
+	 * 復旧用データを書き出す.
+	 */
+	public void writeRecoveryData() {
+		String filename = "";
+		if (openedFile != null) {
+			filename = openedFile.getAbsolutePath();
+		}
+		String data = mmlSeqView.getRecoveryData();
+
+		try {
+			File recoveryFile = new File(AppResource.appText("recover.filename"));
+			PrintStream printStream = new PrintStream(new FileOutputStream(recoveryFile));
+			printStream.println(filename);
+			printStream.println(data);
+			printStream.close();
+		} catch (IOException e) {}
 	}
 }

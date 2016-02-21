@@ -119,6 +119,8 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 
 		// Rank表記は generate後.
 		assertEquals(rank9, obj.getSelectedTrack().mmlRankFormat());
+		obj.updateActivePart(true);
+		String recoveryData = obj.getRecoveryData();
 
 		// redo実行.
 		obj.redo();
@@ -131,6 +133,17 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 		obj.switchTrack(true);
 		// Rank表記は generate後.
 		assertEquals(rank1, obj.getSelectedTrack().mmlRankFormat());
+
+		// Rank9のデータへリカバリー.
+		System.out.println(recoveryData);
+		obj.recovery(recoveryData);
+		System.out.println(obj.getRecoveryData());
+		obj.updateActivePart(true);
+		System.out.println(recoveryData);
+		System.out.println(obj.getRecoveryData());
+		assertEquals(1, obj.getMMLScore().getTrackCount());
+		assertEquals(rank9, obj.getSelectedTrack().mmlRankFormat());
+		assertEquals(recoveryData, obj.getRecoveryData());
 	}
 
 	@Test

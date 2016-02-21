@@ -15,6 +15,7 @@ import java.util.List;
 
 import javax.sound.midi.*;
 
+import fourthline.mabiicco.AppErrorHandler;
 import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLNoteEvent;
 import fourthline.mmlTools.MMLScore;
@@ -172,7 +173,7 @@ public final class MabiDLS {
 					synthesizer.loadInstrument(instrument);
 				}
 			} catch (OutOfMemoryError e) {
-				// FIXME: エラー処理
+				AppErrorHandler.getInstance().exec();
 				System.exit(1);
 			}
 		}
