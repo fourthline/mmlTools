@@ -168,7 +168,7 @@ public final class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFil
 
 	private String makeBackupString() throws IOException {
 		ByteArrayOutputStream bstream = new ByteArrayOutputStream();
-		PrintStream pstream = new PrintStream(bstream);
+		PrintStream pstream = new PrintStream(bstream, false, "UTF-8");
 		pstream.println(serialVersionUID);
 
 		// undoState@Stack<byte[]>
@@ -184,7 +184,7 @@ public final class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFil
 		return new String( bstream.toByteArray() );
 	}
 
-	private boolean parseBackupString(String s) throws IOException, ClassNotFoundException, NumberFormatException {
+	private boolean parseBackupString(String s) throws IOException, NumberFormatException {
 		BufferedReader breader = new BufferedReader(new StringReader(s));
 		long serial = Long.parseLong( breader.readLine() );
 		if (serial != serialVersionUID) {
@@ -242,7 +242,7 @@ public final class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFil
 			boolean result = parseBackupString(decompress(s));
 			makeBackup();
 			return result;
-		} catch (NumberFormatException | ClassNotFoundException | IOException e) {
+		} catch (NumberFormatException | IOException e) {
 			System.out.println(e.getMessage());
 		}
 		return false;

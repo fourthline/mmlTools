@@ -134,6 +134,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		boolean result = undoEdit.recover(s);
 		System.out.println("recover: "+result);
 		if (result) {
+			mmlScore = mmlScore.toGeneratedScore();
 			undoEdit.revertState();
 			updateTrackTabIcon();
 			updateActivePart(false);

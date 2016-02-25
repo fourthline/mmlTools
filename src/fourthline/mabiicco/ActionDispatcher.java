@@ -11,8 +11,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -642,7 +642,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 				return false;
 			}
 			try {
-				BufferedReader reader = new BufferedReader(new FileReader(recoveryFile));
+				BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(recoveryFile),"UTF-8"));
 				String filename = reader.readLine();
 				String data = reader.readLine();
 				reader.close();
@@ -674,7 +674,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 
 		try {
 			File recoveryFile = new File(AppResource.appText("recover.filename"));
-			PrintStream printStream = new PrintStream(new FileOutputStream(recoveryFile));
+			PrintStream printStream = new PrintStream(new FileOutputStream(recoveryFile), false, "UTF-8");
 			printStream.println(filename);
 			printStream.println(data);
 			printStream.close();
