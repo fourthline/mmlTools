@@ -634,9 +634,9 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	public boolean recoveryCheck() {
 		File recoveryFile = new File(AppResource.appText("recover.filename"));
 		if (recoveryFile.exists()) {
-			int status = JOptionPane.showConfirmDialog(mainFrame, 
-					AppResource.appText("recover.message"), 
-					AppResource.appText("recover.title"), 
+			int status = JOptionPane.showConfirmDialog(mainFrame,
+					AppResource.appText("recover.message")+"\n"+recoveryFile.getName(),
+					AppResource.appText("recover.title"),
 					JOptionPane.YES_NO_OPTION);
 			if (status != JOptionPane.OK_OPTION) {
 				return false;
