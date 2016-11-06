@@ -180,6 +180,10 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	public void newMMLNoteAndSelected(Point p) {
 		int note = pianoRollView.convertY2Note(p.y);
 		long tickOffset = pianoRollView.convertXtoTick(p.x);
+		newMMLNoteAndSelected(tickOffset, note);
+	}
+
+	public void newMMLNoteAndSelected(long tickOffset, int note) {
 		long alignedTickOffset = tickOffset - (tickOffset % editAlign);
 		MMLEventList editEventList = mmlManager.getActiveMMLPart();
 		if (editEventList == null) {
@@ -190,6 +194,16 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		MMLNoteEvent noteEvent = new MMLNoteEvent(note, editAlign, (int)alignedTickOffset, prevNote.getVelocity());
 		selectNote(noteEvent);
 		notePlayer.playNote( note, noteEvent.getVelocity() );
+	}
+
+	public void addLengthSelectedNote(int tick){
+		if (selectedNote.size() <= 0) {
+			return;
+		}
+
+		MMLNoteEvent noteEvent = selectedNote.get(0);
+		int newTick = noteEvent.getTick() + tick;
+		noteEvent.setTick(newTick);
 	}
 
 	/**
@@ -567,6 +581,10 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 				}
 			}
 		}
+	}
+
+	public void deleteBack(long tickStart, long tickEnd){
+		mmlManager.getActiveMMLPart().deleteMMLEvent(tickStart, tickEnd);
 	}
 
 	public void changePart(MMLEventList from, MMLEventList to, boolean useSelectedNoteList, ChangePartAction action) {

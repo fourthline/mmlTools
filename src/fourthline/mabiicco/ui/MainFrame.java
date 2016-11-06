@@ -85,6 +85,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	private JMenuItem deleteMenu = null;
 
 	private JButton loopButton = null;
+	private JButton stepRecButton = null;
 
 	private MenuWithIndex fileHistory[] = new MenuWithIndex[ MabiIccoProperties.MAX_FILE_HISTORY ];
 
@@ -310,6 +311,8 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createCheckMenu(settingMenu, "edit.enable", properties::getEnableEdit, properties::setEnableEdit);
 		createCheckMenu(settingMenu, "edit.active_part_switch", properties::getActivePartSwitch, properties::setActivePartSwitch);
 		createMenuItem(settingMenu, "menu.clear_dls", ActionDispatcher.CLEAR_DLS);
+		settingMenu.add(new JSeparator());
+		createMenuItem(settingMenu, "menu.midi_device", ActionDispatcher.MIDI_DEVICE);
 
 		/************************* Help Menu *************************/
 		JMenu helpMenu = new JMenu(appText("menu.help"));
@@ -427,6 +430,10 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createToolButton(toolBar, "menu.pause", ActionDispatcher.PAUSE, false);
 		createToolButton(toolBar, "menu.stop", ActionDispatcher.STOP, false);
 		loopButton = createToolButton(toolBar, "menu.loop", ActionDispatcher.TOGGLE_LOOP, false);
+
+		toolBar.add(newToolBarSeparator());
+
+		stepRecButton = createToolButton(toolBar, "menu.step_rec", ActionDispatcher.TOGGLE_STEP_REC, false);
 
 		toolBar.add(newToolBarSeparator());
 
@@ -558,6 +565,21 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		mmlSeqView.setEditAlign(alignTick);
 	}
 
+	public void setEditAlignNext(boolean next){
+		int index = noteTypeSelect.getSelectedIndex();
+		if(next){
+			if(index < noteTypeSelect.getItemCount()-1){
+				index += 1;
+			}
+		}else{
+			if(0 < index){
+				index -= 1;
+			}
+		}
+		noteTypeSelect.setSelectedIndex(index);
+		setEditAlign();
+	}
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object source = e.getSource();
@@ -617,6 +639,11 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		loopButton.setSelected(b);
 	}
 
+	public void toggleStepRec(){
+		boolean isStepRecMode = mmlSeqView.toggleStepRec();
+		stepRecButton.setSelected(isStepRecMode);
+	}
+
 	public void updateFileHistoryMenu() {
 		File fileList[] = MabiIccoProperties.getInstance().getFileHistory();
 		for (int i = 0; i < fileHistory.length; i++) {
@@ -655,10 +682,40 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 				KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_MASK),
 				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.SWITCH_MMLPART_PREV)));
 
-		createKeyAction(ActionDispatcher.PLAY,
+		createKeyAction(ActionDispatcher.NEXT_ALIGN,
+				KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.ALT_MASK),
+				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.NEXT_ALIGN)));
+		createKeyAction(ActionDispatcher.PREV_ALIGN,
+				KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.ALT_MASK),
+				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.PREV_ALIGN)));
+
+		createKeyAction(ActionDispatcher.TOGGLE_STEP_REC,
+				KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK),
+				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.TOGGLE_STEP_REC)));
+
+		createKeyAction(ActionDispatcher.PLAY_IN_NORMAL,
 				KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0),
-				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.PLAY)));
-	}
+				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.PLAY_IN_NORMAL)));
+
+		createKeyAction(ActionDispatcher.NEXT_STEP,
+				KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0),
+				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.NEXT_STEP)));
+		createKeyAction(ActionDispatcher.PREV_STEP,
+				KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0),
+				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.PREV_STEP)));
+
+		createKeyAction(ActionDispatcher.VIEW_SCROLL_UP,
+				KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0),
+				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.VIEW_SCROLL_UP)));
+		createKeyAction(ActionDispatcher.VIEW_SCROLL_DOWN,
+				KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0),
+				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.VIEW_SCROLL_DOWN)));
+
+		createKeyAction(ActionDispatcher.DELETE_BACK,
+				KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0),
+				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.DELETE_BACK)));
+
+}
 
 	private void createKeyAction(String name, KeyStroke stroke, Runnable func) {
 		new KeyAction(name, stroke, contentPane, func);

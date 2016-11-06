@@ -55,6 +55,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String VIEW_SCALE_UP = "view_scale_up";
 	@Action public static final String VIEW_SCALE_DOWN = "view_scale_down";
 	@Action public static final String PLAY = "play";
+	@Action public static final String PLAY_IN_NORMAL = "play_in_normal";
 	@Action public static final String STOP = "stop";
 	@Action public static final String PAUSE = "pause";
 	@Action public static final String FILE_OPEN = "fileOpen";
@@ -78,6 +79,10 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String SCORE_PROPERTY = "score_property";
 	@Action public static final String NEXT_TIME = "next_time";
 	@Action public static final String PREV_TIME = "prev_time";
+	@Action public static final String NEXT_STEP = "next_step";
+	@Action public static final String PREV_STEP = "prev_step";
+	@Action public static final String NEXT_ALIGN = "next_align";
+	@Action public static final String PREV_ALIGN = "prev_align";
 	@Action public static final String PART_CHANGE = "part_change";
 	@Action public static final String CHANGE_NOTE_HEIGHT_INT = "change_note_height";
 	@Action public static final String ADD_MEASURE = "add_measure";
@@ -101,6 +106,11 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String SWITCH_MMLPART_PREV = "switch_mmlpart_prev";
 	@Action public static final String TOGGLE_LOOP = "toggle_loop";
 	@Action public static final String FILE_OPEN_WITH_HISTORY = "file_open_with_history";
+	@Action public static final String MIDI_DEVICE = "midi_device";
+	@Action public static final String TOGGLE_STEP_REC = "toggle_step_rec";
+	@Action public static final String VIEW_SCROLL_UP = "view_scroll_up";
+	@Action public static final String VIEW_SCROLL_DOWN = "view_scroll_down";
+	@Action public static final String DELETE_BACK = "delete_back";
 
 	private final HashMap<String, Consumer<Object>> actionMap = new HashMap<>();
 
@@ -170,6 +180,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(TRACK_PROPERTY, t -> mmlSeqView.editTrackPropertyAction());
 		actionMap.put(SET_START_POSITION, t -> mmlSeqView.setStartPosition());
 		actionMap.put(PLAY, t -> this.playAction());
+		actionMap.put(PLAY_IN_NORMAL, t -> this.playInNormal());
 		actionMap.put(INPUT_FROM_CLIPBOARD, t -> mmlSeqView.inputClipBoardAction());
 		actionMap.put(OUTPUT_TO_CLIPBOARD, t -> mmlSeqView.outputClipBoardAction());
 		actionMap.put(UNDO, t -> mmlSeqView.undo());
@@ -183,6 +194,10 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(SCORE_PROPERTY, t -> this.scorePropertyAction());
 		actionMap.put(NEXT_TIME, t -> mmlSeqView.nextStepTimeTo(true));
 		actionMap.put(PREV_TIME, t -> mmlSeqView.nextStepTimeTo(false));
+		actionMap.put(NEXT_STEP, t -> mmlSeqView.nextStepAlignTo(true));
+		actionMap.put(PREV_STEP, t -> mmlSeqView.nextStepAlignTo(false));
+		actionMap.put(NEXT_ALIGN, t -> mainFrame.setEditAlignNext(true));
+		actionMap.put(PREV_ALIGN, t -> mainFrame.setEditAlignNext(false));
 		actionMap.put(PART_CHANGE, t -> mmlSeqView.partChange());
 		actionMap.put(ADD_MEASURE, t -> this.addMeasure());
 		actionMap.put(REMOVE_MEASURE, t -> this.removeMeasure());
@@ -206,6 +221,11 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(TOGGLE_LOOP, t -> this.toggleLoop());
 		actionMap.put(CHANGE_NOTE_HEIGHT_INT, t -> this.changeNoteHeight(t));
 		actionMap.put(FILE_OPEN_WITH_HISTORY, t -> this.fileOpenWithHistory(t));
+		actionMap.put(MIDI_DEVICE, t -> mmlSeqView.setMidiDevice());
+		actionMap.put(TOGGLE_STEP_REC, t -> this.toggleStepRec());
+		actionMap.put(VIEW_SCROLL_UP, t -> mmlSeqView.scrollVertical(true));
+		actionMap.put(VIEW_SCROLL_DOWN, t -> mmlSeqView.scrollVertical(false));
+		actionMap.put(DELETE_BACK, t -> mmlSeqView.deleteBack());
 	}
 
 	@Override
@@ -536,6 +556,11 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			mainFrame.disableNoplayItems();
 		}
 	}
+	private void playInNormal() {
+		if(!mmlSeqView.isStepRecMode()){
+			playAction();
+		}
+	}
 
 	private void clearDLSInformation() {
 		MabiIccoProperties properties = MabiIccoProperties.getInstance();
@@ -625,6 +650,10 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		MabiDLS dls = MabiDLS.getInstance();
 		dls.setLoop( !dls.isLoop() );
 		mainFrame.updateLoop( dls.isLoop() );
+	}
+
+	private void toggleStepRec() {
+		mainFrame.toggleStepRec();
 	}
 
 	/**

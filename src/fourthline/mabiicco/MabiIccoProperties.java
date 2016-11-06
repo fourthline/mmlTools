@@ -71,6 +71,10 @@ public final class MabiIccoProperties {
 	public static final int MAX_FILE_HISTORY = 8;
 	private static final String FILE_HISTORY = "file.history";
 
+	/** MidiIn */
+	private static final String MIDI_IN_INDEX = "device.midi_in.index";
+	private static final String MIDI_IN_NAME = "device.midi_in.name";
+
 	public static MabiIccoProperties getInstance() {
 		return instance;
 	}
@@ -262,6 +266,22 @@ public final class MabiIccoProperties {
 		for (int i = 0; i < fileHistory.size(); i++) {
 			properties.setProperty(FILE_HISTORY+i, fileHistory.get(i).getAbsolutePath());
 		}
+		save();
+	}
+
+	public int getMidiInIndex() {
+		String str = properties.getProperty(MIDI_IN_INDEX, "0");
+		int index = Integer.parseInt(str);
+		return index;
+	}
+	public String getMidiInName() {
+		String str = properties.getProperty(MIDI_IN_NAME, "");
+		return str;
+	}
+
+	public void setMidiIn(int index, String name) {
+		properties.setProperty(MIDI_IN_INDEX, Integer.toString(index));
+		properties.setProperty(MIDI_IN_NAME, name);
 		save();
 	}
 }

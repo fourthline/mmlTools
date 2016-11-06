@@ -4,10 +4,14 @@
 
 package fourthline.mabiicco.ui;
 
+import javax.sound.midi.InvalidMidiDataException;
+import javax.sound.midi.MidiDevice;
+import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Sequencer;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JViewport;
@@ -19,8 +23,10 @@ import fourthline.mabiicco.AppResource;
 import fourthline.mabiicco.IEditState;
 import fourthline.mabiicco.IFileState;
 import fourthline.mabiicco.MabiIccoProperties;
+import fourthline.mabiicco.midi.IPlayMidiMessage;
 import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.MabiDLS;
+import fourthline.mabiicco.midi.MidiIn;
 import fourthline.mabiicco.ui.PianoRollView.PaintMode;
 import fourthline.mabiicco.ui.editor.MMLEditor;
 import fourthline.mabiicco.ui.editor.MMLScoreUndoEdit;
@@ -46,6 +52,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -63,7 +70,7 @@ import java.util.List;
  *  +- {@link MMLTrackView} ({@link TrackTabbedPane} extends JTabbedPane 内)
  * </pre>
  */
-public final class MMLSeqView implements IMMLManager, ChangeListener, ActionListener, MouseWheelListener {
+public final class MMLSeqView implements IMMLManager, ChangeListener, ActionListener, MouseWheelListener, IPlayMidiMessage {
 	private static final int INITIAL_TRACK_COUNT = 1;
 
 	private int trackCounter;
@@ -125,6 +132,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 
 		initialSetView();
 		initializeMMLTrack();
+		initializeMidiIn();
 
 		startSequenceThread();
 		startTimeViewUpdateThread();
@@ -377,6 +385,26 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), track.getTrackName());
 	}
 
+	public void setMidiDevice() {
+		MidiDevicePanel panel = new MidiDevicePanel();
+		panel.showDialog(parentFrame);
+		if(panel.getSelected() != null){
+			try {
+				MidiIn.loadMidiInDevice(panel.getSelected(), this);
+			} catch (MidiUnavailableException | IOException | InvalidMidiDataException e) {
+				// TODO:エラー処理
+				e.printStackTrace();
+			}
+		}else{
+			try {
+				MidiIn.clearMidiInDevice();
+			} catch (MidiUnavailableException | IOException | InvalidMidiDataException e) {
+				// TODO:エラー処理
+				e.printStackTrace();
+			}
+		}
+	}
+
 	private void setViewPosition(int x) {
 		JViewport viewport = scrollPane.getViewport();
 		Point point = viewport.getViewPosition();
@@ -388,6 +416,18 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 			point.setLocation(x, point.getY());
 			viewport.setViewPosition(point);
 		}
+	}
+
+	public void scrollVertical(boolean isUp) {
+		JScrollBar bar = scrollPane.getVerticalScrollBar();
+		int delta;
+		if(isUp){
+			delta = -bar.getUnitIncrement(-1);
+		}else{
+			delta = bar.getUnitIncrement(1);
+		}
+		int value = bar.getValue() + delta;
+		bar.setValue(value);
 	}
 
 	public void setPianoRollHeightScaleIndex(int index) {
@@ -647,6 +687,46 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		} catch (UndefinedTickException e) {}
 	}
 
+	public void nextStepAlignTo(boolean next) {
+		int deltaTick = editor.getEditAlign();
+
+		Sequencer sequencer = MabiDLS.getInstance().getSequencer();
+		long tick = pianoRollView.getSequencePlayPosition();
+		if (next) {
+			tick += deltaTick;
+		} else {
+			tick -= 1;
+		}
+		tick -= tick % deltaTick;
+		if (!sequencer.isRunning()) {
+			pianoRollView.setSequenceTick(tick);
+			panel.repaint();
+		} else {
+			// 移動先のテンポに設定する.
+			int tempo = mmlScore.getTempoOnTick(tick);
+			sequencer.setTickPosition(tick);
+			sequencer.setTempoInBPM(tempo);
+		}
+
+		updatePianoRollView();
+	}
+
+	public void deleteBack() {
+		if(isStepRecMode){
+			long tickEnd = pianoRollView.getSequencePlayPosition();
+			nextStepAlignTo(false);
+			long tickStart = pianoRollView.getSequencePlayPosition();
+			editor.deleteBack(tickStart, tickEnd);
+
+			updatePianoRollView();
+		}
+	}
+
+	public void insertNote(int note){
+		editor.newMMLNoteAndSelected(getEditSequencePosition(), note);
+		nextStepAlignTo(true);
+	}
+
 	public void partChange() {
 		MMLPartChangePanel panel = new MMLPartChangePanel(parentFrame, this, editor);
 		panel.showDialog();
@@ -890,5 +970,65 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		new Thread(() -> {
 			MabiDLS.getInstance().loadRequiredInstruments(mmlScore);
 		}).start();
+	}
+
+	private static boolean isStepRecMode = false;
+	public boolean toggleStepRec(){
+		isStepRecMode = !isStepRecMode;
+		if(!isStepRecMode){
+			editor.reset();
+		}
+		return isStepRecMode;
+	}
+	public boolean isStepRecMode(){
+		return isStepRecMode;
+	}
+
+	private void initializeMidiIn(){
+		int index = MabiIccoProperties.getInstance().getMidiInIndex();
+		String name = MabiIccoProperties.getInstance().getMidiInName();
+		MidiDevice.Info infos[] = MidiIn.getMidiInDeviceInfos();
+		if( index < infos.length){
+			if( name.equals(infos[index].getName())){
+				try {
+					MidiIn.loadMidiInDevice(infos[index], this);
+				} catch (MidiUnavailableException | IOException | InvalidMidiDataException e) {
+					// TODO 自動生成された catch ブロック
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	private final int DEFAULT_VELOCITY = 11;
+	@Override
+	public void playNote(int note, int velocity) {
+		if (isStepRecMode) {
+			long tickOffset = getEditSequencePosition();
+			editor.newMMLNoteAndSelected(tickOffset, note);
+			nextStepAlignTo(true);
+		}else{
+			keyboardView.playNote(note, DEFAULT_VELOCITY);
+		}
+	}
+
+	@Override
+	public void offNote(int note) {
+		if (isStepRecMode) {
+			editor.applyEditNote(false);
+		}else{
+			keyboardView.offNote();
+		}
+	}
+
+	@Override
+	public void sustain(boolean isOn) {
+		if (isStepRecMode) {
+			if(isOn){
+				int tick = editor.getEditAlign();
+				editor.addLengthSelectedNote(tick);
+				nextStepAlignTo(true);
+			}
+		}
 	}
 }
