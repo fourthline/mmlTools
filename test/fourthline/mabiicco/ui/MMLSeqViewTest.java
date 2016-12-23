@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 たんらる
+ * Copyright (C) 2015-2016 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -155,25 +155,25 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 		assertEquals(2, obj.getMMLScore().getTrackCount());
 		assertEquals("Track2", obj.getSelectedTrack().getTrackName());
 
-		// 9個ふやす.
-		Stream.iterate(0, i -> i++).limit(9).forEach(t -> {
+		// 13個ふやす.
+		Stream.iterate(0, i -> i++).limit(13).forEach(t -> {
 			obj.addMMLTrack(null);
 		});
-		assertEquals(11, obj.getMMLScore().getTrackCount());
-		assertEquals("Track11", obj.getSelectedTrack().getTrackName());
+		assertEquals(15, obj.getMMLScore().getTrackCount());
+		assertEquals("Track15", obj.getSelectedTrack().getTrackName());
 
 		// 最大
 		obj.addMMLTrack(null);
-		assertEquals(12, obj.getMMLScore().getTrackCount());
-		assertEquals("Track12", obj.getSelectedTrack().getTrackName());
+		assertEquals(16, obj.getMMLScore().getTrackCount());
+		assertEquals("Track16", obj.getSelectedTrack().getTrackName());
 
 		// 増えない.
 		obj.addMMLTrack(null);
-		assertEquals(12, obj.getMMLScore().getTrackCount());
-		assertEquals("Track12", obj.getSelectedTrack().getTrackName());
+		assertEquals(16, obj.getMMLScore().getTrackCount());
+		assertEquals("Track16", obj.getSelectedTrack().getTrackName());
 
-		// 10個へらす.
-		Stream.iterate(0, i -> i++).limit(10).forEach(t -> {
+		// 14個へらす.
+		Stream.iterate(0, i -> i++).limit(14).forEach(t -> {
 			obj.removeMMLTrack();
 		});
 		assertEquals(2, obj.getMMLScore().getTrackCount());
@@ -187,7 +187,7 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 		// へらない.
 		obj.removeMMLTrack();
 		assertEquals(1, obj.getMMLScore().getTrackCount());
-		assertEquals("Track14", obj.getSelectedTrack().getTrackName());
+		assertEquals("Track18", obj.getSelectedTrack().getTrackName());
 	}
 
 	@Test

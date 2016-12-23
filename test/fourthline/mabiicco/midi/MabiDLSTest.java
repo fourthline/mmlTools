@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 たんらる
+ * Copyright (C) 2015-2016 たんらる
  */
 
 package fourthline.mabiicco.midi;
@@ -46,11 +46,9 @@ public class MabiDLSTest extends UseLoadingDLS {
 
 	@Test
 	public final void test() {
-		int track[]   = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
-		int channel[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12 };
-		for (int i = 0; i < track.length; i++) {
-			checkMute(track[i], channel[i]);
-			checkPanpot(track[i], channel[i]);
+		for (int i = 0; i < 16; i++) {
+			checkMute(i, i);
+			checkPanpot(i, i);
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 たんらる
+ * Copyright (C) 2013-2016 たんらる
  */
 
 package fourthline.mabiicco.midi;
@@ -33,8 +33,9 @@ public final class MabiDLS {
 	private MidiChannel channel[];
 	private ArrayList<MMLNoteEvent[]> playNoteList = new ArrayList<>();
 	private static final int MAX_CHANNEL_PLAY_NOTE = 4;
-	public static final int MAX_MIDI_PART = 12;
+	public static final int MAX_MIDI_PART = 16;
 	private ArrayList<InstClass> insts = new ArrayList<>();
+	private static final int DLS_BANK = (0x79 << 7);
 
 	public static final String DEFALUT_DLS_PATH = "Nexon/Mabinogi/mp3/MSXspirit.dls";
 
@@ -115,7 +116,14 @@ public final class MabiDLS {
 		} catch (InvalidMidiDataException e) {}
 	}
 
+	private void allNoteOff() {
+		for (MidiChannel ch : this.channel) {
+			ch.allNotesOff();
+		}
+	}
+
 	private void sequenceStart() {
+		allNoteOff();
 		sequencer.setTickPosition(startTick);
 		sequencer.setTempoInBPM(startTempo);
 		sequencer.start();
@@ -194,9 +202,12 @@ public final class MabiDLS {
 		}
 
 		for (MidiChannel ch : this.channel) {
+			ch.programChange(DLS_BANK, 0);
 			/* ctrl 91 汎用エフェクト 1(リバーブ) */
 			ch.controlChange(91, 0);
 		}
+
+		this.synthesizer.unloadAllInstruments(this.synthesizer.getDefaultSoundbank());
 	}
 
 	public InstClass[] getAvailableInstByInstType(List<InstType> e) {
@@ -233,7 +244,7 @@ public final class MabiDLS {
 			return;
 		}
 		changeProgram(program, channel);
-		MidiChannel midiChannel = this.channel[convertMidiChannel(channel)];
+		MidiChannel midiChannel = this.channel[channel];
 		MMLNoteEvent[] playNoteEvents = this.playNoteList.get(channel);
 
 		for (int i = 0; i < playNoteEvents.length; i++) {
@@ -260,9 +271,8 @@ public final class MabiDLS {
 	}
 
 	public void changeProgram(int program, int ch) {
-		ch = convertMidiChannel(ch);
 		if (channel[ch].getProgram() != program) {
-			channel[ch].programChange(0, program);
+			channel[ch].programChange(DLS_BANK, program);
 		}
 	}
 
@@ -272,27 +282,22 @@ public final class MabiDLS {
 	 * @param panpot
 	 */
 	public void setChannelPanpot(int ch, int panpot) {
-		ch = convertMidiChannel(ch);
 		channel[ch].controlChange(10, panpot);
 	}
 
 	public void toggleMute(int ch) {
-		ch = convertMidiChannel(ch);
 		channel[ch].setMute(!channel[ch].getMute());
 	}
 
 	public void setMute(int ch, boolean mute) {
-		ch = convertMidiChannel(ch);
 		channel[ch].setMute(mute);
 	}
 
 	public boolean getMute(int ch) {
-		ch = convertMidiChannel(ch);
 		return channel[ch].getMute();
 	}
 
 	public void solo(int ch) {
-		ch = convertMidiChannel(ch);
 		for (MidiChannel c : channel) {
 			c.setMute(true);
 		}
@@ -343,9 +348,11 @@ public final class MabiDLS {
 			track.add(new MidiEvent(message, tickOffset));
 		}
 
-		// コーラスパートの作成
-		createVoiceMidiTrack(sequence, score, 13, 100); // 男声コーラス
-		createVoiceMidiTrack(sequence, score, 14, 110); // 女声コーラス
+		if (trackCount <= 13) {
+			// コーラスパートの作成
+			createVoiceMidiTrack(sequence, score, 13, 100); // 男声コーラス
+			createVoiceMidiTrack(sequence, score, 14, 110); // 女声コーラス
+		}
 
 		return sequence;
 	}
@@ -376,7 +383,6 @@ public final class MabiDLS {
 	 */
 	private void convertMidiTrack(Track track, MMLTrack mmlTrack, int channel) throws InvalidMidiDataException {
 		int program = mmlTrack.getProgram();
-		channel = convertMidiChannel(channel);
 		ShortMessage pcMessage = new ShortMessage(ShortMessage.PROGRAM_CHANGE, 
 				channel,
 				program,
@@ -432,16 +438,6 @@ public final class MabiDLS {
 
 	private int convertNoteMML2Midi(int mml_note) {
 		return (mml_note + 12);
-	}
-
-	private int convertMidiChannel(int channel) {
-		if ( (channel >= 9) && (channel < MAX_MIDI_PART) ) {
-			return (channel + 1);
-		}
-		if (channel == MAX_MIDI_PART) {
-			new AssertionError();
-		}
-		return channel;
 	}
 
 	public static void main(String args[]) {

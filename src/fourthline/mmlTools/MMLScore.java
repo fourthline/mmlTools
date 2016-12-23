@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 たんらる
+ * Copyright (C) 2013-2016 たんらる
  */
 
 package fourthline.mmlTools;
@@ -35,7 +35,7 @@ public final class MMLScore implements IMMLFileParser {
 	private final List<MMLTempoEvent> globalTempoList = new ArrayList<>();
 	private final List<Marker> markerList = new ArrayList<>();
 
-	public static final int MAX_TRACK = 12;
+	public static final int MAX_TRACK = 16;
 
 	private String title = "";
 	private String author = "";

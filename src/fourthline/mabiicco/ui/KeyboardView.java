@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 たんらる
+ * Copyright (C) 2013-2016 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -172,10 +172,12 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 		}
 		playNote = OptionalInt.of(note);
 
-		int program = mmlManager.getActivePartProgram();
-		MabiDLS.getInstance().loadRequiredInstruments(mmlManager.getMMLScore());
-		MabiDLS.getInstance().setMute(PLAY_CHANNEL, false);
-		MabiDLS.getInstance().playNote(note, program, PLAY_CHANNEL, velocity);
+		if (!MabiDLS.getInstance().getSequencer().isRunning()) {
+			int program = mmlManager.getActivePartProgram();
+			MabiDLS.getInstance().loadRequiredInstruments(mmlManager.getMMLScore());
+			MabiDLS.getInstance().setMute(PLAY_CHANNEL, false);
+			MabiDLS.getInstance().playNote(note, program, PLAY_CHANNEL, velocity);
+		}
 
 		repaint();
 	}
