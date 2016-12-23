@@ -639,6 +639,9 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 					AppResource.appText("recover.title"),
 					JOptionPane.YES_NO_OPTION);
 			if (status != JOptionPane.OK_OPTION) {
+				File renameFile = new File(recoveryFile.getAbsolutePath()+".bak");
+				renameFile.delete();
+				recoveryFile.renameTo(renameFile);
 				return false;
 			}
 			try {
