@@ -40,6 +40,7 @@ public final class MabiDLS {
 	public static final String DEFALUT_DLS_PATH = "Nexon/Mabinogi/mp3/MSXspirit.dls";
 
 	private ArrayList<Runnable> notifier = new ArrayList<>();
+	private boolean muteState[] = new boolean[ MAX_MIDI_PART ];
 
 	public static MabiDLS getInstance() {
 		if (instance == null) {
@@ -124,6 +125,7 @@ public final class MabiDLS {
 
 	private void sequenceStart() {
 		allNoteOff();
+		midiSetMuteState();
 		sequencer.setTickPosition(startTick);
 		sequencer.setTempoInBPM(startTempo);
 		sequencer.start();
@@ -208,6 +210,7 @@ public final class MabiDLS {
 		}
 
 		this.synthesizer.unloadAllInstruments(this.synthesizer.getDefaultSoundbank());
+		all();
 	}
 
 	public InstClass[] getAvailableInstByInstType(List<InstType> e) {
@@ -243,6 +246,7 @@ public final class MabiDLS {
 		if (sequencer.isRunning()) {
 			return;
 		}
+		midiMuteOff();
 		changeProgram(program, channel);
 		MidiChannel midiChannel = this.channel[channel];
 		MMLNoteEvent[] playNoteEvents = this.playNoteList.get(channel);
@@ -286,26 +290,42 @@ public final class MabiDLS {
 	}
 
 	public void toggleMute(int ch) {
-		channel[ch].setMute(!channel[ch].getMute());
+		muteState[ch] = !muteState[ch];
+		midiSetMuteState();
 	}
 
 	public void setMute(int ch, boolean mute) {
-		channel[ch].setMute(mute);
+		muteState[ch] = mute;
+		midiSetMuteState();
 	}
 
 	public boolean getMute(int ch) {
-		return channel[ch].getMute();
+		return muteState[ch];
 	}
 
 	public void solo(int ch) {
-		for (MidiChannel c : channel) {
-			c.setMute(true);
+		for (int i = 0; i < muteState.length; i++) {
+			muteState[i] = (i != ch);
 		}
-
-		channel[ch].setMute(false);
+		midiSetMuteState();
 	}
 
 	public void all() {
+		for (int i = 0; i < muteState.length; i++) {
+			muteState[i] = false;
+		}
+		midiSetMuteState();
+	}
+
+	/** MIDIにMuteStateを反映する. */
+	private void midiSetMuteState() {
+		for (int i = 0; i < muteState.length; i++) {
+			channel[i].setMute(muteState[i]);
+		}
+	}
+
+	/** MIDIのMute解除する. */
+	private void midiMuteOff() {
 		for (MidiChannel c : channel) {
 			c.setMute(false);
 		}

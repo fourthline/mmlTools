@@ -172,11 +172,11 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 		}
 		playNote = OptionalInt.of(note);
 
-		if (!MabiDLS.getInstance().getSequencer().isRunning()) {
+		MabiDLS dls = MabiDLS.getInstance();
+		if (!dls.getSequencer().isRunning()) {
 			int program = mmlManager.getActivePartProgram();
-			MabiDLS.getInstance().loadRequiredInstruments(mmlManager.getMMLScore());
-			MabiDLS.getInstance().setMute(PLAY_CHANNEL, false);
-			MabiDLS.getInstance().playNote(note, program, PLAY_CHANNEL, velocity);
+			dls.loadRequiredInstruments(mmlManager.getMMLScore());
+			dls.playNote(note, program, PLAY_CHANNEL, velocity);
 		}
 
 		repaint();

@@ -28,11 +28,11 @@ public class MabiDLSTest extends UseLoadingDLS {
 
 	private void checkMute(int trackIndex, int midiChannel) {
 		System.out.println("checkMute "+trackIndex+" @ "+midiChannel);
-		assertEquals(false, dls.getSynthesizer().getChannels()[midiChannel].getMute());
+		assertEquals(false, dls.getMute(midiChannel));
 		dls.toggleMute(trackIndex);
-		assertEquals(true, dls.getSynthesizer().getChannels()[midiChannel].getMute());
+		assertEquals(true, dls.getMute(midiChannel));
 		dls.toggleMute(trackIndex);
-		assertEquals(false, dls.getSynthesizer().getChannels()[midiChannel].getMute());
+		assertEquals(false, dls.getMute(midiChannel));
 	}
 
 	private void checkPanpot(int trackIndex, int midiChannel) {

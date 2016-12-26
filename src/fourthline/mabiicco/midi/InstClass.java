@@ -152,7 +152,7 @@ public final class InstClass {
 			String originalName = inst.getName();
 			int bank = inst.getPatch().getBank();
 			int program = inst.getPatch().getProgram();
-			System.out.printf("%d=%s \"%s\"\n", program,  originalName, name);
+			System.out.printf("%d,%d=%s \"%s\"\n", bank, program,  originalName, name);
 			if (name != null) {
 				name = ""+program+": "+name;
 				instArray.add(new InstClass( name,
