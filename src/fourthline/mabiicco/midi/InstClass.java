@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 たんらる
+ * Copyright (C) 2013-2017 たんらる
  */
 
 package fourthline.mabiicco.midi;
@@ -15,6 +15,9 @@ import javax.sound.midi.Instrument;
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Soundbank;
+
+import com.sun.media.sound.DLSInstrument;
+import com.sun.media.sound.DLSRegion;
 
 import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mmlTools.core.ResourceLoader;
@@ -34,6 +37,7 @@ public final class InstClass {
 
 	private static final String RESOURCE_NAME = "instrument";
 	private static final ResourceBundle instResource = ResourceBundle.getBundle(RESOURCE_NAME, new ResourceLoader());
+	public static boolean debug = false;
 
 	public InstClass(String name, int bank, int program, Instrument inst) {
 		String str[] = name.split(",");
@@ -159,6 +163,20 @@ public final class InstClass {
 						bank,
 						program,
 						inst));
+			}
+
+			if ( (debug) && (inst instanceof DLSInstrument) ) {
+				DLSInstrument dlsinst = (DLSInstrument) inst;
+				for (DLSRegion reg : dlsinst.getRegions()) {
+					double attenuation = reg.getSample().getSampleoptions().getAttenuation()/655360.0;
+					System.out.print(" >> "+reg.getSample().getName()+" ");
+					System.out.print(attenuation+" ");
+					System.out.print(Math.pow(10.0, attenuation/20.0)+" ");
+					System.out.print(reg.getKeyfrom()+" ");
+					System.out.print(reg.getKeyto()+" ");
+					System.out.print(reg.getVelfrom()+" ");
+					System.out.println(reg.getVelto()+" ");
+				}
 			}
 		}
 

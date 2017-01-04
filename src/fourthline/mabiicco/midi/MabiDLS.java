@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 たんらる
+ * Copyright (C) 2013-2017 たんらる
  */
 
 package fourthline.mabiicco.midi;
@@ -15,7 +15,11 @@ import java.util.List;
 
 import javax.sound.midi.*;
 
+import com.sun.media.sound.DLSInstrument;
+import com.sun.media.sound.DLSRegion;
+
 import fourthline.mabiicco.AppErrorHandler;
+import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLNoteEvent;
 import fourthline.mmlTools.MMLScore;
@@ -263,11 +267,11 @@ public final class MabiDLS {
 				}
 			}
 			if (note != playNoteEvents[i]) {
-				InstType instType = getInstByProgram(program).getType();
-				int volumn = instType.convertVelocityMML2Midi(note.getVelocity());
+				InstClass instClass = getInstByProgram(program);
+				int velocity = convertVelocityOnAtt(instClass, note.getNote(), note.getVelocity());
 				int midiNote = convertNoteMML2Midi(note.getNote());
 				if (midiNote >= 0) {
-					midiChannel.noteOn(midiNote, volumn);
+					midiChannel.noteOn(midiNote, velocity);
 				}
 				playNoteEvents[i] = note;
 			}
@@ -390,8 +394,8 @@ public final class MabiDLS {
 				continue;
 			}
 
-			InstType instType = getInstByProgram(program).getType();
-			convertMidiPart(track, mmlTrack.getMMLEventAtIndex(3).getMMLNoteEventList(), channel, instType);
+			InstClass instClass = getInstByProgram(program);
+			convertMidiPart(track, mmlTrack.getMMLEventAtIndex(3).getMMLNoteEventList(), channel, instClass);
 		}
 	}
 
@@ -409,7 +413,7 @@ public final class MabiDLS {
 				0);
 		track.add(new MidiEvent(pcMessage, 0));
 		boolean enablePart[] = InstClass.getEnablePartByProgram(program);
-		InstType instType = getInstByProgram(mmlTrack.getProgram()).getType();
+		InstClass instClass = getInstByProgram(mmlTrack.getProgram());
 
 		MMLMidiTrack midiTrack = new MMLMidiTrack(mmlTrack.getGlobalTempoList());
 		for (int i = 0; i < enablePart.length; i++) {
@@ -418,11 +422,11 @@ public final class MabiDLS {
 				midiTrack.add(eventList.getMMLNoteEventList());
 			}
 		}
-		convertMidiPart(track, midiTrack.getNoteEventList(), channel, instType);
+		convertMidiPart(track, midiTrack.getNoteEventList(), channel, instClass);
 	}
 
-	private void convertMidiPart(Track track, List<MMLNoteEvent> eventList, int channel, InstType inst) {
-		int volumn = MMLNoteEvent.INIT_VOL;
+	private void convertMidiPart(Track track, List<MMLNoteEvent> eventList, int channel, InstClass inst) {
+		int velocity = MMLNoteEvent.INIT_VOL;
 
 		// Noteイベントの変換
 		for ( MMLNoteEvent noteEvent : eventList ) {
@@ -433,7 +437,7 @@ public final class MabiDLS {
 
 			// ボリュームの変更
 			if (noteEvent.getVelocity() >= 0) {
-				volumn = noteEvent.getVelocity();
+				velocity = convertVelocityOnAtt(inst, note, noteEvent.getVelocity());
 			}
 
 			try {
@@ -441,7 +445,7 @@ public final class MabiDLS {
 				MidiMessage message1 = new ShortMessage(ShortMessage.NOTE_ON, 
 						channel,
 						convertNoteMML2Midi(note), 
-						inst.convertVelocityMML2Midi(volumn));
+						velocity);
 				track.add(new MidiEvent(message1, tickOffset));
 
 				// Off イベント作成
@@ -460,8 +464,43 @@ public final class MabiDLS {
 		return (mml_note + 12);
 	}
 
+	/**
+	 * 音源のAttenuationをVelocityに反映する.
+	 * @param inst  音源
+	 * @param note  変換前のNote
+	 * @param velocity  変換前のVelocity
+	 * @return  変換後のVelocity
+	 */
+	private int convertVelocityOnAtt(InstClass inst, int note, int velocity) {
+		velocity = inst.getType().convertVelocityMML2Midi(velocity);
+
+		if (!MabiIccoProperties.getInstance().getDLSAttenuation()) {
+			return velocity;
+		}
+		if (velocity == 0) {
+			return 0;
+		}
+
+		note = convertNoteMML2Midi(note);
+		Instrument instrument = inst.getInstrument();
+		if (instrument instanceof DLSInstrument) {
+			DLSInstrument dlsinst = (DLSInstrument) instrument;
+			for (DLSRegion region : dlsinst.getRegions()) {
+				if ( (note >= region.getKeyfrom())
+						&& (note <= region.getKeyto()) ) {
+					double attenuation = region.getSampleoptions().getAttenuation() / 655360.0;
+					velocity = (int) Math.sqrt( Math.pow(10.0, attenuation/20) * (double)(velocity * velocity) );
+					break;
+				}
+			}
+		}
+
+		return velocity;
+	}
+
 	public static void main(String args[]) {
 		try {
+			InstClass.debug = true;
 			MabiDLS midi = new MabiDLS();
 			midi.initializeMIDI();
 			for (MidiDevice.Info info : MidiSystem.getMidiDeviceInfo()) {

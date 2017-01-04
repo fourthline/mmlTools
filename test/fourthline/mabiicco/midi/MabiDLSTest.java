@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 たんらる
+ * Copyright (C) 2015-2017 たんらる
  */
 
 package fourthline.mabiicco.midi;
@@ -69,25 +69,25 @@ public class MabiDLSTest extends UseLoadingDLS {
 
 		byte a[][] = new byte[][] { 
 				new byte[]{(byte)ShortMessage.PROGRAM_CHANGE, 0x5},
-				new byte[]{(byte)ShortMessage.NOTE_ON, 69, 64}, // a
-				new byte[]{(byte)ShortMessage.NOTE_ON, 71, 64}, // b
-				new byte[]{(byte)ShortMessage.NOTE_ON, 60, 64}, // c
+				new byte[]{(byte)ShortMessage.NOTE_ON, 69, 56}, // a
+				new byte[]{(byte)ShortMessage.NOTE_ON, 71, 56}, // b
+				new byte[]{(byte)ShortMessage.NOTE_ON, 60, 56}, // c
 				new byte[]{(byte)ShortMessage.NOTE_OFF, 69, 0}, // a
 				new byte[]{(byte)ShortMessage.NOTE_OFF, 71, 0}, // b
 				new byte[]{(byte)ShortMessage.NOTE_OFF, 60, 0}, // c
 
-				new byte[]{(byte)ShortMessage.NOTE_ON, 69, 64}, // a
+				new byte[]{(byte)ShortMessage.NOTE_ON, 69, 56}, // a
 				new byte[]{(byte)ShortMessage.NOTE_OFF, 69, 0}, // a
 
 				new byte[]{(byte)MetaMessage.META, 81, 3, 5, 22, 21}, // t180
-				new byte[]{(byte)ShortMessage.NOTE_ON, 69, 64}, // a
-				new byte[]{(byte)ShortMessage.NOTE_ON, 71, 64}, // b
-				new byte[]{(byte)ShortMessage.NOTE_ON, 60, 64}, // c
+				new byte[]{(byte)ShortMessage.NOTE_ON, 69, 56}, // a
+				new byte[]{(byte)ShortMessage.NOTE_ON, 71, 56}, // b
+				new byte[]{(byte)ShortMessage.NOTE_ON, 60, 56}, // c
 				new byte[]{(byte)ShortMessage.NOTE_OFF, 69, 0}, // a
 				new byte[]{(byte)ShortMessage.NOTE_OFF, 71, 0}, // b
 				new byte[]{(byte)ShortMessage.NOTE_OFF, 60, 0}, // c
 
-				new byte[]{(byte)ShortMessage.NOTE_ON, 69, 64}, // a
+				new byte[]{(byte)ShortMessage.NOTE_ON, 69, 56}, // a
 				new byte[]{(byte)ShortMessage.NOTE_OFF, 69, 0}, // a
 		};
 		for (int i = 0; i < a.length; i++) {

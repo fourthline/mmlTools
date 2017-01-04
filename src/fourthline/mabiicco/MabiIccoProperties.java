@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 たんらる
+ * Copyright (C) 2013-2017 たんらる
  */
 
 package fourthline.mabiicco;
@@ -66,6 +66,9 @@ public final class MabiIccoProperties {
 
 	/** ノートクリックによるアクティブパート切り替え */
 	private static final String ACTIVE_PART_SWITCH = "function.active_part_switch";
+
+	/** DLS音源のAttenuationを使用する */
+	private static final String DLS_ATTENUATION = "function.dls_attenuation";
 
 	/** ファイル履歴 */
 	public static final int MAX_FILE_HISTORY = 8;
@@ -234,6 +237,15 @@ public final class MabiIccoProperties {
 	public void setActivePartSwitch(boolean b) {
 		properties.setProperty(ACTIVE_PART_SWITCH, Boolean.toString(b));
 		save();
+	}
+
+	public boolean getDLSAttenuation() {
+		String str = properties.getProperty(DLS_ATTENUATION, "true");
+		return Boolean.parseBoolean(str);
+	}
+
+	public void setDLSAttenuation(boolean b) {
+		properties.setProperty(DLS_ATTENUATION, Boolean.toString(b));
 	}
 
 	private final LinkedList<File> fileHistory = new LinkedList<>();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 たんらる
+ * Copyright (C) 2013-2017 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -309,6 +309,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createCheckMenu(settingMenu, "view.velocity", properties::getVelocityLine, properties::setVelocityLine);
 		createCheckMenu(settingMenu, "edit.enable", properties::getEnableEdit, properties::setEnableEdit);
 		createCheckMenu(settingMenu, "edit.active_part_switch", properties::getActivePartSwitch, properties::setActivePartSwitch);
+		createCheckMenu(settingMenu, "play.dls_attenuation", properties::getDLSAttenuation, properties::setDLSAttenuation);
 		createMenuItem(settingMenu, "menu.clear_dls", ActionDispatcher.CLEAR_DLS);
 
 		/************************* Help Menu *************************/
