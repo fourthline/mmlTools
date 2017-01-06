@@ -21,7 +21,6 @@ import com.sun.media.sound.DLSRegion;
 
 import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mmlTools.core.ResourceLoader;
-import fourthline.mmlTools.parser.MMLEventParser;
 
 /**
  * 楽器に関する情報を扱います. (instrument.propertiesに対応)
@@ -49,19 +48,47 @@ public final class InstClass {
 		} else {
 			this.type = InstType.NORMAL;
 		}
-		if (str.length > 2) {
-			this.lowerNote = MMLEventParser.firstNoteNumber(str[2]);
-		} else {
-			this.lowerNote = 0;
-		}
-		if (str.length > 3) {
-			this.upperNote = MMLEventParser.firstNoteNumber(str[3]);
-		} else {
-			this.upperNote = 1024;
-		}
+		KeyRegion region = regionFromTo(inst);
+		this.lowerNote = region.from;
+		this.upperNote = region.to;
 
 		this.bank = bank;
 		this.program = program;
+	}
+
+	private static final class KeyRegion {
+		final int from;
+		final int to;
+		KeyRegion() {
+			this.from = 0;
+			this.to = 1024;
+		}
+		KeyRegion(int from, int to) {
+			this.from = from;
+			this.to = to;
+		}
+	}
+
+	private KeyRegion regionFromTo(Instrument inst) {
+		if (inst == null) {
+			return new KeyRegion();
+		}
+
+		int max = Integer.MIN_VALUE;
+		int min = Integer.MAX_VALUE;
+		if (inst instanceof DLSInstrument) {
+			DLSInstrument dlsinst = (DLSInstrument) inst;
+			for (DLSRegion reg : dlsinst.getRegions()) {
+				min = Math.min(min, reg.getKeyfrom());
+				max = Math.max(max, reg.getKeyto());
+			}
+		}
+		if ( (max == Integer.MIN_VALUE) || (min == Integer.MAX_VALUE) ) {
+			return new KeyRegion();
+		}
+		min -= 12;
+		max -= 12;
+		return new KeyRegion(min, max);
 	}
 
 	@Override
@@ -156,7 +183,7 @@ public final class InstClass {
 			String originalName = inst.getName();
 			int bank = inst.getPatch().getBank();
 			int program = inst.getPatch().getProgram();
-			System.out.printf("%d,%d=%s \"%s\"\n", bank, program,  originalName, name);
+			System.out.printf("%d,%d=%s \"%s\"\n", bank, program, originalName, name);
 			if (name != null) {
 				name = ""+program+": "+name;
 				instArray.add(new InstClass( name,
