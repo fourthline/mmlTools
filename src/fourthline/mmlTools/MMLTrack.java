@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 たんらる
+ * Copyright (C) 2013-2017 たんらる
  */
 
 package fourthline.mmlTools;
@@ -196,7 +196,10 @@ public final class MMLTrack implements Serializable {
 			System.err.println(getOriginalMML());
 			throw new UndefinedTickException("Verify error.");
 		}
-		mabiMML.setMMLText(getMMLStrings(true, true));
+		/*
+		 * tailFixはMusicQアップデートで不要になりました. 2017/01/07
+		 */
+		mabiMML.setMMLText(getMMLStrings(false, true));
 		generated = true;
 		return this;
 	}

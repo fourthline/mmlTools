@@ -1,11 +1,12 @@
 /*
- * Copyright (C) 2013-2015 たんらる
+ * Copyright (C) 2013-2017 たんらる
  */
 
 package fourthline.mmlTools;
 
 import static org.junit.Assert.*;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import fourthline.mmlTools.core.MMLTools;
@@ -98,6 +99,7 @@ public class MMLTrackTest {
 	/**
 	 * テンポ変速 途中で切れるタイプのMML補正
 	 */
+	@Ignore // 2017/01/07: MusicQアップデートでtailFix不要.
 	@Test
 	public void testPlayingShortMML() throws Exception {
 		String mml       = "MML@t90cccccccccccct150cccc,eeeeeeeeeeeeeeeedddd,;";
@@ -110,6 +112,7 @@ public class MMLTrackTest {
 	/**
 	 * テンポ変速　終わらないタイプのMML補正
 	 */
+	@Ignore // 2017/01/07: MusicQアップデートでtailFix不要.
 	@Test
 	public void testPlayingLongMML() throws Exception {
 		String mml =       "MML@t150cccccccccccct90cccc,eeeeeeeeeeeeeeee,;";
@@ -122,6 +125,7 @@ public class MMLTrackTest {
 	/**
 	 * テンポ変速　終わらないタイプのMML補正
 	 */
+	@Ignore // 2017/01/07: MusicQアップデートでtailFix不要.
 	@Test
 	public void testPlayingLong2MML() throws Exception {
 		String mml =       "MML@t150cccccccccccct90c,eeeeeeeeeeeeeeee;";
@@ -135,7 +139,8 @@ public class MMLTrackTest {
 	 * テンポを跨ぐ場合の分割Tick-Undefined（最小Tick近似） = Exception
 	 * @throws UndefinedTickException
 	 */
-	@Test(expected=UndefinedTickException.class)
+	@Ignore // 2017/01/07: MusicQアップデートでtailFix不要.
+	@Test
 	public void testGeneric00() throws UndefinedTickException {
 		String mml =       "MML@ggt150gg,rr8r16.a24aa;";
 		String expectMML = "MML@ggt150ggr64,rr8r16.a32&a64aa,;";
@@ -151,7 +156,7 @@ public class MMLTrackTest {
 	public void testTempo_all0() throws Exception {
 		String mml =        "MML@,t150c1c1t120c1c1t130c1c1;";
 		String expectMML1 = "MML@t150l1rrt120rrt130,l1cccccc,;";
-		String expectMML2 = "MML@t150v0l1cct120cct130rrv0c64t150,l1cccccc,;";
+		String expectMML2 = "MML@t150v0l1cct120cct130,l1cccccc,;";
 
 		MMLTrack track = new MMLTrack().setMML(mml);
 		assertEquals(expectMML1, track.generate().getOriginalMML());
@@ -167,7 +172,7 @@ public class MMLTrackTest {
 	public void testTempo_tail0() throws UndefinedTickException {
 		String mml =        "MML@,c2t130&c1.t200r1t180";
 		String expectMML1 = "MML@r2t130l1r.t200rt180,l1c&c,;";
-		String expectMML2 = "MML@v0c2t130r1.,l1c&c,;";
+		String expectMML2 = "MML@v0c2t130,l1c&c,;";
 
 		MMLTrack track = new MMLTrack().setMML(mml);
 		assertEquals(expectMML1, track.generate().getOriginalMML());
