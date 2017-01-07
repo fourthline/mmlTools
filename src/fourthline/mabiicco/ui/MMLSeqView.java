@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 たんらる
+ * Copyright (C) 2013-2017 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -149,7 +149,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 
 	private boolean currentEditMode = true;
 	public void repaint() {
-		boolean editMode = MabiIccoProperties.getInstance().getEnableEdit();
+		boolean editMode = MabiIccoProperties.getInstance().enableEdit.get();
 		if (currentEditMode != editMode) {
 			currentEditMode = editMode;
 			for (int i = 0; i < tabbedPane.getTabCount(); i++) {

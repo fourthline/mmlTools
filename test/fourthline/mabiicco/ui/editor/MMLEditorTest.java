@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 たんらる
+ * Copyright (C) 2015-2017 たんらる
  */
 
 package fourthline.mabiicco.ui.editor;
@@ -37,12 +37,12 @@ public final class MMLEditorTest extends UseLoadingDLS {
 	private static boolean activePartSwitch;
 	@BeforeClass
 	public static void initialize() {
-		activePartSwitch = MabiIccoProperties.getInstance().getActivePartSwitch();
+		activePartSwitch = MabiIccoProperties.getInstance().activePartSwitch.get();
 	}
 
 	@AfterClass
 	public static void cleanup() {
-		MabiIccoProperties.getInstance().setActivePartSwitch( activePartSwitch );
+		MabiIccoProperties.getInstance().activePartSwitch.set( activePartSwitch );
 	}
 
 	private MMLEditor editor;
@@ -431,7 +431,7 @@ public final class MMLEditorTest extends UseLoadingDLS {
 	public void test_selectOtherPartMode() {
 		MMLTrack track = new MMLTrack().setMML("MML@,ccc;");
 		mmlManager.setMMLselectedTrack(track);
-		MabiIccoProperties.getInstance().setActivePartSwitch(true);
+		MabiIccoProperties.getInstance().activePartSwitch.set(true);
 
 		// select
 		MMLNoteEvent note1 = track.getMMLEventAtIndex(1).getMMLNoteEventList().get(2);

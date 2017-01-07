@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 たんらる
+ * Copyright (C) 2013-2017 たんらる
  */
 
 package fourthline.mabiicco.fx;
@@ -82,18 +82,18 @@ public final class PianoRollView {
 	private static final Color borderColor = Color.color(0.6f, 0.6f, 0.6f); // 境界線用
 	private static final Color pitchRangeBorderColor = Color.RED; // pitch range
 	private static final Color keyColors[] = new Color[] {
-		wKeyColor, 
-		bKeyColor, 
-		wKeyColor, 
-		bKeyColor, 
-		wKeyColor, 
-		bKeyColor, 
-		wKeyColor, 
-		wKeyColor, 
-		bKeyColor, 
-		wKeyColor, 
-		bKeyColor, 
-		wKeyColor
+			wKeyColor, 
+			bKeyColor, 
+			wKeyColor, 
+			bKeyColor, 
+			wKeyColor, 
+			bKeyColor, 
+			wKeyColor, 
+			wKeyColor, 
+			bKeyColor, 
+			wKeyColor, 
+			bKeyColor, 
+			wKeyColor
 	};
 	private static final Color noSoundColor = Color.color(0.9f, 0.8f, 0.8f);
 
@@ -264,7 +264,7 @@ public final class PianoRollView {
 			int line = octave*12 + (11-i);
 			Color fillColor = keyColors[i];
 			if ( (line < lowerNote) || (line > upperNote) ) {
-				if (MabiIccoProperties.getInstance().getViewRage()) {
+				if (MabiIccoProperties.getInstance().viewRange.get()) {
 					fillColor = noSoundColor;
 				}
 			}
@@ -282,7 +282,7 @@ public final class PianoRollView {
 	}
 
 	private void paintPitchRangeBorder(GraphicsContext gc) {
-		if (MabiIccoProperties.getInstance().getViewRage()) {
+		if (MabiIccoProperties.getInstance().viewRange.get()) {
 			double width = canvas.getWidth();
 			int y1 = convertNote2Y(lowerNote-1);
 			int y2 = convertNote2Y(upperNote);

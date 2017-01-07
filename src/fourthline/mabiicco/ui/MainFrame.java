@@ -31,9 +31,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.function.Consumer;
 import java.util.function.IntSupplier;
-import java.util.function.Supplier;
 
 import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
@@ -303,13 +301,12 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		JMenu settingMenu = new JMenu(appText("menu.setting"));
 		menuBar.add(settingMenu);
 		createNoteHeightMenu(settingMenu);
-		createCheckMenu(settingMenu, "clickPlayMenu", properties::getEnableClickPlay, properties::setEnableClickPlay);
-		createCheckMenu(settingMenu, "view.marker", properties::getEnableViewMarker, properties::setEnableViewMarker);
-		createCheckMenu(settingMenu, "view.range", properties::getViewRage, properties::setViewRage);
-		createCheckMenu(settingMenu, "view.velocity", properties::getVelocityLine, properties::setVelocityLine);
-		createCheckMenu(settingMenu, "edit.enable", properties::getEnableEdit, properties::setEnableEdit);
-		createCheckMenu(settingMenu, "edit.active_part_switch", properties::getActivePartSwitch, properties::setActivePartSwitch);
-		createCheckMenu(settingMenu, "play.dls_attenuation", properties::getDLSAttenuation, properties::setDLSAttenuation);
+		createCheckMenu(settingMenu, "clickPlayMenu", properties.enableClickPlay);
+		createCheckMenu(settingMenu, "view.marker", properties.enableViewMarker);
+		createCheckMenu(settingMenu, "view.range", properties.viewRange);
+		createCheckMenu(settingMenu, "view.velocity", properties.viewVelocityLine);
+		createCheckMenu(settingMenu, "edit.enable", properties.enableEdit);
+		createCheckMenu(settingMenu, "edit.active_part_switch", properties.activePartSwitch);
 		createMenuItem(settingMenu, "menu.clear_dls", ActionDispatcher.CLEAR_DLS);
 
 		/************************* Help Menu *************************/
@@ -372,15 +369,15 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	 * 有効/無効の設定ボタンを作成します.
 	 * @param settingMenu
 	 */
-	private void createCheckMenu(JMenu settingMenu, String itemName, Supplier<Boolean> getter, Consumer<Boolean> setter) {
+	private void createCheckMenu(JMenu settingMenu, String itemName, MabiIccoProperties.Property<Boolean> property) {
 		JCheckBoxMenuItem clickPlayMenu = new JCheckBoxMenuItem(appText(itemName));
 		settingMenu.add(clickPlayMenu);
 
-		clickPlayMenu.setSelected( getter.get() );
+		clickPlayMenu.setSelected( property.get() );
 
 		clickPlayMenu.addActionListener((e) -> {
-			boolean b = getter.get();
-			setter.accept(!b);
+			boolean b = property.get();
+			property.set(!b);
 			clickPlayMenu.setSelected(!b);
 			if (mmlSeqView != null) {
 				mmlSeqView.repaint();
@@ -492,7 +489,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 			setBounds(rect);
 		}
 
-		if (properties.getWindowMaximize()) {
+		if (properties.windowMaximize.get()) {
 			this.setExtendedState(MAXIMIZED_BOTH);
 		}
 
@@ -503,9 +500,9 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		MabiIccoProperties properties = MabiIccoProperties.getInstance();
 
 		if ( extendedState == MAXIMIZED_BOTH ) {
-			properties.setWindowMaximize(true);
+			properties.windowMaximize.set(true);
 		} else {
-			properties.setWindowMaximize(false);
+			properties.windowMaximize.set(false);
 			properties.setWindowRect(this.getBounds());
 		}
 	}

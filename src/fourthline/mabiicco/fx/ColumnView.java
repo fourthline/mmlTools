@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 たんらる
+ * Copyright (C) 2015-2017 たんらる
  */
 
 package fourthline.mabiicco.fx;
@@ -93,7 +93,7 @@ public final class ColumnView implements IViewTargetMarker {
 	}
 
 	private void paintMarker(GraphicsContext gc) {
-		if (MabiIccoProperties.getInstance().getEnableViewMarker()) {
+		if (MabiIccoProperties.getInstance().enableViewMarker.get()) {
 			MMLScore score = mmlManager.getMMLScore();
 
 			for (Marker marker : score.getMarkerList()) {

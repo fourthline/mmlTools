@@ -19,7 +19,6 @@ import com.sun.media.sound.DLSInstrument;
 import com.sun.media.sound.DLSRegion;
 
 import fourthline.mabiicco.AppErrorHandler;
-import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLNoteEvent;
 import fourthline.mmlTools.MMLScore;
@@ -473,10 +472,6 @@ public final class MabiDLS {
 	 */
 	private int convertVelocityOnAtt(InstClass inst, int note, int velocity) {
 		velocity = inst.getType().convertVelocityMML2Midi(velocity);
-
-		if (!MabiIccoProperties.getInstance().getDLSAttenuation()) {
-			return velocity;
-		}
 		if (velocity == 0) {
 			return 0;
 		}

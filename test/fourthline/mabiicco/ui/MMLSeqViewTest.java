@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 たんらる
+ * Copyright (C) 2015-2017 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -36,13 +36,13 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 	private static boolean viewMarker;
 	@BeforeClass
 	public static void initialize() {
-		viewMarker = MabiIccoProperties.getInstance().getEnableViewMarker();
-		MabiIccoProperties.getInstance().setEnableViewMarker(true);
+		viewMarker = MabiIccoProperties.getInstance().enableViewMarker.get();
+		MabiIccoProperties.getInstance().enableViewMarker.set(true);
 	}
 
 	@AfterClass
 	public static void cleanup() {
-		MabiIccoProperties.getInstance().setEnableViewMarker(viewMarker);
+		MabiIccoProperties.getInstance().enableViewMarker.set(viewMarker);
 	}
 
 	private MMLSeqView obj;

@@ -31,7 +31,7 @@ public final class MabiIccoProperties {
 	private static final String DLS_FILE = "app.dls_file";
 
 	/** ウィンドウ最大化 */
-	private static final String WINDOW_MAXIMIZE = "window.maximize";
+	public final Property<Boolean> windowMaximize = new BooleanProperty("window.maximize", false);
 
 	/** ウィンドウ位置 x座標 */
 	private static final String WINDOW_X = "window.x";
@@ -49,26 +49,22 @@ public final class MabiIccoProperties {
 	private static final String HEIGHT_SCALE = "view.pianoRoll.heightScale";
 
 	/** クリック再生機能の有効/無効 */
-	private static final String ENABLE_CLICK_PLAY = "function.enable_click_play";
+	public final Property<Boolean> enableClickPlay = new BooleanProperty("function.enable_click_play", true);
 
 	/** マーカー表示の有効/無効 */
-	private static final String ENABLE_VIEW_MARKER = "function.enable_view_marker";
+	public final Property<Boolean> enableViewMarker = new BooleanProperty("function.enable_view_marker", true);
 
 	/** 編集モード. 非編集時はアクティブパートなし, MMLのTextPanel非表示. */
-
-	private static final String ENABLE_EDIT = "function.enable_edit";
+	public final Property<Boolean> enableEdit = new BooleanProperty("function.enable_edit", true);
 
 	/** 音源境界 */
-	private static final String VIEW_RANGE = "view.pianoRoll.range";
+	public final Property<Boolean> viewRange = new BooleanProperty("view.pianoRoll.range", true);
 
 	/** 音量線 */
-	private static final String VIEW_VELOCITY_LINE = "view.velocity.line";
+	public final Property<Boolean> viewVelocityLine = new BooleanProperty("view.velocity.line", true);
 
 	/** ノートクリックによるアクティブパート切り替え */
-	private static final String ACTIVE_PART_SWITCH = "function.active_part_switch";
-
-	/** DLS音源のAttenuationを使用する */
-	private static final String DLS_ATTENUATION = "function.dls_attenuation";
+	public final Property<Boolean> activePartSwitch = new BooleanProperty("function.active_part_switch", false);
 
 	/** ファイル履歴 */
 	public static final int MAX_FILE_HISTORY = 8;
@@ -130,16 +126,6 @@ public final class MabiIccoProperties {
 		save();
 	}
 
-	public boolean getWindowMaximize() {
-		String str = properties.getProperty(WINDOW_MAXIMIZE, "false");
-		return Boolean.parseBoolean(str);
-	}
-
-	public void setWindowMaximize(boolean b) {
-		properties.setProperty(WINDOW_MAXIMIZE, Boolean.toString(b));
-		save();
-	}
-
 	public Rectangle getWindowRect() {
 		String x = properties.getProperty(WINDOW_X, "-1");
 		String y = properties.getProperty(WINDOW_Y, "-1");
@@ -179,75 +165,6 @@ public final class MabiIccoProperties {
 		save();
 	}
 
-	public boolean getEnableClickPlay() {
-		String str = properties.getProperty(ENABLE_CLICK_PLAY, "true");
-		return Boolean.parseBoolean(str);
-	}
-
-	public void setEnableClickPlay(boolean b) {
-		properties.setProperty(ENABLE_CLICK_PLAY, Boolean.toString(b));
-		save();
-	}
-
-	public boolean getEnableViewMarker() {
-		String str = properties.getProperty(ENABLE_VIEW_MARKER, "true");
-		return Boolean.parseBoolean(str);
-	}
-
-	public void setEnableViewMarker(boolean b) {
-		properties.setProperty(ENABLE_VIEW_MARKER, Boolean.toString(b));
-		save();
-	}
-
-	public boolean getEnableEdit() {
-		String str = properties.getProperty(ENABLE_EDIT, "true");
-		return Boolean.parseBoolean(str);
-	}
-
-	public void setEnableEdit(boolean b) {
-		properties.setProperty(ENABLE_EDIT, Boolean.toString(b));
-		save();
-	}
-
-	public boolean getViewRage() {
-		String str = properties.getProperty(VIEW_RANGE, "true");
-		return Boolean.parseBoolean(str);
-	}
-
-	public void setViewRage(boolean b) {
-		properties.setProperty(VIEW_RANGE, Boolean.toString(b));
-		save();
-	}
-
-	public boolean getVelocityLine() {
-		String str = properties.getProperty(VIEW_VELOCITY_LINE, "false");
-		return Boolean.parseBoolean(str);
-	}
-
-	public void setVelocityLine(boolean b) {
-		properties.setProperty(VIEW_VELOCITY_LINE, Boolean.toString(b));
-		save();
-	}
-
-	public boolean getActivePartSwitch() {
-		String str = properties.getProperty(ACTIVE_PART_SWITCH, "false");
-		return Boolean.parseBoolean(str);
-	}
-
-	public void setActivePartSwitch(boolean b) {
-		properties.setProperty(ACTIVE_PART_SWITCH, Boolean.toString(b));
-		save();
-	}
-
-	public boolean getDLSAttenuation() {
-		String str = properties.getProperty(DLS_ATTENUATION, "true");
-		return Boolean.parseBoolean(str);
-	}
-
-	public void setDLSAttenuation(boolean b) {
-		properties.setProperty(DLS_ATTENUATION, Boolean.toString(b));
-	}
-
 	private final LinkedList<File> fileHistory = new LinkedList<>();
 	private void initFileHistory() {
 		for (int i = 0; i < MAX_FILE_HISTORY; i++) {
@@ -275,5 +192,32 @@ public final class MabiIccoProperties {
 			properties.setProperty(FILE_HISTORY+i, fileHistory.get(i).getAbsolutePath());
 		}
 		save();
+	}
+
+	public interface Property<T> {
+		public void set(T value);
+		public T get();
+	}
+
+	private final class BooleanProperty implements Property<Boolean> {
+		private final String name;
+		private final String defaultValue;
+
+		private BooleanProperty(String name, boolean defaultValue) {
+			this.name = name;
+			this.defaultValue = Boolean.toString(defaultValue);
+		}
+
+		@Override
+		public void set(Boolean b) {
+			properties.setProperty(name, Boolean.toString(b));
+			save();
+		}
+
+		@Override
+		public Boolean get() {
+			String str = properties.getProperty(name, defaultValue);
+			return Boolean.parseBoolean(str);
+		}
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 たんらる
+ * Copyright (C) 2014-2017 たんらる
  */
 
 package fourthline.mabiicco.ui.editor;
@@ -29,7 +29,7 @@ enum EditMode {
 					context.changeState(AREA).executeEvent(context, e);
 				}
 			} else if (SwingUtilities.isLeftMouseButton(e)) {
-				boolean partSwitch = MabiIccoProperties.getInstance().getActivePartSwitch();
+				boolean partSwitch = MabiIccoProperties.getInstance().activePartSwitch.get();
 				EditMode next = INSERT;
 				if (context.onExistNote(startPoint)) {
 					// ノート上であれば、ノートを選択状態にする. 複数選択判定も.

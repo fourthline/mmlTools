@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 たんらる
+ * Copyright (C) 2013-2017 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -91,7 +91,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 		pianoRollView.paintSequenceLine(g2, getHeight());
 		paintTargetMarker(g2);
 
-		if (MabiIccoProperties.getInstance().getVelocityLine()) {
+		if (MabiIccoProperties.getInstance().viewVelocityLine.get()) {
 			paintVelocityLine(g2);
 		}
 
@@ -132,7 +132,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 	}
 
 	private void paintMarker(Graphics2D g) {
-		if (MabiIccoProperties.getInstance().getEnableViewMarker()) {
+		if (MabiIccoProperties.getInstance().enableViewMarker.get()) {
 			MMLScore score = mmlManager.getMMLScore();
 
 			for (Marker marker : score.getMarkerList()) {
@@ -218,7 +218,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 
 	private void playAllNoteOnTick(int x) {
 		Sequencer sequencer = MabiDLS.getInstance().getSequencer();
-		if (!MabiIccoProperties.getInstance().getEnableClickPlay()) {
+		if (!MabiIccoProperties.getInstance().enableClickPlay.get()) {
 			return;
 		}
 		if (!sequencer.isRunning()) {
