@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 たんらる
+ * Copyright (C) 2015-2017 たんらる
  */
 
 package fourthline.mmlTools.core;
@@ -37,11 +37,10 @@ public final class MMLTickTable {
 	}
 
 	MMLTickTable() {
-		long startTime = System.currentTimeMillis();
+		NanoTime time = NanoTime.start();
 		generateTickTable();
 		generateInvTable();
-		long endTime = System.currentTimeMillis();
-		System.out.println("MMLTickTable " + (endTime - startTime) + "ms");
+		System.out.println("MMLTickTable " + time.ms() + "ms");
 	}
 
 	MMLTickTable(InputStream inputStream) {

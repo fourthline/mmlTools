@@ -38,6 +38,7 @@ import fourthline.mabiicco.ui.editor.MMLTranspose;
 import fourthline.mabiicco.ui.mml.MMLImportPanel;
 import fourthline.mabiicco.ui.mml.MMLScorePropertyPanel;
 import fourthline.mmlTools.MMLScore;
+import fourthline.mmlTools.core.NanoTime;
 import fourthline.mmlTools.parser.IMMLFileParser;
 import fourthline.mmlTools.parser.MMLParseException;
 
@@ -278,6 +279,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	}
 
 	private void openMMLFile(File file) {
+		NanoTime time = NanoTime.start();
 		MMLScore score = fileParse(file);
 		if ( (score != null) && (score.getTrackCount() > 0) ) {
 			mmlSeqView.setMMLScore(score);
@@ -289,6 +291,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			mainFrame.updateFileHistoryMenu();
 			MabiDLS.getInstance().all();
 		}
+		String text = "open "+time.us()+"us";
+		mainFrame.setStatusText(text);
 	}
 
 	private void reloadMMLFileAction() {
@@ -456,7 +460,10 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 
 	public void fileImport(File file) {
 		if (file != null) {
+			NanoTime time = NanoTime.start();
 			MMLScore score = fileParse(file);
+			String text = "import "+time.us()+"us";
+			mainFrame.setStatusText(text);
 			if (score != null) {
 				MabiIccoProperties.getInstance().setRecentFile(file.getPath());
 				new MMLImportPanel(mainFrame, score, mmlSeqView).showDialog();
@@ -536,7 +543,10 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		if (MabiDLS.getInstance().getSequencer().isRunning()) {
 			pauseAction();
 		} else {
+			NanoTime time = NanoTime.start();
 			mmlSeqView.startSequence();
+			String text = "play "+time.us()+"us";
+			mainFrame.setStatusText(text);
 			mainFrame.disableNoplayItems();
 		}
 	}

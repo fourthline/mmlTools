@@ -634,6 +634,10 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		}
 	}
 
+	public void setStatusText(String text) {
+		statusField.setText(text);
+	}
+
 	private void initKeyAction() {
 		createKeyAction("select_paintMode.activePart",
 				KeyStroke.getKeyStroke(KeyEvent.VK_F10, 0),
