@@ -256,6 +256,11 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createMenuItem(editMenu, "menu.removeBeat", ActionDispatcher.REMOVE_BEAT, true);
 		createMenuItem(editMenu, "edit.transpose", ActionDispatcher.TRANSPOSE, true);
 
+		editMenu.add(new JSeparator());
+
+		createMenuItem(editMenu, "edit.allClearTempo", ActionDispatcher.ALL_CLEAR_TEMPO, true);
+		createMenuItem(editMenu, "mml.generate", ActionDispatcher.MML_GENERATE, true);
+
 		/************************* Track Menu *************************/
 		JMenu trackMenu = new JMenu(appText("menu.track"));
 		menuBar.add(trackMenu);
@@ -307,6 +312,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createCheckMenu(settingMenu, "view.velocity", properties.viewVelocityLine);
 		createCheckMenu(settingMenu, "edit.enable", properties.enableEdit);
 		createCheckMenu(settingMenu, "edit.active_part_switch", properties.activePartSwitch);
+		createCheckMenu(settingMenu, "mml.optimize", properties.enableMMLOptimize);
 		createMenuItem(settingMenu, "menu.clear_dls", ActionDispatcher.CLEAR_DLS);
 
 		/************************* Help Menu *************************/

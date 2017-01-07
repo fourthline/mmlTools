@@ -101,6 +101,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String SWITCH_MMLPART_PREV = "switch_mmlpart_prev";
 	@Action public static final String TOGGLE_LOOP = "toggle_loop";
 	@Action public static final String FILE_OPEN_WITH_HISTORY = "file_open_with_history";
+	@Action public static final String ALL_CLEAR_TEMPO = "all_clear_tempo";
+	@Action public static final String MML_GENERATE = "mml_generate";
 
 	private final HashMap<String, Consumer<Object>> actionMap = new HashMap<>();
 
@@ -206,6 +208,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(TOGGLE_LOOP, t -> this.toggleLoop());
 		actionMap.put(CHANGE_NOTE_HEIGHT_INT, t -> this.changeNoteHeight(t));
 		actionMap.put(FILE_OPEN_WITH_HISTORY, t -> this.fileOpenWithHistory(t));
+		actionMap.put(ALL_CLEAR_TEMPO, t -> this.allClearTempo());
+		actionMap.put(MML_GENERATE, t -> mmlSeqView.updateActivePart(true));
 	}
 
 	@Override
@@ -625,6 +629,11 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		MabiDLS dls = MabiDLS.getInstance();
 		dls.setLoop( !dls.isLoop() );
 		mainFrame.updateLoop( dls.isLoop() );
+	}
+
+	private void allClearTempo() {
+		mmlSeqView.getMMLScore().getTempoEventList().clear();
+		mmlSeqView.updateActivePart(true);
 	}
 
 	/**

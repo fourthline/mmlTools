@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 たんらる
+ * Copyright (C) 2015-2017 たんらる
  */
 
 package fourthline.mmlTools.optimizer;
@@ -13,7 +13,13 @@ public final class MMLStringOptimizer {
 
 	private static boolean debug = false;
 
-	public static void setDebug(boolean b) {
+	/** 最適化処理をスキップするオプション */
+	private static boolean optSkip = false;
+	public static void setOptSkip(boolean optSkip) {
+		MMLStringOptimizer.optSkip = optSkip;
+	}
+
+ 	public static void setDebug(boolean b) {
 		debug = b;
 	}
 
@@ -41,6 +47,9 @@ public final class MMLStringOptimizer {
 
 	private String optimize() {
 		String mml = originalMML;
+		if (MMLStringOptimizer.optSkip) {
+			return mml;
+		}
 		Optimizer optimizerList[] = {
 				new OxLxOptimizer(),
 				new BpCmOptimizer(),

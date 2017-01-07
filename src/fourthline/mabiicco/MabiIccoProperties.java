@@ -15,8 +15,10 @@ import java.util.InvalidPropertiesFormatException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+import java.util.function.Consumer;
 
 import fourthline.mabiicco.ui.PianoRollView;
+import fourthline.mmlTools.optimizer.MMLStringOptimizer;
 
 public final class MabiIccoProperties {
 	private final Properties properties = new Properties();
@@ -65,6 +67,9 @@ public final class MabiIccoProperties {
 
 	/** ノートクリックによるアクティブパート切り替え */
 	public final Property<Boolean> activePartSwitch = new BooleanProperty("function.active_part_switch", false);
+
+	/** MML最適化 */
+	public final Property<Boolean> enableMMLOptimize = new BooleanProperty("function.mml_optimize", true, (t) -> MMLStringOptimizer.setOptSkip(!t.booleanValue()));
 
 	/** ファイル履歴 */
 	public static final int MAX_FILE_HISTORY = 8;
@@ -202,22 +207,35 @@ public final class MabiIccoProperties {
 	private final class BooleanProperty implements Property<Boolean> {
 		private final String name;
 		private final String defaultValue;
+		private final Consumer<Boolean> optDo;
 
 		private BooleanProperty(String name, boolean defaultValue) {
+			this(name, defaultValue, null);
+		}
+
+		private BooleanProperty(String name, boolean defaultValue, Consumer<Boolean> optDo) {
 			this.name = name;
 			this.defaultValue = Boolean.toString(defaultValue);
+			this.optDo = optDo;
 		}
 
 		@Override
 		public void set(Boolean b) {
 			properties.setProperty(name, Boolean.toString(b));
 			save();
+			if (optDo != null) {
+				optDo.accept(b);
+			}
 		}
 
 		@Override
 		public Boolean get() {
 			String str = properties.getProperty(name, defaultValue);
-			return Boolean.parseBoolean(str);
+			Boolean value = Boolean.parseBoolean(str);
+			if (optDo != null) {
+				optDo.accept(value);
+			}
+			return value;
 		}
 	}
 }
