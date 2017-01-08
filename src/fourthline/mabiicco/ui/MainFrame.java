@@ -112,6 +112,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		mmlSeqView = new MMLSeqView(this);
 		mmlSeqView.setTimeView(timeView);
 		contentPane.add(mmlSeqView.getPanel(), BorderLayout.CENTER);
+		contentPane.setFocusable(false);
 
 		JToolBar toolBar = createToolBar();
 		toolBar.setFloatable(false);
@@ -123,6 +124,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 
 		statusField = new JTextField();
 		statusField.setEditable(false);
+		statusField.setFocusable(false);
 		southPanel.add(statusField, BorderLayout.SOUTH);
 		statusField.setColumns(10);
 

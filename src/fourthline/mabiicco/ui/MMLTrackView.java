@@ -141,6 +141,7 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 			// パートのテキストフィールド
 			mmlText[i] = new JTextField();
 			mmlText[i].setEditable(false);
+			mmlText[i].setFocusable(false);
 			mmlText[i].setFont(new Font("Monospaced", Font.PLAIN, 12));
 			mmlText[i].setColumns(10);
 			mmlText[i].addMouseListener(new ButtonCombAdapter(partButton[i]));
