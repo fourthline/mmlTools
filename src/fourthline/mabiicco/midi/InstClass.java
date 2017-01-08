@@ -21,6 +21,7 @@ import com.sun.media.sound.DLSRegion;
 
 import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mmlTools.core.ResourceLoader;
+import fourthline.mmlTools.parser.MMLEventParser;
 
 /**
  * 楽器に関する情報を扱います. (instrument.propertiesに対応)
@@ -49,6 +50,12 @@ public final class InstClass {
 			this.type = InstType.NORMAL;
 		}
 		KeyRegion region = regionFromTo(inst);
+		if (str.length > 2) {
+			region.from = Math.max(region.from, MMLEventParser.firstNoteNumber(str[2]));
+		}
+		if (str.length > 3) {
+			region.to = Math.min(region.to, MMLEventParser.firstNoteNumber(str[3]));
+		}
 		this.lowerNote = region.from;
 		this.upperNote = region.to;
 
@@ -57,8 +64,8 @@ public final class InstClass {
 	}
 
 	private static final class KeyRegion {
-		final int from;
-		final int to;
+		int from;
+		int to;
 		KeyRegion() {
 			this.from = 0;
 			this.to = 1024;
