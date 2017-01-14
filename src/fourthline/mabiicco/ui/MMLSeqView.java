@@ -15,6 +15,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import fourthline.mabiicco.ActionDispatcher;
 import fourthline.mabiicco.AppResource;
 import fourthline.mabiicco.IEditState;
 import fourthline.mabiicco.IFileState;
@@ -34,6 +35,7 @@ import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTempoEvent;
 import fourthline.mmlTools.MMLTrack;
 import fourthline.mmlTools.core.MMLTicks;
+import fourthline.mmlTools.core.NanoTime;
 import fourthline.mmlTools.core.UndefinedTickException;
 
 import java.awt.BorderLayout;
@@ -667,6 +669,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 
 	@Override
 	public void updateActivePart(boolean generate) {
+		NanoTime time = NanoTime.start();
 		if (generate) {
 			try {
 				mmlScore.generateAll();
@@ -682,6 +685,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		}
 
 		updateAllMMLPart();
+		ActionDispatcher.getInstance().showTime("update", time);
 	}
 
 	private void updateAllMMLPart() {

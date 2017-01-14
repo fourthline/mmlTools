@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 たんらる
+ * Copyright (C) 2014-2017 たんらる
  */
 
 package fourthline.mabiicco;
@@ -291,8 +291,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			mainFrame.updateFileHistoryMenu();
 			MabiDLS.getInstance().all();
 		}
-		String text = "open "+time.us()+"us";
-		mainFrame.setStatusText(text);
+		showTime("open", time);
 	}
 
 	private void reloadMMLFileAction() {
@@ -462,8 +461,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		if (file != null) {
 			NanoTime time = NanoTime.start();
 			MMLScore score = fileParse(file);
-			String text = "import "+time.us()+"us";
-			mainFrame.setStatusText(text);
+			showTime("import", time);
 			if (score != null) {
 				MabiIccoProperties.getInstance().setRecentFile(file.getPath());
 				new MMLImportPanel(mainFrame, score, mmlSeqView).showDialog();
@@ -545,8 +543,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		} else {
 			NanoTime time = NanoTime.start();
 			mmlSeqView.startSequence();
-			String text = "play "+time.us()+"us";
-			mainFrame.setStatusText(text);
+			showTime("play", time);
 			mainFrame.disableNoplayItems();
 		}
 	}
@@ -701,5 +698,12 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			printStream.println(data);
 			printStream.close();
 		} catch (IOException e) {}
+	}
+
+	public void showTime(String name, NanoTime time) {
+		if (mainFrame != null) {
+			String text = name+" "+time.ms()+"ms";
+			mainFrame.setStatusText(text);
+		}
 	}
 }

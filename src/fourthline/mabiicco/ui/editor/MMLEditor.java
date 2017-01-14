@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 たんらる
+ * Copyright (C) 2013-2017 たんらる
  */
 
 package fourthline.mabiicco.ui.editor;
@@ -54,6 +54,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	private final IMMLManager mmlManager;
 
 	private final JPopupMenu popupMenu = new JPopupMenu();
+	private final VelocityChangeMenu velocityChangeMenu;
 
 	private final Frame parentFrame;
 
@@ -65,6 +66,12 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 
 		pianoRoll.setSelectNote(selectedNote);
 
+		velocityChangeMenu = new VelocityChangeMenu(popupMenu,
+				() -> popupTargetNote.getVelocity(),
+				t -> {
+					mmlManager.getActiveMMLPart().setVelocityCommand(popupTargetNote, t);
+					mmlManager.updateActivePart(true);
+				});
 		newPopupMenu(AppResource.appText("part_change"), ActionDispatcher.PART_CHANGE);
 		newPopupMenu(AppResource.appText("edit.select_previous_all"), ActionDispatcher.SELECT_PREVIOUS_ALL);
 		newPopupMenu(AppResource.appText("edit.select_after_all"), ActionDispatcher.SELECT_AFTER_ALL);
@@ -634,6 +641,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 			return;
 		}
 		popupTargetNote = editEventList.searchOnTickOffset(tickOffset);
+		velocityChangeMenu.setValue(popupTargetNote.getVelocity());
 
 		if (hasSelectedNote()) {
 			try {
