@@ -293,8 +293,10 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	 */
 	public void startSequence() {
 		new Thread(() -> {
+			NanoTime time = NanoTime.start();
 			long startTick = pianoRollView.getSequencePosition();
 			MabiDLS.getInstance().createSequenceAndStart(mmlScore, startTick);
+			ActionDispatcher.getInstance().showTime("play", time);
 		}).start();
 	}
 

@@ -541,9 +541,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		if (MabiDLS.getInstance().getSequencer().isRunning()) {
 			pauseAction();
 		} else {
-			NanoTime time = NanoTime.start();
 			mmlSeqView.startSequence();
-			showTime("play", time);
 			mainFrame.disableNoplayItems();
 		}
 	}
