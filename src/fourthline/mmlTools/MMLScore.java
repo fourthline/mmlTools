@@ -221,6 +221,15 @@ public final class MMLScore implements IMMLFileParser {
 		return (int)tick;
 	}
 
+	/**
+	 * @return　(ms)
+	 */
+	public long getTotalTime() {
+		int totalTick = getTotalTickLength();
+		long totalTime = MMLTempoEvent.getTimeOnTickOffset(globalTempoList, totalTick);
+		return totalTime;
+	}
+
 	public byte[] getObjectState() {
 		ByteArrayOutputStream ostream = new ByteArrayOutputStream();
 		writeToOutputStream(ostream);

@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiUnavailableException;
+import javax.sound.sampled.LineUnavailableException;
 
 import org.junit.BeforeClass;
 
@@ -24,7 +25,7 @@ abstract public class UseLoadingDLS {
 				midi.initializeMIDI();
 				midi.loadingDLSFile(new File(MabiDLS.DEFALUT_DLS_PATH));
 			}
-		} catch (IOException | MidiUnavailableException | InvalidMidiDataException e) {
+		} catch (IOException | MidiUnavailableException | InvalidMidiDataException | LineUnavailableException e) {
 			throw new AssertionError();
 		}
 	}

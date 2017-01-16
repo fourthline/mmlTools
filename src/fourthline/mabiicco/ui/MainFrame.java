@@ -210,6 +210,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 
 		createMenuItem(fileMenu, "mml.input.import", ActionDispatcher.FILE_IMPORT, true);
 		createMenuItem(fileMenu, "menu.midiExport", ActionDispatcher.MIDI_EXPORT);
+		createMenuItem(fileMenu, "wavout", ActionDispatcher.WAVOUT, true);
 		createMenuItem(fileMenu, "menu.scoreProperty", ActionDispatcher.SCORE_PROPERTY);
 
 		fileMenu.add(new JSeparator());

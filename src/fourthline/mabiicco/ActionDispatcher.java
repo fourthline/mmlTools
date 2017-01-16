@@ -34,6 +34,7 @@ import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.About;
 import fourthline.mabiicco.ui.MMLSeqView;
 import fourthline.mabiicco.ui.MainFrame;
+import fourthline.mabiicco.ui.WavoutPanel;
 import fourthline.mabiicco.ui.editor.MMLTranspose;
 import fourthline.mabiicco.ui.mml.MMLImportPanel;
 import fourthline.mabiicco.ui.mml.MMLScorePropertyPanel;
@@ -104,6 +105,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String FILE_OPEN_WITH_HISTORY = "file_open_with_history";
 	@Action public static final String ALL_CLEAR_TEMPO = "all_clear_tempo";
 	@Action public static final String MML_GENERATE = "mml_generate";
+	@Action public static final String WAVOUT = "wavout";
 
 	private final HashMap<String, Consumer<Object>> actionMap = new HashMap<>();
 
@@ -114,10 +116,12 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	private final FileFilter mmlFilter = new FileNameExtensionFilter(AppResource.appText("file.mml"), "mml");
 	private final FileFilter allFilter = new FileNameExtensionFilter(AppResource.appText("file.all"), "mmi", "mms", "mml");
 	private final FileFilter midFilter = new FileNameExtensionFilter(AppResource.appText("file.mid"), "mid");
+	private final FileFilter wavFilter = new FileNameExtensionFilter(AppResource.appText("file.wav"), "wav");
 
 	private final JFileChooser openFileChooser;
 	private final JFileChooser saveFileChooser;
 	private final JFileChooser exportFileChooser;
+	private final JFileChooser wavoutFileChooser;
 
 	private static ActionDispatcher instance = null;
 	public static ActionDispatcher getInstance() {
@@ -131,6 +135,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		openFileChooser = MabiIcco.createFileChooser();
 		saveFileChooser = MabiIcco.createFileChooser();
 		exportFileChooser = MabiIcco.createFileChooser();
+		wavoutFileChooser = MabiIcco.createFileChooser();
 	}
 
 	public ActionDispatcher setMainFrame(MainFrame mainFrame) {
@@ -157,6 +162,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		openFileChooser.addChoosableFileFilter(mmlFilter);
 		saveFileChooser.addChoosableFileFilter(mmiFilter);
 		exportFileChooser.addChoosableFileFilter(midFilter);
+		wavoutFileChooser.addChoosableFileFilter(wavFilter);
 	}
 
 	private void initializeActionMap() {
@@ -211,6 +217,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(FILE_OPEN_WITH_HISTORY, t -> this.fileOpenWithHistory(t));
 		actionMap.put(ALL_CLEAR_TEMPO, t -> this.allClearTempo());
 		actionMap.put(MML_GENERATE, t -> mmlSeqView.updateActivePart(true));
+		actionMap.put(WAVOUT, t -> this.startWavOutAction());
 	}
 
 	@Override
@@ -408,7 +415,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			status = JOptionPane.YES_OPTION;
 			if (file.exists()) {
 				// すでにファイルが存在する場合の上書き警告表示.
-				status = JOptionPane.showConfirmDialog(mainFrame, AppResource.appText("message.override"), AppResource.getAppTitle(), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+				status = JOptionPane.showConfirmDialog(mainFrame, AppResource.appText("message.override")+"\n"+file.getName(), AppResource.getAppTitle(), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 			}
 			if (status == JOptionPane.YES_OPTION) {
 				return file;
@@ -446,6 +453,17 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			} catch (IOException | InvalidMidiDataException e) {
 				JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
 			}
+		}
+	}
+
+	/**
+	 * Wavファイル出力
+	 */
+	private void startWavOutAction() {
+		File file = showSaveDialog(wavoutFileChooser, "wav");
+
+		if (file != null) {
+			new WavoutPanel(mainFrame, mmlSeqView, file).showDialog();
 		}
 	}
 
@@ -698,10 +716,14 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		} catch (IOException e) {}
 	}
 
-	public void showTime(String name, NanoTime time) {
+	public void showTime(String name, long ms) {
 		if (mainFrame != null) {
-			String text = name+" "+time.ms()+"ms";
+			String text = name+" "+ms+"ms";
 			mainFrame.setStatusText(text);
 		}
+	}
+
+	public void showTime(String name, NanoTime time) {
+		showTime(name, time.ms());
 	}
 }

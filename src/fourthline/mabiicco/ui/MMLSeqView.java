@@ -817,8 +817,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		long position = pianoRollView.getSequencePlayPosition();
 		List<MMLTempoEvent> tempoList = mmlScore.getTempoEventList();
 		long time = MMLTempoEvent.getTimeOnTickOffset(tempoList, (int)position);
-		int totalTick = mmlScore.getTotalTickLength();
-		long totalTime = MMLTempoEvent.getTimeOnTickOffset(tempoList, totalTick);
+		long totalTime = mmlScore.getTotalTime();
 		int tempo = MMLTempoEvent.searchOnTick(tempoList, (int)position);
 
 		String str = String.format("time %d:%02d.%d/%d:%02d.%d (t%d)", 

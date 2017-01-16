@@ -5,6 +5,8 @@
 package fourthline.mabiicco.midi;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.FileSystems;
@@ -14,9 +16,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.sound.midi.*;
+import javax.sound.sampled.LineUnavailableException;
 
 import com.sun.media.sound.DLSInstrument;
 import com.sun.media.sound.DLSRegion;
+import com.sun.media.sound.SoftSynthesizer;
 
 import fourthline.mabiicco.AppErrorHandler;
 import fourthline.mmlTools.MMLEventList;
@@ -44,6 +48,7 @@ public final class MabiDLS {
 
 	private ArrayList<Runnable> notifier = new ArrayList<>();
 	private boolean muteState[] = new boolean[ MAX_MIDI_PART ];
+	private WavoutDataLine wavout;
 
 	public static MabiDLS getInstance() {
 		if (instance == null) {
@@ -57,9 +62,10 @@ public final class MabiDLS {
 	/**
 	 * initialize
 	 */
-	public void initializeMIDI() throws MidiUnavailableException, InvalidMidiDataException, IOException {
+	public void initializeMIDI() throws MidiUnavailableException, InvalidMidiDataException, IOException, LineUnavailableException {
 		this.synthesizer = MidiSystem.getSynthesizer();
-		this.synthesizer.open();
+		((SoftSynthesizer)this.synthesizer).open(wavout = new WavoutDataLine(), null);
+		addTrackEndNotifier(() -> wavout.stopRec());
 
 		long latency = this.synthesizer.getLatency();
 		int maxPolyphony = this.synthesizer.getMaxPolyphony();
@@ -117,7 +123,28 @@ public final class MabiDLS {
 			this.startTick = startTick;
 			this.startTempo = mmlScore.getTempoOnTick(startTick);
 			sequenceStart();
-		} catch (InvalidMidiDataException e) {}
+		} catch (InvalidMidiDataException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public IWavoutState getWavout() {
+		return wavout;
+	}
+
+	public void startWavout(MMLScore mmlScore, File outFile, Runnable endNotify) {
+		createSequenceAndStart(mmlScore, 0);
+		try {
+			wavout.startRec(new FileOutputStream(outFile), endNotify);
+		} catch (FileNotFoundException e) {
+			wavout.stopRec();
+			e.printStackTrace();
+		}
+	}
+
+	public void stopWavout() {
+		wavout.stopRec();
+		sequencer.stop();
 	}
 
 	private void allNoteOff() {
