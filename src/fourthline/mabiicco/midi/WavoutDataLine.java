@@ -50,7 +50,6 @@ public final class WavoutDataLine implements SourceDataLine, IWavoutState {
 	public void startRec(OutputStream outputStream, Runnable endNotify) {
 		try {
 			tempFile = new File("wavout_"+(int)(Math.random()*100)+".raw");
-			tempFile.deleteOnExit();
 			System.out.println("startRec:" + tempFile);
 			tempOutputStream = new BufferedOutputStream(new FileOutputStream(tempFile));
 			this.rec = true;
@@ -207,6 +206,7 @@ public final class WavoutDataLine implements SourceDataLine, IWavoutState {
 					long size = tempFile.length()/format.getFrameSize();
 					AudioInputStream in = new AudioInputStream(new FileInputStream(tempFile), format, size);
 					AudioSystem.write(in, AudioFileFormat.Type.WAVE, outputStream);
+					in.close();
 					tempFile.delete();
 					System.out.println("stopRec: "+size);
 				} catch (IOException e) {
