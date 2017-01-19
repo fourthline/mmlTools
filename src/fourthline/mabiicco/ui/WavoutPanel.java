@@ -73,14 +73,11 @@ public final class WavoutPanel extends JPanel {
 		parentFrame.disableNoplayItems();
 		MabiDLS.getInstance().startWavout(mmlManager.getMMLScore(), file, this::stopWavout);
 		new Thread(() -> {
-			while (true) {
+			while (run) {
 				try {
 					Thread.sleep(1000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
-				}
-				if (!run) {
-					break;
 				}
 				int len = (int) MabiDLS.getInstance().getWavout().getLen();
 				progress.setValue(len);
@@ -100,10 +97,12 @@ public final class WavoutPanel extends JPanel {
 	}
 
 	private void stopWavout() {
-		run = false;
 		parentFrame.enableNoplayItems();
 		MabiDLS.getInstance().stopWavout();
 		dialog.setVisible(false);
-		ActionDispatcher.getInstance().showTime("wavout", MabiDLS.getInstance().getWavout().getTime());
+		if (run) {
+			ActionDispatcher.getInstance().showTime("wavout", MabiDLS.getInstance().getWavout().getTime());
+		}
+		run = false;
 	}
 }
