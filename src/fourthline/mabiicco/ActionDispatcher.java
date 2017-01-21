@@ -160,6 +160,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		openFileChooser.addChoosableFileFilter(mmiFilter);
 		openFileChooser.addChoosableFileFilter(mmsFilter);
 		openFileChooser.addChoosableFileFilter(mmlFilter);
+		openFileChooser.addChoosableFileFilter(midFilter);
 		saveFileChooser.addChoosableFileFilter(mmiFilter);
 		exportFileChooser.addChoosableFileFilter(midFilter);
 		wavoutFileChooser.addChoosableFileFilter(wavFilter);

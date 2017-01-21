@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 たんらる
+ * Copyright (C) 2013-2017 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -111,7 +111,7 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 		northLPanel.add(comboBox);
 		comboBox.addActionListener(this);
 		comboBox.setMaximumRowCount(30);
-		comboBox.setPreferredSize(new Dimension(140, 20));
+		comboBox.setPreferredSize(new Dimension(200, 20));
 		northLPanel.add(songComboBox);
 		songComboBox.addActionListener(this);
 		songComboBox.setMaximumRowCount(30);
