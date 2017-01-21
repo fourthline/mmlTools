@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 たんらる
+ * Copyright (C) 2013-2017 たんらる
  */
 
 package fourthline.mmlTools;
@@ -230,6 +230,31 @@ public final class MMLScore implements IMMLFileParser {
 		return totalTime;
 	}
 
+	private String getTempoObj() {
+		if (globalTempoList.size() == 0) {
+			return "";
+		}
+		StringBuffer sb = new StringBuffer();
+		for (MMLTempoEvent t : globalTempoList) {
+			sb.append(',');
+			sb.append(t.toString());
+		}
+		return sb.substring(1);
+	}
+
+	private void putTempoObj(String s) {
+		if (s.length() > 0) {
+			String l[] = s.split(",");
+			globalTempoList.clear();
+			for (String str : l) {
+				MMLTempoEvent e = MMLTempoEvent.fromString(str);
+				if (e != null) {
+					e.appendToListElement(globalTempoList);
+				}
+			}
+		}
+	}
+
 	public byte[] getObjectState() {
 		ByteArrayOutputStream ostream = new ByteArrayOutputStream();
 		writeToOutputStream(ostream);
@@ -254,6 +279,7 @@ public final class MMLScore implements IMMLFileParser {
 			stream.println("title="+getTitle());
 			stream.println("author="+getAuthor());
 			stream.println("time="+getBaseTime());
+			stream.println("tempo="+getTempoObj());
 
 			for (MMLTrack track : trackList) {
 				stream.println("mml-track="+track.getOriginalMML());
@@ -342,6 +368,7 @@ public final class MMLScore implements IMMLFileParser {
 		.pattern("title=",       this::setTitle )
 		.pattern("author=",      this::setAuthor )
 		.pattern("time=",        this::setBaseTime )
+		.pattern("tempo=",       this::putTempoObj )
 		.parse();
 	}
 

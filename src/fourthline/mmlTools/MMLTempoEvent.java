@@ -43,7 +43,22 @@ public final class MMLTempoEvent extends MMLEvent implements Cloneable {
 
 	@Override
 	public String toString() {
-		return "[Tempo] " + tempo;
+		return getTickOffset()+"T" + tempo;
+	}
+
+	/**
+	 * toString() でつくった文字列からオブジェクトを生成する.
+	 * @param str
+	 */
+	public static MMLTempoEvent fromString(String str) {
+		if ((str == null) || (str.length() == 0)) {
+			return null;
+		}
+		String s[] = str.split("T");
+		if (s.length != 2) {
+			return null;
+		}
+		return new MMLTempoEvent(Integer.parseInt(s[1]), Integer.parseInt(s[0]));
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 たんらる
+ * Copyright (C) 2013-2017 たんらる
  */
 
 package fourthline.mmlTools;
@@ -76,5 +76,16 @@ public class MMLTempoEventTest {
 		long expect = 0;
 
 		checkGetTimeOnTickTest(mml, expect);
+	}
+
+	@Test
+	public void test_fromString() {
+		MMLTempoEvent t1 = new MMLTempoEvent(140, 192);
+		String str = t1.toString();
+		System.out.println(str);
+		MMLTempoEvent t2 = MMLTempoEvent.fromString(str);
+		System.out.println(t1);
+		System.out.println(t2);
+		assertEquals(true, t1.equals(t2));
 	}
 }

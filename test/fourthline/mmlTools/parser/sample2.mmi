@@ -3,6 +3,7 @@ version=1
 title=test2
 author=tester
 time=4/4
+tempo=
 mml-track=MML@cde,r2.fga,;
 name=Track1
 program=0

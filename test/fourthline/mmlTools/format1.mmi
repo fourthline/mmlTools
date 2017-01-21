@@ -3,6 +3,7 @@ version=1
 title=
 author=
 time=4/4
+tempo=96T150,192T120
 mml-track=MML@at150at120a1,bbb,ccc,dt150dt120&d2.;
 name=track1
 program=0

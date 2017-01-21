@@ -3,6 +3,7 @@ version=1
 title=test
 author=noname
 time=3/4
+tempo=
 mml-track=MML@cdefgab>c2,,;
 name=メインパート
 program=5

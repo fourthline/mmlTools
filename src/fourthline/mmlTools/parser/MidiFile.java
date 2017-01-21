@@ -22,6 +22,7 @@ import fourthline.mmlTools.MMLTrack;
 import fourthline.mmlTools.core.MMLTickTable;
 import fourthline.mmlTools.core.MMLTicks;
 import fourthline.mmlTools.core.UndefinedTickException;
+import fourthline.mmlTools.optimizer.MMLStringOptimizer;
 
 
 /**
@@ -126,7 +127,7 @@ public final class MidiFile implements IMMLFileParser {
 				String mml[] = new String[3];
 				for (int i = 0; i < mml.length; i++) {
 					if (!eventList.isEmpty()) {
-						mml[i] = eventList.get(0).toMMLString(false, false);
+						mml[i] = new MMLStringOptimizer(eventList.get(0).toMMLString(false, false)).toString();
 						eventList.remove(0);
 					} else {
 						mml[i] = "";

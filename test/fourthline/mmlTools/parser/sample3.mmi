@@ -3,6 +3,7 @@ version=1
 title=
 author=
 time=4/4
+tempo=
 mml-track=MML@,,,aaa;
 name=Track1
 program=120
