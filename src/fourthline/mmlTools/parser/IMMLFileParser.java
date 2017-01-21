@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 たんらる
+ * Copyright (C) 2013-2017 たんらる
  */
 
 package fourthline.mmlTools.parser;
@@ -17,10 +17,13 @@ public interface IMMLFileParser {
 
 	public static IMMLFileParser getParser(File file) {
 		IMMLFileParser fileParser;
-		if (file.toString().endsWith(".mms")) {
+		String suffix = file.toString().toLowerCase();
+		if (suffix.endsWith(".mms")) {
 			fileParser = new MMSFile();
-		} else if (file.toString().endsWith(".mml")) {
+		} else if (suffix.endsWith(".mml")) {
 			fileParser = new MMLFile();
+		} else if (suffix.endsWith(".mid")) {
+			fileParser = new MidiFile();
 		} else {
 			fileParser = new MMLScore();
 		}

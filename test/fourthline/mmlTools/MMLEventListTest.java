@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 たんらる
+ * Copyright (C) 2013-2017 たんらる
  */
 
 package fourthline.mmlTools;
@@ -682,5 +682,21 @@ public class MMLEventListTest {
 	public void testParse_m1() throws UndefinedTickException {
 		MMLEventList eventList1 = new MMLEventList("o0c-");
 		assertEquals("<<<<c-4", eventList1.toMMLString());
+	}
+
+	@Test
+	public void testOverlap() {
+		MMLEventList eventList = new MMLEventList("crc");
+		MMLNoteEvent e1 = new MMLEventList("rc").getMMLNoteEventList().get(0);
+		assertEquals(false, eventList.isOverlapNote(e1));
+
+		e1.setTickOffset(e1.getTickOffset()-1);
+		assertEquals(true, eventList.isOverlapNote(e1));
+
+		e1.setTickOffset(e1.getTickOffset()+2);
+		assertEquals(true, eventList.isOverlapNote(e1));
+
+		e1.setTick(e1.getTick()-1);
+		assertEquals(false, eventList.isOverlapNote(e1));
 	}
 }

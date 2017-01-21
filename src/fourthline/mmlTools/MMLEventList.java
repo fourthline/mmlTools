@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 たんらる
+ * Copyright (C) 2013-2017 たんらる
  */
 
 package fourthline.mmlTools;
@@ -186,6 +186,34 @@ public final class MMLEventList implements Serializable, Cloneable {
 				break;
 			}
 		}
+	}
+
+	/**
+	 * リスト中のノートイベントに重複しているかを判定します.
+	 * @param noteEvent  判定するノートイベント.
+	 * @return 重複している場合は trueを返します.
+	 */
+	public boolean isOverlapNote(MMLNoteEvent noteEvent) {
+		int i;
+		for (i = 0; i < noteList.size(); i++) {
+			MMLNoteEvent e = noteList.get(i);
+			if (noteEvent.getTickOffset() < e.getEndTick()) {
+				if (noteEvent.getTickOffset() >= e.getTickOffset()) {
+					return true;
+				}
+				break;
+			}
+		}
+		for (i = 0; i < noteList.size(); i++) {
+			MMLNoteEvent e = noteList.get(i);
+			if (noteEvent.getEndTick() <= e.getEndTick()) {
+				if (noteEvent.getEndTick()-1 >= e.getTickOffset()) {
+					return true;
+				}
+				break;
+			}
+		}
+		return false;
 	}
 
 	/**
