@@ -179,8 +179,8 @@ public final class MidiFile implements IMMLFileParser {
 	 */
 	private void parseMetaMessage(MetaMessage msg, long tick, TrackInfo trackInfo) {
 		System.out.print(tick+" > ");
-		int type = ((MetaMessage) msg).getType();
-		byte[] data = ((MetaMessage) msg).getData();
+		int type = msg.getType();
+		byte[] data = msg.getData();
 		switch (type) {
 		case MMLTempoEvent.META: // テンポ
 			ByteBuffer buf = ByteBuffer.allocate(4);
@@ -238,8 +238,8 @@ public final class MidiFile implements IMMLFileParser {
 					MMLNoteEvent noteEvent = new MMLNoteEvent(note, 0, (int)tick, velocity);
 					activeNoteMap.put(note, noteEvent);
 					curNoteList.add(noteEvent);
-					break;
 				}
+				break;
 			}
 		case ShortMessage.NOTE_OFF:
 			int note = data1 - 12;
