@@ -114,7 +114,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	private final FileFilter mmsFilter = new FileNameExtensionFilter(AppResource.appText("file.mms"), "mms");
 	private final FileFilter mmiFilter = new FileNameExtensionFilter(AppResource.appText("file.mmi"), "mmi");
 	private final FileFilter mmlFilter = new FileNameExtensionFilter(AppResource.appText("file.mml"), "mml");
-	private final FileFilter allFilter = new FileNameExtensionFilter(AppResource.appText("file.all"), "mmi", "mms", "mml");
+	private final FileFilter allFilter = new FileNameExtensionFilter(AppResource.appText("file.all"), "mmi", "mms", "mml", "mid");
 	private final FileFilter midFilter = new FileNameExtensionFilter(AppResource.appText("file.mid"), "mid");
 	private final FileFilter wavFilter = new FileNameExtensionFilter(AppResource.appText("file.wav"), "wav");
 
@@ -527,7 +527,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 
 	private boolean isSupportedSaveFile() {
 		if (openedFile != null) {
-			if (openedFile.getName().endsWith(".mmi")) {
+			if (openedFile.getName().toLowerCase().endsWith(".mmi")) {
 				return true;
 			}
 		}
