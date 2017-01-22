@@ -53,7 +53,11 @@ public final class MidiFile implements IMMLFileParser {
 		}
 
 		score.getTempoEventList().addAll(tempoList);
-		return score;
+		try {
+			return score.generateAll();
+		} catch (UndefinedTickException e) {
+			return score;
+		}
 	}
 
 	private HashMap<Integer, MMLNoteEvent> activeNoteMap = new HashMap<>();
@@ -109,11 +113,11 @@ public final class MidiFile implements IMMLFileParser {
 		ArrayList<MMLEventList> mmlEventList = createMMLEventList();
 
 		// MMLEventListのリストを使ってトラックを生成.
-		createMMLTrack(mmlEventList, trackInfo);
 		System.out.printf(" ###### track tick: %d %d => %d\n",
 				activeNoteMap.size(),
 				curNoteList.size(),
 				mmlEventList.size());
+		createMMLTrack(mmlEventList, trackInfo);
 	}
 
 	/**
@@ -188,8 +192,8 @@ public final class MidiFile implements IMMLFileParser {
 			break;
 		case 3: // シーケンス名/トラック名
 			String name = new String(data);
-			trackInfo.name = name;
 			System.out.println("Name: "+name);
+			break;
 		case 1: // テキストイベント
 		case 2: // 著作権表示
 		case 4: // 楽器名

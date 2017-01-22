@@ -380,9 +380,12 @@ public final class MMLScore implements IMMLFileParser {
 		markerList.clear();
 		for (String s : contents.split("\n")) {
 			// <tickOffset>=<name>
-			String tickString = s.substring(0, s.indexOf('='));
-			String name = s.substring(s.indexOf('=')+1);
-			markerList.add( new Marker(name, Integer.parseInt(tickString)) );
+			int index = s.indexOf('=');
+			if (index > 0) {
+				String tickString = s.substring(0, index);
+				String name = s.substring(index+1);
+				markerList.add( new Marker(name, Integer.parseInt(tickString)) );
+			}
 		}
 	}
 
