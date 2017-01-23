@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 たんらる
+ * Copyright (C) 2013-2017 たんらる
  */
 
 package fourthline.mmlTools.core;
@@ -35,14 +35,19 @@ public final class MMLTicks {
 		return tickTable.getTable().get(str);
 	}
 
+	private static Integer minimum = null;
 	public static int minimumTick() {
-		Integer minimum = null;
-		for (Integer i : tickTable.getTable().values()) {
-			if ( (minimum == null) || (i < minimum) ) {
-				minimum = i;
-			}
+		if (minimum != null) {
+			return minimum;
 		}
 
+		Integer v = null;
+		for (Integer i : tickTable.getTable().values()) {
+			if ( (v == null) || (i < v) ) {
+				v = i;
+			}
+		}
+		minimum = v;
 		return minimum;
 	}
 

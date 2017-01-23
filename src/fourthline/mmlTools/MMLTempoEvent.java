@@ -20,7 +20,7 @@ public final class MMLTempoEvent extends MMLEvent implements Cloneable {
 
 	public MMLTempoEvent(int tempo, int tickOffset) throws IllegalArgumentException {
 		super(tickOffset);
-		if ( (tempo <= 0) || (tempo > 255) ) {
+		if (tempo <= 0) {
 			throw new IllegalArgumentException("tempo "+tempo);
 		}
 		this.tempo = tempo;

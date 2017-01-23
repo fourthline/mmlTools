@@ -245,7 +245,11 @@ public final class MidiFile implements IMMLFileParser {
 			int note = data1 - 12;
 			MMLNoteEvent noteEvent = activeNoteMap.get(note);
 			if (noteEvent != null) {
-				noteEvent.setTick( (int) (tick - noteEvent.getTickOffset()) );
+				tick -= noteEvent.getTickOffset();
+				if (tick < MMLTicks.minimumTick()) {
+					tick = MMLTicks.minimumTick();
+				}
+				noteEvent.setTick( (int)tick );
 				activeNoteMap.remove(note);
 			}
 			break;
