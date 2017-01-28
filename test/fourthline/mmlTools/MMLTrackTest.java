@@ -199,6 +199,7 @@ public class MMLTrackTest {
 		assertFalse( track1.equals(track7) );
 		assertFalse( track1.equals(track8) );
 		assertTrue( track8.equals(track9) );
+		assertFalse( track1.equals("") );
 	}
 
 	@Test

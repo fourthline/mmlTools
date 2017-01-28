@@ -79,6 +79,17 @@ public class MMLTempoEventTest {
 	}
 
 	@Test
+	public void test_staticFunc() {
+		MMLTempoEvent t0 = new MMLTempoEvent(120, 0);
+		ArrayList<MMLTempoEvent> tempoList = new ArrayList<>();
+		tempoList.add(new MMLTempoEvent(90, 96));
+
+		assertEquals(96, MMLTempoEvent.getTickOffsetOnTime(tempoList, 500));
+		assertEquals(120, MMLTempoEvent.searchOnTick(tempoList, 0));
+		assertTrue(t0.equals(MMLTempoEvent.getMaxTempoEvent(tempoList)));
+	}
+
+	@Test
 	public void test_fromString() {
 		MMLTempoEvent t1 = new MMLTempoEvent(140, 192);
 		String str = t1.toString();
@@ -87,5 +98,32 @@ public class MMLTempoEventTest {
 		System.out.println(t1);
 		System.out.println(t2);
 		assertEquals(true, t1.equals(t2));
+	}
+
+	@Test
+	public void test_searchEqualsTick() {
+		ArrayList<MMLTempoEvent> tempoList = new ArrayList<>();
+		tempoList.add(new MMLTempoEvent(90, 96));
+		tempoList.add(new MMLTempoEvent(150, 192));
+
+		assertFalse(MMLTempoEvent.searchEqualsTick(tempoList, 95));
+		assertTrue (MMLTempoEvent.searchEqualsTick(tempoList, 96));
+		assertFalse(MMLTempoEvent.searchEqualsTick(tempoList, 97));
+		assertFalse(MMLTempoEvent.searchEqualsTick(tempoList, 191));
+		assertTrue (MMLTempoEvent.searchEqualsTick(tempoList, 192));
+		assertFalse(MMLTempoEvent.searchEqualsTick(tempoList, 193));
+	}
+
+	@Test
+	public void test_equals() {
+		MMLTempoEvent t1 = new MMLTempoEvent(120, 0);
+		MMLTempoEvent t2 = new MMLTempoEvent(120, 0);
+		MMLTempoEvent t3 = new MMLTempoEvent(121, 0);
+		MMLTempoEvent t4 = new MMLTempoEvent(120, 1);
+
+		assertTrue(t1.equals(t2));
+		assertFalse(t1.equals(t3));
+		assertFalse(t1.equals(t4));
+		assertFalse(t1.equals(""));
 	}
 }

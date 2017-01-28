@@ -268,7 +268,7 @@ public final class MidiFile implements IMMLFileParser {
 	 */
 	private long convTick(long tick) {
 		int min = MMLTicks.minimumTick();
-		long value = (tick * MMLTickTable.TPQN / resolution) + min - 1 ;
+		long value = (tick * MMLTickTable.TPQN / resolution) + (min/2);
 		value -= value % min;
 		return value;
 	}
