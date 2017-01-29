@@ -16,7 +16,6 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -34,7 +33,7 @@ import fourthline.mmlTools.ComposeRank;
 import fourthline.mmlTools.MMLTrack;
 import fourthline.mmlTools.core.MMLText;
 
-public class MMLOutputPanel extends JPanel {
+public final class MMLOutputPanel extends JPanel {
 	private static final long serialVersionUID = 8558159209741558854L;
 	private final TrackListTable table;
 	private final JDialog dialog;
@@ -158,40 +157,9 @@ public class MMLOutputPanel extends JPanel {
 	private void currentSelectedTrackMMLSplitOutput() {
 		int row = table.getSelectedRow();
 		MMLTrack track = trackList.get(row);
-		String mmlText = outputTextList.get(row);
-		new MMLOutputPanel(dialog, track, splitMML(mmlText)).showDialog();
+		MMLText mmlText = new MMLText().setMMLText( outputTextList.get(row) );
+		new MMLOutputPanel(dialog, track, mmlText.splitMML(ComposeRank.getTopRank())).showDialog();
 		nextSelect(row);
-	}
-
-	private LinkedList<String> splitText(String text, int len) {
-		StringBuffer sb = new StringBuffer(text);
-		LinkedList<String> list = new LinkedList<>();
-		while (sb.length() > len ) {
-			list.add(sb.substring(0, len));
-			sb.delete(0, len);
-		}
-		list.add(sb.toString());
-		return list;
-	}
-
-	private ArrayList<MMLText> splitMML(String text) {
-		MMLText mml = new MMLText().setMMLText(text);
-		ComposeRank rank1 = ComposeRank.getTopRank();
-		LinkedList<String> melody = splitText(mml.getText(0), rank1.getMelody());
-		LinkedList<String> chord1 = splitText(mml.getText(1), rank1.getChord1());
-		LinkedList<String> chord2 = splitText(mml.getText(2), rank1.getChord2());
-		LinkedList<String> song   = splitText(mml.getText(3), rank1.getMelody());
-
-		ArrayList<MMLText> mmlList = new ArrayList<>();
-		while ( !melody.isEmpty() || !chord1.isEmpty() || !chord2.isEmpty() || !song.isEmpty() ) {
-			MMLText item = new MMLText().setMMLText(
-					(melody.isEmpty() ? "" : melody.poll()),
-					(chord1.isEmpty() ? "" : chord1.poll()),
-					(chord2.isEmpty() ? "" : chord2.poll()),
-					(song.isEmpty()   ? "" : song.poll()));
-			mmlList.add(item);
-		}
-		return mmlList;
 	}
 
 	private void checkSplitCopy() {

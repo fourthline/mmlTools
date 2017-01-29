@@ -1,8 +1,12 @@
 /*
- * Copyright (C) 2014-2015 たんらる
+ * Copyright (C) 2014-2017 たんらる
  */
 
 package fourthline.mmlTools.core;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import fourthline.mmlTools.ComposeRank;
 
@@ -108,5 +112,34 @@ public final class MMLText {
 
 		str += " )";
 		return str;
+	}
+
+	private LinkedList<String> splitText(String text, int len) {
+		StringBuffer sb = new StringBuffer(text);
+		LinkedList<String> list = new LinkedList<>();
+		while (sb.length() > len ) {
+			list.add(sb.substring(0, len));
+			sb.delete(0, len);
+		}
+		list.add(sb.toString());
+		return list;
+	}
+
+	public List<MMLText> splitMML(ComposeRank rank) {
+		LinkedList<String> melody = splitText(getText(0), rank.getMelody());
+		LinkedList<String> chord1 = splitText(getText(1), rank.getChord1());
+		LinkedList<String> chord2 = splitText(getText(2), rank.getChord2());
+		LinkedList<String> song   = splitText(getText(3), rank.getMelody());
+
+		ArrayList<MMLText> mmlList = new ArrayList<>();
+		while ( !melody.isEmpty() || !chord1.isEmpty() || !chord2.isEmpty() || !song.isEmpty() ) {
+			MMLText item = new MMLText().setMMLText(
+					(melody.isEmpty() ? "" : melody.poll()),
+					(chord1.isEmpty() ? "" : chord1.poll()),
+					(chord2.isEmpty() ? "" : chord2.poll()),
+					(song.isEmpty()   ? "" : song.poll()));
+			mmlList.add(item);
+		}
+		return mmlList;
 	}
 }
