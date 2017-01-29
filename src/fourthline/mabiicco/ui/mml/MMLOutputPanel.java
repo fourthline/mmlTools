@@ -1,18 +1,22 @@
 /*
- * Copyright (C) 2014 たんらる
+ * Copyright (C) 2014-2017 たんらる
  */
 
 package fourthline.mabiicco.ui.mml;
 
 import java.awt.BorderLayout;
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Insets;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -26,30 +30,49 @@ import javax.swing.KeyStroke;
 import javax.swing.JScrollPane;
 
 import fourthline.mabiicco.AppResource;
+import fourthline.mmlTools.ComposeRank;
 import fourthline.mmlTools.MMLTrack;
+import fourthline.mmlTools.core.MMLText;
 
-public final class MMLOutputPanel extends JPanel {
+public class MMLOutputPanel extends JPanel {
 	private static final long serialVersionUID = 8558159209741558854L;
-	private TrackListTable table;
+	private final TrackListTable table;
 	private final JDialog dialog;
-	private final Frame parentFrame;
+	private final Window parentFrame;
+	private final JButton splitButton = new JButton(AppResource.appText("mml.output.split"));
 
 	private List<MMLTrack> trackList;
+	private List<String> outputTextList = new ArrayList<>();
 
 	public MMLOutputPanel(Frame parentFrame) {
 		this.dialog = null;
 		this.parentFrame = parentFrame;
-		initializePanel(null);
+		this.table = null;
+		initializePanel(false);
 	}
 
 	public MMLOutputPanel(Frame parentFrame, List<MMLTrack> trackList) {
 		this.dialog = new JDialog(parentFrame, AppResource.appText("mml.output"), true);
 		this.parentFrame = parentFrame;
-		initializePanel(trackList);
+		this.table = new TrackListTable(trackList);
+		this.trackList = trackList;
+		for (MMLTrack track : trackList) {
+			outputTextList.add(track.getMabiMML());
+		}
+		initializePanel(true);
 	}
 
-	private void initializePanel(List<MMLTrack> trackList) {
-		this.trackList = trackList;
+	private MMLOutputPanel(Dialog parent, MMLTrack track, List<MMLText> textList) {
+		this.dialog = new JDialog(parent, AppResource.appText("mml.output.split"), true);
+		this.parentFrame = parent;
+		this.table = new TrackListTable(track, textList);
+		for (MMLText mmlText : textList) {
+			outputTextList.add(mmlText.getMML());
+		}
+		initializePanel(false);
+	}
+
+	private void initializePanel(boolean splitFunc) {
 		setLayout(new BorderLayout());
 		JPanel buttonPanel = new JPanel();
 		JPanel p = new JPanel();
@@ -61,6 +84,18 @@ public final class MMLOutputPanel extends JPanel {
 		copyButton.addActionListener((event) -> {
 			currentSelectedTrackMMLOutput();
 		});
+
+		if (splitFunc) {
+			splitButton.setMargin(new Insets(5, 10, 5, 10));
+			buttonPanel.add(splitButton);
+			splitButton.addActionListener((event) -> {
+				currentSelectedTrackMMLSplitOutput();
+			});
+			table.getSelectionModel().addListSelectionListener(t -> {
+				checkSplitCopy();
+			});
+			checkSplitCopy();
+		}
 
 		JButton closeButton = new JButton(AppResource.appText("mml.output.closeButton"));
 		closeButton.setMargin(new Insets(5, 10, 5, 10));
@@ -74,7 +109,6 @@ public final class MMLOutputPanel extends JPanel {
 		scrollPane.setBounds(12, 10, 372, 169);
 		p.add(scrollPane);
 
-		table = new TrackListTable(trackList);
 		scrollPane.setViewportView(table);
 
 		InputMap imap = dialog.getRootPane().getInputMap(
@@ -92,23 +126,77 @@ public final class MMLOutputPanel extends JPanel {
 		add(p, BorderLayout.CENTER);
 	}
 
-	public static void copyToClipboard(Frame parent, String text) {
+	public static void copyToClipboard(Window parent, String text) {
 		Toolkit kit = Toolkit.getDefaultToolkit();
 		Clipboard clip = kit.getSystemClipboard();
 		clip.setContents(new StringSelection(text), null);
 		JOptionPane.showMessageDialog(parent, AppResource.appText("mml.output.done"), AppResource.getAppTitle(), JOptionPane.PLAIN_MESSAGE);
 	}
 
-	private void currentSelectedTrackMMLOutput() {
-		int row = table.getSelectedRow();
-		String mmlText = trackList.get(row).getMabiMML();
-		copyToClipboard(parentFrame, mmlText);
 
+	private void nextSelect(int row) {
 		row++;
-		if (row >= trackList.size()) {
+		if (row >= table.getRowCount()) {
 			row = 0;
 		}
 		table.setRowSelectionInterval(row, row);
+	}
+
+	/**
+	 * 現在のトラックのMMLをコピーする
+	 */
+	private void currentSelectedTrackMMLOutput() {
+		int row = table.getSelectedRow();
+		String mmlText = outputTextList.get(row);
+		copyToClipboard(parentFrame, mmlText);
+		nextSelect(row);
+	}
+
+	/**
+	 * 現在のトラックを分割コピーするダイアログを表示する
+	 */
+	private void currentSelectedTrackMMLSplitOutput() {
+		int row = table.getSelectedRow();
+		MMLTrack track = trackList.get(row);
+		String mmlText = outputTextList.get(row);
+		new MMLOutputPanel(dialog, track, splitMML(mmlText)).showDialog();
+		nextSelect(row);
+	}
+
+	private LinkedList<String> splitText(String text, int len) {
+		StringBuffer sb = new StringBuffer(text);
+		LinkedList<String> list = new LinkedList<>();
+		while (sb.length() > len ) {
+			list.add(sb.substring(0, len));
+			sb.delete(0, len);
+		}
+		list.add(sb.toString());
+		return list;
+	}
+
+	private ArrayList<MMLText> splitMML(String text) {
+		MMLText mml = new MMLText().setMMLText(text);
+		ComposeRank rank1 = ComposeRank.getTopRank();
+		LinkedList<String> melody = splitText(mml.getText(0), rank1.getMelody());
+		LinkedList<String> chord1 = splitText(mml.getText(1), rank1.getChord1());
+		LinkedList<String> chord2 = splitText(mml.getText(2), rank1.getChord2());
+		LinkedList<String> song   = splitText(mml.getText(3), rank1.getMelody());
+
+		ArrayList<MMLText> mmlList = new ArrayList<>();
+		while ( !melody.isEmpty() || !chord1.isEmpty() || !chord2.isEmpty() || !song.isEmpty() ) {
+			MMLText item = new MMLText().setMMLText(
+					(melody.isEmpty() ? "" : melody.poll()),
+					(chord1.isEmpty() ? "" : chord1.poll()),
+					(chord2.isEmpty() ? "" : chord2.poll()),
+					(song.isEmpty()   ? "" : song.poll()));
+			mmlList.add(item);
+		}
+		return mmlList;
+	}
+
+	private void checkSplitCopy() {
+		boolean b = table.selectedRowCanSplit();
+		splitButton.setEnabled(b);
 	}
 
 	@Override

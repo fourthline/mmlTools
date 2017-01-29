@@ -14,14 +14,15 @@ import javax.swing.table.AbstractTableModel;
 import fourthline.mabiicco.AppResource;
 import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.MabiDLS;
+import fourthline.mmlTools.ComposeRank;
 import fourthline.mmlTools.MMLTrack;
+import fourthline.mmlTools.core.MMLText;
 
 public final class TrackListTable extends JTable {
 	private static final long serialVersionUID = -710966050907225119L;
 
 	private final class InCheckTableModel extends AbstractTableModel {
 		private static final long serialVersionUID = -5732476297298041942L;
-		private final List<MMLTrack> trackList;
 		private final String[] columnNames = new String[] {
 				"",
 				AppResource.appText("mml.output.trackName"),
@@ -30,13 +31,12 @@ public final class TrackListTable extends JTable {
 		};
 		private final boolean checkBox;
 		private final boolean checkValue[];
-		private final ArrayList<String[]> dataList;
+		private final ArrayList<String[]> dataList = new ArrayList<>();
+		private final ArrayList<ComposeRank> rankList = new ArrayList<>();
 
 		private InCheckTableModel(List<MMLTrack> trackList, boolean checkBox) {
-			this.trackList = trackList;
 			this.checkBox = checkBox;
 			checkValue = new boolean[trackList.size()];
-			dataList = new ArrayList<>();
 			for (MMLTrack track : trackList) {
 				InstClass inst = MabiDLS.getInstance().getInstByProgram(track.getProgram());
 				dataList.add(new String[] {
@@ -44,6 +44,21 @@ public final class TrackListTable extends JTable {
 						inst.toString(),
 						track.mmlRankFormat()
 				});
+				rankList.add(track.mmlRank());
+			}
+		}
+
+		private InCheckTableModel(MMLTrack track, List<MMLText> textList) {
+			this.checkBox = false;
+			this.checkValue = null;
+			for (MMLText mml : textList) {
+				InstClass inst = MabiDLS.getInstance().getInstByProgram(track.getProgram());
+				dataList.add(new String[] {
+						track.getTrackName(),
+						inst.toString(),
+						mml.mmlRankFormat()
+				});
+				rankList.add(mml.mmlRank());
 			}
 		}
 
@@ -69,7 +84,7 @@ public final class TrackListTable extends JTable {
 
 		@Override
 		public int getRowCount() {
-			return trackList.size();
+			return dataList.size();
 		}
 
 		@Override
@@ -129,6 +144,16 @@ public final class TrackListTable extends JTable {
 	public TrackListTable(List<MMLTrack> trackList, boolean checkBox) {
 		super();
 		checkTableModel = new InCheckTableModel(trackList, checkBox);
+		initialize(checkBox);
+	}
+
+	public TrackListTable(MMLTrack track, List<MMLText> textList) {
+		super();
+		checkTableModel = new InCheckTableModel(track, textList);
+		initialize(false);
+	}
+
+	private void initialize(boolean checkBox) {
 		setModel( checkTableModel );
 		if (checkBox) {
 			getColumnModel().getColumn(0).setPreferredWidth(0);
@@ -161,5 +186,11 @@ public final class TrackListTable extends JTable {
 				checkTableModel.checkValue[i] = true;
 			}
 		}
+	}
+
+	public boolean selectedRowCanSplit() {
+		int row = getSelectedRow();
+		ComposeRank rank = checkTableModel.rankList.get(row);
+		return !rank.canCompose();
 	}
 }

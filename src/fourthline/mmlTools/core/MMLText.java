@@ -87,7 +87,7 @@ public final class MMLText {
 		return mml;
 	}
 
-	public String mmlRank() {
+	public ComposeRank mmlRank() {
 		return ComposeRank.mmlRank(this.text[0], this.text[1], this.text[2], this.text[3]);
 	}
 
@@ -98,7 +98,7 @@ public final class MMLText {
 	 */
 	public String mmlRankFormat() {
 		String str = "Rank "
-				+ this.mmlRank() + " "
+				+ this.mmlRank().getRank() + " "
 				+ "( " + this.text[0].length()
 				+ ", " + this.text[1].length()
 				+ ", " + this.text[2].length();

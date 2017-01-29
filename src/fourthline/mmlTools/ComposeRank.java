@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 たんらる
+ * Copyright (C) 2013-2017 たんらる
  */
 
 package fourthline.mmlTools;
@@ -39,6 +39,10 @@ public final class ComposeRank {
 		});
 	}
 
+	public static ComposeRank getTopRank() {
+		return rankList.get(rankList.size()-1);
+	}
+
 	private int melody;
 	private int chord1;
 	private int chord2;
@@ -52,17 +56,17 @@ public final class ComposeRank {
 	 * @param songEx MMLの歌
 	 * @return ランクの文字
 	 */
-	public static String mmlRank(String melody, String chord1, String chord2, String songEx) {
+	public static ComposeRank mmlRank(String melody, String chord1, String chord2, String songEx) {
 		return mmlRank( melody.length(), chord1.length(), chord2.length(), songEx.length() );
 	}
 
-	public static String mmlRank(int melody, int chord1, int chord2, int songEx) {
+	public static ComposeRank mmlRank(int melody, int chord1, int chord2, int songEx) {
 		for (ComposeRank rank : rankList) {
 			if (rank.compare(melody, chord1, chord2, songEx))
-				return rank.getRank();
+				return rank;
 		}
 
-		return RANK_0.getRank();
+		return RANK_0;
 	}
 
 	/**
@@ -113,6 +117,10 @@ public final class ComposeRank {
 
 	public String getRank() {
 		return rank;
+	}
+
+	public boolean canCompose() {
+		return (this != RANK_0);
 	}
 
 	@Override

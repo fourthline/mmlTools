@@ -97,6 +97,10 @@ public final class MMLTrack implements Serializable {
 		return mabiMML.getMML();
 	}
 
+	public ComposeRank mmlRank() {
+		return mabiMML.mmlRank();
+	}
+
 	/**
 	 * 出力用のMMLランク
 	 * @return　フォーマット済みRank文字列
