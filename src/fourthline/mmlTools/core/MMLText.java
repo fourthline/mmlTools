@@ -5,7 +5,7 @@
 package fourthline.mmlTools.core;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
 
 import fourthline.mmlTools.ComposeRank;
@@ -114,31 +114,27 @@ public final class MMLText {
 		return str;
 	}
 
-	private LinkedList<String> splitText(String text, int len) {
-		StringBuffer sb = new StringBuffer(text);
-		LinkedList<String> list = new LinkedList<>();
-		while (sb.length() > len ) {
-			list.add(sb.substring(0, len));
-			sb.delete(0, len);
-		}
-		list.add(sb.toString());
-		return list;
-	}
-
+	/**
+	 * rankで分割する (楽譜集)
+	 * @param rank
+	 * @return
+	 */
 	public List<MMLText> splitMML(ComposeRank rank) {
-		LinkedList<String> melody = splitText(getText(0), rank.getMelody());
-		LinkedList<String> chord1 = splitText(getText(1), rank.getChord1());
-		LinkedList<String> chord2 = splitText(getText(2), rank.getChord2());
-		LinkedList<String> song   = splitText(getText(3), rank.getMelody());
+		int cut[] = { rank.getMelody(), rank.getChord1(), rank.getChord2(), rank.getMelody() };
+		StringBuffer sb[] = new StringBuffer[cut.length];
+		for (int i = 0; i < sb.length; i++) {
+			sb[i] = new StringBuffer(text[i]);
+		}
 
 		ArrayList<MMLText> mmlList = new ArrayList<>();
-		while ( !melody.isEmpty() || !chord1.isEmpty() || !chord2.isEmpty() || !song.isEmpty() ) {
-			MMLText item = new MMLText().setMMLText(
-					(melody.isEmpty() ? "" : melody.poll()),
-					(chord1.isEmpty() ? "" : chord1.poll()),
-					(chord2.isEmpty() ? "" : chord2.poll()),
-					(song.isEmpty()   ? "" : song.poll()));
-			mmlList.add(item);
+		while (Arrays.asList(sb).stream().anyMatch(s -> s.length() != 0)) {
+			String parts[] = new String[sb.length];
+			for (int i = 0; i < sb.length; i++) {
+				int min = Math.min( sb[i].length(), cut[i] );
+				parts[i] = sb[i].substring(0, min);
+				sb[i].delete(0, min);
+			}
+			mmlList.add( new MMLText().setMMLText(parts) );
 		}
 		return mmlList;
 	}
