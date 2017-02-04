@@ -13,9 +13,22 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Optional;
+import java.util.Vector;
 
+import javax.sound.midi.MetaMessage;
+import javax.sound.midi.MidiDevice;
+import javax.sound.midi.MidiMessage;
+import javax.sound.midi.MidiSystem;
+import javax.sound.midi.MidiUnavailableException;
+import javax.sound.midi.Receiver;
 import javax.sound.midi.Sequencer;
+import javax.sound.midi.ShortMessage;
+import javax.sound.midi.SysexMessage;
+import javax.sound.midi.Transmitter;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
@@ -33,7 +46,7 @@ import static fourthline.mabiicco.AppResource.appText;
 /**
  * キーボード入力による編集.
  */
-public final class KeyboardEditor extends JPanel implements KeyListener {
+public final class KeyboardEditor extends JPanel implements KeyListener, Receiver {
 
 	private static final long serialVersionUID = 5355275205517097613L;
 
@@ -52,7 +65,7 @@ public final class KeyboardEditor extends JPanel implements KeyListener {
 	private final int maxOct = 8;
 
 	private MMLNoteEvent editNote = null;
-	private final JPanel panel = new JPanel();
+	private final JPanel panel = new JPanel(new BorderLayout());
 
 	public KeyboardEditor(Frame parentFrame, IMMLManager mmlManager, IPlayNote player, IEditAlign editAlign, PianoRollView pianoRollView) {
 		this.mmlManager = mmlManager;
@@ -65,11 +78,32 @@ public final class KeyboardEditor extends JPanel implements KeyListener {
 	}
 
 	private void initializePanel() {
-		panel.setLayout(new BorderLayout());
+		JPanel nPanel = new JPanel(new BorderLayout());
 		JTextArea textArea = new JTextArea(appText("edit.keyboard.input.description"));
 		textArea.setEditable(false);
 		textArea.setFocusable(false);
-		panel.add(textArea, BorderLayout.NORTH);
+		nPanel.add(textArea, BorderLayout.NORTH);
+
+		JPanel midiPanel = new JPanel();
+		midiPanel.add(new JLabel("Midi Device: "));
+		JComboBox<MidiDevice.Info> midiList = new JComboBox<>(new Vector<>(MabiDLS.getInstance().getMidiInDevice()));
+		midiPanel.add(midiList);
+		JButton midiOpen = new JButton("Midi Open");
+		midiOpen.addActionListener(t -> {
+			MidiDevice.Info info = midiList.getItemAt(midiList.getSelectedIndex());
+			try {
+				MidiSystem.getMidiDevice(info).open();
+				Transmitter transmitter = MidiSystem.getMidiDevice(info).getTransmitter();
+				transmitter.setReceiver(this);
+			} catch (MidiUnavailableException e) {
+				e.printStackTrace();
+			}
+		});
+
+		midiPanel.add(midiOpen);
+		nPanel.add(midiPanel, BorderLayout.SOUTH);
+
+		panel.add(nPanel, BorderLayout.NORTH);
 		panel.add(this, BorderLayout.CENTER);
 
 		dialog.addKeyListener(this);
@@ -174,10 +208,14 @@ public final class KeyboardEditor extends JPanel implements KeyListener {
 	}
 
 	private void addNote(char code) {
+		int note = MMLEventParser.firstNoteNumber("o"+octave+code);
+		addNote(note);
+	}
+
+	private void addNote(int note) {
 		int tickOffset = (int) pianoRollView.getSequencePosition();
 		MMLEventList activePart = mmlManager.getActiveMMLPart();
 
-		int note = MMLEventParser.firstNoteNumber("o"+octave+code);
 		MMLNoteEvent prevNote = activePart.searchPrevNoteOnTickOffset(tickOffset);
 		int velocity = prevNote.getVelocity();
 		int nextTick = tickOffset + editAlign.getEditAlign();
@@ -316,5 +354,50 @@ public final class KeyboardEditor extends JPanel implements KeyListener {
 			}
 		}
 	}
+
+	private void shortMessageAction(ShortMessage msg) {
+		int command = msg.getCommand();
+		int data1 = msg.getData1();
+		int data2 = msg.getData2();
+
+		switch (command) {
+		case ShortMessage.CONTROL_CHANGE:
+			if (data1 == 64) { // Hold1
+				if (data2 > 0) {
+					addEditTick();
+				}
+			}
+			break;
+		case ShortMessage.NOTE_ON:
+			if (data2 > 0) {
+				int note = data1 - 12;
+				int velocity = data2 / 8;
+				System.out.println("NOTE ON: "+note+" v"+velocity);
+				player.playNote(note, velocity);
+				addNote(note);
+				break;
+			}
+		case ShortMessage.NOTE_OFF:
+			player.offNote();
+		}
+	}
+
+	@Override
+	public void send(MidiMessage message, long timeStamp) {
+		System.out.print(timeStamp+" > ");
+		if (message instanceof MetaMessage) {
+			System.out.println("MetaMessage");
+		} else if (message instanceof ShortMessage) {
+			System.out.println("ShortMessage");
+			shortMessageAction((ShortMessage)message);
+		} else if (message instanceof SysexMessage) {
+			System.out.println("Sysex");
+		} else {
+			System.out.println("Unknown MIDI message.");
+		}
+	}
+
+	@Override
+	public void close() {}
 
 }
