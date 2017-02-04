@@ -61,4 +61,7 @@ public final class MMLContents implements IMMLManager {
 	@Override
 	public void moveTrack(int toIndex) {}
 
+	@Override
+	public void updatePianoRollView() {}
+
 }

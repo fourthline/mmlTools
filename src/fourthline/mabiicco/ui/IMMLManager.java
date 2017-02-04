@@ -23,4 +23,5 @@ public interface IMMLManager {
 	public void setMMLselectedTrack(MMLTrack track);
 	public void addMMLTrack(MMLTrack track);
 	public void moveTrack(int toIndex);
+	public void updatePianoRollView();
 }

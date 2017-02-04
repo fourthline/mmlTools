@@ -263,6 +263,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 
 		createMenuItem(editMenu, "edit.allClearTempo", ActionDispatcher.ALL_CLEAR_TEMPO, true);
 		createMenuItem(editMenu, "mml.generate", ActionDispatcher.MML_GENERATE, true);
+		createMenuItem(editMenu, "edit.keyboard.input", ActionDispatcher.KEYBOARD_INPUT, true);
 
 		/************************* Track Menu *************************/
 		JMenu trackMenu = new JMenu(appText("menu.track"));

@@ -23,6 +23,7 @@ import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.PianoRollView.PaintMode;
+import fourthline.mabiicco.ui.editor.KeyboardEditor;
 import fourthline.mabiicco.ui.editor.MMLEditor;
 import fourthline.mabiicco.ui.editor.MMLScoreUndoEdit;
 import fourthline.mabiicco.ui.mml.MMLInputPanel;
@@ -82,6 +83,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	private final MMLInputPanel mmlInputDialog = new MMLInputPanel(this);
 
 	private final MMLEditor editor;
+	private final KeyboardEditor keyboardEditor;
 
 	private final JPanel panel;
 	private JLabel timeView;
@@ -121,6 +123,9 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		pianoRollView.addMouseInputListener(editor);
 		pianoRollView.addMouseWheelListener(this);
 		columnView = new ColumnPanel(parentFrame, pianoRollView, this, editor);
+
+		// create keyboard editor
+		keyboardEditor = new KeyboardEditor(parentFrame, this, keyboardView, editor, pianoRollView);
 
 		scrollPane.setRowHeaderView(keyboardView);
 		scrollPane.setColumnHeaderView(columnView);
@@ -852,7 +857,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		updateViewThread.start();
 	}
 
-	private void updatePianoRollView() {
+	public void updatePianoRollView() {
 		pianoRollView.updateRunningSequencePosition();
 		int measure = pianoRollView.getMeasureWidth();
 		long position = pianoRollView.getSequencePlayPosition();
@@ -895,5 +900,9 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		new Thread(() -> {
 			MabiDLS.getInstance().loadRequiredInstruments(mmlScore);
 		}).start();
+	}
+
+	public void showKeyboardInput() {
+		keyboardEditor.setVisible(true);
 	}
 }
