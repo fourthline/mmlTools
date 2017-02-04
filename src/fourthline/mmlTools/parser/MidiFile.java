@@ -241,6 +241,7 @@ public final class MidiFile implements IMMLFileParser {
 				}
 				break;
 			}
+			// data2 == 0 は Note Off.
 		case ShortMessage.NOTE_OFF:
 			int note = data1 - 12;
 			MMLNoteEvent noteEvent = activeNoteMap.get(note);

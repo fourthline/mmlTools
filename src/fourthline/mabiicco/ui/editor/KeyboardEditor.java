@@ -13,7 +13,6 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Optional;
-import java.util.Vector;
 
 import javax.sound.midi.MetaMessage;
 import javax.sound.midi.MidiDevice;
@@ -66,6 +65,7 @@ public final class KeyboardEditor extends JPanel implements KeyListener, Receive
 
 	private MMLNoteEvent editNote = null;
 	private final JPanel panel = new JPanel(new BorderLayout());
+	private final JComboBox<MidiDevice.Info> midiList = new JComboBox<>();
 
 	public KeyboardEditor(Frame parentFrame, IMMLManager mmlManager, IPlayNote player, IEditAlign editAlign, PianoRollView pianoRollView) {
 		this.mmlManager = mmlManager;
@@ -86,20 +86,23 @@ public final class KeyboardEditor extends JPanel implements KeyListener, Receive
 
 		JPanel midiPanel = new JPanel();
 		midiPanel.add(new JLabel("Midi Device: "));
-		JComboBox<MidiDevice.Info> midiList = new JComboBox<>(new Vector<>(MabiDLS.getInstance().getMidiInDevice()));
+		midiList.setFocusable(false);
 		midiPanel.add(midiList);
 		JButton midiOpen = new JButton("Midi Open");
+		midiOpen.setFocusable(false);
 		midiOpen.addActionListener(t -> {
-			MidiDevice.Info info = midiList.getItemAt(midiList.getSelectedIndex());
-			try {
-				MidiDevice device = MidiSystem.getMidiDevice(info);
-				if (!device.isOpen()) {
-					device.open();
-					Transmitter transmitter = MidiSystem.getMidiDevice(info).getTransmitter();
-					transmitter.setReceiver(this);
+			if (midiList.getItemCount() > 0) {
+				MidiDevice.Info info = midiList.getItemAt(midiList.getSelectedIndex());
+				try {
+					MidiDevice device = MidiSystem.getMidiDevice(info);
+					if (!device.isOpen()) {
+						device.open();
+						Transmitter transmitter = MidiSystem.getMidiDevice(info).getTransmitter();
+						transmitter.setReceiver(this);
+					}
+				} catch (MidiUnavailableException e) {
+					e.printStackTrace();
 				}
-			} catch (MidiUnavailableException e) {
-				e.printStackTrace();
 			}
 		});
 
@@ -117,6 +120,8 @@ public final class KeyboardEditor extends JPanel implements KeyListener, Receive
 	}
 
 	public void setVisible(boolean b) {
+		midiList.removeAllItems();
+		MabiDLS.getInstance().getMidiInDevice().forEach(t -> midiList.addItem(t));
 		dialog.setVisible(b);
 	}
 
@@ -333,10 +338,11 @@ public final class KeyboardEditor extends JPanel implements KeyListener, Receive
 	@Override
 	public void keyTyped(KeyEvent e) {
 		Sequencer sequencer = MabiDLS.getInstance().getSequencer();
-		if (sequencer.isRunning()) {
-			return;
-		}
 		synchronized (inputCode) {
+			if (sequencer.isRunning()) {
+				inputCode = Optional.empty();
+				return;
+			}
 			if (!inputCode.isPresent() || (inputCode.get() != e.getKeyChar()) ) {
 				char code = e.getKeyChar();
 				pressAction(code);
@@ -380,13 +386,19 @@ public final class KeyboardEditor extends JPanel implements KeyListener, Receive
 				addNote(note);
 				break;
 			}
+			// data2 == 0 は Note Off.
 		case ShortMessage.NOTE_OFF:
 			player.offNote();
+			break;
 		}
 	}
 
 	@Override
 	public void send(MidiMessage message, long timeStamp) {
+		Sequencer sequencer = MabiDLS.getInstance().getSequencer();
+		if (sequencer.isRunning()) {
+			return;
+		}
 		System.out.print(timeStamp+" > ");
 		if (message instanceof MetaMessage) {
 			System.out.println("MetaMessage");
