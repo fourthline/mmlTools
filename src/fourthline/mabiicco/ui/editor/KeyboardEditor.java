@@ -92,9 +92,12 @@ public final class KeyboardEditor extends JPanel implements KeyListener, Receive
 		midiOpen.addActionListener(t -> {
 			MidiDevice.Info info = midiList.getItemAt(midiList.getSelectedIndex());
 			try {
-				MidiSystem.getMidiDevice(info).open();
-				Transmitter transmitter = MidiSystem.getMidiDevice(info).getTransmitter();
-				transmitter.setReceiver(this);
+				MidiDevice device = MidiSystem.getMidiDevice(info);
+				if (!device.isOpen()) {
+					device.open();
+					Transmitter transmitter = MidiSystem.getMidiDevice(info).getTransmitter();
+					transmitter.setReceiver(this);
+				}
 			} catch (MidiUnavailableException e) {
 				e.printStackTrace();
 			}
