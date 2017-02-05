@@ -50,6 +50,9 @@ import java.awt.event.InputEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.List;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.function.IntConsumer;
 
 /**
  * 主表示部.
@@ -87,7 +90,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 
 	private final JPanel panel;
 	private JLabel timeView;
-	private Thread timeViewUpdateThread;
+	private ScheduledThreadPoolExecutor scheduledExecutor = new ScheduledThreadPoolExecutor(8);
 
 	private final Frame parentFrame;
 
@@ -135,6 +138,10 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 
 		startSequenceThread();
 		startTimeViewUpdateThread();
+	}
+
+	public void setNoteAlignChanger(IntConsumer noteAlignChanger) {
+		keyboardEditor.setNoteAlignChanger(noteAlignChanger);
 	}
 
 	public boolean recovery(String s) {
@@ -801,21 +808,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 
 	// TimeViewを更新するためのスレッドを開始します.
 	private void startTimeViewUpdateThread() {
-		if (timeViewUpdateThread != null) {
-			return;
-		}
-		// TODO: びみょう・・・？
-		timeViewUpdateThread = new Thread(() -> {
-			while (true) {
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				updateTimeView();
-			}
-		});
-		timeViewUpdateThread.start();
+		scheduledExecutor.scheduleWithFixedDelay(this::updateTimeView, 500, 100, TimeUnit.MILLISECONDS);
 	}
 
 	private void updateTimeView() {
@@ -834,49 +827,59 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		}
 	}
 
-	private Thread updateViewThread;
 	// PianoRoll, Sequence系の描画を行うスレッドを開始します.
 	private void startSequenceThread() {
-		if (updateViewThread != null) {
-			return;
-		}
-		updateViewThread = new Thread(() -> {
-			while (true) {
-				try {
-					Thread.sleep(25);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				if (MabiDLS.getInstance().getSequencer().isRunning()) {
-					EventQueue.invokeLater(() -> {
-						updatePianoRollView();
-					});
-				}
+		scheduledExecutor.scheduleWithFixedDelay(() -> {
+			if (MabiDLS.getInstance().getSequencer().isRunning()) {
+				EventQueue.invokeLater(() -> {
+					updatePianoRollView();
+				});
 			}
-		});
-		updateViewThread.start();
+		}, 500, 25, TimeUnit.MILLISECONDS);
 	}
 
+	@Override
 	public void updatePianoRollView() {
+		JViewport viewport = scrollPane.getViewport();
+		Point point = viewport.getViewPosition();
+		int note = pianoRollView.convertY2Note(point.y);
+		updatePianoRollView(note);
+	}
+
+	@Override
+	public void updatePianoRollView(int note) {
 		pianoRollView.updateRunningSequencePosition();
 		int measure = pianoRollView.getMeasureWidth();
-		long position = pianoRollView.getSequencePlayPosition();
-		position = pianoRollView.convertTicktoX(position);
-		position -= position % measure;
+		long positionX = pianoRollView.getSequencePlayPosition();
+		positionX = pianoRollView.convertTicktoX(positionX);
+		positionX -= positionX % measure;
 		JViewport viewport = scrollPane.getViewport();
 		Point point = viewport.getViewPosition();
 		Dimension dim = viewport.getExtentSize();
 		int x1 = point.x;
 		int x2 = x1 + dim.width - measure;
-		if ( (position < x1) || (position > x2) ) {
+		if ( (positionX < x1) || (positionX > x2) ) {
 			/* ビュー外にあるので、現在のポジションにあわせる */
-			if (position + dim.width > pianoRollView.getWidth()) {
-				position = (pianoRollView.getWidth() - dim.width);
-				position -= position % measure;
+			if (positionX + dim.width > pianoRollView.getWidth()) {
+				positionX = (pianoRollView.getWidth() - dim.width);
+				positionX -= positionX % measure;
 			}
-			point.setLocation(position, point.getY());
-			viewport.setViewPosition(point);
+		} else {
+			positionX = point.x;
 		}
+
+		long positionY = pianoRollView.convertNote2Y(note);
+		int y1 = point.y;
+		int y2 = y1 + dim.height - pianoRollView.getNoteHeight() * 2;
+		if (positionY < y1) {
+		} else if (positionY > y2) {
+			positionY -= dim.height;
+			positionY += pianoRollView.getNoteHeight() * 2;
+		} else {
+			positionY = point.y;
+		}
+		point.setLocation(positionX, positionY);
+		viewport.setViewPosition(point);
 		scrollPane.repaint();
 	}
 
@@ -897,12 +900,12 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	}
 
 	private void updateProgramSelect() {
-		new Thread(() -> {
-			MabiDLS.getInstance().loadRequiredInstruments(mmlScore);
-		}).start();
+		scheduledExecutor.submit(() -> MabiDLS.getInstance().loadRequiredInstruments(mmlScore));
 	}
 
 	public void showKeyboardInput() {
+		editor.reset();
+		repaint();
 		keyboardEditor.setVisible(true);
 	}
 }

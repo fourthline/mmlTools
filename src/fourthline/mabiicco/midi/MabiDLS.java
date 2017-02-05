@@ -525,10 +525,6 @@ public final class MabiDLS {
 		for (MidiDevice.Info info : MidiSystem.getMidiDeviceInfo()) {
 			try {
 				MidiDevice device = MidiSystem.getMidiDevice(info);
-				System.out.print(info.getName()+": ");
-				System.out.print(" transmitters "+device.getMaxTransmitters());
-				System.out.print(" receivers: "+device.getMaxReceivers());
-				System.out.println();
 				if ( (device.getMaxTransmitters() != 0) && (device.getMaxReceivers() == 0) ) {
 					// -1は制限なし.
 					midiDeviceList.add(device.getDeviceInfo());

@@ -104,7 +104,7 @@ public final class MMLEventList implements Serializable, Cloneable {
 	 * @return
 	 */
 	public MMLNoteEvent searchPrevNoteOnTickOffset(long tickOffset) {
-		MMLNoteEvent prevNote = new MMLNoteEvent(-1, 0, 0);
+		MMLNoteEvent prevNote = null;
 		for (MMLNoteEvent noteEvent : noteList) {
 			if (noteEvent.getTickOffset() >= tickOffset) {
 				break;

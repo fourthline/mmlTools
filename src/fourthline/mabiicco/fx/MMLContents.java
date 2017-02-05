@@ -64,4 +64,7 @@ public final class MMLContents implements IMMLManager {
 	@Override
 	public void updatePianoRollView() {}
 
+	@Override
+	public void updatePianoRollView(int note) {}
+
 }

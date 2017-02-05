@@ -30,7 +30,7 @@ public final class MabiIccoProperties {
 	private static final String RECENT_FILE = "app.recent_file";
 
 	/** DLSファイル */
-	private static final String DLS_FILE = "app.dls_file";
+	public final Property<String> dls_file = new StringProperty("app.dls_file", AppResource.appText("default.dls_file"));
 
 	/** ウィンドウ最大化 */
 	public final Property<Boolean> windowMaximize = new BooleanProperty("window.maximize", false);
@@ -71,6 +71,9 @@ public final class MabiIccoProperties {
 	/** MML最適化 */
 	public final Property<Boolean> enableMMLOptimize = new BooleanProperty("function.mml_optimize", true, (t) -> MMLStringOptimizer.setOptSkip(!t.booleanValue()));
 
+	/** Midi Device */
+	public final Property<String> midiInputDevice = new StringProperty("midi.input_device");
+
 	/** ファイル履歴 */
 	public static final int MAX_FILE_HISTORY = 8;
 	private static final String FILE_HISTORY = "file.history";
@@ -110,7 +113,7 @@ public final class MabiIccoProperties {
 	}
 
 	public List<File> getDlsFile() {
-		String str = properties.getProperty(DLS_FILE, AppResource.appText("default.dls_file"));
+		String str = dls_file.get();
 		String filenames[] = str.split(",");
 		ArrayList<File> fileArray = new ArrayList<>();
 		for (String filename : filenames) {
@@ -127,8 +130,7 @@ public final class MabiIccoProperties {
 			}
 			sb.deleteCharAt(sb.length()-1);
 		}
-		properties.setProperty(DLS_FILE, sb.toString());
-		save();
+		dls_file.set(sb.toString());
 	}
 
 	public Rectangle getWindowRect() {
@@ -202,6 +204,32 @@ public final class MabiIccoProperties {
 	public interface Property<T> {
 		public void set(T value);
 		public T get();
+	}
+
+	private final class StringProperty implements Property<String> {
+		private final String name;
+		private final String defaultValue;
+
+		private StringProperty(String name) {
+			this(name, "");
+		}
+
+		private StringProperty(String name, String defaultValue) {
+			this.name = name;
+			this.defaultValue = defaultValue;
+		}
+
+		@Override
+		public void set(String value) {
+			properties.setProperty(name, value);
+			save();
+		}
+
+		@Override
+		public String get() {
+			String str = properties.getProperty(name, defaultValue);
+			return str;
+		}
 	}
 
 	private final class BooleanProperty implements Property<Boolean> {

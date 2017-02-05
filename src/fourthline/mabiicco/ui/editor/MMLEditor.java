@@ -194,7 +194,10 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		}
 		MMLNoteEvent prevNote = editEventList.searchPrevNoteOnTickOffset(tickOffset);
 
-		MMLNoteEvent noteEvent = new MMLNoteEvent(note, editAlign, (int)alignedTickOffset, prevNote.getVelocity());
+		MMLNoteEvent noteEvent = new MMLNoteEvent(note, editAlign, (int)alignedTickOffset);
+		if (prevNote != null) {
+			noteEvent.setVelocity(prevNote.getVelocity());
+		}
 		selectNote(noteEvent);
 		notePlayer.playNote( note, noteEvent.getVelocity() );
 	}

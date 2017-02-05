@@ -208,7 +208,7 @@ public class MMLEventListTest {
 
 		// 0
 		MMLNoteEvent noteEvent0 = eventList.searchPrevNoteOnTickOffset(0);
-		assertEquals(-1, noteEvent0.getNote());
+		assertEquals(null, noteEvent0);
 
 		// 1
 		MMLNoteEvent noteEvent1 = eventList.searchPrevNoteOnTickOffset(t4);

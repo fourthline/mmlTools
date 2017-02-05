@@ -111,6 +111,10 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 
 		mmlSeqView = new MMLSeqView(this);
 		mmlSeqView.setTimeView(timeView);
+		mmlSeqView.setNoteAlignChanger(t -> {
+			if ( (t >= 0) && (t < noteTypeSelect.getItemCount()) )
+				noteTypeSelect.setSelectedIndex(t);
+		});
 		contentPane.add(mmlSeqView.getPanel(), BorderLayout.CENTER);
 		contentPane.setFocusable(false);
 
@@ -263,7 +267,8 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 
 		createMenuItem(editMenu, "edit.allClearTempo", ActionDispatcher.ALL_CLEAR_TEMPO, true);
 		createMenuItem(editMenu, "mml.generate", ActionDispatcher.MML_GENERATE, true);
-		createMenuItem(editMenu, "edit.keyboard.input", ActionDispatcher.KEYBOARD_INPUT, true);
+		createMenuItem(editMenu, "edit.keyboard.input", ActionDispatcher.KEYBOARD_INPUT, true,
+				KeyStroke.getKeyStroke(KeyEvent.VK_K, InputEvent.CTRL_MASK));
 
 		/************************* Track Menu *************************/
 		JMenu trackMenu = new JMenu(appText("menu.track"));

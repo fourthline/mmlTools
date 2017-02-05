@@ -191,7 +191,7 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 		MMLNoteEvent prevNote = eventList.searchPrevNoteOnTickOffset(noteEvent[0].getTickOffset());
 		int velocity = noteEvent[0].getVelocity();
 		velocityValueField.setValue(velocity);
-		if (prevNote.getVelocity() != velocity) {
+		if ( (prevNote == null) || (prevNote.getVelocity() != velocity) ) {
 			velocityCheckBox.setSelected(true);
 		} else {
 			velocityCheckBox.setSelected(false);

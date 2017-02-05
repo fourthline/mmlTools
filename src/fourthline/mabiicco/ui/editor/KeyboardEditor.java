@@ -5,14 +5,12 @@
 package fourthline.mabiicco.ui.editor;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
+import java.awt.Component;
 import java.awt.Frame;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Optional;
+import java.util.function.IntConsumer;
 
 import javax.sound.midi.MetaMessage;
 import javax.sound.midi.MidiDevice;
@@ -24,13 +22,16 @@ import javax.sound.midi.Sequencer;
 import javax.sound.midi.ShortMessage;
 import javax.sound.midi.SysexMessage;
 import javax.sound.midi.Transmitter;
-import javax.swing.JButton;
+import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import javax.swing.SpinnerModel;
 
+import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mabiicco.midi.IPlayNote;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.IMMLManager;
@@ -45,177 +46,138 @@ import static fourthline.mabiicco.AppResource.appText;
 /**
  * キーボード入力による編集.
  */
-public final class KeyboardEditor extends JPanel implements KeyListener, Receiver {
-
-	private static final long serialVersionUID = 5355275205517097613L;
+public final class KeyboardEditor implements KeyListener, Receiver {
 
 	private final JDialog dialog;
-
-	private final int width = 16;
-	private final int height = 90;
-	private final int paintOct = 3;
 
 	private final IMMLManager mmlManager;
 	private final IPlayNote player;
 	private final IEditAlign editAlign;
 	private final PianoRollView pianoRollView;
-	private int octave = 4;
+	private final int initOct = 4;
 	private final int minOct = 0;
 	private final int maxOct = 8;
+
+	private MidiDevice midiDevice = null;
 
 	private MMLNoteEvent editNote = null;
 	private final JPanel panel = new JPanel(new BorderLayout());
 	private final JComboBox<MidiDevice.Info> midiList = new JComboBox<>();
+	private final JSpinner velocityValueField = NumberSpinner.createSpinner(MMLNoteEvent.INIT_VOL, 0, MMLNoteEvent.MAX_VOL, 1);
+	private final JSpinner octaveValueField = NumberSpinner.createSpinner(initOct, minOct, maxOct, 1);
+	private IntConsumer noteAlignChanger;
 
 	public KeyboardEditor(Frame parentFrame, IMMLManager mmlManager, IPlayNote player, IEditAlign editAlign, PianoRollView pianoRollView) {
 		this.mmlManager = mmlManager;
 		this.player = player;
 		this.editAlign = editAlign;
 		this.pianoRollView = pianoRollView;
-		dialog = new JDialog(parentFrame, appText("edit.keyboard.input"));
-		setPreferredSize(new Dimension(width*paintOct*12, height));
+		dialog = new JDialog(parentFrame, appText("edit.keyboard.input"), true);
 		initializePanel();
 	}
 
+	public void setNoteAlignChanger(IntConsumer noteAlignChanger) {
+		this.noteAlignChanger = noteAlignChanger;
+	}
+
+	private JPanel createLPanel(Component c) {
+		JPanel panel = new JPanel(new BorderLayout());
+		panel.add(c, BorderLayout.WEST);
+		return panel;
+	}
+
+	private void initialSpinnerProperty(JSpinner spinner) {
+		JTextField field = ((JSpinner.NumberEditor) spinner.getEditor()).getTextField();
+		spinner.setFocusable(false);
+		field.setEditable(false);
+		field.setFocusable(false);
+	}
+
 	private void initializePanel() {
-		JPanel nPanel = new JPanel(new BorderLayout());
-		JTextArea textArea = new JTextArea(appText("edit.keyboard.input.description"));
-		textArea.setEditable(false);
-		textArea.setFocusable(false);
-		nPanel.add(textArea, BorderLayout.NORTH);
+		JPanel panel1 = new JPanel();
+		panel1.add(new JLabel(appText("edit.velocity")));
+		initialSpinnerProperty(velocityValueField);
+		panel1.add(velocityValueField);
+
+		JPanel panel2 = new JPanel();
+		panel2.add(new JLabel(appText("edit.octave")));
+		initialSpinnerProperty(octaveValueField);
+		panel2.add(octaveValueField);
 
 		JPanel midiPanel = new JPanel();
 		midiPanel.add(new JLabel("Midi Device: "));
 		midiList.setFocusable(false);
-		midiPanel.add(midiList);
-		JButton midiOpen = new JButton("Midi Open");
-		midiOpen.setFocusable(false);
-		midiOpen.addActionListener(t -> {
-			if (midiList.getItemCount() > 0) {
+		midiList.addActionListener(t -> {
+			synchronized (this) {
+				if (midiDevice != null) {
+					midiDevice.close();
+				}
 				MidiDevice.Info info = midiList.getItemAt(midiList.getSelectedIndex());
+				if (info == null) return;
+				System.out.println("midi select > \""+info.getName()+"\"");
 				try {
 					MidiDevice device = MidiSystem.getMidiDevice(info);
 					if (!device.isOpen()) {
 						device.open();
 						Transmitter transmitter = MidiSystem.getMidiDevice(info).getTransmitter();
 						transmitter.setReceiver(this);
+						midiDevice = device;
 					}
+					MabiIccoProperties.getInstance().midiInputDevice.set(info.getName());
 				} catch (MidiUnavailableException e) {
 					e.printStackTrace();
 				}
 			}
 		});
+		midiPanel.add(midiList);
 
-		midiPanel.add(midiOpen);
-		nPanel.add(midiPanel, BorderLayout.SOUTH);
+		JPanel nPanel = new JPanel();
+		nPanel.setLayout(new BoxLayout(nPanel, BoxLayout.Y_AXIS));
+		nPanel.add(createLPanel(new JLabel(appText("edit.keyboard.input.description"))));
+		nPanel.add(createLPanel(panel1));
+		nPanel.add(createLPanel(panel2));
+		nPanel.add(createLPanel(midiPanel));
 
 		panel.add(nPanel, BorderLayout.NORTH);
-		panel.add(this, BorderLayout.CENTER);
 
 		dialog.addKeyListener(this);
 		dialog.getContentPane().add(panel);
-		dialog.pack();
 		dialog.setResizable(false);
 		dialog.setLocationRelativeTo(null);
 	}
 
 	public void setVisible(boolean b) {
+		String initialMidiName = MabiIccoProperties.getInstance().midiInputDevice.get();
 		midiList.removeAllItems();
 		MabiDLS.getInstance().getMidiInDevice().forEach(t -> midiList.addItem(t));
+
+		int tickOffset = (int) pianoRollView.getSequencePosition();
+		MMLEventList activePart = mmlManager.getActiveMMLPart();
+		MMLNoteEvent prevNote = activePart.searchPrevNoteOnTickOffset(tickOffset);
+		if (prevNote == null) {
+			velocityValueField.setValue(MMLNoteEvent.INIT_VOL);
+		} else {
+			velocityValueField.setValue(prevNote.getVelocity());
+		}
+
+		// 設定値にもっているMIDIデバイスを選択する.
+		for (int i = 0; i < midiList.getItemCount(); i++) {
+			MidiDevice.Info info = midiList.getItemAt(i);
+			System.out.println("midi search > \""+initialMidiName+"\" \""+info.getName()+"\"");
+			if (info.getName().equals(initialMidiName)) {
+				midiList.setSelectedIndex(i);
+				break;
+			}
+		}
+
+		dialog.pack();
 		dialog.setVisible(b);
 	}
 
 
-	/**
-	 * 横向きのキーボードを描画する.
-	 */
-	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
-
-		Graphics2D g2 = (Graphics2D)g.create();
-		g2.setColor(Color.WHITE);
-		g2.fillRect(0, 0, width, height);
-
-		for (int i = 0; i <= paintOct; i++) {
-			paintOctPianoLine(g2, i, (i+octave-1));
-		}
-
-		g2.dispose();
-	}
-
-
-	private final Color colorG  = new Color(0.3f, 0.3f, 0.3f);
-	private final Color colorW1 = new Color(0.5f, 0.5f, 0.5f);
-	private final Color colorW2 = new Color(0.9f, 0.9f, 0.9f);
-	private final Color colorB1 = new Color(0.1f, 0.1f, 0.1f);
-	private final Color colorB2 = new Color(0.2f, 0.2f, 0.2f);
-	private void paintOctPianoLine(Graphics2D g, int pos, int paintOctave) {
-		int octWidth = width * 12;
-		int whiteH = height-20;
-		int blackH = whiteH/3*2;
-		// ド～シのしろ鍵盤
-
-		int startX = octWidth * pos;
-		for (int i = 0; i < 7; i++) {
-			double x1 = octWidth * i / 7;
-			double x2 = octWidth * (i+1) / 7;
-			g.setColor(colorW1);
-			g.fillRect((int)(startX+x1), 0, (int)(x2-x1), whiteH);
-			g.setColor(colorG);
-			g.drawRect((int)(startX+x1), 0, (int)(x2-x1), whiteH);
-			g.setColor(colorW2);
-			g.fillRoundRect((int)(startX+x1)+2, -10, (int)(x2-x1)-3, whiteH-5+10, 10, 10);
-		}
-
-		// 黒鍵盤
-		int black_posIndex[] = { 
-				1, // A#
-				2, // G#
-				3, // F#
-				5, // D#
-				6  // C#
-		};
-
-		for (int i = 0; i < black_posIndex.length; i++) {
-			int x = octWidth * (7-black_posIndex[i]) / 7 - width / 2-1;
-			x += startX;
-
-			g.setColor(colorB1);
-			g.fillRect(x, 0, width, blackH);
-			g.setColor(colorB2);
-			g.fillRoundRect(x+2, -5, width-3, blackH-5+5, 5, 5);
-
-			g.drawRect(x, 0, width, blackH);
-		}
-
-		// グリッド
-		g.setColor(new Color(0.3f, 0.3f, 0.6f));
-		g.drawLine(startX, blackH, startX, height);
-
-		// オクターブ
-		String octText = "o"+paintOctave;
-		if ( (paintOctave < minOct) || (paintOctave > maxOct) ) {
-			octText = "X";
-		} else if (octave - 1 == paintOctave) {
-			octText = "<";
-		} else if (octave + 1 == paintOctave) {
-			octText = ">";
-		}
-		char o_char[] = octText.toCharArray();
-		int y = startX + octWidth;
-		g.drawChars(o_char, 0, o_char.length, startX+width*6-2, height-6);
-		g.drawLine(y, blackH, y, height);
-
-		// Code Char
-		if (paintOctave == octave) {
-			char c_char[] = "CDEFGAB".toCharArray();
-			for (int i = 0; i < c_char.length; i++) {
-				g.drawChars(c_char, i, 1, startX+(octWidth*i/7)+(octWidth/14)-2, whiteH-8);
-			}
-		}
-	}
 
 	private void addNote(char code) {
+		int octave = ((Integer) octaveValueField.getValue()).intValue();
 		int note = MMLEventParser.firstNoteNumber("o"+octave+code);
 		addNote(note);
 	}
@@ -224,8 +186,7 @@ public final class KeyboardEditor extends JPanel implements KeyListener, Receive
 		int tickOffset = (int) pianoRollView.getSequencePosition();
 		MMLEventList activePart = mmlManager.getActiveMMLPart();
 
-		MMLNoteEvent prevNote = activePart.searchPrevNoteOnTickOffset(tickOffset);
-		int velocity = prevNote.getVelocity();
+		int velocity = ((Integer) velocityValueField.getValue()).intValue();
 		int nextTick = tickOffset + editAlign.getEditAlign();
 		nextTick -= nextTick % editAlign.getEditAlign();
 		MMLNoteEvent noteEvent = new MMLNoteEvent(note, nextTick-tickOffset, tickOffset, velocity);
@@ -233,7 +194,7 @@ public final class KeyboardEditor extends JPanel implements KeyListener, Receive
 		player.playNote(note, velocity);
 		pianoRollView.setSequenceTick(nextTick);
 		mmlManager.updateActivePart(true);
-		mmlManager.updatePianoRollView();
+		mmlManager.updatePianoRollView(note);
 		this.editNote = noteEvent;
 	}
 
@@ -261,38 +222,42 @@ public final class KeyboardEditor extends JPanel implements KeyListener, Receive
 		activePart.deleteMMLEvent(deleteEvent);
 		pianoRollView.setSequenceTick(nextTick);
 		mmlManager.updateActivePart(true);
+
+		MMLNoteEvent prevNote = activePart.searchPrevNoteOnTickOffset(nextTick);
+		if (prevNote != null) {
+			mmlManager.updatePianoRollView(prevNote.getNote());
+		} else {
+			mmlManager.updatePianoRollView();
+		}
 		this.editNote = null;
 	}
 
 	private void octaveChange(char code) {
-		if (code == '<') {
-			if (octave > minOct) {
-				octave--;
-				repaint();
+		SpinnerModel model = octaveValueField.getModel();
+		try {
+			if (code == '<') {
+				octaveValueField.setValue( model.getPreviousValue() );
+			} else if (code == '>') {
+				octaveValueField.setValue( model.getNextValue() );
 			}
-		} else if (code == '>') {
-			if (octave < maxOct) {
-				octave++;
-				repaint();
-			}
-		}
+		} catch (IllegalArgumentException e) {}
 		this.editNote = null;
 	}
 
 	private void addSharpFlat(char code) {
-		if ( (code == '+') || (code == '#') ) {
-			if (editNote != null) {
-				editNote.setNote(editNote.getNote()+1);
-				player.playNote(editNote.getNote(), editNote.getVelocity());
-				mmlManager.updateActivePart(true);
-			}
-		} else if (code == '-') {
-			if (editNote != null) {
-				editNote.setNote(editNote.getNote()-1);
-				player.playNote(editNote.getNote(), editNote.getVelocity());
-				mmlManager.updateActivePart(true);
-			}
+		if (editNote == null) {
+			return;
 		}
+		if ( (code == '+') || (code == '#') ) {
+			editNote.setNote(editNote.getNote()+1);
+			player.playNote(editNote.getNote(), editNote.getVelocity());
+			mmlManager.updateActivePart(true);
+		} else if (code == '-') {
+			editNote.setNote(editNote.getNote()-1);
+			player.playNote(editNote.getNote(), editNote.getVelocity());
+			mmlManager.updateActivePart(true);
+		}
+		mmlManager.updatePianoRollView(editNote.getNote());
 		this.editNote = null;
 	}
 
@@ -309,8 +274,42 @@ public final class KeyboardEditor extends JPanel implements KeyListener, Receive
 			activePart.addMMLNoteEvent(noteEvent);
 			pianoRollView.setSequenceTick(nextTick);
 			mmlManager.updateActivePart(true);
-			mmlManager.updatePianoRollView();
+			mmlManager.updatePianoRollView(noteEvent.getNote());
 			this.editNote = noteEvent;
+		}
+	}
+
+	private void cursorMove(boolean forward) {
+		int tickOffset = (int) pianoRollView.getSequencePosition();
+		MMLEventList activePart = mmlManager.getActiveMMLPart();
+		int nextTick = tickOffset + (forward?editAlign.getEditAlign():-editAlign.getEditAlign());
+		nextTick -= nextTick % editAlign.getEditAlign();
+		pianoRollView.setSequenceTick(nextTick);
+
+		MMLNoteEvent prevNote = activePart.searchPrevNoteOnTickOffset(nextTick);
+		if (prevNote != null) {
+			mmlManager.updatePianoRollView(prevNote.getNote());
+		} else {
+			mmlManager.updatePianoRollView();
+		}
+		this.editNote = null;
+	}
+
+	private void velocityChange(boolean up) {
+		SpinnerModel model = velocityValueField.getModel();
+		try {
+			velocityValueField.setValue( up ? model.getNextValue() : model.getPreviousValue() );
+		} catch (IllegalArgumentException e) {}
+	}
+
+	private void changeNoteAlign(char code) {
+		char select[] = {
+				'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'
+		};
+		for (int i = 0; i < select.length; i++) {
+			if (select[i] == code) {
+				noteAlignChanger.accept(i);
+			}
 		}
 	}
 
@@ -327,6 +326,18 @@ public final class KeyboardEditor extends JPanel implements KeyListener, Receive
 			addSharpFlat(code);
 		} else if (code == ' ') {
 			addEditTick();
+		} else if (code == KeyEvent.VK_ESCAPE) {
+			dialog.setVisible(false);
+		} else if (code == KeyEvent.VK_LEFT) {
+			cursorMove(false);
+		} else if (code == KeyEvent.VK_RIGHT) {
+			cursorMove(true);
+		} else if (code == KeyEvent.VK_DOWN) {
+			velocityChange(false);
+		} else if (code == KeyEvent.VK_UP) {
+			velocityChange(true);
+		} else {
+			changeNoteAlign(code);
 		}
 	}
 
@@ -338,7 +349,7 @@ public final class KeyboardEditor extends JPanel implements KeyListener, Receive
 	@Override
 	public void keyTyped(KeyEvent e) {
 		Sequencer sequencer = MabiDLS.getInstance().getSequencer();
-		synchronized (inputCode) {
+		synchronized (this) {
 			if (sequencer.isRunning()) {
 				inputCode = Optional.empty();
 				return;
@@ -352,11 +363,17 @@ public final class KeyboardEditor extends JPanel implements KeyListener, Receive
 	}
 
 	@Override
-	public void keyPressed(KeyEvent e) {}
+	public void keyPressed(KeyEvent e) {
+		int code = e.getKeyCode();
+		if ( (code == KeyEvent.VK_LEFT) || (code == KeyEvent.VK_RIGHT)
+				|| (code == KeyEvent.VK_UP) || (code == KeyEvent.VK_DOWN)) {
+			pressAction((char)code);
+		}
+	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		synchronized (inputCode) {
+		synchronized (this) {
 			if (inputCode.isPresent() && (inputCode.get() == e.getKeyChar())) {
 				releaseAction();
 				inputCode = Optional.empty();
@@ -364,7 +381,8 @@ public final class KeyboardEditor extends JPanel implements KeyListener, Receive
 		}
 	}
 
-	private void shortMessageAction(ShortMessage msg) {
+	private int midiNote = Integer.MIN_VALUE;
+	private synchronized void shortMessageAction(ShortMessage msg) {
 		int command = msg.getCommand();
 		int data1 = msg.getData1();
 		int data2 = msg.getData2();
@@ -383,12 +401,17 @@ public final class KeyboardEditor extends JPanel implements KeyListener, Receive
 				int velocity = data2 / 8;
 				System.out.println("NOTE ON: "+note+" v"+velocity);
 				player.playNote(note, velocity);
+				midiNote = note;
 				addNote(note);
 				break;
 			}
 			// data2 == 0 は Note Off.
 		case ShortMessage.NOTE_OFF:
-			player.offNote();
+			int note = data1 - 12;
+			if (note == midiNote) {
+				player.offNote();
+				midiNote = Integer.MIN_VALUE;
+			}
 			break;
 		}
 	}

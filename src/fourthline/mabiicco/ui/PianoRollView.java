@@ -300,6 +300,9 @@ public final class PianoRollView extends JPanel {
 
 	public void setSequenceTick(long tick) {
 		if (!MabiDLS.getInstance().getSequencer().isRunning()) {
+			if (tick < 0) {
+				tick = 0;
+			}
 			sequencePosition = tick;
 		}
 	}
