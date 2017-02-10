@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 たんらる
+ * Copyright (C) 2013-2017 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -12,17 +12,17 @@ import java.awt.Graphics2D;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
-import java.util.OptionalInt;
 
 import javax.swing.JPanel;
 
 import fourthline.mabiicco.midi.IPlayNote;
 import fourthline.mabiicco.midi.MabiDLS;
+import fourthline.mmlTools.MMLNoteEvent;
 
 public final class KeyboardView extends JPanel implements IPlayNote {
 	private static final long serialVersionUID = -3850112420986284800L;
 
-	private OptionalInt playNote = OptionalInt.empty();
+	private int playNote[] = null;
 	private final int width = 60;
 	private final int PLAY_CHANNEL = 15;
 	private final int DEFAULT_VELOCITY = 11;
@@ -105,19 +105,21 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 
 	private void paintPlayNote(Graphics2D g) {
 		int yAdd[] = { -2, -2, -1, -2, 1, -3, -2, -2, -1, 0, 0, 2 }; // 補正値
-		if (!playNote.isPresent()) {
+		if (playNote == null) {
 			return;
 		}
 
-		int x = 15;
-		int note = playNote.getAsInt();
-		if ( isWhiteKey(note) ) {
-			x += 20;
-		}
+		for (int i = 0; i < playNote.length; i++) {
+			int x = 15;
+			int note = playNote[i];
+			if ( isWhiteKey(note) ) {
+				x += 20;
+			}
 
-		int y = pianoRollView.convertNote2Y(note) + yAdd[(note+12)%12];
-		g.setColor(Color.RED);
-		g.fillOval(x, y, 4, 4);
+			int y = pianoRollView.convertNote2Y(note) + yAdd[(note+12)%12];
+			g.setColor(Color.RED);
+			g.fillOval(x, y, 4, 4);
+		}
 	}
 
 	private void paintOctPianoLine(Graphics2D g, int pos, char posText) {
@@ -170,13 +172,26 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 			offNote();
 			return;
 		}
-		playNote = OptionalInt.of(note);
+		playNote(new int[]{ note }, velocity);
+	}
+
+	@Override
+	public void playNote(int note[], int velocity) {
+		if (note == null) {
+			offNote();
+			return;
+		}
+		playNote = note;
+		MMLNoteEvent noteEvent[] = new MMLNoteEvent[note.length];
+		for (int i = 0; i < note.length; i++) {
+			noteEvent[i] = new MMLNoteEvent(note[i], 0, 0, velocity);
+		}
 
 		MabiDLS dls = MabiDLS.getInstance();
 		if (!dls.getSequencer().isRunning()) {
 			int program = mmlManager.getActivePartProgram();
 			dls.loadRequiredInstruments(mmlManager.getMMLScore());
-			dls.playNote(note, program, PLAY_CHANNEL, velocity);
+			dls.playNotes(noteEvent, program, PLAY_CHANNEL);
 		}
 
 		repaint();
@@ -184,7 +199,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 
 	@Override
 	public void offNote() {
-		playNote = OptionalInt.empty();
+		playNote = null;
 		int program = mmlManager.getActivePartProgram();
 		MabiDLS.getInstance().playNote(Integer.MIN_VALUE, program, PLAY_CHANNEL, 0);
 

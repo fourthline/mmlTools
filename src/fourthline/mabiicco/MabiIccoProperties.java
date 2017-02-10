@@ -74,6 +74,9 @@ public final class MabiIccoProperties {
 	/** Midi Device */
 	public final Property<String> midiInputDevice = new StringProperty("midi.input_device");
 
+	/** Midi キーボード 和音入力 */
+	public final Property<Boolean> midiChordInput = new BooleanProperty("midi.chord_input", false);
+
 	/** ファイル履歴 */
 	public static final int MAX_FILE_HISTORY = 8;
 	private static final String FILE_HISTORY = "file.history";

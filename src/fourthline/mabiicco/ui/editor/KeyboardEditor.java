@@ -7,12 +7,14 @@ package fourthline.mabiicco.ui.editor;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.function.IntConsumer;
 
-import javax.sound.midi.MetaMessage;
 import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.MidiSystem;
@@ -20,24 +22,27 @@ import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.Sequencer;
 import javax.sound.midi.ShortMessage;
-import javax.sound.midi.SysexMessage;
 import javax.sound.midi.Transmitter;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerModel;
 
 import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mabiicco.midi.IPlayNote;
+import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.IMMLManager;
 import fourthline.mabiicco.ui.PianoRollView;
 import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLNoteEvent;
+import fourthline.mmlTools.MMLTrack;
 import fourthline.mmlTools.parser.MMLEventParser;
 
 import static fourthline.mabiicco.AppResource.appText;
@@ -46,7 +51,12 @@ import static fourthline.mabiicco.AppResource.appText;
 /**
  * キーボード入力による編集.
  */
-public final class KeyboardEditor implements KeyListener, Receiver {
+public final class KeyboardEditor {
+
+	private static boolean debug = false;
+ 	public static void setDebug(boolean b) {
+		debug = b;
+	}
 
 	private final JDialog dialog;
 
@@ -58,14 +68,40 @@ public final class KeyboardEditor implements KeyListener, Receiver {
 	private final int minOct = 0;
 	private final int maxOct = 8;
 
-	private MidiDevice midiDevice = null;
-
-	private MMLNoteEvent editNote = null;
 	private final JPanel panel = new JPanel(new BorderLayout());
 	private final JComboBox<MidiDevice.Info> midiList = new JComboBox<>();
 	private final JSpinner velocityValueField = NumberSpinner.createSpinner(MMLNoteEvent.INIT_VOL, 0, MMLNoteEvent.MAX_VOL, 1);
 	private final JSpinner octaveValueField = NumberSpinner.createSpinner(initOct, minOct, maxOct, 1);
 	private IntConsumer noteAlignChanger;
+
+	private final CharKeyboard charKeyboard = new CharKeyboard();
+	private final MidiKeyboard midiKeyboard = new MidiKeyboard();
+
+	/** 単音/和音入力は排他 */
+	private IKeyboardAction currentAction = null;
+
+	private synchronized boolean tryLock(IKeyboardAction action) {
+		if (currentAction == null) {
+			if (debug) System.out.println("lock   "+action.toString());
+			currentAction = action;
+			return true;
+		} else if (currentAction == action) {
+			return true;
+		}
+		return false;
+	}
+
+	private synchronized void unlock(IKeyboardAction action) {
+		if (currentAction != action) {
+			throw new IllegalArgumentException("keyboardAction unlock");
+		}
+		if (debug) System.out.println("unlock "+action.toString());
+		currentAction = null;
+	}
+
+	public boolean isEmpty() {
+		return (currentAction == null);
+	}
 
 	public KeyboardEditor(Frame parentFrame, IMMLManager mmlManager, IPlayNote player, IEditAlign editAlign, PianoRollView pianoRollView) {
 		this.mmlManager = mmlManager;
@@ -104,49 +140,53 @@ public final class KeyboardEditor implements KeyListener, Receiver {
 		initialSpinnerProperty(octaveValueField);
 		panel2.add(octaveValueField);
 
-		JPanel midiPanel = new JPanel();
-		midiPanel.add(new JLabel("Midi Device: "));
+		JPanel panel3 = new JPanel();
+		panel3.add(new JLabel(appText("edit.midi_device")));
 		midiList.setFocusable(false);
-		midiList.addActionListener(t -> {
-			synchronized (this) {
-				if (midiDevice != null) {
-					midiDevice.close();
-				}
-				MidiDevice.Info info = midiList.getItemAt(midiList.getSelectedIndex());
-				if (info == null) return;
-				System.out.println("midi select > \""+info.getName()+"\"");
-				try {
-					MidiDevice device = MidiSystem.getMidiDevice(info);
-					if (!device.isOpen()) {
-						device.open();
-						Transmitter transmitter = MidiSystem.getMidiDevice(info).getTransmitter();
-						transmitter.setReceiver(this);
-						midiDevice = device;
-					}
-					MabiIccoProperties.getInstance().midiInputDevice.set(info.getName());
-				} catch (MidiUnavailableException e) {
-					e.printStackTrace();
-				}
-			}
-		});
-		midiPanel.add(midiList);
+		midiList.addActionListener(new MidiEventListener());
+		panel3.add(midiList);
+
+		JPanel panel4 = new JPanel();
+		panel4.add(new JLabel(appText("edit.midi_device.input_method")));
+		ButtonGroup buttonGroup = new ButtonGroup();
+		JRadioButton r1 = new JRadioButton(appText("edit.midi_device.mono"));
+		JRadioButton r2 = new JRadioButton(appText("edit.midi_device.chord"));
+		r1.setFocusable(false);
+		r2.setFocusable(false);
+		buttonGroup.add(r1);
+		buttonGroup.add(r2);
+		if (MabiIccoProperties.getInstance().midiChordInput.get()) {
+			r1.setSelected(false);
+			r2.setSelected(true);
+		} else {
+			r1.setSelected(true);
+			r2.setSelected(false);
+		}
+		r1.addActionListener(t -> changeEditor(false));
+		r2.addActionListener(t -> changeEditor(true));
+		panel4.add(r1);
+		panel4.add(r2);
 
 		JPanel nPanel = new JPanel();
 		nPanel.setLayout(new BoxLayout(nPanel, BoxLayout.Y_AXIS));
 		nPanel.add(createLPanel(new JLabel(appText("edit.keyboard.input.description"))));
 		nPanel.add(createLPanel(panel1));
 		nPanel.add(createLPanel(panel2));
-		nPanel.add(createLPanel(midiPanel));
+		nPanel.add(createLPanel(panel3));
+		nPanel.add(createLPanel(panel4));
 
 		panel.add(nPanel, BorderLayout.NORTH);
 
-		dialog.addKeyListener(this);
+		dialog.addKeyListener(charKeyboard);
 		dialog.getContentPane().add(panel);
 		dialog.setResizable(false);
-		dialog.setLocationRelativeTo(null);
 	}
 
 	public void setVisible(boolean b) {
+		if (!b) {
+			dialog.setVisible(b);
+			return;
+		}
 		String initialMidiName = MabiIccoProperties.getInstance().midiInputDevice.get();
 		midiList.removeAllItems();
 		MabiDLS.getInstance().getMidiInDevice().forEach(t -> midiList.addItem(t));
@@ -170,272 +210,485 @@ public final class KeyboardEditor implements KeyListener, Receiver {
 			}
 		}
 
+		midiKeyboard.initPartList();
+
 		dialog.pack();
+		dialog.setLocationRelativeTo(null);
 		dialog.setVisible(b);
 	}
 
-
-
-	private void addNote(char code) {
-		int octave = ((Integer) octaveValueField.getValue()).intValue();
-		int note = MMLEventParser.firstNoteNumber("o"+octave+code);
-		addNote(note);
+	private int nextTick(int tickOffset) {
+		int tickLength = editAlign.getEditAlign();
+		int nextTick = tickOffset + tickLength;
+		nextTick -= nextTick % tickLength;
+		return nextTick;
 	}
 
-	private void addNote(int note) {
-		int tickOffset = (int) pianoRollView.getSequencePosition();
-		MMLEventList activePart = mmlManager.getActiveMMLPart();
-
-		int velocity = ((Integer) velocityValueField.getValue()).intValue();
-		int nextTick = tickOffset + editAlign.getEditAlign();
-		nextTick -= nextTick % editAlign.getEditAlign();
-		MMLNoteEvent noteEvent = new MMLNoteEvent(note, nextTick-tickOffset, tickOffset, velocity);
-		activePart.addMMLNoteEvent(noteEvent);
-		player.playNote(note, velocity);
-		pianoRollView.setSequenceTick(nextTick);
-		mmlManager.updateActivePart(true);
-		mmlManager.updatePianoRollView(note);
-		this.editNote = noteEvent;
+	private int prevTick(int tickOffset) {
+		int tickLength = editAlign.getEditAlign();
+		int nextTick = tickOffset - tickLength;
+		nextTick -= nextTick % tickLength;
+		return nextTick;
 	}
 
-	private void addRest() {
-		int tickOffset = (int) pianoRollView.getSequencePosition();
-		MMLEventList activePart = mmlManager.getActiveMMLPart();
-
-		MMLNoteEvent noteEvent = activePart.searchOnTickOffset(tickOffset);
-		activePart.deleteMMLEvent(noteEvent);
-		int nextTick = tickOffset + editAlign.getEditAlign();
-		nextTick -= nextTick % editAlign.getEditAlign();
-		pianoRollView.setSequenceTick(nextTick);
-		mmlManager.updateActivePart(true);
-		mmlManager.updatePianoRollView();
-		this.editNote = null;
+	public void changeEditor(boolean chordInput) {
+		MabiIccoProperties.getInstance().midiChordInput.set(chordInput);
+		charKeyboard.clear();
+		midiKeyboard.clear();
 	}
 
-	private void backDelete() {
-		int tickOffset = (int) pianoRollView.getSequencePosition();
-		MMLEventList activePart = mmlManager.getActiveMMLPart();
+	private interface IKeyboardAction {
+		void clear();
+		void pressNote(int note);
+		void addTick();
+		void releaseNote(int note);
+		boolean isPlay();
+	}
 
-		int nextTick = tickOffset - editAlign.getEditAlign();
-		nextTick -= nextTick % editAlign.getEditAlign();
-		MMLNoteEvent deleteEvent = activePart.searchOnTickOffset(nextTick);
-		activePart.deleteMMLEvent(deleteEvent);
-		pianoRollView.setSequenceTick(nextTick);
-		mmlManager.updateActivePart(true);
+	/**
+	 * キーボード/MIDI: 単音入力
+	 */
+	private final class CharKeyboard implements KeyListener, IKeyboardAction {
+		private MMLNoteEvent editNote = null;
+		private int playNote = Integer.MIN_VALUE;
 
-		MMLNoteEvent prevNote = activePart.searchPrevNoteOnTickOffset(nextTick);
-		if (prevNote != null) {
-			mmlManager.updatePianoRollView(prevNote.getNote());
-		} else {
-			mmlManager.updatePianoRollView();
+		private int charToNote(char code) {
+			int octave = ((Integer) octaveValueField.getValue()).intValue();
+			int note = MMLEventParser.firstNoteNumber("o"+octave+code);
+			return note;
 		}
-		this.editNote = null;
-	}
 
-	private void octaveChange(char code) {
-		SpinnerModel model = octaveValueField.getModel();
-		try {
-			if (code == '<') {
-				octaveValueField.setValue( model.getPreviousValue() );
-			} else if (code == '>') {
-				octaveValueField.setValue( model.getNextValue() );
-			}
-		} catch (IllegalArgumentException e) {}
-		this.editNote = null;
-	}
-
-	private void addSharpFlat(char code) {
-		if (editNote == null) {
-			return;
+		@Override
+		public String toString() {
+			return "CharKeyboard";
 		}
-		if ( (code == '+') || (code == '#') ) {
-			editNote.setNote(editNote.getNote()+1);
-			player.playNote(editNote.getNote(), editNote.getVelocity());
-			mmlManager.updateActivePart(true);
-		} else if (code == '-') {
-			editNote.setNote(editNote.getNote()-1);
-			player.playNote(editNote.getNote(), editNote.getVelocity());
-			mmlManager.updateActivePart(true);
+
+		@Override
+		public void clear() {
+			editNote = null;
 		}
-		mmlManager.updatePianoRollView(editNote.getNote());
-		this.editNote = null;
-	}
 
-	private void addEditTick() {
-		int tickOffset = (int) pianoRollView.getSequencePosition();
-		MMLEventList activePart = mmlManager.getActiveMMLPart();
-
-		MMLNoteEvent noteEvent = activePart.searchOnTickOffset(tickOffset-1);
-		if (noteEvent != null) {
-			noteEvent = noteEvent.clone();
-			int nextTick = tickOffset + editAlign.getEditAlign();
-			nextTick -= nextTick % editAlign.getEditAlign();
-			noteEvent.setTick(nextTick - noteEvent.getTickOffset());
+		@Override
+		public void pressNote(int note) {
+			MMLEventList activePart = mmlManager.getActiveMMLPart();
+			int velocity = ((Integer) velocityValueField.getValue()).intValue();
+			int tickOffset = (int) pianoRollView.getSequencePosition();
+			int nextTick = nextTick(tickOffset);
+			MMLNoteEvent noteEvent = new MMLNoteEvent(note, nextTick-tickOffset, tickOffset, velocity);
 			activePart.addMMLNoteEvent(noteEvent);
+			playNote = note;
+			player.playNote(note, velocity);
 			pianoRollView.setSequenceTick(nextTick);
 			mmlManager.updateActivePart(true);
-			mmlManager.updatePianoRollView(noteEvent.getNote());
+			mmlManager.updatePianoRollView(note);
 			this.editNote = noteEvent;
 		}
-	}
 
-	private void cursorMove(boolean forward) {
-		int tickOffset = (int) pianoRollView.getSequencePosition();
-		MMLEventList activePart = mmlManager.getActiveMMLPart();
-		int nextTick = tickOffset + (forward?editAlign.getEditAlign():-editAlign.getEditAlign());
-		nextTick -= nextTick % editAlign.getEditAlign();
-		pianoRollView.setSequenceTick(nextTick);
-
-		MMLNoteEvent prevNote = activePart.searchPrevNoteOnTickOffset(nextTick);
-		if (prevNote != null) {
-			mmlManager.updatePianoRollView(prevNote.getNote());
-		} else {
+		private void addRest() {
+			int tickOffset = (int) pianoRollView.getSequencePosition();
+			int nextTick = nextTick(tickOffset);
+			MMLEventList activePart = mmlManager.getActiveMMLPart();
+			MMLNoteEvent noteEvent = activePart.searchOnTickOffset(tickOffset);
+			activePart.deleteMMLEvent(noteEvent);
+			pianoRollView.setSequenceTick(nextTick);
+			mmlManager.updateActivePart(true);
 			mmlManager.updatePianoRollView();
+			this.editNote = null;
 		}
-		this.editNote = null;
-	}
 
-	private void velocityChange(boolean up) {
-		SpinnerModel model = velocityValueField.getModel();
-		try {
-			velocityValueField.setValue( up ? model.getNextValue() : model.getPreviousValue() );
-		} catch (IllegalArgumentException e) {}
-	}
+		private void backDelete() {
+			int tickOffset = (int) pianoRollView.getSequencePosition();
+			MMLEventList activePart = mmlManager.getActiveMMLPart();
 
-	private void changeNoteAlign(char code) {
-		char select[] = {
-				'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'
-		};
-		for (int i = 0; i < select.length; i++) {
-			if (select[i] == code) {
-				noteAlignChanger.accept(i);
+			int prevTick = prevTick(tickOffset);
+			MMLNoteEvent deleteEvent = activePart.searchOnTickOffset(prevTick);
+			activePart.deleteMMLEvent(deleteEvent);
+			pianoRollView.setSequenceTick(prevTick);
+			mmlManager.updateActivePart(true);
+
+			MMLNoteEvent prevNote = activePart.searchPrevNoteOnTickOffset(prevTick);
+			if (prevNote != null) {
+				mmlManager.updatePianoRollView(prevNote.getNote());
+			} else {
+				mmlManager.updatePianoRollView();
 			}
+			this.editNote = null;
 		}
-	}
 
-	private void pressAction(char code) {
-		if ( (code >= 'a') && (code <= 'g') || (code >= 'A') && (code <= 'G') ) {
-			addNote(code);
-		} else if ( (code == 'r') || (code == 'R') ) {
-			addRest();
-		} else if (code == KeyEvent.VK_BACK_SPACE) {
-			backDelete();
-		} else if ( (code == '<') || (code == '>') ) {
-			octaveChange(code);
-		} else if ( (code == '+') || (code == '#') || (code == '-') ) {
-			addSharpFlat(code);
-		} else if (code == ' ') {
-			addEditTick();
-		} else if (code == KeyEvent.VK_ESCAPE) {
-			dialog.setVisible(false);
-		} else if (code == KeyEvent.VK_LEFT) {
-			cursorMove(false);
-		} else if (code == KeyEvent.VK_RIGHT) {
-			cursorMove(true);
-		} else if (code == KeyEvent.VK_DOWN) {
-			velocityChange(false);
-		} else if (code == KeyEvent.VK_UP) {
-			velocityChange(true);
-		} else {
-			changeNoteAlign(code);
+		private void octaveChange(char code) {
+			SpinnerModel model = octaveValueField.getModel();
+			try {
+				if (code == '<') {
+					octaveValueField.setValue( model.getPreviousValue() );
+				} else if (code == '>') {
+					octaveValueField.setValue( model.getNextValue() );
+				}
+			} catch (IllegalArgumentException e) {}
+			this.editNote = null;
 		}
-	}
 
-	private void releaseAction() {
-		player.offNote();
-	}
-
-	private Optional<Character> inputCode = Optional.empty();
-	@Override
-	public void keyTyped(KeyEvent e) {
-		Sequencer sequencer = MabiDLS.getInstance().getSequencer();
-		synchronized (this) {
-			if (sequencer.isRunning()) {
-				inputCode = Optional.empty();
+		private void addSharpFlat(char code) {
+			if (editNote == null) {
 				return;
 			}
-			if (!inputCode.isPresent() || (inputCode.get() != e.getKeyChar()) ) {
-				char code = e.getKeyChar();
-				pressAction(code);
-				inputCode = Optional.of(code);
+			if ( (code == '+') || (code == '#') ) {
+				editNote.setNote(editNote.getNote()+1);
+			} else if (code == '-') {
+				editNote.setNote(editNote.getNote()-1);
+			} else {
+				return;
 			}
+			int note = editNote.getNote();
+			playNote = note;
+			player.playNote(note, editNote.getVelocity());
+			mmlManager.updateActivePart(true);
+			mmlManager.updatePianoRollView(editNote.getNote());
 		}
-	}
 
-	@Override
-	public void keyPressed(KeyEvent e) {
-		int code = e.getKeyCode();
-		if ( (code == KeyEvent.VK_LEFT) || (code == KeyEvent.VK_RIGHT)
-				|| (code == KeyEvent.VK_UP) || (code == KeyEvent.VK_DOWN)) {
-			pressAction((char)code);
-		}
-	}
-
-	@Override
-	public void keyReleased(KeyEvent e) {
-		synchronized (this) {
-			if (inputCode.isPresent() && (inputCode.get() == e.getKeyChar())) {
-				releaseAction();
-				inputCode = Optional.empty();
+		@Override
+		public void addTick() {
+			int tickOffset = (int) pianoRollView.getSequencePosition();
+			MMLEventList activePart = mmlManager.getActiveMMLPart();
+			if (editNote == null) {
+				return;
 			}
+
+			int nextTick = nextTick(tickOffset);
+			editNote.setTick(nextTick - editNote.getTickOffset());
+			activePart.addMMLNoteEvent(editNote);
+			pianoRollView.setSequenceTick(nextTick);
+			mmlManager.updateActivePart(true);
+			mmlManager.updatePianoRollView(editNote.getNote());
 		}
-	}
 
-	private int midiNote = Integer.MIN_VALUE;
-	private synchronized void shortMessageAction(ShortMessage msg) {
-		int command = msg.getCommand();
-		int data1 = msg.getData1();
-		int data2 = msg.getData2();
+		private void cursorMove(boolean forward) {
+			int tickOffset = (int) pianoRollView.getSequencePosition();
+			MMLEventList activePart = mmlManager.getActiveMMLPart();
+			int nextTick = forward ? nextTick(tickOffset) : prevTick(tickOffset);
+			pianoRollView.setSequenceTick(nextTick);
 
-		switch (command) {
-		case ShortMessage.CONTROL_CHANGE:
-			if (data1 == 64) { // Hold1
-				if (data2 > 0) {
-					addEditTick();
+			MMLNoteEvent prevNote = activePart.searchPrevNoteOnTickOffset(nextTick);
+			if (prevNote != null) {
+				mmlManager.updatePianoRollView(prevNote.getNote());
+			} else {
+				mmlManager.updatePianoRollView();
+			}
+			this.editNote = null;
+		}
+
+		private void velocityChange(boolean up) {
+			SpinnerModel model = velocityValueField.getModel();
+			try {
+				velocityValueField.setValue( up ? model.getNextValue() : model.getPreviousValue() );
+			} catch (IllegalArgumentException e) {}
+		}
+
+		private void changeNoteAlign(char code) {
+			char select[] = {
+					'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'
+			};
+			for (int i = 0; i < select.length; i++) {
+				if (select[i] == code) {
+					noteAlignChanger.accept(i);
 				}
 			}
-			break;
-		case ShortMessage.NOTE_ON:
-			if (data2 > 0) {
-				int note = data1 - 12;
-				int velocity = data2 / 8;
-				System.out.println("NOTE ON: "+note+" v"+velocity);
-				player.playNote(note, velocity);
-				midiNote = note;
-				addNote(note);
+		}
+
+		private void pressAction(char code) {
+			if (!tryLock(this)) {
+				return;
+			}
+			if ( (code >= 'a') && (code <= 'g') || (code >= 'A') && (code <= 'G') ) {
+				int note = charToNote(code);
+				if (playNote != note) {
+					pressNote(note);
+				}
+			} else if ( (code == 'r') || (code == 'R') ) {
+				addRest();
+			} else if (code == KeyEvent.VK_BACK_SPACE) {
+				backDelete();
+			} else if ( (code == '<') || (code == '>') ) {
+				octaveChange(code);
+			} else if ( (code == '+') || (code == '#') || (code == '-') ) {
+				addSharpFlat(code);
+			} else if (code == KeyEvent.VK_ESCAPE) {
+				dialog.setVisible(false);
+			} else if (code == KeyEvent.VK_LEFT) {
+				cursorMove(false);
+			} else if (code == KeyEvent.VK_RIGHT) {
+				cursorMove(true);
+			} else if (code == KeyEvent.VK_DOWN) {
+				velocityChange(false);
+			} else if (code == KeyEvent.VK_UP) {
+				velocityChange(true);
+			} else if ( (code >= '0') && (code <= '9') ) {
+				changeNoteAlign(code);
+			}
+			if (!isPlay()) {
+				unlock(this);
+			}
+		}
+
+		@Override
+		public boolean isPlay() {
+			return (playNote != Integer.MIN_VALUE);
+		}
+
+		@Override
+		public void releaseNote(int note) {
+			if ( (note != Integer.MIN_VALUE) && (playNote == note) ) {
+				playNote = Integer.MIN_VALUE;
+				player.offNote();
+			}
+		}
+
+		private char typeCode = 0;
+		@Override
+		public void keyTyped(KeyEvent e) {
+			Sequencer sequencer = MabiDLS.getInstance().getSequencer();
+			synchronized (this) {
+				if (sequencer.isRunning()) {
+					return;
+				}
+				char code = e.getKeyChar();
+				// スペースキーは現在の入力に対して実施する.
+				if (code == ' ') {
+					if (currentAction != null) {
+						currentAction.addTick();
+					}
+					return;
+				}
+				if (typeCode != code) {
+					typeCode = code;
+					pressAction(code);
+				}
+			}
+		}
+
+		@Override
+		public void keyPressed(KeyEvent e) {
+			if (e.getKeyChar() == ' ') {
+				return;
+			}
+			int code = e.getKeyCode();
+			if ( (code == KeyEvent.VK_LEFT) || (code == KeyEvent.VK_RIGHT)
+					|| (code == KeyEvent.VK_UP) || (code == KeyEvent.VK_DOWN)) {
+				pressAction((char)code);
+			}
+		}
+
+		@Override
+		public void keyReleased(KeyEvent e) {
+			synchronized (this) {
+				char keyChar = e.getKeyChar();
+				if ( typeCode != keyChar ) {
+					return;
+				}
+				typeCode = 0;
+				if ( (keyChar != ' ') && (playNote != Integer.MIN_VALUE) ) {
+					unlock(this);
+				}
+				releaseNote(playNote);
+			}
+		}
+	}
+
+	/**
+	 * MIDI: 和音入力
+	 */
+	private final class MidiKeyboard implements IKeyboardAction {
+		private final ArrayList<MMLNoteEvent> chord = new ArrayList<>();
+		private final ArrayList<MMLEventList> partList = new ArrayList<>();
+		private void initPartList() {
+			partList.clear();
+			int program = mmlManager.getActivePartProgram();
+			boolean enablePart[] = InstClass.getEnablePartByProgram(program);
+			int trackIndex = mmlManager.getActiveTrackIndex();
+			MMLTrack activeTrack = mmlManager.getMMLScore().getTrack(trackIndex);
+			for (int i = 0; i < enablePart.length; i++) {
+				if (enablePart[i]) {
+					partList.add(activeTrack.getMMLEventAtIndex(i));
+				}
+			}
+		}
+
+		@Override
+		public String toString() {
+			return "MidiKeyboard";
+		}
+
+		@Override
+		public void clear() {
+			chord.clear();
+		}
+
+		@Override
+		public void pressNote(int note) {
+			if (chord.size() >= partList.size()) {
+				return;
+			}
+			int tickOffset = (int) pianoRollView.getSequencePosition();
+			int tickLength = editAlign.getEditAlign();
+			if (!chord.isEmpty()) {
+				tickLength = chord.get(0).getTick();
+			}
+			int velocity = ((Integer)velocityValueField.getValue()).intValue();
+			if (!chord.stream().anyMatch(t -> t.getNote() == note)) {
+				MMLNoteEvent addNoteEvent = new MMLNoteEvent(note, tickLength, tickOffset, velocity);
+
+				chord.add(addNoteEvent);
+			}
+			Iterator<MMLNoteEvent> noteList = chord.iterator();
+			for (int i = 0; i < partList.size(); i++) {
+				if (noteList.hasNext()) {
+					partList.get(i).addMMLNoteEvent( noteList.next() );
+				} else {
+					MMLNoteEvent deleteNoteEvent = partList.get(i).searchOnTickOffset(tickOffset);
+					if (deleteNoteEvent != null) {
+						partList.get(i).deleteMMLEvent(deleteNoteEvent);
+					}
+				}
+			}
+			int playNote[] = new int[chord.size()];
+			for (int i = 0; i < playNote.length; i++) {
+				playNote[i] = chord.get(i).getNote();
+			}
+			player.playNote(playNote, velocity);
+			mmlManager.updateActivePart(true);
+			mmlManager.updatePianoRollView(note);
+		}
+
+		@Override
+		public void addTick() {
+			for (int i = 0; i < chord.size(); i++) {
+				MMLNoteEvent note = chord.get(i);
+				partList.get(i).deleteMMLEvent(note);
+				note.setTick( note.getTick() + editAlign.getEditAlign() );
+				partList.get(i).addMMLNoteEvent(note);
+			}
+			mmlManager.updateActivePart(true);
+			mmlManager.updatePianoRollView();
+		}
+
+		@Override
+		public void releaseNote(int note) {
+			if (chord.size() == 0) {
+				return;
+			}
+			int nextTick = chord.get(0).getEndTick();
+			for (MMLNoteEvent n : chord) {
+				if (n.getNote() == note) {
+					chord.remove(n);
+					break;
+				}
+			}
+			if (chord.size() == 0) {
+				player.offNote();
+				pianoRollView.setSequenceTick(nextTick);
+				mmlManager.updateActivePart(true);
+				mmlManager.updatePianoRollView();
+			}
+		}
+
+		@Override
+		public boolean isPlay() {
+			return (chord.size() != 0);
+		}
+	}
+
+	/**
+	 * MIDIデバイスからのイベント処理を行います.
+	 */
+	private final class MidiEventListener implements Receiver, ActionListener {
+		private MidiDevice midiDevice = null;
+
+		@Override
+		public void actionPerformed(ActionEvent event) {
+			if (event.getSource() != midiList) {
+				return;
+			}
+			if (midiDevice != null) {
+				midiDevice.close();
+			}
+			MidiDevice.Info info = midiList.getItemAt(midiList.getSelectedIndex());
+			if (info == null) return;
+			System.out.println("midi select > \""+info.getName()+"\"");
+			try {
+				MidiDevice device = MidiSystem.getMidiDevice(info);
+				if (!device.isOpen()) {
+					device.open();
+					Transmitter transmitter = MidiSystem.getMidiDevice(info).getTransmitter();
+					transmitter.setReceiver(this);
+					midiDevice = device;
+				}
+				MabiIccoProperties.getInstance().midiInputDevice.set(info.getName());
+			} catch (MidiUnavailableException e) {
+				e.printStackTrace();
+			}
+		}
+
+		private synchronized void shortMessageAction(ShortMessage msg) {
+			int command = msg.getCommand();
+			int data1 = msg.getData1();
+			int data2 = msg.getData2();
+			int note = data1 - 12;
+			IKeyboardAction action = MabiIccoProperties.getInstance().midiChordInput.get() ? midiKeyboard : charKeyboard;
+
+			if (!tryLock(action)) {
+				return;
+			}
+			switch (command) {
+			case ShortMessage.CONTROL_CHANGE:
+				if (data1 == 64) { // Hold1
+					if (data2 > 0) {
+						action.addTick();
+					}
+				}
+				break;
+			case ShortMessage.NOTE_ON:
+				if (data2 > 0) {
+					action.pressNote(note);
+					break;
+				}
+				// data2 == 0 は Note Off.
+			case ShortMessage.NOTE_OFF:
+				action.releaseNote(note);
 				break;
 			}
-			// data2 == 0 は Note Off.
-		case ShortMessage.NOTE_OFF:
-			int note = data1 - 12;
-			if (note == midiNote) {
-				player.offNote();
-				midiNote = Integer.MIN_VALUE;
+			if (!action.isPlay()) {
+				unlock(action);
 			}
-			break;
 		}
+
+		@Override
+		public void send(MidiMessage message, long timeStamp) {
+			Sequencer sequencer = MabiDLS.getInstance().getSequencer();
+			if (sequencer.isRunning()) {
+				return;
+			}
+			if (message.getStatus() == ShortMessage.ACTIVE_SENSING) {
+				return;
+			}
+			if (message instanceof ShortMessage) {
+				shortMessageAction((ShortMessage)message);
+			}
+		}
+
+		@Override
+		public void close() {}
 	}
 
-	@Override
-	public void send(MidiMessage message, long timeStamp) {
-		Sequencer sequencer = MabiDLS.getInstance().getSequencer();
-		if (sequencer.isRunning()) {
-			return;
-		}
-		System.out.print(timeStamp+" > ");
-		if (message instanceof MetaMessage) {
-			System.out.println("MetaMessage");
-		} else if (message instanceof ShortMessage) {
-			System.out.println("ShortMessage");
-			shortMessageAction((ShortMessage)message);
-		} else if (message instanceof SysexMessage) {
-			System.out.println("Sysex");
-		} else {
-			System.out.println("Unknown MIDI message.");
-		}
+	public KeyListener getKeyListener() {
+		return charKeyboard;
 	}
 
-	@Override
-	public void close() {}
-
+	public Receiver getReciever() {
+		ActionListener actionListener[] = midiList.getActionListeners();
+		for (ActionListener action : actionListener) {
+			if (action instanceof Receiver) {
+				return (Receiver) action;
+			}
+		}
+		return null;
+	}
 }
