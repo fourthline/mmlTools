@@ -1,5 +1,6 @@
 mmlTools
 =======
+[![Build Status](https://travis-ci.org/fourthline/mmlTools.svg?branch=master)](https://travis-ci.org/fourthline/mmlTools)
 
 ### 最新版のダウンロード
 
