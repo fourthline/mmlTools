@@ -7,6 +7,7 @@ package fourthline.mmlTools.optimizer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import fourthline.mmlTools.core.MMLTokenizer;
 
@@ -19,7 +20,7 @@ public final class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 	/**
 	 * Lの文字列と、生成中文字列のBuilder.
 	 */
-	private final HashMap<String, StringBuilder> map = new HashMap<>();
+	private final Map<String, StringBuilder> map = new HashMap<>();
 
 	public OxLxOptimizer() {
 		map.clear();
@@ -28,11 +29,16 @@ public final class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 
 	@Override
 	public String getMinString() {
-		return map.values()
-				.stream()
-				.min((t1, t2) -> (t1.length() - t2.length()))
-				.get()
-				.toString();
+		StringBuilder min = null;
+		int minLength = Integer.MAX_VALUE;
+		for (StringBuilder sb : map.values()) {
+			int len = sb.length();
+			if (len < minLength) {
+				min = sb;
+				minLength = len;
+			}
+		}
+		return (min == null) ? "" : min.toString();
 	}
 
 	private void printMap() {

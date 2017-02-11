@@ -278,6 +278,7 @@ public final class MabiDLS {
 		}
 		midiMuteOff();
 		changeProgram(program, channel);
+		setChannelPanpot(channel, 64);
 		MidiChannel midiChannel = this.channel[channel];
 		MMLNoteEvent[] playNoteEvents = this.playNoteList.get(channel);
 
@@ -286,13 +287,13 @@ public final class MabiDLS {
 			if ( (noteList != null) && (i < noteList.length) ) {
 				note = noteList[i];
 			}
-			if ( (note == null) || (note != playNoteEvents[i]) ) {
+			if ( (note == null) || (!note.equals(playNoteEvents[i])) ) {
 				if (playNoteEvents[i] != null) {
 					midiChannel.noteOff( convertNoteMML2Midi(playNoteEvents[i].getNote()) );
 					playNoteEvents[i] = null;
 				}
 			}
-			if (note != playNoteEvents[i]) {
+			if ( (note != null) && (!note.equals(playNoteEvents[i]))) {
 				InstClass instClass = getInstByProgram(program);
 				int velocity = convertVelocityOnAtt(instClass, note.getNote(), note.getVelocity());
 				int midiNote = convertNoteMML2Midi(note.getNote());
