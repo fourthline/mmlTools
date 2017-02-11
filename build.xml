@@ -85,4 +85,8 @@
 		</fx:jar>
 	</target>
 	<!-- // jfx-package task -->
+
+	<!-- test task -->
+	<target name="test" depends="jfx-package">
+	</target>
 </project>
