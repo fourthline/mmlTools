@@ -53,8 +53,8 @@ import static fourthline.mabiicco.AppResource.appText;
  */
 public final class KeyboardEditor {
 
-	private static boolean debug = false;
- 	public static void setDebug(boolean b) {
+	private static boolean debug = true;
+	public static void setDebug(boolean b) {
 		debug = b;
 	}
 
@@ -72,6 +72,8 @@ public final class KeyboardEditor {
 	private final JComboBox<MidiDevice.Info> midiList = new JComboBox<>();
 	private final JSpinner velocityValueField = NumberSpinner.createSpinner(MMLNoteEvent.INIT_VOL, 0, MMLNoteEvent.MAX_VOL, 1);
 	private final JSpinner octaveValueField = NumberSpinner.createSpinner(initOct, minOct, maxOct, 1);
+	private final JRadioButton monoButton = new JRadioButton(appText("edit.midi_device.mono"));
+	private final JRadioButton chordButton = new JRadioButton(appText("edit.midi_device.chord"));
 	private IntConsumer noteAlignChanger;
 
 	private final CharKeyboard charKeyboard = new CharKeyboard();
@@ -149,23 +151,15 @@ public final class KeyboardEditor {
 		JPanel panel4 = new JPanel();
 		panel4.add(new JLabel(appText("edit.midi_device.input_method")));
 		ButtonGroup buttonGroup = new ButtonGroup();
-		JRadioButton r1 = new JRadioButton(appText("edit.midi_device.mono"));
-		JRadioButton r2 = new JRadioButton(appText("edit.midi_device.chord"));
-		r1.setFocusable(false);
-		r2.setFocusable(false);
-		buttonGroup.add(r1);
-		buttonGroup.add(r2);
-		if (MabiIccoProperties.getInstance().midiChordInput.get()) {
-			r1.setSelected(false);
-			r2.setSelected(true);
-		} else {
-			r1.setSelected(true);
-			r2.setSelected(false);
-		}
-		r1.addActionListener(t -> changeEditor(false));
-		r2.addActionListener(t -> changeEditor(true));
-		panel4.add(r1);
-		panel4.add(r2);
+		monoButton.setFocusable(false);
+		chordButton.setFocusable(false);
+		buttonGroup.add(monoButton);
+		buttonGroup.add(chordButton);
+		selectMidiModeButton();
+		monoButton.addActionListener(t -> changeEditor(false));
+		chordButton.addActionListener(t -> changeEditor(true));
+		panel4.add(monoButton);
+		panel4.add(chordButton);
 
 		JPanel nPanel = new JPanel();
 		nPanel.setLayout(new BoxLayout(nPanel, BoxLayout.Y_AXIS));
@@ -180,6 +174,12 @@ public final class KeyboardEditor {
 		dialog.addKeyListener(charKeyboard);
 		dialog.getContentPane().add(panel);
 		dialog.setResizable(false);
+	}
+
+	private void editorInit() {
+		currentAction = null;
+		charKeyboard.clear();
+		midiKeyboard.clear();
 	}
 
 	public void setVisible(boolean b) {
@@ -210,6 +210,7 @@ public final class KeyboardEditor {
 			}
 		}
 
+		editorInit();
 		midiKeyboard.initPartList();
 
 		dialog.pack();
@@ -220,21 +221,39 @@ public final class KeyboardEditor {
 	private int nextTick(int tickOffset) {
 		int tickLength = editAlign.getEditAlign();
 		int nextTick = tickOffset + tickLength;
-		nextTick -= nextTick % tickLength;
 		return nextTick;
 	}
 
 	private int prevTick(int tickOffset) {
 		int tickLength = editAlign.getEditAlign();
 		int nextTick = tickOffset - tickLength;
-		nextTick -= nextTick % tickLength;
 		return nextTick;
 	}
 
+	/**
+	 * MIDI入力モードを変更する. 入力中のモード変更は禁止する.
+	 * @param chordInput    単音は false, 和音は true.
+	 */
 	public void changeEditor(boolean chordInput) {
-		MabiIccoProperties.getInstance().midiChordInput.set(chordInput);
-		charKeyboard.clear();
-		midiKeyboard.clear();
+		if (currentAction == null) {
+			MabiIccoProperties.getInstance().midiChordInput.set(chordInput);
+			charKeyboard.clear();
+			midiKeyboard.clear();
+		}
+		selectMidiModeButton();
+	}
+
+	/**
+	 * MIDI入力モードに基づいてボタンの選択状態を設定する.
+	 */
+	private void selectMidiModeButton() {
+		boolean chordInput = MabiIccoProperties.getInstance().midiChordInput.get();
+		if (monoButton.isSelected() == chordInput) {
+			monoButton.setSelected(!chordInput);
+		}
+		if (chordButton.isSelected() != chordInput) {
+			chordButton.setSelected(chordInput);
+		}
 	}
 
 	private interface IKeyboardAction {
@@ -251,6 +270,7 @@ public final class KeyboardEditor {
 	private final class CharKeyboard implements KeyListener, IKeyboardAction {
 		private MMLNoteEvent editNote = null;
 		private int playNote = Integer.MIN_VALUE;
+		private char typeCode = 0;
 
 		private int charToNote(char code) {
 			int octave = ((Integer) octaveValueField.getValue()).intValue();
@@ -266,6 +286,8 @@ public final class KeyboardEditor {
 		@Override
 		public void clear() {
 			editNote = null;
+			playNote = Integer.MIN_VALUE;
+			typeCode = 0;
 		}
 
 		@Override
@@ -442,7 +464,6 @@ public final class KeyboardEditor {
 			}
 		}
 
-		private char typeCode = 0;
 		@Override
 		public void keyTyped(KeyEvent e) {
 			Sequencer sequencer = MabiDLS.getInstance().getSequencer();
@@ -486,7 +507,9 @@ public final class KeyboardEditor {
 				}
 				typeCode = 0;
 				if ( (keyChar != ' ') && (playNote != Integer.MIN_VALUE) ) {
-					unlock(this);
+					if (tryLock(this)) {
+						unlock(this);
+					}
 				}
 				releaseNote(playNote);
 			}

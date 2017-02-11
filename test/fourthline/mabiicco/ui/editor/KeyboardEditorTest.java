@@ -443,4 +443,50 @@ public class KeyboardEditorTest extends UseLoadingDLS {
 
 		editor.setVisible(false);
 	}
+
+	@Test
+	public void testLock_changeEditor() throws InterruptedException, InvalidMidiDataException {
+		MMLTrack expect = new MMLTrack().setMML("MML@<c8c8,,;");
+		new Thread(() -> editor.setVisible(true)).start();
+		Thread.sleep(500);
+
+		Receiver reciver = editor.getReciever();
+
+		// MIDI入力中のモード切替禁止
+		reciver.send(new ShortMessage(ShortMessage.NOTE_ON, 0, 48, 110), 0);
+		assertFalse(editor.isEmpty());
+		editor.changeEditor(false);
+		assertFalse(editor.isEmpty());
+		reciver.send(new ShortMessage(ShortMessage.NOTE_ON, 0, 48, 0), 0);
+		assertTrue(editor.isEmpty());
+
+		// MIDI入力中のモード切替禁止
+		reciver.send(new ShortMessage(ShortMessage.NOTE_ON, 0, 48, 110), 0);
+		assertFalse(editor.isEmpty());
+		editor.changeEditor(true);
+		assertFalse(editor.isEmpty());
+		reciver.send(new ShortMessage(ShortMessage.NOTE_ON, 0, 48, 0), 0);
+		assertTrue(editor.isEmpty());
+
+		assertEquals(expect.getMabiMML(), mmlManager.getMMLScore().getTrack(0).getMabiMML());
+
+		editor.setVisible(false);
+	}
+
+	@Test
+	public void testRelease() throws InterruptedException, InvalidMidiDataException {
+		new Thread(() -> editor.setVisible(true)).start();
+		Thread.sleep(500);
+
+		Receiver reciver = editor.getReciever();
+		KeyListener key = editor.getKeyListener();
+
+		// リリースのみ.
+		reciver.send(new ShortMessage(ShortMessage.NOTE_OFF, 0, 48, 0), 0);
+		assertTrue(editor.isEmpty());
+		key.keyReleased(new KeyEvent(new JButton(), 0, 0, 0, 0, 'c'));
+		assertTrue(editor.isEmpty());
+
+		editor.setVisible(false);
+	}
 }

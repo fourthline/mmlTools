@@ -354,6 +354,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		if (checkCloseModifiedFileState()) {
 			openedFile = null;
 			mmlSeqView.initializeMMLTrack();
+			mmlSeqView.setStartPosition();
 			notifyUpdateFileState();
 			MabiDLS.getInstance().all();
 		}
