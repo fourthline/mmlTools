@@ -842,7 +842,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	public void updatePianoRollView() {
 		JViewport viewport = scrollPane.getViewport();
 		Point point = viewport.getViewPosition();
-		int note = pianoRollView.convertY2Note(point.y);
+		int note = pianoRollView.convertY2Note(point.y)-1;
 		updatePianoRollView(note);
 	}
 

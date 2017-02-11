@@ -354,9 +354,17 @@ public final class KeyboardEditor {
 				return;
 			}
 			if ( (code == '+') || (code == '#') ) {
-				editNote.setNote(editNote.getNote()+1);
+				int note = editNote.getNote();
+				if (note < 107) {
+					note++;
+				}
+				editNote.setNote(note);
 			} else if (code == '-') {
-				editNote.setNote(editNote.getNote()-1);
+				int note = editNote.getNote();
+				if (note >= 0) {
+					note--;
+				}
+				editNote.setNote(note);
 			} else {
 				return;
 			}
@@ -365,6 +373,7 @@ public final class KeyboardEditor {
 			player.playNote(note, editNote.getVelocity());
 			mmlManager.updateActivePart(true);
 			mmlManager.updatePianoRollView(editNote.getNote());
+			editNote = null;
 		}
 
 		@Override
