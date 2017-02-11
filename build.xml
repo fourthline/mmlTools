@@ -10,8 +10,19 @@
 
 	<property name="src" location="src" />
 	<property name="dest" location="dest" />
+	<property name="test" location="test" />
+	<property name="lib" location="lib" />
+	<property name="out" location="out" />
 	<property name="properties" location="properties" />
 	<property name="jardest" location="" />
+
+	<path id="classpath">
+		<pathelement location="${lib}/commons-compress/commons-compress-1.9.jar"/>
+	</path>
+	<path id="classpath-test">
+		<pathelement location="${lib}/junit-4.12.jar"/>
+		<pathelement location="${lib}/hamcrest-core-1.3.jar"/>
+	</path>
 
 	<!-- アプリケーションの設定 -->
 	<property name="app.vendor" value="fourthline" />
@@ -86,7 +97,48 @@
 	</target>
 	<!-- // jfx-package task -->
 
+	<!-- compile-test task -->
+	<target name="compile-test" depends="clean">
+		<javac
+			srcdir="${test}"
+			destdir="${dest}"
+			classpathref="classpath-test"
+			encoding="UTF-8"
+			listfiles="yes"
+			includeantruntime="false" />
+		<copy todir="${dest}">
+			<fileset dir="${test}">
+				<include name="**/*.mml" />
+				<include name="**/*.mms" />
+				<include name="**/*.mmi" />
+				<include name="**/*.mid" />
+				<include name="**/*.txt" />
+			</fileset>
+		</copy>
+	</target>
+
 	<!-- test task -->
-	<target name="test" depends="jfx-package">
+	<target name="test" depends="jfx-package,compile-test">
+		<junit printsummary="no">
+			<classpath>
+				<path refid="classpath"/>
+				<path refid="classpath-test"/>
+				<pathelement path="${dest}"/>
+			</classpath>
+			<formatter type="xml" />
+			<batchtest todir="${dest}">
+				<fileset dir="${test}" includes="**/*Test.java">
+					<exclude name="fourthline/mabiicco/midi/MabiDLSTest.java"/>
+					<exclude name="fourthline/mabiicco/ui/MMLSeqViewTest.java"/>
+					<exclude name="fourthline/mabiicco/ui/MainFrameTest.java"/>
+					<exclude name="fourthline/mabiicco/ui/editor/KeyboardEditorTest.java"/>
+					<exclude name="fourthline/mabiicco/ui/editor/MMLEditorTest.java"/>
+					<exclude name="fourthline/mmlTools/MMLScoreTest.java"/>
+					<exclude name="fourthline/mmlTools/parser/MMLFileTest.java"/>
+					<exclude name="fourthline/mmlTools/parser/MMSFileTest.java"/>
+					<exclude name="fourthline/mmlTools/parser/MidiFileTest.java"/>
+				</fileset>
+			</batchtest>
+		</junit>
 	</target>
 </project>
