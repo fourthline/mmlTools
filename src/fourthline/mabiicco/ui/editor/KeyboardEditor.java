@@ -284,14 +284,14 @@ public final class KeyboardEditor {
 		}
 
 		@Override
-		public void clear() {
+		public synchronized void clear() {
 			editNote = null;
 			playNote = Integer.MIN_VALUE;
 			typeCode = 0;
 		}
 
 		@Override
-		public void pressNote(int note) {
+		public synchronized void pressNote(int note) {
 			MMLEventList activePart = mmlManager.getActiveMMLPart();
 			int velocity = ((Integer) velocityValueField.getValue()).intValue();
 			int tickOffset = (int) pianoRollView.getSequencePosition();
@@ -306,7 +306,7 @@ public final class KeyboardEditor {
 			this.editNote = noteEvent;
 		}
 
-		private void addRest() {
+		private synchronized void addRest() {
 			int tickOffset = (int) pianoRollView.getSequencePosition();
 			int nextTick = nextTick(tickOffset);
 			MMLEventList activePart = mmlManager.getActiveMMLPart();
@@ -373,11 +373,10 @@ public final class KeyboardEditor {
 			player.playNote(note, editNote.getVelocity());
 			mmlManager.updateActivePart(true);
 			mmlManager.updatePianoRollView(editNote.getNote());
-			editNote = null;
 		}
 
 		@Override
-		public void addTick() {
+		public synchronized void addTick() {
 			int tickOffset = (int) pianoRollView.getSequencePosition();
 			MMLEventList activePart = mmlManager.getActiveMMLPart();
 			if (editNote == null) {
@@ -466,7 +465,7 @@ public final class KeyboardEditor {
 		}
 
 		@Override
-		public void releaseNote(int note) {
+		public synchronized void releaseNote(int note) {
 			if ( (note != Integer.MIN_VALUE) && (playNote == note) ) {
 				playNote = Integer.MIN_VALUE;
 				player.offNote();
@@ -550,12 +549,12 @@ public final class KeyboardEditor {
 		}
 
 		@Override
-		public void clear() {
+		public synchronized void clear() {
 			chord.clear();
 		}
 
 		@Override
-		public void pressNote(int note) {
+		public synchronized void pressNote(int note) {
 			if (chord.size() >= partList.size()) {
 				return;
 			}
@@ -591,7 +590,7 @@ public final class KeyboardEditor {
 		}
 
 		@Override
-		public void addTick() {
+		public synchronized void addTick() {
 			for (int i = 0; i < chord.size(); i++) {
 				MMLNoteEvent note = chord.get(i);
 				partList.get(i).deleteMMLEvent(note);
@@ -603,7 +602,7 @@ public final class KeyboardEditor {
 		}
 
 		@Override
-		public void releaseNote(int note) {
+		public synchronized void releaseNote(int note) {
 			if (chord.size() == 0) {
 				return;
 			}
