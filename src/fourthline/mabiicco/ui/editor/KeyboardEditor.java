@@ -84,7 +84,7 @@ public final class KeyboardEditor {
 
 	private synchronized boolean tryLock(IKeyboardAction action) {
 		if (currentAction == null) {
-			if (debug) System.out.println("lock   "+action.toString());
+			if (debug) System.out.println("lock   "+action.getClass().getSimpleName());
 			currentAction = action;
 			return true;
 		} else if (currentAction == action) {
@@ -97,7 +97,7 @@ public final class KeyboardEditor {
 		if (currentAction != action) {
 			throw new IllegalArgumentException("keyboardAction unlock");
 		}
-		if (debug) System.out.println("unlock "+action.toString());
+		if (debug) System.out.println("unlock "+action.getClass().getSimpleName());
 		currentAction = null;
 	}
 
@@ -276,11 +276,6 @@ public final class KeyboardEditor {
 			int octave = ((Integer) octaveValueField.getValue()).intValue();
 			int note = MMLEventParser.firstNoteNumber("o"+octave+code);
 			return note;
-		}
-
-		@Override
-		public String toString() {
-			return "CharKeyboard";
 		}
 
 		@Override
@@ -541,11 +536,6 @@ public final class KeyboardEditor {
 					partList.add(activeTrack.getMMLEventAtIndex(i));
 				}
 			}
-		}
-
-		@Override
-		public String toString() {
-			return "MidiKeyboard";
 		}
 
 		@Override

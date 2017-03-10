@@ -39,7 +39,7 @@ public final class MMLTickTableTest extends FileSelect {
 		ByteArrayOutputStream outputStream2 = new ByteArrayOutputStream();
 		tickTable1.writeToOutputStreamInvTable(outputStream1);
 		tickTable2.writeToOutputStreamInvTable(outputStream2);
-		assertEquals(outputStream1.toString(), outputStream2.toString());
+		assertEquals(outputStream2.toString(), outputStream1.toString());
 	}
 
 	@Test

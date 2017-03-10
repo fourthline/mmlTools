@@ -210,6 +210,8 @@ public class MMLScoreTest extends FileSelect {
 					}
 				}
 			} catch (MMLParseException | FileNotFoundException e) {}
+		} else {
+			System.out.println("  -> not found. ");
 		}
 	}
 
