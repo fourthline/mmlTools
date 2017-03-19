@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 たんらる
+ * Copyright (C) 2015-2017 たんらる
  */
 
 package fourthline.mmlTools.optimizer;
@@ -102,6 +102,67 @@ public final class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 				map.put(key, builder);
 			}
 		});
+
+		FlexDotPattern.updateFlexDot(map, noteName, lenString);
+	}
+
+	private static final class FlexDotPattern {
+		private static final FlexDotPattern flexList[] = {
+				new FlexDotPattern(64),
+				new FlexDotPattern(32),
+				new FlexDotPattern(16),
+				new FlexDotPattern(8),
+				new FlexDotPattern(4)
+		};
+
+		private final String lCur;
+		private final String lNext;
+		private final String lPrev;
+		private FlexDotPattern(int l) {
+			this.lCur = (l/2) + ".";
+			this.lNext = Integer.toString(l);
+			this.lPrev = Integer.toString(l/4);
+		}
+
+		private void updatePattern(Map<String, StringBuilder> map, String noteName, String lenString) {
+			String cName = noteName;
+			if (!noteName.toLowerCase().equals("r")) {
+				cName = "&" + noteName;
+			}
+
+			String eStr = noteName + lPrev + cName + lCur;
+			HashMap<String, StringBuilder> updateMap = new HashMap<>();
+			for (String key : map.keySet()) {
+				if (key.equals(lNext)) {
+					String text = map.get(key).toString();
+					if (text.endsWith(eStr)) {
+						String prevText = text.substring(0, text.length() - eStr.length());
+						String nextText1 = prevText + noteName + cName + lPrev+".";
+						String nextText2 = prevText + noteName + "l" + lPrev+"." + cName;
+						String nextText3 = prevText + noteName + "l" + lPrev + cName +".";
+						updateMap.put(key, new StringBuilder(nextText1));
+						updateMap.put(lPrev+".", new StringBuilder(nextText2));
+						updateMap.put(lPrev, new StringBuilder(nextText3));
+					}
+				}
+			}
+
+			updateMap.forEach((key, builder) -> {
+				StringBuilder now = map.get(key);
+				if ( (now == null) || (builder.length() < now.length()) ) {
+					map.put(key, builder);
+				}
+			});
+		}
+
+		private static void updateFlexDot(Map<String, StringBuilder> map, String noteName, String lenString) {
+			for (FlexDotPattern t : flexList) {
+				if (lenString.equals(t.lCur)) {
+					t.updatePattern(map, noteName, lenString);
+					break;
+				}
+			}
+		}
 	}
 
 	private void cleanMap() {

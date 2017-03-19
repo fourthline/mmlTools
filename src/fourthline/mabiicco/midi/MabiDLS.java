@@ -122,6 +122,7 @@ public final class MabiDLS {
 			sequencer.setSequence(sequence);
 			this.startTick = startTick;
 			this.startTempo = mmlScore.getTempoOnTick(startTick);
+			updatePanpot(mmlScore);
 			sequenceStart();
 		} catch (InvalidMidiDataException e) {
 			e.printStackTrace();

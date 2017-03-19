@@ -173,20 +173,24 @@ public class MMLScoreTest extends FileSelect {
 				System.out.println(filename);
 				score.getTrackList().forEach(t -> {
 					try {
-						String mml1 = t.getOriginalMML();
-						String rank1 = t.mmlRankFormat();
-						System.out.println("mml1: "+mml1);
+						MMLText mml1 = new MMLText().setMMLText(t.getOriginalMML());
+						String rank1 = mml1.mmlRankFormat();
+						System.out.println("mml1: "+mml1.getMML());
 						t.generate();
-						String mml2 = t.getOriginalMML();
-						System.out.println("mml2: "+mml2);
-						String rank2 = new MMLText().setMMLText(mml2).mmlRankFormat();
+						MMLText mml2 = new MMLText().setMMLText(t.getOriginalMML());
+						System.out.println("mml2: "+mml2.getMML());
+						String rank2 = mml2.mmlRankFormat();
 						String rank3 = t.mmlRankFormat();
-						if (!mml1.equals(mml2)) {
-							System.out.print("#");
+						if (!mml1.getMML().equals(mml2.getMML())) {
+							System.err.print("!!! "+t.getTrackName()+" ");
+							System.err.println(rank1 + " -> " + rank2 + ", " + rank3);
 						}
 						System.out.println(rank1 + " -> " + rank2 + ", " + rank3);
-						assertTrue(mml1.length() >= mml2.length());
-						assertEquals(new MMLTrack().setMML(mml1), new MMLTrack().setMML(mml2));
+						assertTrue(mml1.getText(0).length() >= mml2.getText(0).length());
+						assertTrue(mml1.getText(1).length() >= mml2.getText(1).length());
+						assertTrue(mml1.getText(2).length() >= mml2.getText(2).length());
+						assertTrue(mml1.getText(3).length() >= mml2.getText(3).length());
+						assertEquals(new MMLTrack().setMML(mml1.getMML()), new MMLTrack().setMML(mml2.getMML()));
 					} catch (UndefinedTickException e) {
 						fail(e.getMessage());
 					}

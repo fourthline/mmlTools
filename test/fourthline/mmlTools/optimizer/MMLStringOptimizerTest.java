@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 たんらる
+ * Copyright (C) 2013-2017 たんらる
  */
 
 package fourthline.mmlTools.optimizer;
@@ -24,6 +24,7 @@ public class MMLStringOptimizerTest {
 
 	@Before
 	public void setup() throws UndefinedTickException {
+		checkMMLStringOptimize("c4", "c");
 		MMLStringOptimizer.setDebug(true);
 		MMLTicks.getTick("64");
 	}
@@ -224,8 +225,8 @@ public class MMLStringOptimizerTest {
 		checkMMLStringOptimize(input, expect);
 	}
 
-	@Test(timeout=TIMEOUT)
 	@Ignore
+	@Test(timeout=TIMEOUT)
 	public void testSwap_l1() {
 		String input  =  "l16aaaaaaab4&bl4ccccccccc";
 		String expect =  "l16aaaaaaabl4&bccccccccc";
@@ -243,6 +244,27 @@ public class MMLStringOptimizerTest {
 	public void test_o0cm() {
 		String input  =  "o4co0c-o4ccccco0c-c-c-c-cc-cc-c-cccc>ccc<c->ccc";
 		String expect =  "co0c-o4ccccco0c-c-c-c-cc-cc-c-cccc>ccc<c->ccc";
+		checkMMLStringOptimize(input, expect);
+	}
+
+	@Test(timeout=TIMEOUT)
+	public void test_F1() {
+		String input  =  "l32ererer8.rer8.rer8.";
+		String expect =  "l32erererr8.err8.e";
+		checkMMLStringOptimize(input, expect);
+	}
+
+	@Test(timeout=TIMEOUT)
+	public void test_F2() {
+		String input  =  "a32a32a32a32c8&c16.a8a8a8a8a8";
+		String expect =  "l32aaaacl8&c.aaaaa";
+		checkMMLStringOptimize(input, expect);
+	}
+
+	@Test(timeout=TIMEOUT)
+	public void test_F3() {
+		String input  =  "a32a32a32a32r8r16.a8a8a8a8a8";
+		String expect =  "l32aaaarl8r.aaaaa";
 		checkMMLStringOptimize(input, expect);
 	}
 }
