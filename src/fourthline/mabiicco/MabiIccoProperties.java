@@ -62,6 +62,9 @@ public final class MabiIccoProperties {
 	/** 音源境界 */
 	public final Property<Boolean> viewRange = new BooleanProperty("view.pianoRoll.range", true);
 
+	/** すべての音量を表示 */
+	public final Property<Boolean> showAllVelocity = new BooleanProperty("view.pianoRoll.show_all_velocity", false);
+
 	/** 音量線 */
 	public final Property<Boolean> viewVelocityLine = new BooleanProperty("view.velocity.line", true);
 

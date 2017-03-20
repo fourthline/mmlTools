@@ -317,6 +317,8 @@ public final class PianoRollView extends JPanel {
 		endViewTick = convertXtoTick((int)(x + width));
 	}
 
+	private boolean showAllVelocity = false;
+
 	/**
 	 * 1オクターブ 12 x 6
 	 * 9オクターブ分つくると、648
@@ -324,6 +326,7 @@ public final class PianoRollView extends JPanel {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
+		showAllVelocity = MabiIccoProperties.getInstance().showAllVelocity.get();
 		updateViewTick();
 
 		// FIXME: しぼったほうがいいかも？
@@ -500,7 +503,7 @@ public final class PianoRollView extends JPanel {
 		if (drawOption) {
 			// velocityの描画.
 			int velocity = noteEvent.getVelocity();
-			if ( (prevNote == null) || (prevNote.getVelocity() != velocity) ) {
+			if ( showAllVelocity || (prevNote == null) || (prevNote.getVelocity() != velocity) ) {
 				String s = "V" + velocity;
 				g.setColor(Color.DARK_GRAY);
 				g.drawString(s, x, y);

@@ -71,8 +71,9 @@ public final class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 		return changeBuilder;
 	}
 
+	private final Map<String, StringBuilder> newBuilderMap = new HashMap<>();
 	private void addNoteText(String noteName, String lenString, int insertBack) {
-		HashMap<String, StringBuilder> newBuilderMap = new HashMap<>();
+		newBuilderMap.clear();
 		String minString = getMinString();
 
 		// 保有するbuilderを更新.
@@ -130,8 +131,8 @@ public final class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 				cName = "&" + noteName;
 			}
 
+			Map<String, StringBuilder> updateMap = new HashMap<>();
 			String eStr = noteName + lPrev + cName + lCur;
-			HashMap<String, StringBuilder> updateMap = new HashMap<>();
 			for (String key : map.keySet()) {
 				if (key.equals(lNext)) {
 					String text = map.get(key).toString();
@@ -165,9 +166,10 @@ public final class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 		}
 	}
 
+	private final ArrayList<String> deleteKey = new ArrayList<>();
 	private void cleanMap() {
 		int minLength = getMinString().length();
-		ArrayList<String> deleteKey = new ArrayList<>();
+		deleteKey.clear();
 		map.forEach((key, builder) -> {
 			if (builder.length() > minLength+key.length()+1) {
 				deleteKey.add(key);

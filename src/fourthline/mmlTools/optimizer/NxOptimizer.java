@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 たんらる
+ * Copyright (C) 2015-2017 たんらる
  */
 
 package fourthline.mmlTools.optimizer;
@@ -19,7 +19,7 @@ import fourthline.mmlTools.core.UndefinedTickException;
  */
 public final class NxOptimizer implements MMLStringOptimizer.Optimizer {
 
-	private static class NxBuilder implements Cloneable {
+	private static final class NxBuilder implements Cloneable {
 		private StringBuilder builder = new StringBuilder();
 		private int nCount = 0;
 		private int prevOct;
@@ -52,12 +52,9 @@ public final class NxOptimizer implements MMLStringOptimizer.Optimizer {
 	}
 
 	private int octave = 4;
-	private MelodyParser parser = new MelodyParser("");
+	private final MelodyParser parser = new MelodyParser("");
 
-	/**
-	 * 
-	 */
-	private List<NxBuilder> builderList = new ArrayList<>();
+	private final List<NxBuilder> builderList = new ArrayList<>();
 
 	public NxOptimizer() {
 		builderList.add(new NxBuilder(octave));
