@@ -88,7 +88,7 @@
 			<manifest>
 				<attribute name="Implementation-Vendor" value="${app.vendor}" />
 				<attribute name="Implementation-Title" value="${app.name}" />
-				<attribute name="Implementation-Version" value="${app.version}" />
+				<attribute name="MabiIcco-Version" value="${app.version}" />
 				<attribute name="SplashScreen-Image" value="${splash.image}" />
 				<attribute name="Class-Path" value="${class.path}" />
 			</manifest>

@@ -7,6 +7,8 @@ package fourthline.mabiicco;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 import java.util.jar.Manifest;
@@ -18,7 +20,7 @@ import fourthline.mmlTools.core.ResourceLoader;
 public final class AppResource {
 	private final static String APP_TITLE = " * MabiIcco * ";
 	private final static String RESOURCE_NAME = "appResource";
-	private static Manifest mf;
+	private static ArrayList<Manifest> mf;
 	private final static ResourceBundle bundle = ResourceBundle.getBundle(RESOURCE_NAME, new ResourceLoader());
 
 	private AppResource() {}
@@ -28,7 +30,7 @@ public final class AppResource {
 	}
 
 	public static String getVersionText() {
-		String versionText = getManifestValue("Implementation-Version");
+		String versionText = getManifestValue("MabiIcco-Version");
 		return versionText;
 	}
 
@@ -40,18 +42,30 @@ public final class AppResource {
 		return System.getProperties().get("java.runtime.version").toString();
 	}
 
-	public static String getManifestValue(String key) {
+	public static synchronized String getManifestValue(String key) {
 		if (mf == null) {
 			try {
-				InputStream is = AppResource.class.getResourceAsStream("/META-INF/MANIFEST.MF");
-				mf = new Manifest(is);
+				ClassLoader cl = Thread.currentThread().getContextClassLoader();
+				Enumeration<URL> urls = cl.getResources("META-INF/MANIFEST.MF");
+				mf = new ArrayList<>();
+				while (urls.hasMoreElements()) {
+					URL url = urls.nextElement();
+					mf.add( new Manifest(url.openStream()) );
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 				return "";
 			}
 		}
 
-		return mf.getMainAttributes().getValue(key);
+		for (Manifest t : mf) {
+			String obj = t.getMainAttributes().getValue(key);
+			if (obj != null) {
+				return obj;
+			}
+		}
+
+		return "";
 	}
 
 	public static String appText(String key) {
