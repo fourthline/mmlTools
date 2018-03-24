@@ -1,11 +1,10 @@
 /*
- * Copyright (C) 2014 たんらる
+ * Copyright (C) 2014-2018 たんらる
  */
 
 package fourthline.mabiicco;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2017 たんらる
+ * Copyright (C) 2013-2018 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -262,6 +262,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createMenuItem(editMenu, "menu.addBeat", ActionDispatcher.ADD_BEAT, true);
 		createMenuItem(editMenu, "menu.removeBeat", ActionDispatcher.REMOVE_BEAT, true);
 		createMenuItem(editMenu, "edit.transpose", ActionDispatcher.TRANSPOSE, true);
+		createMenuItem(editMenu, "edit.tracks.velocity", ActionDispatcher.TRACKS_EDIT, true);
 
 		editMenu.add(new JSeparator());
 

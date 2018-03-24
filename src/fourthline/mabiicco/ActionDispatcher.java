@@ -35,6 +35,7 @@ import fourthline.mabiicco.ui.About;
 import fourthline.mabiicco.ui.MMLSeqView;
 import fourthline.mabiicco.ui.MainFrame;
 import fourthline.mabiicco.ui.WavoutPanel;
+import fourthline.mabiicco.ui.editor.MultiTracksVelocityChangeEditor;
 import fourthline.mabiicco.ui.editor.MMLTranspose;
 import fourthline.mabiicco.ui.mml.MMLImportPanel;
 import fourthline.mabiicco.ui.mml.MMLScorePropertyPanel;
@@ -88,6 +89,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String REMOVE_BEAT = "remove_beat";
 	@Action public static final String NOTE_PROPERTY = "note_property";
 	@Action public static final String TRANSPOSE = "transpose";
+	@Action public static final String TRACKS_EDIT = "tracks_edit";
 	@Action public static final String ABOUT = "about";
 	@Action public static final String MIDI_EXPORT = "midi_export";
 	@Action public static final String FILE_IMPORT = "file_import";
@@ -201,6 +203,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(REMOVE_BEAT, t -> this.removeBeat());
 		actionMap.put(NOTE_PROPERTY, t -> editState.noteProperty());
 		actionMap.put(TRANSPOSE, t -> new MMLTranspose().execute(mainFrame, mmlSeqView));
+		actionMap.put(TRACKS_EDIT, t -> new MultiTracksVelocityChangeEditor(mainFrame, mmlSeqView).showDialog());
 		actionMap.put(ABOUT, t -> new About().show(mainFrame));
 		actionMap.put(MIDI_EXPORT, t -> this.midiExportAction());
 		actionMap.put(FILE_IMPORT, t -> this.fileImportAction());

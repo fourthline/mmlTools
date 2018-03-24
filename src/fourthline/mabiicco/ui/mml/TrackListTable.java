@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 たんらる
+ * Copyright (C) 2014-2018 たんらる
  */
 
 package fourthline.mabiicco.ui.mml;
@@ -174,6 +174,15 @@ public final class TrackListTable extends JTable {
 	 */
 	public boolean[] getCheckList() {
 		return checkTableModel.checkValue;
+	}
+
+	public int getCheckCount() {
+		int count = 0;
+
+		for (boolean b : this.getCheckList()) {
+			if (b) count++;
+		}
+		return count;
 	}
 
 	/**

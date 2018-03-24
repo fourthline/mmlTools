@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2017 たんらる
+ * Copyright (C) 2013-2018 たんらる
  */
 
 package fourthline.mabiicco.ui.editor;
@@ -69,7 +69,15 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		velocityChangeMenu = new VelocityChangeMenu(popupMenu,
 				() -> popupTargetNote.getVelocity(),
 				t -> {
+					// 音量コマンド挿入.
 					mmlManager.getActiveMMLPart().setVelocityCommand(popupTargetNote, t);
+					mmlManager.updateActivePart(true);
+				},
+				t -> {
+					// 選択したノートの音量を変更する.
+					for(MMLNoteEvent n : selectedNote) {
+						n.setVelocity(t);
+					}
 					mmlManager.updateActivePart(true);
 				});
 		newPopupMenu(AppResource.appText("part_change"), ActionDispatcher.PART_CHANGE);

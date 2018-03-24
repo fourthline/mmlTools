@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 たんらる
+ * Copyright (C) 2014-2018 たんらる
  */
 
 package fourthline.mabiicco.ui.mml;
@@ -88,11 +88,7 @@ public final class MMLImportPanel extends JPanel {
 		table = new TrackListTable(trackList, true);
 		table.setInitialCheck(possibleImportTrackCount);
 		table.addPropertyChangeListener(evt -> {
-			int count = 0;
-			for (boolean b : table.getCheckList()) {
-				if (b) count++;
-			}
-			importButton.setEnabled( count <= possibleImportTrackCount );
+			importButton.setEnabled( table.getCheckCount() <= possibleImportTrackCount );
 		});
 		scrollPane.setViewportView(table);
 

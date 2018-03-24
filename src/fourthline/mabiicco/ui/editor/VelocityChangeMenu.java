@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 たんらる
+ * Copyright (C) 2017-2018 たんらる
  */
 
 package fourthline.mabiicco.ui.editor;
@@ -24,26 +24,27 @@ public class VelocityChangeMenu {
 
 	private final JSlider slider = new JSlider(0, 15, 8);
 	private final JMenu menu = new JMenu(appText("edit.velocity"));
-	private final JButton defaultButton = new JButton(appText("edit.default"));
+//	private final JButton defaultButton = new JButton(appText("edit.default"));
 	private final JButton applyButton = new JButton(appText("edit.apply"));
 	private final JButton cancelButton = new JButton(appText("edit.cancel"));
+	private final JButton selectedApplyButton = new JButton(appText("edit.selected_apply"));
 
 	/**
 	 * @param parent メニューを登録する親
 	 * @param getter デフォルト値取得時のgetter
 	 * @param setter 値反映時のsetter
 	 */
-	public VelocityChangeMenu(JPopupMenu parent, Supplier<Integer> getter, Consumer<Integer> setter) {
+	public VelocityChangeMenu(JPopupMenu parent, Supplier<Integer> getter, Consumer<Integer> setter, Consumer<Integer> selectedSetter) {
 		slider.setSnapToTicks(true);
 		slider.setPaintTicks(true);
 		slider.setMinorTickSpacing(1);
 		slider.setMajorTickSpacing(3);
 		slider.setPaintLabels(true);
 
-		defaultButton.addActionListener(t -> {
-			int v = getter.get();
-			setValue(v);
-		});
+//		defaultButton.addActionListener(t -> {
+//			int v = getter.get();
+//			setValue(v);
+//		});
 		applyButton.addActionListener(t -> {
 			setter.accept(slider.getValue());
 			parent.setVisible(false);
@@ -51,10 +52,15 @@ public class VelocityChangeMenu {
 		cancelButton.addActionListener(t -> {
 			parent.setVisible(false);
 		});
+		selectedApplyButton.addActionListener( t -> {
+			selectedSetter.accept(slider.getValue());
+			parent.setVisible(false);
+		});
 
 		JPanel p1 = new JPanel();
-		p1.add(defaultButton);
+//		p1.add(defaultButton);
 		p1.add(applyButton);
+		p1.add(selectedApplyButton);
 		p1.add(cancelButton);
 
 		JPanel p2 = new JPanel(new BorderLayout());
