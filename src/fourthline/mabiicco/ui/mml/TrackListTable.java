@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2018 たんらる
+ * Copyright (C) 2014-2019 たんらる
  */
 
 package fourthline.mabiicco.ui.mml;
@@ -190,9 +190,13 @@ public final class TrackListTable extends JTable {
 	 * @param count
 	 */
 	public void setInitialCheck(int count) {
+		setInitialCheck(count, true);
+	}
+
+	public void setInitialCheck(int count, boolean b) {
 		for (int i = 0; i < checkTableModel.checkValue.length; i++) {
 			if (i < count) {
-				checkTableModel.checkValue[i] = true;
+				checkTableModel.checkValue[i] = b;
 			}
 		}
 	}

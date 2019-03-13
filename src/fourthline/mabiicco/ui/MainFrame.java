@@ -284,6 +284,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 
 		createMenuItem(trackMenu, "menu.trackProperty", ActionDispatcher.TRACK_PROPERTY, true,
 				KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.ALT_MASK));
+		createMenuItem(trackMenu, "edit.tracks.view", ActionDispatcher.TRACKS_VIEW, false);
 
 		trackMenu.add(new JSeparator());
 

@@ -537,6 +537,10 @@ public final class PianoRollView extends JPanel {
 	 * @param index トラックindex
 	 */
 	private void paintMMLTrack(Graphics2D g, int index, MMLTrack track) {
+		if (!track.isVisiable()) {
+			return;
+		}
+
 		boolean instEnable[] = InstClass.getEnablePartByProgram(track.getProgram());
 		boolean songExEnable[] = InstClass.getEnablePartByProgram(track.getSongProgram());
 		MMLEventList activePart = mmlManager.getActiveMMLPart();
