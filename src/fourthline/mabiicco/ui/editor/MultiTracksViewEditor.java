@@ -27,7 +27,7 @@ import fourthline.mabiicco.ui.mml.TrackListTable;
 import fourthline.mmlTools.MMLTrack;
 
 /**
- * 複数トラックの音量変更する.
+ * トラック表示設定.
  */
 public final class MultiTracksViewEditor extends JPanel {
 	private static final long serialVersionUID = 7227807579193973972L;
