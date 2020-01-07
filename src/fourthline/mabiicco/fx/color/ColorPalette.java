@@ -64,18 +64,22 @@ final class ColorPalette {
 	}
 
 	private static final Color trackBaseColor[] = {
-		Color.color(0.9, 0, 0),
-		Color.color(0, 0.9, 0),
-		Color.color(0, 0, 0.9),
-		Color.web("#FF4400"),
-		Color.web("#00AAFF"),
-		Color.web("#FF00D0"),
-		Color.web("#009933"),
-		Color.web("#FF5564"),
-		Color.web("#8100FF"),
-		Color.web("#891D1D"),
-		Color.web("#A78100"),
-		Color.web("#00600B"),
+		Color.web("#f44336"),	// Red
+		Color.web("#e91e63"),	// Pink
+		Color.web("#9c27b0"),	// Purple
+		Color.web("#673ab7"),	// Deep Purple
+		Color.web("#3f51b5"),	// Indigo
+		Color.web("#2196f3"),	// Blue
+		Color.web("#03a9f4"),	// Light Blue
+		Color.web("#00bcd4"),	// Cyan
+		Color.web("#009688"),	// Teal
+		Color.web("#4caf50"),	// Green
+		Color.web("#8bc34a"),	// Light Green
+		Color.web("#cddc39"),	// Lime
+		Color.web("#ffeb3b"),	// Yellow
+		Color.web("#ffc107"),	// Amber
+		Color.web("#ff9800"),	// Orange
+		Color.web("#ff5722"),	// Deep Orange
 	};
 
 	private static ArrayList<ColorPalette> instanceList = null;
