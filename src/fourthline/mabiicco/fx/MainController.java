@@ -17,28 +17,41 @@ import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTrack;
 import fourthline.mmlTools.parser.IMMLFileParser;
 import fourthline.mmlTools.parser.MMLParseException;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.layout.Pane;
 import javafx.scene.Parent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.binding.Bindings;
 
 /**
  * 
  */
 public final class MainController implements Initializable {
-	@FXML private Canvas canvas;
-	@FXML private Canvas keyboardCanvas;
-	@FXML private Canvas columnCanvas;
+	@FXML
+	private BorderPane mainPane;
+	@FXML
+	private Canvas canvas;
+	@FXML
+	private Canvas keyboardCanvas;
+	@FXML
+	private Canvas columnCanvas;
 
-	@FXML private MenuItem newFileMenu;
-	@FXML private TabPane tabPane;
+	@FXML
+	private MenuItem newFileMenu;
+	@FXML
+	private TabPane tabPane;
 
 	private Stage stage;
 	private PianoRollView pianoRollView;
@@ -46,7 +59,8 @@ public final class MainController implements Initializable {
 
 	@Override
 	public void initialize(URL url, ResourceBundle resouceBundle) {
-		System.out.println(this.getClass().getName()+"["+resouceBundle.getLocale()+"]: "+url);
+		System.out.println(this.getClass().getName() + "[" + resouceBundle.getLocale() + "]: " + url);
+		initializeFontSizeManager();
 		this.pianoRollView = new PianoRollView(canvas, mmlContents);
 		new KeyboardView(keyboardCanvas, pianoRollView);
 		new ColumnView(columnCanvas, pianoRollView, mmlContents);
@@ -69,7 +83,8 @@ public final class MainController implements Initializable {
 
 	public MainController() {
 		MMLScore mmlScore = mmlContents.getMMLScore();
-		mmlScore.addTrack(new MMLTrack().setMML("MML@o0t150v7ccct112cr1o4rc64rc32rc16rc8rc4rc2rc1,o0eeee,o0gggg,o0bbbb;"));
+		mmlScore.addTrack(
+				new MMLTrack().setMML("MML@o0t150v7ccct112cr1o4rc64rc32rc16rc8rc4rc2rc1,o0eeee,o0gggg,o0bbbb;"));
 		mmlScore.addTrack(new MMLTrack().setMML("MML@o1cccc,o1eeee,o1gggg,o1bbbb;"));
 		mmlScore.addTrack(new MMLTrack().setMML("MML@o2cccc,o2eeee,o2gggg,o2bbbb;"));
 		mmlScore.addTrack(new MMLTrack().setMML("MML@o3cccc,o3eeee,o3gggg,o3bbbb;"));
@@ -93,13 +108,13 @@ public final class MainController implements Initializable {
 	private void openFileAction(ActionEvent e) {
 		System.out.println("openFileAction");
 		FileChooser fileChooser = new FileChooser();
-		fileChooser.getExtensionFilters().addAll(
-				new FileChooser.ExtensionFilter(AppResource.appText("file.mmi"), "*.mmi"));
+		fileChooser.getExtensionFilters()
+				.addAll(new FileChooser.ExtensionFilter(AppResource.appText("file.mmi"), "*.mmi"));
 		fileChooser.setInitialDirectory(null);
 		File file = fileChooser.showOpenDialog(stage);
 		System.out.println(file);
 		if (file != null) {
-			mmlContents.setMMLScore( fileParse(file) );
+			mmlContents.setMMLScore(fileParse(file));
 			pianoRollView.paint();
 		}
 	}
@@ -123,5 +138,20 @@ public final class MainController implements Initializable {
 	@FXML
 	private void reloadFileAction(ActionEvent e) {
 		System.out.println("reloadFileAction");
+	}
+
+	// 高DPI対応
+	private void initializeFontSizeManager() {
+		// Cf.
+		// https://stackoverflow.com/questions/13246211/javafx-how-to-get-stage-from-controller-during-initialization
+		mainPane.sceneProperty().addListener((observableScene, oldScene, newScene) -> {
+			// We need a scene to work on
+			if (oldScene == null && newScene != null) {
+				DoubleProperty fontSize = new SimpleDoubleProperty(0);
+				fontSize.bind(newScene.widthProperty().add(newScene.heightProperty()).divide(1280 + 720).multiply(100));
+				mainPane.styleProperty()
+						.bind(Bindings.concat("-fx-font-size: ", fontSize.asString("%.0f")).concat("%;"));
+			}
+		});
 	}
 }

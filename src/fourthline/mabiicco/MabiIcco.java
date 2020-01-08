@@ -29,11 +29,11 @@ import javafx.application.Application;
 import javafx.application.Preloader;
 import javafx.stage.Stage;
 
-
 /**
  * MabiIccoアプリケーションクラス (Main).
  * 
  * MMLの処理は MMLTools を使用し, DLSを読み込んで音を鳴らす部分はMIDIを使用します.
+ * 
  * <pre>
  * 1. Midi初期化.
  * 2. DLSファイルの音源情報を読み込む. (Waveは読み込まない)
@@ -49,12 +49,12 @@ public final class MabiIcco extends Application {
 
 	private void initialize() {
 		try {
-			UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
 			// font
 			String fontName = AppResource.appText("ui.font");
 			if (!fontName.equals("ui.font")) {
-				setUIFont(new javax.swing.plaf.FontUIResource(fontName, Font.PLAIN, 11));
+				setUIFont(new javax.swing.plaf.FontUIResource(fontName, Font.PLAIN, 14));
 			}
 
 			// initialize
@@ -62,8 +62,9 @@ public final class MabiIcco extends Application {
 			notifyPreloader(new MabiIccoPreloaderNotification("OK\n", 20));
 
 			notifyPreloader(new MabiIccoPreloaderNotification(AppResource.appText("init.dls"), 20));
-			if ( !loadDLSFiles(20, 70) ) {
-				JOptionPane.showMessageDialog(null, AppResource.appText("error.needDls"), "ERROR", JOptionPane.ERROR_MESSAGE);
+			if (!loadDLSFiles(20, 70)) {
+				JOptionPane.showMessageDialog(null, AppResource.appText("error.needDls"), "ERROR",
+						JOptionPane.ERROR_MESSAGE);
 				System.exit(1);
 			}
 			notifyPreloader(new MabiIccoPreloaderNotification("OK\n", 90));
@@ -85,24 +86,29 @@ public final class MabiIcco extends Application {
 				dispatcher.checkAndOpenMMLFile(new File(args.get(0)));
 			}
 			try {
-				notifyPreloader(new Preloader.StateChangeNotification(Preloader.StateChangeNotification.Type.BEFORE_START));
-			} catch (IllegalStateException e) {}
+				notifyPreloader(
+						new Preloader.StateChangeNotification(Preloader.StateChangeNotification.Type.BEFORE_START));
+			} catch (IllegalStateException e) {
+			}
 			mainFrame.setVisible(true);
 		});
 	}
 
 	/**
 	 * DLSのロードを行います. 初回に失敗した場合は、DLSファイル選択ダイアログを表示します.
+	 * 
 	 * @return 1つ以上のInstrumentをロードできれば true.
 	 * @throws InvalidMidiDataException
 	 * @throws IOException
 	 */
-	private boolean loadDLSFiles(double initialProgress, double endProgress) throws InvalidMidiDataException, IOException {
+	private boolean loadDLSFiles(double initialProgress, double endProgress)
+			throws InvalidMidiDataException, IOException {
 		MabiIccoProperties appProperties = MabiIccoProperties.getInstance();
 		if (tryloadDLSFiles(initialProgress, endProgress)) {
 			return true;
 		}
-		JOptionPane.showMessageDialog(null, AppResource.appText("msg.dls_title.detail"), AppResource.appText("msg.dls_title"), JOptionPane.INFORMATION_MESSAGE);
+		JOptionPane.showMessageDialog(null, AppResource.appText("msg.dls_title.detail"),
+				AppResource.appText("msg.dls_title"), JOptionPane.INFORMATION_MESSAGE);
 		JFileChooser fileChooser = createFileChooser();
 		fileChooser.setCurrentDirectory(new File("."));
 		FileFilter dlsFilter = new FileNameExtensionFilter(AppResource.appText("file.dls"), "dls");
@@ -112,7 +118,7 @@ public final class MabiIcco extends Application {
 		fileChooser.setAcceptAllFileFilterUsed(false);
 		int status = fileChooser.showOpenDialog(null);
 		if (status == JFileChooser.APPROVE_OPTION) {
-			appProperties.setDlsFile( fileChooser.getSelectedFiles() );
+			appProperties.setDlsFile(fileChooser.getSelectedFiles());
 		} else {
 			return false;
 		}
@@ -122,11 +128,13 @@ public final class MabiIcco extends Application {
 
 	/**
 	 * DLSファイルのロードを試みます.
+	 * 
 	 * @return 1つ以上のInstrumentをロードできれば true.
 	 * @throws InvalidMidiDataException
 	 * @throws IOException
 	 */
-	private boolean tryloadDLSFiles(double initialProgress, double endProgress) throws InvalidMidiDataException, IOException {
+	private boolean tryloadDLSFiles(double initialProgress, double endProgress)
+			throws InvalidMidiDataException, IOException {
 		MabiDLS dls = MabiDLS.getInstance();
 		MabiIccoProperties appProperties = MabiIccoProperties.getInstance();
 		List<File> dlsFiles = appProperties.getDlsFile();

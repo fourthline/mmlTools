@@ -33,7 +33,7 @@
 	<property name="app.vendor" value="fourthline" />
 	<property name="app.id" value="MabiIcco" />
 	<property name="app.name" value="MabiIcco" />
-	<property name="app.version" value="1.0.40" />
+	<property name="app.version" value="1.0.40.1" />
 	<property name="app.main-class" value="fourthline.mabiicco.MabiIcco" />
 	<property name="app.preloader-class" value="fourthline.mabiicco.preloader.MabiIccoPreloader" />
 	<property name="splash.image" value="img/title.png" />
@@ -133,5 +133,33 @@
 				</fileset>
 			</batchtest>
 		</junit>
+	</target>
+
+	<!-- exewrap -->
+	<target name="exewrap" depends="jfx-package">
+		<exec executable="lib/exewrap/x64/exewrap.exe">
+			<arg value="-g"/>
+			<arg value="-d"/>
+			<arg value="Mabinogi MML Editor" />
+			<arg value="-c"/>
+			<arg value="${app.vendor}" />
+			<arg value="-t"/>
+			<arg value="1.8"/>
+			<arg value="-i"/>
+			<arg value="resources\MabiIcco.ico"/>
+			<arg value="-p" />
+			<arg value="${app.name}"/>
+			<arg value="-v" />
+			<arg value="${app.version}"/>
+			<arg value="-V" />
+			<arg value="${app.version}"/>
+			<arg value="-D"/>
+			<arg value="java.library.path=${env.JAVA_HOME}\jre\bin"/>
+			<arg value="-j"/>
+			<arg value="${app.name}.jar"/>
+			<arg value="-o"/>
+			<arg value="${app.name}.exe"/>
+			<arg value="-a"/>
+		</exec>
 	</target>
 </project>
