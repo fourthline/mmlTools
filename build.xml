@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project name="MabiIcco"
-	basedir="."
-	default="jfx-package"
+<project name="MabiIcco" basedir="." default="jfx-package" 
 	xmlns:fx="javafx:com.sun.javafx.tools.ant">
 
 	<!-- 環境変数 -->
 	<property environment="env" />
-	<property name="javafx.tools.ant.jar" value="${env.JAVA_HOME}/lib/ant-javafx.jar" />
-
+	<!--property name="env.JAVA_HOME" value="./jdk-13.0.1" /-->
 	<property name="src" location="src" />
 	<property name="dest" location="dest" />
 	<property name="test" location="test" />
@@ -17,11 +14,19 @@
 	<property name="jardest" location="" />
 
 	<path id="classpath">
-		<pathelement location="${lib}/commons-compress/commons-compress-1.9.jar"/>
+		<pathelement location="${lib}/commons-compress/commons-compress-1.19.jar"/>
+		<pathelement location="com.sun.media.sound"/>
+
 	</path>
 	<path id="classpath-test">
 		<pathelement location="${lib}/junit-4.12.jar"/>
 		<pathelement location="${lib}/hamcrest-core-1.3.jar"/>
+	</path>
+	<path id="fxant">
+		<filelist>
+			<file name="${java.home}\..\lib\ant-javafx.jar"/>
+			<file name="${java.home}\lib\ext\jfxrt.jar"/>
+		</filelist>
 	</path>
 
 	<!-- アプリケーションの設定 -->
@@ -32,7 +37,7 @@
 	<property name="app.main-class" value="fourthline.mabiicco.MabiIcco" />
 	<property name="app.preloader-class" value="fourthline.mabiicco.preloader.MabiIccoPreloader" />
 	<property name="splash.image" value="img/title.png" />
-	<property name="class.path" value="lib/commons-compress/commons-compress-1.9.jar" />
+	<property name="class.path" value="./lib/commons-compress/commons-compress-1.19.jar" />
 
 	<!-- clean task -->
 	<target name="clean">
@@ -43,14 +48,13 @@
 
 	<!-- compile task -->
 	<target name="compile" depends="clean">
-		<javac
-			srcdir="${src}"
-			destdir="${dest}"
-			classpath="${class.path}"
-			excludes="**/package-info.java,com/,fourthline/mabiicco/fx/"
-			encoding="UTF-8"
-			listfiles="yes"
-			includeantruntime="false" />
+		<javac destdir="${dest}" encoding="UTF-8" listfiles="yes" includeantruntime="false" fork="true" executable="${env.JAVA_HOME}\bin\javac">
+			<compilerarg value="-Xlint:deprecation" />
+			<compilerarg value="-XDignore.symbol.file" />
+			<classpath refid="classpath" />
+			<src path="${src}" />
+			<exclude name="**/package-info.java,com/,fourthline/mabiicco/fx/"/>
+		</javac>
 	</target>
 
 	<!-- resources task -->
@@ -66,25 +70,15 @@
 	</target>
 
 	<!-- jfx-package task -->
-	<target name="jfx-package"
-		description="javafxpackage"
-		depends="compile,resources">
-		
-		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml"
-			uri="javafx:com.sun.javafx.tools.ant"
-			classpath="${javafx.tools.ant.jar}" />
+	<target name="jfx-package" description="javafxpackage" depends="compile,resources">
 
-		<fx:application
-			id="app-info"
-			name="${app.name}"
-			mainClass="${app.main-class}"
-			preloaderClass="${app.preloader-class}">
+		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml" uri="javafx:com.sun.javafx.tools.ant" classpathref="fxant"/>
+
+		<fx:application id="app-info" name="${app.name}" mainClass="${app.main-class}" preloaderClass="${app.preloader-class}">
 		</fx:application>
 
 		<fx:jar destfile="${jardest}/${app.id}.jar">
 			<fx:application refid="app-info" />
-			<fx:platform javafx="2.2+">
-			</fx:platform>
 			<manifest>
 				<attribute name="Implementation-Vendor" value="${app.vendor}" />
 				<attribute name="Implementation-Title" value="${app.name}" />
@@ -99,13 +93,12 @@
 
 	<!-- compile-test task -->
 	<target name="compile-test" depends="clean">
-		<javac
-			srcdir="${test}"
-			destdir="${dest}"
-			classpathref="classpath-test"
-			encoding="UTF-8"
-			listfiles="yes"
-			includeantruntime="false" />
+		<javac destdir="${dest}" encoding="UTF-8" listfiles="yes" includeantruntime="false" fork="true" executable="${env.JAVA_HOME}\bin\javac">
+			<compilerarg value="-Xlint:deprecation" />
+			<compilerarg value="-XDignore.symbol.file" />
+			<classpath refid="classpath-test" />
+			<src path="${src}" />
+		</javac>
 		<copy todir="${dest}">
 			<fileset dir="${test}">
 				<include name="**/*.mml" />
