@@ -47,7 +47,7 @@ public final class MabiDLS {
 	public static final String DEFALUT_DLS_PATH = "Nexon/Mabinogi/mp3/MSXspirit.dls";
 
 	private ArrayList<Runnable> notifier = new ArrayList<>();
-	private boolean muteState[] = new boolean[ MAX_MIDI_PART ];
+	private boolean muteState[] = new boolean[MAX_MIDI_PART];
 	private WavoutDataLine wavout;
 
 	public static MabiDLS getInstance() {
@@ -57,14 +57,16 @@ public final class MabiDLS {
 		return instance;
 	}
 
-	private MabiDLS() {}
+	private MabiDLS() {
+	}
 
 	/**
 	 * initialize
 	 */
-	public void initializeMIDI() throws MidiUnavailableException, InvalidMidiDataException, IOException, LineUnavailableException {
+	public void initializeMIDI()
+			throws MidiUnavailableException, InvalidMidiDataException, IOException, LineUnavailableException {
 		this.synthesizer = MidiSystem.getSynthesizer();
-		((SoftSynthesizer)this.synthesizer).open(wavout = new WavoutDataLine(), null);
+		((SoftSynthesizer) this.synthesizer).open(wavout = new WavoutDataLine(), null);
 		addTrackEndNotifier(() -> wavout.stopRec());
 
 		long latency = this.synthesizer.getLatency();
@@ -110,6 +112,7 @@ public final class MabiDLS {
 
 	/**
 	 * MMLScoreからMIDIシーケンスに変換して, 再生を開始する.
+	 * 
 	 * @param mmlScore
 	 * @param startTick
 	 */
@@ -167,7 +170,7 @@ public final class MabiDLS {
 	}
 
 	public void loadingDLSFile(File file) throws InvalidMidiDataException, IOException {
-		System.out.println("["+file.getName()+"]");
+		System.out.println("[" + file.getName() + "]");
 		if (file.getName().equals("")) {
 			return;
 		}
@@ -179,7 +182,8 @@ public final class MabiDLS {
 					file = aFile;
 					break;
 				}
-			};
+			}
+			;
 		}
 		if (file.exists()) {
 			List<InstClass> loadList = InstClass.loadDLS(file);
@@ -195,12 +199,12 @@ public final class MabiDLS {
 		ArrayList<InstClass> requiredInsts = new ArrayList<>();
 		ArrayList<MMLTrack> trackList = new ArrayList<>(score.getTrackList());
 		for (MMLTrack track : trackList) {
-			InstClass inst1 = getInstByProgram( track.getProgram() );
-			InstClass inst2 = getInstByProgram( track.getSongProgram() );
-			if ( (inst1 != null) && (!requiredInsts.contains(inst1)) ) {
+			InstClass inst1 = getInstByProgram(track.getProgram());
+			InstClass inst2 = getInstByProgram(track.getSongProgram());
+			if ((inst1 != null) && (!requiredInsts.contains(inst1))) {
 				requiredInsts.add(inst1);
 			}
-			if ( (inst2 != null) && (!requiredInsts.contains(inst2)) ) {
+			if ((inst2 != null) && (!requiredInsts.contains(inst2))) {
 				requiredInsts.add(inst2);
 			}
 		}
@@ -245,9 +249,7 @@ public final class MabiDLS {
 	}
 
 	public InstClass[] getAvailableInstByInstType(List<InstType> e) {
-		return insts.stream()
-				.filter(inst -> e.contains(inst.getType()))
-				.toArray(size -> new InstClass[size]);
+		return insts.stream().filter(inst -> e.contains(inst.getType())).toArray(size -> new InstClass[size]);
 	}
 
 	public InstClass getInstByProgram(int program) {
@@ -265,7 +267,7 @@ public final class MabiDLS {
 	 */
 	public void playNote(int note, int program, int channel, int velocity) {
 		MMLNoteEvent playNote = this.playNoteList.get(channel)[0];
-		if ( (playNote == null) || (playNote.getNote() != note) ) {
+		if ((playNote == null) || (playNote.getNote() != note)) {
 			playNote = new MMLNoteEvent(note, 0, 0, velocity);
 		}
 		playNotes(new MMLNoteEvent[] { playNote }, program, channel);
@@ -285,16 +287,16 @@ public final class MabiDLS {
 
 		for (int i = 0; i < playNoteEvents.length; i++) {
 			MMLNoteEvent note = null;
-			if ( (noteList != null) && (i < noteList.length) ) {
+			if ((noteList != null) && (i < noteList.length)) {
 				note = noteList[i];
 			}
-			if ( (note == null) || (!note.equals(playNoteEvents[i])) ) {
+			if ((note == null) || (!note.equals(playNoteEvents[i]))) {
 				if (playNoteEvents[i] != null) {
-					midiChannel.noteOff( convertNoteMML2Midi(playNoteEvents[i].getNote()) );
+					midiChannel.noteOff(convertNoteMML2Midi(playNoteEvents[i].getNote()));
 					playNoteEvents[i] = null;
 				}
 			}
-			if ( (note != null) && (!note.equals(playNoteEvents[i]))) {
+			if ((note != null) && (!note.equals(playNoteEvents[i]))) {
 				InstClass instClass = getInstByProgram(program);
 				int velocity = convertVelocityOnAtt(instClass, note.getNote(), note.getVelocity());
 				int midiNote = convertNoteMML2Midi(note.getNote());
@@ -314,6 +316,7 @@ public final class MabiDLS {
 
 	/**
 	 * 指定したチャンネルのパンポットを設定します.
+	 * 
 	 * @param ch
 	 * @param panpot
 	 */
@@ -374,7 +377,8 @@ public final class MabiDLS {
 
 	/**
 	 * MIDIシーケンスを作成します。
-	 * @throws InvalidMidiDataException 
+	 * 
+	 * @throws InvalidMidiDataException
 	 */
 	public Sequence createSequence(MMLScore score) throws InvalidMidiDataException {
 		Sequence sequence = new Sequence(Sequence.PPQ, MMLTickTable.TPQN);
@@ -395,8 +399,7 @@ public final class MabiDLS {
 			byte tempo[] = tempoEvent.getMetaData();
 			int tickOffset = tempoEvent.getTickOffset();
 
-			MidiMessage message = new MetaMessage(MMLTempoEvent.META, 
-					tempo, tempo.length);
+			MidiMessage message = new MetaMessage(MMLTempoEvent.META, tempo, tempo.length);
 			track.add(new MidiEvent(message, tickOffset));
 		}
 
@@ -409,12 +412,10 @@ public final class MabiDLS {
 		return sequence;
 	}
 
-	private void createVoiceMidiTrack(Sequence sequence, MMLScore score, int channel, int program) throws InvalidMidiDataException {
+	private void createVoiceMidiTrack(Sequence sequence, MMLScore score, int channel, int program)
+			throws InvalidMidiDataException {
 		Track track = sequence.createTrack();
-		ShortMessage pcMessage = new ShortMessage(ShortMessage.PROGRAM_CHANGE, 
-				channel,
-				program,
-				0);
+		ShortMessage pcMessage = new ShortMessage(ShortMessage.PROGRAM_CHANGE, channel, program, 0);
 		track.add(new MidiEvent(pcMessage, 0));
 
 		for (MMLTrack mmlTrack : score.getTrackList()) {
@@ -429,16 +430,14 @@ public final class MabiDLS {
 
 	/**
 	 * トラックに含まれるすべてのMMLEventListを1つのMIDIトラックに変換します.
+	 * 
 	 * @param track
 	 * @param channel
 	 * @throws InvalidMidiDataException
 	 */
 	private void convertMidiTrack(Track track, MMLTrack mmlTrack, int channel) throws InvalidMidiDataException {
 		int program = mmlTrack.getProgram();
-		ShortMessage pcMessage = new ShortMessage(ShortMessage.PROGRAM_CHANGE, 
-				channel,
-				program,
-				0);
+		ShortMessage pcMessage = new ShortMessage(ShortMessage.PROGRAM_CHANGE, channel, program, 0);
 		track.add(new MidiEvent(pcMessage, 0));
 		boolean enablePart[] = InstClass.getEnablePartByProgram(program);
 		InstClass instClass = getInstByProgram(mmlTrack.getProgram());
@@ -457,7 +456,7 @@ public final class MabiDLS {
 		int velocity = MMLNoteEvent.INIT_VOL;
 
 		// Noteイベントの変換
-		for ( MMLNoteEvent noteEvent : eventList ) {
+		for (MMLNoteEvent noteEvent : eventList) {
 			int note = noteEvent.getNote();
 			int tick = noteEvent.getTick();
 			int tickOffset = noteEvent.getTickOffset() + 1;
@@ -470,17 +469,12 @@ public final class MabiDLS {
 
 			try {
 				// ON イベント作成
-				MidiMessage message1 = new ShortMessage(ShortMessage.NOTE_ON, 
-						channel,
-						convertNoteMML2Midi(note), 
+				MidiMessage message1 = new ShortMessage(ShortMessage.NOTE_ON, channel, convertNoteMML2Midi(note),
 						velocity);
 				track.add(new MidiEvent(message1, tickOffset));
 
 				// Off イベント作成
-				MidiMessage message2 = new ShortMessage(ShortMessage.NOTE_OFF,
-						channel, 
-						convertNoteMML2Midi(note),
-						0);
+				MidiMessage message2 = new ShortMessage(ShortMessage.NOTE_OFF, channel, convertNoteMML2Midi(note), 0);
 				track.add(new MidiEvent(message2, endTickOffset));
 			} catch (InvalidMidiDataException e) {
 				e.printStackTrace();
@@ -494,10 +488,11 @@ public final class MabiDLS {
 
 	/**
 	 * 音源のAttenuationをVelocityに反映する.
-	 * @param inst  音源
-	 * @param note  変換前のNote
-	 * @param velocity  変換前のVelocity
-	 * @return  変換後のVelocity
+	 * 
+	 * @param inst     音源
+	 * @param note     変換前のNote
+	 * @param velocity 変換前のVelocity
+	 * @return 変換後のVelocity
 	 */
 	private int convertVelocityOnAtt(InstClass inst, int note, int velocity) {
 		velocity = inst.getType().convertVelocityMML2Midi(velocity);
@@ -510,10 +505,9 @@ public final class MabiDLS {
 		if (instrument instanceof DLSInstrument) {
 			DLSInstrument dlsinst = (DLSInstrument) instrument;
 			for (DLSRegion region : dlsinst.getRegions()) {
-				if ( (note >= region.getKeyfrom())
-						&& (note <= region.getKeyto()) ) {
+				if ((note >= region.getKeyfrom()) && (note <= region.getKeyto())) {
 					double attenuation = region.getSampleoptions().getAttenuation() / 655360.0;
-					velocity = (int) Math.sqrt( Math.pow(10.0, attenuation/20) * (double)(velocity * velocity) );
+					velocity = (int) Math.sqrt(Math.pow(10.0, attenuation / 20) * (double) (velocity * velocity));
 					break;
 				}
 			}
@@ -527,7 +521,7 @@ public final class MabiDLS {
 		for (MidiDevice.Info info : MidiSystem.getMidiDeviceInfo()) {
 			try {
 				MidiDevice device = MidiSystem.getMidiDevice(info);
-				if ( (device.getMaxTransmitters() != 0) && (device.getMaxReceivers() == 0) ) {
+				if ((device.getMaxTransmitters() != 0) && (device.getMaxReceivers() == 0)) {
 					// -1は制限なし.
 					midiDeviceList.add(device.getDeviceInfo());
 				}

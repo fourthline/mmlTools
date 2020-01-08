@@ -66,10 +66,12 @@ public final class InstClass {
 	private static final class KeyRegion {
 		int from;
 		int to;
+
 		KeyRegion() {
 			this.from = 0;
 			this.to = 1024;
 		}
+
 		KeyRegion(int from, int to) {
 			this.from = from;
 			this.to = to;
@@ -90,7 +92,7 @@ public final class InstClass {
 				max = Math.max(max, reg.getKeyto());
 			}
 		}
-		if ( (max == Integer.MIN_VALUE) || (min == Integer.MAX_VALUE) ) {
+		if ((max == Integer.MIN_VALUE) || (min == Integer.MAX_VALUE)) {
 			return new KeyRegion();
 		}
 		min -= 12;
@@ -138,6 +140,7 @@ public final class InstClass {
 
 	/**
 	 * プログラム番号上で有効なパート情報を取得する.
+	 * 
 	 * @param program
 	 * @return
 	 */
@@ -151,6 +154,7 @@ public final class InstClass {
 
 	/**
 	 * プログラム番号上で有効な最初のパート番号を取得する.
+	 * 
 	 * @param program
 	 * @return パート番号
 	 */
@@ -168,7 +172,7 @@ public final class InstClass {
 
 	private static String instName(Instrument inst) {
 		try {
-			String name = instResource.getString(""+inst.getPatch().getProgram());
+			String name = instResource.getString("" + inst.getPatch().getProgram());
 			return name;
 		} catch (MissingResourceException e) {
 			return null;
@@ -181,7 +185,7 @@ public final class InstClass {
 			sb = MidiSystem.getSoundbank(dlsFile);
 		} catch (Exception e) {
 			MabiIccoProperties.getInstance().setDlsFile(null);
-			throw new IOException("loadDLS: "+dlsFile.getName());
+			throw new IOException("loadDLS: " + dlsFile.getName());
 		}
 
 		ArrayList<InstClass> instArray = new ArrayList<>();
@@ -192,24 +196,21 @@ public final class InstClass {
 			int program = inst.getPatch().getProgram();
 			System.out.printf("%d,%d=%s \"%s\"\n", bank, program, originalName, name);
 			if (name != null) {
-				name = ""+program+": "+name;
-				instArray.add(new InstClass( name,
-						bank,
-						program,
-						inst));
+				name = "" + program + ": " + name;
+				instArray.add(new InstClass(name, bank, program, inst));
 			}
 
-			if ( (debug) && (inst instanceof DLSInstrument) ) {
+			if ((debug) && (inst instanceof DLSInstrument)) {
 				DLSInstrument dlsinst = (DLSInstrument) inst;
 				for (DLSRegion reg : dlsinst.getRegions()) {
-					double attenuation = reg.getSample().getSampleoptions().getAttenuation()/655360.0;
-					System.out.print(" >> "+reg.getSample().getName()+" ");
-					System.out.print(attenuation+" ");
-					System.out.print(Math.pow(10.0, attenuation/20.0)+" ");
-					System.out.print(reg.getKeyfrom()+" ");
-					System.out.print(reg.getKeyto()+" ");
-					System.out.print(reg.getVelfrom()+" ");
-					System.out.println(reg.getVelto()+" ");
+					double attenuation = reg.getSample().getSampleoptions().getAttenuation() / 655360.0;
+					System.out.print(" >> " + reg.getSample().getName() + " ");
+					System.out.print(attenuation + " ");
+					System.out.print(Math.pow(10.0, attenuation / 20.0) + " ");
+					System.out.print(reg.getKeyfrom() + " ");
+					System.out.print(reg.getKeyto() + " ");
+					System.out.print(reg.getVelfrom() + " ");
+					System.out.println(reg.getVelto() + " ");
 				}
 			}
 		}

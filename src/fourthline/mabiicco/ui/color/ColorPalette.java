@@ -11,34 +11,41 @@ import java.util.List;
 
 final class ColorPalette {
 	private static enum ColorPattern {
+		// 選択状態
 		ACTIVE(250, 200, 0),
+		// メロディ
 		MELODY(0, 200, 0),
+		// 和音１
 		CHORD1(0, 200, 40),
+		// 和音２
 		CHORD2(0, 200, 80),
+		// コーラス
 		SONGEX(0, 200, 120),
+		// 未使用
 		UNUSED(0, 80, 0) {
 			@Override
 			public Color getFillColor(Color baseColor) {
-				return Color.GRAY;
+				return Color.decode("#78909c");
 			}
 		};
 
 		protected Color filter(Color color) {
-			return new Color(
-					limit(color.getRed()+beta), 
-					limit(color.getGreen()+beta), 
-					limit(color.getBlue()+beta), 
-					color.getAlpha());
+			return new Color(limit(color.getRed() + beta), limit(color.getGreen() + beta),
+					limit(color.getBlue() + beta), color.getAlpha());
 		}
+
 		private static int limit(int a) {
-			if (a > 255) return 255;
-			if (a < 0)   return 0;
+			if (a > 255)
+				return 255;
+			if (a < 0)
+				return 0;
 			return a;
 		}
 
 		private final int rectAlpha;
 		private final int fillAlpha;
 		private final int beta;
+
 		private ColorPattern(int rectAlpha, int fillAlpha, int beta) {
 			this.rectAlpha = rectAlpha;
 			this.fillAlpha = fillAlpha;
@@ -46,48 +53,61 @@ final class ColorPalette {
 		}
 
 		public Color getRectColor(Color baseColor) {
-			return filter(new Color(
-					baseColor.getRed(),
-					baseColor.getGreen(),
-					baseColor.getBlue(),
-					rectAlpha));
+			return filter(new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(), rectAlpha));
 		}
 
 		public Color getFillColor(Color baseColor) {
-			return filter(new Color(
-					baseColor.getRed(),
-					baseColor.getGreen(),
-					baseColor.getBlue(),
-					fillAlpha));
+			return filter(new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(), fillAlpha));
 		}
 	}
 
 	private static final Color trackBaseColor[] = {
-		new Color(200, 0, 0),
-		new Color(0, 200, 0),
-		new Color(0, 0, 200),
-		Color.decode("#FF4400"),
-		Color.decode("#00AAFF"),
-		Color.decode("#FF00D0"),
-		Color.decode("#009933"),
-		Color.decode("#FF5564"),
-		Color.decode("#8100FF"),
-		Color.decode("#891D1D"),
-		Color.decode("#A78100"),
-		Color.decode("#00600B"),
-	};
+			// Red
+			Color.decode("#f44336"),
+			// Pink
+			Color.decode("#e91e63"),
+			// Purple
+			Color.decode("#9c27b0"),
+			// Deep Purple
+			Color.decode("#673ab7"),
+			// Indigo
+			Color.decode("#3f51b5"),
+			// Blue
+			Color.decode("#2196f3"),
+			// Light Blue
+			Color.decode("#03a9f4"),
+			// Cyan
+			Color.decode("#00bcd4"),
+			// Teal
+			Color.decode("#009688"),
+			// Green
+			Color.decode("#4caf50"),
+			// Light Green
+			Color.decode("#8bc34a"),
+			// Lime
+			Color.decode("#cddc39"),
+			// Yellow
+			Color.decode("#ffeb3b"),
+			// Amber
+			Color.decode("#ffc107"),
+			// Orange
+			Color.decode("#ff9800"),
+			// Deep Orange
+			Color.decode("#ff5722"), };
 
 	private static ArrayList<ColorPalette> instanceList = null;
+
 	public static void createInstance() {
 		instanceList = new ArrayList<>();
 		for (Color baseColor : trackBaseColor) {
-			instanceList.add( new ColorPalette(baseColor) );
+			instanceList.add(new ColorPalette(baseColor));
 		}
 	}
 
 	public static int getInstanceSize() {
 		return trackBaseColor.length;
 	}
+
 	public static ColorPalette getInstance(int trackIndex) {
 		if (instanceList == null) {
 			createInstance();
@@ -109,8 +129,8 @@ final class ColorPalette {
 		fillColorTable.clear();
 		this.baseColor = baseColor;
 		for (ColorPattern pattern : ColorPattern.values()) {
-			rectColorTable.add( pattern.getRectColor(baseColor) );
-			fillColorTable.add( pattern.getFillColor(baseColor) );
+			rectColorTable.add(pattern.getRectColor(baseColor));
+			fillColorTable.add(pattern.getFillColor(baseColor));
 		}
 	}
 
@@ -124,23 +144,23 @@ final class ColorPalette {
 	}
 
 	public Color getActiveRectColor() {
-		return getColor( rectColorTable, ColorPattern.ACTIVE );
+		return getColor(rectColorTable, ColorPattern.ACTIVE);
 	}
 
 	public Color getActiveFillColor() {
-		return getColor( fillColorTable, ColorPattern.ACTIVE );
+		return getColor(fillColorTable, ColorPattern.ACTIVE);
 	}
 
 	public Color getPartRectColor(int part) {
-		return getColor( rectColorTable, getColorType(part) );
+		return getColor(rectColorTable, getColorType(part));
 	}
 
 	public Color getPartFillColor(int part) {
-		return getColor( fillColorTable, getColorType(part) );
+		return getColor(fillColorTable, getColorType(part));
 	}
 
 	public Color getUnusedFillColor() {
-		return getColor( fillColorTable, ColorPattern.UNUSED );
+		return getColor(fillColorTable, ColorPattern.UNUSED);
 	}
 
 	public ColorPattern getColorType(int part) {
@@ -170,13 +190,13 @@ final class ColorPalette {
 		int track = 12;
 		int part = 4;
 		for (int i = 0; i < track; i++) {
-			System.out.println( "rectA="+ColorPalette.toText( colorManager.getActiveRectColor(i) ));
-			System.out.println( "fillA="+ColorPalette.toText( colorManager.getActiveFillColor(i) ));
+			System.out.println("rectA=" + ColorPalette.toText(colorManager.getActiveRectColor(i)));
+			System.out.println("fillA=" + ColorPalette.toText(colorManager.getActiveFillColor(i)));
 			for (int j = 0; j < part; j++) {
-				System.out.println( "rect"+j+"="+ColorPalette.toText( colorManager.getPartRectColor(i, j) ));
-				System.out.println( "fill"+j+"="+ColorPalette.toText( colorManager.getPartFillColor(i, j) ));
+				System.out.println("rect" + j + "=" + ColorPalette.toText(colorManager.getPartRectColor(i, j)));
+				System.out.println("fill" + j + "=" + ColorPalette.toText(colorManager.getPartFillColor(i, j)));
 			}
 		}
-		System.out.println( "unused="+ColorPalette.toText( colorManager.getUnusedFillColor() ));
+		System.out.println("unused=" + ColorPalette.toText(colorManager.getUnusedFillColor()));
 	}
 }
