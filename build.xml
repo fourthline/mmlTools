@@ -13,10 +13,14 @@
 	<property name="properties" location="properties" />
 	<property name="jardest" location="" />
 
+	<path id="app-info">
+		<pathelement location="${lib}/commons-compress/commons-compress-1.19.jar"/>
+		<pathelement location="com.sun.media.sound"/>
+	</path>
+
 	<path id="classpath">
 		<pathelement location="${lib}/commons-compress/commons-compress-1.19.jar"/>
 		<pathelement location="com.sun.media.sound"/>
-
 	</path>
 	<path id="classpath-test">
 		<pathelement location="${lib}/junit-4.12.jar"/>
@@ -33,7 +37,8 @@
 	<property name="app.vendor" value="fourthline" />
 	<property name="app.id" value="MabiIcco" />
 	<property name="app.name" value="MabiIcco" />
-	<property name="app.version" value="1.0.40.1" />
+	<property name="app.version" value="1.0.40" />
+	<property name="app.description" value="MML Editor for Mabinogi / MapleStory2"/>
 	<property name="app.main-class" value="fourthline.mabiicco.MabiIcco" />
 	<property name="app.preloader-class" value="fourthline.mabiicco.preloader.MabiIccoPreloader" />
 	<property name="splash.image" value="img/title.png" />
@@ -74,8 +79,7 @@
 
 		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml" uri="javafx:com.sun.javafx.tools.ant" classpathref="fxant"/>
 
-		<fx:application id="app-info" name="${app.name}" mainClass="${app.main-class}" preloaderClass="${app.preloader-class}">
-		</fx:application>
+		<fx:application id="app-info" name="${app.name}" mainClass="${app.main-class}" preloaderClass="${app.preloader-class}"/>
 
 		<fx:jar destfile="${jardest}/${app.id}.jar">
 			<fx:application refid="app-info" />
@@ -135,24 +139,49 @@
 		</junit>
 	</target>
 
+	<!-- デプロイ設定 -->
+	<target name="deploy" depends="jfx-package">
+		<mkdir dir="${out}" />
+		<delete dir="${out}" />
+		<mkdir dir="${out}" />
+
+		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml" uri="javafx:com.sun.javafx.tools.ant" classpathref="fxant"/>
+
+		<fx:deploy nativeBundles="all" outdir="${out}" outfile="${app.name}" offlineAllowed="true">
+			<fx:application name="${app.name}" mainClass="${app.main-class}" preloaderClass="${app.preloader-class}"/>
+			<fx:resources>
+				<fx:fileset dir="${basedir}" includes="*.jar"/>
+				<fx:fileset dir="${basedir}" includes="properties/*"/>
+				<fx:fileset dir="${basedir}" includes="resources/*"/>
+			</fx:resources>
+			<fx:info title="${app.name}" vendor="${app.vendor}" description="${app.description}">
+				<fx:icon href="resources/MabiIcco.ico"/>
+				<fx:association extension="mmi" description="MabiIcco MML File" icon="resources/mmi.ico" />
+			</fx:info>
+			<fx:preferences install="false"/>
+		</fx:deploy>
+	</target>
+
 	<!-- exewrap -->
 	<target name="exewrap" depends="jfx-package">
 		<exec executable="lib/exewrap/x64/exewrap.exe">
 			<arg value="-g"/>
 			<arg value="-d"/>
-			<arg value="Mabinogi MML Editor" />
+			<arg value="${app.description}" />
 			<arg value="-c"/>
 			<arg value="${app.vendor}" />
 			<arg value="-t"/>
 			<arg value="1.8"/>
+			<arg value="-M"/>
+			<arg value="${app.main-class}"/>
 			<arg value="-i"/>
 			<arg value="resources\MabiIcco.ico"/>
 			<arg value="-p" />
 			<arg value="${app.name}"/>
 			<arg value="-v" />
-			<arg value="${app.version}"/>
+			<arg value="${app.version}.2"/>
 			<arg value="-V" />
-			<arg value="${app.version}"/>
+			<arg value="${app.version}.2"/>
 			<arg value="-D"/>
 			<arg value="java.library.path=${env.JAVA_HOME}\jre\bin"/>
 			<arg value="-j"/>

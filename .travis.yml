@@ -3,7 +3,7 @@ install: ant
 sudo: false
 
 jdk:
-  - openjdk8
+  - oraclejdk8
 
 
 
