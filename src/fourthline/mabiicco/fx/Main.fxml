@@ -88,16 +88,37 @@
                   <accelerator>
                     <KeyCodeCombination alt="UP" code="X" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
                   </accelerator>
+                  <graphic>
+                    <ImageView>
+                      <image>
+                        <Image url="@/img/cut.png" />
+                      </image>
+                    </ImageView>
+                  </graphic>
                 </MenuItem>
                 <MenuItem mnemonicParsing="false" text="%menu.copy">
                   <accelerator>
                     <KeyCodeCombination alt="UP" code="C" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
                   </accelerator>
+                  <graphic>
+                    <ImageView>
+                      <image>
+                        <Image url="@/img/copy.png" />
+                      </image>
+                    </ImageView>
+                  </graphic>
                 </MenuItem>
                 <MenuItem mnemonicParsing="false" text="%menu.paste">
                   <accelerator>
                     <KeyCodeCombination alt="UP" code="V" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
                   </accelerator>
+                  <graphic>
+                    <ImageView>
+                      <image>
+                        <Image url="@/img/paste.png" />
+                      </image>
+                    </ImageView>
+                  </graphic>
                 </MenuItem>
                 <MenuItem mnemonicParsing="false" text="%menu.delete">
                   <accelerator>
@@ -164,28 +185,63 @@
                   <accelerator>
                     <KeyCodeCombination alt="UP" code="T" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
                   </accelerator>
+                  <graphic>
+                    <ImageView>
+                      <image>
+                        <Image url="@/img/insertT.png" />
+                      </image>
+                    </ImageView>
+                  </graphic>
                 </MenuItem>
                 <MenuItem mnemonicParsing="false" text="%menu.removeTrack">
                   <accelerator>
                     <KeyCodeCombination alt="UP" code="T" control="UP" meta="UP" shift="DOWN" shortcut="DOWN" />
                   </accelerator>
+                  <graphic>
+                    <ImageView>
+                      <image>
+                        <Image url="@/img/deleteT.png" />
+                      </image>
+                    </ImageView>
+                  </graphic>
                 </MenuItem>
                 <SeparatorMenuItem />
                 <MenuItem mnemonicParsing="false" text="%menu.trackProperty">
                   <accelerator>
                     <KeyCodeCombination alt="DOWN" code="ENTER" control="UP" meta="UP" shift="UP" shortcut="UP" />
                   </accelerator>
+                  <graphic>
+                    <ImageView>
+                      <image>
+                        <Image url="@/img/property.png" />
+                      </image>
+                    </ImageView>
+                  </graphic>
                 </MenuItem>
                 <SeparatorMenuItem />
                 <MenuItem mnemonicParsing="false" text="%menu.mml_import">
                   <accelerator>
                     <KeyCodeCombination alt="UP" code="V" control="UP" meta="UP" shift="DOWN" shortcut="DOWN" />
                   </accelerator>
+                  <graphic>
+                    <ImageView>
+                      <image>
+                        <Image url="@/img/inputMML.png" />
+                      </image>
+                    </ImageView>
+                  </graphic>
                 </MenuItem>
                 <MenuItem mnemonicParsing="false" text="%menu.mml_export">
                   <accelerator>
                     <KeyCodeCombination alt="UP" code="C" control="UP" meta="UP" shift="DOWN" shortcut="DOWN" />
                   </accelerator>
+                  <graphic>
+                    <ImageView>
+                      <image>
+                        <Image url="@/img/outputMML.png" />
+                      </image>
+                    </ImageView>
+                  </graphic>
                 </MenuItem>
               </items>
             </Menu>
@@ -265,7 +321,15 @@
             </Menu>
             <Menu mnemonicParsing="false" text="%menu.setting">
               <items>
-                <Menu mnemonicParsing="false" text="%menu.noteHeight" />
+                <Menu mnemonicParsing="false" text="%menu.noteHeight">
+                  <graphic>
+                    <ImageView>
+                      <image>
+                        <Image url="@/img/height.png" />
+                      </image>
+                    </ImageView>
+                  </graphic>
+                </Menu>
                 <CheckMenuItem mnemonicParsing="false" text="%clickPlayMenu" />
                 <CheckMenuItem mnemonicParsing="false" text="%view.marker" />
                 <CheckMenuItem mnemonicParsing="false" text="%view.range" />

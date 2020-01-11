@@ -9,7 +9,7 @@
 <VBox xmlns="http://javafx.com/javafx/8" 
   xmlns:fx="http://javafx.com/fxml/1" fx:controller="fourthline.mabiicco.fx.TrackViewController">
   <children>
-    <BorderPane>
+    <BorderPane stylesheets="@main.css">
       <left>
         <HBox spacing="5.0" BorderPane.alignment="CENTER">
           <children>
@@ -67,7 +67,7 @@
       <right>
         <HBox BorderPane.alignment="CENTER">
           <children>
-            <Label fx:id="rankText" text="Label" />
+            <Label fx:id="rankText" text="Rank" />
           </children>
           <padding>
             <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
