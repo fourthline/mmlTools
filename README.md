@@ -4,7 +4,7 @@ mmlTools
 
 ### 最新版のダウンロード
 
-* リリースを参照ください https://github.com/fourthline/mmlTools/releases
+* リリースを参照ください https://github.com/logue/mmlTools/releases
 * Windowsのみです.
 
 
@@ -28,3 +28,6 @@ mmlTools
 * テンポ指定がスコア単位なので、各パートにそれぞれテンポ指定は不要です。
 * MMLの調整を行う機能をもっています。（演奏時間補正など）
 * 作成した楽譜（MML文字列ではなく）をマビノギ演奏に最も近づける！（マビノギにもっていってはじめておかしい！と気づくようなことをなくしたい）
+
+### 例
+[![](https://img.youtube.com/vi/7RXuQOZL-xY/0.jpg)](https://www.youtube.com/watch?v=7RXuQOZL-xY)
