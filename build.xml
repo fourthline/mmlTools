@@ -1,31 +1,39 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project name="MabiIcco" basedir="." default="jfx-package" 
+<project name="MabiIcco" basedir="." default="jar" 
 	xmlns:fx="javafx:com.sun.javafx.tools.ant">
 
 	<!-- 環境変数 -->
 	<property environment="env" />
-	<!--property name="env.JAVA_HOME" value="./jdk-13.0.1" /-->
-	<property name="src" location="src" />
-	<property name="dest" location="dest" />
-	<property name="test" location="test" />
-	<property name="lib" location="lib" />
-	<property name="out" location="out" />
-	<property name="properties" location="properties" />
-	<property name="jardest" location="" />
+	<property name="env.JAVA_HOME" value="C:\Program Files\BellSoft\LibericaJDK-8-Full" />
 
-	<path id="app-info">
-		<pathelement location="${lib}/commons-compress/commons-compress-1.19.jar"/>
-		<pathelement location="com.sun.media.sound"/>
-	</path>
+	<!-- ビルド設定 -->
+	<property name="build.src.dir" value="src"/>
+	<property name="build.classes.dir" value="classes"/>
+	<property name="build.dist.dir" value="dist"/>
+	<property name="build.test.dir" location="test" />
+	<property name="build.lib.dir" location="lib" />
+	<property name="build.properties.dir" location="properties" />
 
+	<!-- アプリケーションの設定 -->
+	<property name="app.vendor" value="fourthline" />
+	<property name="app.id" value="MabiIcco" />
+	<property name="app.name" value="MabiIcco" />
+	<property name="app.version" value="1.0.41" />
+	<property name="app.description" value="MML Editor for Mabinogi / MapleStory2"/>
+	<property name="app.main-class" value="fourthline.mabiicco.MabiIcco" />
+	<property name="app.preloader-class" value="fourthline.mabiicco.preloader.MabiIccoPreloader" />
+	<property name="app.splash.image" value="img/title.png" />
+
+	<!-- パス設定 -->
 	<path id="classpath">
-		<pathelement location="${lib}/commons-compress/commons-compress-1.19.jar"/>
+		<pathelement location="${build.lib.dir}/commons-compress/commons-compress-1.19.jar"/>
 		<pathelement location="com.sun.media.sound"/>
 	</path>
 	<path id="classpath-test">
-		<pathelement location="${lib}/junit-4.12.jar"/>
-		<pathelement location="${lib}/hamcrest-core-1.3.jar"/>
+		<pathelement location="${build.lib.dir}/junit-4.12.jar"/>
+		<pathelement location="${build.lib.dir}/hamcrest-core-1.3.jar"/>
 	</path>
+
 	<path id="fxant">
 		<filelist>
 			<file name="${java.home}\..\lib\ant-javafx.jar"/>
@@ -33,39 +41,27 @@
 		</filelist>
 	</path>
 
-	<!-- アプリケーションの設定 -->
-	<property name="app.vendor" value="fourthline" />
-	<property name="app.id" value="MabiIcco" />
-	<property name="app.name" value="MabiIcco" />
-	<property name="app.version" value="1.0.40" />
-	<property name="app.description" value="MML Editor for Mabinogi / MapleStory2"/>
-	<property name="app.main-class" value="fourthline.mabiicco.MabiIcco" />
-	<property name="app.preloader-class" value="fourthline.mabiicco.preloader.MabiIccoPreloader" />
-	<property name="splash.image" value="img/title.png" />
-	<property name="class.path" value="./lib/commons-compress/commons-compress-1.19.jar" />
-
 	<!-- clean task -->
 	<target name="clean">
-		<mkdir dir="${dest}" />
-		<delete dir="${dest}" />
-		<mkdir dir="${dest}" />
+		<mkdir dir="${build.classes.dir}"/>
+		<mkdir dir="${build.dist.dir}"/>
+
+		<delete>
+			<fileset dir="${build.classes.dir}" includes="**/*"/>
+			<fileset dir="${build.dist.dir}" includes="**/*"/>
+		</delete>
 	</target>
+
 
 	<!-- compile task -->
 	<target name="compile" depends="clean">
-		<javac destdir="${dest}" encoding="UTF-8" listfiles="yes" includeantruntime="false" fork="true" executable="${env.JAVA_HOME}\bin\javac">
+		<javac includeantruntime="false" srcdir="${build.src.dir}" destdir="${build.classes.dir}" encoding="UTF-8" listfiles="yes" fork="yes" classpathref="classpath" source="8" debug="on">
 			<compilerarg value="-Xlint:deprecation" />
 			<compilerarg value="-XDignore.symbol.file" />
-			<classpath refid="classpath" />
-			<src path="${src}" />
 			<exclude name="**/package-info.java,com/,fourthline/mabiicco/fx/"/>
 		</javac>
-	</target>
-
-	<!-- resources task -->
-	<target name="resources">
-		<copy todir="${dest}">
-			<fileset dir="${src}">
+		<copy todir="${build.classes.dir}">
+			<fileset dir="${build.src.dir}">
 				<include name="**/*.png" />
 				<include name="**/*.fxml" />
 				<include name="**/*.css" />
@@ -74,37 +70,31 @@
 		</copy>
 	</target>
 
-	<!-- jfx-package task -->
-	<target name="jfx-package" description="javafxpackage" depends="compile,resources">
-
+	<target name="jar" depends="compile">
 		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml" uri="javafx:com.sun.javafx.tools.ant" classpathref="fxant"/>
-
-		<fx:application id="app-info" name="${app.name}" mainClass="${app.main-class}" preloaderClass="${app.preloader-class}"/>
-
-		<fx:jar destfile="${jardest}/${app.id}.jar">
-			<fx:application refid="app-info" />
+		<fx:jar destfile="${build.dist.dir}/${app.id}.jar">
+			<fx:application name="${app.name}" version="${app.version}" mainClass="${app.main-class}" preloaderClass="${app.preloader-class}" />
 			<manifest>
 				<attribute name="Implementation-Vendor" value="${app.vendor}" />
 				<attribute name="Implementation-Title" value="${app.name}" />
 				<attribute name="MabiIcco-Version" value="${app.version}" />
-				<attribute name="SplashScreen-Image" value="${splash.image}" />
-				<attribute name="Class-Path" value="${class.path}" />
+				<attribute name="SplashScreen-Image" value="${app.splash.image}" />
+				<attribute name="Class-Path" value="${app.main-class}" />
 			</manifest>
-			<fileset dir="${dest}" />
+			<fileset dir="${build.classes.dir}" />
 		</fx:jar>
 	</target>
-	<!-- // jfx-package task -->
 
 	<!-- compile-test task -->
 	<target name="compile-test" depends="clean">
-		<javac destdir="${dest}" encoding="UTF-8" listfiles="yes" includeantruntime="false" fork="true" executable="${env.JAVA_HOME}\bin\javac">
+		<javac destdir="${build.classes.dir}" encoding="UTF-8" listfiles="yes" includeantruntime="false" fork="true">
 			<compilerarg value="-Xlint:deprecation" />
 			<compilerarg value="-XDignore.symbol.file" />
 			<classpath refid="classpath-test" />
-			<src path="${src}" />
+			<src path="${build.src.dir}" />
 		</javac>
-		<copy todir="${dest}">
-			<fileset dir="${test}">
+		<copy todir="${build.classes.dir}">
+			<fileset dir="${build.test,dir}">
 				<include name="**/*.mml" />
 				<include name="**/*.mms" />
 				<include name="**/*.mmi" />
@@ -115,16 +105,16 @@
 	</target>
 
 	<!-- test task -->
-	<target name="test" depends="jfx-package,compile-test">
+	<target name="test" depends="clean,compile-test">
 		<junit printsummary="no">
 			<classpath>
 				<path refid="classpath"/>
 				<path refid="classpath-test"/>
-				<pathelement path="${dest}"/>
+				<pathelement path="${build.classes.dir}"/>
 			</classpath>
 			<formatter type="xml" />
-			<batchtest todir="${dest}">
-				<fileset dir="${test}" includes="**/*Test.java">
+			<batchtest todir="${build.classes.dir}">
+				<fileset dir="${build.test.dir}" includes="**/*Test.java">
 					<exclude name="fourthline/mabiicco/midi/MabiDLSTest.java"/>
 					<exclude name="fourthline/mabiicco/ui/MMLSeqViewTest.java"/>
 					<exclude name="fourthline/mabiicco/ui/MainFrameTest.java"/>
@@ -140,30 +130,27 @@
 	</target>
 
 	<!-- デプロイ設定 -->
-	<target name="deploy" depends="jfx-package">
-		<mkdir dir="${out}" />
-		<delete dir="${out}" />
-		<mkdir dir="${out}" />
-
-		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml" uri="javafx:com.sun.javafx.tools.ant" classpathref="fxant"/>
-
-		<fx:deploy nativeBundles="all" outdir="${out}" outfile="${app.name}" offlineAllowed="true">
-			<fx:application name="${app.name}" mainClass="${app.main-class}" preloaderClass="${app.preloader-class}"/>
+	<target name="deploy" depends="clean,compile,jar">
+		<fx:deploy outdir="." outfile="${app.name}" nativeBundles="all" offlineAllowed="true">
+			<!--fx:platform>
+				<fx:jvmuserarg name="-Xms" value="31m"/>
+				<fx:jvmuserarg name="-Xmx" value="64m"/>
+			</fx:platform-->
+			<fx:application name="${app.name}" version="${app.version}" mainClass="${app.main-class}" preloaderClass="${app.preloader-class}" />
 			<fx:resources>
-				<fx:fileset dir="${basedir}" includes="*.jar"/>
 				<fx:fileset dir="${basedir}" includes="properties/*"/>
-				<fx:fileset dir="${basedir}" includes="resources/*"/>
+				<fx:fileset dir="${build.dist.dir}" includes="*.jar"/>
+				<fx:fileset dir="${build.lib.dir}/commons-compress" includes="*.jar"/>
 			</fx:resources>
 			<fx:info title="${app.name}" vendor="${app.vendor}" description="${app.description}">
-				<fx:icon href="resources/MabiIcco.ico"/>
-				<fx:association extension="mmi" description="MabiIcco MML File" icon="resources/mmi.ico" />
+				<fx:icon href="${basedir}/resources/MabiIcco.ico"/>
+				<fx:association extension="mmi" description="MabiIcco MML File" mimetype="text/x-mabiicco-mml" icon="${basedir}/resources/mmi.ico" />
 			</fx:info>
-			<fx:preferences install="false"/>
+			<fx:preferences install="false" shortcut="true"/>
 		</fx:deploy>
 	</target>
-
 	<!-- exewrap -->
-	<target name="exewrap" depends="jfx-package">
+	<target name="exewrap" depends="jar">
 		<exec executable="lib/exewrap/x64/exewrap.exe">
 			<arg value="-g"/>
 			<arg value="-d"/>
@@ -179,9 +166,9 @@
 			<arg value="-p" />
 			<arg value="${app.name}"/>
 			<arg value="-v" />
-			<arg value="${app.version}.2"/>
+			<arg value="${app.version}"/>
 			<arg value="-V" />
-			<arg value="${app.version}.2"/>
+			<arg value="${app.version}"/>
 			<arg value="-D"/>
 			<arg value="java.library.path=${env.JAVA_HOME}\jre\bin"/>
 			<arg value="-j"/>
