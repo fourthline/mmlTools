@@ -5,3 +5,6 @@
 /.settings
 /config.properties
 /MabiIcco.jar
+/nbproject/private/
+/build/
+/dist/

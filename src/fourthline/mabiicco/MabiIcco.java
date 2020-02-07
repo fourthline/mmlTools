@@ -53,8 +53,9 @@ public final class MabiIcco extends Application {
 
 			// font
 			String fontName = AppResource.appText("ui.font");
+			String fontSize = AppResource.appText("ui.fontsize");
 			if (!fontName.equals("ui.font")) {
-				setUIFont(new javax.swing.plaf.FontUIResource(fontName, Font.PLAIN, 14));
+				setUIFont(new javax.swing.plaf.FontUIResource(fontName, Font.PLAIN, Integer.parseInt(fontSize)));
 			}
 
 			// initialize
