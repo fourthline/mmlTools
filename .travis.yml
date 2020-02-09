@@ -5,6 +5,8 @@ before_install:
   - sudo wget https://github.com/bell-sw/Liberica/releases/download/8u242%2B7/bellsoft-jdk8u242+7-linux-amd64-full.deb
   - sudo apt-get update -q
   - sudo apt-get install ./bellsoft-jdk8u242+7-linux-amd64-full.deb -y
+  - sudo apt-get install ant-optional -y
+  - sudo apt-get upgrade -y
   - export JAVA_HOME=/usr/lib/jvm/bellsoft-java8-full-amd64
   - echo $JAVA_HOME
 
