@@ -24,16 +24,17 @@
 	<property name="app.preloader-class" value="fourthline.mabiicco.preloader.MabiIccoPreloader" />
 	<property name="app.splash.image" value="img/title.png" />
 
-	<!-- パス設定 -->
+	<!-- 依存ライブラリのパス設定 -->
 	<path id="classpath">
 		<pathelement location="${build.lib.dir}/commons-compress/commons-compress-1.20.jar"/>
 		<pathelement location="com.sun.media.sound"/>
 	</path>
+	<!-- テスト用ライブラリのパス設定 -->
 	<path id="classpath-test">
-		<pathelement location="${build.lib.dir}/junit-4.12.jar"/>
-		<pathelement location="${build.lib.dir}/hamcrest-core-1.3.jar"/>
+		<pathelement location="${build.lib.dir}/junit-4.13.jar"/>
+		<pathelement location="${build.lib.dir}/hamcrest-core-2.2.jar"/>
 	</path>
-
+	<!-- JavaFXのパス設定 -->
 	<path id="fxant">
 		<filelist>
 			<file name="${java.home}\..\lib\ant-javafx.jar"/>
@@ -45,13 +46,11 @@
 	<target name="clean">
 		<mkdir dir="${build.classes.dir}"/>
 		<mkdir dir="${build.dist.dir}"/>
-
 		<delete>
 			<fileset dir="${build.classes.dir}" includes="**/*"/>
 			<fileset dir="${build.dist.dir}" includes="**/*"/>
 		</delete>
 	</target>
-
 
 	<!-- compile task -->
 	<target name="compile" depends="clean">
@@ -70,6 +69,7 @@
 		</copy>
 	</target>
 
+	<!-- build jar file task -->
 	<target name="jar" depends="compile">
 		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml" uri="javafx:com.sun.javafx.tools.ant" classpathref="fxant"/>
 		<fx:jar destfile="${build.dist.dir}/${app.id}.jar">
@@ -87,14 +87,13 @@
 
 	<!-- compile-test task -->
 	<target name="compile-test" depends="clean">
-		<javac destdir="${build.classes.dir}" encoding="UTF-8" listfiles="yes" includeantruntime="false" fork="true">
+		<javac includeantruntime="false" srcdir="${build.src.dir}" destdir="${build.classes.dir}" encoding="UTF-8" listfiles="yes" fork="yes" classpathref="classpath" source="8" debug="on">
 			<compilerarg value="-Xlint:deprecation" />
 			<compilerarg value="-XDignore.symbol.file" />
 			<classpath refid="classpath-test" />
-			<src path="${build.src.dir}" />
 		</javac>
 		<copy todir="${build.classes.dir}">
-			<fileset dir="${build.test,dir}">
+			<fileset dir="${build.test.dir}">
 				<include name="**/*.mml" />
 				<include name="**/*.mms" />
 				<include name="**/*.mmi" />
