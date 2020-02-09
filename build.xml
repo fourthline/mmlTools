@@ -4,7 +4,7 @@
 
 	<!-- 環境変数 -->
 	<property environment="env" />
-	<property name="env.JAVA_HOME" value="C:\Program Files\BellSoft\LibericaJDK-8-Full" />
+	<!--property name="env.JAVA_HOME" value="C:\Program Files\BellSoft\LibericaJDK-8-Full" /-->
 
 	<!-- ビルド設定 -->
 	<property name="build.src.dir" value="src"/>
@@ -26,7 +26,7 @@
 
 	<!-- パス設定 -->
 	<path id="classpath">
-		<pathelement location="${build.lib.dir}/commons-compress/commons-compress-1.19.jar"/>
+		<pathelement location="${build.lib.dir}/commons-compress/commons-compress-1.20.jar"/>
 		<pathelement location="com.sun.media.sound"/>
 	</path>
 	<path id="classpath-test">
