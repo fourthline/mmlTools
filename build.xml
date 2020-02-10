@@ -32,6 +32,7 @@
 	<!-- テスト用ライブラリのパス設定 -->
 	<path id="classpath-test">
 		<pathelement location="${build.lib.dir}/junit-4.13.jar"/>
+		<pathelement location="${build.lib.dir}/hamcrest-2.2.jar"/>
 		<pathelement location="${build.lib.dir}/hamcrest-core-2.2.jar"/>
 	</path>
 	<!-- JavaFXのパス設定 -->
@@ -87,9 +88,11 @@
 
 	<!-- compile-test task -->
 	<target name="compile-test" depends="clean">
-		<javac includeantruntime="false" srcdir="${build.src.dir}" destdir="${build.classes.dir}" encoding="UTF-8" listfiles="yes" fork="yes" classpathref="classpath" source="8" debug="on">
+		<javac includeantruntime="false" destdir="${build.classes.dir}" encoding="UTF-8" listfiles="yes" fork="yes" classpathref="classpath" source="8" debug="on">
 			<compilerarg value="-Xlint:deprecation" />
 			<compilerarg value="-XDignore.symbol.file" />
+			<src path="${build.src.dir}" />
+			<src path="${build.test.dir}" />
 			<classpath refid="classpath-test" />
 		</javac>
 		<copy todir="${build.classes.dir}">
@@ -104,7 +107,7 @@
 	</target>
 
 	<!-- test task -->
-	<target name="test" depends="clean,compile-test">
+	<target name="test" depends="compile-test">
 		<junit printsummary="no">
 			<classpath>
 				<path refid="classpath"/>
@@ -128,8 +131,8 @@
 		</junit>
 	</target>
 
-	<!-- デプロイ設定 -->
-	<target name="deploy" depends="clean,compile,jar">
+	<!-- Deploy Task -->
+	<target name="deploy" depends="jar">
 		<fx:deploy outdir="." outfile="${app.name}" nativeBundles="all" offlineAllowed="true">
 			<!--fx:platform>
 				<fx:jvmuserarg name="-Xms" value="31m"/>
@@ -143,12 +146,14 @@
 			</fx:resources>
 			<fx:info title="${app.name}" vendor="${app.vendor}" description="${app.description}">
 				<fx:icon href="${basedir}/resources/MabiIcco.ico"/>
+				<!-- WiX Toolset Required for File association. -->
 				<fx:association extension="mmi" description="MabiIcco MML File" mimetype="text/x-mabiicco-mml" icon="${basedir}/resources/mmi.ico" />
 			</fx:info>
 			<fx:preferences install="false" shortcut="true"/>
 		</fx:deploy>
 	</target>
-	<!-- exewrap -->
+
+	<!-- Deploy using exewrap task. -->
 	<target name="exewrap" depends="jar">
 		<exec executable="lib/exewrap/x64/exewrap.exe">
 			<arg value="-g"/>
