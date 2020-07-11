@@ -143,7 +143,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 
 		if (!lookNote) {
 			note[0] = 0;
-			note[1] = 96;
+			note[1] = 108;
 		}
 
 		selectedNote.clear();
