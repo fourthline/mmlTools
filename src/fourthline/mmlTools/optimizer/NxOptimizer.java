@@ -71,11 +71,12 @@ public final class NxOptimizer implements MMLStringOptimizer.Optimizer {
 	}
 
 	private void addPattern(List<NxBuilder> prevMap) {
-		if (parser.getNoteNumber() < 0) {
+		int noteNumber = parser.getNoteNumber();
+		if ( (noteNumber < 0) || (noteNumber > 96) ) {
 			return;
 		}
 		prevMap.forEach(t -> {
-			t.builder.append("n"+parser.getNoteNumber());
+			t.builder.append("n"+noteNumber);
 			t.nCount++;
 		});
 		builderList.add( minStack(prevMap) );
