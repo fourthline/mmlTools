@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2018 たんらる
+ * Copyright (C) 2013-2020 たんらる
  */
 
 package fourthline.mabiicco.ui.editor;
@@ -10,8 +10,14 @@ import java.awt.Frame;
 import java.awt.IllegalComponentStateException;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -30,6 +36,7 @@ import fourthline.mabiicco.ui.IMMLManager;
 import fourthline.mabiicco.ui.PianoRollView;
 import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLNoteEvent;
+import fourthline.mmlTools.core.UndefinedTickException;
 
 
 public final class MMLEditor implements MouseInputListener, IEditState, IEditContext, IEditAlign {
@@ -40,9 +47,6 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	private final ArrayList<MMLNoteEvent> selectedNote = new ArrayList<>();
 	// 複数ノート移動時のdetachリスト
 	private final ArrayList<MMLNoteEvent> detachedNote = new ArrayList<>();
-
-	// Cut, Copy時に保持するリスト.
-	private MMLEventList clipEventList;
 
 	// 編集align (tick base)
 	private int editAlign = 48;
@@ -57,6 +61,8 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	private final VelocityChangeMenu velocityChangeMenu;
 
 	private final Frame parentFrame;
+
+	private static final String MMLEVENT_PREFIX = "MMLEVENT@";
 
 	public MMLEditor(Frame parentFrame, IPlayNote notePlayer, PianoRollView pianoRoll, IMMLManager mmlManager) {
 		this.notePlayer = notePlayer;
@@ -462,8 +468,41 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		this.editObserver = observer;
 	}
 
+	/**
+	 * クリップボードからMMLデータを取得する
+	 */
+	private MMLEventList fromClipBoard() {
+		MMLEventList clipEventList = null;
+		Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+		try {
+			String str = (String) clipboard.getData(DataFlavor.stringFlavor);
+			if ( (str != null) && str.startsWith(MMLEVENT_PREFIX)) {
+				clipEventList = new MMLEventList(str.substring(MMLEVENT_PREFIX.length()));
+			}
+		} catch (UnsupportedFlavorException | IOException e) {}
+
+		return clipEventList;
+	}
+
+	/**
+	 * クリップボードへMMLデータを設定する
+	 * @param eventList     設定するMMLデータ.
+	 */
+	private void toClipBoard(MMLEventList eventList) {
+		int startOffset = eventList.getMMLNoteEventList().get(0).getTickOffset();
+		for (MMLNoteEvent e : eventList.getMMLNoteEventList()) {
+			e.setTickOffset( e.getTickOffset() - startOffset );
+		}
+		try {
+			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+			StringSelection selection = new StringSelection(MMLEVENT_PREFIX + eventList.toMMLString(false, false));
+			clipboard.setContents(selection, selection);
+		} catch (UndefinedTickException e) {}
+	}
+
 	@Override 
 	public boolean canPaste() {
+		MMLEventList clipEventList = fromClipBoard();
 		if (clipEventList == null) {
 			return false;
 		}
@@ -485,6 +524,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 			return;
 		}
 		selectNote(null);
+		MMLEventList clipEventList = fromClipBoard();
 		int delta = (int)( startTick - clipEventList.getMMLNoteEventList().get(0).getTickOffset() );
 		for (MMLNoteEvent noteEvent : clipEventList.getMMLNoteEventList()) {
 			MMLNoteEvent addNote = noteEvent.clone();
@@ -503,12 +543,13 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		if (editEventList == null) {
 			return;
 		}
-		clipEventList = new MMLEventList("");
+		MMLEventList clipEventList = new MMLEventList("");
 		for (MMLNoteEvent noteEvent : selectedNote) {
 			clipEventList.addMMLNoteEvent(noteEvent);
 			editEventList.deleteMMLEvent(noteEvent);
 		}
 
+		toClipBoard(clipEventList);
 		selectNote(null);
 		editObserver.notifyUpdateEditState();
 		mmlManager.updateActivePart(true);
@@ -516,11 +557,12 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 
 	@Override
 	public void selectedCopy() {
-		clipEventList = new MMLEventList("");
+		MMLEventList clipEventList = new MMLEventList("");
 		for (MMLNoteEvent noteEvent : selectedNote) {
 			clipEventList.addMMLNoteEvent(noteEvent);
 		}
 
+		toClipBoard(clipEventList);
 		editObserver.notifyUpdateEditState();
 	}
 
