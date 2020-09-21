@@ -287,6 +287,7 @@ public final class MMLScore implements IMMLFileParser {
 				stream.println("program="+track.getProgram());
 				stream.println("songProgram="+track.getSongProgram());
 				stream.println("panpot="+track.getPanpot());
+				stream.println("visible="+track.isVisible());
 			}
 
 			if (!markerList.isEmpty()) {
@@ -365,6 +366,7 @@ public final class MMLScore implements IMMLFileParser {
 		.pattern("program=",     t -> this.trackList.getLast().setProgram(Integer.parseInt(t)) )
 		.pattern("songProgram=", t -> this.trackList.getLast().setSongProgram(Integer.parseInt(t)) )
 		.pattern("panpot=",      t -> this.trackList.getLast().setPanpot(Integer.parseInt(t)) )
+		.pattern("visible=",     t -> this.trackList.getLast().setVisible(Boolean.parseBoolean(t)) )
 		.pattern("title=",       this::setTitle )
 		.pattern("author=",      this::setAuthor )
 		.pattern("time=",        this::setBaseTime )

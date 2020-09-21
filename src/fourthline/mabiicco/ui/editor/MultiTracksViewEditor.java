@@ -69,6 +69,7 @@ public final class MultiTracksViewEditor extends JPanel {
 		buttonPanel.add(applyButton);
 		applyButton.addActionListener((event) -> {
 			apply(table.getCheckList());
+			mmlManager.updateActivePart(true);
 			dialog.setVisible(false);
 		});
 
@@ -108,7 +109,7 @@ public final class MultiTracksViewEditor extends JPanel {
 		table.setDefaultEditor(Object.class, null);
 		for (int i = 0; i < table.getCheckList().length; i++) {
 			MMLTrack track = mmlManager.getMMLScore().getTrack(i);
-			table.getCheckList()[i] = track.isVisiable();
+			table.getCheckList()[i] = track.isVisible();
 		}
 		oldValue = table.getCheckList().clone();
 
@@ -137,7 +138,7 @@ public final class MultiTracksViewEditor extends JPanel {
 	public void apply(boolean list[]) {
 		List<MMLTrack> trackList = mmlManager.getMMLScore().getTrackList();
 		for (int i = 0; i < trackList.size(); i++) {
-			trackList.get(i).setVisiable(list[i]);
+			trackList.get(i).setVisible(list[i]);
 		}
 		parentFrame.repaint();
 	}

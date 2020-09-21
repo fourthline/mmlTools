@@ -537,7 +537,7 @@ public final class PianoRollView extends JPanel {
 	 * @param index トラックindex
 	 */
 	private void paintMMLTrack(Graphics2D g, int index, MMLTrack track) {
-		if (!track.isVisiable()) {
+		if (!track.isVisible()) {
 			return;
 		}
 

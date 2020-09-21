@@ -25,7 +25,7 @@ public final class MMLTrack implements Serializable {
 	private int program = 0;
 	private String trackName;
 	private int panpot = 64;
-	private boolean visiable = true;
+	private boolean visible = true;
 
 	// for MML input
 	private MMLText originalMML = new MMLText();
@@ -324,11 +324,11 @@ public final class MMLTrack implements Serializable {
 		return false;
 	}
 
-	public boolean isVisiable() {
-		return visiable;
+	public boolean isVisible() {
+		return visible;
 	}
 
-	public void setVisiable(boolean visiable) {
-		this.visiable = visiable;
+	public void setVisible(boolean visible) {
+		this.visible = visible;
 	}
 }

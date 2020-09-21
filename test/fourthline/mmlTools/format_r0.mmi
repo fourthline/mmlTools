@@ -9,3 +9,4 @@ name=track1
 program=0
 songProgram=-1
 panpot=64
+visible=true

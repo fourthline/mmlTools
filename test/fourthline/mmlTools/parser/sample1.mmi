@@ -9,6 +9,7 @@ name=メインパート
 program=5
 songProgram=-1
 panpot=64
+visible=true
 [marker]
 192=マーカー1
 480=マーカー2

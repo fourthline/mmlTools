@@ -9,10 +9,12 @@ name=Track1
 program=0
 songProgram=-1
 panpot=74
+visible=true
 mml-track=MML@r1aba,,;
 name=Track3
 program=1
 songProgram=-1
 panpot=54
+visible=true
 [marker]
 384=marker1

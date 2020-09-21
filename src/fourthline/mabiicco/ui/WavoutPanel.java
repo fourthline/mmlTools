@@ -17,7 +17,6 @@ import javax.swing.JButton;
 
 import fourthline.mabiicco.ActionDispatcher;
 import fourthline.mabiicco.midi.MabiDLS;
-import fourthline.mabiicco.ui.IMMLManager;
 
 import static fourthline.mabiicco.AppResource.appText;
 
