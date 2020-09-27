@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2017 たんらる
+ * Copyright (C) 2013-2020 たんらる
  */
 
 package fourthline.mmlTools;
@@ -156,7 +156,7 @@ public class MMLTrackTest {
 	public void testTempo_all0() throws Exception {
 		String mml =        "MML@,t150c1c1t120c1c1t130c1c1;";
 		String expectMML1 = "MML@t150l1rrt120rrt130,l1cccccc,;";
-		String expectMML2 = "MML@t150v0l1cct120cct130,l1cccccc,;";
+		String expectMML2 = "MML@t150l1rv0dt120rdt130,l1cccccc,;";
 
 		MMLTrack track = new MMLTrack().setMML(mml);
 		assertEquals(expectMML1, track.generate().getOriginalMML());
@@ -172,7 +172,7 @@ public class MMLTrackTest {
 	public void testTempo_tail0() throws UndefinedTickException {
 		String mml =        "MML@,c2t130&c1.t200r1t180";
 		String expectMML1 = "MML@r2t130l1r.t200rt180,l1c&c,;";
-		String expectMML2 = "MML@v0c2t130,l1c&c,;";
+		String expectMML2 = "MML@v0d2t130,l1c&c,;";
 
 		MMLTrack track = new MMLTrack().setMML(mml);
 		assertEquals(expectMML1, track.generate().getOriginalMML());

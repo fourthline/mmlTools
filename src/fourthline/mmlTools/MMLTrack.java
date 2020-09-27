@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2017 たんらる
+ * Copyright (C) 2013-2020 たんらる
  */
 
 package fourthline.mmlTools;
@@ -219,7 +219,9 @@ public final class MMLTrack implements Serializable {
 			MMLEventList eventList = mmlParts.get(i);
 			boolean isPrimaryTempoPart = (i == 0) || (i == 3);
 			if ( isPrimaryTempoPart ) {
-				mml[i] = eventList.toMMLString(true, totalTick, mabiTempo);
+				// part0 の場合, 1,2のパート情報を渡す
+				List<MMLEventList> relationPart = (i == 0) ? mmlParts.subList(1, 3) : null;
+				mml[i] = eventList.toMMLString(true, totalTick, mabiTempo, relationPart);
 			} else {
 				mml[i] = eventList.toMMLString();
 			}

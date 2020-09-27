@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 たんらる
+ * Copyright (C) 2013-2020 たんらる
  */
 
 package fourthline.mmlTools;
@@ -95,7 +95,7 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 	}
 
 	private static final String noteNameTable[] = {
-		"c", "c+", "d", "d+", "e", "f", "f+", "g", "g+", "a", "a+", "b"
+			"c", "c+", "d", "d+", "e", "f", "f+", "g", "g+", "a", "a+", "b"
 	};
 	private String getNoteName() throws UndefinedTickException {
 		if (note == -1) {

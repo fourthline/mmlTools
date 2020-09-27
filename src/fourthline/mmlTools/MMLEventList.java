@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2017 たんらる
+ * Copyright (C) 2013-2020 たんらる
  */
 
 package fourthline.mmlTools;
@@ -77,6 +77,14 @@ public final class MMLEventList implements Serializable, Cloneable {
 
 	public List<MMLNoteEvent> getMMLNoteEventList() {
 		return noteList;
+	}
+
+	private MMLNoteEvent getLastNote() {
+		int index = noteList.size() - 1;
+		if (index >= 0) {
+			return noteList.get(index);
+		}
+		return null;
 	}
 
 	/**
@@ -268,25 +276,62 @@ public final class MMLEventList implements Serializable, Cloneable {
 		return toMMLString(withTempo, 0, mabiTempo);
 	}
 
-	private MMLNoteEvent insertTempoMML(StringBuilder sb, MMLNoteEvent prevNoteEvent, MMLTempoEvent tempoEvent, boolean mabiTempo)
+	public String toMMLString(boolean withTempo, int totalTick, boolean mabiTempo) throws UndefinedTickException {
+		return toMMLString(withTempo, totalTick, mabiTempo, null);
+	}
+
+	/**
+	 * テンポ補正に使う文字を決定する.
+	 * @param relationPart     関連するパートの情報
+	 * @param offset           判定するtickのオフセット
+	 * @param currentOctave    現在のオクターブ
+	 * @return                 テンポ補正に使う文字
+	 * @throws UndefinedTickException
+	 */
+	private char makeTempoChar(List<MMLEventList> relationPart, long offset, int currentOctave) throws UndefinedTickException {
+		boolean f[] = { true, true, true, true, true, true, true };
+		// relationのパートのオフセット位置の情報をつかって、使用するabcdefg のどれを使うかを決める。
+		if (relationPart != null) {
+			for (MMLEventList t : relationPart) {
+				MMLNoteEvent e = t.searchOnTickOffset(offset);
+				if (e != null) {
+					if (e.getOctave() == currentOctave) {
+						char c = e.toMMLString().toLowerCase().charAt(0);
+						int index = c - 'a';
+						f[index] = false;
+					}
+				}
+			}
+		}
+
+		for (int i = 0; i < f.length; i++) {
+			int index = (i + 2) % f.length;
+			if (f[index]) {
+				return (char)('a' + index);
+			}
+		}
+
+		return 'c';
+	}
+
+	private MMLNoteEvent insertTempoMML(StringBuilder sb, MMLNoteEvent prevNoteEvent, MMLTempoEvent tempoEvent, boolean mabiTempo, List<MMLEventList> relationPart)
 			throws UndefinedTickException {
 		if (prevNoteEvent.getEndTick() != tempoEvent.getTickOffset()) {
 			int tickLength = tempoEvent.getTickOffset() - prevNoteEvent.getEndTick();
 			int tickOffset = prevNoteEvent.getEndTick();
 			int note = prevNoteEvent.getNote();
-			// FIXME: 最後の1つのrだけに細工すればよいね.
+			int currentOctave = prevNoteEvent.getOctave();
+			MMLTicks ticks = new MMLTicks("r", tickLength, false);
+			prevNoteEvent = new MMLNoteEvent(prevNoteEvent.getNote(), tickLength, tickOffset, prevNoteEvent.getVelocity());
+			sb.append(ticks.toMMLText());
 			if (mabiTempo) {
-				// マビノギ補正（rrrT***N の処理
-				MMLTicks ticks = new MMLTicks("c", tickLength, false);
-				if (prevNoteEvent.getVelocity() != 0) {
-					sb.append("v0");
-				}
-				sb.append(ticks.toMMLText());
+				// 最後の1つのrだけを補正文字に置換する.
+				int lastIndex = sb.lastIndexOf("r");
+				sb.replace(lastIndex, lastIndex+1, "c");
+				long offset = new MMLEventList(sb.toString()).getLastNote().getTickOffset();
+				char inChar = makeTempoChar(relationPart, offset, currentOctave);
+				sb.replace(lastIndex, lastIndex+1, (prevNoteEvent.getVelocity() != 0) ? "v0"+inChar : ""+inChar);
 				prevNoteEvent = new MMLNoteEvent(note, tickLength, tickOffset, 0);
-			} else {
-				MMLTicks ticks = new MMLTicks("r", tickLength, false);
-				prevNoteEvent = new MMLNoteEvent(prevNoteEvent.getNote(), tickLength, tickOffset, prevNoteEvent.getVelocity());
-				sb.append(ticks.toMMLText());
 			}
 		}
 		sb.append(tempoEvent.toMMLString());
@@ -337,10 +382,11 @@ public final class MMLEventList implements Serializable, Cloneable {
 	 * @param withTempo trueを指定すると、tempo指定を含むMMLを返します.
 	 * @param totalTick 最大tick長. これに満たない場合は、末尾を休符分で埋めます.
 	 * @param mabiTempo MML for mabi
+	 * @param mabiTempo テンポ補正時に参照する関連するパートの情報
 	 * @return
 	 * @throws UndefinedTickException
 	 */
-	public String toMMLString(boolean withTempo, int totalTick, boolean mabiTempo)
+	public String toMMLString(boolean withTempo, int totalTick, boolean mabiTempo, List<MMLEventList> relationPart)
 			throws UndefinedTickException {
 		//　テンポ
 		LinkedList<MMLTempoEvent> localTempoList = new LinkedList<>(tempoList);
@@ -353,7 +399,7 @@ public final class MMLEventList implements Serializable, Cloneable {
 			while ( (!localTempoList.isEmpty()) && (localTempoList.getFirst().getTickOffset() <= noteEvent.getTickOffset()) ) {
 				if (withTempo) {
 					// tempo挿入 (rrrT***N の処理)
-					prevNoteEvent = insertTempoMML(sb, prevNoteEvent, localTempoList.getFirst(), mabiTempo);
+					prevNoteEvent = insertTempoMML(sb, prevNoteEvent, localTempoList.getFirst(), mabiTempo, relationPart);
 				}
 				localTempoList.removeFirst();
 			}
@@ -371,7 +417,7 @@ public final class MMLEventList implements Serializable, Cloneable {
 			}
 			if (withTempo) {
 				// tempo挿入 (rrrT***N の処理)
-				prevNoteEvent = insertTempoMML(sb, prevNoteEvent, tempo, mabiTempo);
+				prevNoteEvent = insertTempoMML(sb, prevNoteEvent, tempo, mabiTempo, relationPart);
 			}
 			localTempoList.removeFirst();
 		}
