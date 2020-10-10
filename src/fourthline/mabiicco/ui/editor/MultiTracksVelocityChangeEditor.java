@@ -44,7 +44,11 @@ public final class MultiTracksVelocityChangeEditor extends JPanel {
 	private final IMMLManager mmlManager;
 
 	public MultiTracksVelocityChangeEditor(Frame parentFrame, IMMLManager mmlManager) {
-		this.dialog = new JDialog(parentFrame, AppResource.appText("edit.tracks.velocity"), true);
+		if (parentFrame != null) {
+			this.dialog = new JDialog(parentFrame, AppResource.appText("edit.tracks.velocity"), true, parentFrame.getGraphicsConfiguration());
+		} else {
+			this.dialog = new JDialog(parentFrame, AppResource.appText("edit.tracks.velocity"), true);
+		}
 		this.mmlManager = mmlManager;
 
 		initializePanel();

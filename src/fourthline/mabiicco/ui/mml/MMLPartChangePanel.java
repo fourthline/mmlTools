@@ -66,7 +66,11 @@ public final class MMLPartChangePanel extends JPanel {
 	}
 
 	public MMLPartChangePanel(Frame parentFrame, IMMLManager mmlManager, MMLEditor editor) {
-		this.dialog = new JDialog(parentFrame, AppResource.appText("part_change"), true);
+		if (parentFrame != null) {
+			this.dialog = new JDialog(parentFrame, AppResource.appText("part_change"), true, parentFrame.getGraphicsConfiguration());
+		} else {
+			this.dialog = new JDialog(parentFrame, AppResource.appText("part_change"), true);
+		}
 		this.mmlManager = mmlManager;
 		this.editor = editor;
 		initializePanel(mmlManager.getMMLScore().getTrackList(), mmlManager.getActiveTrackIndex());

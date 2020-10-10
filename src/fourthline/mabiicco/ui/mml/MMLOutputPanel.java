@@ -51,7 +51,11 @@ public final class MMLOutputPanel extends JPanel {
 	}
 
 	public MMLOutputPanel(Frame parentFrame, List<MMLTrack> trackList) {
-		this.dialog = new JDialog(parentFrame, AppResource.appText("mml.output"), true);
+		if (parentFrame != null) {
+			this.dialog = new JDialog(parentFrame, AppResource.appText("mml.output"), true, parentFrame.getGraphicsConfiguration());
+		} else {
+			this.dialog = new JDialog(parentFrame, AppResource.appText("mml.output"), true);
+		}
 		this.parentFrame = parentFrame;
 		this.table = new TrackListTable(trackList);
 		this.trackList = trackList;
@@ -62,7 +66,11 @@ public final class MMLOutputPanel extends JPanel {
 	}
 
 	private MMLOutputPanel(Dialog parent, MMLTrack track, List<MMLText> textList) {
-		this.dialog = new JDialog(parent, AppResource.appText("mml.output.split"), true);
+		if (parent != null) {
+			this.dialog = new JDialog(parent, AppResource.appText("mml.output.split"), true, parent.getGraphicsConfiguration());
+		} else {
+			this.dialog = new JDialog(parent, AppResource.appText("mml.output.split"), true);
+		}
 		this.parentFrame = parent;
 		this.table = new TrackListTable(track, textList);
 		for (MMLText mmlText : textList) {

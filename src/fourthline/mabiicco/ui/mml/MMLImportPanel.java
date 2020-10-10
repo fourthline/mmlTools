@@ -48,7 +48,11 @@ public final class MMLImportPanel extends JPanel {
 	}
 
 	public MMLImportPanel(Frame parentFrame, MMLScore score, IMMLManager mmlManager) {
-		this.dialog = new JDialog(parentFrame, AppResource.appText("mml.input.import"), true);
+		if (parentFrame != null) {
+			this.dialog = new JDialog(parentFrame, AppResource.appText("mml.input.import"), true, parentFrame.getGraphicsConfiguration());
+		} else {
+			this.dialog = new JDialog(parentFrame, AppResource.appText("mml.input.import"), true);
+		}
 		this.trackList = score.getTrackList();
 		this.mmlManager = mmlManager;
 		possibleImportTrackCount = MMLScore.MAX_TRACK - mmlManager.getMMLScore().getTrackCount();
@@ -93,7 +97,7 @@ public final class MMLImportPanel extends JPanel {
 		scrollPane.setViewportView(table);
 
 		JLabel lblNewLabel = new JLabel(AppResource.appText("mml.input.import.possibleImport")+": "+possibleImportTrackCount);
-		lblNewLabel.setBounds(22, 189, 300, 13);
+		lblNewLabel.setBounds(22, 182, 300, 13);
 		p.add(lblNewLabel);
 
 		table.setDefaultEditor(Object.class, null);

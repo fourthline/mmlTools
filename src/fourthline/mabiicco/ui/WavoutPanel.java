@@ -35,7 +35,11 @@ public final class WavoutPanel extends JPanel {
 	private boolean run = false;
 
 	public WavoutPanel(MainFrame parentFrame, IMMLManager mmlManager, File file) {
-		this.dialog = new JDialog(parentFrame, appText("wavout"), true);
+		if (parentFrame != null) {
+			this.dialog = new JDialog(parentFrame, appText("wavout"), true, parentFrame.getGraphicsConfiguration());
+		} else {
+			this.dialog = new JDialog(parentFrame, appText("wavout"), true);
+		}
 		this.parentFrame = parentFrame;
 		this.mmlManager = mmlManager;
 		this.file = file;

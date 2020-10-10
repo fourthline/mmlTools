@@ -110,7 +110,11 @@ public final class KeyboardEditor {
 		this.player = player;
 		this.editAlign = editAlign;
 		this.pianoRollView = pianoRollView;
-		dialog = new JDialog(parentFrame, appText("edit.keyboard.input"), true);
+		if (parentFrame != null) {
+			dialog = new JDialog(parentFrame, appText("edit.keyboard.input"), true, parentFrame.getGraphicsConfiguration());
+		} else {
+			dialog = new JDialog(parentFrame, appText("edit.keyboard.input"), true);
+		}
 		initializePanel();
 	}
 
