@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2017 たんらる
+ * Copyright (C) 2013-2020 たんらる
  */
 
 package fourthline.mmlTools;
@@ -356,11 +356,32 @@ public final class MMLScore implements IMMLFileParser {
 	}
 
 	/**
+	 * MML@ - ; 内の空白文字を削除する.
+	 * @param text
+	 * @return
+	 */
+	private String fixMMLspace(String text) {
+		StringBuilder sb = new StringBuilder();
+		int index = 0;
+		int start = 0;
+
+		while ( (start = text.indexOf("MML@", index)) >= 0) {
+			int end = text.indexOf(';', start);
+			sb.append(text.substring(index, start));
+			sb.append( text.substring(start, end+1).replaceAll("[ \t\f\r\n]", "") );
+			index = end + 1;
+		}
+
+		sb.append(text.substring(index));
+		return sb.toString();
+	}
+
+	/**
 	 * parse [mml-score] contents
 	 * @param contents
 	 */
 	private void parseMMLScore(String contents) {
-		TextParser.text(contents)
+		TextParser.text(fixMMLspace(contents))
 		.pattern("mml-track=",   t -> this.addTrack(new MMLTrack().setMML(t)) )
 		.pattern("name=",        t -> this.trackList.getLast().setTrackName(t) )
 		.pattern("program=",     t -> this.trackList.getLast().setProgram(Integer.parseInt(t)) )

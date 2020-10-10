@@ -125,6 +125,21 @@ public class MMLScoreTest extends FileSelect {
 	}
 
 	@Test
+	public void testMMLFileFormat1_ex() throws UndefinedTickException {
+		/* MMLScore.parse() */
+		try {
+			MMLScore score1 = new MMLScore().parse(fileSelect("format1.mmi")).generateAll();
+			MMLScore score2 = new MMLScore().parse(fileSelect("format1_ex.mmi")).generateAll();
+
+			assertArrayEquals(score1.getObjectState(), score2.getObjectState());
+		} catch (MMLParseException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	@Test
 	public void testMMLFileFormat_r0() throws UndefinedTickException {
 		MMLScore score = new MMLScore();
 		MMLTrack track = new MMLTrack().setMML("MML@r1t180c8;");
