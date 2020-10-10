@@ -42,11 +42,7 @@ public final class MultiTracksViewEditor extends JPanel {
 	private boolean oldValue[];
 
 	public MultiTracksViewEditor(Frame parentFrame, IMMLManager mmlManager) {
-		if (parentFrame != null) {
-			this.dialog = new JDialog(parentFrame, AppResource.appText("edit.tracks.view"), true, parentFrame.getGraphicsConfiguration());
-		} else {
-			this.dialog = new JDialog(parentFrame, AppResource.appText("edit.tracks.view"), true);
-		}
+		this.dialog = new JDialog(parentFrame, AppResource.appText("edit.tracks.view"), true);
 		this.mmlManager = mmlManager;
 		this.parentFrame = parentFrame;
 
@@ -57,7 +53,7 @@ public final class MultiTracksViewEditor extends JPanel {
 		dialog.getContentPane().add(this);
 		dialog.pack();
 		dialog.setResizable(false);
-		dialog.setLocationRelativeTo(null);
+		dialog.setLocationRelativeTo(parentFrame);
 		dialog.setVisible(true);
 	}
 

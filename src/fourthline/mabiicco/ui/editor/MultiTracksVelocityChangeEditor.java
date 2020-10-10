@@ -42,14 +42,12 @@ public final class MultiTracksVelocityChangeEditor extends JPanel {
 	private JSpinner spinner;
 
 	private final IMMLManager mmlManager;
+	private final Frame parentFrame;
 
 	public MultiTracksVelocityChangeEditor(Frame parentFrame, IMMLManager mmlManager) {
-		if (parentFrame != null) {
-			this.dialog = new JDialog(parentFrame, AppResource.appText("edit.tracks.velocity"), true, parentFrame.getGraphicsConfiguration());
-		} else {
-			this.dialog = new JDialog(parentFrame, AppResource.appText("edit.tracks.velocity"), true);
-		}
+		this.dialog = new JDialog(parentFrame, AppResource.appText("edit.tracks.velocity"), true);
 		this.mmlManager = mmlManager;
+		this.parentFrame = parentFrame;
 
 		initializePanel();
 	}
@@ -58,7 +56,7 @@ public final class MultiTracksVelocityChangeEditor extends JPanel {
 		dialog.getContentPane().add(this);
 		dialog.pack();
 		dialog.setResizable(false);
-		dialog.setLocationRelativeTo(null);
+		dialog.setLocationRelativeTo(parentFrame);
 		dialog.setVisible(true);
 	}
 

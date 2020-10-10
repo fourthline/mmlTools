@@ -82,6 +82,8 @@ public final class KeyboardEditor {
 	/** 単音/和音入力は排他 */
 	private IKeyboardAction currentAction = null;
 
+	private final Frame parentFrame;
+
 	private synchronized boolean tryLock(IKeyboardAction action) {
 		if (currentAction == null) {
 			if (debug) System.out.println("lock   "+action.getClass().getSimpleName());
@@ -110,11 +112,9 @@ public final class KeyboardEditor {
 		this.player = player;
 		this.editAlign = editAlign;
 		this.pianoRollView = pianoRollView;
-		if (parentFrame != null) {
-			dialog = new JDialog(parentFrame, appText("edit.keyboard.input"), true, parentFrame.getGraphicsConfiguration());
-		} else {
-			dialog = new JDialog(parentFrame, appText("edit.keyboard.input"), true);
-		}
+		this.parentFrame = parentFrame;
+		dialog = new JDialog(parentFrame, appText("edit.keyboard.input"), true);
+
 		initializePanel();
 	}
 
@@ -218,7 +218,7 @@ public final class KeyboardEditor {
 		midiKeyboard.initPartList();
 
 		dialog.pack();
-		dialog.setLocationRelativeTo(null);
+		dialog.setLocationRelativeTo(this.parentFrame);
 		dialog.setVisible(b);
 	}
 

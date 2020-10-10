@@ -50,6 +50,7 @@ public final class MMLPartChangePanel extends JPanel {
 
 	private final IMMLManager mmlManager;
 	private final MMLEditor editor;
+	private final Frame parentFrame;
 
 	private JRadioButton radioSelectArea;
 	private JRadioButton radioAllArea;
@@ -62,17 +63,15 @@ public final class MMLPartChangePanel extends JPanel {
 		this.dialog = null;
 		this.mmlManager = null;
 		this.editor = null;
+		this.parentFrame = null;
 		initializePanel(null, 0);
 	}
 
 	public MMLPartChangePanel(Frame parentFrame, IMMLManager mmlManager, MMLEditor editor) {
-		if (parentFrame != null) {
-			this.dialog = new JDialog(parentFrame, AppResource.appText("part_change"), true, parentFrame.getGraphicsConfiguration());
-		} else {
-			this.dialog = new JDialog(parentFrame, AppResource.appText("part_change"), true);
-		}
+		this.dialog = new JDialog(parentFrame, AppResource.appText("part_change"), true);
 		this.mmlManager = mmlManager;
 		this.editor = editor;
+		this.parentFrame = parentFrame;
 		initializePanel(mmlManager.getMMLScore().getTrackList(), mmlManager.getActiveTrackIndex());
 	}
 
@@ -251,7 +250,7 @@ public final class MMLPartChangePanel extends JPanel {
 			dialog.getContentPane().add(this);
 			dialog.pack();
 			dialog.setResizable(false);
-			dialog.setLocationRelativeTo(null);
+			dialog.setLocationRelativeTo(parentFrame);
 			dialog.setVisible(true);
 		}
 	}

@@ -32,6 +32,7 @@ public final class MMLImportPanel extends JPanel {
 	private static final long serialVersionUID = -1504636951822574399L;
 	private TrackListTable table;
 	private final JDialog dialog;
+	private final Frame parentFrame;
 
 	private List<MMLTrack> trackList;
 	private IMMLManager mmlManager;
@@ -44,17 +45,15 @@ public final class MMLImportPanel extends JPanel {
 	 */
 	public MMLImportPanel(Frame parentFrame) {
 		this.dialog = null;
+		this.parentFrame = parentFrame;
 		initializePanel(null);
 	}
 
 	public MMLImportPanel(Frame parentFrame, MMLScore score, IMMLManager mmlManager) {
-		if (parentFrame != null) {
-			this.dialog = new JDialog(parentFrame, AppResource.appText("mml.input.import"), true, parentFrame.getGraphicsConfiguration());
-		} else {
-			this.dialog = new JDialog(parentFrame, AppResource.appText("mml.input.import"), true);
-		}
+		this.dialog = new JDialog(parentFrame, AppResource.appText("mml.input.import"), true);
 		this.trackList = score.getTrackList();
 		this.mmlManager = mmlManager;
+		this.parentFrame = parentFrame;
 		possibleImportTrackCount = MMLScore.MAX_TRACK - mmlManager.getMMLScore().getTrackCount();
 		if (score.getTrackCount() < possibleImportTrackCount) {
 			possibleImportTrackCount = score.getTrackCount();
@@ -140,7 +139,7 @@ public final class MMLImportPanel extends JPanel {
 		dialog.getContentPane().add(this);
 		dialog.pack();
 		dialog.setResizable(false);
-		dialog.setLocationRelativeTo(null);
+		dialog.setLocationRelativeTo(parentFrame);
 		dialog.setVisible(true);
 	}
 }
