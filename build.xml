@@ -28,7 +28,7 @@
 	<property name="app.vendor" value="fourthline" />
 	<property name="app.id" value="MabiIcco" />
 	<property name="app.name" value="MabiIcco" />
-	<property name="app.version" value="1.0.40" />
+	<property name="app.version" value="1.0.41" />
 	<property name="app.main-class" value="fourthline.mabiicco.MabiIcco" />
 	<property name="app.preloader-class" value="fourthline.mabiicco.preloader.MabiIccoPreloader" />
 	<property name="splash.image" value="img/title.png" />
