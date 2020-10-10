@@ -351,6 +351,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			MabiIccoProperties.getInstance().setFileHistory(file);
 			mainFrame.updateFileHistoryMenu();
 		} catch (IOException e) {
+			JOptionPane.showMessageDialog(mainFrame, AppResource.appText("fail.saveFile"), "ERROR", JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 		return true;
@@ -444,10 +445,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		if (file != null) {
 			if (saveMMLFile(file)) {
 				openedFile = file;
-			} else {
-				JOptionPane.showMessageDialog(mainFrame, AppResource.appText("fail.saveFile"), "ERROR", JOptionPane.ERROR_MESSAGE);
+				return true;
 			}
-			return true;
 		}
 		return false;
 	}
@@ -523,8 +522,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		} else {
 			if (isSupportedSaveFile()) {
 				// 上書き保存可.
-				saveMMLFile(openedFile);
-				return true;
+				return saveMMLFile(openedFile);
 			} else if (showDialogSaveFile()) {
 				// ファイルOpenされているが、サポート外なので別名保存.
 				return true;
