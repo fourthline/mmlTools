@@ -489,10 +489,6 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	 * @param eventList     設定するMMLデータ.
 	 */
 	private void toClipBoard(MMLEventList eventList) {
-		int startOffset = eventList.getMMLNoteEventList().get(0).getTickOffset();
-		for (MMLNoteEvent e : eventList.getMMLNoteEventList()) {
-			e.setTickOffset( e.getTickOffset() - startOffset );
-		}
 		try {
 			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 			StringSelection selection = new StringSelection(MMLEVENT_PREFIX + eventList.toMMLString(false, false));
