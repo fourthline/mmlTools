@@ -379,10 +379,10 @@ public final class MMLEventList implements Serializable, Cloneable {
 	/**
 	 * テンポ出力を行うかどうかを指定してMML文字列を作成する.
 	 * TODO: 長いなぁ。
-	 * @param withTempo trueを指定すると、tempo指定を含むMMLを返します.
-	 * @param totalTick 最大tick長. これに満たない場合は、末尾を休符分で埋めます.
-	 * @param mabiTempo MML for mabi
-	 * @param mabiTempo テンポ補正時に参照する関連するパートの情報
+	 * @param withTempo    trueを指定すると、tempo指定を含むMMLを返します.
+	 * @param totalTick    最大tick長. これに満たない場合は、末尾を休符分で埋めます.
+	 * @param mabiTempo    MML for mabi
+	 * @param relationPart テンポ補正時に参照する関連するパートの情報
 	 * @return
 	 * @throws UndefinedTickException
 	 */
