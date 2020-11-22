@@ -32,7 +32,7 @@ public final class MMLTickTable {
 	private final LinkedHashMap<Integer, List<String>> tickInvTable = new LinkedHashMap<>();
 
 	public static MMLTickTable createTickTable() {
-		InputStream preTable = MMLTickTable.class.getResourceAsStream("ticktable.txqt");
+		InputStream preTable = MMLTickTable.class.getResourceAsStream("ticktable.txt");
 
 		MMLTickTable tickTable;
 		if (preTable == null) {
