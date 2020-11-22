@@ -46,6 +46,6 @@ public final class MMLTickTableTest extends FileSelect {
 	public void test_create() {
 		MMLTickTable tickTable = MMLTickTable.createTickTable();
 		assertNotNull(tickTable);
-		assertEquals(320, tickTable.getInvTable().size());
+		assertEquals(567, tickTable.getInvTable().size());
 	}
 }

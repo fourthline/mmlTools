@@ -18,7 +18,7 @@ import java.util.Map;
 
 public final class MMLTickTable {
 
-	private static final int COMBN = 2;
+	private static final int COMBN = 3;
 	public static final int TPQN = 96;
 
 	/**
@@ -32,7 +32,14 @@ public final class MMLTickTable {
 	private final LinkedHashMap<Integer, List<String>> tickInvTable = new LinkedHashMap<>();
 
 	public static MMLTickTable createTickTable() {
-		MMLTickTable tickTable = new MMLTickTable();
+		InputStream preTable = MMLTickTable.class.getResourceAsStream("ticktable.txqt");
+
+		MMLTickTable tickTable;
+		if (preTable == null) {
+			tickTable = new MMLTickTable();
+		} else {
+			tickTable = new MMLTickTable(preTable);
+		}
 		return tickTable;
 	}
 
@@ -48,7 +55,7 @@ public final class MMLTickTable {
 		generateTickTable();
 		readFromInputStreamInvTable(inputStream);
 		long endTime = System.currentTimeMillis();
-		System.out.println("MMLTickTable " + (endTime - startTime) + "ms");
+		System.out.println("MMLTickTable(load) " + (endTime - startTime) + "ms");
 	}
 
 	public Map<Integer, List<String>> getInvTable() {
