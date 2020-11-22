@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 たんらる
+ * Copyright (C) 2015-2020 たんらる
  */
 
 package fourthline.mmlTools.core;
@@ -59,9 +59,15 @@ public final class MMLTicksTest {
 		String expect64 = "c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64";
 		String expect32 = "c32&c32&c32&c32&c32&c32&c32&c32&c64";
 		String expect16 = "c16&c16&c16&c16&c64";
+		String expect48 = "c48&c48&c48&c48&c48&c48&c48&c48&c48&c48&c48&c48&c64";
+		String expect24 = "c24&c24&c24&c24&c24&c24&c64";
+		String expect12 = "c12&c12&c12&c64";
 		assertEquals(expect64, note.toMMLTextByBase(TuningBase.L64));
 		assertEquals(expect32, note.toMMLTextByBase(TuningBase.L32));
 		assertEquals(expect16, note.toMMLTextByBase(TuningBase.L16));
+		assertEquals(expect48, note.toMMLTextByBase(TuningBase.L48));
+		assertEquals(expect24, note.toMMLTextByBase(TuningBase.L24));
+		assertEquals(expect12, note.toMMLTextByBase(TuningBase.L12));
 	}
 
 	/**
@@ -75,12 +81,23 @@ public final class MMLTicksTest {
 	}
 
 	/**
-	 * 指定調律長で分割後, 生成できなければNG.
+	 * 数Tickオーバーの調律符1
 	 */
-	@Test(expected = UndefinedTickException.class)
-	public void test_toMMLTextByBaseE() throws UndefinedTickException {
+	@Test
+	public void test_toMMLTextByBaseE1() throws UndefinedTickException {
 		MMLTicks note = new MMLTicks("r", 96+5, false);
-		note.toMMLTextByBase(TuningBase.L16);
+		String expect16 = "r16r16r16r13";
+		assertEquals(expect16, note.toMMLTextByBase(TuningBase.L16));
+	}
+
+	/**
+	 * 数Tickオーバーの調律符2
+	 */
+	@Test
+	public void test_toMMLTextByBaseE2() throws UndefinedTickException {
+		MMLTicks note = new MMLTicks("r", 48+1, false);
+		String expect16 = "r32r32r32r29";
+		assertEquals(expect16, note.toMMLTextByBase(TuningBase.L32));
 	}
 
 	@Test

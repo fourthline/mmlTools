@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 たんらる
+ * Copyright (C) 2014-2020 たんらる
  */
 
 package fourthline.mmlTools.core;
@@ -8,7 +8,10 @@ package fourthline.mmlTools.core;
 public enum TuningBase {
 	L64("64"),
 	L32("32"),
-	L16("16");
+	L16("16"),
+	L48("48"),
+	L24("24"),
+	L12("12");
 
 	private final String base;
 	private int tick;

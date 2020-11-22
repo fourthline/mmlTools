@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2017 たんらる
+ * Copyright (C) 2013-2020 たんらる
  */
 
 package fourthline.mmlTools.core;
@@ -151,9 +151,10 @@ public final class MMLTicks {
 	public String toMMLTextByBase(TuningBase base) throws UndefinedTickException {
 		int remTick = tick;
 		StringBuilder sb = new StringBuilder();
+		int min = minimumTick();
 
 		int baseTick = base.getTick();
-		while (remTick >= baseTick) {
+		while (remTick >= baseTick + min) {
 			sb.append( mmlNotePart(base.getBase()) );
 			remTick -= baseTick;
 		}
