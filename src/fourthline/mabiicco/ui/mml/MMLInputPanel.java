@@ -1,20 +1,23 @@
 /*
- * Copyright (C) 2013-2014 たんらる
+ * Copyright (C) 2013-2021 たんらる
  */
 
 package fourthline.mabiicco.ui.mml;
 
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.Insets;
 import java.awt.Toolkit;
+import java.awt.Window;
 
 import javax.swing.ButtonGroup;
-import javax.swing.JOptionPane;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.border.TitledBorder;
 import javax.swing.border.LineBorder;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
@@ -22,6 +25,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JTextField;
 
 import fourthline.mabiicco.AppResource;
@@ -33,31 +37,39 @@ import fourthline.mmlTools.MMLTrack;
 
 public final class MMLInputPanel extends JPanel {
 	private static final long serialVersionUID = -2517820687250637949L;
-	private final JTextField textField;
-	private final JComboBox<InstClass> comboBox;
 
-	private final JRadioButton overrideButton;
-	private final JRadioButton newTrackButton;
+	private final JDialog dialog;
+	private JTextField textField;
+	private JComboBox<InstClass> comboBox;
+
+	private JRadioButton overrideButton;
+	private JRadioButton newTrackButton;
 
 	private final IMMLManager mmlManager;
 	private MMLTrack track;
-
-	public MMLInputPanel() {
-		this(null);
-	}
+	private final Window parentFrame;
 
 	/**
 	 * @param mmlManager
 	 */
-	public MMLInputPanel(IMMLManager mmlManager) {
+	public MMLInputPanel(Frame parentFrame, String trackName, IMMLManager mmlManager) {
 		this.mmlManager = mmlManager;
+		this.dialog = new JDialog(parentFrame, AppResource.appText("mml.input"), true);
+		this.parentFrame = parentFrame;
 
-		setLayout(null);
+		initializePanel(trackName);
+	}
+
+	private void initializePanel(String trackName) {
+		setLayout(new BorderLayout());
+
+		JPanel contentPanel = new JPanel();
+		contentPanel.setLayout(null);
 
 		JPanel panel1 = new JPanel();
 		panel1.setBorder(new TitledBorder(new LineBorder(new Color(128, 128, 128), 1, true), AppResource.appText("mml.input.method"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel1.setBounds(26, 28, 275, 87);
-		add(panel1);
+		contentPanel.add(panel1);
 		panel1.setLayout(null);
 
 		overrideButton = new JRadioButton(AppResource.appText("mml.input.method.override"));
@@ -76,9 +88,8 @@ public final class MMLInputPanel extends JPanel {
 		JPanel panel2 = new JPanel();
 		panel2.setBorder(new TitledBorder(new LineBorder(new Color(128, 128, 128), 1, true), AppResource.appText("mml.input.instrument"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel2.setBounds(26, 140, 275, 75);
-		add(panel2);
+		contentPanel.add(panel2);
 		panel2.setLayout(null);
-
 
 		comboBox = new JComboBox<>( MabiDLS.getInstance().getAvailableInstByInstType(InstType.MAIN_INST_LIST) );
 		comboBox.setBounds(25, 33, 193, 19);
@@ -88,26 +99,46 @@ public final class MMLInputPanel extends JPanel {
 		JPanel panel3 = new JPanel();
 		panel3.setBorder(new TitledBorder(new LineBorder(new Color(128, 128, 128), 1, true), AppResource.appText("mml.input.trackname"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel3.setBounds(26, 249, 275, 75);
-		add(panel3);
+		contentPanel.add(panel3);
 		panel3.setLayout(null);
 
 		textField = new JTextField(20);
+		textField.setText(trackName);
 		textField.setBounds(27, 35, 193, 19);
 		panel3.add(textField);
+
+		/* button */
+		JPanel buttonPanel = new JPanel();
+		JButton okButton = new JButton(AppResource.appText("mml.input.okButton"));
+		okButton.setMargin(new Insets(5, 10, 5, 10));
+		buttonPanel.add(okButton);
+		okButton.addActionListener((event) -> {
+			applyMMLTrack();
+			dialog.setVisible(false);
+		});
+
+		JButton cancelButton = new JButton(AppResource.appText("mml.input.cancelButton"));
+		cancelButton.setMargin(new Insets(5, 10, 5, 10));
+		buttonPanel.add(cancelButton);
+		cancelButton.setFocusable(false);
+		cancelButton.addActionListener((event) -> {
+			dialog.setVisible(false);
+		});
+
+		add(buttonPanel, BorderLayout.SOUTH);
+		add(contentPanel, BorderLayout.CENTER);
 	}
 
 	@Override
 	public Dimension getPreferredSize() {
-		return new Dimension(350, 350);
+		return new Dimension(350, 380);
 	}
 
 	/**
 	 * トラック名を指定して、ダイアログを表示する.
 	 * @param trackName トラック名
 	 */
-	public void showDialog(Frame parentFrame, String trackName) {
-		textField.setText(trackName);
-
+	public void showDialog() {
 		String mml = getClipboardString();
 
 		track = new MMLTrack().setMML(mml);
@@ -116,15 +147,11 @@ public final class MMLInputPanel extends JPanel {
 			return;
 		}
 
-		int status = JOptionPane.showConfirmDialog(parentFrame, 
-				this,
-				AppResource.appText("mml.input"), 
-				JOptionPane.OK_CANCEL_OPTION,
-				JOptionPane.PLAIN_MESSAGE);
-
-		if (status == JOptionPane.OK_OPTION) {
-			applyMMLTrack();
-		}
+		dialog.getContentPane().add(this);
+		dialog.pack();
+		dialog.setResizable(false);
+		dialog.setLocationRelativeTo(parentFrame);
+		dialog.setVisible(true);
 	}
 
 	private void applyMMLTrack() {

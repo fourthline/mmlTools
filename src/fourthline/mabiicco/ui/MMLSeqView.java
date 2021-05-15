@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2017 たんらる
+ * Copyright (C) 2013-2021 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -82,8 +82,6 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 
 	private MMLScore mmlScore = new MMLScore();
 	private final MMLScoreUndoEdit undoEdit = new MMLScoreUndoEdit(this);
-
-	private final MMLInputPanel mmlInputDialog = new MMLInputPanel(this);
 
 	private final MMLEditor editor;
 	private final KeyboardEditor keyboardEditor;
@@ -445,7 +443,8 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	}
 
 	public void inputClipBoardAction() {
-		mmlInputDialog.showDialog(parentFrame, getNewTrackName());
+		MMLInputPanel mmlInputDialog = new MMLInputPanel(parentFrame, getNewTrackName(), this);
+		mmlInputDialog.showDialog();
 	}
 
 	public void outputClipBoardAction() {
