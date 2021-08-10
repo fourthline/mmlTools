@@ -89,8 +89,13 @@ public final class MMLText {
 	 * @return　{@code MML@aaa,bbb,ccc,ddd;} 形式の文字列
 	 */
 	public String getMML() {
+		// メロディ or 歌 パートがどちらも空で楽譜の文字がある場合、メロディパートに1文字入れる.
+		String melody_part = text[0];
+		if (( melody_part.length() == 0) && ((this.text[1].length() != 0) || (this.text[2].length() != 0)) && (this.text[3].length() == 0) ) {
+			melody_part = "r";
+		}
 		String mml = "MML@"
-				+ this.text[0] + ","
+				+ melody_part + ","
 				+ this.text[1]+ ","
 				+ this.text[2];
 		if ( this.text[3].length() > 0 ) {
