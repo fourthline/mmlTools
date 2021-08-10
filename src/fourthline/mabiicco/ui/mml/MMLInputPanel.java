@@ -10,7 +10,9 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.Window;
 
+import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -22,11 +24,15 @@ import java.awt.Color;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 
 import fourthline.mabiicco.AppResource;
 import fourthline.mabiicco.midi.InstClass;
@@ -44,6 +50,9 @@ public final class MMLInputPanel extends JPanel {
 
 	private JRadioButton overrideButton;
 	private JRadioButton newTrackButton;
+	private final JPanel buttonPanel = new JPanel();
+	private final JButton okButton = new JButton("OK" /*AppResource.appText("mml.input.okButton")*/);
+	private final JButton cancelButton = new JButton("Cancel" /*AppResource.appText("mml.input.cancelButton")*/);
 
 	private final IMMLManager mmlManager;
 	private MMLTrack track;
@@ -55,7 +64,17 @@ public final class MMLInputPanel extends JPanel {
 	public MMLInputPanel(Frame parentFrame, String trackName, IMMLManager mmlManager) {
 		this.mmlManager = mmlManager;
 		this.dialog = new JDialog(parentFrame, AppResource.appText("mml.input"), true);
-		this.parentFrame = parentFrame;
+		this.parentFrame = parentFrame;	
+
+		InputMap imap = dialog.getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "close-it");
+		dialog.getRootPane().getActionMap().put("close-it", new AbstractAction() {
+			private static final long serialVersionUID = 1904207537628707057L;
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				dialog.setVisible(false);
+			}});
 
 		initializePanel(trackName);
 	}
@@ -108,16 +127,14 @@ public final class MMLInputPanel extends JPanel {
 		panel3.add(textField);
 
 		/* button */
-		JPanel buttonPanel = new JPanel();
-		JButton okButton = new JButton(AppResource.appText("mml.input.okButton"));
 		okButton.setMargin(new Insets(5, 10, 5, 10));
+		okButton.setFocusPainted(true);
 		buttonPanel.add(okButton);
 		okButton.addActionListener((event) -> {
 			applyMMLTrack();
 			dialog.setVisible(false);
 		});
 
-		JButton cancelButton = new JButton(AppResource.appText("mml.input.cancelButton"));
 		cancelButton.setMargin(new Insets(5, 10, 5, 10));
 		buttonPanel.add(cancelButton);
 		cancelButton.setFocusable(false);
@@ -148,6 +165,7 @@ public final class MMLInputPanel extends JPanel {
 		}
 
 		dialog.getContentPane().add(this);
+		dialog.getRootPane().setDefaultButton(okButton);
 		dialog.pack();
 		dialog.setResizable(false);
 		dialog.setLocationRelativeTo(parentFrame);
