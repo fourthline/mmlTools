@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2017 たんらる
+ * Copyright (C) 2014-2021 たんらる
  */
 
 package fourthline.mmlTools.core;
@@ -48,6 +48,16 @@ public final class MMLText {
 		for (int i = 0; (i < parts.length) && (i < this.text.length); i++) {
 			this.text[i] = parts[i];
 		}
+		return this;
+	}
+
+	public MMLText setMMLText(String text, int partIndex) {
+		if (partIndex < this.text.length) {
+			this.text[partIndex] = text;
+		} else {
+			throw new IndexOutOfBoundsException();
+		}
+
 		return this;
 	}
 

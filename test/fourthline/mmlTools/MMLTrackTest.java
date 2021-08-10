@@ -1,11 +1,13 @@
 /*
- * Copyright (C) 2013-2020 たんらる
+ * Copyright (C) 2013-2021 たんらる
  */
 
 package fourthline.mmlTools;
 
 import static org.junit.Assert.*;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -17,13 +19,40 @@ import fourthline.mmlTools.core.UndefinedTickException;
  *
  */
 public class MMLTrackTest {
+	private boolean orgOptTempoCorrection;
+	@Before
+	public void setup() {
+		orgOptTempoCorrection = MMLTrack.getOptTempoCorrection();
+		MMLTrack.setOptTempoCorrection(true);
+	}
+
+	@After
+	public void cleanup() {
+		MMLTrack.setOptTempoCorrection(orgOptTempoCorrection);
+	}
 
 	/**
 	 * Test method for {@link fourthline.mmlTools.MMLTrack#getMMLStrings()}.
 	 * @throws UndefinedTickException
 	 */
 	@Test
-	public void testGetMMLStrings() throws UndefinedTickException {
+	public void testGetMMLStrings() throws UndefinedTickException {MMLTrack.setOptTempoCorrection(true);
+		MMLTrack track = new MMLTrack().setMML("MML@aaa,bbb,ccc,ddd;");
+		String expect[] = {
+				"a8t150v0a8v8aa", // melodyパートのみテンポ指定.
+				"bbb",
+				"ccc",
+				"d8t150v0d8v8dd"
+		};
+		new MMLTempoEvent(150, 48).appendToListElement(track.getGlobalTempoList());
+		String mml[] = track.generate().getMabiMMLArray();
+
+		assertArrayEquals(expect, mml);
+	}
+
+	@Test
+	public void testGetMMLStringsMusicQ() throws UndefinedTickException {
+		MMLTrack.setOptTempoCorrection(false);
 		MMLTrack track = new MMLTrack().setMML("MML@aaa,bbb,ccc,ddd;");
 		String expect[] = {
 				"a8t150v0a8v8aa", // melodyパートのみテンポ指定.

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2020 たんらる
+ * Copyright (C) 2013-2021 たんらる
  */
 
 package fourthline.mmlTools;
@@ -7,6 +7,7 @@ package fourthline.mmlTools;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import fourthline.mmlTools.core.MMLText;
@@ -16,6 +17,16 @@ import fourthline.mmlTools.optimizer.MMLStringOptimizer;
 
 public final class MMLTrack implements Serializable {
 	private static final long serialVersionUID = 2006880378975808647L;
+
+	/** MMLテンポ補正をするかどうかのオプション */
+	private static boolean optTempoCorrection = false;
+	public static void setOptTempoCorrection(boolean opt) {
+		MMLTrack.optTempoCorrection = opt;
+	}
+
+	public static boolean getOptTempoCorrection() {
+		return MMLTrack.optTempoCorrection;
+	}
 
 	private static final int PART_COUNT = 4;
 	private List<MMLEventList> mmlParts = new ArrayList<>();
@@ -204,7 +215,11 @@ public final class MMLTrack implements Serializable {
 		/*
 		 * tailFixはMusicQアップデートで不要になりました. 2017/01/07
 		 */
-		mabiMML.setMMLText(getMMLStrings(false, true));
+		if (optTempoCorrection) {
+			mabiMML.setMMLText(getMMLStrings(false, true));
+		} else {
+			mabiMML.setMMLText(getMMLStringsMusicQ());
+		}
 		generated = true;
 		return this;
 	}
@@ -232,6 +247,36 @@ public final class MMLTrack implements Serializable {
 		// for mabi MML, メロディ～和音2 までがカラの時にはメロディパートもカラにする.
 		if ( mabiTempo && mmlParts.get(0).getMMLNoteEventList().isEmpty() && mml[1].equals("") && mml[2].equals("") ) {
 			mml[0] = "";
+		}
+		for (int i = 0; i < count; i++) {
+			mml[i] = new MMLStringOptimizer(mml[i]).toString();
+		}
+		if ((mmlParts.get(3).getTickLength() == 0)) {
+			mml[3] = "";
+		}
+
+		return mml;
+	}
+
+	/**
+	 * MusicQ以降用のMabinogi用MML生成.
+	 * @return
+	 * @throws UndefinedTickException
+	 */
+	private String[] getMMLStringsMusicQ() throws UndefinedTickException {
+		int count = mmlParts.size();
+		String mml[] = new String[count];
+		LinkedList<MMLTempoEvent> localTempoList = new LinkedList<>(globalTempoList);
+
+		for (int i = 0; i < count; i++) {
+			// メロディパートのMML更新（テンポ, tickLengthにあわせる.
+			MMLEventList eventList = mmlParts.get(i);
+			if (i == 3) {
+				localTempoList = new LinkedList<>(globalTempoList);
+			}
+			List<MMLEventList> relationPart = (i < 2) ? mmlParts.subList(i+1, 3) : null;
+			mml[i] = eventList.toMMLStringMusicQ(localTempoList, relationPart);
+
 		}
 		for (int i = 0; i < count; i++) {
 			mml[i] = new MMLStringOptimizer(mml[i]).toString();

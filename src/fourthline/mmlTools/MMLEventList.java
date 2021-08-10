@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2020 たんらる
+ * Copyright (C) 2013-2021 たんらる
  */
 
 package fourthline.mmlTools;
@@ -368,7 +368,7 @@ public final class MMLEventList implements Serializable, Cloneable {
 			}
 		}
 
-		if (divNoteEvent.getTick() > 0){
+		if (divNoteEvent.getTick() > 0) {
 			sb.append( divNoteEvent.toMMLString(prevNoteEvent) );
 		}
 		if (noteEvent.getVelocity() != divNoteEvent.getVelocity()) {
@@ -420,6 +420,88 @@ public final class MMLEventList implements Serializable, Cloneable {
 				prevNoteEvent = insertTempoMML(sb, prevNoteEvent, tempo, mabiTempo, relationPart);
 			}
 			localTempoList.removeFirst();
+		}
+
+		return sb.toString();
+	}
+
+	private int insertNoteWithTempoMusicQ(StringBuilder sb, List<MMLTempoEvent> localTempoList, int tempoIndex,
+			MMLNoteEvent prevNoteEvent, MMLNoteEvent noteEvent, List<MMLEventList> relationPart) throws UndefinedTickException {
+		MMLNoteEvent divNoteEvent = noteEvent.clone();
+
+		int index = tempoIndex;
+
+		// endTickOffsetがTempoを跨いでいたら、他のパートで挿入できるか判定する
+		while ( (localTempoList.size() > index) ) {
+			boolean found = false;
+			MMLTempoEvent tempoEvent = localTempoList.get(index);
+			// 他の関連パート中に適切な挿入位置があるかどうかを探す.
+			if ( (divNoteEvent.getTickOffset() < tempoEvent.getTickOffset()) && 
+					(tempoEvent.getTickOffset() < divNoteEvent.getEndTick()) ) {
+				long tickOffset = tempoEvent.getTickOffset();
+				if (relationPart != null) {
+					for (MMLEventList t : relationPart) {
+						MMLNoteEvent e1 = t.searchOnTickOffset(tickOffset);
+						MMLNoteEvent e2 = t.searchPrevNoteOnTickOffset(tickOffset);
+						if ( ((e1 != null) && (e1.getTickOffset() == tickOffset)) ||
+								((e2 != null) && (e2.getEndTick() == tickOffset)) ) {
+							found = true;
+						}
+					}
+				}
+			} else {
+				break;
+			}
+			if (found) {
+				index++;
+				continue;
+			}
+
+			int tick = localTempoList.get(index).getTickOffset() - divNoteEvent.getTickOffset();
+			MMLNoteEvent partNoteEvent = new MMLNoteEvent(divNoteEvent.getNote(), tick, divNoteEvent.getTickOffset(), divNoteEvent.getVelocity());
+			sb.append( partNoteEvent.toMMLString(prevNoteEvent) );
+			sb.append( localTempoList.get(index).toMMLString() );
+			localTempoList.remove(index);
+
+			divNoteEvent.setTick(divNoteEvent.getTick() - tick);
+			divNoteEvent.setTickOffset(divNoteEvent.getTickOffset() + tick);
+			prevNoteEvent = partNoteEvent;
+			divNoteEvent.setVelocity(0);
+		}
+
+		if (divNoteEvent.getTick() > 0) {
+			sb.append( divNoteEvent.toMMLString(prevNoteEvent) );
+		}
+		if (noteEvent.getVelocity() != divNoteEvent.getVelocity()) {
+			sb.append("v"+noteEvent.getVelocity());
+		}
+
+		return index;
+	}
+
+	/**
+	 * テンポ出力を行うかどうかを指定してMML文字列を作成する. MusicQ以降用. 関連パートにテンポを入れられる場合はいれない.
+	 * @param localTempoList テンポリスト
+	 * @param relationPart   テンポ補正時に参照する関連するパートの情報
+	 * @return
+	 * @throws UndefinedTickException
+	 */
+	public String toMMLStringMusicQ(List<MMLTempoEvent> localTempoList, List<MMLEventList> relationPart)
+			throws UndefinedTickException {
+		StringBuilder sb = new StringBuilder();
+		int tempoIndex = 0;
+
+		// initial note: octave 4, tick 0, offset 0, velocity 8
+		MMLNoteEvent prevNoteEvent = new MMLNoteEvent(12*4, 0, 0, MMLNoteEvent.INIT_VOL);
+		for (MMLNoteEvent noteEvent : noteList) {
+			// テンポのMML挿入判定
+			while ( (localTempoList.size() > tempoIndex) && (localTempoList.get(tempoIndex).getTickOffset() <= noteEvent.getTickOffset()) ) {
+				prevNoteEvent = insertTempoMML(sb, prevNoteEvent, localTempoList.get(tempoIndex), false, relationPart);
+				localTempoList.remove(tempoIndex);
+			}
+
+			tempoIndex = insertNoteWithTempoMusicQ(sb, localTempoList, tempoIndex, prevNoteEvent, noteEvent, relationPart);
+			prevNoteEvent = noteEvent;
 		}
 
 		return sb.toString();

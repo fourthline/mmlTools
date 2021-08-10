@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2020 たんらる
+ * Copyright (C) 2014-2021 たんらる
  */
 
 package fourthline.mmlTools;
@@ -18,11 +18,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.stream.Stream;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-
-
 
 
 
@@ -37,8 +36,19 @@ import fourthline.mmlTools.parser.MMLParseException;
 public class MMLScoreTest extends FileSelect {
 
 	@BeforeClass
-	public static void setup() {
+	public static void setupClass() {
 		UseLoadingDLS.initializeDefaultDLS();
+	}
+
+	private boolean orgOptTempoCorrection;
+	@Before
+	public void setup() {
+		orgOptTempoCorrection = MMLTrack.getOptTempoCorrection();
+	}
+
+	@After
+	public void cleanup() {
+		MMLTrack.setOptTempoCorrection(orgOptTempoCorrection);
 	}
 
 	/**
@@ -141,6 +151,8 @@ public class MMLScoreTest extends FileSelect {
 
 	@Test
 	public void testMMLFileFormat_r0() throws UndefinedTickException {
+		MMLTrack.setOptTempoCorrection(true);
+
 		MMLScore score = new MMLScore();
 		MMLTrack track = new MMLTrack().setMML("MML@r1t180c8;");
 		track.setTrackName("track1");
@@ -152,7 +164,21 @@ public class MMLScoreTest extends FileSelect {
 	}
 
 	@Test
+	public void testMMLFileFormat_r0_q() throws UndefinedTickException {
+		MMLScore score = new MMLScore();
+		MMLTrack track = new MMLTrack().setMML("MML@r1t180c8;");
+		track.setTrackName("track1");
+		score.addTrack(track);
+
+		String mml[] = { "MML@r1t180c8,,;" };
+
+		checkMMLFileOutput(score.generateAll(), "format_r0.mmi", mml);
+	}
+
+	@Test
 	public void testMMLFileFormat_r1() throws UndefinedTickException {
+		MMLTrack.setOptTempoCorrection(true);
+
 		MMLScore score = new MMLScore();
 		MMLTrack track1 = new MMLTrack().setMML("MML@r1>f+1t120&f+1;");
 		track1.setTrackName("track1");
@@ -169,6 +195,30 @@ public class MMLScoreTest extends FileSelect {
 		String mml[] = {
 				"MML@l1r>f+t120v0f+v8,,;",
 				"MML@l1rv0ct120v8a+,,;",
+				"MML@d1,,;" // 後方にあるテンポは出力しない.
+		};
+
+		checkMMLFileOutput(score.generateAll(), "format_r1.mmi", mml);
+	}
+
+	@Test
+	public void testMMLFileFormat_r1_q() throws UndefinedTickException {
+		MMLScore score = new MMLScore();
+		MMLTrack track1 = new MMLTrack().setMML("MML@r1>f+1t120&f+1;");
+		track1.setTrackName("track1");
+		score.addTrack(track1);
+
+		MMLTrack track2 = new MMLTrack().setMML("MML@r1r1a+1;");
+		track2.setTrackName("track2");
+		score.addTrack(track2);
+
+		MMLTrack track3 = new MMLTrack().setMML("MML@d1;");
+		track3.setTrackName("track3");
+		score.addTrack(track3);
+
+		String mml[] = {
+				"MML@l1r>f+t120v0f+v8,,;",
+				"MML@l1rrt120a+,,;",
 				"MML@d1,,;" // 後方にあるテンポは出力しない.
 		};
 
@@ -352,99 +402,107 @@ public class MMLScoreTest extends FileSelect {
 		checkTranspose(mml, expect, +2);
 	}
 
-	@Test
-	public void test_v0ct_temp1() throws UndefinedTickException {
-		/* 他のパートに d がある場合のテンポ補正 */
+	private void checkGenerateAll(String mml, String expect) throws UndefinedTickException {
 		MMLScore score = new MMLScore();
-		String mml =    "MML@l2drt130rv8g,l1rd,;";
-		String expect = "MML@l2dv0ct130rv8g,l1rd,;";
-
 		score.addTrack(new MMLTrack().setMML(mml));
 		score.generateAll();
 		assertEquals(expect, score.getTrack(0).getMabiMML());
+	}
+
+	@Test
+	public void test_v0ct_temp1() throws UndefinedTickException {
+		MMLTrack.setOptTempoCorrection(true);
+
+		/* 他のパートに d がある場合のテンポ補正 */
+		checkGenerateAll(
+				"MML@l2drt130rv8g,l1rd,;",
+				"MML@l2dv0ct130rv8g,l1rd,;"
+				);
 	}
 
 	@Test
 	public void test_v0ct_temp2() throws UndefinedTickException {
-		/* 他のパートに c がある場合のテンポ補正 */
-		MMLScore score = new MMLScore();
-		String mml =    "MML@l2drt130rv8g,l2rc,;";
-		String expect = "MML@l2dv0dt130rv8g,l2rc,;";
+		MMLTrack.setOptTempoCorrection(true);
 
-		score.addTrack(new MMLTrack().setMML(mml));
-		score.generateAll();
-		assertEquals(expect, score.getTrack(0).getMabiMML());
+		/* 他のパートに c がある場合のテンポ補正 */
+		checkGenerateAll(
+				"MML@l2drt130rv8g,l2rc,;",
+				"MML@l2dv0dt130rv8g,l2rc,;"
+				);
 	}
 
 	@Test
 	public void test_v0ct_temp3() throws UndefinedTickException {
-		/* 他のパートに c, d がある場合のテンポ補正 */
-		MMLScore score = new MMLScore();
-		String mml =    "MML@l2drt130rv8g,l2rc,l2rd;";
-		String expect = "MML@l2dv0et130rv8g,l2rc,l2rd;";
+		MMLTrack.setOptTempoCorrection(true);
 
-		score.addTrack(new MMLTrack().setMML(mml));
-		score.generateAll();
-		assertEquals(expect, score.getTrack(0).getMabiMML());
+		/* 他のパートに c, d がある場合のテンポ補正 */
+		checkGenerateAll(
+				"MML@l2drt130rv8g,l2rc,l2rd;",
+				"MML@l2dv0et130rv8g,l2rc,l2rd;"
+				);
 	}
 
 	@Test
 	public void test_v0ct_temp4() throws UndefinedTickException {
-		/* 他のパートに c, d がある場合のテンポ補正 */
-		MMLScore score = new MMLScore();
-		String mml =    "MML@l2drt130rv8g,l2rd,l2rc;";
-		String expect = "MML@l2dv0et130rv8g,l2rd,l2rc;";
+		MMLTrack.setOptTempoCorrection(true);
 
-		score.addTrack(new MMLTrack().setMML(mml));
-		score.generateAll();
-		assertEquals(expect, score.getTrack(0).getMabiMML());
+		/* 他のパートに c, d がある場合のテンポ補正 */
+		checkGenerateAll(
+				"MML@l2drt130rv8g,l2rd,l2rc;",
+				"MML@l2dv0et130rv8g,l2rd,l2rc;"
+				);
 	}
 
 	@Test
 	public void test_v0ct_temp5() throws UndefinedTickException {
-		/* 他のパートに b, c がある場合のテンポ補正 */
-		MMLScore score = new MMLScore();
-		String mml =    "MML@l2drt130rv8g,l2rb,l2rc;";
-		String expect = "MML@l2dv0dt130rv8g,l2rb,l2rc;";
+		MMLTrack.setOptTempoCorrection(true);
 
-		score.addTrack(new MMLTrack().setMML(mml));
-		score.generateAll();
-		assertEquals(expect, score.getTrack(0).getMabiMML());
+		/* 他のパートに b, c がある場合のテンポ補正 */
+		checkGenerateAll(
+				"MML@l2drt130rv8g,l2rb,l2rc;",
+				"MML@l2dv0dt130rv8g,l2rb,l2rc;"
+				);
 	}
 
 	@Test
 	public void test_v0ct_temp6() throws UndefinedTickException {
-		/* 他のパートに g, a がある場合のテンポ補正 */
-		MMLScore score = new MMLScore();
-		String mml =    "MML@l2drt130rv8g,l2rg,l2ra;";
-		String expect = "MML@l2dv0ct130rv8g,l2rg,l2ra;";
+		MMLTrack.setOptTempoCorrection(true);
 
-		score.addTrack(new MMLTrack().setMML(mml));
-		score.generateAll();
-		assertEquals(expect, score.getTrack(0).getMabiMML());
+		/* 他のパートに g, a がある場合のテンポ補正 */
+		checkGenerateAll(
+				"MML@l2drt130rv8g,l2rg,l2ra;",
+				"MML@l2dv0ct130rv8g,l2rg,l2ra;"
+				);
 	}
 
 	@Test
 	public void test_v0ct_temp7() throws UndefinedTickException {
-		/* 長い休符の場合最後のみ */
-		MMLScore score = new MMLScore();
-		String mml =    "MML@l1r.r.rrt130,,l1r.r.rrc;";
-		String expect = "MML@l1r.r.rv0ct130,,l1r.r.rrc;";
+		MMLTrack.setOptTempoCorrection(true);
 
-		score.addTrack(new MMLTrack().setMML(mml));
-		score.generateAll();
-		assertEquals(expect, score.getTrack(0).getMabiMML());
+		/* 長い休符の場合最後のみ */
+		checkGenerateAll(
+				"MML@l1r.r.rrt130,,l1r.r.rrc;",
+				"MML@l1r.r.rv0ct130,,l1r.r.rrc;"
+				);
 	}
 
 	@Test
 	public void test_v0ct_temp8() throws UndefinedTickException {
-		/* とちゅうで切る場合 */
-		MMLScore score = new MMLScore();
-		String mml =    "MML@l1r.r.rt240,v12ccccdd2deeec2fffggggaaaabbbb>c1,d1d1.d1.;";
-		String expect = "MML@l1r.r.v0et240,v12ccccdd2deeec2fffggggaaaabbbb>c1,l1dd.d.;";
+		MMLTrack.setOptTempoCorrection(true);
 
-		score.addTrack(new MMLTrack().setMML(mml));
-		score.generateAll();
-		assertEquals(expect, score.getTrack(0).getMabiMML());
+		/* とちゅうで切る場合 */
+		checkGenerateAll(
+				"MML@l1r.r.rt240,v12ccccdd2deeec2fffggggaaaabbbb>c1,d1d1.d1.;",
+				"MML@l1r.r.v0et240,v12ccccdd2deeec2fffggggaaaabbbb>c1,l1dd.d.;"
+				);
+	}
+
+	@Test
+	public void test_tempo_q01() throws UndefinedTickException {
+		/* メロディ以外 */
+		checkGenerateAll(
+				"MML@l1>c&c&c,ggggt180gggggggg,;",
+				"MML@l1.>c&c,ggggt180gggggggg,;"
+				);
 	}
 }

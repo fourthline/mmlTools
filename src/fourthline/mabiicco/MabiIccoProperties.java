@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2017 たんらる
+ * Copyright (C) 2013-2021 たんらる
  */
 
 package fourthline.mabiicco;
@@ -18,6 +18,7 @@ import java.util.Properties;
 import java.util.function.Consumer;
 
 import fourthline.mabiicco.ui.PianoRollView;
+import fourthline.mmlTools.MMLTrack;
 import fourthline.mmlTools.optimizer.MMLStringOptimizer;
 
 public final class MabiIccoProperties {
@@ -83,6 +84,9 @@ public final class MabiIccoProperties {
 	/** ファイル履歴 */
 	public static final int MAX_FILE_HISTORY = 8;
 	private static final String FILE_HISTORY = "file.history";
+
+	/** テンポ補正 */
+	public final Property<Boolean> mmlTempoCorrection = new BooleanProperty("function.mml_tempo_correction", false, t -> MMLTrack.setOptTempoCorrection(t.booleanValue()));
 
 	public static MabiIccoProperties getInstance() {
 		return instance;
