@@ -26,7 +26,13 @@ public final class NoteAlign {
 				"editor.note_6",
 				"editor.note_12",
 				"editor.note_24",
-				"editor.note_48"
+				"editor.note_48",
+				"editor.note_2.",
+				"editor.note_4.",
+				"editor.note_8.",
+				"editor.note_16.",
+				"editor.note_32.",
+				"editor.note_64."
 		};
 		ArrayList<NoteAlign> list = new ArrayList<>();
 		for (String key : keyList) {

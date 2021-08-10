@@ -36,7 +36,7 @@ public class MMLTrackTest {
 	 * @throws UndefinedTickException
 	 */
 	@Test
-	public void testGetMMLStrings() throws UndefinedTickException {MMLTrack.setOptTempoCorrection(true);
+	public void testGetMMLStrings() throws UndefinedTickException {
 		MMLTrack track = new MMLTrack().setMML("MML@aaa,bbb,ccc,ddd;");
 		String expect[] = {
 				"a8t150v0a8v8aa", // melodyパートのみテンポ指定.
