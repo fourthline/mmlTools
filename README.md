@@ -16,7 +16,7 @@ mmlTools
 
 * mmlToolsは、マビノギMMLを扱うためのツール群です。
 * MabiIccoは、mmlToolsを使用したマビノギMMLのエディタです。
-* Java 8以降が必要です。
+* Java 8が必要です。
 * Javaなので、JREとDLSファイルがあればWinさん以外でも起動はします。
 
 
