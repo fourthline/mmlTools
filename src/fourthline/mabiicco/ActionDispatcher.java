@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2017 たんらる
+ * Copyright (C) 2014-2021 たんらる
  */
 
 package fourthline.mabiicco;
@@ -111,6 +111,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String MML_GENERATE = "mml_generate";
 	@Action public static final String WAVOUT = "wavout";
 	@Action public static final String KEYBOARD_INPUT = "keyboard_input";
+	@Action public static final String INPUT_EMPTY_CORRECTION = "input_empty_correction";
 
 	private final HashMap<String, Consumer<Object>> actionMap = new HashMap<>();
 
@@ -227,6 +228,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(MML_GENERATE, t -> mmlSeqView.updateActivePart(true));
 		actionMap.put(WAVOUT, t -> this.startWavOutAction());
 		actionMap.put(KEYBOARD_INPUT, t -> mmlSeqView.showKeyboardInput());
+		actionMap.put(INPUT_EMPTY_CORRECTION, t -> this.inputEmptyCorrection());
 	}
 
 	@Override
@@ -235,6 +237,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		Consumer<Object> func = actionMap.get(command);
 		if (func != null) {
 			func.accept( e.getSource() );
+		} else {
+			System.err.println("not found Action: " + command);
 		}
 	}
 
@@ -733,5 +737,12 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 
 	public void showTime(String name, NanoTime time) {
 		showTime(name, time.ms());
+	}
+
+	private void inputEmptyCorrection() {
+		String value = JOptionPane.showInputDialog(mainFrame, AppResource.appText("mml.emptyCorrection"), MabiIccoProperties.getInstance().mmlEmptyCorrection.get());
+		if (value != null) {
+			MabiIccoProperties.getInstance().mmlEmptyCorrection.set(value);
+		}
 	}
 }

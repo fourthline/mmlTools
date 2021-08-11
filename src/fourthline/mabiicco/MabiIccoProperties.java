@@ -19,6 +19,7 @@ import java.util.function.Consumer;
 
 import fourthline.mabiicco.ui.PianoRollView;
 import fourthline.mmlTools.MMLTrack;
+import fourthline.mmlTools.core.MMLText;
 import fourthline.mmlTools.optimizer.MMLStringOptimizer;
 
 public final class MabiIccoProperties {
@@ -87,6 +88,9 @@ public final class MabiIccoProperties {
 
 	/** テンポ補正 */
 	public final Property<Boolean> mmlTempoCorrection = new BooleanProperty("function.mml_tempo_correction", false, t -> MMLTrack.setOptTempoCorrection(t.booleanValue()));
+
+	/** MML空補正 */
+	public final Property<String> mmlEmptyCorrection = new StringProperty("function.mml_empty_correction", AppResource.appText("mml.emptyCorrection.default"), t -> MMLText.setMelodyEmptyStr(t));
 
 	public static MabiIccoProperties getInstance() {
 		return instance;
@@ -219,25 +223,37 @@ public final class MabiIccoProperties {
 	private final class StringProperty implements Property<String> {
 		private final String name;
 		private final String defaultValue;
+		private final Consumer<String> optDo;
 
 		private StringProperty(String name) {
 			this(name, "");
 		}
 
 		private StringProperty(String name, String defaultValue) {
+			this(name, defaultValue, null);
+		}
+
+		private StringProperty(String name, String defaultValue, Consumer<String> optDo) {
 			this.name = name;
 			this.defaultValue = defaultValue;
+			this.optDo = optDo;
 		}
 
 		@Override
-		public void set(String value) {
-			properties.setProperty(name, value);
+		public void set(String str) {
+			properties.setProperty(name, str);
 			save();
+			if (optDo != null) {
+				optDo.accept(str);
+			}
 		}
 
 		@Override
 		public String get() {
 			String str = properties.getProperty(name, defaultValue);
+			if (optDo != null) {
+				optDo.accept(str);
+			}
 			return str;
 		}
 	}

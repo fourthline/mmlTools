@@ -301,7 +301,7 @@ public final class MMLEditorTest extends UseLoadingDLS {
 		editor.selectAll();
 		editor.selectedDelete();
 		int index = mmlManager.getActiveTrackIndex();
-		assertEquals("MML@r,ddd,eee;", mmlManager.getMMLScore().getTrack(index).getOriginalMML());
+		assertEquals("MML@,ddd,eee;", mmlManager.getMMLScore().getTrack(index).getOriginalMML());
 	}
 
 	/**
@@ -354,7 +354,7 @@ public final class MMLEditorTest extends UseLoadingDLS {
 	@Test
 	public void test_changePartMove() throws Exception {
 		String mml =    "MML@ccc,ddd,eee;";
-		String expect = "MML@r,ddd,ccc;";
+		String expect = "MML@,ddd,ccc;";
 		check_changePart(mml, expect, MMLEditor.ChangePartAction.MOVE, false);
 	}
 

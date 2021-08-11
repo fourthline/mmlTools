@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2018 たんらる
+ * Copyright (C) 2013-2021 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -326,7 +326,8 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createCheckMenu(settingMenu, "edit.active_part_switch", properties.activePartSwitch);
 		createCheckMenu(settingMenu, "mml.optimize", properties.enableMMLOptimize);
 		createCheckMenu(settingMenu, "mml.tempoCorrection", properties.mmlTempoCorrection);
-		createMenuItem(settingMenu, "menu.clear_dls", ActionDispatcher.CLEAR_DLS);
+		createMenuItem(settingMenu, "mml.emptyCorrection", ActionDispatcher.INPUT_EMPTY_CORRECTION, true);
+		createMenuItem(settingMenu, "menu.clear_dls", ActionDispatcher.CLEAR_DLS, true);
 
 		/************************* Help Menu *************************/
 		JMenu helpMenu = new JMenu(appText("menu.help"));

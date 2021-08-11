@@ -19,6 +19,17 @@ public final class MMLText {
 	private static int DEFAULT_PART_NUM = 4;
 	private String text[];
 
+	/* メロディパートが空のときに作曲スキルで怒られないようにするために入れる文字列 */
+	private static String melody_empty_str = "";
+
+	public static void setMelodyEmptyStr(String str) {
+		MMLText.melody_empty_str = str;
+	}
+
+	public static String getMelodyEmptyStr() {
+		return MMLText.melody_empty_str;
+	}
+
 	public MMLText() {
 		text = new String[ DEFAULT_PART_NUM ];
 		for (int i = 0; i < text.length; i++) {
@@ -62,6 +73,19 @@ public final class MMLText {
 	}
 
 	public MMLText setMMLText(String melody, String chord1, String chord2, String songEx) {
+		if (melody == null) {
+			melody = "";
+		}
+		if (chord1 == null) {
+			chord1 = "";
+		}
+		if (chord2 == null) {
+			chord2 = "";
+		}
+		if (songEx == null) {
+			songEx = "";
+		}
+
 		String parts[] = { melody, chord1, chord2, songEx };
 		setMMLText(parts);
 		return this;
@@ -92,7 +116,7 @@ public final class MMLText {
 		// メロディ or 歌 パートがどちらも空で楽譜の文字がある場合、メロディパートに1文字入れる.
 		String melody_part = text[0];
 		if (( melody_part.length() == 0) && ((this.text[1].length() != 0) || (this.text[2].length() != 0)) && (this.text[3].length() == 0) ) {
-			melody_part = "r";
+			melody_part = MMLText.melody_empty_str;
 		}
 		String mml = "MML@"
 				+ melody_part + ","
