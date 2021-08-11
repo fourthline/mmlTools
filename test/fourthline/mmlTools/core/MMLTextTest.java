@@ -16,16 +16,14 @@ import fourthline.mmlTools.ComposeRank;
 
 public final class MMLTextTest {
 
-	private String backup;
-
 	@Before
 	public void setup() {
-		backup = MMLText.getMelodyEmptyStr();
+		MMLText.setMelodyEmptyStr("");
 	}
 
 	@After
 	public void cleanup() {
-		MMLText.setMelodyEmptyStr(backup);
+		MMLText.setMelodyEmptyStr("");
 	}
 
 	@Test

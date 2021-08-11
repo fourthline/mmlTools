@@ -237,6 +237,9 @@ public final class MabiIccoProperties {
 			this.name = name;
 			this.defaultValue = defaultValue;
 			this.optDo = optDo;
+			if (optDo != null) {
+				optDo.accept(defaultValue);
+			}
 		}
 
 		@Override
@@ -251,9 +254,6 @@ public final class MabiIccoProperties {
 		@Override
 		public String get() {
 			String str = properties.getProperty(name, defaultValue);
-			if (optDo != null) {
-				optDo.accept(str);
-			}
 			return str;
 		}
 	}
@@ -271,6 +271,9 @@ public final class MabiIccoProperties {
 			this.name = name;
 			this.defaultValue = Boolean.toString(defaultValue);
 			this.optDo = optDo;
+			if (optDo != null) {
+				optDo.accept(defaultValue);
+			}
 		}
 
 		@Override
@@ -286,9 +289,6 @@ public final class MabiIccoProperties {
 		public Boolean get() {
 			String str = properties.getProperty(name, defaultValue);
 			Boolean value = Boolean.parseBoolean(str);
-			if (optDo != null) {
-				optDo.accept(value);
-			}
 			return value;
 		}
 	}
