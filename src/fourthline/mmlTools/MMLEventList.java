@@ -504,6 +504,12 @@ public final class MMLEventList implements Serializable, Cloneable {
 			prevNoteEvent = noteEvent;
 		}
 
+		// 終端にテンポをつける場合
+		if ( (localTempoList.size() > tempoIndex) && (localTempoList.get(tempoIndex).getTickOffset() == prevNoteEvent.getEndTick()) ) {
+			insertTempoMML(sb, prevNoteEvent, localTempoList.get(tempoIndex), false, relationPart);
+			localTempoList.remove(tempoIndex);
+		}
+
 		return sb.toString();
 	}
 
