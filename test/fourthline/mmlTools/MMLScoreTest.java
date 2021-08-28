@@ -170,7 +170,7 @@ public class MMLScoreTest extends FileSelect {
 		track.setTrackName("track1");
 		score.addTrack(track);
 
-		String mml[] = { "MML@r1t180c8,,;" };
+		String mml[] = { "MML@v0c1t180v8c8,,;" };
 
 		checkMMLFileOutput(score.generateAll(), "format_r0.mmi", mml);
 	}
@@ -217,8 +217,8 @@ public class MMLScoreTest extends FileSelect {
 		score.addTrack(track3);
 
 		String mml[] = {
-				"MML@l1r>f+t120v0f+v8,,;",
-				"MML@l1rrt120a+,,;",
+				"MML@l1r>f+&f+,l1rv0ct120,;",
+				"MML@l1rv0ct120v8a+,,;",
 				"MML@d1,,;" // 後方にあるテンポは出力しない.
 		};
 

@@ -310,7 +310,7 @@ public class MMLTrackTest {
 		MMLTrack.setOptTempoCorrection(false);
 
 		String mml = "MML@a&a&a,rrt120,c";
-		String expect = "MML@a2t120v0av8,,c;";
+		String expect = "MML@a2.,v0d2t120,c;";
 		MMLTrack track = new MMLTrack().setMML(mml).generate();
 		assertEquals(expect, track.getMabiMML());
 	}
@@ -330,7 +330,7 @@ public class MMLTrackTest {
 		MMLTrack.setOptTempoCorrection(false);
 
 		String mml = "MML@a&a&a,rrt120,rrc";
-		String expect = "MML@a2.,,r2t120c;";
+		String expect = "MML@a2.,,v0c2t120v8c;";
 		MMLTrack track = new MMLTrack().setMML(mml).generate();
 		assertEquals(expect, track.getMabiMML());
 	}
@@ -340,7 +340,7 @@ public class MMLTrackTest {
 		MMLTrack.setOptTempoCorrection(false);
 
 		String mml = "MML@a&a&a,rrt120,rc&c";
-		String expect = "MML@a2t120v0av8,,rc2;";
+		String expect = "MML@a2.,v0c2t120,rc2;";
 		MMLTrack track = new MMLTrack().setMML(mml).generate();
 		assertEquals(expect, track.getMabiMML());
 	}
@@ -350,7 +350,7 @@ public class MMLTrackTest {
 		MMLTrack.setOptTempoCorrection(false);
 
 		String mml = "MML@a2,l1c&c&c&c,l1<a&a;";
-		String expect = "MML@a2,l1ct121v0c&ct123cv8,l1<a&at122;";
+		String expect = "MML@l2av0dt121l1r.v0dt123,l1c.&c.&c,l1<a&at122;";
 		MMLTrack track = new MMLTrack().setMML(mml);
 		track.getGlobalTempoList().add(new MMLTempoEvent(121, 96*4));
 		track.getGlobalTempoList().add(new MMLTempoEvent(122, 96*8));

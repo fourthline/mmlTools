@@ -433,26 +433,15 @@ public final class MMLEventList implements Serializable, Cloneable {
 
 		// endTickOffsetがTempoを跨いでいたら、他のパートで挿入できるか判定する
 		while ( (localTempoList.size() > index) ) {
-			boolean found = false;
 			MMLTempoEvent tempoEvent = localTempoList.get(index);
-			// 他の関連パート中に適切な挿入位置があるかどうかを探す.
-			if ( (divNoteEvent.getTickOffset() < tempoEvent.getTickOffset()) && 
-					(tempoEvent.getTickOffset() < divNoteEvent.getEndTick()) ) {
-				long tickOffset = tempoEvent.getTickOffset();
-				if (relationPart != null) {
-					for (MMLEventList t : relationPart) {
-						MMLNoteEvent e1 = t.searchOnTickOffset(tickOffset);
-						MMLNoteEvent e2 = t.searchPrevNoteOnTickOffset(tickOffset);
-						if ( ((e1 != null) && (e1.getTickOffset() == tickOffset)) ||
-								((e2 != null) && (e2.getEndTick() == tickOffset)) ) {
-							found = true;
-						}
-					}
-				}
-			} else {
+			long tickOffset = tempoEvent.getTickOffset();
+			if ( (divNoteEvent.getTickOffset() >= tickOffset) || 
+					(tickOffset >= divNoteEvent.getEndTick()) ) {
+				// テンポを跨がないので分割しない
 				break;
 			}
-			if (found) {
+			// 他の関連パート中に適切な挿入位置があるかどうかを探す.
+			if (searchRelationPartCanInsertTempo(relationPart, tickOffset)) {
 				index++;
 				continue;
 			}
@@ -480,13 +469,54 @@ public final class MMLEventList implements Serializable, Cloneable {
 	}
 
 	/**
+	 * 関連パートにテンポ挿入できる箇所があるかどうかを判定する
+	 * @param relationPart
+	 * @param tickOffset
+	 * @return
+	 */
+	private static boolean searchRelationPartCanInsertTempo(List<MMLEventList> relationPart, long tickOffset) {
+		boolean found = false;
+		if (relationPart != null) {
+			for (MMLEventList t : relationPart) {
+				MMLNoteEvent e1 = t.searchOnTickOffset(tickOffset);
+				if ( (e1 == null) || (e1.getTickOffset() == tickOffset) ) {
+					found = true;
+				}
+			}
+		}
+
+		return found;
+	}
+	/**
+	 * 関連パートに接触ノートがあるかどうかを判定する
+	 * @param relationPart
+	 * @param tickOffset
+	 * @return
+	 */
+	private static boolean searchRelationPartOnTick(List<MMLEventList> relationPart, long tickOffset) {
+		boolean found = false;
+		if (relationPart != null) {
+			for (MMLEventList t : relationPart) {
+				MMLNoteEvent e1 = t.searchOnTickOffset(tickOffset);
+				MMLNoteEvent e2 = t.searchPrevNoteOnTickOffset(tickOffset);
+				if ( ((e1 != null) && (e1.getTickOffset() == tickOffset)) ||
+						((e2 != null) && (e2.getEndTick() == tickOffset)) ) {
+					found = true;
+				}
+			}
+		}
+
+		return found;
+	}
+
+	/**
 	 * テンポ出力を行うかどうかを指定してMML文字列を作成する. MusicQ以降用. 関連パートにテンポを入れられる場合はいれない.
 	 * @param localTempoList テンポリスト
 	 * @param relationPart   テンポ補正時に参照する関連するパートの情報
 	 * @return
 	 * @throws UndefinedTickException
 	 */
-	public String toMMLStringMusicQ(List<MMLTempoEvent> localTempoList, List<MMLEventList> relationPart)
+	public String toMMLStringMusicQ(List<MMLTempoEvent> localTempoList, int totalTick, List<MMLEventList> relationPart)
 			throws UndefinedTickException {
 		StringBuilder sb = new StringBuilder();
 		int tempoIndex = 0;
@@ -496,7 +526,7 @@ public final class MMLEventList implements Serializable, Cloneable {
 		for (MMLNoteEvent noteEvent : noteList) {
 			// テンポのMML挿入判定
 			while ( (localTempoList.size() > tempoIndex) && (localTempoList.get(tempoIndex).getTickOffset() <= noteEvent.getTickOffset()) ) {
-				prevNoteEvent = insertTempoMML(sb, prevNoteEvent, localTempoList.get(tempoIndex), false, relationPart);
+				prevNoteEvent = insertTempoMML(sb, prevNoteEvent, localTempoList.get(tempoIndex), true, relationPart);
 				localTempoList.remove(tempoIndex);
 			}
 
@@ -504,10 +534,20 @@ public final class MMLEventList implements Serializable, Cloneable {
 			prevNoteEvent = noteEvent;
 		}
 
-		// 終端にテンポをつける場合
-		if ( (localTempoList.size() > tempoIndex) && (localTempoList.get(tempoIndex).getTickOffset() == prevNoteEvent.getEndTick()) ) {
-			insertTempoMML(sb, prevNoteEvent, localTempoList.get(tempoIndex), false, relationPart);
-			localTempoList.remove(tempoIndex);
+		// テンポがまだ残っていれば、その分をつなげる.
+		while (localTempoList.size() > tempoIndex) {
+			long tempoTick = localTempoList.get(tempoIndex).getTickOffset();
+			if (tempoTick >= totalTick) {
+				// 不要な終端テンポは付けない.
+				break;
+			}
+			// 関連パートに接触ノートがある場合は自パートにテンポ挿入しない
+			if (!searchRelationPartOnTick(relationPart, tempoTick)) {
+				insertTempoMML(sb, prevNoteEvent, localTempoList.get(tempoIndex), true, relationPart);
+				localTempoList.remove(tempoIndex);
+			} else {
+				tempoIndex++;
+			}
 		}
 
 		return sb.toString();

@@ -266,6 +266,7 @@ public final class MMLTrack implements Serializable {
 	private String[] getMMLStringsMusicQ() throws UndefinedTickException {
 		int count = mmlParts.size();
 		String mml[] = new String[count];
+		int totalTick = (int)this.getMaxTickLength();
 		LinkedList<MMLTempoEvent> localTempoList = new LinkedList<>(globalTempoList);
 
 		for (int i = 0; i < count; i++) {
@@ -275,7 +276,7 @@ public final class MMLTrack implements Serializable {
 				localTempoList = new LinkedList<>(globalTempoList);
 			}
 			List<MMLEventList> relationPart = (i < 2) ? mmlParts.subList(i+1, 3) : null;
-			mml[i] = eventList.toMMLStringMusicQ(localTempoList, relationPart);
+			mml[i] = eventList.toMMLStringMusicQ(localTempoList, totalTick, relationPart);
 
 		}
 		for (int i = 0; i < count; i++) {
