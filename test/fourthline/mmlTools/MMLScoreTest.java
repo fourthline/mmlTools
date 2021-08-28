@@ -40,15 +40,14 @@ public class MMLScoreTest extends FileSelect {
 		UseLoadingDLS.initializeDefaultDLS();
 	}
 
-	private boolean orgOptTempoCorrection;
 	@Before
 	public void setup() {
-		orgOptTempoCorrection = MMLTrack.getOptTempoCorrection();
+		MMLTrack.setTempoAllowChordPart(false);
 	}
 
 	@After
 	public void cleanup() {
-		MMLTrack.setOptTempoCorrection(orgOptTempoCorrection);
+		MMLTrack.setTempoAllowChordPart(true);
 	}
 
 	/**
@@ -151,7 +150,7 @@ public class MMLScoreTest extends FileSelect {
 
 	@Test
 	public void testMMLFileFormat_r0() throws UndefinedTickException {
-		MMLTrack.setOptTempoCorrection(true);
+		MMLTrack.setTempoAllowChordPart(true);
 
 		MMLScore score = new MMLScore();
 		MMLTrack track = new MMLTrack().setMML("MML@r1t180c8;");
@@ -177,8 +176,6 @@ public class MMLScoreTest extends FileSelect {
 
 	@Test
 	public void testMMLFileFormat_r1() throws UndefinedTickException {
-		MMLTrack.setOptTempoCorrection(true);
-
 		MMLScore score = new MMLScore();
 		MMLTrack track1 = new MMLTrack().setMML("MML@r1>f+1t120&f+1;");
 		track1.setTrackName("track1");
@@ -203,6 +200,8 @@ public class MMLScoreTest extends FileSelect {
 
 	@Test
 	public void testMMLFileFormat_r1_q() throws UndefinedTickException {
+		MMLTrack.setTempoAllowChordPart(true);
+
 		MMLScore score = new MMLScore();
 		MMLTrack track1 = new MMLTrack().setMML("MML@r1>f+1t120&f+1;");
 		track1.setTrackName("track1");
@@ -411,7 +410,7 @@ public class MMLScoreTest extends FileSelect {
 
 	@Test
 	public void test_v0ct_temp1() throws UndefinedTickException {
-		MMLTrack.setOptTempoCorrection(true);
+		MMLTrack.setTempoAllowChordPart(true);
 
 		/* 他のパートに d がある場合のテンポ補正 */
 		checkGenerateAll(
@@ -422,7 +421,7 @@ public class MMLScoreTest extends FileSelect {
 
 	@Test
 	public void test_v0ct_temp2() throws UndefinedTickException {
-		MMLTrack.setOptTempoCorrection(true);
+		MMLTrack.setTempoAllowChordPart(true);
 
 		/* 他のパートに c がある場合のテンポ補正 */
 		checkGenerateAll(
@@ -433,7 +432,7 @@ public class MMLScoreTest extends FileSelect {
 
 	@Test
 	public void test_v0ct_temp3() throws UndefinedTickException {
-		MMLTrack.setOptTempoCorrection(true);
+		MMLTrack.setTempoAllowChordPart(true);
 
 		/* 他のパートに c, d がある場合のテンポ補正 */
 		checkGenerateAll(
@@ -444,7 +443,7 @@ public class MMLScoreTest extends FileSelect {
 
 	@Test
 	public void test_v0ct_temp4() throws UndefinedTickException {
-		MMLTrack.setOptTempoCorrection(true);
+		MMLTrack.setTempoAllowChordPart(true);
 
 		/* 他のパートに c, d がある場合のテンポ補正 */
 		checkGenerateAll(
@@ -455,7 +454,7 @@ public class MMLScoreTest extends FileSelect {
 
 	@Test
 	public void test_v0ct_temp5() throws UndefinedTickException {
-		MMLTrack.setOptTempoCorrection(true);
+		MMLTrack.setTempoAllowChordPart(true);
 
 		/* 他のパートに b, c がある場合のテンポ補正 */
 		checkGenerateAll(
@@ -466,7 +465,7 @@ public class MMLScoreTest extends FileSelect {
 
 	@Test
 	public void test_v0ct_temp6() throws UndefinedTickException {
-		MMLTrack.setOptTempoCorrection(true);
+		MMLTrack.setTempoAllowChordPart(true);
 
 		/* 他のパートに g, a がある場合のテンポ補正 */
 		checkGenerateAll(
@@ -477,8 +476,6 @@ public class MMLScoreTest extends FileSelect {
 
 	@Test
 	public void test_v0ct_temp7() throws UndefinedTickException {
-		MMLTrack.setOptTempoCorrection(true);
-
 		/* 長い休符の場合最後のみ */
 		checkGenerateAll(
 				"MML@l1r.r.rrt130,,l1r.r.rrc;",
@@ -488,8 +485,6 @@ public class MMLScoreTest extends FileSelect {
 
 	@Test
 	public void test_v0ct_temp8() throws UndefinedTickException {
-		MMLTrack.setOptTempoCorrection(true);
-
 		/* とちゅうで切る場合 */
 		checkGenerateAll(
 				"MML@l1r.r.rt240,v12ccccdd2deeec2fffggggaaaabbbb>c1,d1d1.d1.;",
@@ -499,6 +494,8 @@ public class MMLScoreTest extends FileSelect {
 
 	@Test
 	public void test_tempo_q01() throws UndefinedTickException {
+		MMLTrack.setTempoAllowChordPart(true);
+
 		/* メロディ以外 */
 		checkGenerateAll(
 				"MML@l1>c&c&c,ggggt180gggggggg,;",

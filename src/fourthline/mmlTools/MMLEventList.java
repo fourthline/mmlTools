@@ -428,7 +428,6 @@ public final class MMLEventList implements Serializable, Cloneable {
 	private int insertNoteWithTempoMusicQ(StringBuilder sb, List<MMLTempoEvent> localTempoList, int tempoIndex,
 			MMLNoteEvent prevNoteEvent, MMLNoteEvent noteEvent, List<MMLEventList> relationPart) throws UndefinedTickException {
 		MMLNoteEvent divNoteEvent = noteEvent.clone();
-
 		int index = tempoIndex;
 
 		// endTickOffsetがTempoを跨いでいたら、他のパートで挿入できるか判定する
@@ -475,17 +474,16 @@ public final class MMLEventList implements Serializable, Cloneable {
 	 * @return
 	 */
 	private static boolean searchRelationPartCanInsertTempo(List<MMLEventList> relationPart, long tickOffset) {
-		boolean found = false;
 		if (relationPart != null) {
 			for (MMLEventList t : relationPart) {
 				MMLNoteEvent e1 = t.searchOnTickOffset(tickOffset);
 				if ( (e1 == null) || (e1.getTickOffset() == tickOffset) ) {
-					found = true;
+					return true;
 				}
 			}
 		}
 
-		return found;
+		return false;
 	}
 	/**
 	 * 関連パートに接触ノートがあるかどうかを判定する
@@ -494,19 +492,18 @@ public final class MMLEventList implements Serializable, Cloneable {
 	 * @return
 	 */
 	private static boolean searchRelationPartOnTick(List<MMLEventList> relationPart, long tickOffset) {
-		boolean found = false;
 		if (relationPart != null) {
 			for (MMLEventList t : relationPart) {
 				MMLNoteEvent e1 = t.searchOnTickOffset(tickOffset);
 				MMLNoteEvent e2 = t.searchPrevNoteOnTickOffset(tickOffset);
 				if ( ((e1 != null) && (e1.getTickOffset() == tickOffset)) ||
 						((e2 != null) && (e2.getEndTick() == tickOffset)) ) {
-					found = true;
+					return true;
 				}
 			}
 		}
 
-		return found;
+		return false;
 	}
 
 	/**

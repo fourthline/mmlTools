@@ -325,7 +325,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createCheckMenu(settingMenu, "edit.enable", properties.enableEdit);
 		createCheckMenu(settingMenu, "edit.active_part_switch", properties.activePartSwitch);
 		createCheckMenu(settingMenu, "mml.optimize", properties.enableMMLOptimize);
-		createCheckMenu(settingMenu, "mml.tempoCorrection", properties.mmlTempoCorrection);
+		createCheckMenu(settingMenu, "mml.tempo_allow_chord_part", properties.mmlTempoAllowChordPart);
 		createMenuItem(settingMenu, "mml.emptyCorrection", ActionDispatcher.INPUT_EMPTY_CORRECTION, true);
 		createMenuItem(settingMenu, "menu.clear_dls", ActionDispatcher.CLEAR_DLS, true);
 

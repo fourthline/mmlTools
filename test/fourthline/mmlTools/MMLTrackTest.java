@@ -21,12 +21,12 @@ import fourthline.mmlTools.core.UndefinedTickException;
 public class MMLTrackTest {
 	@Before
 	public void setup() {
-		MMLTrack.setOptTempoCorrection(true);
+		MMLTrack.setTempoAllowChordPart(false);
 	}
 
 	@After
 	public void cleanup() {
-		MMLTrack.setOptTempoCorrection(false);
+		MMLTrack.setTempoAllowChordPart(true);
 	}
 
 	/**
@@ -50,7 +50,7 @@ public class MMLTrackTest {
 
 	@Test
 	public void testGetMMLStringsMusicQ() throws UndefinedTickException {
-		MMLTrack.setOptTempoCorrection(false);
+		MMLTrack.setTempoAllowChordPart(true);
 		MMLTrack track = new MMLTrack().setMML("MML@aaa,bbb,ccc,ddd;");
 		String expect[] = {
 				"a8t150v0a8v8aa", // melodyパートのみテンポ指定.
@@ -307,7 +307,7 @@ public class MMLTrackTest {
 
 	@Test
 	public void test_musicq_tempo_00() throws UndefinedTickException {
-		MMLTrack.setOptTempoCorrection(false);
+		MMLTrack.setTempoAllowChordPart(true);
 
 		String mml = "MML@a&a&a,rrt120,c";
 		String expect = "MML@a2.,v0d2t120,c;";
@@ -317,7 +317,7 @@ public class MMLTrackTest {
 
 	@Test
 	public void test_musicq_tempo_01() throws UndefinedTickException {
-		MMLTrack.setOptTempoCorrection(false);
+		MMLTrack.setTempoAllowChordPart(true);
 
 		String mml = "MML@a&a&a,rrt120,rc";
 		String expect = "MML@a2.,,rct120;";
@@ -327,7 +327,7 @@ public class MMLTrackTest {
 
 	@Test
 	public void test_musicq_tempo_02() throws UndefinedTickException {
-		MMLTrack.setOptTempoCorrection(false);
+		MMLTrack.setTempoAllowChordPart(true);
 
 		String mml = "MML@a&a&a,rrt120,rrc";
 		String expect = "MML@a2.,,v0c2t120v8c;";
@@ -337,7 +337,7 @@ public class MMLTrackTest {
 
 	@Test
 	public void test_musicq_tempo_03() throws UndefinedTickException {
-		MMLTrack.setOptTempoCorrection(false);
+		MMLTrack.setTempoAllowChordPart(true);
 
 		String mml = "MML@a&a&a,rrt120,rc&c";
 		String expect = "MML@a2.,v0c2t120,rc2;";
@@ -347,7 +347,7 @@ public class MMLTrackTest {
 
 	@Test
 	public void test_musicq_tempo_04() throws UndefinedTickException {
-		MMLTrack.setOptTempoCorrection(false);
+		MMLTrack.setTempoAllowChordPart(true);
 
 		String mml = "MML@a2,l1c&c&c&c,l1<a&a;";
 		String expect = "MML@l2av0dt121l1r.v0dt123,l1c.&c.&c,l1<a&at122;";

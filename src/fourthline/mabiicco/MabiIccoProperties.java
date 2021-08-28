@@ -86,8 +86,8 @@ public final class MabiIccoProperties {
 	public static final int MAX_FILE_HISTORY = 8;
 	private static final String FILE_HISTORY = "file.history";
 
-	/** テンポ補正 */
-	public final Property<Boolean> mmlTempoCorrection = new BooleanProperty("function.mml_tempo_correction", false, t -> MMLTrack.setOptTempoCorrection(t.booleanValue()));
+	/** 和音にテンポ出力を許可するかどうか */
+	public final Property<Boolean> mmlTempoAllowChordPart = new BooleanProperty("function.mml_tempo_allow_chord_part", true, t -> MMLTrack.setTempoAllowChordPart(t.booleanValue()));
 
 	/** MML空補正 */
 	public final Property<String> mmlEmptyCorrection = new StringProperty("function.mml_empty_correction", AppResource.appText("mml.emptyCorrection.default"), t -> MMLText.setMelodyEmptyStr(t));

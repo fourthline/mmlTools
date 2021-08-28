@@ -18,14 +18,14 @@ import fourthline.mmlTools.optimizer.MMLStringOptimizer;
 public final class MMLTrack implements Serializable {
 	private static final long serialVersionUID = 2006880378975808647L;
 
-	/** MMLテンポ補正をするかどうかのオプション */
-	private static boolean optTempoCorrection = false;
-	public static void setOptTempoCorrection(boolean opt) {
-		MMLTrack.optTempoCorrection = opt;
+	/** 和音にテンポ出力を許可するかどうかのオプション */
+	private static boolean optTempoAllowChordPart = false;
+	public static void setTempoAllowChordPart(boolean opt) {
+		MMLTrack.optTempoAllowChordPart = opt;
 	}
 
-	public static boolean getOptTempoCorrection() {
-		return MMLTrack.optTempoCorrection;
+	public static boolean getTempoAllowChordPart() {
+		return MMLTrack.optTempoAllowChordPart;
 	}
 
 	private static final int PART_COUNT = 4;
@@ -215,7 +215,7 @@ public final class MMLTrack implements Serializable {
 		/*
 		 * tailFixはMusicQアップデートで不要になりました. 2017/01/07
 		 */
-		if (optTempoCorrection) {
+		if (!optTempoAllowChordPart) {
 			mabiMML.setMMLText(getMMLStrings(false, true));
 		} else {
 			mabiMML.setMMLText(getMMLStringsMusicQ());
