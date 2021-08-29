@@ -87,7 +87,7 @@ public final class MabiIccoProperties {
 	private static final String FILE_HISTORY = "file.history";
 
 	/** 和音にテンポ出力を許可するかどうか */
-	public final Property<Boolean> mmlTempoAllowChordPart = new BooleanProperty("function.mml_tempo_allow_chord_part", true, t -> MMLTrack.setTempoAllowChordPart(t.booleanValue()));
+	public final Property<Boolean> mmlTempoAllowChordPart = new BooleanProperty("function.mml_tempo_allow_chord_part", false, t -> MMLTrack.setTempoAllowChordPart(t.booleanValue()));
 
 	/** MML空補正 */
 	public final Property<String> mmlEmptyCorrection = new StringProperty("function.mml_empty_correction", AppResource.appText("mml.emptyCorrection.default"), t -> MMLText.setMelodyEmptyStr(t));
