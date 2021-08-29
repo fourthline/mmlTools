@@ -254,6 +254,10 @@ public final class MabiIccoProperties {
 		@Override
 		public String get() {
 			String str = properties.getProperty(name, defaultValue);
+			if (optDo != null) {
+				// 設定ファイルからの反映に必要
+				optDo.accept(str);
+			}
 			return str;
 		}
 	}
@@ -289,6 +293,10 @@ public final class MabiIccoProperties {
 		public Boolean get() {
 			String str = properties.getProperty(name, defaultValue);
 			Boolean value = Boolean.parseBoolean(str);
+			if (optDo != null) {
+				// 設定ファイルからの反映に必要
+				optDo.accept(value);
+			}
 			return value;
 		}
 	}

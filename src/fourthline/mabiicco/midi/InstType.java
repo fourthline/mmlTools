@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 たんらる
+ * Copyright (C) 2014-2021 たんらる
  */
 
 package fourthline.mabiicco.midi;
@@ -21,6 +21,11 @@ public interface InstType {
 	 * @return 移調可能な場合は true, 移調できない場合は falseを返す.
 	 */
 	public boolean allowTranspose();
+
+	/**
+	 * @return 和音パートにテンポ出力を許容するかどうかを返す.
+	 */
+	public boolean allowTempoChordPart();
 
 	/**
 	 * mmlのV指定からMidiの音量値に変換する.
@@ -88,6 +93,11 @@ public interface InstType {
 		public int convertVelocityMML2Midi(int mml_velocity) {
 			return 0;
 		}
+
+		@Override
+		public boolean allowTempoChordPart() {
+			return false;
+		}
 	}
 
 	/**
@@ -124,6 +134,11 @@ public interface InstType {
 			}
 			return (mml_velocity * 8);
 		}
+
+		@Override
+		public boolean allowTempoChordPart() {
+			return true;
+		}
 	}
 
 	/**
@@ -156,6 +171,11 @@ public interface InstType {
 				mml_velocity = 0;
 			}
 			return (mml_velocity * 11);
+		}
+
+		@Override
+		public boolean allowTempoChordPart() {
+			return false;
 		}
 	}
 }

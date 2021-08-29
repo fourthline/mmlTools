@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 たんらる
+ * Copyright (C) 2014-2021 たんらる
  */
 
 package fourthline.mabiicco;
@@ -25,6 +25,7 @@ import fourthline.mabiicco.midi.InstType;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.preloader.MabiIccoPreloaderNotification;
 import fourthline.mabiicco.ui.MainFrame;
+import fourthline.mmlTools.MMLTrack;
 import javafx.application.Application;
 import javafx.application.Preloader;
 import javafx.stage.Stage;
@@ -60,6 +61,11 @@ public final class MabiIcco extends Application {
 			// initialize
 			MabiDLS.getInstance().initializeMIDI();
 			notifyPreloader(new MabiIccoPreloaderNotification("OK\n", 20));
+
+			MMLTrack.setTempoAllowChardPartFunction(t -> {
+				InstType type = MabiDLS.getInstance().getInstByProgram(t).getType();
+				return type.allowTempoChordPart();
+			});
 
 			notifyPreloader(new MabiIccoPreloaderNotification(AppResource.appText("init.dls"), 20));
 			if ( !loadDLSFiles(20, 70) ) {

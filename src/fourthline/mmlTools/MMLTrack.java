@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.IntFunction;
 
 import fourthline.mmlTools.core.MMLText;
 import fourthline.mmlTools.core.MMLTicks;
@@ -26,6 +27,12 @@ public final class MMLTrack implements Serializable {
 
 	public static boolean getTempoAllowChordPart() {
 		return MMLTrack.optTempoAllowChordPart;
+	}
+
+	/** program番号から和音へのテンポ出力が可能かどうかの判定を行うためのFunction */
+	private static IntFunction<Boolean> tempoAllowChordPartFunction = t -> true;
+	public static void setTempoAllowChardPartFunction(IntFunction<Boolean> f) {
+		tempoAllowChordPartFunction = f;
 	}
 
 	private static final int PART_COUNT = 4;
@@ -258,6 +265,26 @@ public final class MMLTrack implements Serializable {
 		return mml;
 	}
 
+	private List<List<MMLEventList>> makeRelationPart() {
+		List<List<MMLEventList>> list = new ArrayList<>();
+		List<MMLEventList> list1 = new ArrayList<>();
+		list1.add(mmlParts.get(1));
+		list1.add(mmlParts.get(2));
+
+		List<MMLEventList> list2 = new ArrayList<>();
+		list2.add(mmlParts.get(2));
+		list2.add(mmlParts.get(0));
+
+		List<MMLEventList> list3 = new ArrayList<>();
+		list3.add(mmlParts.get(0));
+		list3.add(mmlParts.get(1));
+
+		list.add(list1);
+		list.add(list2);
+		list.add(list3);
+		return list;
+	}
+
 	/**
 	 * MusicQ以降用のMabinogi用MML生成.
 	 * @return
@@ -268,6 +295,8 @@ public final class MMLTrack implements Serializable {
 		String mml[] = new String[count];
 		int totalTick = (int)this.getMaxTickLength();
 		LinkedList<MMLTempoEvent> localTempoList = new LinkedList<>(globalTempoList);
+		List<List<MMLEventList>> relationParts = makeRelationPart();
+		boolean allowed = tempoAllowChordPartFunction.apply(program);
 
 		for (int i = 0; i < count; i++) {
 			// メロディパートのMML更新（テンポ, tickLengthにあわせる.
@@ -275,9 +304,13 @@ public final class MMLTrack implements Serializable {
 			if (i == 3) {
 				localTempoList = new LinkedList<>(globalTempoList);
 			}
-			List<MMLEventList> relationPart = (i < 2) ? mmlParts.subList(i+1, 3) : null;
+			List<MMLEventList> relationPart = ((i < 3) && (allowed)) ? relationParts.get(i) : null;
 			mml[i] = eventList.toMMLStringMusicQ(localTempoList, totalTick, relationPart);
 
+		}
+		// for mabi MML, メロディ～和音2 までがカラの時にはメロディパートもカラにする.
+		if ( mmlParts.get(0).getMMLNoteEventList().isEmpty() && mml[1].equals("") && mml[2].equals("") ) {
+			mml[0] = "";
 		}
 		for (int i = 0; i < count; i++) {
 			mml[i] = new MMLStringOptimizer(mml[i]).toString();

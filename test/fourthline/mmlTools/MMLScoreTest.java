@@ -421,8 +421,6 @@ public class MMLScoreTest extends FileSelect {
 
 	@Test
 	public void test_v0ct_temp2() throws UndefinedTickException {
-		MMLTrack.setTempoAllowChordPart(true);
-
 		/* 他のパートに c がある場合のテンポ補正 */
 		checkGenerateAll(
 				"MML@l2drt130rv8g,l2rc,;",
@@ -432,8 +430,6 @@ public class MMLScoreTest extends FileSelect {
 
 	@Test
 	public void test_v0ct_temp3() throws UndefinedTickException {
-		MMLTrack.setTempoAllowChordPart(true);
-
 		/* 他のパートに c, d がある場合のテンポ補正 */
 		checkGenerateAll(
 				"MML@l2drt130rv8g,l2rc,l2rd;",
@@ -443,8 +439,6 @@ public class MMLScoreTest extends FileSelect {
 
 	@Test
 	public void test_v0ct_temp4() throws UndefinedTickException {
-		MMLTrack.setTempoAllowChordPart(true);
-
 		/* 他のパートに c, d がある場合のテンポ補正 */
 		checkGenerateAll(
 				"MML@l2drt130rv8g,l2rd,l2rc;",
@@ -454,8 +448,6 @@ public class MMLScoreTest extends FileSelect {
 
 	@Test
 	public void test_v0ct_temp5() throws UndefinedTickException {
-		MMLTrack.setTempoAllowChordPart(true);
-
 		/* 他のパートに b, c がある場合のテンポ補正 */
 		checkGenerateAll(
 				"MML@l2drt130rv8g,l2rb,l2rc;",
@@ -465,8 +457,6 @@ public class MMLScoreTest extends FileSelect {
 
 	@Test
 	public void test_v0ct_temp6() throws UndefinedTickException {
-		MMLTrack.setTempoAllowChordPart(true);
-
 		/* 他のパートに g, a がある場合のテンポ補正 */
 		checkGenerateAll(
 				"MML@l2drt130rv8g,l2rg,l2ra;",
@@ -489,6 +479,28 @@ public class MMLScoreTest extends FileSelect {
 		checkGenerateAll(
 				"MML@l1r.r.rt240,v12ccccdd2deeec2fffggggaaaabbbb>c1,d1d1.d1.;",
 				"MML@l1r.r.v0et240,v12ccccdd2deeec2fffggggaaaabbbb>c1,l1dd.d.;"
+				);
+	}
+
+	@Test
+	public void test_v0ct_temp9() throws UndefinedTickException {
+		MMLTrack.setTempoAllowChordPart(true);
+
+		/* 他のパートに c, d がある場合のテンポ補正, 和音1にテンポ */
+		checkGenerateAll(
+				"MML@l2rd,l2drt130rv8g,l2rc;",
+				"MML@l2rd,l2dv0et130rv8g,l2rc;"
+				);
+	}
+
+	@Test
+	public void test_v0ct_temp10() throws UndefinedTickException {
+		MMLTrack.setTempoAllowChordPart(true);
+
+		/* 和音2にテンポをつくる */
+		checkGenerateAll(
+				"MML@l2rd,l2rc,l2drt130rv8g;",
+				"MML@l2rd,l2rc,l2dv0et130rv8g;"
 				);
 	}
 

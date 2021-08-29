@@ -358,4 +358,19 @@ public class MMLTrackTest {
 		track.generate();
 		assertEquals(expect, track.getMabiMML());
 	}
+
+	/**
+	 * 和音にテンポ出力する場合に他のパートと音符が重ならないようにする
+	 * @throws UndefinedTickException
+	 */
+	@Test
+	public void test_musicq_tempo_05() throws UndefinedTickException {
+		MMLTrack.setTempoAllowChordPart(true);
+
+		String mml = "MML@c1&c1,rrt230,;";
+		String expect = "MML@l1c&c,v0d2t230,;";
+		MMLTrack track = new MMLTrack().setMML(mml);
+		track.generate();
+		assertEquals(expect, track.getMabiMML());
+	}
 }
