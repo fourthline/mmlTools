@@ -258,7 +258,9 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		MMLScore score = null;
 		try {
 			IMMLFileParser fileParser = IMMLFileParser.getParser(file);
-			score = fileParser.parse(new FileInputStream(file));
+			FileInputStream in = new FileInputStream(file);
+			score = fileParser.parse(in);
+			in.close();
 		} catch (FileNotFoundException e) {
 			JOptionPane.showMessageDialog(mainFrame, 
 					AppResource.appText("error.read"), 
@@ -268,6 +270,10 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			JOptionPane.showMessageDialog(mainFrame, 
 					AppResource.appText("error.read"), 
 					AppResource.appText("error.invalid_file"), JOptionPane.WARNING_MESSAGE);
+		} catch (IOException e) {
+			JOptionPane.showMessageDialog(mainFrame, 
+					AppResource.appText("error.read"), 
+					AppResource.appText(e.getMessage()), JOptionPane.WARNING_MESSAGE);
 		}
 
 		// mabiicco由来のファイルであれば, generateされたものにする.

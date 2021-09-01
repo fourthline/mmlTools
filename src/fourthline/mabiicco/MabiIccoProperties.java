@@ -98,7 +98,9 @@ public final class MabiIccoProperties {
 
 	private MabiIccoProperties() {
 		try {
-			properties.load(new FileInputStream(configFile));
+			FileInputStream in = new FileInputStream(configFile);
+			properties.load(in);
+			in.close();
 			initFileHistory();
 		} catch (InvalidPropertiesFormatException e) {
 		} catch (FileNotFoundException e) {
