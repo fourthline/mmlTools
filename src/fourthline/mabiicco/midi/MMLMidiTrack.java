@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 たんらる
+ * Copyright (C) 2014-2021 たんらる
  */
 
 package fourthline.mabiicco.midi;
@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fourthline.mmlTools.MMLNoteEvent;
-import fourthline.mmlTools.MMLTempoEvent;
-import fourthline.mmlTools.core.MMLTicks;
 
 /**
  * 複数のMMLNoteEventリストから, MIDIトラック用リストに変換する.
@@ -17,15 +15,11 @@ import fourthline.mmlTools.core.MMLTicks;
  *   TODO: 再生方式の完全な変更が必要.
  */
 public class MMLMidiTrack {
-	private List<MMLTempoEvent> tempoList;
+	private final InstClass inst;
 	private ArrayList<MMLNoteEvent> noteEventList;
 
-	public MMLMidiTrack(List<MMLTempoEvent> tempoList) {
-		if (tempoList != null) {
-			this.tempoList = tempoList;
-		} else {
-			this.tempoList = new ArrayList<>();
-		}
+	public MMLMidiTrack(InstClass inst) {
+		this.inst = inst;
 		noteEventList = new ArrayList<>();
 	}
 
@@ -42,6 +36,7 @@ public class MMLMidiTrack {
 	private void addItem(MMLNoteEvent addEvent) {
 		int targetTick = addEvent.getTickOffset();
 		int targetIndex = 0;
+
 		for (MMLNoteEvent noteEvent : noteEventList) {
 			if (noteEvent.getTickOffset() > targetTick) {
 				break;
@@ -52,28 +47,48 @@ public class MMLMidiTrack {
 			}
 		}
 
+		addEvent = overlapNote(targetIndex, addEvent);
+		if (addEvent != null) {
+			noteEventList.add(targetIndex, addEvent);
+		}
+	}
+
+	private MMLNoteEvent overlapNote(int targetIndex, MMLNoteEvent addEvent) {
+		if (inst.isOverlap(addEvent.getNote())) {
+			return addEvent;
+		}
+
+		int targetTick = addEvent.getTickOffset();
+
 		// 前の音との重複修正
 		if ( targetIndex > 0 ) {
 			MMLNoteEvent prevEvent = noteEventList.get( targetIndex - 1 );
 			if (addEvent.getNote() == prevEvent.getNote()) {
 				if ( prevEvent.getTickOffset() == targetTick ) {
+					/* 音量はテンポの有無でどちらかのノートの設定になるが対応しない */
+					if (prevEvent.getTick() >= addEvent.getTick()) {
+						noteEventList.get(targetIndex-1).setTick(addEvent.getTick());
+					}
+					return null;
+
+					// 2021/09/18 テンポを和音出力し、ゲーム内の鳴り方もかわったようなので以下コードは使用しない
 					// 開始位置が同じときには, 後発音で更新する.
 					// 前の音とテンポ指定がある場合は元あったノートのまま.
 					// 後発音が V0 の場合は l64音に更新する.
-					if (!MMLTempoEvent.searchEqualsTick(tempoList, targetTick)) {
-						if (addEvent.getVelocity() == 0) {
-							prevEvent.setTick(MMLTicks.minimumTick());
-						}
-						return;
-					} else {
-						if (prevEvent.getVelocity() == 0) {
-							addEvent.setTick(MMLTicks.minimumTick());
-						}
-						targetIndex--;
-						noteEventList.remove(targetIndex);
-					}
-				} else {
-					trimOverlapNote(prevEvent, addEvent);
+//					if (!MMLTempoEvent.searchEqualsTick(tempoList, targetTick)) {
+//						if (addEvent.getVelocity() == 0) {
+//							prevEvent.setTick(MMLTicks.minimumTick());
+//						}
+//						return null;
+//					} else {
+//						if (prevEvent.getVelocity() == 0) {
+//							addEvent.setTick(MMLTicks.minimumTick());
+//						}
+//						targetIndex--;
+//						noteEventList.remove(targetIndex);
+//					}
+//				} else {
+//					trimOverlapNote(prevEvent, addEvent);
 				}
 			}
 		}
@@ -84,7 +99,7 @@ public class MMLMidiTrack {
 			trimOverlapNote(addEvent, nextEvent);
 		}
 
-		noteEventList.add(targetIndex, addEvent);
+		return addEvent;
 	}
 
 	private void trimOverlapNote(MMLNoteEvent note1, MMLNoteEvent note2) {

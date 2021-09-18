@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2017 たんらる
+ * Copyright (C) 2013-2021 たんらる
  */
 
 package fourthline.mabiicco.midi;
@@ -18,8 +18,6 @@ import java.util.List;
 import javax.sound.midi.*;
 import javax.sound.sampled.LineUnavailableException;
 
-import com.sun.media.sound.DLSInstrument;
-import com.sun.media.sound.DLSRegion;
 import com.sun.media.sound.SoftSynthesizer;
 
 import fourthline.mabiicco.AppErrorHandler;
@@ -443,7 +441,7 @@ public final class MabiDLS {
 		boolean enablePart[] = InstClass.getEnablePartByProgram(program);
 		InstClass instClass = getInstByProgram(mmlTrack.getProgram());
 
-		MMLMidiTrack midiTrack = new MMLMidiTrack(mmlTrack.getGlobalTempoList());
+		MMLMidiTrack midiTrack = new MMLMidiTrack(instClass);
 		for (int i = 0; i < enablePart.length; i++) {
 			if (enablePart[i]) {
 				MMLEventList eventList = mmlTrack.getMMLEventAtIndex(i);
@@ -505,19 +503,8 @@ public final class MabiDLS {
 			return 0;
 		}
 
-		note = convertNoteMML2Midi(note);
-		Instrument instrument = inst.getInstrument();
-		if (instrument instanceof DLSInstrument) {
-			DLSInstrument dlsinst = (DLSInstrument) instrument;
-			for (DLSRegion region : dlsinst.getRegions()) {
-				if ( (note >= region.getKeyfrom())
-						&& (note <= region.getKeyto()) ) {
-					double attenuation = region.getSampleoptions().getAttenuation() / 655360.0;
-					velocity = (int) Math.sqrt( Math.pow(10.0, attenuation/20) * (double)(velocity * velocity) );
-					break;
-				}
-			}
-		}
+		double attenuation = inst.getAttention(note) / 655360.0;
+		velocity = (int) Math.sqrt( Math.pow(10.0, attenuation/20) * (double)(velocity * velocity) );
 
 		return velocity;
 	}

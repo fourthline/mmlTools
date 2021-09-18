@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2017 たんらる
+ * Copyright (C) 2013-2021 たんらる
  */
 
 package fourthline.mabiicco.midi;
@@ -34,6 +34,7 @@ public final class InstClass {
 	private final int upperNote;
 	private final InstType type;
 	private final Instrument inst;
+	private final Options options;
 
 	private static final String RESOURCE_NAME = "instrument";
 	private static final ResourceBundle instResource = ResourceBundle.getBundle(RESOURCE_NAME, new ResourceLoader());
@@ -61,6 +62,8 @@ public final class InstClass {
 
 		this.bank = bank;
 		this.program = program;
+
+		this.options = new Options(inst);
 	}
 
 	private static final class KeyRegion {
@@ -137,6 +140,76 @@ public final class InstClass {
 	}
 
 	/**
+	 * DLSの情報に基づくOptions
+	 */
+	private class Options {
+		private final static int OPTION_NUM = 256;
+		private final int attentionList[];
+		private final boolean overlapList[];
+
+		private Options(Instrument instrument) {
+			if (instrument instanceof DLSInstrument) {
+				attentionList = new int[ OPTION_NUM ];
+				overlapList = new boolean[ OPTION_NUM ];
+
+				int min = OPTION_NUM;
+				int max = 0;
+				DLSInstrument dlsinst = (DLSInstrument) instrument;
+				for (DLSRegion region : dlsinst.getRegions()) {
+					min = Math.min(min, region.getKeyfrom());
+					max = Math.max(max, region.getKeyto());
+					int v = region.getSampleoptions().getAttenuation();
+					boolean overlap = region.getOptions() == 1;
+					for (int i = region.getKeyfrom(); i <= region.getKeyto(); i++ ) {
+						attentionList[i] = v;
+						overlapList[i] = overlap;
+					}
+				}
+
+				for (int i = min - 1; i >= 0; i--) {
+					attentionList[i] = attentionList[i+12];
+					overlapList[i] = overlapList[i+12];
+				}
+				for (int i = max; i < OPTION_NUM; i++) {
+					attentionList[i] = attentionList[i-12];
+					overlapList[i] = overlapList[i-12];
+				}
+			} else {
+				attentionList = null;
+				overlapList = null;
+			}
+		}
+	}
+
+	private int convertNoteMML2Midi(int mml_note) {
+		return (mml_note + 12);
+	}
+
+	public int getAttention(int note) {
+		if (options.attentionList == null) {
+			return 0;
+		}
+		try {
+			note = convertNoteMML2Midi(note);
+			return options.attentionList[note];
+		} catch (IndexOutOfBoundsException e) {
+			return 0;
+		}
+	}
+
+	public boolean isOverlap(int note) {
+		if (options.overlapList == null) {
+			return false;
+		}
+		try {
+			note = convertNoteMML2Midi(note);
+			return options.overlapList[note];
+		} catch (IndexOutOfBoundsException e) {
+			return false;
+		}
+	}
+
+	/**
 	 * プログラム番号上で有効なパート情報を取得する.
 	 * @param program
 	 * @return
@@ -209,7 +282,17 @@ public final class InstClass {
 					System.out.print(reg.getKeyfrom()+" ");
 					System.out.print(reg.getKeyto()+" ");
 					System.out.print(reg.getVelfrom()+" ");
-					System.out.println(reg.getVelto()+" ");
+					System.out.print(reg.getVelto()+" ");
+					System.out.print(reg.getChannel()+" ");
+					System.out.print(reg.getExclusiveClass()+" ");
+					System.out.print(reg.getFusoptions()+" ");
+					System.out.print(reg.getPhasegroup()+" ");
+					System.out.print(reg.getOptions()+" "); // overlap
+					System.out.print(reg.getSampleoptions().getUnitynote()+" ");
+					System.out.print(reg.getSampleoptions().getAttenuation()+" ");
+					System.out.print(reg.getSampleoptions().getOptions()+" ");
+					System.out.print(reg.getSampleoptions().getFinetune()+" ");
+					System.out.println();
 				}
 			}
 		}
