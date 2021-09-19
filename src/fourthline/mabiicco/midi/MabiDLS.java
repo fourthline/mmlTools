@@ -503,7 +503,7 @@ public final class MabiDLS {
 			return 0;
 		}
 
-		double attenuation = inst.getAttention(note) / 655360.0;
+		double attenuation = inst.getAttention(note);
 		velocity = (int) Math.sqrt( Math.pow(10.0, attenuation/20) * (double)(velocity * velocity) );
 
 		return velocity;

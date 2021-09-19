@@ -477,10 +477,14 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 			int program = getActivePartProgram();
 
 			editor.reset();
-			pianoRollView.setPitchRange(MabiDLS.getInstance().getInstByProgram(program));
+
+			InstClass inst = MabiDLS.getInstance().getInstByProgram(program);
+			pianoRollView.setRelativeInst(inst);
+			keyboardView.setRelativeInst(inst);
 
 			pianoRollView.repaint();
 			columnView.repaint();
+			keyboardView.repaint();
 		}
 	}
 

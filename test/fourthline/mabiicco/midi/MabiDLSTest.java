@@ -94,4 +94,21 @@ public class MabiDLSTest extends UseLoadingDLS {
 			assertArrayEquals(""+i, a[i], seq.getTracks()[0].get(i).getMessage().getMessage());
 		}
 	}
+
+	@Test
+	public void testInstOptions() {
+		InstClass inst = dls.getInstByProgram(0);
+		for (int i = -12; i < 16; i++) {
+			System.out.println(i + ": " + inst.getAttention(i) + " " + inst.isOverlap(i));
+			assertEquals(false, inst.isOverlap(i));
+		}
+		for (int i = 16; i < 48; i++) {
+			System.out.println(i + ": " + inst.getAttention(i) + " " + inst.isOverlap(i));
+			assertEquals(true, inst.isOverlap(i));
+		}
+		for (int i = 48; i < 256-12; i++) {
+			System.out.println(i + ": " + inst.getAttention(i) + " " + inst.isOverlap(i));
+			assertEquals(false, inst.isOverlap(i));
+		}
+	}
 }

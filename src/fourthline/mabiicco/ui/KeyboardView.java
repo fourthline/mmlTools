@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2017 たんらる
+ * Copyright (C) 2013-2021 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -16,6 +16,7 @@ import java.awt.event.MouseMotionAdapter;
 import javax.swing.JPanel;
 
 import fourthline.mabiicco.midi.IPlayNote;
+import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mmlTools.MMLNoteEvent;
 
@@ -29,6 +30,8 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 	private final IMMLManager mmlManager;
 
 	private final PianoRollView pianoRollView;
+
+	private InstClass relativeInst = null;
 
 	/**
 	 * Create the panel.
@@ -80,8 +83,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 			paintOctPianoLine(g2, i, (char)('0'+PianoRollView.OCTNUM-i-1));
 		}
 
-		g2.setColor(Color.BLUE);
-		g2.drawLine(width-1, 0, width-1, height);
+		paintOverlapRange(g2);
 		paintPlayNote(g2);
 
 		g2.dispose();
@@ -123,6 +125,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 	}
 
 	private void paintOctPianoLine(Graphics2D g, int pos, char posText) {
+		int height = pianoRollView.getNoteHeight();
 		int octHeight = pianoRollView.getNoteHeight() * 12;
 		// ド～シのしろ鍵盤
 		g.setColor(new Color(0.3f, 0.3f, 0.3f));
@@ -144,14 +147,14 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 		};
 
 		for (int i = 0; i < black_posIndex.length; i++) {
-			int y = octHeight * black_posIndex[i] / 7 - pianoRollView.getNoteHeight() / 2-1;
+			int y = octHeight * black_posIndex[i] / 7 - height / 2-1;
 			y += startY;
 
 			g.setColor(new Color(0.0f, 0.0f, 0.0f));
-			g.fillRect(0, y, 20, pianoRollView.getNoteHeight());
+			g.fillRect(0, y, 20, height);
 
 			g.setColor(new Color(0.3f, 0.3f, 0.3f));
-			g.drawRect(0, y, 20, pianoRollView.getNoteHeight());
+			g.drawRect(0, y, 20, height);
 		}
 
 		// グリッド
@@ -164,6 +167,25 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 		int y = startY + octHeight;
 		g.drawChars(o_char, 0, o_char.length, 42, y);
 		g.drawLine(40, y, width, y);
+	}
+
+	private void paintOverlapRange(Graphics2D g) {
+		if (relativeInst == null) {
+			return;
+		}
+
+		for (int i = -1;; i++) {
+			int y1 = pianoRollView.convertNote2Y(i);
+			int y2 = pianoRollView.convertNote2Y(i-1);
+			if (y2 < 0) {
+				break;
+			}
+			int x = width - 1;
+			if (relativeInst.isOverlap(i)) {
+				g.setColor(Color.BLUE);
+				g.drawLine(x, y1, x, y2);
+			}
+		}
 	}
 
 	@Override
@@ -204,5 +226,9 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 		MabiDLS.getInstance().playNote(Integer.MIN_VALUE, program, PLAY_CHANNEL, 0);
 
 		repaint();
+	}
+
+	public void setRelativeInst(InstClass inst) {
+		this.relativeInst = inst;
 	}
 }

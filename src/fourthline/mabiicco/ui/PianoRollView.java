@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2017 たんらる
+ * Copyright (C) 2013-2021 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -74,14 +74,12 @@ public final class PianoRollView extends JPanel {
 	// 選択用の枠
 	private Rectangle selectingRect;
 
-	// draw pitch range
-	private int lowerNote = 0;
-	private int upperNote = 14;
+	// draw valid range
+	private InstClass relativeInst;
 
 	private static final Color wKeyColor = new Color(0.9f, 0.9f, 0.9f); // 白鍵盤用
 	private static final Color bKeyColor = new Color(0.8f, 0.8f, 0.8f); // 黒鍵盤用
 	private static final Color borderColor = new Color(0.6f, 0.6f, 0.6f); // 境界線用
-	private static final Color pitchRangeBorderColor = Color.RED; // pitch range
 	private static final Color keyColors[] = new Color[] {
 			wKeyColor, 
 			bKeyColor, 
@@ -336,7 +334,6 @@ public final class PianoRollView extends JPanel {
 		}
 
 		paintMeasure(g2);
-		paintPitchRangeBorder(g2);
 
 		paintOtherTrack(g2);
 		paintActiveTrack(g2);
@@ -357,7 +354,7 @@ public final class PianoRollView extends JPanel {
 		for (int i = 0; i < 12; i++) {
 			int line = octave*12 + (11-i);
 			Color fillColor = keyColors[i];
-			if ( (line < lowerNote) || (line > upperNote) ) {
+			if (relativeInst.isValid(line) == false) {
 				if (MabiIccoProperties.getInstance().viewRange.get()) {
 					fillColor = noSoundColor;
 				}
@@ -373,17 +370,6 @@ public final class PianoRollView extends JPanel {
 		}
 		g.setColor(darkBarBorder);
 		g.drawLine(0, 12*noteHeight+y, width, 12*noteHeight+y);
-	}
-
-	private void paintPitchRangeBorder(Graphics2D g) {
-		if (MabiIccoProperties.getInstance().viewRange.get()) {
-			int width = getWidth();
-			int y1 = convertNote2Y(lowerNote-1);
-			int y2 = convertNote2Y(upperNote);
-			g.setColor(pitchRangeBorderColor);
-			g.drawLine(0, y1, width, y1);
-			g.drawLine(0, y2, width, y2);
-		}
 	}
 
 	void paintSequenceLine(Graphics2D g, int height) {
@@ -605,11 +591,8 @@ public final class PianoRollView extends JPanel {
 		}
 	}
 
-	public void setPitchRange(InstClass inst) {
-		if (inst == null) {
-			return;
-		}
-		this.lowerNote = inst.getLowerNote();
-		this.upperNote = inst.getUpperNote();
+	public void setRelativeInst(InstClass inst) {
+		this.relativeInst = inst;
+		repaint();
 	}
 }

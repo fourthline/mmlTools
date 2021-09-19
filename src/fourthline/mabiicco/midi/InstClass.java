@@ -142,15 +142,22 @@ public final class InstClass {
 	/**
 	 * DLSの情報に基づくOptions
 	 */
-	private class Options {
-		private final static int OPTION_NUM = 256;
-		private final int attentionList[];
+	public class Options {
+		public final static int OPTION_NUM = 256;
+		private final double attentionList[];
 		private final boolean overlapList[];
+		private final boolean validList[];
 
 		private Options(Instrument instrument) {
 			if (instrument instanceof DLSInstrument) {
-				attentionList = new int[ OPTION_NUM ];
+				attentionList = new double[ OPTION_NUM ];
 				overlapList = new boolean[ OPTION_NUM ];
+				validList = new boolean[ OPTION_NUM ];
+				for (int i = 0; i < OPTION_NUM; i++) {
+					attentionList[i] = 0.0;
+					overlapList[i] = false;
+					validList[i] = false;
+				}
 
 				int min = OPTION_NUM;
 				int max = 0;
@@ -158,25 +165,18 @@ public final class InstClass {
 				for (DLSRegion region : dlsinst.getRegions()) {
 					min = Math.min(min, region.getKeyfrom());
 					max = Math.max(max, region.getKeyto());
-					int v = region.getSampleoptions().getAttenuation();
+					double v = region.getSampleoptions().getAttenuation() / 655360.0;
 					boolean overlap = region.getOptions() == 1;
 					for (int i = region.getKeyfrom(); i <= region.getKeyto(); i++ ) {
 						attentionList[i] = v;
 						overlapList[i] = overlap;
+						validList[i] = true;
 					}
-				}
-
-				for (int i = min - 1; i >= 0; i--) {
-					attentionList[i] = attentionList[i+12];
-					overlapList[i] = overlapList[i+12];
-				}
-				for (int i = max; i < OPTION_NUM; i++) {
-					attentionList[i] = attentionList[i-12];
-					overlapList[i] = overlapList[i-12];
 				}
 			} else {
 				attentionList = null;
 				overlapList = null;
+				validList = null;
 			}
 		}
 	}
@@ -185,7 +185,7 @@ public final class InstClass {
 		return (mml_note + 12);
 	}
 
-	public int getAttention(int note) {
+	public double getAttention(int note) {
 		if (options.attentionList == null) {
 			return 0;
 		}
@@ -204,6 +204,18 @@ public final class InstClass {
 		try {
 			note = convertNoteMML2Midi(note);
 			return options.overlapList[note];
+		} catch (IndexOutOfBoundsException e) {
+			return false;
+		}
+	}
+
+	public boolean isValid(int note) {
+		if (options.overlapList == null) {
+			return false;
+		}
+		try {
+			note = convertNoteMML2Midi(note);
+			return options.validList[note];
 		} catch (IndexOutOfBoundsException e) {
 			return false;
 		}
