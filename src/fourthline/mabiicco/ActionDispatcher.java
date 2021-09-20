@@ -262,18 +262,20 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			score = fileParser.parse(in);
 			in.close();
 		} catch (FileNotFoundException e) {
-			JOptionPane.showMessageDialog(mainFrame, 
-					AppResource.appText("error.read"), 
-					AppResource.appText("error.nofile"), 
+			JOptionPane.showMessageDialog(mainFrame,
+					AppResource.appText("error.nofile"),
+					AppResource.appText("error.read"),
 					JOptionPane.WARNING_MESSAGE);
 		} catch (MMLParseException e) {
-			JOptionPane.showMessageDialog(mainFrame, 
-					AppResource.appText("error.read"), 
-					AppResource.appText("error.invalid_file"), JOptionPane.WARNING_MESSAGE);
-		} catch (IOException e) {
-			JOptionPane.showMessageDialog(mainFrame, 
-					AppResource.appText("error.read"), 
-					AppResource.appText(e.getMessage()), JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(mainFrame,
+					AppResource.appText("error.invalid_file"),
+					AppResource.appText("error.read"),
+					JOptionPane.WARNING_MESSAGE);
+		} catch (Throwable e) {
+			JOptionPane.showMessageDialog(mainFrame,
+					e.getClass().getCanonicalName(),
+					AppResource.appText("error.read"),
+					JOptionPane.WARNING_MESSAGE);
 		}
 
 		// mabiicco由来のファイルであれば, generateされたものにする.
@@ -289,8 +291,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			File file = MabiIccoProperties.getInstance().getFileHistory()[index];
 			if ( (file == null) || (!file.exists()) ) {
 				JOptionPane.showMessageDialog(mainFrame,
-						AppResource.appText("error.read"),
 						AppResource.appText("error.nofile"),
+						AppResource.appText("error.read"),
 						JOptionPane.WARNING_MESSAGE);
 			} else {
 				checkAndOpenMMLFile( file );
