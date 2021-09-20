@@ -174,17 +174,19 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 			return;
 		}
 
-		for (int i = -1;; i++) {
-			int y1 = pianoRollView.convertNote2Y(i);
-			int y2 = pianoRollView.convertNote2Y(i-1);
-			if (y2 < 0) {
-				break;
-			}
-			int x = width - 1;
-			if (relativeInst.isOverlap(i)) {
+		int totalHeight = pianoRollView.getTotalHeight();
+		int height = pianoRollView.getNoteHeight();
+		int x = width - 1;
+		for (int i = 0; i < totalHeight; i += height) {
+			int note = pianoRollView.convertY2Note(i);
+			if (!relativeInst.isValid(note)) {
+				g.setColor(Color.RED);
+			} else if (relativeInst.isOverlap(note)) { 
 				g.setColor(Color.BLUE);
-				g.drawLine(x, y1, x, y2);
+			} else {
+				g.setColor(Color.GREEN);
 			}
+			g.drawLine(x, i, x, i+height);
 		}
 	}
 
