@@ -21,6 +21,7 @@ import fourthline.mabiicco.AppResource;
 import static fourthline.mabiicco.AppResource.appText;
 import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mabiicco.ui.PianoRollView.PaintMode;
+import fourthline.mabiicco.ui.color.ScaleColor;
 import fourthline.mabiicco.ui.editor.NoteAlign;
 
 import java.awt.event.ActionListener;
@@ -32,6 +33,7 @@ import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.function.IntSupplier;
+import java.util.function.Supplier;
 
 import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
@@ -317,6 +319,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		JMenu settingMenu = new JMenu(appText("menu.setting"));
 		menuBar.add(settingMenu);
 		createNoteHeightMenu(settingMenu);
+		createScaleColorMenu(settingMenu);
 		createCheckMenu(settingMenu, "clickPlayMenu", properties.enableClickPlay);
 		createCheckMenu(settingMenu, "view.marker", properties.enableViewMarker);
 		createCheckMenu(settingMenu, "view.range", properties.viewRange);
@@ -348,6 +351,19 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		@Override
 		public int getAsInt() {
 			return this.index;
+		}
+	}
+
+	private class CheckBoxMenuWith<T> extends JCheckBoxMenuItem implements Supplier<T> {
+		private static final long serialVersionUID = -7786833458520626015L;
+		private final T obj;
+		private CheckBoxMenuWith(String text, T obj) {
+			super(text);
+			this.obj = obj;
+		}
+		@Override
+		public T get() {
+			return obj;
 		}
 	}
 
@@ -383,6 +399,25 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		MabiIccoProperties properties = MabiIccoProperties.getInstance();
 		index = properties.getPianoRollViewHeightScaleProperty();
 		Collections.list(group.getElements()).get(index).setSelected(true);
+	}
+
+	/**
+	 * 音階表示設定メニュー
+	 */
+	private void createScaleColorMenu(JMenu settingMenu) {
+		JMenu plotScaleMenu = new JMenu(appText("menu.scale_color"));
+		settingMenu.add(plotScaleMenu);
+
+		ButtonGroup group = new ButtonGroup();
+		for (ScaleColor p : ScaleColor.values()) {
+			CheckBoxMenuWith<ScaleColor> menu = new CheckBoxMenuWith<>(appText(p.getName()), p);
+			menu.setActionCommand(ActionDispatcher.CHANGE_SCALE_COLOR);
+			menu.addActionListener(listener);
+			plotScaleMenu.add(menu);
+			group.add(menu);
+		}
+
+		Collections.list(group.getElements()).get(0).setSelected(true);
 	}
 
 	/**

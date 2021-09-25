@@ -21,6 +21,7 @@ import java.lang.annotation.Target;
 import java.util.HashMap;
 import java.util.function.Consumer;
 import java.util.function.IntSupplier;
+import java.util.function.Supplier;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiSystem;
@@ -35,6 +36,7 @@ import fourthline.mabiicco.ui.About;
 import fourthline.mabiicco.ui.MMLSeqView;
 import fourthline.mabiicco.ui.MainFrame;
 import fourthline.mabiicco.ui.WavoutPanel;
+import fourthline.mabiicco.ui.color.ScaleColor;
 import fourthline.mabiicco.ui.editor.MultiTracksVelocityChangeEditor;
 import fourthline.mabiicco.ui.editor.MultiTracksViewEditor;
 import fourthline.mabiicco.ui.editor.MMLTranspose;
@@ -112,6 +114,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String WAVOUT = "wavout";
 	@Action public static final String KEYBOARD_INPUT = "keyboard_input";
 	@Action public static final String INPUT_EMPTY_CORRECTION = "input_empty_correction";
+	@Action public static final String CHANGE_SCALE_COLOR = "change_scale_color";
 
 	private final HashMap<String, Consumer<Object>> actionMap = new HashMap<>();
 
@@ -229,6 +232,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(WAVOUT, t -> this.startWavOutAction());
 		actionMap.put(KEYBOARD_INPUT, t -> mmlSeqView.showKeyboardInput());
 		actionMap.put(INPUT_EMPTY_CORRECTION, t -> this.inputEmptyCorrection());
+		actionMap.put(CHANGE_SCALE_COLOR, t -> this.changeScaleColor(t));
 	}
 
 	@Override
@@ -751,6 +755,19 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		String value = JOptionPane.showInputDialog(mainFrame, AppResource.appText("mml.emptyCorrection"), MabiIccoProperties.getInstance().mmlEmptyCorrection.get());
 		if (value != null) {
 			MabiIccoProperties.getInstance().mmlEmptyCorrection.set(value);
+		}
+	}
+
+	private void changeScaleColor(Object source) {
+		if (source instanceof Supplier<?>) {
+			Object o = ((Supplier<?>) source).get();
+			if (o instanceof ScaleColor) {
+				mmlSeqView.setScaleColor((ScaleColor)o);
+			} else {
+				System.err.println("changeScaleColor invalid param (not Supplier<ScaleColor>)");
+			}
+		} else {
+			System.err.println("changeScaleColor invalid param (not Supplier)");
 		}
 	}
 }

@@ -23,6 +23,7 @@ import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.PianoRollView.PaintMode;
+import fourthline.mabiicco.ui.color.ScaleColor;
 import fourthline.mabiicco.ui.editor.KeyboardEditor;
 import fourthline.mabiicco.ui.editor.MMLEditor;
 import fourthline.mabiicco.ui.editor.MMLScoreUndoEdit;
@@ -910,5 +911,10 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		editor.reset();
 		repaint();
 		keyboardEditor.setVisible(true);
+	}
+
+	public void setScaleColor(ScaleColor scaleColor) {
+		pianoRollView.setScaleColor(scaleColor);
+		pianoRollView.repaint();
 	}
 }

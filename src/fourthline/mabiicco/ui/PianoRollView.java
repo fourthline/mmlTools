@@ -23,6 +23,7 @@ import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.color.ColorManager;
+import fourthline.mabiicco.ui.color.ScaleColor;
 import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLNoteEvent;
 import fourthline.mmlTools.MMLScore;
@@ -77,23 +78,13 @@ public final class PianoRollView extends JPanel {
 	// draw valid range
 	private InstClass relativeInst;
 
-	private static final Color wKeyColor = new Color(0.9f, 0.9f, 0.9f); // 白鍵盤用
-	private static final Color bKeyColor = new Color(0.8f, 0.8f, 0.8f); // 黒鍵盤用
-	private static final Color borderColor = new Color(0.6f, 0.6f, 0.6f); // 境界線用
-	private static final Color keyColors[] = new Color[] {
-			wKeyColor, 
-			bKeyColor, 
-			wKeyColor, 
-			bKeyColor, 
-			wKeyColor, 
-			bKeyColor, 
-			wKeyColor, 
-			wKeyColor, 
-			bKeyColor, 
-			wKeyColor, 
-			bKeyColor, 
-			wKeyColor
-	};
+	// スケール表示の色
+	private ScaleColor scaleColor = ScaleColor.C_MAJOR;
+
+	public void setScaleColor(ScaleColor scaleColor) {
+		this.scaleColor = scaleColor;
+	}
+
 	private static final Color noSoundColor = new Color(0.9f, 0.8f, 0.8f);
 
 	private static final Color barBorder = new Color(0.5f, 0.5f, 0.5f);
@@ -353,7 +344,7 @@ public final class PianoRollView extends JPanel {
 		int width = getWidth();
 		for (int i = 0; i < 12; i++) {
 			int line = octave*12 + (11-i);
-			Color fillColor = keyColors[i];
+			Color fillColor = scaleColor.getColor(i);
 			if (relativeInst.isValid(line) == false) {
 				if (MabiIccoProperties.getInstance().viewRange.get()) {
 					fillColor = noSoundColor;
@@ -364,7 +355,7 @@ public final class PianoRollView extends JPanel {
 			if (i == 0) {
 				g.setColor(darkBarBorder);
 			} else {
-				g.setColor(borderColor);
+				g.setColor(ScaleColor.BORDER_COLOR);
 			}
 			g.drawLine(0, i*noteHeight+y, width, i*noteHeight+y);
 		}
