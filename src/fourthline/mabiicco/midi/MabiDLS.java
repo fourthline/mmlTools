@@ -38,7 +38,7 @@ public final class MabiDLS {
 	private MidiChannel channel[];
 	private ArrayList<MMLNoteEvent[]> playNoteList = new ArrayList<>();
 	private static final int MAX_CHANNEL_PLAY_NOTE = 4;
-	public static final int MAX_MIDI_PART = 16;
+	public static final int MAX_MIDI_PART = 32;
 	private ArrayList<InstClass> insts = new ArrayList<>();
 	private static final int DLS_BANK = (0x79 << 7);
 
@@ -275,6 +275,9 @@ public final class MabiDLS {
 		if (sequencer.isRunning()) {
 			return;
 		}
+		if (channel >= this.channel.length) {
+			return;
+		}
 		midiMuteOff();
 		changeProgram(program, channel);
 		setChannelPanpot(channel, 64);
@@ -316,7 +319,9 @@ public final class MabiDLS {
 	 * @param panpot
 	 */
 	public void setChannelPanpot(int ch, int panpot) {
-		channel[ch].controlChange(10, panpot);
+		if (ch < channel.length) {
+			channel[ch].controlChange(10, panpot);
+		}
 	}
 
 	public void toggleMute(int ch) {
@@ -349,7 +354,7 @@ public final class MabiDLS {
 
 	/** MIDIにMuteStateを反映する. */
 	private void midiSetMuteState() {
-		for (int i = 0; i < muteState.length; i++) {
+		for (int i = 0; i < channel.length; i++) {
 			channel[i].setMute(muteState[i]);
 		}
 	}
@@ -381,7 +386,7 @@ public final class MabiDLS {
 		for (MMLTrack mmlTrack : score.getTrackList()) {
 			convertMidiTrack(sequence.createTrack(), mmlTrack, trackCount);
 			trackCount++;
-			if (trackCount >= MAX_MIDI_PART) {
+			if (trackCount >= this.channel.length) {
 				break;
 			}
 		}

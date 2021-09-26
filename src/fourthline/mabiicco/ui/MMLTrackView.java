@@ -55,6 +55,7 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 	private JButton muteButton;
 	private JButton soloButton;
 	private JButton allButton;
+	private JLabel trackIndexLabel = new JLabel();
 
 	private IMMLManager mmlManager;
 
@@ -199,6 +200,7 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 		allButton.setIcon(AppResource.getImageIcon(AppResource.appText("mmltrack.all.icon")));
 		allButton.setToolTipText(AppResource.appText("mmltrack.all"));
 		toolBar.add(allButton);
+		toolBar.add(trackIndexLabel);
 
 		for (int i = 0; i < partButton.length; i++) {
 			partButton[i].addActionListener(actionListener);
@@ -224,10 +226,20 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 	}
 
 	public void updateMuteButton() {
-		if (MabiDLS.getInstance().getMute(trackIndex)) {
-			muteButton.setIcon(AppResource.getImageIcon(AppResource.appText("mmltrack.mute.on.icon")));
+		if (trackIndex < MMLSeqView.MAX_MIDI_TRACK) {
+			muteButton.setEnabled(true);
+			soloButton.setEnabled(true);
+			allButton.setEnabled(true);
+			if (MabiDLS.getInstance().getMute(trackIndex)) {
+				muteButton.setIcon(AppResource.getImageIcon(AppResource.appText("mmltrack.mute.on.icon")));
+			} else {
+				muteButton.setIcon(AppResource.getImageIcon(AppResource.appText("mmltrack.mute.off.icon")));
+			}
 		} else {
-			muteButton.setIcon(AppResource.getImageIcon(AppResource.appText("mmltrack.mute.off.icon")));
+			muteButton.setIcon(AppResource.getImageIcon(AppResource.appText("mmltrack.mute.on.icon")));
+			muteButton.setEnabled(false);
+			soloButton.setEnabled(false);
+			allButton.setEnabled(false);
 		}
 	}
 
@@ -273,6 +285,11 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 
 		setInstProgram(mmlTrack);
 		trackComposeLabel.setText(mmlTrack.mmlRankFormat());
+		String str = "   "+(trackIndex+1)+"/"+mmlManager.getMMLScore().getTrackCount();
+		if (trackIndex >= MMLSeqView.MAX_MIDI_TRACK) {
+			str += ":"+AppResource.appText("mmltrack.not_play");
+		}
+		trackIndexLabel.setText(str);
 	}
 
 	private void setInstProgram(MMLTrack track) {

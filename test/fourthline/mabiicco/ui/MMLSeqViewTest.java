@@ -155,25 +155,25 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 		assertEquals(2, obj.getMMLScore().getTrackCount());
 		assertEquals("Track2", obj.getSelectedTrack().getTrackName());
 
-		// 13個ふやす.
-		Stream.iterate(0, i -> i++).limit(13).forEach(t -> {
+		// 21個ふやす.
+		Stream.iterate(0, i -> i++).limit(21).forEach(t -> {
 			obj.addMMLTrack(null);
 		});
-		assertEquals(15, obj.getMMLScore().getTrackCount());
-		assertEquals("Track15", obj.getSelectedTrack().getTrackName());
+		assertEquals(15+8, obj.getMMLScore().getTrackCount());
+		assertEquals("Track23", obj.getSelectedTrack().getTrackName());
 
 		// 最大
 		obj.addMMLTrack(null);
-		assertEquals(16, obj.getMMLScore().getTrackCount());
-		assertEquals("Track16", obj.getSelectedTrack().getTrackName());
+		assertEquals(24, obj.getMMLScore().getTrackCount());
+		assertEquals("Track24", obj.getSelectedTrack().getTrackName());
 
 		// 増えない.
 		obj.addMMLTrack(null);
-		assertEquals(16, obj.getMMLScore().getTrackCount());
-		assertEquals("Track16", obj.getSelectedTrack().getTrackName());
+		assertEquals(24, obj.getMMLScore().getTrackCount());
+		assertEquals("Track24", obj.getSelectedTrack().getTrackName());
 
-		// 14個へらす.
-		Stream.iterate(0, i -> i++).limit(14).forEach(t -> {
+		// 22個へらす.
+		Stream.iterate(0, i -> i++).limit(22).forEach(t -> {
 			obj.removeMMLTrack();
 		});
 		assertEquals(2, obj.getMMLScore().getTrackCount());
@@ -187,7 +187,7 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 		// へらない.
 		obj.removeMMLTrack();
 		assertEquals(1, obj.getMMLScore().getTrackCount());
-		assertEquals("Track18", obj.getSelectedTrack().getTrackName());
+		assertEquals("Track26", obj.getSelectedTrack().getTrackName());
 	}
 
 	@Test
