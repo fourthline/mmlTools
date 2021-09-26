@@ -19,5 +19,11 @@ public interface IEditState {
 	public void selectPreviousAll();
 	public void selectAfterAll();
 
+	/** 連続した複数のノートが選択されているかどうかを判定する */
+	public boolean hasSelectedMultipleConsecutiveNotes();
+
+	/** 音符間の休符を削除する */
+	public void removeRestsBetweenNotes();
+
 	public void setEditStateObserver(IEditStateObserver observer);
 }

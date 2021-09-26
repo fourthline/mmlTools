@@ -115,6 +115,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String KEYBOARD_INPUT = "keyboard_input";
 	@Action public static final String INPUT_EMPTY_CORRECTION = "input_empty_correction";
 	@Action public static final String CHANGE_SCALE_COLOR = "change_scale_color";
+	@Action public static final String REMOVE_RESTS_BETWEEN_NOTES = "remote_rests_between_notes";
 
 	private final HashMap<String, Consumer<Object>> actionMap = new HashMap<>();
 
@@ -233,6 +234,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(KEYBOARD_INPUT, t -> mmlSeqView.showKeyboardInput());
 		actionMap.put(INPUT_EMPTY_CORRECTION, t -> this.inputEmptyCorrection());
 		actionMap.put(CHANGE_SCALE_COLOR, t -> this.changeScaleColor(t));
+		actionMap.put(REMOVE_RESTS_BETWEEN_NOTES, t -> editState.removeRestsBetweenNotes());
 	}
 
 	@Override
@@ -670,6 +672,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	public void notifyUpdateEditState() {
 		mainFrame.setSelectedEdit(editState.hasSelectedNote());
 		mainFrame.setPasteEnable(editState.canPaste());
+		mainFrame.setRemoveRestsBetweenNotesEnable(editState.hasSelectedMultipleConsecutiveNotes());
 	}
 
 	private void toggleLoop() {

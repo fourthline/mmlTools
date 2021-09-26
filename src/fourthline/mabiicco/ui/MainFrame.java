@@ -83,6 +83,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	private JMenuItem copyMenu = null;
 	private JMenuItem pasteMenu = null;
 	private JMenuItem deleteMenu = null;
+	private JMenuItem removeRestsBetweenNotesMenu = null;
 
 	private JButton loopButton = null;
 
@@ -140,6 +141,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		setCanSaveFile(false);
 		setSelectedEdit(false);
 		setPasteEnable(false);
+		setRemoveRestsBetweenNotesEnable(false);
 
 		// 閉じるボタンへのアクション設定
 		setDefaultCloseOperation( DO_NOTHING_ON_CLOSE );
@@ -265,6 +267,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createMenuItem(editMenu, "menu.removeBeat", ActionDispatcher.REMOVE_BEAT, true);
 		createMenuItem(editMenu, "edit.transpose", ActionDispatcher.TRANSPOSE, true);
 		createMenuItem(editMenu, "edit.tracks.velocity", ActionDispatcher.TRACKS_EDIT, true);
+		removeRestsBetweenNotesMenu = createMenuItem(editMenu, "edit.remove_rests_between_notes", ActionDispatcher.REMOVE_RESTS_BETWEEN_NOTES);
 
 		editMenu.add(new JSeparator());
 
@@ -664,6 +667,10 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 
 	public void setPasteEnable(boolean b) {
 		pasteMenu.setEnabled(b);
+	}
+
+	public void setRemoveRestsBetweenNotesEnable(boolean b) {
+		removeRestsBetweenNotesMenu.setEnabled(b);
 	}
 
 	public void updateLoop(boolean b) {

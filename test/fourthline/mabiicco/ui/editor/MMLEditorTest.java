@@ -458,21 +458,33 @@ public final class MMLEditorTest extends UseLoadingDLS {
 	 * 右クリックして, 指定された処理を実行後のMMLをテストする.
 	 * @param input
 	 * @param expect
-	 * @param selectIndex 右クリックするノートindex
+	 * @param selectIndex1 右クリックするノートindex
+	 * @param selectIndex2 index1と違う値であれば範囲選択にする。ただし、Noteの高さは同じであること。
 	 * @param r
 	 */
-	private void checkOneSelectActionButton3(String input, String expect, int selectIndex, Runnable r) {
+	private void checkOneSelectActionButton3(String input, String expect, int selectIndex1, int selectIndex2,Runnable r) {
 		MMLTrack track = new MMLTrack().setMML(input);
 		mmlManager.setMMLselectedTrack(track);
 
 		// select
-		MMLNoteEvent note1 = track.getMMLEventAtIndex(0).getMMLNoteEventList().get(selectIndex);
+		MMLNoteEvent note1 = track.getMMLEventAtIndex(0).getMMLNoteEventList().get(selectIndex1);
 		int y1 = pianoRollView.convertNote2Y( note1.getNote() );
 		int x1 = pianoRollView.convertTicktoX( note1.getTickOffset() );
 		MouseEvent e1 = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON3_DOWN_MASK, x1+1, y1+1, 1, false);
 
-		editor.mousePressed(e1);
-		editor.mouseReleased(e1);
+		MMLNoteEvent note2 = track.getMMLEventAtIndex(0).getMMLNoteEventList().get(selectIndex2);
+		int y2 = pianoRollView.convertNote2Y( note2.getNote() );
+		int x2 = pianoRollView.convertTicktoX( note2.getTickOffset() );
+		MouseEvent e2 = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON3_DOWN_MASK, x2+1, y2-1, 1, false);
+
+		if (selectIndex1 == selectIndex2) {
+			editor.mousePressed(e1);
+			editor.mouseReleased(e1);
+		} else {
+			editor.mousePressed(e2);
+			editor.mouseDragged(e1);
+			editor.mouseReleased(e1);
+		}
 
 		r.run();
 
@@ -481,7 +493,7 @@ public final class MMLEditorTest extends UseLoadingDLS {
 
 	@Test
 	public void test_selectPreviousAll() {
-		checkOneSelectActionButton3("MML@aabebaa;", "MML@r1baa,,;", 3, () -> {
+		checkOneSelectActionButton3("MML@aabebaa;", "MML@r1baa,,;", 3, 3, () -> {
 			editor.selectPreviousAll();
 			editor.selectedDelete();
 		});
@@ -489,9 +501,39 @@ public final class MMLEditorTest extends UseLoadingDLS {
 
 	@Test
 	public void test_selectAfterAll() {
-		checkOneSelectActionButton3("MML@aabebaa;", "MML@aab,,;", 3, () -> {
+		checkOneSelectActionButton3("MML@aabebaa;", "MML@aab,,;", 3, 3, () -> {
 			editor.selectAfterAll();
 			editor.selectedDelete();
+		});
+	}
+
+	@Test
+	public void test_remoteRestsBetweenNotes1() {
+		// 連続音間の休符削除
+		checkOneSelectActionButton3("MML@arara;", "MML@a2a2a,,;", 0, 2, () -> {
+			boolean b = editor.hasSelectedMultipleConsecutiveNotes();
+			assertEquals(true, b);
+			editor.removeRestsBetweenNotes();
+		});
+	}
+
+	@Test
+	public void test_remoteRestsBetweenNotes2() {
+		// 連続ではない
+		checkOneSelectActionButton3("MML@ardra;", "MML@ardra,,;", 0, 2, () -> {
+			boolean b = editor.hasSelectedMultipleConsecutiveNotes();
+			assertEquals(false, b);
+			editor.removeRestsBetweenNotes();
+		});
+	}
+
+	@Test
+	public void test_remoteRestsBetweenNotes3() {
+		// 連続音間の休符削除2
+		checkOneSelectActionButton3("MML@reerererereerere,,;", "MML@ree2e2e2e2ee2ere,,;", 1, 7, () -> {
+			boolean b = editor.hasSelectedMultipleConsecutiveNotes();
+			assertEquals(true, b);
+			editor.removeRestsBetweenNotes();
 		});
 	}
 }

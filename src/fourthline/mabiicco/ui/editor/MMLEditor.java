@@ -20,6 +20,7 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -461,6 +462,41 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	@Override
 	public boolean hasSelectedNote() {
 		return !(selectedNote.isEmpty());
+	}
+
+	/** 連続した複数のノートが選択されているかどうかを判定する */
+	@Override
+	public boolean hasSelectedMultipleConsecutiveNotes() {
+		if (selectedNote.size() >= 2) {
+			List<MMLNoteEvent> activePart = mmlManager.getActiveMMLPart().getMMLNoteEventList();
+			int index = 0;
+			for (int i = 0; i < selectedNote.size()-1; i++) {
+				for ( ; (index < activePart.size()-1) && (activePart.get(index) != selectedNote.get(i)); index++ );
+				if ((index < activePart.size()-1) && (activePart.get(index+1).equals(selectedNote.get(i+1)))) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/** 音符間の休符を削除する */
+	@Override
+	public void removeRestsBetweenNotes() {
+		List<MMLNoteEvent> activePart = mmlManager.getActiveMMLPart().getMMLNoteEventList();
+		int index = 0;
+		for (int i = 0; i < selectedNote.size()-1; i++) {
+			for ( ; (index < activePart.size()-1) && (activePart.get(index) != selectedNote.get(i)); index++ );
+			if ((index < activePart.size()-1) && (activePart.get(index+1).equals(selectedNote.get(i+1)))) {
+				MMLNoteEvent note = activePart.get(index);
+				note.setTick(activePart.get(index+1).getTickOffset()-note.getTickOffset());
+			}
+		}
+
+		selectNote(null);
+		editObserver.notifyUpdateEditState();
+		mmlManager.updateActivePart(true);
 	}
 
 	@Override
