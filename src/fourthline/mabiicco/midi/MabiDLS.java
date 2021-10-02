@@ -242,6 +242,10 @@ public final class MabiDLS {
 		all();
 	}
 
+	public List<InstClass> getAllInst() {
+		return insts;
+	}
+
 	public InstClass[] getAvailableInstByInstType(List<InstType> e) {
 		return insts.stream()
 				.filter(inst -> e.contains(inst.getType()))

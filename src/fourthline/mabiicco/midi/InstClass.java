@@ -6,6 +6,8 @@ package fourthline.mabiicco.midi;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.MissingResourceException;
@@ -162,7 +164,8 @@ public final class InstClass {
 				int min = OPTION_NUM;
 				int max = 0;
 				DLSInstrument dlsinst = (DLSInstrument) instrument;
-				for (DLSRegion region : dlsinst.getRegions()) {
+				List<DLSRegion> regionsList = dlsinst.getRegions();
+				for (DLSRegion region : regionsList) {
 					min = Math.min(min, region.getKeyfrom());
 					max = Math.max(max, region.getKeyto());
 					double v = region.getSampleoptions().getAttenuation() / 655360.0;
@@ -260,6 +263,58 @@ public final class InstClass {
 		}
 	}
 
+	public String toStringOptionsInfo() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(program);
+		for (boolean b : options.validList) {
+			sb.append(',').append(b);
+		}
+		for (double v : options.attentionList) {
+			sb.append(',').append(v);
+		}
+		for (boolean b : options.overlapList) {
+			sb.append(',').append(b);
+		}
+
+		return sb.toString();
+	}
+
+	private void dlsInfoWriteToOutputStream(OutputStream outputStream) {
+		PrintStream out = new PrintStream(outputStream);
+		String name = instName(inst);
+		String originalName = inst.getName();
+		int bank = inst.getPatch().getBank();
+		int program = inst.getPatch().getProgram();
+		out.printf("%d,%d=%s \"%s\"\n", bank, program, originalName, name);
+		if (name != null) {
+			name = ""+program+": "+name;
+		}
+
+		if ( (debug) && (inst instanceof DLSInstrument) ) {
+			DLSInstrument dlsinst = (DLSInstrument) inst;
+			for (DLSRegion reg : dlsinst.getRegions()) {
+				double attenuation = reg.getSample().getSampleoptions().getAttenuation()/655360.0;
+				out.print(" >> "+reg.getSample().getName()+" ");
+				out.print(attenuation+" ");
+				out.print(Math.pow(10.0, attenuation/20.0)+" ");
+				out.print(reg.getKeyfrom()+" ");
+				out.print(reg.getKeyto()+" ");
+				out.print(reg.getVelfrom()+" ");
+				out.print(reg.getVelto()+" ");
+				out.print(reg.getChannel()+" ");
+				out.print(reg.getExclusiveClass()+" ");
+				out.print(reg.getFusoptions()+" ");
+				out.print(reg.getPhasegroup()+" ");
+				out.print(reg.getOptions()+"* "); // overlap
+				out.print(reg.getSampleoptions().getUnitynote()+" ");
+				out.print(reg.getSampleoptions().getAttenuation()+" ");
+				out.print(reg.getSampleoptions().getOptions()+" ");
+				out.print(reg.getSampleoptions().getFinetune()+" ");
+				out.println();
+			}
+		}
+	}
+
 	public static List<InstClass> loadDLS(File dlsFile) throws InvalidMidiDataException, IOException {
 		Soundbank sb = null;
 		try {
@@ -276,36 +331,14 @@ public final class InstClass {
 			int bank = inst.getPatch().getBank();
 			int program = inst.getPatch().getProgram();
 			System.out.printf("%d,%d=%s \"%s\"\n", bank, program, originalName, name);
-			if (name != null) {
+			if ( (name != null) || (debug == true) ) {
 				name = ""+program+": "+name;
-				instArray.add(new InstClass( name,
+				InstClass instc = new InstClass( name,
 						bank,
 						program,
-						inst));
-			}
-
-			if ( (debug) && (inst instanceof DLSInstrument) ) {
-				DLSInstrument dlsinst = (DLSInstrument) inst;
-				for (DLSRegion reg : dlsinst.getRegions()) {
-					double attenuation = reg.getSample().getSampleoptions().getAttenuation()/655360.0;
-					System.out.print(" >> "+reg.getSample().getName()+" ");
-					System.out.print(attenuation+" ");
-					System.out.print(Math.pow(10.0, attenuation/20.0)+" ");
-					System.out.print(reg.getKeyfrom()+" ");
-					System.out.print(reg.getKeyto()+" ");
-					System.out.print(reg.getVelfrom()+" ");
-					System.out.print(reg.getVelto()+" ");
-					System.out.print(reg.getChannel()+" ");
-					System.out.print(reg.getExclusiveClass()+" ");
-					System.out.print(reg.getFusoptions()+" ");
-					System.out.print(reg.getPhasegroup()+" ");
-					System.out.print(reg.getOptions()+" "); // overlap
-					System.out.print(reg.getSampleoptions().getUnitynote()+" ");
-					System.out.print(reg.getSampleoptions().getAttenuation()+" ");
-					System.out.print(reg.getSampleoptions().getOptions()+" ");
-					System.out.print(reg.getSampleoptions().getFinetune()+" ");
-					System.out.println();
-				}
+						inst);
+				instArray.add(instc);
+				instc.dlsInfoWriteToOutputStream(System.out);
 			}
 		}
 

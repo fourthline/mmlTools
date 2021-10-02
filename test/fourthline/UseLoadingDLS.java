@@ -11,14 +11,17 @@ import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.sampled.LineUnavailableException;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
+import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.InstType;
 import fourthline.mabiicco.midi.MabiDLS;
 
-abstract public class UseLoadingDLS {
+abstract public class UseLoadingDLS extends FileSelect {
 	@BeforeClass
 	public static void initializeDefaultDLS() {
+		InstClass.debug = true;
 		try {
 			MabiDLS midi = MabiDLS.getInstance();
 			if (midi.getAvailableInstByInstType(InstType.MAIN_INST_LIST).length == 0) {
@@ -28,5 +31,10 @@ abstract public class UseLoadingDLS {
 		} catch (IOException | MidiUnavailableException | InvalidMidiDataException | LineUnavailableException e) {
 			throw new AssertionError();
 		}
+	}
+
+	@AfterClass
+	public static void cleanupDLS() {
+		InstClass.debug = false;
 	}
 }

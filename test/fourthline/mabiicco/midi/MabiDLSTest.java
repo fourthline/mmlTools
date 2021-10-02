@@ -6,6 +6,9 @@ package fourthline.mabiicco.midi;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MetaMessage;
 import javax.sound.midi.Sequence;
@@ -68,27 +71,27 @@ public class MabiDLSTest extends UseLoadingDLS {
 		assertEquals(MMLTicks.getTick("1"), seq.getTickLength());
 
 		byte a[][] = new byte[][] { 
-				new byte[]{(byte)ShortMessage.PROGRAM_CHANGE, 0x5},
-				new byte[]{(byte)ShortMessage.NOTE_ON, 69, 56}, // a
-				new byte[]{(byte)ShortMessage.NOTE_ON, 71, 56}, // b
-				new byte[]{(byte)ShortMessage.NOTE_ON, 60, 56}, // c
-				new byte[]{(byte)ShortMessage.NOTE_OFF, 69, 0}, // a
-				new byte[]{(byte)ShortMessage.NOTE_OFF, 71, 0}, // b
-				new byte[]{(byte)ShortMessage.NOTE_OFF, 60, 0}, // c
+			new byte[]{(byte)ShortMessage.PROGRAM_CHANGE, 0x5},
+			new byte[]{(byte)ShortMessage.NOTE_ON, 69, 56}, // a
+			new byte[]{(byte)ShortMessage.NOTE_ON, 71, 56}, // b
+			new byte[]{(byte)ShortMessage.NOTE_ON, 60, 56}, // c
+			new byte[]{(byte)ShortMessage.NOTE_OFF, 69, 0}, // a
+			new byte[]{(byte)ShortMessage.NOTE_OFF, 71, 0}, // b
+			new byte[]{(byte)ShortMessage.NOTE_OFF, 60, 0}, // c
 
-				new byte[]{(byte)ShortMessage.NOTE_ON, 69, 56}, // a
-				new byte[]{(byte)ShortMessage.NOTE_OFF, 69, 0}, // a
+			new byte[]{(byte)ShortMessage.NOTE_ON, 69, 56}, // a
+			new byte[]{(byte)ShortMessage.NOTE_OFF, 69, 0}, // a
 
-				new byte[]{(byte)MetaMessage.META, 81, 3, 5, 22, 21}, // t180
-				new byte[]{(byte)ShortMessage.NOTE_ON, 69, 56}, // a
-				new byte[]{(byte)ShortMessage.NOTE_ON, 71, 56}, // b
-				new byte[]{(byte)ShortMessage.NOTE_ON, 60, 56}, // c
-				new byte[]{(byte)ShortMessage.NOTE_OFF, 69, 0}, // a
-				new byte[]{(byte)ShortMessage.NOTE_OFF, 71, 0}, // b
-				new byte[]{(byte)ShortMessage.NOTE_OFF, 60, 0}, // c
+			new byte[]{(byte)MetaMessage.META, 81, 3, 5, 22, 21}, // t180
+			new byte[]{(byte)ShortMessage.NOTE_ON, 69, 56}, // a
+			new byte[]{(byte)ShortMessage.NOTE_ON, 71, 56}, // b
+			new byte[]{(byte)ShortMessage.NOTE_ON, 60, 56}, // c
+			new byte[]{(byte)ShortMessage.NOTE_OFF, 69, 0}, // a
+			new byte[]{(byte)ShortMessage.NOTE_OFF, 71, 0}, // b
+			new byte[]{(byte)ShortMessage.NOTE_OFF, 60, 0}, // c
 
-				new byte[]{(byte)ShortMessage.NOTE_ON, 69, 56}, // a
-				new byte[]{(byte)ShortMessage.NOTE_OFF, 69, 0}, // a
+			new byte[]{(byte)ShortMessage.NOTE_ON, 69, 56}, // a
+			new byte[]{(byte)ShortMessage.NOTE_OFF, 69, 0}, // a
 		};
 		for (int i = 0; i < a.length; i++) {
 			assertArrayEquals(""+i, a[i], seq.getTracks()[0].get(i).getMessage().getMessage());
@@ -110,5 +113,23 @@ public class MabiDLSTest extends UseLoadingDLS {
 			System.out.println(i + ": " + inst.getAttention(i) + " " + inst.isOverlap(i));
 			assertEquals(false, inst.isOverlap(i));
 		}
+	}
+
+	@Test
+	public void testInstOptionsAll() {
+		try {
+			StringBuilder sb = new StringBuilder();
+			for (InstClass inst : dls.getAllInst()) {
+				sb.append(inst.toStringOptionsInfo()).append('\n');
+			}
+
+			InputStream inputStream = fileSelect("instOptions.txt");
+			int size = inputStream.available();
+			byte expectBuf[] = new byte[size];
+			inputStream.read(expectBuf);
+			inputStream.close();
+
+			assertEquals(new String(expectBuf).replaceAll("\r", ""), sb.toString());
+		} catch (IOException e) {}
 	}
 }
