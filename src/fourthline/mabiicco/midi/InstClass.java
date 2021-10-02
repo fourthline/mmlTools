@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -165,6 +166,7 @@ public final class InstClass {
 				int max = 0;
 				DLSInstrument dlsinst = (DLSInstrument) instrument;
 				List<DLSRegion> regionsList = dlsinst.getRegions();
+				Collections.reverse(regionsList);
 				for (DLSRegion region : regionsList) {
 					min = Math.min(min, region.getKeyfrom());
 					max = Math.max(max, region.getKeyto());
