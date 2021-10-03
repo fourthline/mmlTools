@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -165,17 +164,23 @@ public final class InstClass {
 				int min = OPTION_NUM;
 				int max = 0;
 				DLSInstrument dlsinst = (DLSInstrument) instrument;
-				List<DLSRegion> regionsList = dlsinst.getRegions();
-				Collections.reverse(regionsList);
-				for (DLSRegion region : regionsList) {
+				for (DLSRegion region : dlsinst.getRegions()) {
 					min = Math.min(min, region.getKeyfrom());
 					max = Math.max(max, region.getKeyto());
 					double v = region.getSampleoptions().getAttenuation() / 655360.0;
 					boolean overlap = region.getOptions() == 1;
 					for (int i = region.getKeyfrom(); i <= region.getKeyto(); i++ ) {
-						attentionList[i] = v;
-						overlapList[i] = overlap;
-						validList[i] = true;
+						if (validList[i]) {
+							// 重複Regionがある場合は、あとのをスキップする。ロンカドーラが対象。
+							System.out.println("　　region skip > "+region.getSample().getName()+"["+region.getKeyfrom()+"-"+region.getKeyto()+"]");
+							region.setKeyfrom(0);
+							region.setKeyto(0);
+							break;
+						} else {
+							validList[i] = true;
+							attentionList[i] = v;
+							overlapList[i] = overlap;
+						}
 					}
 				}
 			} else {
