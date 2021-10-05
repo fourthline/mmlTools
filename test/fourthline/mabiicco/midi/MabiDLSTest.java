@@ -6,6 +6,7 @@ package fourthline.mabiicco.midi;
 
 import static org.junit.Assert.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -130,6 +131,24 @@ public class MabiDLSTest extends UseLoadingDLS {
 			inputStream.close();
 
 			assertEquals(new String(expectBuf).replaceAll("\r", ""), sb.toString());
+		} catch (IOException e) {}
+	}
+
+	@Test
+	public void testInstOptionsAll2() {
+		try {
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			for (InstClass inst : dls.getAllInst()) {
+				inst.dlsInfoWriteToOutputStream(out);
+			}
+
+			InputStream inputStream = fileSelect("instInfos.txt");
+			int size = inputStream.available();
+			byte expectBuf[] = new byte[size];
+			inputStream.read(expectBuf);
+			inputStream.close();
+
+			assertEquals(new String(expectBuf).replaceAll("\r", ""), out.toString().replaceAll("\r", ""));
 		} catch (IOException e) {}
 	}
 }
