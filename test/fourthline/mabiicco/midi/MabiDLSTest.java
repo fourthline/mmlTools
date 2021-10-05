@@ -135,7 +135,7 @@ public class MabiDLSTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void testInstOptionsAll2() {
+	public void testInstInfos() {
 		try {
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			for (InstClass inst : dls.getAllInst()) {

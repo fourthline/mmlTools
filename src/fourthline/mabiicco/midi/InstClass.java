@@ -170,7 +170,7 @@ public final class InstClass {
 					double v = region.getSampleoptions().getAttenuation() / 655360.0;
 					boolean overlap = region.getOptions() == 1;
 					for (int i = region.getKeyfrom(); i <= region.getKeyto(); i++ ) {
-						if (validList[i]) {
+						if (validList[i] || (region.getSample().getName().equals("Pipe_c5") && region.getKeyfrom() == 60)) {
 							// 重複Regionがある場合は、あとのをスキップする。ロンカドーラが対象。
 							System.out.println("　　region skip > "+region.getSample().getName()+"["+region.getKeyfrom()+"-"+region.getKeyto()+"]");
 							region.setKeyfrom(0);
@@ -286,7 +286,7 @@ public final class InstClass {
 		return sb.toString();
 	}
 
-	private void dlsInfoWriteToOutputStream(OutputStream outputStream) {
+	public void dlsInfoWriteToOutputStream(OutputStream outputStream) {
 		PrintStream out = new PrintStream(outputStream);
 		String name = instName(inst);
 		String originalName = inst.getName();
