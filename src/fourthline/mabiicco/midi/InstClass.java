@@ -141,6 +141,35 @@ public final class InstClass {
 		return this.inst;
 	}
 
+	private final static class ExcludeRegion {
+		private static final ExcludeRegion values[] = {
+				new ExcludeRegion("Pipe_c5", 60 ,71, 60),
+				new ExcludeRegion("Pipe_c5", 48 ,59, 48),
+				new ExcludeRegion("Pipe_c5", 72 ,83, 60),
+		};
+		private static boolean isExlcude(DLSRegion region) {
+			for (ExcludeRegion v : values) {
+				if (v.name.equals(region.getSample().getName())
+						&&(v.from == region.getKeyfrom())
+						&& (v.to == region.getKeyto())
+						&& (v.unitynote == region.getSampleoptions().getUnitynote())) {
+					return true;
+				}
+			}
+			return false;
+		}
+		private final String name;
+		private final int from;
+		private final int to;
+		private final int unitynote;
+		private ExcludeRegion(String name, int from, int to, int unitynote) {
+			this.name = name;
+			this.from = from;
+			this.to = to;
+			this.unitynote = unitynote;
+		}
+	}
+
 	/**
 	 * DLSの情報に基づくOptions
 	 */
@@ -170,8 +199,8 @@ public final class InstClass {
 					double v = region.getSampleoptions().getAttenuation() / 655360.0;
 					boolean overlap = region.getOptions() == 1;
 					for (int i = region.getKeyfrom(); i <= region.getKeyto(); i++ ) {
-						if (validList[i] || (region.getSample().getName().equals("Pipe_c5") && region.getKeyfrom() == 60)) {
-							// 重複Regionがある場合は、あとのをスキップする。ロンカドーラが対象。
+						if (ExcludeRegion.isExlcude(region)) {
+							// 特定Regionを無効化する.
 							System.out.println("　　region skip > "+region.getSample().getName()+"["+region.getKeyfrom()+"-"+region.getKeyto()+"]");
 							region.setKeyfrom(0);
 							region.setKeyto(0);
