@@ -304,7 +304,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 			selectNote(null);
 		}
 		notePlayer.offNote();
-		mmlManager.updateActivePart(true);
+		mmlManager.updateActivePart(true, mmlManager.getActiveTrackIndex());
 	}
 
 	@Override

@@ -691,10 +691,19 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 
 	@Override
 	public void updateActivePart(boolean generate) {
+		updateActivePart(generate, -1);
+	}
+
+	@Override
+	public void updateActivePart(boolean generate, int trackIndex) {
 		NanoTime time = NanoTime.start();
 		if (generate) {
 			try {
-				mmlScore.generateAll();
+				if (trackIndex >= 0) {
+					mmlScore.generateOne(trackIndex);
+				} else {
+					mmlScore.generateAll();
+				}
 			} catch (UndefinedTickException e) {
 				EventQueue.invokeLater(() -> {
 					String msg = AppResource.appText("fail.mml_modify") + "\n" + e.getMessage();

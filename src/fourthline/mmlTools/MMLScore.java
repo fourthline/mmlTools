@@ -414,6 +414,11 @@ public final class MMLScore implements IMMLFileParser {
 		}
 	}
 
+	public MMLScore generateOne(int trackIndex) throws UndefinedTickException {
+		trackList.get(trackIndex).generate();
+		return this;
+	}
+
 	public MMLScore generateAll() throws UndefinedTickException {
 		exceptionStack.clear();
 		trackList.parallelStream().forEach(t -> {

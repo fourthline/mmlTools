@@ -17,6 +17,7 @@ public interface IMMLManager {
 	public int getActiveTrackIndex();
 	public MMLEventList getActiveMMLPart();
 	public void updateActivePart(boolean generate);
+	public void updateActivePart(boolean generate, int trackIndex);
 	public void updateActiveTrackProgram(int trackIndex, int program, int songProgram);
 	public int getActivePartProgram();
 	public boolean selectTrackOnExistNote(int note, int tickOffset);
