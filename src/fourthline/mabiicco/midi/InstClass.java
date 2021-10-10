@@ -150,7 +150,7 @@ public final class InstClass {
 		private static boolean isExlcude(DLSRegion region) {
 			for (ExcludeRegion v : values) {
 				if (v.name.equals(region.getSample().getName())
-						&&(v.from == region.getKeyfrom())
+						&& (v.from == region.getKeyfrom())
 						&& (v.to == region.getKeyto())
 						&& (v.unitynote == region.getSampleoptions().getUnitynote())) {
 					return true;

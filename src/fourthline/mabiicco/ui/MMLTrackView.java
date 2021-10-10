@@ -275,7 +275,7 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 	public void updateTrack() {
 		MMLTrack mmlTrack = mmlManager.getMMLScore().getTrack(trackIndex);
 		String mml[] = mmlTrack.getMabiMMLArray();
-		for (int i = 0; i < mmlText.length; i++) {
+		for (int i = 0, len = mmlText.length; i < len; i++) {
 			if (i < mml.length) {
 				mmlText[i].setText(mml[i]);
 			} else {

@@ -42,6 +42,8 @@ public final class MMLScore implements IMMLFileParser {
 	private int numTime = 4;
 	private int baseTime = 4;
 
+	private final Stack<UndefinedTickException> exceptionStack = new Stack<>();
+
 	/**
 	 * 新たにトラックを追加します.
 	 * @param track
@@ -413,7 +415,7 @@ public final class MMLScore implements IMMLFileParser {
 	}
 
 	public MMLScore generateAll() throws UndefinedTickException {
-		Stack<UndefinedTickException> exceptionStack = new Stack<>();
+		exceptionStack.clear();
 		trackList.parallelStream().forEach(t -> {
 			try {
 				t.generate();
