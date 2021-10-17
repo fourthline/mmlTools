@@ -695,7 +695,11 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	}
 
 	@Override
-	public void updateActivePart(boolean generate, int trackIndex) {
+	public void generateActiveTrack() {
+		updateActivePart(true, getActiveTrackIndex());
+	}
+
+	private void updateActivePart(boolean generate, int trackIndex) {
 		NanoTime time = NanoTime.start();
 		if (generate) {
 			try {

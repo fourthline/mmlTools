@@ -78,14 +78,14 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 				t -> {
 					// 音量コマンド挿入.
 					mmlManager.getActiveMMLPart().setVelocityCommand(popupTargetNote, t);
-					mmlManager.updateActivePart(true);
+					mmlManager.generateActiveTrack();
 				},
 				t -> {
 					// 選択したノートの音量を変更する.
 					for(MMLNoteEvent n : selectedNote) {
 						n.setVelocity(t);
 					}
-					mmlManager.updateActivePart(true);
+					mmlManager.generateActiveTrack();
 				});
 		newPopupMenu(AppResource.appText("part_change"), ActionDispatcher.PART_CHANGE);
 		newPopupMenu(AppResource.appText("edit.select_previous_all"), ActionDispatcher.SELECT_PREVIOUS_ALL);
@@ -304,7 +304,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 			selectNote(null);
 		}
 		notePlayer.offNote();
-		mmlManager.updateActivePart(true, mmlManager.getActiveTrackIndex());
+		mmlManager.generateActiveTrack();
 	}
 
 	@Override
@@ -496,7 +496,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 
 		selectNote(null);
 		editObserver.notifyUpdateEditState();
-		mmlManager.updateActivePart(true);
+		mmlManager.generateActiveTrack();
 	}
 
 	@Override
@@ -622,7 +622,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		MMLEventList editEventList = mmlManager.getActiveMMLPart();
 		if (editEventList != null) {
 			new MMLNotePropertyPanel(selectedNote.toArray(new MMLNoteEvent[selectedNote.size()]), editEventList).showDialog(parentFrame);
-			mmlManager.updateActivePart(true);
+			mmlManager.generateActiveTrack();
 		}
 	}
 
