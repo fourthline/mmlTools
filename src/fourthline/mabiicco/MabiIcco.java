@@ -73,7 +73,7 @@ public final class MabiIcco extends Application {
 				System.exit(1);
 			}
 			notifyPreloader(new MabiIccoPreloaderNotification("OK\n", 90));
-		} catch (Exception | Error e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
 			System.exit(1);
