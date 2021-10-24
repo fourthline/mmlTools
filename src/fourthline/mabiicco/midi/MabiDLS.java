@@ -13,6 +13,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.sound.midi.*;
@@ -62,12 +63,18 @@ public final class MabiDLS {
 	 */
 	public void initializeMIDI() throws MidiUnavailableException, InvalidMidiDataException, IOException, LineUnavailableException {
 		this.synthesizer = MidiSystem.getSynthesizer();
-		((SoftSynthesizer)this.synthesizer).open(wavout = new WavoutDataLine(), null);
+		HashMap<String, Object> info = new HashMap<>();
+		info.put("midi channels", "24");
+		info.put("large mode", "true");
+		info.put("load default soundbank", "false");
+		info.put("max polyphony", "96");
+		((SoftSynthesizer)this.synthesizer).open(wavout = new WavoutDataLine(), info);
 		addTrackEndNotifier(() -> wavout.stopRec());
 
 		long latency = this.synthesizer.getLatency();
 		int maxPolyphony = this.synthesizer.getMaxPolyphony();
-		System.out.printf("Latency: %d\nMaxPolyphony: %d\n", latency, maxPolyphony);
+		int midiChannels = this.synthesizer.getChannels().length;
+		System.out.printf("Latency: %d\nMaxPolyphony: %d\nChannels: %d\n", latency, maxPolyphony, midiChannels);
 
 		this.sequencer = MidiSystem.getSequencer();
 		this.sequencer.open();
@@ -418,7 +425,7 @@ public final class MabiDLS {
 
 	private void createVoiceMidiTrack(Sequence sequence, MMLScore score, int channel, int program) throws InvalidMidiDataException {
 		Track track = sequence.createTrack();
-		ShortMessage pcMessage = new ShortMessage(ShortMessage.PROGRAM_CHANGE, 
+		ShortMessage pcMessage = new ExtendMessage(ShortMessage.PROGRAM_CHANGE, 
 				channel,
 				program,
 				0);
@@ -442,7 +449,7 @@ public final class MabiDLS {
 	 */
 	private void convertMidiTrack(Track track, MMLTrack mmlTrack, int channel) throws InvalidMidiDataException {
 		int program = mmlTrack.getProgram();
-		ShortMessage pcMessage = new ShortMessage(ShortMessage.PROGRAM_CHANGE, 
+		ShortMessage pcMessage = new ExtendMessage(ShortMessage.PROGRAM_CHANGE, 
 				channel,
 				program,
 				0);
@@ -477,14 +484,14 @@ public final class MabiDLS {
 
 			try {
 				// ON イベント作成
-				MidiMessage message1 = new ShortMessage(ShortMessage.NOTE_ON, 
+				MidiMessage message1 = new ExtendMessage(ShortMessage.NOTE_ON, 
 						channel,
 						convertNoteMML2Midi(note), 
 						velocity);
 				track.add(new MidiEvent(message1, tickOffset));
 
 				// Off イベント作成
-				MidiMessage message2 = new ShortMessage(ShortMessage.NOTE_OFF,
+				MidiMessage message2 = new ExtendMessage(ShortMessage.NOTE_OFF,
 						channel, 
 						convertNoteMML2Midi(note),
 						0);
