@@ -32,7 +32,7 @@
 	<property name="app.main-class" value="fourthline.mabiicco.MabiIcco" />
 	<property name="app.preloader-class" value="fourthline.mabiicco.preloader.MabiIccoPreloader" />
 	<property name="splash.image" value="img/title.png" />
-	<property name="class.path" value="lib/commons-compress/commons-compress-1.9.jar" />
+	<property name="class.path" value="lib/commons-compress/commons-compress-1.9.jar;lib/javafx-sdk-17.0.1/lib/javafx.base.jar;lib/javafx-sdk-17.0.1/lib/javafx.controls.jar;lib/javafx-sdk-17.0.1/lib/javafx.fxml.jar;lib/javafx-sdk-17.0.1/lib/javafx.graphics.jar" />
 
 	<!-- clean task -->
 	<target name="clean">
@@ -50,7 +50,10 @@
 			excludes="**/package-info.java,com/,fourthline/mabiicco/fx/"
 			encoding="UTF-8"
 			listfiles="yes"
-			includeantruntime="false" />
+			includeantruntime="false">
+			<compilerarg line="--add-exports java.desktop/com.sun.media.sound=ALL-UNNAMED" />
+			<compilerarg line="--add-exports java.desktop/sun.swing=ALL-UNNAMED" />
+	</javac>
 	</target>
 
 	<!-- resources task -->
@@ -140,5 +143,8 @@
 				</fileset>
 			</batchtest>
 		</junit>
+	</target>
+
+	<target name="jre">
 	</target>
 </project>

@@ -42,15 +42,18 @@ public class MabiDLSTest extends UseLoadingDLS {
 	private void checkPanpot(int trackIndex, int midiChannel) {
 		System.out.println("checkPanpot "+trackIndex+" @ "+midiChannel);
 		assertEquals(64, dls.getSynthesizer().getChannels()[midiChannel].getController(10));
+		assertEquals(64, dls.getSynthesizer().getChannels()[midiChannel+24].getController(10));
 		dls.setChannelPanpot(trackIndex, 0);
 		assertEquals(0, dls.getSynthesizer().getChannels()[midiChannel].getController(10));
+		assertEquals(0, dls.getSynthesizer().getChannels()[midiChannel+24].getController(10));
 		dls.setChannelPanpot(trackIndex, 64);
 		assertEquals(64, dls.getSynthesizer().getChannels()[midiChannel].getController(10));
+		assertEquals(64, dls.getSynthesizer().getChannels()[midiChannel+24].getController(10));
 	}
 
 	@Test
 	public final void test() {
-		for (int i = 0; i < 16; i++) {
+		for (int i = 0; i < 24; i++) {
 			checkMute(i, i);
 			checkPanpot(i, i);
 		}
@@ -67,8 +70,9 @@ public class MabiDLSTest extends UseLoadingDLS {
 	public void test_createSequence() throws InvalidMidiDataException, UndefinedTickException {
 		MMLScore score = new MMLScore();
 		score.addTrack(new MMLTrack().setMML("MML@aat180aa,brb,crc,drd;").setProgram(5));
+		score.getTrack(0).setSongProgram(100);
 		Sequence seq = dls.createSequence(score);
-		assertEquals(3, seq.getTracks().length);
+		assertEquals(2, seq.getTracks().length);
 		assertEquals(MMLTicks.getTick("1"), seq.getTickLength());
 
 		byte a[][] = new byte[][] { 

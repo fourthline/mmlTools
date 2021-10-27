@@ -72,7 +72,6 @@ import java.util.function.IntConsumer;
  */
 public final class MMLSeqView implements IMMLManager, ChangeListener, ActionListener, MouseWheelListener {
 	private static final int INITIAL_TRACK_COUNT = 1;
-	public static final int MAX_MIDI_TRACK = 16;
 
 	private int trackCounter;
 
@@ -204,7 +203,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	}
 
 	private String getNewTrackName() {
-		if (trackCounter >= MAX_MIDI_TRACK * 4) {
+		if (trackCounter >= MMLScore.MAX_TRACK * 4) {
 			trackCounter = 0;
 		}
 		trackCounter++;

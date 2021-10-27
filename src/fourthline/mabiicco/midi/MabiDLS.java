@@ -39,7 +39,8 @@ public final class MabiDLS {
 	private MidiChannel channel[];
 	private ArrayList<MMLNoteEvent[]> playNoteList = new ArrayList<>();
 	private static final int MAX_CHANNEL_PLAY_NOTE = 4;
-	public static final int MAX_MIDI_PART = 32;
+	public static final int MAX_MIDI_PART = MMLScore.MAX_TRACK * 2;
+	private static final int MIDI_CHORUS_OFFSET = MMLScore.MAX_TRACK;
 	private ArrayList<InstClass> insts = new ArrayList<>();
 	private static final int DLS_BANK = (0x79 << 7);
 
@@ -64,7 +65,7 @@ public final class MabiDLS {
 	public void initializeMIDI() throws MidiUnavailableException, InvalidMidiDataException, IOException, LineUnavailableException {
 		this.synthesizer = MidiSystem.getSynthesizer();
 		HashMap<String, Object> info = new HashMap<>();
-		info.put("midi channels", "24");
+		info.put("midi channels", MAX_MIDI_PART);
 		info.put("large mode", "true");
 		info.put("load default soundbank", "false");
 		info.put("max polyphony", "96");
@@ -332,16 +333,19 @@ public final class MabiDLS {
 	public void setChannelPanpot(int ch, int panpot) {
 		if (ch < channel.length) {
 			channel[ch].controlChange(10, panpot);
+			channel[ch+MIDI_CHORUS_OFFSET].controlChange(10, panpot);
 		}
 	}
 
 	public void toggleMute(int ch) {
 		muteState[ch] = !muteState[ch];
+		muteState[ch+MIDI_CHORUS_OFFSET] = muteState[ch];
 		midiSetMuteState();
 	}
 
 	public void setMute(int ch, boolean mute) {
 		muteState[ch] = mute;
+		muteState[ch+MIDI_CHORUS_OFFSET] = muteState[ch];
 		midiSetMuteState();
 	}
 
@@ -353,6 +357,7 @@ public final class MabiDLS {
 		for (int i = 0; i < muteState.length; i++) {
 			muteState[i] = (i != ch);
 		}
+		muteState[ch+MIDI_CHORUS_OFFSET] = muteState[ch];
 		midiSetMuteState();
 	}
 
@@ -395,7 +400,10 @@ public final class MabiDLS {
 
 		int trackCount = 0;
 		for (MMLTrack mmlTrack : score.getTrackList()) {
-			convertMidiTrack(sequence.createTrack(), mmlTrack, trackCount);
+			convertMidiTrack(sequence.createTrack(), mmlTrack, trackCount, mmlTrack.getProgram());
+			if (mmlTrack.getSongProgram() >= 0) {
+				convertMidiTrack(sequence.createTrack(), mmlTrack, trackCount+MIDI_CHORUS_OFFSET, mmlTrack.getSongProgram());
+			}
 			trackCount++;
 			if (trackCount >= this.channel.length) {
 				break;
@@ -414,31 +422,7 @@ public final class MabiDLS {
 			track.add(new MidiEvent(message, tickOffset));
 		}
 
-		if (trackCount <= 13) {
-			// コーラスパートの作成
-			createVoiceMidiTrack(sequence, score, 13, 100); // 男声コーラス
-			createVoiceMidiTrack(sequence, score, 14, 110); // 女声コーラス
-		}
-
 		return sequence;
-	}
-
-	private void createVoiceMidiTrack(Sequence sequence, MMLScore score, int channel, int program) throws InvalidMidiDataException {
-		Track track = sequence.createTrack();
-		ShortMessage pcMessage = new ExtendMessage(ShortMessage.PROGRAM_CHANGE, 
-				channel,
-				program,
-				0);
-		track.add(new MidiEvent(pcMessage, 0));
-
-		for (MMLTrack mmlTrack : score.getTrackList()) {
-			if (mmlTrack.getSongProgram() != program) {
-				continue;
-			}
-
-			InstClass instClass = getInstByProgram(program);
-			convertMidiPart(track, mmlTrack.getMMLEventAtIndex(3).getMMLNoteEventList(), channel, instClass);
-		}
 	}
 
 	/**
@@ -447,15 +431,14 @@ public final class MabiDLS {
 	 * @param channel
 	 * @throws InvalidMidiDataException
 	 */
-	private void convertMidiTrack(Track track, MMLTrack mmlTrack, int channel) throws InvalidMidiDataException {
-		int program = mmlTrack.getProgram();
+	private void convertMidiTrack(Track track, MMLTrack mmlTrack, int channel, int targetProgram) throws InvalidMidiDataException {
 		ShortMessage pcMessage = new ExtendMessage(ShortMessage.PROGRAM_CHANGE, 
 				channel,
-				program,
+				targetProgram,
 				0);
 		track.add(new MidiEvent(pcMessage, 0));
-		boolean enablePart[] = InstClass.getEnablePartByProgram(program);
-		InstClass instClass = getInstByProgram(mmlTrack.getProgram());
+		boolean enablePart[] = InstClass.getEnablePartByProgram(targetProgram);
+		InstClass instClass = getInstByProgram(targetProgram);
 
 		MMLMidiTrack midiTrack = new MMLMidiTrack(instClass);
 		for (int i = 0; i < enablePart.length; i++) {

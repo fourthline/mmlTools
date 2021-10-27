@@ -10,15 +10,15 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.DragGestureListener;
 import java.awt.dnd.DragSource;
-import java.awt.dnd.InvalidDnDOperationException;
+import java.io.IOException;
 import java.util.OptionalInt;
 
-import javax.activation.ActivationDataFlavor;
-import javax.activation.DataHandler;
 import javax.swing.JTabbedPane;
 import javax.swing.TransferHandler;
 
@@ -67,14 +67,34 @@ public final class TrackTabbedPane extends JTabbedPane implements DragGestureLis
 		TrackTabbedPane tabbedPane = (TrackTabbedPane) c;
 
 		if (tabbedPane.getTabCount() > 1) {
-			try {
-				event.startDrag(DragSource.DefaultMoveDrop, new DataHandler(tabbedPane, DataFlavor.javaJVMLocalObjectMimeType));
-			} catch (InvalidDnDOperationException e) {
-				e.printStackTrace();
-			}
+			event.startDrag(DragSource.DefaultMoveDrop, new TrackTabTransfer(tabbedPane));
 		}
 	}
 
+	private final class TrackTabTransfer implements Transferable {
+		private final TrackTabbedPane content;
+		private DataFlavor f[] = {
+				new DataFlavor(TrackTabbedPane.class, "obj/TabbedPane")
+		};
+		private TrackTabTransfer(TrackTabbedPane c) {
+			this.content = c;
+		}
+
+		@Override
+		public DataFlavor[] getTransferDataFlavors() {
+			return f;
+		}
+
+		@Override
+		public boolean isDataFlavorSupported(DataFlavor flavor) {
+			return true;
+		}
+
+		@Override
+		public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+			return content;
+		}
+	}
 
 
 	private final class TrackTabTransferHandler extends TransferHandler {
@@ -88,7 +108,7 @@ public final class TrackTabbedPane extends JTabbedPane implements DragGestureLis
 			super();
 			this.pane = pane;
 			this.mmlManager = mmlManager;
-			dataFlavor = new ActivationDataFlavor(TrackTabbedPane.class, DataFlavor.javaJVMLocalObjectMimeType, "obj/TabbedPane");
+			dataFlavor = new DataFlavor(TrackTabbedPane.class, "obj/TabbedPane");
 		}
 
 		private OptionalInt getTargetIndex(Point p) {

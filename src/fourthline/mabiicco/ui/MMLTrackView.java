@@ -39,10 +39,10 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 
 	private static final long serialVersionUID = 4955513242349170508L;
 	public static final String MMLPART_NAME[] = {
-		AppResource.appText("melody"),
-		AppResource.appText("chord1"),
-		AppResource.appText("chord2"),
-		AppResource.appText("song")
+			AppResource.appText("melody"),
+			AppResource.appText("chord1"),
+			AppResource.appText("chord2"),
+			AppResource.appText("song")
 	};
 	private JToggleButton partButton[];
 	private JTextField mmlText[];
@@ -226,20 +226,13 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 	}
 
 	public void updateMuteButton() {
-		if (trackIndex < MMLSeqView.MAX_MIDI_TRACK) {
-			muteButton.setEnabled(true);
-			soloButton.setEnabled(true);
-			allButton.setEnabled(true);
-			if (MabiDLS.getInstance().getMute(trackIndex)) {
-				muteButton.setIcon(AppResource.getImageIcon(AppResource.appText("mmltrack.mute.on.icon")));
-			} else {
-				muteButton.setIcon(AppResource.getImageIcon(AppResource.appText("mmltrack.mute.off.icon")));
-			}
-		} else {
+		muteButton.setEnabled(true);
+		soloButton.setEnabled(true);
+		allButton.setEnabled(true);
+		if (MabiDLS.getInstance().getMute(trackIndex)) {
 			muteButton.setIcon(AppResource.getImageIcon(AppResource.appText("mmltrack.mute.on.icon")));
-			muteButton.setEnabled(false);
-			soloButton.setEnabled(false);
-			allButton.setEnabled(false);
+		} else {
+			muteButton.setIcon(AppResource.getImageIcon(AppResource.appText("mmltrack.mute.off.icon")));
 		}
 	}
 
@@ -286,9 +279,6 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 		setInstProgram(mmlTrack);
 		trackComposeLabel.setText(mmlTrack.mmlRankFormat());
 		String str = "   "+(trackIndex+1)+"/"+mmlManager.getMMLScore().getTrackCount();
-		if (trackIndex >= MMLSeqView.MAX_MIDI_TRACK) {
-			str += ":"+AppResource.appText("mmltrack.not_play");
-		}
 		trackIndexLabel.setText(str);
 	}
 

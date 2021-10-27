@@ -54,7 +54,7 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 
 	@Before @After
 	public void initMute() {
-		for (int i = 0; i < MabiDLS.MAX_MIDI_PART; i++) {
+		for (int i = 0; i < MMLScore.MAX_TRACK; i++) {
 			MabiDLS.getInstance().setMute(i, false);
 		}
 	}
