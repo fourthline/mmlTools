@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project name="MabiIcco"
 	basedir="."
-	default="jfx-package"
-	xmlns:fx="javafx:com.sun.javafx.tools.ant">
+	default="jar">
 
 	<!-- 環境変数 -->
 	<property environment="env" />
@@ -30,9 +29,7 @@
 	<property name="app.name" value="MabiIcco" />
 	<property name="app.version" value="1.0.53" />
 	<property name="app.main-class" value="fourthline.mabiicco.MabiIcco" />
-	<property name="app.preloader-class" value="fourthline.mabiicco.preloader.MabiIccoPreloader" />
-	<property name="splash.image" value="img/title.png" />
-	<property name="class.path" value="lib/commons-compress/commons-compress-1.9.jar;lib/javafx-sdk-17.0.1/lib/javafx.base.jar;lib/javafx-sdk-17.0.1/lib/javafx.controls.jar;lib/javafx-sdk-17.0.1/lib/javafx.fxml.jar;lib/javafx-sdk-17.0.1/lib/javafx.graphics.jar" />
+	<property name="class.path" value="lib/commons-compress/commons-compress-1.9.jar" />
 
 	<!-- clean task -->
 	<target name="clean">
@@ -68,38 +65,6 @@
 		</copy>
 	</target>
 
-	<!-- jfx-package task -->
-	<target name="jfx-package"
-		description="javafxpackage"
-		depends="compile,resources">
-		
-		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml"
-			uri="javafx:com.sun.javafx.tools.ant"
-			classpath="${javafx.tools.ant.jar}" />
-
-		<fx:application
-			id="app-info"
-			name="${app.name}"
-			mainClass="${app.main-class}"
-			preloaderClass="${app.preloader-class}">
-		</fx:application>
-
-		<fx:jar destfile="${jardest}/${app.id}.jar">
-			<fx:application refid="app-info" />
-			<fx:platform javafx="2.2+">
-			</fx:platform>
-			<manifest>
-				<attribute name="Implementation-Vendor" value="${app.vendor}" />
-				<attribute name="Implementation-Title" value="${app.name}" />
-				<attribute name="MabiIcco-Version" value="${app.version}" />
-				<attribute name="SplashScreen-Image" value="${splash.image}" />
-				<attribute name="Class-Path" value="${class.path}" />
-			</manifest>
-			<fileset dir="${dest}" />
-		</fx:jar>
-	</target>
-	<!-- // jfx-package task -->
-
 	<!-- compile-test task -->
 	<target name="compile-test" depends="clean">
 		<javac
@@ -121,7 +86,7 @@
 	</target>
 
 	<!-- test task -->
-	<target name="test" depends="jfx-package,compile-test">
+	<target name="test" depends="compile-test">
 		<junit printsummary="no">
 			<classpath>
 				<path refid="classpath"/>
@@ -145,6 +110,22 @@
 		</junit>
 	</target>
 
-	<target name="jre">
+
+	<!-- jar task -->
+	<target name="jar"
+		description="jar"
+		depends="compile,resources">
+		<jar jarfile="${jardest}/${app.id}.jar">
+			<fileset dir="${dest}" />
+			<manifest>
+				<attribute name="Main-Class" value="${app.main-class}"/>
+				<attribute name="Implementation-Vendor" value="${app.vendor}" />
+				<attribute name="Implementation-Title" value="${app.name}" />
+				<attribute name="MabiIcco-Version" value="${app.version}" />
+				<attribute name="SplashScreen-Image" value="${splash.image}" />
+				<attribute name="Class-Path" value="${class.path}" />
+			</manifest>
+		</jar>
 	</target>
+	<!-- // jar task -->
 </project>
