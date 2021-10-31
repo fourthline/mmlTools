@@ -118,31 +118,31 @@ public final class MabiIcco {
 				return type.allowTempoChordPart();
 			});
 
+			// loading DLS
 			updateProgress(AppResource.appText("init.dls"), 20);
 			if ( !loadDLSFiles(20, 70) ) {
 				JOptionPane.showMessageDialog(null, AppResource.appText("error.needDls"), "ERROR", JOptionPane.ERROR_MESSAGE);
 				System.exit(1);
 			}
 			updateProgress("OK\n", 90);
+
+			// create MainFrame
+			ActionDispatcher dispatcher = ActionDispatcher.getInstance();
+			MainFrame mainFrame = new MainFrame(dispatcher);
+			mainFrame.setTransferHandler(new FileTransferHandler(dispatcher));
+			updateProgress("", 100);
+			dispatcher.setMainFrame(mainFrame).initialize();
+			if (dispatcher.recoveryCheck()) {
+			} else if (args.length > 0) {
+				dispatcher.checkAndOpenMMLFile(new File(args[0]));
+			}
+			mainFrame.setVisible(true);
+			splash.dispose();
 		} catch (Throwable e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
 			System.exit(1);
 		}
-
-		ActionDispatcher dispatcher = ActionDispatcher.getInstance();
-		MainFrame mainFrame = new MainFrame(dispatcher);
-		mainFrame.setTransferHandler(new FileTransferHandler(dispatcher));
-		updateProgress("", 100);
-		dispatcher.setMainFrame(mainFrame).initialize();
-		if (dispatcher.recoveryCheck()) {
-		} else if (args.length > 0) {
-			dispatcher.checkAndOpenMMLFile(new File(args[0]));
-		}
-		try {
-			this.splash.dispose();
-		} catch (IllegalStateException e) {}
-		mainFrame.setVisible(true);
 	}
 
 	/**
