@@ -136,8 +136,8 @@ public final class MabiIcco {
 		updateProgress("", 100);
 		dispatcher.setMainFrame(mainFrame).initialize();
 		if (dispatcher.recoveryCheck()) {
-		} else if (args.length > 1) {
-			dispatcher.checkAndOpenMMLFile(new File(args[1]));
+		} else if (args.length > 0) {
+			dispatcher.checkAndOpenMMLFile(new File(args[0]));
 		}
 		try {
 			this.splash.dispose();
