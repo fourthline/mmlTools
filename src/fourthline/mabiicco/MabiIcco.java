@@ -16,8 +16,8 @@ import java.util.List;
 import javax.sound.midi.InvalidMidiDataException;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -48,7 +48,7 @@ import fourthline.mmlTools.MMLTrack;
  */
 public final class MabiIcco {
 	private final String args[];
-	private final JFrame splash = new JFrame();
+	private final JDialog splash = new JDialog();
 	private final SplashPanel splashPanel = new SplashPanel();
 
 	private final class SplashPanel extends JPanel {

@@ -6,8 +6,8 @@ package fourthline.mabiicco.ui.editor;
 
 import java.awt.Cursor;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.InputEvent;
 
 import javax.swing.SwingUtilities;
 
@@ -33,7 +33,7 @@ enum EditMode {
 				EditMode next = INSERT;
 				if (context.onExistNote(startPoint)) {
 					// ノート上であれば、ノートを選択状態にする. 複数選択判定も.
-					context.selectNoteByPoint(startPoint, e.getModifiers());
+					context.selectNoteByPoint(startPoint, e.getModifiersEx());
 					if (context.isEditLengthPosition(startPoint)) {
 						next = LENGTH;
 					} else {
@@ -51,7 +51,7 @@ enum EditMode {
 		public void executeEvent(IEditContext context, MouseEvent e) {
 			int cursorType = Cursor.DEFAULT_CURSOR;
 			Point p = e.getPoint();
-			boolean onOption = (e.getModifiers() == ActionEvent.SHIFT_MASK + ActionEvent.CTRL_MASK);
+			boolean onOption = (e.getModifiersEx() == InputEvent.SHIFT_DOWN_MASK + InputEvent.CTRL_DOWN_MASK);
 			if (context.onExistNote(p)) {
 				if (context.isEditLengthPosition(p)) {
 					cursorType = Cursor.E_RESIZE_CURSOR;
@@ -107,7 +107,7 @@ enum EditMode {
 		public void executeEvent(IEditContext context, MouseEvent e) {
 			// 選択中のNoteを移動
 			boolean shiftOption = false;
-			if ( (e.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
+			if ( (e.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK) != 0) {
 				shiftOption = true;
 			}
 			context.moveSelectedMMLNote(startPoint, e.getPoint(), shiftOption);

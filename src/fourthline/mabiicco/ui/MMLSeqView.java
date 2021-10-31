@@ -568,15 +568,15 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		JViewport viewport = scrollPane.getViewport();
 		Point p = viewport.getViewPosition();
-		int modifiers = e.getModifiers();
+		int modifiers = e.getModifiersEx();
 		int rotation = e.getWheelRotation();
-		if (modifiers == InputEvent.CTRL_MASK) {
+		if (modifiers == InputEvent.CTRL_DOWN_MASK) {
 			if (rotation < 0) {
 				expandPianoViewWide( e.getX() - p.x );
 			} else {
 				reducePianoViewWide( e.getX() - p.x );
 			}
-		} else if (modifiers == InputEvent.SHIFT_MASK) {
+		} else if (modifiers == InputEvent.SHIFT_DOWN_MASK) {
 			p.x += (rotation * 16);
 			if (p.x < 0) {
 				p.x = 0;

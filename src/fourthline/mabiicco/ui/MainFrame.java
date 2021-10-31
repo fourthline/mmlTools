@@ -205,14 +205,14 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		menuBar.add(fileMenu);
 
 		createMenuItem(fileMenu, "menu.newFile", ActionDispatcher.NEW_FILE, true,
-				KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
 		createMenuItem(fileMenu, "menu.openFile", ActionDispatcher.FILE_OPEN, true,
-				KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
 		reloadMenuItem = createMenuItem(fileMenu, "menu.reloadFile", ActionDispatcher.RELOAD_FILE, true);
 		saveMenuItem = createMenuItem(fileMenu, "menu.saveFile", ActionDispatcher.SAVE_FILE,
-				KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
 		createMenuItem(fileMenu, "menu.saveAsFile", ActionDispatcher.SAVEAS_FILE,
-				KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK | InputEvent.SHIFT_DOWN_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
 
 		fileMenu.add(new JSeparator());
 
@@ -238,25 +238,25 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		menuBar.add(editMenu);
 
 		undoMenu = createMenuItem(editMenu, "menu.undo", ActionDispatcher.UNDO,
-				KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK));
 		redoMenu = createMenuItem(editMenu, "menu.redo", ActionDispatcher.REDO,
-				KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK));
 
 		editMenu.add(new JSeparator());	
 
 		cutMenu = createMenuItem(editMenu, "menu.cut", ActionDispatcher.CUT,
-				KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK));
 		copyMenu = createMenuItem(editMenu, "menu.copy", ActionDispatcher.COPY,
-				KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
 		pasteMenu = createMenuItem(editMenu, "menu.paste", ActionDispatcher.PASTE,
-				KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK));
 		deleteMenu = createMenuItem(editMenu, "menu.delete", ActionDispatcher.DELETE,
 				KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
 
 		editMenu.add(new JSeparator());
 
 		createMenuItem(editMenu, "menu.selectAll", ActionDispatcher.SELECT_ALL,
-				KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK));
 
 		editMenu.add(new JSeparator());
 
@@ -274,29 +274,29 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createMenuItem(editMenu, "edit.allClearTempo", ActionDispatcher.ALL_CLEAR_TEMPO, true);
 		createMenuItem(editMenu, "mml.generate", ActionDispatcher.MML_GENERATE, true);
 		createMenuItem(editMenu, "edit.keyboard.input", ActionDispatcher.KEYBOARD_INPUT, true,
-				KeyStroke.getKeyStroke(KeyEvent.VK_K, InputEvent.CTRL_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_K, InputEvent.CTRL_DOWN_MASK));
 
 		/************************* Track Menu *************************/
 		JMenu trackMenu = new JMenu(appText("menu.track"));
 		menuBar.add(trackMenu);
 
 		createMenuItem(trackMenu, "menu.addTrack", ActionDispatcher.ADD_TRACK, true,
-				KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK));
 		createMenuItem(trackMenu, "menu.removeTrack", ActionDispatcher.REMOVE_TRACK, true,
-				KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
 
 		trackMenu.add(new JSeparator());
 
 		createMenuItem(trackMenu, "menu.trackProperty", ActionDispatcher.TRACK_PROPERTY, true,
-				KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.ALT_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.ALT_DOWN_MASK));
 		createMenuItem(trackMenu, "edit.tracks.view", ActionDispatcher.TRACKS_VIEW, false);
 
 		trackMenu.add(new JSeparator());
 
 		createMenuItem(trackMenu, "menu.mml_import", ActionDispatcher.MML_IMPORT, true,
-				KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
 		createMenuItem(trackMenu, "menu.mml_export", ActionDispatcher.MML_EXPORT,
-				KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
 
 		/************************* Play Menu *************************/
 		JMenu playMenu = new JMenu(appText("menu.operate"));
@@ -706,17 +706,17 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 				() -> paintModeSelect.setSelectedItem(PaintMode.ALL_TRACK));
 
 		createKeyAction(ActionDispatcher.SWITCH_TRACK_NEXT,
-				KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.CTRL_MASK),
+				KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.CTRL_DOWN_MASK),
 				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.SWITCH_TRACK_NEXT)));
 		createKeyAction(ActionDispatcher.SWITCH_TRACK_PREV,
-				KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.CTRL_MASK),
+				KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.CTRL_DOWN_MASK),
 				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.SWITCH_TRACK_PREV)));
 
 		createKeyAction(ActionDispatcher.SWITCH_MMLPART_NEXT,
-				KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.CTRL_MASK),
+				KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.CTRL_DOWN_MASK),
 				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.SWITCH_MMLPART_NEXT)));
 		createKeyAction(ActionDispatcher.SWITCH_MMLPART_PREV,
-				KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_MASK),
+				KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_DOWN_MASK),
 				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.SWITCH_MMLPART_PREV)));
 
 		createKeyAction(ActionDispatcher.PLAY,

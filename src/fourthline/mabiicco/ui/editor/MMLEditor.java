@@ -15,7 +15,7 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -186,10 +186,10 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 				return;
 			}
 
-			if ( (selectedNote.size() == 1) && ((selectModifiers & ActionEvent.SHIFT_MASK) != 0) ) {
+			if ( (selectedNote.size() == 1) && ((selectModifiers & InputEvent.SHIFT_DOWN_MASK) != 0) ) {
 				selectMultipleNote(selectedNote.get(0), noteEvent, false);
 			} else {
-				selectNote(noteEvent, ((selectModifiers & ActionEvent.CTRL_MASK) != 0));
+				selectNote(noteEvent, ((selectModifiers & InputEvent.CTRL_DOWN_MASK) != 0));
 			}
 		}
 	}
