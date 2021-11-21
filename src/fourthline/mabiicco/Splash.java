@@ -58,7 +58,7 @@ public final class Splash extends JDialog {
 			add(textArea);
 			textArea.setEditable(false);
 			textArea.setBounds(20, 100, WIDTH-40, 80);
-			textArea.setBorder(new RoundBorder(30, 10));
+			textArea.setBorder(new RoundBorder(20, 10));
 			setOpaque(false);
 			setBorder(new LineBorder(Color.GRAY, 1, false));
 		}
