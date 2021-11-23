@@ -35,13 +35,13 @@ import fourthline.mmlTools.core.MMLText;
 
 public final class MMLOutputPanel extends JPanel {
 	private static final long serialVersionUID = 8558159209741558854L;
-	private final TrackListTable table;
+	final TrackListTable table;
 	private final JDialog dialog;
 	private final Window parentFrame;
 	private final JButton splitButton = new JButton(AppResource.appText("mml.output.split"));
 
 	private List<MMLTrack> trackList;
-	private List<String> outputTextList = new ArrayList<>();
+	List<String> outputTextList = new ArrayList<>();
 
 	public MMLOutputPanel(Frame parentFrame) {
 		this.dialog = null;
@@ -156,10 +156,19 @@ public final class MMLOutputPanel extends JPanel {
 	 */
 	private void currentSelectedTrackMMLSplitOutput() {
 		int row = table.getSelectedRow();
+		createSelectedTrackMMLSplitPanel(row).showDialog();
+		nextSelect(row);
+	}
+
+	/**
+	 * 楽譜集分割用のパネルを作成する
+	 */
+	MMLOutputPanel createSelectedTrackMMLSplitPanel(int row) {
 		MMLTrack track = trackList.get(row);
 		MMLText mmlText = new MMLText().setMMLText( outputTextList.get(row) );
-		new MMLOutputPanel(dialog, track, mmlText.splitMML(ComposeRank.getTopRank())).showDialog();
-		nextSelect(row);
+		mmlText.setExcludeSongPart(track.isExcludeSongPart());
+		ComposeRank topRank = !track.isExcludeSongPart() ? ComposeRank.getTopRank() : ComposeRank.getTopExcludeSongRank();
+		return new MMLOutputPanel(dialog, track, mmlText.splitMML(topRank));
 	}
 
 	private void checkSplitCopy() {

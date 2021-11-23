@@ -1,11 +1,12 @@
 /*
- * Copyright (C) 2013-2017 たんらる
+ * Copyright (C) 2013-2021 たんらる
  */
 
 package fourthline.mmlTools;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import fourthline.mmlTools.core.ResourceLoader;
@@ -18,10 +19,19 @@ public final class ComposeRank {
 	/** 作曲不可ランク */
 	final private static ComposeRank RANK_0 = new ComposeRank(0, 0, 0, "-");
 
-	final private static ArrayList<ComposeRank> rankList;
+	final private static ArrayList<ComposeRank> rankList = new ArrayList<>();
+	final private static ArrayList<ComposeRank> excludeSongRankList = new ArrayList<>();
 	static {
-		rankList = new ArrayList<>();
-		ResourceBundle bundle = ResourceBundle.getBundle(RESOURCE_NAME, new ResourceLoader());
+		loadRankResource(rankList, RESOURCE_NAME);
+		rankList.forEach(t -> {
+			int d = t.getMelody() / 3;
+			ComposeRank r = new ComposeRank(t.getMelody()+d, t.getChord1()+d, t.getChord2()+d, t.getRank()+'`');
+			excludeSongRankList.add(r);
+		});
+	}
+
+	static private void loadRankResource(List<ComposeRank> list, String name) {
+		ResourceBundle bundle = ResourceBundle.getBundle(name, new ResourceLoader());
 		for (String key : Collections.list(bundle.getKeys()) ) {
 			String s[] = bundle.getString(key).split(",");
 			if (s.length != 4) {
@@ -30,10 +40,10 @@ public final class ComposeRank {
 			int melody = Integer.parseInt(s[0].trim());
 			int chord1 = Integer.parseInt(s[1].trim());
 			int chord2 = Integer.parseInt(s[2].trim());
-			rankList.add( new ComposeRank(melody, chord1, chord2, s[3].trim()) );
+			list.add( new ComposeRank(melody, chord1, chord2, s[3].trim()) );
 		}
 
-		rankList.sort((rank1, rank2) -> {
+		list.sort((rank1, rank2) -> {
 			return (rank1.melody + rank1.chord1 + rank1.chord2)
 					- (rank2.melody + rank2.chord1 + rank2.chord2);
 		});
@@ -41,6 +51,10 @@ public final class ComposeRank {
 
 	public static ComposeRank getTopRank() {
 		return rankList.get(rankList.size()-1);
+	}
+
+	public static ComposeRank getTopExcludeSongRank() {
+		return excludeSongRankList.get(excludeSongRankList.size()-1);
 	}
 
 	private int melody;
@@ -61,23 +75,24 @@ public final class ComposeRank {
 	}
 
 	public static ComposeRank mmlRank(int melody, int chord1, int chord2, int songEx) {
-		for (ComposeRank rank : rankList) {
+		return mmlRank(rankList, melody, chord1, chord2, songEx);
+	}
+
+	public static ComposeRank mmlExcludeSongRank(String melody, String chord1, String chord2, String songEx) {
+		return mmlExcludeSongRank( melody.length(), chord1.length(), chord2.length(), songEx.length() );
+	}
+
+	public static ComposeRank mmlExcludeSongRank(int melody, int chord1, int chord2, int songEx) {
+		return mmlRank(excludeSongRankList, melody, chord1, chord2, songEx);
+	}
+
+	private static ComposeRank mmlRank(List<ComposeRank> list, int melody, int chord1, int chord2, int songEx) {
+		for (ComposeRank rank : list) {
 			if (rank.compare(melody, chord1, chord2, songEx))
 				return rank;
 		}
 
 		return RANK_0;
-	}
-
-	/**
-	 * for Test, package private
-	 * @param melody
-	 * @param chord1
-	 * @param chord2
-	 * @return
-	 */
-	static ComposeRank createComposeRank(int melody, int chord1, int chord2) {
-		return new ComposeRank(melody, chord1, chord2);
 	}
 
 	private ComposeRank() {}

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2017 たんらる
+ * Copyright (C) 2013-2021 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -60,7 +60,9 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 	private IMMLManager mmlManager;
 
 	private final InstClass noUseSongEx = new InstClass(AppResource.appText("instrument.nouse_chorus")+",0", -1, -1, null);
+	private final InstClass excludeSongPart = new InstClass(AppResource.appText("instrument.excludeSongPart")+",0", -2, -2, null);
 	private int trackIndex;
+	private boolean disableAction = false;
 
 	private JPanel mmlTextPanel = new JPanel();
 
@@ -105,6 +107,7 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 		comboBox = new JComboBox<>( MabiDLS.getInstance().getAvailableInstByInstType(InstType.MAIN_INST_LIST) );
 		songComboBox = new JComboBox<>( MabiDLS.getInstance().getAvailableInstByInstType(InstType.SUB_INST_LIST) );
 		songComboBox.addItem(noUseSongEx);
+		songComboBox.addItem(excludeSongPart);
 		songComboBox.setSelectedItem(noUseSongEx);
 		comboBox.setFocusable(false);
 		songComboBox.setFocusable(false);
@@ -277,14 +280,32 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 		}
 
 		setInstProgram(mmlTrack);
+		updateRankFormat(mmlTrack);
+	}
+
+	private void updateRankFormat(MMLTrack mmlTrack) {
 		trackComposeLabel.setText(mmlTrack.mmlRankFormat());
 		String str = "   "+(trackIndex+1)+"/"+mmlManager.getMMLScore().getTrackCount();
 		trackIndexLabel.setText(str);
 	}
 
+	private InstClass convertInstBySongProgram(InstClass inst, int songProgram) {
+		InstClass songInst = MabiDLS.getInstance().getInstByProgram(songProgram);
+		if (songInst != null) {
+			return songInst;
+		}
+
+		if ( (songProgram == excludeSongPart.getProgram()) && (inst.getType() != InstType.VOICE) ) {
+			return excludeSongPart;
+		}
+		return noUseSongEx;
+	}
+
 	private void setInstProgram(MMLTrack track) {
 		int program = track.getProgram();
 		int songProgram = track.getSongProgram();
+
+		disableAction = true;
 		InstClass inst = MabiDLS.getInstance().getInstByProgram(program);
 		if (inst != null) {
 			comboBox.setSelectedItem(inst);
@@ -293,14 +314,11 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 			program = ((InstClass) comboBox.getSelectedItem()).getProgram();
 			track.setProgram(program);
 		}
-		InstClass songInst = MabiDLS.getInstance().getInstByProgram(songProgram);
-		if ( (songInst != null) && (songInst.getType() == InstType.CHORUS) ) {
-			songComboBox.setSelectedItem(songInst);
-		} else {
-			songComboBox.setSelectedItem(noUseSongEx);
-			songProgram = ((InstClass) songComboBox.getSelectedItem()).getProgram();
-			track.setSongProgram(songProgram);
-		}
+
+		InstClass songInst = convertInstBySongProgram(inst, songProgram);
+		songComboBox.setSelectedItem(songInst);
+		track.setSongProgram(songInst.getProgram());
+		disableAction = false;
 
 		updateProgramChangeStatus();
 	}
@@ -315,23 +333,25 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 	 */
 	private void updateProgramChangeStatus() {
 		InstClass inst = (InstClass) comboBox.getSelectedItem();
+		MMLTrack track = mmlManager.getMMLScore().getTrack(trackIndex);
+
 		if (inst.getType() == InstType.VOICE) {
-			songComboBox.setSelectedItem(noUseSongEx);
 			songComboBox.setVisible(false);
 		} else {
 			songComboBox.setVisible(true);
 		}
+
 		updatePartButtonStatus();
 
 		InstClass songInst = ((InstClass) songComboBox.getSelectedItem());
 		int program = inst.getProgram();
-		int songProgram = songInst.getProgram();
-		MMLTrack track = mmlManager.getMMLScore().getTrack(trackIndex);
+		int songProgram = convertInstBySongProgram(inst, songInst.getProgram()).getProgram();
 		if ( (track.getProgram() == program) && (track.getSongProgram() == songProgram) ) {
 			return;
 		}
 
 		mmlManager.updateActiveTrackProgram(trackIndex, program, songProgram);
+		updateRankFormat(track);
 	}
 
 	private void updatePartButtonStatus() {
@@ -385,6 +405,9 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		if (disableAction) {
+			return;
+		}
 		Object source = e.getSource();
 		if (source instanceof JComboBox<?>) {
 			updateProgramChangeStatus();
@@ -398,5 +421,17 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 			MabiDLS.getInstance().all();
 			updateMuteButton();
 		}
+	}
+
+	JComboBox<InstClass> getComboBox() {
+		return comboBox;
+	}
+
+	JComboBox<InstClass> getSongComboBox() {
+		return songComboBox;
+	}
+
+	String getRankText() {
+		return trackComposeLabel.getText();
 	}
 }

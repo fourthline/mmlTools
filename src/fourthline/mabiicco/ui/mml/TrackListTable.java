@@ -206,4 +206,8 @@ public final class TrackListTable extends JTable {
 		ComposeRank rank = checkTableModel.rankList.get(row);
 		return !rank.canCompose();
 	}
+
+	public ComposeRank getRank(int index) {
+		return checkTableModel.rankList.get(index);
+	}
 }

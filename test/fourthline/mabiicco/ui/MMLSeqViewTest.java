@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2017 たんらる
+ * Copyright (C) 2015-2021 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -12,6 +12,7 @@ import java.lang.reflect.Field;
 import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
+import javax.swing.JTabbedPane;
 import javax.swing.JViewport;
 
 import static org.junit.Assert.*;
@@ -24,6 +25,7 @@ import org.junit.Test;
 
 import fourthline.UseLoadingDLS;
 import fourthline.mabiicco.MabiIccoProperties;
+import fourthline.mabiicco.midi.InstType;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLNoteEvent;
@@ -476,5 +478,54 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 		assertEquals(false, dls.getMute(0));
 		assertEquals(true, dls.getMute(1));
 		assertEquals(false, dls.getMute(2));
+	}
+
+
+	@Test
+	public void test_changeInst() throws Exception {
+		MMLTrack track1 = createMMLTrack(1200, 400, 400, 1200, false);
+		MMLScore score = new MMLScore();
+		score.addTrack(track1);
+		obj.setMMLScore(score);
+		
+		JTabbedPane tabbedPane = (JTabbedPane) getField("tabbedPane");
+		MMLTrackView view = (MMLTrackView) tabbedPane.getComponentAt(0);
+
+		assertEquals(false, obj.getFileState().canUndo());
+		assertEquals(false, obj.getFileState().canRedo());
+		assertEquals(false, obj.getSelectedTrack().isExcludeSongPart());
+		assertEquals("*Rank 1 ( 1200, 400, 400, 1200 )", view.getRankText());
+
+		// 歌パートを除外する
+		view.getSongComboBox().setSelectedIndex(3);
+		assertEquals(true, obj.getSelectedTrack().isExcludeSongPart());
+		assertEquals("*Rank 7` ( 1200, 400, 400 )", view.getRankText());
+
+		// 歌の音源に変更する
+		view.getComboBox().setSelectedIndex(38);
+		assertEquals(InstType.VOICE, MabiDLS.getInstance().getInstByProgram(obj.getSelectedTrack().getProgram()).getType());
+		assertEquals(false, obj.getSelectedTrack().isExcludeSongPart());
+		assertEquals("*Rank 1 ( 1200, 400, 400, 1200 )", view.getRankText());
+
+		assertEquals(true, obj.getFileState().canUndo());
+		assertEquals(false, obj.getFileState().canRedo());
+
+		// undo
+		obj.undo();
+		assertEquals(0, obj.getMMLScore().getTrack(0).getProgram());
+		assertEquals(-2, obj.getMMLScore().getTrack(0).getSongProgram());
+		assertEquals(true, obj.getFileState().canUndo());
+		assertEquals(true, obj.getFileState().canRedo());
+		assertEquals(true, obj.getSelectedTrack().isExcludeSongPart());
+		assertEquals("Rank 7` ( 1200, 400, 400 )", view.getRankText());
+
+		// undo
+		obj.undo();
+		assertEquals(0, obj.getMMLScore().getTrack(0).getProgram());
+		assertEquals(-1, obj.getMMLScore().getTrack(0).getSongProgram());
+		assertEquals(false, obj.getFileState().canUndo());
+		assertEquals(true, obj.getFileState().canRedo());
+		assertEquals(false, obj.getSelectedTrack().isExcludeSongPart());
+		assertEquals("Rank 1 ( 1200, 400, 400, 1200 )", view.getRankText());
 	}
 }
