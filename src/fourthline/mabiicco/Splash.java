@@ -81,8 +81,10 @@ public final class Splash extends JDialog {
 			@Override
 			public void paintBorder(Component c, Graphics g, int x, int y, int w, int h) {
 				Graphics2D g2 = (Graphics2D) g.create();
-				g2.setColor(Color.GRAY);
+				g2.setColor(new Color(0.7f, 0.7f, 0.7f));
 				g2.drawRoundRect(0, 0, w-1, h-1, r, r);
+				g2.setColor(new Color(0.6f, 0.6f, 0.6f));
+				g2.drawRoundRect(1, 1, w-3, h-3, r, r);
 				g2.dispose();
 			}
 
