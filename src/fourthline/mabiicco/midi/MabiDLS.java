@@ -396,22 +396,14 @@ public final class MabiDLS {
 	 * @throws InvalidMidiDataException 
 	 */
 	public Sequence createSequence(MMLScore score) throws InvalidMidiDataException {
+		return createSequence(score, 1);
+	}
+
+	public Sequence createSequence(MMLScore score, int startOffset) throws InvalidMidiDataException {
 		Sequence sequence = new Sequence(Sequence.PPQ, MMLTickTable.TPQN);
 
-		int trackCount = 0;
-		for (MMLTrack mmlTrack : score.getTrackList()) {
-			convertMidiTrack(sequence.createTrack(), mmlTrack, trackCount, mmlTrack.getProgram());
-			if (mmlTrack.getSongProgram() >= 0) {
-				convertMidiTrack(sequence.createTrack(), mmlTrack, trackCount+MIDI_CHORUS_OFFSET, mmlTrack.getSongProgram());
-			}
-			trackCount++;
-			if (trackCount >= this.channel.length) {
-				break;
-			}
-		}
-
 		// グローバルテンポ
-		Track track = sequence.getTracks()[0];
+		Track track = sequence.createTrack();
 		List<MMLTempoEvent> globalTempoList = score.getTempoEventList();
 		for (MMLTempoEvent tempoEvent : globalTempoList) {
 			byte tempo[] = tempoEvent.getMetaData();
@@ -420,6 +412,18 @@ public final class MabiDLS {
 			MidiMessage message = new MetaMessage(MMLTempoEvent.META, 
 					tempo, tempo.length);
 			track.add(new MidiEvent(message, tickOffset));
+		}
+
+		int trackCount = 0;
+		for (MMLTrack mmlTrack : score.getTrackList()) {
+			convertMidiTrack(sequence.createTrack(), mmlTrack, trackCount, mmlTrack.getProgram(), startOffset);
+			if (mmlTrack.getSongProgram() >= 0) {
+				convertMidiTrack(sequence.createTrack(), mmlTrack, trackCount+MIDI_CHORUS_OFFSET, mmlTrack.getSongProgram(), startOffset);
+			}
+			trackCount++;
+			if (trackCount >= this.channel.length) {
+				break;
+			}
 		}
 
 		return sequence;
@@ -431,7 +435,7 @@ public final class MabiDLS {
 	 * @param channel
 	 * @throws InvalidMidiDataException
 	 */
-	private void convertMidiTrack(Track track, MMLTrack mmlTrack, int channel, int targetProgram) throws InvalidMidiDataException {
+	private void convertMidiTrack(Track track, MMLTrack mmlTrack, int channel, int targetProgram, int startOffset) throws InvalidMidiDataException {
 		ShortMessage pcMessage = new ExtendMessage(ShortMessage.PROGRAM_CHANGE, 
 				channel,
 				targetProgram,
@@ -447,18 +451,18 @@ public final class MabiDLS {
 				midiTrack.add(eventList.getMMLNoteEventList());
 			}
 		}
-		convertMidiPart(track, midiTrack.getNoteEventList(), channel, instClass);
+		convertMidiPart(track, midiTrack.getNoteEventList(), channel, instClass, startOffset);
 	}
 
-	private void convertMidiPart(Track track, List<MMLNoteEvent> eventList, int channel, InstClass inst) {
+	private void convertMidiPart(Track track, List<MMLNoteEvent> eventList, int channel, InstClass inst, int startOffset) {
 		int velocity = MMLNoteEvent.INIT_VOL;
 
 		// Noteイベントの変換
 		for ( MMLNoteEvent noteEvent : eventList ) {
 			int note = noteEvent.getNote();
 			int tick = noteEvent.getTick();
-			int tickOffset = noteEvent.getTickOffset() + 1;
-			int endTickOffset = tickOffset + tick - 1;
+			int tickOffset = noteEvent.getTickOffset() + startOffset;
+			int endTickOffset = tickOffset + tick - startOffset;
 
 			// ボリュームの変更
 			if (noteEvent.getVelocity() >= 0) {
