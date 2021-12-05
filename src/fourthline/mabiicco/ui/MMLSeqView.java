@@ -695,7 +695,8 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 
 	@Override
 	public void generateActiveTrack() {
-		updateActivePart(true, getActiveTrackIndex());
+		// 単一のTrackだけを更新したいところであるが, 整合性を保つために全体をGenerateする. 
+		updateActivePart(true, -1);
 	}
 
 	private void updateActivePart(boolean generate, int trackIndex) {
