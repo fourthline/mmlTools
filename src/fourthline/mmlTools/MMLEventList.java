@@ -20,6 +20,7 @@ import fourthline.mmlTools.parser.MMLEventParser;
  */
 public final class MMLEventList implements Serializable, Cloneable {
 	private static final long serialVersionUID = -1430758411579285535L;
+	private static final int STRING_BUILDER_SIZE = 2048;
 
 	private List<MMLNoteEvent>   noteList   = new ArrayList<>();
 	private List<MMLTempoEvent>  tempoList;
@@ -390,7 +391,7 @@ public final class MMLEventList implements Serializable, Cloneable {
 			throws UndefinedTickException {
 		//　テンポ
 		LinkedList<MMLTempoEvent> localTempoList = new LinkedList<>(tempoList);
-		StringBuilder sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder(STRING_BUILDER_SIZE);
 
 		// initial note: octave 4, tick 0, offset 0, velocity 8
 		MMLNoteEvent prevNoteEvent = new MMLNoteEvent(12*4, 0, 0, MMLNoteEvent.INIT_VOL);
@@ -515,7 +516,7 @@ public final class MMLEventList implements Serializable, Cloneable {
 	 */
 	public String toMMLStringMusicQ(List<MMLTempoEvent> localTempoList, int totalTick, List<MMLEventList> relationPart)
 			throws UndefinedTickException {
-		StringBuilder sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder(STRING_BUILDER_SIZE);
 		int tempoIndex = 0;
 
 		// initial note: octave 4, tick 0, offset 0, velocity 8

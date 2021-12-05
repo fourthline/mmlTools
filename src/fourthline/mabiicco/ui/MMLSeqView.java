@@ -72,7 +72,6 @@ import java.util.function.IntConsumer;
  */
 public final class MMLSeqView implements IMMLManager, ChangeListener, ActionListener, MouseWheelListener {
 	private static final int INITIAL_TRACK_COUNT = 1;
-	public static final int MAX_MIDI_TRACK = 16;
 
 	private int trackCounter;
 
@@ -204,7 +203,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	}
 
 	private String getNewTrackName() {
-		if (trackCounter >= MAX_MIDI_TRACK * 4) {
+		if (trackCounter >= MMLScore.MAX_TRACK * 4) {
 			trackCounter = 0;
 		}
 		trackCounter++;
@@ -569,15 +568,15 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		JViewport viewport = scrollPane.getViewport();
 		Point p = viewport.getViewPosition();
-		int modifiers = e.getModifiers();
+		int modifiers = e.getModifiersEx();
 		int rotation = e.getWheelRotation();
-		if (modifiers == InputEvent.CTRL_MASK) {
+		if (modifiers == InputEvent.CTRL_DOWN_MASK) {
 			if (rotation < 0) {
 				expandPianoViewWide( e.getX() - p.x );
 			} else {
 				reducePianoViewWide( e.getX() - p.x );
 			}
-		} else if (modifiers == InputEvent.SHIFT_MASK) {
+		} else if (modifiers == InputEvent.SHIFT_DOWN_MASK) {
 			p.x += (rotation * 16);
 			if (p.x < 0) {
 				p.x = 0;
@@ -691,10 +690,24 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 
 	@Override
 	public void updateActivePart(boolean generate) {
+		updateActivePart(generate, -1);
+	}
+
+	@Override
+	public void generateActiveTrack() {
+		// 単一のTrackだけを更新したいところであるが, 整合性を保つために全体をGenerateする. 
+		updateActivePart(true, -1);
+	}
+
+	private void updateActivePart(boolean generate, int trackIndex) {
 		NanoTime time = NanoTime.start();
 		if (generate) {
 			try {
-				mmlScore.generateAll();
+				if (trackIndex >= 0) {
+					mmlScore.generateOne(trackIndex);
+				} else {
+					mmlScore.generateAll();
+				}
 			} catch (UndefinedTickException e) {
 				EventQueue.invokeLater(() -> {
 					String msg = AppResource.appText("fail.mml_modify") + "\n" + e.getMessage();

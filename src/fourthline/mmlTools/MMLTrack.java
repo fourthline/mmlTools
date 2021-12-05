@@ -117,6 +117,7 @@ public final class MMLTrack implements Serializable {
 	}
 
 	public ComposeRank mmlRank() {
+		mabiMML.setExcludeSongPart(isExcludeSongPart());
 		return mabiMML.mmlRank();
 	}
 
@@ -125,6 +126,7 @@ public final class MMLTrack implements Serializable {
 	 * @return　フォーマット済みRank文字列
 	 */
 	public String mmlRankFormat() {
+		mabiMML.setExcludeSongPart(isExcludeSongPart());
 		return (generated ? "" : "*") + mabiMML.mmlRankFormat();
 	}
 
@@ -411,5 +413,9 @@ public final class MMLTrack implements Serializable {
 
 	public void setVisible(boolean visible) {
 		this.visible = visible;
+	}
+
+	public boolean isExcludeSongPart() {
+		return songProgram == -2;
 	}
 }

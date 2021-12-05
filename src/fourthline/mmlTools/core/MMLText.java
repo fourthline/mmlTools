@@ -19,6 +19,9 @@ public final class MMLText {
 	private static int DEFAULT_PART_NUM = 4;
 	private String text[];
 
+	/** 歌パートを除いて他のパートの文字数を増やすオプション (2021/11/18 MabiKR) */
+	private boolean excludeSongPart = false;
+
 	/* メロディパートが空のときに作曲スキルで怒られないようにするために入れる文字列 */
 	private static String melody_empty_str = "";
 
@@ -115,14 +118,14 @@ public final class MMLText {
 	public String getMML() {
 		// メロディ or 歌 パートがどちらも空で楽譜の文字がある場合、メロディパートに1文字入れる.
 		String melody_part = text[0];
-		if (( melody_part.length() == 0) && ((this.text[1].length() != 0) || (this.text[2].length() != 0)) && (this.text[3].length() == 0) ) {
+		if (( melody_part.length() == 0) && ((this.text[1].length() != 0) || (this.text[2].length() != 0)) && !validSongPart() ) {
 			melody_part = MMLText.melody_empty_str;
 		}
 		String mml = "MML@"
 				+ melody_part + ","
 				+ this.text[1]+ ","
 				+ this.text[2];
-		if ( this.text[3].length() > 0 ) {
+		if (validSongPart()) {
 			mml += "," + this.text[3];
 		}
 
@@ -130,8 +133,16 @@ public final class MMLText {
 		return mml;
 	}
 
+	private boolean validSongPart() {
+		return (!this.excludeSongPart) && (this.text[3].length() > 0);
+	}
+
 	public ComposeRank mmlRank() {
-		return ComposeRank.mmlRank(this.text[0], this.text[1], this.text[2], this.text[3]);
+		if (!this.excludeSongPart) {
+			return ComposeRank.mmlRank(this.text[0], this.text[1], this.text[2], this.text[3]);
+		} else {
+			return ComposeRank.mmlExcludeSongRank(this.text[0], this.text[1], this.text[2], "");
+		}
 	}
 
 	/**
@@ -145,7 +156,7 @@ public final class MMLText {
 				+ "( " + this.text[0].length()
 				+ ", " + this.text[1].length()
 				+ ", " + this.text[2].length();
-		if ( this.text[3].length() > 0 ) {
+		if (validSongPart()) {
 			str += ", " + this.text[3].length();
 		}
 
@@ -173,8 +184,18 @@ public final class MMLText {
 				parts[i] = sb[i].substring(0, min);
 				sb[i].delete(0, min);
 			}
-			mmlList.add( new MMLText().setMMLText(parts) );
+			MMLText item = new MMLText().setMMLText(parts);
+			item.setExcludeSongPart(this.isExcludeSongPart());
+			mmlList.add( item );
 		}
 		return mmlList;
+	}
+
+	public boolean isExcludeSongPart() {
+		return excludeSongPart;
+	}
+
+	public void setExcludeSongPart(boolean b) {
+		this.excludeSongPart = b;
 	}
 }

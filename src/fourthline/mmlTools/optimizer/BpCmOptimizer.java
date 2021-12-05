@@ -136,8 +136,8 @@ public final class BpCmOptimizer implements MMLStringOptimizer.Optimizer {
 		}
 	}
 
-	private StringBuilder builder = new StringBuilder();
-	private StringBuilder optBuilder = new StringBuilder();
+	private final StringBuilder builder = new StringBuilder();
+	private final StringBuilder optBuilder = new StringBuilder();
 	private BpCmState state = BpCmState.NONE;
 
 	@Override

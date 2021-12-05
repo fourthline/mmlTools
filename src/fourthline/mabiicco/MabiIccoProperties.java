@@ -20,6 +20,7 @@ import java.util.function.Consumer;
 import fourthline.mabiicco.ui.PianoRollView;
 import fourthline.mmlTools.MMLTrack;
 import fourthline.mmlTools.core.MMLText;
+import fourthline.mmlTools.core.ResourceLoader;
 import fourthline.mmlTools.optimizer.MMLStringOptimizer;
 
 public final class MabiIccoProperties {
@@ -98,7 +99,7 @@ public final class MabiIccoProperties {
 
 	private MabiIccoProperties() {
 		try {
-			FileInputStream in = new FileInputStream(configFile);
+			FileInputStream in = new FileInputStream(ResourceLoader.getAppPath(configFile));
 			properties.load(in);
 			in.close();
 			initFileHistory();
@@ -110,7 +111,9 @@ public final class MabiIccoProperties {
 
 	private void save() {
 		try {
-			properties.store(new FileOutputStream(configFile), "");
+			FileOutputStream out = new FileOutputStream(ResourceLoader.getAppPath(configFile));
+			properties.store(out, "");
+			out.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

@@ -6,7 +6,6 @@ package fourthline.mabiicco.ui.editor;
 
 import static org.junit.Assert.*;
 
-import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.Field;
@@ -418,7 +417,7 @@ public final class MMLEditorTest extends UseLoadingDLS {
 		int x1 = pianoRollView.convertTicktoX( note1.getTickOffset() );
 		int x2 = pianoRollView.convertTicktoX( note2.getTickOffset() );
 		MouseEvent e1 = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON1_DOWN_MASK, x1+1, y1+1, 1, false);
-		MouseEvent e2 = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON1_DOWN_MASK | ActionEvent.SHIFT_MASK, x2+1, y2+1, 1, false);
+		MouseEvent e2 = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON1_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK, x2+1, y2+1, 1, false);
 
 		editor.mousePressed(e1);
 		editor.mouseReleased(e1);

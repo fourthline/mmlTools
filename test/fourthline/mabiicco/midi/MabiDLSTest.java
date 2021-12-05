@@ -42,15 +42,18 @@ public class MabiDLSTest extends UseLoadingDLS {
 	private void checkPanpot(int trackIndex, int midiChannel) {
 		System.out.println("checkPanpot "+trackIndex+" @ "+midiChannel);
 		assertEquals(64, dls.getSynthesizer().getChannels()[midiChannel].getController(10));
+		assertEquals(64, dls.getSynthesizer().getChannels()[midiChannel+24].getController(10));
 		dls.setChannelPanpot(trackIndex, 0);
 		assertEquals(0, dls.getSynthesizer().getChannels()[midiChannel].getController(10));
+		assertEquals(0, dls.getSynthesizer().getChannels()[midiChannel+24].getController(10));
 		dls.setChannelPanpot(trackIndex, 64);
 		assertEquals(64, dls.getSynthesizer().getChannels()[midiChannel].getController(10));
+		assertEquals(64, dls.getSynthesizer().getChannels()[midiChannel+24].getController(10));
 	}
 
 	@Test
 	public final void test() {
-		for (int i = 0; i < 16; i++) {
+		for (int i = 0; i < 24; i++) {
 			checkMute(i, i);
 			checkPanpot(i, i);
 		}
@@ -67,11 +70,15 @@ public class MabiDLSTest extends UseLoadingDLS {
 	public void test_createSequence() throws InvalidMidiDataException, UndefinedTickException {
 		MMLScore score = new MMLScore();
 		score.addTrack(new MMLTrack().setMML("MML@aat180aa,brb,crc,drd;").setProgram(5));
-		Sequence seq = dls.createSequence(score);
+		score.getTrack(0).setSongProgram(100);
+		Sequence seq = dls.createSequence(score, 1);
 		assertEquals(3, seq.getTracks().length);
 		assertEquals(MMLTicks.getTick("1"), seq.getTickLength());
 
-		byte a[][] = new byte[][] { 
+		byte t0[][] = new byte[][] {
+			new byte[]{(byte)MetaMessage.META, 81, 3, 5, 22, 21}, // t180
+		};
+		byte t1[][] = new byte[][] {
 			new byte[]{(byte)ShortMessage.PROGRAM_CHANGE, 0x5},
 			new byte[]{(byte)ShortMessage.NOTE_ON, 69, 56}, // a
 			new byte[]{(byte)ShortMessage.NOTE_ON, 71, 56}, // b
@@ -83,7 +90,6 @@ public class MabiDLSTest extends UseLoadingDLS {
 			new byte[]{(byte)ShortMessage.NOTE_ON, 69, 56}, // a
 			new byte[]{(byte)ShortMessage.NOTE_OFF, 69, 0}, // a
 
-			new byte[]{(byte)MetaMessage.META, 81, 3, 5, 22, 21}, // t180
 			new byte[]{(byte)ShortMessage.NOTE_ON, 69, 56}, // a
 			new byte[]{(byte)ShortMessage.NOTE_ON, 71, 56}, // b
 			new byte[]{(byte)ShortMessage.NOTE_ON, 60, 56}, // c
@@ -94,9 +100,15 @@ public class MabiDLSTest extends UseLoadingDLS {
 			new byte[]{(byte)ShortMessage.NOTE_ON, 69, 56}, // a
 			new byte[]{(byte)ShortMessage.NOTE_OFF, 69, 0}, // a
 		};
-		for (int i = 0; i < a.length; i++) {
-			assertArrayEquals(""+i, a[i], seq.getTracks()[0].get(i).getMessage().getMessage());
+		for (int i = 0; i < t0.length; i++) {
+			assertArrayEquals(""+i, t0[i], seq.getTracks()[0].get(i).getMessage().getMessage());
 		}
+		for (int i = 0; i < t1.length; i++) {
+			assertArrayEquals(""+i, t1[i], seq.getTracks()[1].get(i).getMessage().getMessage());
+		}
+		assertEquals(192, seq.getTracks()[0].get(0).getTick());
+		assertEquals(0, seq.getTracks()[1].get(0).getTick());
+		assertEquals(1, seq.getTracks()[1].get(1).getTick());
 	}
 
 	@Test

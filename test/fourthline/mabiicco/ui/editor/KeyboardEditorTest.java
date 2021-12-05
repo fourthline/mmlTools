@@ -104,6 +104,9 @@ public class KeyboardEditorTest extends UseLoadingDLS {
 
 		@Override
 		public void updatePianoRollView(int note) {}
+
+		@Override
+		public void generateActiveTrack() {}
 	}
 
 	private class StubPlayer implements IPlayNote {

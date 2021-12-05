@@ -13,6 +13,7 @@ import java.nio.ByteOrder;
 import java.util.Base64;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.Base64.Decoder;
 import java.util.zip.CRC32;
 
@@ -53,15 +54,20 @@ public final class MMLFile implements IMMLFileParser {
 		return score;
 	}
 
+	private static final Pattern END_LINE_PATTERN = Pattern.compile("//.*\n");
+	private static final Pattern COMMENT_PATTERN = Pattern.compile("/\\*/?([^/]|[^*]/)*\\*/");
+	private static final Pattern SPACE_PATTERN = Pattern.compile("[ \t\n]");
+
 	private void parseSection(List<SectionContents> contentsList) throws MMLParseException {
 		for (SectionContents contents : contentsList) {
 			if (contents.getName().equals("[3MLE EXTENSION]")) {
 				trackList = parse3mleExtension(contents.getContents());
 			} else if (contents.getName().matches("\\[Channel[0-9]*\\]")) {
-				mmlParts.add( contents.getContents()
-						.replaceAll("//.*\n", "\n")
-						.replaceAll("/\\*/?([^/]|[^*]/)*\\*/", "")
-						.replaceAll("[ \t\n]", "") );
+				String s = contents.getContents();
+				s = END_LINE_PATTERN.matcher(s).replaceAll("\n");
+				s = COMMENT_PATTERN.matcher(s).replaceAll("");
+				s = SPACE_PATTERN.matcher(s).replaceAll("");
+				mmlParts.add(s);
 			} else if (contents.getName().equals("[Settings]")) {
 				parseSettings(contents.getContents());
 			}

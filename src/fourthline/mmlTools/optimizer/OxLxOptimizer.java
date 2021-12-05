@@ -62,8 +62,19 @@ public final class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 		});
 	}
 
-	private StringBuilder newBuilder(String minString, String lenString, String s, int insertBack) {
-		StringBuilder changeBuilder = new StringBuilder( minString );
+	private static StringBuilder newStringBuilder(Map<String, StringBuilder> map, String key, String init) {
+		StringBuilder sb = map.get(key);
+		if (sb != null) {
+			sb.setLength(0);
+			sb.append(init);
+		} else {
+			sb = new StringBuilder(init);
+		}
+		return sb;
+	}
+
+	private StringBuilder newBuilder(StringBuilder sb, String lenString, String s, int insertBack) {
+		StringBuilder changeBuilder = sb;
 		int len = changeBuilder.length();
 		// &や他の指示よりも前に配置する.
 		changeBuilder.insert(len-insertBack, "l"+lenString);
@@ -85,10 +96,10 @@ public final class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 				} else {
 					builder.append(lenString);
 				}
-				newBuilderMap.put(lenString, newBuilder(minString, lenString, noteName, insertBack));
+				newBuilderMap.put(lenString, newBuilder(newStringBuilder(newBuilderMap, lenString, minString), lenString, noteName, insertBack));
 				if (lenString.endsWith(".")) {
 					String lenString2 = lenString.substring(0, lenString.length()-1);
-					newBuilderMap.put(lenString2, newBuilder(minString, lenString2, noteName+".", insertBack));
+					newBuilderMap.put(lenString2, newBuilder(newStringBuilder(newBuilderMap, lenString2, minString), lenString2, noteName+".", insertBack));
 				}
 			}
 		});
@@ -138,12 +149,13 @@ public final class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 					String text = map.get(key).toString();
 					if (text.endsWith(eStr)) {
 						String prevText = text.substring(0, text.length() - eStr.length());
-						String nextText1 = prevText + noteName + cName + lPrev+".";
-						String nextText2 = prevText + noteName + "l" + lPrev+"." + cName;
+						String lPrevDot = lPrev+".";
+						String nextText1 = prevText + noteName + cName + lPrevDot;
+						String nextText2 = prevText + noteName + "l" + lPrevDot + cName;
 						String nextText3 = prevText + noteName + "l" + lPrev + cName +".";
-						updateMap.put(key, new StringBuilder(nextText1));
-						updateMap.put(lPrev+".", new StringBuilder(nextText2));
-						updateMap.put(lPrev, new StringBuilder(nextText3));
+						updateMap.put(key, newStringBuilder(updateMap, key, nextText1));
+						updateMap.put(lPrevDot, newStringBuilder(updateMap, lPrevDot, nextText2));
+						updateMap.put(lPrev, newStringBuilder(updateMap, lPrev, nextText3));
 					}
 				}
 			}
