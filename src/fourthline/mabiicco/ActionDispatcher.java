@@ -316,6 +316,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		NanoTime time = NanoTime.start();
 		MMLScore score = fileParse(file);
 		if ( (score != null) && (score.getTrackCount() > 0) ) {
+			// ミュートボタンの状態を反映させるために, 先にミュート解除する.
+			MabiDLS.getInstance().all();
 			mmlSeqView.setMMLScore(score);
 
 			openedFile = file;
@@ -323,7 +325,6 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			MabiIccoProperties.getInstance().setRecentFile(file.getPath());
 			MabiIccoProperties.getInstance().setFileHistory(file);
 			mainFrame.updateFileHistoryMenu();
-			MabiDLS.getInstance().all();
 		}
 		showTime("open", time);
 	}
@@ -573,6 +574,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 
 	private void stopAction() {
 		MabiDLS.getInstance().getSequencer().stop();
+		MabiDLS.getInstance().allNoteOff();
 		mainFrame.enableNoplayItems();
 	}
 

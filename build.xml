@@ -27,7 +27,7 @@
 	<property name="app.vendor" value="fourthline" />
 	<property name="app.id" value="MabiIcco" />
 	<property name="app.name" value="MabiIcco" />
-	<property name="app.version" value="1.1.55" />
+	<property name="app.version" value="1.1.56" />
 	<property name="app.main-class" value="fourthline.mabiicco.MabiIcco" />
 	<property name="class.path" value="lib/commons-compress/commons-compress-1.9.jar" />
 
@@ -58,9 +58,7 @@
 		<copy todir="${dest}">
 			<fileset dir="${src}">
 				<include name="**/*.png" />
-				<include name="**/*.fxml" />
-				<include name="**/*.css" />
-				<exclude name="fourthline/mabiicco/fx/" />
+				<include name="fourthline/mmlTools/core/ticktable.txt" />
 			</fileset>
 		</copy>
 	</target>
