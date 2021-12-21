@@ -39,15 +39,16 @@ public final class MabiDLS {
 	private MidiChannel channel[];
 	private ArrayList<MMLNoteEvent[]> playNoteList = new ArrayList<>();
 	private static final int MAX_CHANNEL_PLAY_NOTE = 4;
-	public static final int MAX_MIDI_PART = MMLScore.MAX_TRACK * 2;
+	private static final int MAX_MIDI_PART = MMLScore.MAX_TRACK * 2;
 	private static final int MIDI_CHORUS_OFFSET = MMLScore.MAX_TRACK;
+	public static final int KEYBOARD_PLAY_CHANNEL = MAX_MIDI_PART;
 	private ArrayList<InstClass> insts = new ArrayList<>();
 	private static final int DLS_BANK = (0x79 << 7);
 
 	public static final String DEFALUT_DLS_PATH = "Nexon/Mabinogi/mp3/MSXspirit.dls";
 
 	private ArrayList<Runnable> notifier = new ArrayList<>();
-	private boolean muteState[] = new boolean[ MAX_MIDI_PART ];
+	private boolean muteState[] = new boolean[ MAX_MIDI_PART+1 ];
 	private WavoutDataLine wavout;
 
 	public static MabiDLS getInstance() {
@@ -65,7 +66,7 @@ public final class MabiDLS {
 	public void initializeMIDI() throws MidiUnavailableException, InvalidMidiDataException, IOException, LineUnavailableException {
 		this.synthesizer = MidiSystem.getSynthesizer();
 		HashMap<String, Object> info = new HashMap<>();
-		info.put("midi channels", MAX_MIDI_PART);
+		info.put("midi channels", MAX_MIDI_PART+1);
 		info.put("large mode", "true");
 		info.put("load default soundbank", "false");
 		info.put("max polyphony", "96");
@@ -341,19 +342,25 @@ public final class MabiDLS {
 	public void setChannelPanpot(int ch, int panpot) {
 		if (ch < channel.length) {
 			channel[ch].controlChange(10, panpot);
+		}
+		if (ch < MIDI_CHORUS_OFFSET) {
 			channel[ch+MIDI_CHORUS_OFFSET].controlChange(10, panpot);
 		}
 	}
 
 	public void toggleMute(int ch) {
 		muteState[ch] = !muteState[ch];
-		muteState[ch+MIDI_CHORUS_OFFSET] = muteState[ch];
+		if (ch < MIDI_CHORUS_OFFSET) {
+			muteState[ch+MIDI_CHORUS_OFFSET] = muteState[ch];
+		}
 		midiSetMuteState();
 	}
 
 	public void setMute(int ch, boolean mute) {
 		muteState[ch] = mute;
-		muteState[ch+MIDI_CHORUS_OFFSET] = muteState[ch];
+		if (ch < MIDI_CHORUS_OFFSET) {
+			muteState[ch+MIDI_CHORUS_OFFSET] = muteState[ch];
+		}
 		midiSetMuteState();
 	}
 
@@ -365,7 +372,9 @@ public final class MabiDLS {
 		for (int i = 0; i < muteState.length; i++) {
 			muteState[i] = (i != ch);
 		}
-		muteState[ch+MIDI_CHORUS_OFFSET] = muteState[ch];
+		if (ch < MIDI_CHORUS_OFFSET) {
+			muteState[ch+MIDI_CHORUS_OFFSET] = muteState[ch];
+		}
 		midiSetMuteState();
 	}
 

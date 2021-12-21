@@ -25,7 +25,6 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 
 	private int playNote[] = null;
 	private final int width = 60;
-	private final int PLAY_CHANNEL = 15;
 	private final int DEFAULT_VELOCITY = 11;
 	private final IMMLManager mmlManager;
 
@@ -215,7 +214,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 		if (!dls.getSequencer().isRunning()) {
 			int program = mmlManager.getActivePartProgram();
 			dls.loadRequiredInstruments(mmlManager.getMMLScore());
-			dls.playNotes(noteEvent, program, PLAY_CHANNEL);
+			dls.playNotes(noteEvent, program, MabiDLS.KEYBOARD_PLAY_CHANNEL);
 		}
 
 		repaint();
@@ -225,7 +224,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 	public void offNote() {
 		playNote = null;
 		int program = mmlManager.getActivePartProgram();
-		MabiDLS.getInstance().playNote(Integer.MIN_VALUE, program, PLAY_CHANNEL, 0);
+		MabiDLS.getInstance().playNote(Integer.MIN_VALUE, program, MabiDLS.KEYBOARD_PLAY_CHANNEL, 0);
 
 		repaint();
 	}
