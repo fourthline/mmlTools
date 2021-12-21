@@ -735,7 +735,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 			view.updateTrack();
 		}
 
-		MabiDLS.getInstance().updatePanpot(mmlScore);
+		MabiDLS.getInstance().updateMidiControl(mmlScore);
 		undoEdit.saveState();
 		panel.repaint();
 	}

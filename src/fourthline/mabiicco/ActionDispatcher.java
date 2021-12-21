@@ -573,6 +573,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 
 	private void stopAction() {
 		MabiDLS.getInstance().getSequencer().stop();
+		MabiDLS.getInstance().allNoteOff();
 		mainFrame.enableNoplayItems();
 	}
 

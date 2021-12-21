@@ -98,7 +98,7 @@ public final class MabiDLS {
 		// シーケンサとシンセサイザの初期化
 		initializeSynthesizer();
 		Transmitter transmitter = this.sequencer.getTransmitters().get(0);
-		transmitter.setReceiver(this.synthesizer.getReceiver());
+		transmitter.setReceiver(new ExtendMessage.ExtendReceiver(this.synthesizer.getReceiver()));
 	}
 
 	// ループ再生時にも使用するパラメータ.
@@ -128,7 +128,7 @@ public final class MabiDLS {
 			sequencer.setSequence(sequence);
 			this.startTick = startTick;
 			this.startTempo = mmlScore.getTempoOnTick(startTick);
-			updatePanpot(mmlScore);
+			updateMidiControl(mmlScore);
 			sequenceStart();
 		} catch (InvalidMidiDataException e) {
 			e.printStackTrace();
@@ -154,9 +154,10 @@ public final class MabiDLS {
 		sequencer.stop();
 	}
 
-	private void allNoteOff() {
+	public void allNoteOff() {
 		for (MidiChannel ch : this.channel) {
 			ch.allNotesOff();
+			ch.allSoundOff();
 		}
 	}
 
@@ -290,8 +291,8 @@ public final class MabiDLS {
 		if (channel >= this.channel.length) {
 			return;
 		}
-		midiMuteOff();
 		changeProgram(program, channel);
+		this.channel[channel].setMute(false); // TODO: ミュート & エレキギター/チェロ/ヴァイオリンなどのチャネルだと、残音が残ってしまう.
 		setChannelPanpot(channel, 64);
 		MidiChannel midiChannel = this.channel[channel];
 		MMLNoteEvent[] playNoteEvents = this.playNoteList.get(channel);
@@ -319,10 +320,17 @@ public final class MabiDLS {
 		}
 	}
 
-	public void changeProgram(int program, int ch) {
+	private void changeProgram(int program, int ch) {
 		if (channel[ch].getProgram() != program) {
 			channel[ch].programChange(DLS_BANK, program);
 		}
+	}
+
+	public int getChannelProgram(int ch) {
+		if ( (0 >= ch) && (ch < channel.length) ) {
+			return channel[ch].getProgram();
+		}
+		return -1;
 	}
 
 	/**
@@ -375,18 +383,13 @@ public final class MabiDLS {
 		}
 	}
 
-	/** MIDIのMute解除する. */
-	private void midiMuteOff() {
-		for (MidiChannel c : channel) {
-			c.setMute(false);
-		}
-	}
-
-	public void updatePanpot(MMLScore score) {
+	public void updateMidiControl(MMLScore score) {
 		int trackCount = 0;
 		for (MMLTrack mmlTrack : score.getTrackList()) {
 			int panpot = mmlTrack.getPanpot();
 			this.setChannelPanpot(trackCount, panpot);
+			this.changeProgram(mmlTrack.getProgram(), trackCount);
+			this.changeProgram(mmlTrack.getSongProgram(), trackCount+MIDI_CHORUS_OFFSET);
 			trackCount++;
 		}
 	}
