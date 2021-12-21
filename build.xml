@@ -58,9 +58,7 @@
 		<copy todir="${dest}">
 			<fileset dir="${src}">
 				<include name="**/*.png" />
-				<include name="**/*.fxml" />
-				<include name="**/*.css" />
-				<exclude name="fourthline/mabiicco/fx/" />
+				<include name="fourthline/mmlTools/core/ticktable.txt" />
 			</fileset>
 		</copy>
 	</target>
