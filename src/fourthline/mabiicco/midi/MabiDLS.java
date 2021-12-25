@@ -78,7 +78,7 @@ public final class MabiDLS {
 		int midiChannels = this.synthesizer.getChannels().length;
 		System.out.printf("Latency: %d\nMaxPolyphony: %d\nChannels: %d\n", latency, maxPolyphony, midiChannels);
 
-		this.sequencer = MidiSystem.getSequencer();
+		this.sequencer = new MabiIccoSequencer(MidiSystem.getSequencer(), this);
 		this.sequencer.open();
 		this.sequencer.addMetaEventListener(meta -> {
 			int type = meta.getType();
@@ -158,7 +158,9 @@ public final class MabiDLS {
 	public void allNoteOff() {
 		for (MidiChannel ch : this.channel) {
 			ch.allNotesOff();
-			ch.allSoundOff();
+
+			// sustain off
+			ch.controlChange(64, 0);
 		}
 	}
 
@@ -244,8 +246,12 @@ public final class MabiDLS {
 
 		for (MidiChannel ch : this.channel) {
 			ch.programChange(DLS_BANK, 0);
+
 			/* ctrl 91 汎用エフェクト 1(リバーブ) */
 			ch.controlChange(91, 0);
+
+			// sustain off
+			ch.controlChange(64, 0);
 		}
 
 		this.synthesizer.unloadAllInstruments(this.synthesizer.getDefaultSoundbank());
