@@ -71,7 +71,7 @@ public final class MabiIcco {
 
 			// create MainFrame
 			ActionDispatcher dispatcher = ActionDispatcher.getInstance();
-			MainFrame mainFrame = new MainFrame(dispatcher);
+			MainFrame mainFrame = new MainFrame(dispatcher, dispatcher);
 			mainFrame.setTransferHandler(new FileTransferHandler(dispatcher));
 			splash.updateProgress("", 100);
 			dispatcher.setMainFrame(mainFrame).initialize();

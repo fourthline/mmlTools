@@ -28,7 +28,7 @@ public final class MainFrameTest extends UseLoadingDLS {
 		MainFrame mainFrame = new MainFrame(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {}
-		});
+		}, null);
 
 		checkNotNullField(mainFrame, "reloadMenuItem");
 		checkNotNullField(mainFrame, "undoMenu");
