@@ -373,4 +373,31 @@ public class MMLTrackTest {
 		track.generate();
 		assertEquals(expect, track.getMabiMML());
 	}
+
+	@Test
+	public void test_clone() throws UndefinedTickException {
+		MMLTrack t1 = new MMLTrack().setMML("MML@aaat130,b8c6,rc,rrd;");
+		t1.setPanpot(1);
+		t1.setProgram(2);
+		t1.setProgram(-2);
+
+		MMLTrack t2 = t1.clone();
+
+		assertEquals(t1.getMabiMML(), t2.getMabiMML());
+		assertEquals(t1.getOriginalMML(), t2.getOriginalMML());
+		assertEquals(t1.getPanpot(), t2.getPanpot());
+		assertEquals(t1.getProgram(), t2.getProgram());
+		assertEquals(t1.getSongProgram(), t2.getSongProgram());
+
+		t1.getMMLEventList().get(0).getMMLNoteEventList().get(0).setNote(99);
+		t1.generate();
+
+		assertNotEquals(t1.getMabiMML(), t2.getMabiMML());
+		assertNotEquals(t1.getOriginalMML(), t2.getOriginalMML());
+
+		MMLTrack t3 = t1.clone();
+
+		assertEquals(t1.getMabiMML(), t3.getMabiMML());
+		assertEquals(t1.getOriginalMML(), t3.getOriginalMML());
+	}
 }
