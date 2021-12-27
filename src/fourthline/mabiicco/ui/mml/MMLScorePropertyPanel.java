@@ -37,19 +37,19 @@ public final class MMLScorePropertyPanel extends JPanel {
 		setLayout(null);
 
 		JLabel label1 = new JLabel(AppResource.appText("score_property.name"));
-		label1.setBounds(12, 40, 90, 13);
+		label1.setBounds(12, 40, 90, 14);
 		add(label1);
 
 		JLabel label2 = new JLabel(AppResource.appText("score_property.author"));
-		label2.setBounds(12, 73, 90, 13);
+		label2.setBounds(12, 73, 90, 14);
 		add(label2);
 
 		JLabel label3 = new JLabel(AppResource.appText("score_property.measure"));
-		label3.setBounds(12, 105, 90, 13);
+		label3.setBounds(12, 105, 90, 14);
 		add(label3);
 
 		JLabel label4 = new JLabel("/");
-		label4.setBounds(198, 105, 15, 13);
+		label4.setBounds(198, 105, 15, 14);
 		add(label4);
 
 		titleField = new JTextField();

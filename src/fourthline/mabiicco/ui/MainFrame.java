@@ -18,6 +18,8 @@ import javax.swing.JButton;
 
 import fourthline.mabiicco.ActionDispatcher;
 import fourthline.mabiicco.AppResource;
+import fourthline.mabiicco.IEditStateObserver;
+
 import static fourthline.mabiicco.AppResource.appText;
 import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mabiicco.ui.PianoRollView.PaintMode;
@@ -93,7 +95,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	 * Create the frame.
 	 * @param listener 関連付けるActionListener
 	 */
-	public MainFrame(ActionListener listener) {
+	public MainFrame(ActionListener listener, IEditStateObserver editStateObserver) {
 		this.listener = listener;
 
 		setTitleAndFileName(null);
@@ -150,6 +152,12 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 			@Override
 			public void windowClosing(WindowEvent e) {
 				quitEvent();
+			}
+
+			@Override
+			public void windowActivated(WindowEvent e) {
+				// ウィンドウがアクティベートされたときにペースト可能などを更新する.
+				editStateObserver.notifyUpdateEditState();
 			}
 		});
 	}
@@ -285,6 +293,8 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 				KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK));
 		createMenuItem(trackMenu, "menu.removeTrack", ActionDispatcher.REMOVE_TRACK, true,
 				KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+		createMenuItem(trackMenu, "menu.duplicateTrack", ActionDispatcher.DUPLICATE_TRACK, true,
+				KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK));
 
 		trackMenu.add(new JSeparator());
 

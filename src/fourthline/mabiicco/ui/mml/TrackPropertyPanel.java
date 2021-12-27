@@ -41,7 +41,7 @@ public final class TrackPropertyPanel extends JPanel {
 		setLayout(null);
 
 		JLabel lblNewLabel = new JLabel(AppResource.appText("track_property.trackname"));
-		lblNewLabel.setBounds(30, 39, 70, 13);
+		lblNewLabel.setBounds(30, 39, 70, 14);
 		add(lblNewLabel);
 
 		trackNameField = new JTextField();
@@ -71,7 +71,7 @@ public final class TrackPropertyPanel extends JPanel {
 		add(panpotR);
 
 		JLabel label = new JLabel(AppResource.appText("track_property.panpot"));
-		label.setBounds(30, 97, 70, 13);
+		label.setBounds(30, 97, 70, 14);
 		add(label);
 	}
 

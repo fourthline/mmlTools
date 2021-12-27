@@ -96,7 +96,7 @@ public final class MMLImportPanel extends JPanel {
 		scrollPane.setViewportView(table);
 
 		JLabel lblNewLabel = new JLabel(AppResource.appText("mml.input.import.possibleImport")+": "+possibleImportTrackCount);
-		lblNewLabel.setBounds(22, 182, 300, 13);
+		lblNewLabel.setBounds(22, 182, 300, 14);
 		p.add(lblNewLabel);
 
 		table.setDefaultEditor(Object.class, null);

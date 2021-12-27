@@ -14,9 +14,9 @@ import fourthline.mmlTools.MMLNoteEvent;
  *   マビノギ内の演奏とは若干ちがうけど！（気にしない
  *   TODO: 再生方式の完全な変更が必要.
  */
-public class MMLMidiTrack {
+public final class MMLMidiTrack {
 	private final InstClass inst;
-	private ArrayList<MMLNoteEvent> noteEventList;
+	private final ArrayList<MMLNoteEvent> noteEventList;
 
 	public MMLMidiTrack(InstClass inst) {
 		this.inst = inst;

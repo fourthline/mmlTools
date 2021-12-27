@@ -129,11 +129,11 @@ public final class MMLPartChangePanel extends JPanel {
 		add(destSelectPanel);
 
 		JLabel label1 = new JLabel(AppResource.appText("track"));
-		label1.setBounds(12, 23, 172, 13);
+		label1.setBounds(12, 23, 172, 14);
 		destSelectPanel.add(label1);
 
 		JLabel label2 = new JLabel(AppResource.appText("part"));
-		label2.setBounds(12, 209, 64, 13);
+		label2.setBounds(12, 209, 64, 14);
 		destSelectPanel.add(label2);
 
 		partSelectComboBox = new JComboBox<>();

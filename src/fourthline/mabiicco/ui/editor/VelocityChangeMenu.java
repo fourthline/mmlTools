@@ -20,7 +20,7 @@ import static fourthline.mabiicco.AppResource.appText;
 /**
  * ポップアップメニューで音量を変更する.
  */
-public class VelocityChangeMenu {
+public final class VelocityChangeMenu {
 
 	private final JSlider slider = new JSlider(0, 15, 8);
 	private final JMenu menu = new JMenu(appText("edit.velocity"));
