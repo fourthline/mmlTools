@@ -43,6 +43,7 @@ import fourthline.mabiicco.ui.editor.MMLTranspose;
 import fourthline.mabiicco.ui.mml.MMLImportPanel;
 import fourthline.mabiicco.ui.mml.MMLScorePropertyPanel;
 import fourthline.mmlTools.MMLScore;
+import fourthline.mmlTools.MMLTrack;
 import fourthline.mmlTools.core.NanoTime;
 import fourthline.mmlTools.parser.IMMLFileParser;
 import fourthline.mmlTools.parser.MMLParseException;
@@ -69,6 +70,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String QUIT = "quit";
 	@Action public static final String ADD_TRACK = "addTrack";
 	@Action public static final String REMOVE_TRACK = "removeTrack";
+	@Action public static final String DUPLICATE_TRACK = "duplicateTrack";
 	@Action public static final String TRACK_PROPERTY = "trackProperty";
 	@Action public static final String SET_START_POSITION = "setStartPosition";
 	@Action public static final String INPUT_FROM_CLIPBOARD = "inputFromClipboard";
@@ -187,6 +189,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(QUIT, t -> this.quitAction());
 		actionMap.put(ADD_TRACK, t -> mmlSeqView.addMMLTrack(null));
 		actionMap.put(REMOVE_TRACK, t -> mmlSeqView.removeMMLTrack());
+		actionMap.put(DUPLICATE_TRACK, t -> this.duplicateMMLTrack());
 		actionMap.put(TRACK_PROPERTY, t -> mmlSeqView.editTrackPropertyAction());
 		actionMap.put(SET_START_POSITION, t -> mmlSeqView.setStartPosition());
 		actionMap.put(PLAY, t -> this.playAction());
@@ -773,5 +776,10 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		} else {
 			System.err.println("changeScaleColor invalid param (not Supplier)");
 		}
+	}
+
+	private void duplicateMMLTrack() {
+		MMLTrack track = mmlSeqView.getSelectedTrack().clone();
+		mmlSeqView.addMMLTrack(track);
 	}
 }

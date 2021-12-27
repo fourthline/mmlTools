@@ -16,7 +16,7 @@ import fourthline.mmlTools.core.MMLTicks;
 import fourthline.mmlTools.core.UndefinedTickException;
 import fourthline.mmlTools.optimizer.MMLStringOptimizer;
 
-public final class MMLTrack implements Serializable {
+public final class MMLTrack implements Serializable, Cloneable {
 	private static final long serialVersionUID = 2006880378975808647L;
 
 	/** 和音にテンポ出力を許可するかどうかのオプション */
@@ -417,5 +417,23 @@ public final class MMLTrack implements Serializable {
 
 	public boolean isExcludeSongPart() {
 		return songProgram == -2;
+	}
+
+	@Override
+	public MMLTrack clone() {
+		MMLTrack o = new MMLTrack().setMML(this.getOriginalMML());
+		o.setGlobalTempoList(globalTempoList);
+		o.setPanpot(panpot);
+		o.setProgram(program);
+		o.setSongProgram(songProgram);
+		o.setTrackName(trackName);
+		if (generated) {
+			try {
+				o.generate();
+			} catch (UndefinedTickException e) {
+				e.printStackTrace();
+			}
+		}
+		return o;
 	}
 }

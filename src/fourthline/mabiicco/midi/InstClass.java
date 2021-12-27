@@ -173,7 +173,7 @@ public final class InstClass {
 	/**
 	 * DLSの情報に基づくOptions
 	 */
-	public class Options {
+	public final class Options {
 		public final static int OPTION_NUM = 256;
 		private final double attentionList[];
 		private final boolean overlapList[];
