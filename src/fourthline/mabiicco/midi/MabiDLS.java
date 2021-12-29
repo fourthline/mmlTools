@@ -419,6 +419,7 @@ public final class MabiDLS {
 
 	public Sequence createSequence(MMLScore score, int startOffset) throws InvalidMidiDataException {
 		Sequence sequence = new Sequence(Sequence.PPQ, MMLTickTable.TPQN);
+		int totalTick = score.getTotalTickLength();
 
 		// グローバルテンポ
 		Track track = sequence.createTrack();
@@ -426,6 +427,9 @@ public final class MabiDLS {
 		for (MMLTempoEvent tempoEvent : globalTempoList) {
 			byte tempo[] = tempoEvent.getMetaData();
 			int tickOffset = tempoEvent.getTickOffset();
+			if (tickOffset >= totalTick) {
+				break;
+			}
 
 			MidiMessage message = new MetaMessage(MMLTempoEvent.META, 
 					tempo, tempo.length);
