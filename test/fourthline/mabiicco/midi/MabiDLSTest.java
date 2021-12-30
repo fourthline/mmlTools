@@ -112,6 +112,21 @@ public class MabiDLSTest extends UseLoadingDLS {
 	}
 
 	@Test
+	public void test_createSequence2() throws InvalidMidiDataException, UndefinedTickException {
+		MMLScore score = new MMLScore();
+		score.addTrack(new MMLTrack().setMML("MML@aart180a;"));
+		Sequence seq = dls.createSequence(score, 1);
+		assertEquals(2, seq.getTracks().length);
+		assertEquals(MMLTicks.getTick("1"), seq.getTickLength());
+
+		score.getTrack(0).getMMLEventAtIndex(0).getMMLNoteEventList().remove(2);
+		seq = dls.createSequence(score, 1);
+		assertEquals(2, seq.getTracks().length);
+		assertEquals(MMLTicks.getTick("2"), seq.getTickLength());
+	}
+
+
+	@Test
 	public void testInstOptions() {
 		InstClass inst = dls.getInstByProgram(0);
 		for (int i = -12; i < 16; i++) {

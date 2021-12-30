@@ -383,8 +383,8 @@ public class MMLTrackTest {
 
 		MMLTrack t2 = t1.clone();
 
-		assertEquals(t1.getMabiMML(), t2.getMabiMML());
-		assertEquals(t1.getOriginalMML(), t2.getOriginalMML());
+		assertEquals("MML@aaat130,b8c6,rc,rrd;", t2.getMabiMML());
+		assertEquals("MML@aaat130,b8c6,rc,rrd;", t2.getOriginalMML());
 		assertEquals(t1.getPanpot(), t2.getPanpot());
 		assertEquals(t1.getProgram(), t2.getProgram());
 		assertEquals(t1.getSongProgram(), t2.getSongProgram());
@@ -392,12 +392,13 @@ public class MMLTrackTest {
 		t1.getMMLEventList().get(0).getMMLNoteEventList().get(0).setNote(99);
 		t1.generate();
 
-		assertNotEquals(t1.getMabiMML(), t2.getMabiMML());
-		assertNotEquals(t1.getOriginalMML(), t2.getOriginalMML());
+		assertEquals("MML@o8d+o4aa,b8c6,rc,r2d;", t1.getMabiMML());
+		assertEquals("MML@aaat130,b8c6,rc,rrd;", t2.getMabiMML());
+		assertEquals("MML@aaat130,b8c6,rc,rrd;", t2.getOriginalMML());
 
 		MMLTrack t3 = t1.clone();
 
-		assertEquals(t1.getMabiMML(), t3.getMabiMML());
-		assertEquals(t1.getOriginalMML(), t3.getOriginalMML());
+		assertEquals("MML@o8d+o4aa,b8c6,rc,r2d;", t3.getMabiMML());
+		assertEquals("MML@o8d+o4aat130,b8c6,rc,r2dt130;", t3.getOriginalMML());
 	}
 }
