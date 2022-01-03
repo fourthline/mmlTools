@@ -211,6 +211,10 @@ public final class MMLScore implements IMMLFileParser {
 		MMLEvent.removeTick(markerList, tickPosition, tick);
 	}
 
+	/**
+	 * ノートのみのTick長を取得する.
+	 * @return
+	 */
 	public int getTotalTickLength() {
 		long tick = 0;
 		for (MMLTrack track : trackList) {
@@ -221,6 +225,26 @@ public final class MMLScore implements IMMLFileParser {
 		}
 
 		return (int)tick;
+	}
+
+	private int maxTickMMLEvent(int tick, List<? extends MMLEvent> list) {
+		int ret = tick;
+		int index = list.size();
+		if (index > 0) {
+			int v = list.get(index-1).getTickOffset();
+			if (ret < v) {
+				ret = v;
+			}
+		}
+		return ret;
+	}
+
+	/**
+	 * テンポ, マーカを含むTick長を取得する.
+	 * @return
+	 */
+	public int getTotalTickLengthWithAll() {
+		return maxTickMMLEvent(maxTickMMLEvent(getTotalTickLength(), globalTempoList), markerList);
 	}
 
 	/**
