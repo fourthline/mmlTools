@@ -1,12 +1,14 @@
 /*
- * Copyright (C) 2014-2021 たんらる
+ * Copyright (C) 2014-2022 たんらる
  */
 
 package fourthline.mabiicco;
 
 import java.awt.Font;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Collections;
 import java.util.List;
 
@@ -82,7 +84,9 @@ public final class MabiIcco {
 			mainFrame.setVisible(true);
 			splash.dispose();
 		} catch (Throwable e) {
-			e.printStackTrace();
+			try {
+				e.printStackTrace(new PrintStream(AppResource.getErrFile()));
+			} catch (FileNotFoundException e1) {}
 			JOptionPane.showMessageDialog(null, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
 			System.exit(1);
 		}

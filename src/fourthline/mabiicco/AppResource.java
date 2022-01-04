@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2018 たんらる
+ * Copyright (C) 2014-2022 たんらる
  */
 
 package fourthline.mabiicco;
@@ -89,6 +89,10 @@ public final class AppResource {
 		}
 
 		return icon;
+	}
+
+	public static String getErrFile() {
+		return ResourceLoader.getAppPath("err.txt");
 	}
 
 	public static void main(String args[]) {
