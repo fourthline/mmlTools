@@ -524,10 +524,12 @@ public class MMLScoreTest extends FileSelect {
 		assertEquals(384, score.getTotalTickLengthWithAll());
 
 		score.getMarkerList().add(new Marker("test", 1000));
+		score.getMarkerList().add(new Marker("test", 800));
 		assertEquals(384, score.getTotalTickLength());
 		assertEquals(1000, score.getTotalTickLengthWithAll());
 
 		score.getTempoEventList().add(new MMLTempoEvent(90, 2000));
+		score.getTempoEventList().add(new MMLTempoEvent(92, 1800));
 		assertEquals(384, score.getTotalTickLength());
 		assertEquals(2000, score.getTotalTickLengthWithAll());
 	}
