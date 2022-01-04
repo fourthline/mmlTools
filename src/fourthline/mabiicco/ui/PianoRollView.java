@@ -160,15 +160,8 @@ public final class PianoRollView extends JPanel {
 	 * 現在のトラックの内容に合わせた幅に設定します.
 	 */
 	private void updateViewWidthTrackLength() {
-		long tickLength = 0;
 		MMLScore mmlScore = mmlManager.getMMLScore();
-
-		for (MMLTrack track : mmlScore.getTrackList()) {
-			long length = track.getMaxTickLength();
-			if (tickLength < length) {
-				tickLength = length;
-			}
-		}
+		long tickLength = mmlScore.getTotalTickLengthWithAll();
 		try {
 			// 最後に4小節分のマージンを作成します.
 			int t1 = MMLTicks.getTick("1");

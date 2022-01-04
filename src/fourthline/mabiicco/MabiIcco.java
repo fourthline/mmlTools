@@ -1,12 +1,14 @@
 /*
- * Copyright (C) 2014-2021 たんらる
+ * Copyright (C) 2014-2022 たんらる
  */
 
 package fourthline.mabiicco;
 
 import java.awt.Font;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Collections;
 import java.util.List;
 
@@ -45,47 +47,41 @@ public final class MabiIcco {
 		splash.setVisible(true);
 	}
 
-	public void start() {
+	public void start() throws Exception {
 		splash.updateProgress(AppResource.appText("init.midi"), 10);
 		initialize();
 	}
 
-	private void initialize() {
-		try {
-			// initialize
-			MabiDLS.getInstance().initializeMIDI();
-			splash.updateProgress("OK\n", 20);
+	private void initialize() throws Exception {
+		// initialize
+		MabiDLS.getInstance().initializeMIDI();
+		splash.updateProgress("OK\n", 20);
 
-			MMLTrack.setTempoAllowChardPartFunction(t -> {
-				InstType type = MabiDLS.getInstance().getInstByProgram(t).getType();
-				return type.allowTempoChordPart();
-			});
+		MMLTrack.setTempoAllowChardPartFunction(t -> {
+			InstType type = MabiDLS.getInstance().getInstByProgram(t).getType();
+			return type.allowTempoChordPart();
+		});
 
-			// loading DLS
-			splash.updateProgress(AppResource.appText("init.dls"), 20);
-			if ( !loadDLSFiles(20, 70) ) {
-				JOptionPane.showMessageDialog(null, AppResource.appText("error.needDls"), "ERROR", JOptionPane.ERROR_MESSAGE);
-				System.exit(1);
-			}
-			splash.updateProgress("OK\n", 90);
-
-			// create MainFrame
-			ActionDispatcher dispatcher = ActionDispatcher.getInstance();
-			MainFrame mainFrame = new MainFrame(dispatcher, dispatcher);
-			mainFrame.setTransferHandler(new FileTransferHandler(dispatcher));
-			splash.updateProgress("", 100);
-			dispatcher.setMainFrame(mainFrame).initialize();
-			if (dispatcher.recoveryCheck()) {
-			} else if (args.length > 0) {
-				dispatcher.checkAndOpenMMLFile(new File(args[0]));
-			}
-			mainFrame.setVisible(true);
-			splash.dispose();
-		} catch (Throwable e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(null, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
-			System.exit(1);
+		// loading DLS
+		splash.updateProgress(AppResource.appText("init.dls"), 20);
+		if ( !loadDLSFiles(20, 70) ) {
+			JOptionPane.showMessageDialog(null, AppResource.appText("error.needDls"), "ERROR", JOptionPane.ERROR_MESSAGE);
+			System.exit(0);
 		}
+		splash.updateProgress("OK\n", 90);
+
+		// create MainFrame
+		ActionDispatcher dispatcher = ActionDispatcher.getInstance();
+		MainFrame mainFrame = new MainFrame(dispatcher, dispatcher);
+		mainFrame.setTransferHandler(new FileTransferHandler(dispatcher));
+		splash.updateProgress("", 100);
+		dispatcher.setMainFrame(mainFrame).initialize();
+		if (dispatcher.recoveryCheck()) {
+		} else if (args.length > 0) {
+			dispatcher.checkAndOpenMMLFile(new File(args[0]));
+		}
+		mainFrame.setVisible(true);
+		splash.dispose();
 	}
 
 	/**
@@ -161,14 +157,22 @@ public final class MabiIcco {
 	}
 
 	public static void main(String args[]) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
-		UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
+		try {
+			UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
 
-		// font
-		String fontName = AppResource.appText("ui.font");
-		if (!fontName.equals("ui.font")) {
-			setUIFont(new javax.swing.plaf.FontUIResource(fontName, Font.PLAIN, 11));
+			// font
+			String fontName = AppResource.appText("ui.font");
+			if (!fontName.equals("ui.font")) {
+				setUIFont(new javax.swing.plaf.FontUIResource(fontName, Font.PLAIN, 11));
+			}
+
+			new MabiIcco(args).start();
+		} catch (Throwable e) {
+			try {
+				e.printStackTrace(new PrintStream(AppResource.getErrFile()));
+			} catch (FileNotFoundException e1) {}
+			JOptionPane.showMessageDialog(null, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+			System.exit(0);
 		}
-
-		new MabiIcco(args).start();
 	}
 }
