@@ -80,24 +80,24 @@ public class MabiDLSTest extends UseLoadingDLS {
 		};
 		byte t1[][] = new byte[][] {
 			new byte[]{(byte)ShortMessage.PROGRAM_CHANGE, 0x5},
-			new byte[]{(byte)ShortMessage.NOTE_ON, 69, 56}, // a
-			new byte[]{(byte)ShortMessage.NOTE_ON, 71, 56}, // b
-			new byte[]{(byte)ShortMessage.NOTE_ON, 60, 56}, // c
+			new byte[]{(byte)ShortMessage.NOTE_ON, 69, 39}, // a
+			new byte[]{(byte)ShortMessage.NOTE_ON, 71, 39}, // b
+			new byte[]{(byte)ShortMessage.NOTE_ON, 60, 39}, // c
 			new byte[]{(byte)ShortMessage.NOTE_OFF, 69, 0}, // a
 			new byte[]{(byte)ShortMessage.NOTE_OFF, 71, 0}, // b
 			new byte[]{(byte)ShortMessage.NOTE_OFF, 60, 0}, // c
 
-			new byte[]{(byte)ShortMessage.NOTE_ON, 69, 56}, // a
+			new byte[]{(byte)ShortMessage.NOTE_ON, 69, 39}, // a
 			new byte[]{(byte)ShortMessage.NOTE_OFF, 69, 0}, // a
 
-			new byte[]{(byte)ShortMessage.NOTE_ON, 69, 56}, // a
-			new byte[]{(byte)ShortMessage.NOTE_ON, 71, 56}, // b
-			new byte[]{(byte)ShortMessage.NOTE_ON, 60, 56}, // c
+			new byte[]{(byte)ShortMessage.NOTE_ON, 69, 39}, // a
+			new byte[]{(byte)ShortMessage.NOTE_ON, 71, 39}, // b
+			new byte[]{(byte)ShortMessage.NOTE_ON, 60, 39}, // c
 			new byte[]{(byte)ShortMessage.NOTE_OFF, 69, 0}, // a
 			new byte[]{(byte)ShortMessage.NOTE_OFF, 71, 0}, // b
 			new byte[]{(byte)ShortMessage.NOTE_OFF, 60, 0}, // c
 
-			new byte[]{(byte)ShortMessage.NOTE_ON, 69, 56}, // a
+			new byte[]{(byte)ShortMessage.NOTE_ON, 69, 39}, // a
 			new byte[]{(byte)ShortMessage.NOTE_OFF, 69, 0}, // a
 		};
 		for (int i = 0; i < t0.length; i++) {

@@ -45,7 +45,12 @@ public final class MabiDLS {
 	private ArrayList<InstClass> insts = new ArrayList<>();
 	private static final int DLS_BANK = (0x79 << 7);
 
-	public static final String DEFALUT_DLS_PATH = "Nexon/Mabinogi/mp3/MSXspirit.dls";
+	public static final String DEFALUT_DLS_PATH[] = { 
+			"Nexon/Mabinogi/mp3/MSXspirit01.dls",
+			"Nexon/Mabinogi/mp3/MSXspirit02.dls",
+			"Nexon/Mabinogi/mp3/MSXspirit03.dls",
+			"Nexon/Mabinogi/mp3/MSXspirit04.dls"
+	};
 
 	private ArrayList<Runnable> notifier = new ArrayList<>();
 	private boolean muteState[] = new boolean[ MAX_MIDI_PART+1 ];
@@ -558,7 +563,9 @@ public final class MabiDLS {
 			for (MidiDevice.Info info : MidiSystem.getMidiDeviceInfo()) {
 				System.out.println(info);
 			}
-			midi.loadingDLSFile(new File(DEFALUT_DLS_PATH));
+			for (String t : DEFALUT_DLS_PATH) {
+				midi.loadingDLSFile(new File(t));
+			}
 			System.exit(0);
 		} catch (Exception e) {
 			e.printStackTrace();

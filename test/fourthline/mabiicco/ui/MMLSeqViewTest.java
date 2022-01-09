@@ -502,7 +502,7 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 		assertEquals("*Rank 7` ( 1200, 400, 400 )", view.getRankText());
 
 		// 歌の音源に変更する
-		view.getComboBox().setSelectedIndex(38);
+		view.getComboBox().setSelectedIndex(39);
 		assertEquals(InstType.VOICE, MabiDLS.getInstance().getInstByProgram(obj.getSelectedTrack().getProgram()).getType());
 		assertEquals(false, obj.getSelectedTrack().isExcludeSongPart());
 		assertEquals("*Rank 1 ( 1200, 400, 400, 1200 )", view.getRankText());
