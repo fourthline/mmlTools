@@ -125,6 +125,14 @@ public final class InstClass {
 		return this.program;
 	}
 
+	public boolean checkPitchRange(int note) {
+		if ( (note < lowerNote) || (note > upperNote) ) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
 	public int getLowerNote() {
 		return this.lowerNote;
 	}
