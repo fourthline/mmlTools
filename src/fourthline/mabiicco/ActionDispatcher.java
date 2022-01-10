@@ -179,8 +179,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	}
 
 	private void initializeActionMap() {
-		actionMap.put(VIEW_SCALE_UP, t -> mmlSeqView.expandPianoViewWide(0));
-		actionMap.put(VIEW_SCALE_DOWN, t -> mmlSeqView.reducePianoViewWide(0));
+		actionMap.put(VIEW_SCALE_UP, t -> mmlSeqView.getPianoRollScaler().expandPianoViewWide());
+		actionMap.put(VIEW_SCALE_DOWN, t -> mmlSeqView.getPianoRollScaler().reducePianoViewWide());
 		actionMap.put(STOP, t -> this.stopAction());
 		actionMap.put(PAUSE, t -> this.pauseAction());
 		actionMap.put(FILE_OPEN, t -> this.openMMLFileAction());
