@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2020 たんらる
+ * Copyright (C) 2013-2022 たんらる
  */
 
 package fourthline.mabiicco.ui.editor;
@@ -72,6 +72,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		this.parentFrame = parentFrame;
 
 		pianoRoll.setSelectNote(selectedNote);
+		pianoRoll.addMouseInputListener(this);
 
 		velocityChangeMenu = new VelocityChangeMenu(popupMenu,
 				() -> popupTargetNote.getVelocity(),

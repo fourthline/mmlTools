@@ -123,8 +123,6 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 
 		// create mml editor
 		editor = new MMLEditor(parentFrame, keyboardView, pianoRollView, this);
-		pianoRollView.addMouseInputListener(editor);
-		pianoRollView.addMouseWheelListener(pianoRollScaler);
 		columnView = new ColumnPanel(parentFrame, pianoRollView, this, editor);
 
 		// create keyboard editor

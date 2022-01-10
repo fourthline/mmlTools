@@ -26,6 +26,7 @@ public final class PianoRollScaler implements MouseWheelListener {
 		this.pianoRollView = pv;
 		this.scrollPane = sp;
 		this.parent = parent;
+		pv.addMouseWheelListener(this);
 	}
 
 
