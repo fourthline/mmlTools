@@ -27,7 +27,9 @@ abstract public class UseLoadingDLS extends FileSelect {
 			MabiDLS midi = MabiDLS.getInstance();
 			if (midi.getAvailableInstByInstType(InstType.MAIN_INST_LIST).length == 0) {
 				midi.initializeMIDI();
-				midi.loadingDLSFile(new File(MabiDLS.DEFALUT_DLS_PATH));
+				for (String t : MabiDLS.DEFALUT_DLS_PATH) {
+					midi.loadingDLSFile(new File(t));
+				}
 			}
 		} catch (IOException | MidiUnavailableException | InvalidMidiDataException | LineUnavailableException e) {
 			throw new AssertionError();

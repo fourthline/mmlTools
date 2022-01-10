@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2021 たんらる
+ * Copyright (C) 2013-2022 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -81,11 +81,15 @@ public final class PianoRollView extends JPanel {
 	// スケール表示の色
 	private ScaleColor scaleColor = ScaleColor.C_MAJOR;
 
+	// pitch range border
+	private static final Color pitchRangeBorderColor = Color.RED;
+
 	public void setScaleColor(ScaleColor scaleColor) {
 		this.scaleColor = scaleColor;
 	}
 
 	private static final Color noSoundColor = new Color(0.9f, 0.8f, 0.8f);
+	private static final Color outRangeColor = new Color(230, 204, 204);
 
 	private static final Color barBorder = new Color(0.5f, 0.5f, 0.5f);
 	private static final Color darkBarBorder = new Color(0.3f, 0.2f, 0.3f);
@@ -318,6 +322,7 @@ public final class PianoRollView extends JPanel {
 		}
 
 		paintMeasure(g2);
+		paintPitchRangeBorder(g2);
 
 		paintOtherTrack(g2);
 		paintActiveTrack(g2);
@@ -338,10 +343,10 @@ public final class PianoRollView extends JPanel {
 		for (int i = 0; i < 12; i++) {
 			int line = octave*12 + (11-i);
 			Color fillColor = scaleColor.getColor(i);
-			if (relativeInst.isValid(line) == false) {
-				if (MabiIccoProperties.getInstance().viewRange.get()) {
-					fillColor = noSoundColor;
-				}
+			if (MabiIccoProperties.getInstance().viewRange.get() && !relativeInst.checkPitchRange(line)) {
+				fillColor = outRangeColor;
+			} else if (relativeInst.isValid(line) == false) {
+				fillColor = noSoundColor;
 			}
 			g.setColor(fillColor);
 			g.fillRect(0, i*noteHeight+y, width, noteHeight);
@@ -354,6 +359,17 @@ public final class PianoRollView extends JPanel {
 		}
 		g.setColor(darkBarBorder);
 		g.drawLine(0, 12*noteHeight+y, width, 12*noteHeight+y);
+	}
+
+	private void paintPitchRangeBorder(Graphics2D g) {
+		if (MabiIccoProperties.getInstance().viewRange.get()) {
+			int width = getWidth();
+			int y1 = convertNote2Y(relativeInst.getLowerNote()-1);
+			int y2 = convertNote2Y(relativeInst.getUpperNote());
+			g.setColor(pitchRangeBorderColor);
+			g.drawLine(0, y1, width, y1);
+			g.drawLine(0, y2, width, y2);
+		}
 	}
 
 	void paintSequenceLine(Graphics2D g, int height) {

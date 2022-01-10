@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2021 たんらる
+ * Copyright (C) 2013-2022 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -47,9 +47,6 @@ import java.awt.Frame;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -70,13 +67,14 @@ import java.util.function.IntConsumer;
  *  +- {@link MMLTrackView} ({@link TrackTabbedPane} extends JTabbedPane 内)
  * </pre>
  */
-public final class MMLSeqView implements IMMLManager, ChangeListener, ActionListener, MouseWheelListener {
+public final class MMLSeqView implements IMMLManager, ChangeListener, ActionListener, MainView {
 	private static final int INITIAL_TRACK_COUNT = 1;
 
 	private int trackCounter;
 
 	private final JScrollPane scrollPane;
 	private final PianoRollView pianoRollView;
+	private final PianoRollScaler pianoRollScaler;
 	private final KeyboardView keyboardView;
 	private final JTabbedPane tabbedPane;
 	private final ColumnPanel columnView;
@@ -114,6 +112,9 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		panel.add(scrollPane, BorderLayout.CENTER);
 		pianoRollView.setViewportAndParent(scrollPane.getViewport(), this);
 
+		// PianoRollScaler
+		pianoRollScaler = new PianoRollScaler(pianoRollView, scrollPane, this);
+
 		// MMLTrackView (tab) - SOUTH
 		tabbedPane = new TrackTabbedPane(this);
 		tabbedPane.addChangeListener(this);
@@ -122,8 +123,6 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 
 		// create mml editor
 		editor = new MMLEditor(parentFrame, keyboardView, pianoRollView, this);
-		pianoRollView.addMouseInputListener(editor);
-		pianoRollView.addMouseWheelListener(this);
 		columnView = new ColumnPanel(parentFrame, pianoRollView, this, editor);
 
 		// create keyboard editor
@@ -161,6 +160,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	}
 
 	private boolean currentEditMode = true;
+	@Override
 	public void repaint() {
 		boolean editMode = MabiIccoProperties.getInstance().enableEdit.get();
 		if (currentEditMode != editMode) {
@@ -517,77 +517,8 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		editor.setEditAlign(alignTick);
 	}
 
-
-	private int viewScaleIndex = 0;
-	private final double viewScaleTable[] = { 6, 5, 4, 3, 2, 1.5, 1, 0.75, 0.5, 0.375, 0.25 };
-
-	/**
-	 * ピアノロールビューの表示を1段階拡大します.
-	 * @param xOffset 拡大基準
-	 */
-	public void expandPianoViewWide(int xOffset) {
-		if (viewScaleIndex+1 < viewScaleTable.length) {
-			viewScaleIndex++;
-		}
-
-		double scale1 = pianoRollView.getWideScale();
-		pianoRollView.setWideScale(viewScaleTable[viewScaleIndex]);
-		repositionChangeScaleView(scale1, pianoRollView.getWideScale(), xOffset);
-	}
-
-	/**
-	 * ピアノロールビューの表示を1段階縮小します.
-	 * @param xOffset 縮小基準
-	 */
-	public void reducePianoViewWide(int xOffset) {
-		if (viewScaleIndex-1 >= 0) {
-			viewScaleIndex--;
-		}
-
-		double scale1 = pianoRollView.getWideScale();
-		pianoRollView.setWideScale(viewScaleTable[viewScaleIndex]);
-		repositionChangeScaleView(scale1, pianoRollView.getWideScale(), xOffset);
-	}
-
-	// TODO: 応急措置, 拡大時に表示位置を保持できていない.
-	private void repositionChangeScaleView(double scale1, double scale2, int xOffset) {
-		JViewport viewport = scrollPane.getViewport();
-		Point p = viewport.getViewPosition();
-
-		// 拡大/縮小したときの表示位置を調整します.
-		p.x = (int)((p.x + xOffset) * scale1 / scale2) - xOffset;
-		repaint();
-		viewport.updateUI();
-		viewport.setViewPosition(p);
-		if ( (viewport.getViewPosition().x != p.x) || (viewport.getViewPosition().y != p.y)) {
-			viewport.setViewPosition(p);
-		}
-	}
-
-	@Override
-	public void mouseWheelMoved(MouseWheelEvent e) {
-		JViewport viewport = scrollPane.getViewport();
-		Point p = viewport.getViewPosition();
-		int modifiers = e.getModifiersEx();
-		int rotation = e.getWheelRotation();
-		if (modifiers == InputEvent.CTRL_DOWN_MASK) {
-			if (rotation < 0) {
-				expandPianoViewWide( e.getX() - p.x );
-			} else {
-				reducePianoViewWide( e.getX() - p.x );
-			}
-		} else if (modifiers == InputEvent.SHIFT_DOWN_MASK) {
-			p.x += (rotation * 16);
-			if (p.x < 0) {
-				p.x = 0;
-			}
-			scrollPane.getViewport().setViewPosition(p);
-			repaint();
-		} else {
-			for (MouseWheelListener listener : scrollPane.getMouseWheelListeners()) {
-				listener.mouseWheelMoved(e);
-			}
-		}
+	public PianoRollScaler getPianoRollScaler() {
+		return this.pianoRollScaler;
 	}
 
 	/**
