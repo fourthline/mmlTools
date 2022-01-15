@@ -83,7 +83,7 @@ public final class MabiDLS {
 		int midiChannels = this.synthesizer.getChannels().length;
 		System.out.printf("Latency: %d\nMaxPolyphony: %d\nChannels: %d\n", latency, maxPolyphony, midiChannels);
 
-		this.sequencer = new MabiIccoSequencer(MidiSystem.getSequencer(), this);
+		this.sequencer = MidiSystem.getSequencer();
 		this.sequencer.open();
 		this.sequencer.addMetaEventListener(meta -> {
 			int type = meta.getType();

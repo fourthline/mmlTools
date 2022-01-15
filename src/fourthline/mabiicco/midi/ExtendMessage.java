@@ -69,6 +69,14 @@ public final class ExtendMessage extends ShortMessage {
 					target.send(message, timeStamp);
 					if (debug) System.out.println(messageString(message, timeStamp));
 				}
+			} else if (message instanceof ShortMessage e) {
+				int cmd = e.getCommand();
+				int ch = e.getChannel();
+				int d = e.getData1();
+				if ( (cmd == ShortMessage.CONTROL_CHANGE) && (ch == 0) && (d == 123) ) { // ch=0, all notes off
+					// シーケンサーの停止が遅い場合があるため、ch0へのallnoteOffで全chノートOFFする.
+					MabiDLS.getInstance().allNoteOff();
+				}
 			}
 		}
 
