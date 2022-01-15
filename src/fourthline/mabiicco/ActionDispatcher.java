@@ -576,7 +576,9 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	}
 
 	private void stopAction() {
+		NanoTime time = NanoTime.start();
 		MabiDLS.getInstance().getSequencer().stop();
+		showTime("stop", time);
 		mainFrame.enableNoplayItems();
 	}
 
