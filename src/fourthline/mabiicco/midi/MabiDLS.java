@@ -162,7 +162,7 @@ public final class MabiDLS {
 
 	public void allNoteOff() {
 		for (MidiChannel ch : this.channel) {
-			ch.allNotesOff();
+			ch.allSoundOff();
 
 			// sustain off
 			ch.controlChange(64, 0);

@@ -267,4 +267,12 @@ public class MMLStringOptimizerTest {
 		String expect =  "l32aaaarl8r.aaaaa";
 		checkMMLStringOptimize(input, expect);
 	}
+
+	@Ignore @Test(timeout=TIMEOUT)
+	public void test_bn2() {
+		/* 最適化改善パターン */
+		String input  =  "c1<a+b+a+>c1";
+		String expect =  "c1n22cn22c1";
+		checkMMLStringOptimize(input, expect);
+	}
 }

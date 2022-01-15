@@ -101,7 +101,7 @@ public final class MabiIccoSequencer implements Sequencer {
 
 	@Override
 	public void stop() {
-		target.stop();
+		target.stop(); // TODO: 2秒止まらない場合がある?
 		dls.allNoteOff();
 	}
 
