@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2021 たんらる
+ * Copyright (C) 2013-2022 たんらる
  */
 
 package fourthline.mmlTools;
@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.IntFunction;
 
 import fourthline.mmlTools.core.MMLText;
@@ -258,7 +259,12 @@ public final class MMLTrack implements Serializable, Cloneable {
 			mml[0] = "";
 		}
 		for (int i = 0; i < count; i++) {
-			mml[i] = new MMLStringOptimizer(mml[i]).toString();
+			if (mabiTempo) {
+				mml[i] = mabiMMLOptimizeFunc.apply(new MMLStringOptimizer(mml[i]));
+			} else {
+				// 内部データ向けは旧アルゴリズムを使用する.
+				mml[i] = new MMLStringOptimizer(mml[i]).toString();
+			}
 		}
 		if ((mmlParts.get(3).getTickLength() == 0)) {
 			mml[3] = "";
@@ -315,13 +321,18 @@ public final class MMLTrack implements Serializable, Cloneable {
 			mml[0] = "";
 		}
 		for (int i = 0; i < count; i++) {
-			mml[i] = new MMLStringOptimizer(mml[i]).toString();
+			mml[i] = mabiMMLOptimizeFunc.apply(new MMLStringOptimizer(mml[i]));
 		}
 		if ((mmlParts.get(3).getTickLength() == 0)) {
 			mml[3] = "";
 		}
 
 		return mml;
+	}
+
+	private Function<MMLStringOptimizer, String> mabiMMLOptimizeFunc = t -> t.toString();
+	public void setMabiMMLOptimizeFunc(Function<MMLStringOptimizer, String> f) {
+		mabiMMLOptimizeFunc = f;
 	}
 
 	private String tailFix(String melody, String chord1, String chord2) throws UndefinedTickException {

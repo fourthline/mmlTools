@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2017 たんらる
+ * Copyright (C) 2015-2022 たんらる
  */
 
 package fourthline.mmlTools.optimizer;
@@ -15,7 +15,7 @@ import fourthline.mmlTools.core.MMLTokenizer;
 /**
  * Ox, Lxを使用した最適化.
  */
-public final class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
+public class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 
 	/**
 	 * Lの文字列と、生成中文字列のBuilder.
@@ -62,7 +62,7 @@ public final class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 		});
 	}
 
-	private static StringBuilder newStringBuilder(Map<String, StringBuilder> map, String key, String init) {
+	protected static StringBuilder newStringBuilder(Map<String, StringBuilder> map, String key, String init) {
 		StringBuilder sb = map.get(key);
 		if (sb != null) {
 			sb.setLength(0);
@@ -73,7 +73,7 @@ public final class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 		return sb;
 	}
 
-	private StringBuilder newBuilder(StringBuilder sb, String lenString, String s, int insertBack) {
+	protected StringBuilder newBuilder(StringBuilder sb, String lenString, String s, int insertBack) {
 		StringBuilder changeBuilder = sb;
 		int len = changeBuilder.length();
 		// &や他の指示よりも前に配置する.
@@ -83,26 +83,32 @@ public final class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 	}
 
 	private final Map<String, StringBuilder> newBuilderMap = new HashMap<>();
+	private void updateBuilder(String key, StringBuilder builder, String minString, String noteName, String lenString, int insertBack) {
+		builder.append(noteName);
+		if (!key.equals(lenString)) {
+			if (lenString.equals(key+".")) {
+				builder.append(".");
+			} else {
+				builder.append(lenString);
+			}
+			newBuilderMap.put(lenString, newBuilder(newStringBuilder(newBuilderMap, lenString, minString), lenString, noteName, insertBack));
+			if (lenString.endsWith(".")) {
+				String lenString2 = lenString.substring(0, lenString.length()-1);
+				newBuilderMap.put(lenString2, newBuilder(newStringBuilder(newBuilderMap, lenString2, minString), lenString2, noteName+".", insertBack));
+			}
+			extendPatternBuilder(key, newBuilderMap, minString, noteName, lenString, insertBack);
+		}
+	}
+
+	protected void extendPatternBuilder(String key, Map<String, StringBuilder> newBuilderMap, String minString, String noteName, String lenString, int insertBack) {}
+
+
 	private void addNoteText(String noteName, String lenString, int insertBack) {
 		newBuilderMap.clear();
 		String minString = getMinString();
 
 		// 保有するbuilderを更新.
-		map.forEach((key, builder) -> {
-			builder.append(noteName);
-			if (!key.equals(lenString)) {
-				if (lenString.equals(key+".")) {
-					builder.append(".");
-				} else {
-					builder.append(lenString);
-				}
-				newBuilderMap.put(lenString, newBuilder(newStringBuilder(newBuilderMap, lenString, minString), lenString, noteName, insertBack));
-				if (lenString.endsWith(".")) {
-					String lenString2 = lenString.substring(0, lenString.length()-1);
-					newBuilderMap.put(lenString2, newBuilder(newStringBuilder(newBuilderMap, lenString2, minString), lenString2, noteName+".", insertBack));
-				}
-			}
-		});
+		map.forEach((key, builder) -> updateBuilder(key, builder, minString, noteName, lenString, insertBack));
 
 		// 新規のbuilderで保有mapを更新.
 		newBuilderMap.forEach((key, builder) -> {
@@ -208,7 +214,10 @@ public final class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 			lenString = this.section + ".";
 		}
 		addNoteText(noteName, lenString, insertBack);
+		fixPattern(map);
 	}
+
+	protected void fixPattern(Map<String, StringBuilder> map) {}
 
 	public static String getOctaveString(int prevOct, int nextOct) {
 		int delta = prevOct - nextOct;
