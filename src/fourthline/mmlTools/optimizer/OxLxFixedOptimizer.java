@@ -52,4 +52,22 @@ public final class OxLxFixedOptimizer extends OxLxOptimizer {
 			newBuilderMap.put(newKey, newBuilder(newStringBuilder(newBuilderMap, newKey, ssb.toString()), newKey, noteName, insertBack));
 		}
 	}
+
+	private static class OptimizerMap2 extends OptimizerMap {
+		private static final long serialVersionUID = -1916149376927832458L;
+
+		@Override
+		protected void updateMapMinLength(String key, StringBuilder builder) {
+			String s1 = new MMLStringOptimizer(builder.toString()).optimizeOct();
+			StringBuilder now = this.get(key);
+			if ( (now == null) || (s1.length() < new MMLStringOptimizer(now.toString()).optimizeOct().length()) ) {
+				this.put(key, builder);
+			}
+		}
+	}
+
+	@Override
+	protected OptimizerMap createOptimizerMap() {
+		return new OptimizerMap2();
+	}
 }

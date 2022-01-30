@@ -17,10 +17,25 @@ import fourthline.mmlTools.core.MMLTokenizer;
  */
 public class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 
+	public static class OptimizerMap extends HashMap<String, StringBuilder> {
+		private static final long serialVersionUID = -7335134548044714344L;
+
+		protected void updateMapMinLength(String key, StringBuilder builder) {
+			StringBuilder now = this.get(key);
+			if ( (now == null) || (builder.length() < now.length()) ) {
+				this.put(key, builder);
+			}
+		}
+	}
+
+	protected OptimizerMap createOptimizerMap() {
+		return new OptimizerMap();
+	}
+
 	/**
 	 * Lの文字列と、生成中文字列のBuilder.
 	 */
-	private final Map<String, StringBuilder> map = new HashMap<>();
+	private final OptimizerMap map = createOptimizerMap();
 
 	public OxLxOptimizer() {
 		map.clear();
@@ -102,7 +117,6 @@ public class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 
 	protected void extendPatternBuilder(String key, Map<String, StringBuilder> newBuilderMap, String minString, String noteName, String lenString, int insertBack) {}
 
-
 	private void addNoteText(String noteName, String lenString, int insertBack) {
 		newBuilderMap.clear();
 		String minString = getMinString();
@@ -111,15 +125,7 @@ public class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 		map.forEach((key, builder) -> updateBuilder(key, builder, minString, noteName, lenString, insertBack));
 
 		// 新規のbuilderで保有mapを更新.
-		newBuilderMap.forEach((key, builder) -> {
-			if (map.containsKey(key)) {
-				if ( builder.length() < map.get(key).length() ) {
-					map.put(key, builder);
-				}
-			} else {
-				map.put(key, builder);
-			}
-		});
+		newBuilderMap.forEach((key, builder) -> map.updateMapMinLength(key, builder));
 
 		FlexDotPattern.updateFlexDot(map, noteName, lenString);
 	}
@@ -142,7 +148,7 @@ public class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 			this.lPrev = Integer.toString(l/4);
 		}
 
-		private void updatePattern(Map<String, StringBuilder> map, String noteName, String lenString) {
+		private void updatePattern(OptimizerMap map, String noteName, String lenString) {
 			String cName = noteName;
 			if (!noteName.toLowerCase().equals("r")) {
 				cName = "&" + noteName;
@@ -166,15 +172,10 @@ public class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 				}
 			}
 
-			updateMap.forEach((key, builder) -> {
-				StringBuilder now = map.get(key);
-				if ( (now == null) || (builder.length() < now.length()) ) {
-					map.put(key, builder);
-				}
-			});
+			updateMap.forEach((key, builder) -> map.updateMapMinLength(key, builder));
 		}
 
-		private static void updateFlexDot(Map<String, StringBuilder> map, String noteName, String lenString) {
+		private static void updateFlexDot(OptimizerMap map, String noteName, String lenString) {
 			for (FlexDotPattern t : flexList) {
 				if (lenString.equals(t.lCur)) {
 					t.updatePattern(map, noteName, lenString);

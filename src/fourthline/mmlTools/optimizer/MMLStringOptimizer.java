@@ -49,6 +49,13 @@ public final class MMLStringOptimizer {
 		return optimize(optimizerList);
 	}
 
+	public String optimizeOct() {
+		Optimizer optimizerList[] = {
+				new NxBpCmOptimizer()
+		};
+		return optimize(optimizerList);
+	}
+
 	private String optimize() {
 		Optimizer optimizerList[] = {
 				new OxLxOptimizer(),
