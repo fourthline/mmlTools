@@ -348,4 +348,13 @@ public class MMLStringOptimizerTest {
 		checkMMLStringOptimize(input, expect);
 		checkMMLStringOptimize(input, expect, t -> t.optimizeGen2());
 	}
+
+	@Test
+	public void test_gen2_ln25() throws UndefinedTickException {
+		/* Gen2チェックパターン3 */
+		String input =  "l2fffc+<g+4>d+d+4.l8n22f&f2.n22f1d+1f1&f2.ff";
+		String expect=  "l2fffc+<g+4>d+d+4.l8n22f&f2.n22f1d+1f1&f2.ff";
+		checkMMLStringOptimize(input, expect);
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen2());
+	}
 }

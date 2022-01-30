@@ -76,7 +76,7 @@ public final class MMLStringOptimizer {
 		return mml;
 	}
 
-	interface Optimizer {
+	public interface Optimizer {
 		public void nextToken(String token);
 		public String getMinString();
 	}
