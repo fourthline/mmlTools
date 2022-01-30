@@ -35,6 +35,11 @@ public class NxOptimizer implements MMLStringOptimizer.Optimizer {
 			prevOct = initOct;
 		}
 
+		protected NxBuilder(int initOct, String initStr) {
+			prevOct = initOct;
+			builder = new StringBuilder(initStr);
+		}
+
 		@Override
 		public String toString() {
 			return builder.toString()+" [o"+prevOct+"] ("+offset+") ";
@@ -70,12 +75,16 @@ public class NxOptimizer implements MMLStringOptimizer.Optimizer {
 		}).get();
 	}
 
+	protected int getCurrentNoteNumber() {
+		return parser.getNoteNumber();
+	}
+
 	/**
 	 * nのパターンを追加する
 	 * @param prevMap
 	 */
-	protected void addPattern(List<NxBuilder> prevMap) {
-		int noteNumber = parser.getNoteNumber();
+	private void addPattern(List<NxBuilder> prevMap) {
+		int noteNumber = getCurrentNoteNumber();
 		if ( (noteNumber < 0) || (noteNumber > 96) ) {
 			return;
 		}
@@ -99,7 +108,7 @@ public class NxOptimizer implements MMLStringOptimizer.Optimizer {
 		});
 	}
 
-	protected List<NxBuilder> listClone() {
+	private List<NxBuilder> listClone() {
 		List<NxBuilder> cloneList = new ArrayList<>();
 		builderList.forEach(t -> {
 			cloneList.add(t.clone());
@@ -107,7 +116,7 @@ public class NxOptimizer implements MMLStringOptimizer.Optimizer {
 		return cloneList;
 	}
 
-	protected void cleanList() {
+	private void cleanList() {
 		NxBuilder min = minStack(builderList);
 		builderList.clear();
 		builderList.add(min);
@@ -141,7 +150,7 @@ public class NxOptimizer implements MMLStringOptimizer.Optimizer {
 		}
 	}
 
-	protected void addNoteToken(String token) {
+	private void addNoteToken(String token) {
 		builderList.forEach(t -> {
 			t.builder.append( OxLxOptimizer.getOctaveString(t.prevOct, octave) );
 			t.builder.append(token);
@@ -150,7 +159,7 @@ public class NxOptimizer implements MMLStringOptimizer.Optimizer {
 		clearOctToken();
 	}
 
-	protected void addToken(String token) {
+	private void addToken(String token) {
 		builderList.forEach(t -> {
 			t.builder.append(token);
 		});

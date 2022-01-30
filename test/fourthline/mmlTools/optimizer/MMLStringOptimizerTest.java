@@ -291,7 +291,7 @@ public class MMLStringOptimizerTest {
 		checkMMLStringOptimize(input, expect, t -> t.optimizeGen2());
 	}
 
-	@Test(timeout=TIMEOUT)
+	@Test
 	public void test_con2() {
 		/* &で接続されたノート */
 		String input  =  "d2d2d2d2c2.&c8";
@@ -327,6 +327,25 @@ public class MMLStringOptimizerTest {
 		/* 最適化改善パターン: 1つの休符を分割使用する */
 		String input  =  "l32crrrcrrrcrrrcrrrb";
 		String expect =  "l32crrrcrrrcrrrcrrrb";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen2());
+	}
+
+	@Test
+	public void test_gen2_n23() throws UndefinedTickException {
+		/* Gen2チェックパターン1 */
+		String input  = "l2f+.r4f+.f+4<f1b>b<f+4>c+4f+f1f+1f+1f+.r4f+.f+4f8>f+4f+<c-bff4r4c-1c+<f+c-1n49d+c-1n49f+";
+		String expect = "l2f+.r4f+.f+4<f1b>b<f+4>c+4f+f1f+1f+1f+.r4f+.f+4f8>f+4f+<c-bff4r4c-1c+<f+c-1n49d+c-1n49f+";
+		String expect2= "l2f+.r4f+.f+4<f1bn59f+4>c+4f+f1f+1f+1f+.r4f+.f+4f8>f+4f+<c-bff4r4<b1n49f+c-1n49d+c-1n49f+";
+		checkMMLStringOptimize(input, expect);
+		checkMMLStringOptimize(input, expect2, t -> t.optimizeGen2());
+	}
+
+	@Test
+	public void test_gen2_n24() throws UndefinedTickException {
+		/* Gen2チェックパターン2 */
+		String input  = "l64ffffffr1v12l4<<a+fg";
+		String expect = "l64ffffffr1v12l4<<a+fg";
+		checkMMLStringOptimize(input, expect);
 		checkMMLStringOptimize(input, expect, t -> t.optimizeGen2());
 	}
 }

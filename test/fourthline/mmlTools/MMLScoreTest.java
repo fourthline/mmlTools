@@ -258,6 +258,14 @@ public class MMLScoreTest extends FileSelect {
 						assertTrue(mml1.getText(2).length() >= mml2.getText(2).length()*0.97);
 						assertTrue(mml1.getText(3).length() >= mml2.getText(3).length()*0.97);
 						assertEquals(new MMLTrack().setMML(mml1.getMML()), new MMLTrack().setMML(mml2.getMML()));
+
+						String mabiMMLoptGen1 = t.getMabiMML();
+						t.setMabiMMLOptimizeFunc(tt -> tt.optimizeGen2());
+						String mabiMMLoptGen2 = t.generate().getMabiMML();
+						System.out.println("gen1: " + mabiMMLoptGen1);
+						System.out.println("gen2: " + mabiMMLoptGen2);
+						System.out.println("gen1: " + mabiMMLoptGen1.length() + ", gen2: " + mabiMMLoptGen2.length());
+						assertTrue(mabiMMLoptGen1.length() >= mabiMMLoptGen2.length());
 					} catch (UndefinedTickException e) {
 						fail(e.getMessage());
 					}
