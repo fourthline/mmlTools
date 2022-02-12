@@ -30,6 +30,7 @@ import fourthline.FileSelect;
 import fourthline.UseLoadingDLS;
 import fourthline.mmlTools.core.MMLText;
 import fourthline.mmlTools.core.UndefinedTickException;
+import fourthline.mmlTools.optimizer.MMLStringOptimizer;
 import fourthline.mmlTools.parser.IMMLFileParser;
 import fourthline.mmlTools.parser.MMLParseException;
 
@@ -299,6 +300,7 @@ public class MMLScoreTest extends FileSelect {
 	 */
 	@Test
 	public void testLocalMMLParse() {
+		MMLStringOptimizer.counterReset();
 		try {
 			String listFile = "localMMLFileList.txt";
 			InputStream stream = fileSelect(listFile);
@@ -312,6 +314,7 @@ public class MMLScoreTest extends FileSelect {
 				mmlFileParse(s, overwriteToLocalMMLOption);
 			});
 		} catch (IOException e) {}
+		MMLStringOptimizer.printCounter();
 	}
 
 	/**

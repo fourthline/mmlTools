@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 たんらる
+ * Copyright (C) 2013-2022 たんらる
  */
 
 package fourthline.mmlTools.core;
@@ -15,19 +15,18 @@ public final class MMLTokenizer implements Iterator<String> {
 	private static final String noteString = "abcdefgABCDEFGnNrR";
 	private static final String tokenString = noteString + "tToOlLvV<>&";
 	private final String mml_src;
-	int startIndex = 0;
-	int endIndex = 0;
+	private final int mml_length;
+	private int startIndex = 0;
+	private int endIndex = 0;
 
 	public MMLTokenizer(String src) {
 		mml_src = src;
+		mml_length = src.length();
 	}
 
 	@Override
 	public boolean hasNext() {
-		if (endIndex < mml_src.length())
-			return true;
-
-		return false;
+		return (endIndex < mml_length) ? true : false;
 	}
 
 	@Override

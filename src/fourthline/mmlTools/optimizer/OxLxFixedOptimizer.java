@@ -4,8 +4,11 @@
 
 package fourthline.mmlTools.optimizer;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import fourthline.mmlTools.core.MMLTokenizer;
 
 /**
  * OxLx機能拡張
@@ -53,15 +56,49 @@ public final class OxLxFixedOptimizer extends OxLxOptimizer {
 		}
 	}
 
-	private static class OptimizerMap2 extends OptimizerMap {
+	public static class OptimizerMap2 extends OptimizerMap {
 		private static final long serialVersionUID = -1916149376927832458L;
+		public static int count = 0;
+
+		record OptimizerCache(String mml, NxBpCmOptimizer optimizer) {}
+
+		// key, cache data
+		private final HashMap<String, OptimizerCache> cacheMap = new HashMap<>();
+
+		private NxBpCmOptimizer opti(String mml) {
+			count++;
+			NxBpCmOptimizer optimizer = new NxBpCmOptimizer();
+			new MMLTokenizer(mml).forEachRemaining(t -> optimizer.nextToken(t));
+			return optimizer;
+		}
+
+		private NxBpCmOptimizer getOptimizer(String key, String mml) {
+			if (cacheMap.containsKey(key)) {
+				OptimizerCache cache = cacheMap.get(key);
+				int index = cache.mml.length();
+				if ( (mml.length() > index) && mml.substring(0, index).equals(cache.mml)) {
+					String s = mml.substring(index);
+					new MMLTokenizer(s).forEachRemaining(t -> cache.optimizer.nextToken(t));
+					cacheMap.put(key, new OptimizerCache(mml, cache.optimizer));
+					return cache.optimizer;
+				}
+			}
+			NxBpCmOptimizer opt = opti(mml);
+			cacheMap.put(key, new OptimizerCache(mml, opt));
+			return opt;
+		}
 
 		@Override
 		protected void updateMapMinLength(String key, StringBuilder builder) {
-			String s1 = new MMLStringOptimizer(builder.toString()).optimizeOct();
 			StringBuilder now = this.get(key);
-			if ( (now == null) || (s1.length() < new MMLStringOptimizer(now.toString()).optimizeOct().length()) ) {
+			if ( (now == null) ) {
 				this.put(key, builder);
+			} else {
+				int i1 = new MMLStringOptimizer(builder.toString()).optimizeOct().length(); // TODO: ここが重い.
+				int i2 =  getOptimizer(key, now.toString()).getMinString().length();
+				if (i1 < i2) {
+					this.put(key, builder);
+				}
 			}
 		}
 	}

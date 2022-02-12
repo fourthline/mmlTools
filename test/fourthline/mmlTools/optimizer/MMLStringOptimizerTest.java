@@ -314,7 +314,7 @@ public class MMLStringOptimizerTest {
 		checkMMLStringOptimize(input, expect);
 	}
 
-	@Test(timeout=TIMEOUT)
+	@Test
 	public void test_bn2() {
 		/* 最適化改善パターン */
 		String input  =  "c1<a+b+a+>c1";
