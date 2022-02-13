@@ -84,10 +84,8 @@ public final class MMLTokenizer implements Iterator<String> {
 	}
 
 	public int searchToken(int startIndex) {
-		int length = mml_src.length();
-
 		int index;
-		for (index = startIndex; index < length; index++) {
+		for (index = startIndex; index < mml_length; index++) {
 			char ch = mml_src.charAt(index);
 			if (isToken(ch))
 				break;

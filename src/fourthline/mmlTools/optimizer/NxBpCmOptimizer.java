@@ -13,7 +13,7 @@ public final class NxBpCmOptimizer extends NxOptimizer {
 	private final class NxBuilderPattern extends HashMap<Integer, String> {
 		private static final long serialVersionUID = 2475114248706563390L;
 		private void addToken(NxBuilder builder, int nextOctave, String token) {
-			StringBuilder sb = new StringBuilder(builder.builder.toString());
+			StringBuilder sb = new StringBuilder(builder.builder);
 		
 			sb.append( OxLxOptimizer.getOctaveString(builder.prevOct, nextOctave) );
 			sb.append(token);
@@ -26,6 +26,18 @@ public final class NxBpCmOptimizer extends NxOptimizer {
 	}
 
 	private final NxBuilderPattern map = new NxBuilderPattern();
+
+	public NxBpCmOptimizer() {
+		super();
+	}
+
+	public NxBpCmOptimizer(int octave, String initStr) {
+		super();
+		this.octave = octave;
+		builderList.clear();
+		builderList.add(new NxBuilder(octave, initStr));
+		parser.setOctave(octave);
+	}
 
 	@Override
 	protected void notePattern(String token, String noteName, String noteLength) {

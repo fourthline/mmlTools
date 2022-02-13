@@ -111,11 +111,11 @@ public class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 				String lenString2 = lenString.substring(0, lenString.length()-1);
 				newBuilderMap.put(lenString2, newBuilder(newStringBuilder(newBuilderMap, lenString2, minString), lenString2, noteName+".", insertBack));
 			}
-			extendPatternBuilder(key, newBuilderMap, minString, noteName, lenString, insertBack);
+			extendPatternBuilder(newBuilderMap, minString, noteName, lenString, insertBack);
 		}
 	}
 
-	protected void extendPatternBuilder(String key, Map<String, StringBuilder> newBuilderMap, String minString, String noteName, String lenString, int insertBack) {}
+	protected void extendPatternBuilder(Map<String, StringBuilder> newBuilderMap, String minString, String noteName, String lenString, int insertBack) {}
 
 	private void addNoteText(String noteName, String lenString, int insertBack) {
 		newBuilderMap.clear();

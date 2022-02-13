@@ -4,7 +4,6 @@
 
 package fourthline.mmlTools.optimizer;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,7 +46,12 @@ public final class OxLxFixedOptimizer extends OxLxOptimizer {
 	 * l2c&c4. -> l2c.l8c のパターンをつくる
 	 */
 	@Override
-	protected void extendPatternBuilder(String key, Map<String, StringBuilder> newBuilderMap, String minString, String noteName, String lenString, int insertBack) {
+	protected void extendPatternBuilder(Map<String, StringBuilder> newBuilderMap, String minString, String noteName, String lenString, int insertBack) {
+		int keyIndex = minString.lastIndexOf("l");
+		String key = "4";
+		if (keyIndex >= 0) {
+			key = new MMLTokenizer(minString.substring(keyIndex)).next().substring(1); 
+		}
 		if ( (insertBack > 0) && (!key.endsWith(".")) && (minString.endsWith(noteName+"&")) && (lenString.equals( Integer.parseInt(key)*2 + ".") )) {
 			String newKey = ""+Integer.parseInt(key)*4;
 			StringBuilder ssb = new StringBuilder(minString);
@@ -56,36 +60,54 @@ public final class OxLxFixedOptimizer extends OxLxOptimizer {
 		}
 	}
 
-	public static class OptimizerMap2 extends OptimizerMap {
+	public static final class OptimizerMap2 extends OptimizerMap {
 		private static final long serialVersionUID = -1916149376927832458L;
-		public static int count = 0;
 
-		record OptimizerCache(String mml, NxBpCmOptimizer optimizer) {}
-
-		// key, cache data
-		private final HashMap<String, OptimizerCache> cacheMap = new HashMap<>();
-
-		private NxBpCmOptimizer opti(String mml) {
-			count++;
-			NxBpCmOptimizer optimizer = new NxBpCmOptimizer();
-			new MMLTokenizer(mml).forEachRemaining(t -> optimizer.nextToken(t));
-			return optimizer;
-		}
-
-		private NxBpCmOptimizer getOptimizer(String key, String mml) {
-			if (cacheMap.containsKey(key)) {
-				OptimizerCache cache = cacheMap.get(key);
-				int index = cache.mml.length();
-				if ( (mml.length() > index) && mml.substring(0, index).equals(cache.mml)) {
-					String s = mml.substring(index);
-					new MMLTokenizer(s).forEachRemaining(t -> cache.optimizer.nextToken(t));
-					cacheMap.put(key, new OptimizerCache(mml, cache.optimizer));
-					return cache.optimizer;
+		private static int compString(StringBuilder s1, StringBuilder s2) {
+			int len = Math.min(s1.length(), s2.length());
+			int i;
+			for (i = 0; i < len; i++) {
+				if (s1.charAt(i) != s2.charAt(i)) {
+					break;
 				}
 			}
-			NxBpCmOptimizer opt = opti(mml);
-			cacheMap.put(key, new OptimizerCache(mml, opt));
-			return opt;
+
+			while (i > 0) {
+				i--;
+				char c = s1.charAt(i);
+				if (MMLTokenizer.isToken(c) || MMLTokenizer.isNote(c))
+					break;
+			}
+			return i;
+		}
+
+		private static int calcOctave(String mml) {
+			int octave = 4;
+			for (int i = 0; i < mml.length(); i++) {
+				switch (mml.charAt(i)) {
+				case '<':
+					octave--;
+					break;
+				case '>':
+					octave++;
+					break;
+				case 'o':
+				case 'O':
+					i++;
+					octave = Integer.parseInt(mml.charAt(i)+"");
+					break;
+				}
+			}
+			return octave;
+		}
+
+		public static int count = 0;
+		private static int calcSubNxBpCpOptLength(String mml, int commonLen, int octave) {
+			count++;
+			String initStr = mml.substring(0, commonLen);
+			NxBpCmOptimizer optimizer = new NxBpCmOptimizer(octave, initStr);
+			new MMLTokenizer(mml.substring(commonLen)).forEachRemaining(t -> optimizer.nextToken(t));
+			return optimizer.getMinString().length();
 		}
 
 		@Override
@@ -94,8 +116,10 @@ public final class OxLxFixedOptimizer extends OxLxOptimizer {
 			if ( (now == null) ) {
 				this.put(key, builder);
 			} else {
-				int i1 = new MMLStringOptimizer(builder.toString()).optimizeOct().length(); // TODO: ここが重い.
-				int i2 =  getOptimizer(key, now.toString()).getMinString().length();
+				int commonLen = compString(builder, now);
+				int octave = calcOctave(builder.substring(0, commonLen));
+				int i1 = calcSubNxBpCpOptLength(builder.toString(), commonLen, octave);
+				int i2 = calcSubNxBpCpOptLength(now.toString(), commonLen, octave);
 				if (i1 < i2) {
 					this.put(key, builder);
 				}

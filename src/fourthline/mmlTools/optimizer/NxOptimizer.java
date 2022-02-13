@@ -57,7 +57,7 @@ public class NxOptimizer implements MMLStringOptimizer.Optimizer {
 	}
 
 	protected int octave = 4;
-	private final MelodyParser parser = new MelodyParser("");
+	protected final MelodyParser parser = new MelodyParser("");
 
 	protected final List<NxBuilder> builderList = new ArrayList<>();
 
