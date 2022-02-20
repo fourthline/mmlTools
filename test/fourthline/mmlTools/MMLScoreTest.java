@@ -305,8 +305,8 @@ public class MMLScoreTest extends FileSelect {
 		}
 	}
 
-	private final MMLOptimizerPerfomanceCounter optNormal = new MMLOptimizerPerfomanceCounter("Normal", t -> t.toString());
-	private final MMLOptimizerPerfomanceCounter optGen2   = new MMLOptimizerPerfomanceCounter("Gen2  ", t -> t.optimizeGen2());
+	private final MMLOptimizerPerfotmanceCounter optNormal = new MMLOptimizerPerfotmanceCounter("Normal", t -> t.toString());
+	private final MMLOptimizerPerfotmanceCounter optGen2   = new MMLOptimizerPerfotmanceCounter("Gen2  ", t -> t.optimizeGen2());
 	/**
 	 * ローカルのファイルを読み取って, MML最適化に劣化がないかどうかを確認するテスト.
 	 */
@@ -559,19 +559,19 @@ public class MMLScoreTest extends FileSelect {
 		assertEquals(2000, score.getTotalTickLengthWithAll());
 	}
 
-	public static class MMLOptimizerPerfomanceCounter implements Function<MMLStringOptimizer, String> {
+	public static class MMLOptimizerPerfotmanceCounter implements Function<MMLStringOptimizer, String> {
 		private long output = 0;
 		private long time = 0;
 		private final String name;
 		private final Function<MMLStringOptimizer, String> f;
 
-		public MMLOptimizerPerfomanceCounter(String name, Function<MMLStringOptimizer, String> func) {
+		public MMLOptimizerPerfotmanceCounter(String name, Function<MMLStringOptimizer, String> func) {
 			this.name = name;
 			this.f = func;
 		}
 
 		public void printReport() {
-			System.out.println(name+": output = " + output + ", time = " + time + " [us], speed = " + output/(time/1000) + " [/ms]");
+			System.out.println(name+": output = " + output + ", time = " + time/1000 + " [ms], speed = " + output/(time/1000) + " [k/s]");
 		}
 
 		@Override
@@ -582,5 +582,12 @@ public class MMLScoreTest extends FileSelect {
 			output += ret.length();
 			return ret;
 		}
+	}
+
+	public static void main(String args[]) {
+		var o = new MMLScoreTest();
+		MMLScoreTest.setupClass();
+		o.setup();
+		o.testLocalMMLParse();
 	}
 }

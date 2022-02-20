@@ -64,17 +64,19 @@ public final class OxLxFixedOptimizer extends OxLxOptimizer {
 		private static final long serialVersionUID = -1916149376927832458L;
 
 		private static int compString(StringBuilder s1, StringBuilder s2) {
-			int len = Math.min(s1.length(), s2.length());
+			char[] ss1 = s1.toString().toCharArray();
+			char[] ss2 = s2.toString().toCharArray();
+			int len = Math.min(ss1.length, ss2.length);
 			int i;
 			for (i = 0; i < len; i++) {
-				if (s1.charAt(i) != s2.charAt(i)) {
+				if (ss1[i] != ss2[i]) {
 					break;
 				}
 			}
 
 			while (i > 0) {
 				i--;
-				char c = s1.charAt(i);
+				char c = ss1[i];
 				if (MMLTokenizer.isToken(c) || MMLTokenizer.isNote(c))
 					break;
 			}
@@ -82,9 +84,10 @@ public final class OxLxFixedOptimizer extends OxLxOptimizer {
 		}
 
 		private static int calcOctave(String mml) {
+			char[] a = mml.toCharArray();
 			int octave = 4;
-			for (int i = 0; i < mml.length(); i++) {
-				switch (mml.charAt(i)) {
+			for (int i = 0; i < a.length; i++) {
+				switch (a[i]) {
 				case '<':
 					octave--;
 					break;
@@ -94,7 +97,7 @@ public final class OxLxFixedOptimizer extends OxLxOptimizer {
 				case 'o':
 				case 'O':
 					i++;
-					octave = Integer.parseInt(mml.charAt(i)+"");
+					octave = a[i] - '0';
 					break;
 				}
 			}
@@ -102,7 +105,7 @@ public final class OxLxFixedOptimizer extends OxLxOptimizer {
 		}
 
 		public static int count = 0;
-		private static int calcSubNxBpCpOptLength(String mml, int commonLen, int octave) {
+		private static int calcSubNxBpCmOptLength(String mml, int commonLen, int octave) {
 			count++;
 			String initStr = mml.substring(0, commonLen);
 			NxBpCmOptimizer optimizer = new NxBpCmOptimizer(octave, initStr);
@@ -118,8 +121,8 @@ public final class OxLxFixedOptimizer extends OxLxOptimizer {
 			} else {
 				int commonLen = compString(builder, now);
 				int octave = calcOctave(builder.substring(0, commonLen));
-				int i1 = calcSubNxBpCpOptLength(builder.toString(), commonLen, octave);
-				int i2 = calcSubNxBpCpOptLength(now.toString(), commonLen, octave);
+				int i1 = calcSubNxBpCmOptLength(builder.toString(), commonLen, octave);
+				int i2 = calcSubNxBpCmOptLength(now.toString(), commonLen, octave);
 				if (i1 < i2) {
 					this.put(key, builder);
 				}

@@ -234,11 +234,13 @@ public class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 	}
 
 	private void insertOxPattern(int insertBack) {
-		int nextOct = this.octave + this.octD;
-		addString(getOctaveString(this.octave, nextOct), insertBack);
+		if (this.octD != 0) {
+			int nextOct = this.octave + this.octD;
+			addString(getOctaveString(this.octave, nextOct), insertBack);
 
-		this.octave = nextOct;
-		this.octD = 0;
+			this.octave = nextOct;
+			this.octD = 0;
+		}
 	}
 
 	private boolean doToken(char firstC, String lenString) {
