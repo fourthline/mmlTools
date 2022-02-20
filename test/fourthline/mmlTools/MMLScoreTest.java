@@ -16,6 +16,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.junit.After;
@@ -29,7 +30,9 @@ import org.junit.Test;
 import fourthline.FileSelect;
 import fourthline.UseLoadingDLS;
 import fourthline.mmlTools.core.MMLText;
+import fourthline.mmlTools.core.NanoTime;
 import fourthline.mmlTools.core.UndefinedTickException;
+import fourthline.mmlTools.optimizer.MMLStringOptimizer;
 import fourthline.mmlTools.parser.IMMLFileParser;
 import fourthline.mmlTools.parser.MMLParseException;
 
@@ -243,7 +246,9 @@ public class MMLScoreTest extends FileSelect {
 						MMLText mml1 = new MMLText().setMMLText(t.getOriginalMML());
 						String rank1 = mml1.mmlRankFormat();
 						System.out.println("mml1: "+mml1.getMML());
+						t.setMabiMMLOptimizeFunc(optNormal);
 						t.generate();
+						t.setMabiMMLOptimizeFunc(tt -> tt.toString());
 						MMLText mml2 = new MMLText().setMMLText(t.getOriginalMML());
 						System.out.println("mml2: "+mml2.getMML());
 						String rank2 = mml2.mmlRankFormat();
@@ -286,6 +291,7 @@ public class MMLScoreTest extends FileSelect {
 		}
 	}
 
+	private final MMLOptimizerPerfotmanceCounter optNormal = new MMLOptimizerPerfotmanceCounter("Normal", t -> t.toString());
 	/**
 	 * ローカルのファイルを読み取って, MML最適化に劣化がないかどうかを確認するテスト.
 	 */
@@ -304,6 +310,8 @@ public class MMLScoreTest extends FileSelect {
 				mmlFileParse(s, overwriteToLocalMMLOption);
 			});
 		} catch (IOException e) {}
+
+		optNormal.printReport();
 	}
 
 	/**
@@ -532,5 +540,37 @@ public class MMLScoreTest extends FileSelect {
 		score.getTempoEventList().add(new MMLTempoEvent(92, 1800));
 		assertEquals(384, score.getTotalTickLength());
 		assertEquals(2000, score.getTotalTickLengthWithAll());
+	}
+
+	public static class MMLOptimizerPerfotmanceCounter implements Function<MMLStringOptimizer, String> {
+		private long output = 0;
+		private long time = 0;
+		private final String name;
+		private final Function<MMLStringOptimizer, String> f;
+
+		public MMLOptimizerPerfotmanceCounter(String name, Function<MMLStringOptimizer, String> func) {
+			this.name = name;
+			this.f = func;
+		}
+
+		public void printReport() {
+			System.out.println(name+": output = " + output + ", time = " + time/1000 + " [ms], speed = " + output/(time/1000) + " [k/s]");
+		}
+
+		@Override
+		public String apply(MMLStringOptimizer t) {
+			NanoTime time = NanoTime.start();
+			String ret = f.apply(t);
+			this.time += time.us();
+			output += ret.length();
+			return ret;
+		}
+	}
+
+	public static void main(String args[]) {
+		var o = new MMLScoreTest();
+		MMLScoreTest.setupClass();
+		o.setup();
+		o.testLocalMMLParse();
 	}
 }
