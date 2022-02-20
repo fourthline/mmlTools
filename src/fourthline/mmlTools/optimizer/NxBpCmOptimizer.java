@@ -11,16 +11,28 @@ import java.util.Map;
  * Nx + BpCm統合版
  */
 public final class NxBpCmOptimizer extends NxOptimizer {
+	/**
+	 * パターン構築用のMap<Octave, MML>
+	 */
 	private final Map<Integer, String> map = new HashMap<>();
 
 	public NxBpCmOptimizer() {
 		super();
 	}
 
+	/**
+	 * パターン追加
+	 * @param builder
+	 * @param nextOctave
+	 * @param token
+	 */
 	private void addToken(NxBuilder builder, int nextOctave, String token) {
 		StringBuilder sb = new StringBuilder(builder.builder);
-	
-		sb.append( OxLxOptimizer.getOctaveString(builder.prevOct, nextOctave) + token );
+
+		if (builder.prevOct != nextOctave) {
+			sb.append( OxLxOptimizer.getOctaveString(builder.prevOct, nextOctave) );
+		}
+		sb.append(token);
 
 		String t = map.get(nextOctave);
 		if ((t == null) || (t.length() > sb.length())) {
@@ -38,8 +50,6 @@ public final class NxBpCmOptimizer extends NxOptimizer {
 
 	@Override
 	protected void notePattern(String token, String noteName, String noteLength) {
-		map.clear();
-
 		builderList.forEach(t -> {
 			// 通常パターン
 			addToken(t, octave, token);
@@ -65,5 +75,6 @@ public final class NxBpCmOptimizer extends NxOptimizer {
 		map.forEach((key, str) -> {
 			builderList.add(new NxBuilder(key, str));
 		});
+		map.clear();
 	}
 }

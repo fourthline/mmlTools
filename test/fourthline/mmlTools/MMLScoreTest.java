@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2021 たんらる
+ * Copyright (C) 2014-2022 たんらる
  */
 
 package fourthline.mmlTools;
@@ -16,6 +16,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -24,16 +25,12 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-
-
-
 import fourthline.FileSelect;
 import fourthline.UseLoadingDLS;
 import fourthline.mmlTools.core.MMLText;
 import fourthline.mmlTools.core.NanoTime;
 import fourthline.mmlTools.core.UndefinedTickException;
 import fourthline.mmlTools.optimizer.MMLStringOptimizer;
-import fourthline.mmlTools.optimizer.OxLxFixedOptimizer.OptimizerMap2;
 import fourthline.mmlTools.parser.IMMLFileParser;
 import fourthline.mmlTools.parser.MMLParseException;
 
@@ -228,6 +225,21 @@ public class MMLScoreTest extends FileSelect {
 		checkMMLFileOutput(score.generateAll(), "format_r1.mmi", mml);
 	}
 
+	private PrintStream reportStream = null;
+	private void printReport(String s1, String s2) {
+		if (reportStream != null) {
+			MMLText mml3 = new MMLText().setMMLText(s1);
+			MMLText mml4 = new MMLText().setMMLText(s2);
+			for (int i = 0; i < 4; i++) {
+				int l1 = mml3.getText(i).length();
+				int l2 = mml4.getText(i).length();
+				if ( (l1 > 0) && (l2 > 0) ) {
+					reportStream.printf("%d\t%d\n", l1, l2);
+				}
+			}
+		}
+	}
+
 	/**
 	 * ファイルをparseして, 出力文字が増加していないか確認する.
 	 * @param filename
@@ -277,6 +289,8 @@ public class MMLScoreTest extends FileSelect {
 						String re1 = new MMLTrack().setMML(mabiMMLoptGen1).generate().getMabiMML();
 						String re2 = new MMLTrack().setMML(mabiMMLoptGen2).generate().getMabiMML();
 						assertEquals(re1, re2);
+
+						printReport(mabiMMLoptGen1, mabiMMLoptGen2);
 					} catch (UndefinedTickException e) {
 						fail(e.getMessage());
 					}
@@ -328,7 +342,6 @@ public class MMLScoreTest extends FileSelect {
 
 		optNormal.printReport();
 		optGen2.printReport();
-		System.out.println("count = "+OptimizerMap2.count);
 	}
 
 	/**
@@ -587,7 +600,13 @@ public class MMLScoreTest extends FileSelect {
 	public static void main(String args[]) {
 		var o = new MMLScoreTest();
 		MMLScoreTest.setupClass();
+		var report = new ByteArrayOutputStream();
+		o.reportStream = new PrintStream(report);
 		o.setup();
 		o.testLocalMMLParse();
+
+//		System.out.println(" ==== ");
+//		System.out.println(report.toString());
+		System.exit(0);
 	}
 }

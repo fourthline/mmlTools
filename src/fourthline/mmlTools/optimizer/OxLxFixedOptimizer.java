@@ -4,6 +4,7 @@
 
 package fourthline.mmlTools.optimizer;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -16,12 +17,24 @@ public final class OxLxFixedOptimizer extends OxLxOptimizer {
 	/**
 	 * 置換パターン用レコード
 	 */
-	private static final record FixPattern(String lStr, String match, String replace) {
+	private static final class FixPattern {
+		private final String lStr;
+		private final String match;
+		private final int matchLen;
+		private final String replace;
+
+		private FixPattern(String lStr, String match, String replace) {
+			this.lStr = lStr;
+			this.match = match;
+			this.matchLen = match.length();
+			this.replace = replace;
+		}
+
 		public void patternApply(String key, StringBuilder sb) {
 			if (key.equals(lStr)) {
-				int len = sb.length();
-				int index = sb.length()-match.length();
-				if (sb.substring(sb.length()-match.length()).equals(match)) {
+				if (sb.toString().endsWith(match)) {
+					int len = sb.length();
+					int index = len - matchLen;
 					sb.replace(index, len, replace);
 				}
 			}
@@ -52,8 +65,8 @@ public final class OxLxFixedOptimizer extends OxLxOptimizer {
 		if (keyIndex >= 0) {
 			key = new MMLTokenizer(minString.substring(keyIndex)).next().substring(1); 
 		}
-		if ( (insertBack > 0) && (!key.endsWith(".")) && (minString.endsWith(noteName+"&")) && (lenString.equals( Integer.parseInt(key)*2 + ".") )) {
-			String newKey = ""+Integer.parseInt(key)*4;
+		if ( (insertBack > 0) && (!key.endsWith(".")) && (minString.endsWith(noteName+"&")) && (lenString.equals( (Integer.parseInt(key) << 1) + ".") )) {
+			String newKey = ""+ (Integer.parseInt(key) << 2);
 			StringBuilder ssb = new StringBuilder(minString);
 			ssb.insert(minString.length()-1, '.');
 			newBuilderMap.put(newKey, newBuilder(newStringBuilder(newBuilderMap, newKey, ssb.toString()), newKey, noteName, insertBack));
@@ -66,14 +79,8 @@ public final class OxLxFixedOptimizer extends OxLxOptimizer {
 		private static int compString(StringBuilder s1, StringBuilder s2) {
 			char[] ss1 = s1.toString().toCharArray();
 			char[] ss2 = s2.toString().toCharArray();
-			int len = Math.min(ss1.length, ss2.length);
-			int i;
-			for (i = 0; i < len; i++) {
-				if (ss1[i] != ss2[i]) {
-					break;
-				}
-			}
-
+			int i = Arrays.mismatch(ss1, ss2) - 1;
+			if (i < 0) i = 0;
 			while (i > 0) {
 				i--;
 				char c = ss1[i];
