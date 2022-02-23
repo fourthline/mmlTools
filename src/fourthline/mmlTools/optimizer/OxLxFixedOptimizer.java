@@ -111,9 +111,7 @@ public final class OxLxFixedOptimizer extends OxLxOptimizer {
 			return octave;
 		}
 
-		public static int count = 0;
 		private static int calcSubNxBpCmOptLength(String mml, int commonLen, int octave) {
-			count++;
 			String initStr = mml.substring(0, commonLen);
 			NxBpCmOptimizer optimizer = new NxBpCmOptimizer(octave, initStr);
 			new MMLTokenizer(mml.substring(commonLen)).forEachRemaining(t -> optimizer.nextToken(t));

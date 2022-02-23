@@ -319,8 +319,8 @@ public class MMLScoreTest extends FileSelect {
 		}
 	}
 
-	private final MMLOptimizerPerfotmanceCounter optNormal = new MMLOptimizerPerfotmanceCounter("Normal", t -> t.toString());
-	private final MMLOptimizerPerfotmanceCounter optGen2   = new MMLOptimizerPerfotmanceCounter("Gen2  ", t -> t.optimizeGen2());
+	private final MMLOptimizerPerfoｒmanceCounter optNormal = new MMLOptimizerPerfoｒmanceCounter("Normal", t -> t.toString());
+	private final MMLOptimizerPerfoｒmanceCounter optGen2   = new MMLOptimizerPerfoｒmanceCounter("Gen2  ", t -> t.optimizeGen2());
 	/**
 	 * ローカルのファイルを読み取って, MML最適化に劣化がないかどうかを確認するテスト.
 	 */
@@ -572,13 +572,13 @@ public class MMLScoreTest extends FileSelect {
 		assertEquals(2000, score.getTotalTickLengthWithAll());
 	}
 
-	public static class MMLOptimizerPerfotmanceCounter implements Function<MMLStringOptimizer, String> {
+	public static class MMLOptimizerPerfoｒmanceCounter implements Function<MMLStringOptimizer, String> {
 		private long output = 0;
 		private long time = 0;
 		private final String name;
 		private final Function<MMLStringOptimizer, String> f;
 
-		public MMLOptimizerPerfotmanceCounter(String name, Function<MMLStringOptimizer, String> func) {
+		public MMLOptimizerPerfoｒmanceCounter(String name, Function<MMLStringOptimizer, String> func) {
 			this.name = name;
 			this.f = func;
 		}
