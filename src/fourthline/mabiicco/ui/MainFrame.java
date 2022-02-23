@@ -332,18 +332,26 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		MabiIccoProperties properties = MabiIccoProperties.getInstance();
 		JMenu settingMenu = new JMenu(appText("menu.setting"));
 		menuBar.add(settingMenu);
+		// 表示に関わる設定
 		createNoteHeightMenu(settingMenu);
 		createScaleColorMenu(settingMenu);
-		createCheckMenu(settingMenu, "clickPlayMenu", properties.enableClickPlay);
 		createCheckMenu(settingMenu, "view.marker", properties.enableViewMarker);
 		createCheckMenu(settingMenu, "view.range", properties.viewRange);
+		createCheckMenu(settingMenu, "view.instAttr", properties.instAttr);
 		createCheckMenu(settingMenu, "view.showAllVelocity", properties.showAllVelocity);
 		createCheckMenu(settingMenu, "view.velocity", properties.viewVelocityLine);
+		settingMenu.add(new JSeparator());
+		// 機能に関わる設定
 		createCheckMenu(settingMenu, "edit.enable", properties.enableEdit);
 		createCheckMenu(settingMenu, "edit.active_part_switch", properties.activePartSwitch);
+		createCheckMenu(settingMenu, "clickPlayMenu", properties.enableClickPlay);
+		settingMenu.add(new JSeparator());
+		// MML生成に関わる設定
 		createCheckMenu(settingMenu, "mml.optimize", properties.enableMMLOptimize);
 		createCheckMenu(settingMenu, "mml.tempo_allow_chord_part", properties.mmlTempoAllowChordPart);
 		createMenuItem(settingMenu, "mml.emptyCorrection", ActionDispatcher.INPUT_EMPTY_CORRECTION, true);
+		settingMenu.add(new JSeparator());
+		// DLSに関わる設定
 		createMenuItem(settingMenu, "menu.clear_dls", ActionDispatcher.CLEAR_DLS, true);
 
 		/************************* Help Menu *************************/
