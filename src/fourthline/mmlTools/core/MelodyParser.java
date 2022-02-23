@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 たんらる
+ * Copyright (C) 2013-2022 たんらる
  */
 
 package fourthline.mmlTools.core;
@@ -96,6 +96,14 @@ public final class MelodyParser {
 
 	public String getGt() {
 		return gt;
+	}
+
+	public void setOctave(int octave) {
+		this.mml_oct = octave;
+	}
+
+	public int getOctave() {
+		return this.mml_oct;
 	}
 
 	public boolean checkPitch(int min, int max) {

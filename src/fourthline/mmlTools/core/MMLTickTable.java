@@ -24,12 +24,12 @@ public final class MMLTickTable {
 	/**
 	 * For MML text -> tick
 	 */
-	private final LinkedHashMap<String, Integer> tickTable = new LinkedHashMap<>();
+	private final Map<String, Integer> tickTable = new LinkedHashMap<>(1024);
 
 	/**
 	 * For tick -> MML text
 	 */
-	private final LinkedHashMap<Integer, List<String>> tickInvTable = new LinkedHashMap<>();
+	private final Map<Integer, List<String>> tickInvTable = new LinkedHashMap<>(1024);
 
 	public static MMLTickTable createTickTable() {
 		InputStream preTable = MMLTickTable.class.getResourceAsStream("ticktable.txt");

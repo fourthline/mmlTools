@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2021 たんらる
+ * Copyright (C) 2014-2022 たんらる
  */
 
 package fourthline.mmlTools;
@@ -16,6 +16,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -23,9 +24,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-
-
 
 import fourthline.FileSelect;
 import fourthline.UseLoadingDLS;
@@ -227,6 +225,21 @@ public class MMLScoreTest extends FileSelect {
 		checkMMLFileOutput(score.generateAll(), "format_r1.mmi", mml);
 	}
 
+	private PrintStream reportStream = null;
+	private void printReport(String s1, String s2) {
+		if (reportStream != null) {
+			MMLText mml3 = new MMLText().setMMLText(s1);
+			MMLText mml4 = new MMLText().setMMLText(s2);
+			for (int i = 0; i < 4; i++) {
+				int l1 = mml3.getText(i).length();
+				int l2 = mml4.getText(i).length();
+				if ( (l1 > 0) && (l2 > 0) ) {
+					reportStream.printf("%d\t%d\n", l1, l2);
+				}
+			}
+		}
+	}
+
 	/**
 	 * ファイルをparseして, 出力文字が増加していないか確認する.
 	 * @param filename
@@ -263,6 +276,22 @@ public class MMLScoreTest extends FileSelect {
 						assertTrue(mml1.getText(2).length() >= mml2.getText(2).length()*0.97);
 						assertTrue(mml1.getText(3).length() >= mml2.getText(3).length()*0.97);
 						assertEquals(new MMLTrack().setMML(mml1.getMML()), new MMLTrack().setMML(mml2.getMML()));
+
+						String mabiMMLoptGen1 = t.getMabiMML();
+						t.setMabiMMLOptimizeFunc(optGen2);
+						String mabiMMLoptGen2 = t.generate().getMabiMML();
+						t.setMabiMMLOptimizeFunc(tt -> tt.toString());
+						System.out.println("gen1: " + mabiMMLoptGen1);
+						System.out.println("gen2: " + mabiMMLoptGen2);
+						System.out.println("gen1: " + mabiMMLoptGen1.length() + ", gen2: " + mabiMMLoptGen2.length());
+						assertTrue(mabiMMLoptGen1.length() >= mabiMMLoptGen2.length());
+
+						// reparse
+						String re1 = new MMLTrack().setMML(mabiMMLoptGen1).generate().getMabiMML();
+						String re2 = new MMLTrack().setMML(mabiMMLoptGen2).generate().getMabiMML();
+						assertEquals(re1, re2);
+
+						printReport(mabiMMLoptGen1, mabiMMLoptGen2);
 					} catch (UndefinedTickException e) {
 						fail(e.getMessage());
 					}
@@ -291,7 +320,8 @@ public class MMLScoreTest extends FileSelect {
 		}
 	}
 
-	private final MMLOptimizerPerfotmanceCounter optNormal = new MMLOptimizerPerfotmanceCounter("Normal", t -> t.toString());
+	private final MMLOptimizerPerfoｒmanceCounter optNormal = new MMLOptimizerPerfoｒmanceCounter("Normal", t -> t.toString());
+	private final MMLOptimizerPerfoｒmanceCounter optGen2   = new MMLOptimizerPerfoｒmanceCounter("Gen2  ", t -> t.optimizeGen2());
 	/**
 	 * ローカルのファイルを読み取って, MML最適化に劣化がないかどうかを確認するテスト.
 	 */
@@ -312,6 +342,7 @@ public class MMLScoreTest extends FileSelect {
 		} catch (IOException e) {}
 
 		optNormal.printReport();
+		optGen2.printReport();
 	}
 
 	/**
@@ -542,13 +573,13 @@ public class MMLScoreTest extends FileSelect {
 		assertEquals(2000, score.getTotalTickLengthWithAll());
 	}
 
-	public static class MMLOptimizerPerfotmanceCounter implements Function<MMLStringOptimizer, String> {
+	public static class MMLOptimizerPerfoｒmanceCounter implements Function<MMLStringOptimizer, String> {
 		private long output = 0;
 		private long time = 0;
 		private final String name;
 		private final Function<MMLStringOptimizer, String> f;
 
-		public MMLOptimizerPerfotmanceCounter(String name, Function<MMLStringOptimizer, String> func) {
+		public MMLOptimizerPerfoｒmanceCounter(String name, Function<MMLStringOptimizer, String> func) {
 			this.name = name;
 			this.f = func;
 		}
@@ -570,7 +601,13 @@ public class MMLScoreTest extends FileSelect {
 	public static void main(String args[]) {
 		var o = new MMLScoreTest();
 		MMLScoreTest.setupClass();
+		var report = new ByteArrayOutputStream();
+		o.reportStream = new PrintStream(report);
 		o.setup();
 		o.testLocalMMLParse();
+
+//		System.out.println(" ==== ");
+//		System.out.println(report.toString());
+		System.exit(0);
 	}
 }

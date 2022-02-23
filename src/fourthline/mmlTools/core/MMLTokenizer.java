@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 たんらる
+ * Copyright (C) 2013-2022 たんらる
  */
 
 package fourthline.mmlTools.core;
@@ -15,19 +15,20 @@ public final class MMLTokenizer implements Iterator<String> {
 	private static final String noteString = "abcdefgABCDEFGnNrR";
 	private static final String tokenString = noteString + "tToOlLvV<>&";
 	private final String mml_src;
-	int startIndex = 0;
-	int endIndex = 0;
+	private final int mml_length;
+	private final char[] mml_charArray;
+	private int startIndex = 0;
+	private int endIndex = 0;
 
 	public MMLTokenizer(String src) {
 		mml_src = src;
+		mml_length = src.length();
+		mml_charArray = src.toCharArray();
 	}
 
 	@Override
 	public boolean hasNext() {
-		if (endIndex < mml_src.length())
-			return true;
-
-		return false;
+		return (endIndex < mml_length) ? true : false;
 	}
 
 	@Override
@@ -66,7 +67,7 @@ public final class MMLTokenizer implements Iterator<String> {
 	}
 
 	public static String noteName(String token) {
-		String noteName = ""+token.charAt(0);
+		String noteName = token.substring(0, 1);
 
 		if (token.length() > 1) {
 			char note2 = token.charAt(1);
@@ -85,11 +86,9 @@ public final class MMLTokenizer implements Iterator<String> {
 	}
 
 	public int searchToken(int startIndex) {
-		int length = mml_src.length();
-
 		int index;
-		for (index = startIndex; index < length; index++) {
-			char ch = mml_src.charAt(index);
+		for (index = startIndex; index < mml_length; index++) {
+			char ch = mml_charArray[index];
 			if (isToken(ch))
 				break;
 		}
@@ -100,7 +99,7 @@ public final class MMLTokenizer implements Iterator<String> {
 	public int backSearchToken(int startIndex) {
 		int index;
 		for (index = startIndex-1; index >=0 ; index--) {
-			char ch = mml_src.charAt(index);
+			char ch = mml_charArray[index];
 			if (isToken(ch))
 				break;
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2017 たんらる
+ * Copyright (C) 2015-2022 たんらる
  */
 
 package fourthline.mmlTools.optimizer;
@@ -17,12 +17,12 @@ import fourthline.mmlTools.core.UndefinedTickException;
 /**
  * Nxを使用した最適化.
  */
-public final class NxOptimizer implements MMLStringOptimizer.Optimizer {
+public class NxOptimizer implements MMLStringOptimizer.Optimizer {
 
-	private static final class NxBuilder implements Cloneable {
-		private StringBuilder builder = new StringBuilder();
+	protected static final class NxBuilder implements Cloneable {
+		protected StringBuilder builder = new StringBuilder();
 		private int nCount = 0;
-		private int prevOct;
+		protected int prevOct;
 		private OptionalInt offset = OptionalInt.empty();
 
 		private void addOctToken(int offset, String token) {
@@ -33,6 +33,11 @@ public final class NxOptimizer implements MMLStringOptimizer.Optimizer {
 
 		private NxBuilder(int initOct) {
 			prevOct = initOct;
+		}
+
+		protected NxBuilder(int initOct, String initStr) {
+			prevOct = initOct;
+			builder = new StringBuilder(initStr);
 		}
 
 		@Override
@@ -51,10 +56,10 @@ public final class NxOptimizer implements MMLStringOptimizer.Optimizer {
 		}
 	}
 
-	private int octave = 4;
-	private final MelodyParser parser = new MelodyParser("");
+	protected int octave = 4;
+	protected final MelodyParser parser = new MelodyParser("");
 
-	private final List<NxBuilder> builderList = new ArrayList<>();
+	protected final List<NxBuilder> builderList = new ArrayList<>();
 
 	public NxOptimizer() {
 		builderList.add(new NxBuilder(octave));
@@ -70,8 +75,16 @@ public final class NxOptimizer implements MMLStringOptimizer.Optimizer {
 		}).get();
 	}
 
+	protected int getCurrentNoteNumber() {
+		return parser.getNoteNumber();
+	}
+
+	/**
+	 * nのパターンを追加する
+	 * @param prevMap
+	 */
 	private void addPattern(List<NxBuilder> prevMap) {
-		int noteNumber = parser.getNoteNumber();
+		int noteNumber = getCurrentNoteNumber();
 		if ( (noteNumber < 0) || (noteNumber > 96) ) {
 			return;
 		}
@@ -109,7 +122,7 @@ public final class NxOptimizer implements MMLStringOptimizer.Optimizer {
 		builderList.add(min);
 	}
 
-	private void notePattern(String token, String noteLength) {
+	protected void notePattern(String token, String noteName, String noteLength) {
 		List<NxBuilder> prevList = listClone();
 		addNoteToken(token);
 		cleanList();
@@ -122,7 +135,7 @@ public final class NxOptimizer implements MMLStringOptimizer.Optimizer {
 		String s[] = MMLTokenizer.noteNames(token);
 		char firstC = Character.toLowerCase(s[0].charAt(0));
 		if ( (firstC >= 'a') && (firstC <= 'g') ) {
-			notePattern(token, s[1]);
+			notePattern(token, s[0], s[1]);
 		} else if (firstC == '>') {
 			octave++;
 			addOctToken(token);

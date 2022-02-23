@@ -1,10 +1,12 @@
 /*
- * Copyright (C) 2013-2017 たんらる
+ * Copyright (C) 2013-2022 たんらる
  */
 
 package fourthline.mmlTools.optimizer;
 
 import static org.junit.Assert.*;
+
+import java.util.function.Function;
 
 import org.junit.After;
 import org.junit.Before;
@@ -41,9 +43,13 @@ public class MMLStringOptimizerTest {
 	}
 
 	private void checkMMLStringOptimize(String input, String expect) {
+		checkMMLStringOptimize(input, expect, (t) -> t.toString());
+	}
+
+	private void checkMMLStringOptimize(String input, String expect, Function<MMLStringOptimizer, String> f) {
 		try {
 			MMLStringOptimizer optimizer = new MMLStringOptimizer(new MMLEventList(input).toMMLString(true, true));
-			String mml = optimizer.toString();
+			String mml = f.apply(optimizer);
 
 			System.out.println(input);
 			System.out.println(mml);
@@ -262,17 +268,93 @@ public class MMLStringOptimizerTest {
 	}
 
 	@Test(timeout=TIMEOUT)
+	public void test_con4() {
+		/* &で接続されたノート */
+		String input  =  "d4d4d4d4c2.&c8";
+		String expect =  "ddddc2&c.";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen2());
+	}
+
+	@Test(timeout=TIMEOUT)
+	public void test_con8() {
+		/* &で接続されたノート */
+		String input  =  "d8d8d8d8c2.&c8";
+		String expect =  "l8ddddc&c2.";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen2());
+	}
+
+	@Test(timeout=TIMEOUT)
+	public void test_con16() {
+		/* &で接続されたノート */
+		String input  =  "d16d16d16d16c2.&c8";
+		String expect =  "l16ddddc2&c4.";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen2());
+	}
+
+	@Test
+	public void test_con2() {
+		/* &で接続されたノート */
+		String input  =  "d2d2d2d2c2.&c8";
+		String expect =  "l2ddddc&c4.";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen2());
+	}
+
+	@Test(timeout=TIMEOUT)
+	public void test_con2_8() {
+		/* 最適化改善パターン: &で接続されたノートで順いれかえ */
+		String input  =  "d2d2d2d2c2.&c8d8d8d8d8";
+		String expect =  "l2ddddc.l8&cdddd";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen2());
+	}
+
+	@Test(timeout=TIMEOUT)
 	public void test_F3() {
 		String input  =  "a32a32a32a32r8r16.a8a8a8a8a8";
 		String expect =  "l32aaaarl8r.aaaaa";
 		checkMMLStringOptimize(input, expect);
 	}
 
-	@Ignore @Test(timeout=TIMEOUT)
+	@Test
 	public void test_bn2() {
 		/* 最適化改善パターン */
 		String input  =  "c1<a+b+a+>c1";
-		String expect =  "c1n22cn22c1";
+		String expect =  "c1n46cn46c1";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen2());
+	}
+
+	@Test(timeout=TIMEOUT)
+	public void test_rl32() {
+		/* 最適化改善パターン: 1つの休符を分割使用する */
+		String input  =  "l32crrrcrrrcrrrcrrrb";
+		String expect =  "l32crrrcrrrcrrrcrrrb";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen2());
+	}
+
+	@Test
+	public void test_gen2_n23() throws UndefinedTickException {
+		/* Gen2チェックパターン1 */
+		String input  = "l2f+.r4f+.f+4<f1b>b<f+4>c+4f+f1f+1f+1f+.r4f+.f+4f8>f+4f+<c-bff4r4c-1c+<f+c-1n49d+c-1n49f+";
+		String expect = "l2f+.r4f+.f+4<f1b>b<f+4>c+4f+f1f+1f+1f+.r4f+.f+4f8>f+4f+<c-bff4r4c-1c+<f+c-1n49d+c-1n49f+";
+		String expect2= "f+2.rf+2.f+<f1b2>b2n42c+l2f+f1f+1f+1f+.r4f+.f+4f8>f+4f+<c-bff4r4<b1n49f+c-1n49d+c-1n49f+";
 		checkMMLStringOptimize(input, expect);
+		checkMMLStringOptimize(input, expect2, t -> t.optimizeGen2());
+	}
+
+	@Test
+	public void test_gen2_n24() throws UndefinedTickException {
+		/* Gen2チェックパターン2 */
+		String input  = "l64ffffffr1v12l4<<a+fg";
+		String expect = "l64ffffffr1v12l4<<a+fg";
+		checkMMLStringOptimize(input, expect);
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen2());
+	}
+
+	@Test
+	public void test_gen2_ln25() throws UndefinedTickException {
+		/* Gen2チェックパターン3 */
+		String input =  "l2fffl8n22f&f2.n22f1d+1f1&f2.ff";
+		String expect=  "l2fffl8n22f&f2.n22f1d+1f1&f2.ff";
+		checkMMLStringOptimize(input, expect);
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen2());
 	}
 }

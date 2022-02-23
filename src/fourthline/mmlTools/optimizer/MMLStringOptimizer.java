@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2017 たんらる
+ * Copyright (C) 2015-2022 たんらる
  */
 
 package fourthline.mmlTools.optimizer;
@@ -38,44 +38,50 @@ public final class MMLStringOptimizer {
 
 	@Override
 	public String toString() {
-		return getOptimizedString();
-	}
-
-	private String getOptimizedString() {
 		return optimize();
 	}
 
+	public String optimizeGen2() {
+		Optimizer optimizerList[] = {
+				new OxLxFixedOptimizer(),
+				new NxBpCmOptimizer()
+		};
+		return optimize(optimizerList);
+	}
+
 	private String optimize() {
-		String mml = originalMML;
-		if (MMLStringOptimizer.optSkip) {
-			return mml;
-		}
 		Optimizer optimizerList[] = {
 				new OxLxOptimizer(),
 				new BpCmOptimizer(),
 				new NxOptimizer()
 		};
+		return optimize(optimizerList);
+	}
+
+	private String optimize(Optimizer optimizerList[]) {
+		String mml = originalMML;
+		if (MMLStringOptimizer.optSkip) {
+			return mml;
+		}
 
 		for (Optimizer optimizer : optimizerList) {
-			MMLTokenizer tokenizer = new MMLTokenizer(mml);
-			while (tokenizer.hasNext()) {
-				String token = tokenizer.next();
-				optimizer.nextToken(token);
-			}
+			new MMLTokenizer(mml).forEachRemaining(t -> optimizer.nextToken(t));
 			mml = optimizer.getMinString();
 		}
 
 		return mml;
 	}
 
-	interface Optimizer {
+	public interface Optimizer {
 		public void nextToken(String token);
 		public String getMinString();
 	}
 
 	public static void main(String args[]) {
 		MMLStringOptimizer.setDebug(true);
-		String mml = "c8c2c1c8c2c1c8c2c1c8c2c1";
-		System.out.println( new MMLStringOptimizer(mml).toString() );
+//		String mml = "c8c2c1c8c2c1c8c2c1c8c2c1";
+		String mml = "c1<a+>rc<a+>c1";
+//		System.out.println( new MMLStringOptimizer(mml).toString() );
+		System.out.println(new MMLStringOptimizer(mml).optimizeGen2());
 	}
 }
