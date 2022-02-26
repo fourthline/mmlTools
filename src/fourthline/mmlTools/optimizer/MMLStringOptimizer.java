@@ -4,6 +4,7 @@
 
 package fourthline.mmlTools.optimizer;
 
+import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.core.MMLTokenizer;
 
 /**
@@ -11,20 +12,26 @@ import fourthline.mmlTools.core.MMLTokenizer;
  */
 public final class MMLStringOptimizer {
 
+	/**
+	 * デバッグオプション
+	 */
 	private static boolean debug = false;
 
-	/** 最適化処理をスキップするオプション */
-	private static boolean optSkip = false;
-	public static void setOptSkip(boolean optSkip) {
-		MMLStringOptimizer.optSkip = optSkip;
-	}
+	/**
+	 * Gen2最適化を使うオプション
+	 */
+	private static boolean enablePreciseOptimize = false;
 
- 	public static void setDebug(boolean b) {
+	public static void setDebug(boolean b) {
 		debug = b;
 	}
 
 	public static boolean getDebug() {
 		return debug;
+	}
+
+	public static void setEnablePreciseOptimize(boolean enable) {
+		enablePreciseOptimize = enable;
 	}
 
 	private String originalMML;
@@ -41,6 +48,22 @@ public final class MMLStringOptimizer {
 		return optimize();
 	}
 
+	/**
+	 * 精密なMML最適化を行う
+	 * 設定によってGen2/Normalを切り替える, Gen2の場合は出力結果を再Parseして検査する.
+	 */
+	public String priciseOptimize() {
+		if (enablePreciseOptimize) {
+			String mml1 = optimizeGen2();
+			return (new MMLEventList(mml1).equals(new MMLEventList(originalMML))) ? mml1 : optimize();
+		} else {
+			return optimize();
+		}
+	}
+
+	/**
+	 * MML最適化 Gen2
+	 */
 	public String optimizeGen2() {
 		Optimizer optimizerList[] = {
 				new OxLxFixedOptimizer(),
@@ -49,6 +72,9 @@ public final class MMLStringOptimizer {
 		return optimize(optimizerList);
 	}
 
+	/**
+	 * MML最適化 Normal
+	 */
 	private String optimize() {
 		Optimizer optimizerList[] = {
 				new OxLxOptimizer(),
@@ -60,10 +86,6 @@ public final class MMLStringOptimizer {
 
 	private String optimize(Optimizer optimizerList[]) {
 		String mml = originalMML;
-		if (MMLStringOptimizer.optSkip) {
-			return mml;
-		}
-
 		for (Optimizer optimizer : optimizerList) {
 			new MMLTokenizer(mml).forEachRemaining(t -> optimizer.nextToken(t));
 			mml = optimizer.getMinString();
@@ -79,9 +101,9 @@ public final class MMLStringOptimizer {
 
 	public static void main(String args[]) {
 		MMLStringOptimizer.setDebug(true);
-//		String mml = "c8c2c1c8c2c1c8c2c1c8c2c1";
+		// String mml = "c8c2c1c8c2c1c8c2c1c8c2c1";
 		String mml = "c1<a+>rc<a+>c1";
-//		System.out.println( new MMLStringOptimizer(mml).toString() );
+		// System.out.println( new MMLStringOptimizer(mml).toString() );
 		System.out.println(new MMLStringOptimizer(mml).optimizeGen2());
 	}
 }

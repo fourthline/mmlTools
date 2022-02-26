@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2021 たんらる
+ * Copyright (C) 2013-2022 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -347,7 +347,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createCheckMenu(settingMenu, "clickPlayMenu", properties.enableClickPlay);
 		settingMenu.add(new JSeparator());
 		// MML生成に関わる設定
-		createCheckMenu(settingMenu, "mml.optimize", properties.enableMMLOptimize);
+		createCheckMenu(settingMenu, "mml.precise_optimize", properties.enableMMLPreciseOptimize);
 		createCheckMenu(settingMenu, "mml.tempo_allow_chord_part", properties.mmlTempoAllowChordPart);
 		createMenuItem(settingMenu, "mml.emptyCorrection", ActionDispatcher.INPUT_EMPTY_CORRECTION, true);
 		settingMenu.add(new JSeparator());

@@ -259,9 +259,9 @@ public class MMLScoreTest extends FileSelect {
 						MMLText mml1 = new MMLText().setMMLText(t.getOriginalMML());
 						String rank1 = mml1.mmlRankFormat();
 						System.out.println("mml1: "+mml1.getMML());
-						t.setMabiMMLOptimizeFunc(optNormal);
+						MMLTrack.setMabiMMLOptimizeFunc(optNormal);
 						t.generate();
-						t.setMabiMMLOptimizeFunc(tt -> tt.toString());
+						MMLTrack.setMabiMMLOptimizeFunc(tt -> tt.toString());
 						MMLText mml2 = new MMLText().setMMLText(t.getOriginalMML());
 						System.out.println("mml2: "+mml2.getMML());
 						String rank2 = mml2.mmlRankFormat();
@@ -278,9 +278,9 @@ public class MMLScoreTest extends FileSelect {
 						assertEquals(new MMLTrack().setMML(mml1.getMML()), new MMLTrack().setMML(mml2.getMML()));
 
 						String mabiMMLoptGen1 = t.getMabiMML();
-						t.setMabiMMLOptimizeFunc(optGen2);
+						MMLTrack.setMabiMMLOptimizeFunc(optGen2);
 						String mabiMMLoptGen2 = t.generate().getMabiMML();
-						t.setMabiMMLOptimizeFunc(tt -> tt.toString());
+						MMLTrack.setMabiMMLOptimizeFunc(tt -> tt.toString());
 						System.out.println("gen1: " + mabiMMLoptGen1);
 						System.out.println("gen2: " + mabiMMLoptGen2);
 						System.out.println("gen1: " + mabiMMLoptGen1.length() + ", gen2: " + mabiMMLoptGen2.length());

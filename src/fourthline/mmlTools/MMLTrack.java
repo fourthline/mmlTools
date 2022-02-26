@@ -330,8 +330,8 @@ public final class MMLTrack implements Serializable, Cloneable {
 		return mml;
 	}
 
-	private Function<MMLStringOptimizer, String> mabiMMLOptimizeFunc = t -> t.toString();
-	public void setMabiMMLOptimizeFunc(Function<MMLStringOptimizer, String> f) {
+	private static Function<MMLStringOptimizer, String> mabiMMLOptimizeFunc = t -> t.priciseOptimize();
+	public static void setMabiMMLOptimizeFunc(Function<MMLStringOptimizer, String> f) {
 		mabiMMLOptimizeFunc = f;
 	}
 

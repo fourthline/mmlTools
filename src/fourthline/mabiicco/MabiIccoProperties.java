@@ -77,8 +77,8 @@ public final class MabiIccoProperties {
 	/** ノートクリックによるアクティブパート切り替え */
 	public final Property<Boolean> activePartSwitch = new BooleanProperty("function.active_part_switch", false);
 
-	/** MML最適化 */
-	public final Property<Boolean> enableMMLOptimize = new BooleanProperty("function.mml_optimize", true, (t) -> MMLStringOptimizer.setOptSkip(!t.booleanValue()));
+	/** 精密なMML最適化 */
+	public final Property<Boolean> enableMMLPreciseOptimize = new BooleanProperty("function.mml_precise_optimize", true, (t) -> MMLStringOptimizer.setEnablePreciseOptimize(t.booleanValue()));
 
 	/** Midi Device */
 	public final Property<String> midiInputDevice = new StringProperty("midi.input_device");
