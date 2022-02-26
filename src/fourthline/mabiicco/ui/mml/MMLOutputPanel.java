@@ -105,7 +105,7 @@ public final class MMLOutputPanel extends JPanel {
 		});
 
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(12, 10, 372, 169);
+		scrollPane.setBounds(12, 10, 460, 280);
 		p.add(scrollPane);
 
 		scrollPane.setViewportView(table);
@@ -178,7 +178,7 @@ public final class MMLOutputPanel extends JPanel {
 
 	@Override
 	public Dimension getPreferredSize() {
-		return new Dimension(390, 220);
+		return new Dimension(480, 340);
 	}
 
 	/**
