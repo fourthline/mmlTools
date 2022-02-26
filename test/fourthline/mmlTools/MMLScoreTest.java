@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2021 たんらる
+ * Copyright (C) 2014-2022 たんらる
  */
 
 package fourthline.mmlTools;
@@ -16,6 +16,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.junit.After;
@@ -23,13 +25,12 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-
-
-
 import fourthline.FileSelect;
 import fourthline.UseLoadingDLS;
 import fourthline.mmlTools.core.MMLText;
+import fourthline.mmlTools.core.NanoTime;
 import fourthline.mmlTools.core.UndefinedTickException;
+import fourthline.mmlTools.optimizer.MMLStringOptimizer;
 import fourthline.mmlTools.parser.IMMLFileParser;
 import fourthline.mmlTools.parser.MMLParseException;
 
@@ -224,6 +225,21 @@ public class MMLScoreTest extends FileSelect {
 		checkMMLFileOutput(score.generateAll(), "format_r1.mmi", mml);
 	}
 
+	private PrintStream reportStream = null;
+	private void printReport(String s1, String s2) {
+		if (reportStream != null) {
+			MMLText mml3 = new MMLText().setMMLText(s1);
+			MMLText mml4 = new MMLText().setMMLText(s2);
+			for (int i = 0; i < 4; i++) {
+				int l1 = mml3.getText(i).length();
+				int l2 = mml4.getText(i).length();
+				if ( (l1 > 0) && (l2 > 0) ) {
+					reportStream.printf("%d\t%d\n", l1, l2);
+				}
+			}
+		}
+	}
+
 	/**
 	 * ファイルをparseして, 出力文字が増加していないか確認する.
 	 * @param filename
@@ -243,7 +259,9 @@ public class MMLScoreTest extends FileSelect {
 						MMLText mml1 = new MMLText().setMMLText(t.getOriginalMML());
 						String rank1 = mml1.mmlRankFormat();
 						System.out.println("mml1: "+mml1.getMML());
+						MMLTrack.setMabiMMLOptimizeFunc(optNormal);
 						t.generate();
+						MMLTrack.setMabiMMLOptimizeFunc(tt -> tt.toString());
 						MMLText mml2 = new MMLText().setMMLText(t.getOriginalMML());
 						System.out.println("mml2: "+mml2.getMML());
 						String rank2 = mml2.mmlRankFormat();
@@ -258,6 +276,22 @@ public class MMLScoreTest extends FileSelect {
 						assertTrue(mml1.getText(2).length() >= mml2.getText(2).length()*0.97);
 						assertTrue(mml1.getText(3).length() >= mml2.getText(3).length()*0.97);
 						assertEquals(new MMLTrack().setMML(mml1.getMML()), new MMLTrack().setMML(mml2.getMML()));
+
+						String mabiMMLoptGen1 = t.getMabiMML();
+						MMLTrack.setMabiMMLOptimizeFunc(optGen2);
+						String mabiMMLoptGen2 = t.generate().getMabiMML();
+						MMLTrack.setMabiMMLOptimizeFunc(tt -> tt.toString());
+						System.out.println("gen1: " + mabiMMLoptGen1);
+						System.out.println("gen2: " + mabiMMLoptGen2);
+						System.out.println("gen1: " + mabiMMLoptGen1.length() + ", gen2: " + mabiMMLoptGen2.length());
+						assertTrue(mabiMMLoptGen1.length() >= mabiMMLoptGen2.length());
+
+						// reparse
+						String re1 = new MMLTrack().setMML(mabiMMLoptGen1).generate().getMabiMML();
+						String re2 = new MMLTrack().setMML(mabiMMLoptGen2).generate().getMabiMML();
+						assertEquals(re1, re2);
+
+						printReport(mabiMMLoptGen1, mabiMMLoptGen2);
 					} catch (UndefinedTickException e) {
 						fail(e.getMessage());
 					}
@@ -286,6 +320,8 @@ public class MMLScoreTest extends FileSelect {
 		}
 	}
 
+	private final MMLOptimizerPerfoｒmanceCounter optNormal = new MMLOptimizerPerfoｒmanceCounter("Normal", t -> t.toString());
+	private final MMLOptimizerPerfoｒmanceCounter optGen2   = new MMLOptimizerPerfoｒmanceCounter("Gen2  ", t -> t.optimizeGen2());
 	/**
 	 * ローカルのファイルを読み取って, MML最適化に劣化がないかどうかを確認するテスト.
 	 */
@@ -304,6 +340,9 @@ public class MMLScoreTest extends FileSelect {
 				mmlFileParse(s, overwriteToLocalMMLOption);
 			});
 		} catch (IOException e) {}
+
+		optNormal.printReport();
+		optGen2.printReport();
 	}
 
 	/**
@@ -532,5 +571,43 @@ public class MMLScoreTest extends FileSelect {
 		score.getTempoEventList().add(new MMLTempoEvent(92, 1800));
 		assertEquals(384, score.getTotalTickLength());
 		assertEquals(2000, score.getTotalTickLengthWithAll());
+	}
+
+	public static class MMLOptimizerPerfoｒmanceCounter implements Function<MMLStringOptimizer, String> {
+		private long output = 0;
+		private long time = 0;
+		private final String name;
+		private final Function<MMLStringOptimizer, String> f;
+
+		public MMLOptimizerPerfoｒmanceCounter(String name, Function<MMLStringOptimizer, String> func) {
+			this.name = name;
+			this.f = func;
+		}
+
+		public void printReport() {
+			System.out.println(name+": output = " + output + ", time = " + time/1000 + " [ms], speed = " + output/(time/1000) + " [k/s]");
+		}
+
+		@Override
+		public String apply(MMLStringOptimizer t) {
+			NanoTime time = NanoTime.start();
+			String ret = f.apply(t);
+			this.time += time.us();
+			output += ret.length();
+			return ret;
+		}
+	}
+
+	public static void main(String args[]) {
+		var o = new MMLScoreTest();
+		MMLScoreTest.setupClass();
+		var report = new ByteArrayOutputStream();
+		o.reportStream = new PrintStream(report);
+		o.setup();
+		o.testLocalMMLParse();
+
+//		System.out.println(" ==== ");
+//		System.out.println(report.toString());
+		System.exit(0);
 	}
 }

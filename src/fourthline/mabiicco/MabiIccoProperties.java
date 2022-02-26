@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2021 たんらる
+ * Copyright (C) 2013-2022 たんらる
  */
 
 package fourthline.mabiicco;
@@ -65,6 +65,9 @@ public final class MabiIccoProperties {
 	/** 音源境界 */
 	public final Property<Boolean> viewRange = new BooleanProperty("view.pianoRoll.range", true);
 
+	/** 音源属性 */
+	public final Property<Boolean> instAttr = new BooleanProperty("view.instrument.attribute", true);
+
 	/** すべての音量を表示 */
 	public final Property<Boolean> showAllVelocity = new BooleanProperty("view.pianoRoll.show_all_velocity", false);
 
@@ -74,8 +77,8 @@ public final class MabiIccoProperties {
 	/** ノートクリックによるアクティブパート切り替え */
 	public final Property<Boolean> activePartSwitch = new BooleanProperty("function.active_part_switch", false);
 
-	/** MML最適化 */
-	public final Property<Boolean> enableMMLOptimize = new BooleanProperty("function.mml_optimize", true, (t) -> MMLStringOptimizer.setOptSkip(!t.booleanValue()));
+	/** 精密なMML最適化 */
+	public final Property<Boolean> enableMMLPreciseOptimize = new BooleanProperty("function.mml_precise_optimize", true, (t) -> MMLStringOptimizer.setEnablePreciseOptimize(t.booleanValue()));
 
 	/** Midi Device */
 	public final Property<String> midiInputDevice = new StringProperty("midi.input_device");

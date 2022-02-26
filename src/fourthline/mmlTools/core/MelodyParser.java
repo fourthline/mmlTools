@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 たんらる
+ * Copyright (C) 2013-2022 たんらる
  */
 
 package fourthline.mmlTools.core;
@@ -96,6 +96,14 @@ public final class MelodyParser {
 
 	public String getGt() {
 		return gt;
+	}
+
+	public void setOctave(int octave) {
+		this.mml_oct = octave;
+	}
+
+	public int getOctave() {
+		return this.mml_oct;
 	}
 
 	public boolean checkPitch(int min, int max) {
@@ -277,17 +285,19 @@ public final class MelodyParser {
 		char note1 = note.charAt(0);
 		char note2 = ' ';
 		gt = mml_L;
+		int noteLength = note.length();
 
-		if (note.length() > 1) {
+		if (noteLength > 1) {
 			int startIndex = 1;
 			note2 = note.charAt(1);
 
 			if ( (note2 == '+') || (note2 == '-') || (note2 == '#') )
 				startIndex++;
 
-			if (startIndex < note.length()) {
+			if (startIndex < noteLength) {
 				String s = note.substring(startIndex);
-				if ( (s.length() > 0) && (s.charAt(0) == '.' || Character.isDigit(s.charAt(0))) ) {
+				char firstC = s.charAt(0);
+				if ( (s.length() > 0) && (firstC == '.' || Character.isDigit(firstC)) ) {
 					gt = s;
 				}
 				if (gt.startsWith(".")) {

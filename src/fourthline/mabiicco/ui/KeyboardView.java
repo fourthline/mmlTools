@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2021 たんらる
+ * Copyright (C) 2013-2022 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -15,6 +15,7 @@ import java.awt.event.MouseMotionAdapter;
 
 import javax.swing.JPanel;
 
+import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mabiicco.midi.IPlayNote;
 import fourthline.mabiicco.midi.InstClass;
 import fourthline.mabiicco.midi.MabiDLS;
@@ -173,19 +174,23 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 			return;
 		}
 
-		int totalHeight = pianoRollView.getTotalHeight();
-		int height = pianoRollView.getNoteHeight();
-		int x = width - 1;
-		for (int i = 0; i < totalHeight; i += height) {
-			int note = pianoRollView.convertY2Note(i);
-			if (!relativeInst.isValid(note)) {
-				g.setColor(Color.RED);
-			} else if (relativeInst.isOverlap(note)) {
-				g.setColor(Color.BLUE);
-			} else {
-				g.setColor(Color.GREEN);
+		if (!MabiIccoProperties.getInstance().enableEdit.get()) {
+			// 編集モードでなければ表示しない
+		} else if (MabiIccoProperties.getInstance().instAttr.get()) {
+			int totalHeight = pianoRollView.getTotalHeight();
+			int height = pianoRollView.getNoteHeight();
+			int x = width - 1;
+			for (int i = 0; i < totalHeight; i += height) {
+				int note = pianoRollView.convertY2Note(i);
+				if (!relativeInst.isValid(note)) {
+					g.setColor(Color.RED);
+				} else if (relativeInst.isOverlap(note)) {
+					g.setColor(Color.BLUE);
+				} else {
+					g.setColor(Color.GREEN);
+				}
+				g.drawLine(x, i, x, i+height);
 			}
-			g.drawLine(x, i, x, i+height);
 		}
 	}
 

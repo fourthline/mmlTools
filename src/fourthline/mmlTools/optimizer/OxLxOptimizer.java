@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2017 たんらる
+ * Copyright (C) 2015-2022 たんらる
  */
 
 package fourthline.mmlTools.optimizer;
@@ -15,12 +15,27 @@ import fourthline.mmlTools.core.MMLTokenizer;
 /**
  * Ox, Lxを使用した最適化.
  */
-public final class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
+public class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
+
+	public static class OptimizerMap extends HashMap<String, StringBuilder> {
+		private static final long serialVersionUID = -7335134548044714344L;
+
+		protected void updateMapMinLength(String key, StringBuilder builder) {
+			StringBuilder now = this.get(key);
+			if ( (now == null) || (builder.length() < now.length()) ) {
+				this.put(key, builder);
+			}
+		}
+	}
+
+	protected OptimizerMap createOptimizerMap() {
+		return new OptimizerMap();
+	}
 
 	/**
 	 * Lの文字列と、生成中文字列のBuilder.
 	 */
-	private final Map<String, StringBuilder> map = new HashMap<>();
+	private final OptimizerMap map = createOptimizerMap();
 
 	public OxLxOptimizer() {
 		map.clear();
@@ -62,7 +77,7 @@ public final class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 		});
 	}
 
-	private static StringBuilder newStringBuilder(Map<String, StringBuilder> map, String key, String init) {
+	protected static StringBuilder newStringBuilder(Map<String, StringBuilder> map, String key, String init) {
 		StringBuilder sb = map.get(key);
 		if (sb != null) {
 			sb.setLength(0);
@@ -73,7 +88,7 @@ public final class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 		return sb;
 	}
 
-	private StringBuilder newBuilder(StringBuilder sb, String lenString, String s, int insertBack) {
+	protected StringBuilder newBuilder(StringBuilder sb, String lenString, String s, int insertBack) {
 		StringBuilder changeBuilder = sb;
 		int len = changeBuilder.length();
 		// &や他の指示よりも前に配置する.
@@ -83,37 +98,34 @@ public final class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 	}
 
 	private final Map<String, StringBuilder> newBuilderMap = new HashMap<>();
+	private void updateBuilder(String key, StringBuilder builder, String minString, String noteName, String lenString, int insertBack) {
+		builder.append(noteName);
+		if (!key.equals(lenString)) {
+			if (lenString.equals(key+".")) {
+				builder.append(".");
+			} else {
+				builder.append(lenString);
+			}
+			newBuilderMap.put(lenString, newBuilder(newStringBuilder(newBuilderMap, lenString, minString), lenString, noteName, insertBack));
+			if (lenString.endsWith(".")) {
+				String lenString2 = lenString.substring(0, lenString.length()-1);
+				newBuilderMap.put(lenString2, newBuilder(newStringBuilder(newBuilderMap, lenString2, minString), lenString2, noteName+".", insertBack));
+			}
+			extendPatternBuilder(newBuilderMap, minString, noteName, lenString, insertBack);
+		}
+	}
+
+	protected void extendPatternBuilder(Map<String, StringBuilder> newBuilderMap, String minString, String noteName, String lenString, int insertBack) {}
+
 	private void addNoteText(String noteName, String lenString, int insertBack) {
 		newBuilderMap.clear();
 		String minString = getMinString();
 
 		// 保有するbuilderを更新.
-		map.forEach((key, builder) -> {
-			builder.append(noteName);
-			if (!key.equals(lenString)) {
-				if (lenString.equals(key+".")) {
-					builder.append(".");
-				} else {
-					builder.append(lenString);
-				}
-				newBuilderMap.put(lenString, newBuilder(newStringBuilder(newBuilderMap, lenString, minString), lenString, noteName, insertBack));
-				if (lenString.endsWith(".")) {
-					String lenString2 = lenString.substring(0, lenString.length()-1);
-					newBuilderMap.put(lenString2, newBuilder(newStringBuilder(newBuilderMap, lenString2, minString), lenString2, noteName+".", insertBack));
-				}
-			}
-		});
+		map.forEach((key, builder) -> updateBuilder(key, builder, minString, noteName, lenString, insertBack));
 
 		// 新規のbuilderで保有mapを更新.
-		newBuilderMap.forEach((key, builder) -> {
-			if (map.containsKey(key)) {
-				if ( builder.length() < map.get(key).length() ) {
-					map.put(key, builder);
-				}
-			} else {
-				map.put(key, builder);
-			}
-		});
+		newBuilderMap.forEach((key, builder) -> map.updateMapMinLength(key, builder));
 
 		FlexDotPattern.updateFlexDot(map, noteName, lenString);
 	}
@@ -136,7 +148,7 @@ public final class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 			this.lPrev = Integer.toString(l/4);
 		}
 
-		private void updatePattern(Map<String, StringBuilder> map, String noteName, String lenString) {
+		private void updatePattern(OptimizerMap map, String noteName, String lenString) {
 			String cName = noteName;
 			if (!noteName.toLowerCase().equals("r")) {
 				cName = "&" + noteName;
@@ -160,15 +172,10 @@ public final class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 				}
 			}
 
-			updateMap.forEach((key, builder) -> {
-				StringBuilder now = map.get(key);
-				if ( (now == null) || (builder.length() < now.length()) ) {
-					map.put(key, builder);
-				}
-			});
+			updateMap.forEach((key, builder) -> map.updateMapMinLength(key, builder));
 		}
 
-		private static void updateFlexDot(Map<String, StringBuilder> map, String noteName, String lenString) {
+		private static void updateFlexDot(OptimizerMap map, String noteName, String lenString) {
 			for (FlexDotPattern t : flexList) {
 				if (lenString.equals(t.lCur)) {
 					t.updatePattern(map, noteName, lenString);
@@ -208,7 +215,10 @@ public final class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 			lenString = this.section + ".";
 		}
 		addNoteText(noteName, lenString, insertBack);
+		fixPattern(map);
 	}
+
+	protected void fixPattern(Map<String, StringBuilder> map) {}
 
 	public static String getOctaveString(int prevOct, int nextOct) {
 		int delta = prevOct - nextOct;
@@ -224,11 +234,13 @@ public final class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 	}
 
 	private void insertOxPattern(int insertBack) {
-		int nextOct = this.octave + this.octD;
-		addString(getOctaveString(this.octave, nextOct), insertBack);
+		if (this.octD != 0) {
+			int nextOct = this.octave + this.octD;
+			addString(getOctaveString(this.octave, nextOct), insertBack);
 
-		this.octave = nextOct;
-		this.octD = 0;
+			this.octave = nextOct;
+			this.octD = 0;
+		}
 	}
 
 	private boolean doToken(char firstC, String lenString) {

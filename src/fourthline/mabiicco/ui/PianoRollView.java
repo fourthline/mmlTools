@@ -343,9 +343,11 @@ public final class PianoRollView extends JPanel {
 		for (int i = 0; i < 12; i++) {
 			int line = octave*12 + (11-i);
 			Color fillColor = scaleColor.getColor(i);
-			if (MabiIccoProperties.getInstance().viewRange.get() && !relativeInst.checkPitchRange(line)) {
+			if (!MabiIccoProperties.getInstance().enableEdit.get()) {
+				// 編集モード時は境界表示しない
+			} else if (MabiIccoProperties.getInstance().viewRange.get() && !relativeInst.checkPitchRange(line)) {
 				fillColor = outRangeColor;
-			} else if (relativeInst.isValid(line) == false) {
+			} else if ( (MabiIccoProperties.getInstance().instAttr.get()) && (relativeInst.isValid(line) == false) ) {
 				fillColor = noSoundColor;
 			}
 			g.setColor(fillColor);
@@ -362,7 +364,9 @@ public final class PianoRollView extends JPanel {
 	}
 
 	private void paintPitchRangeBorder(Graphics2D g) {
-		if (MabiIccoProperties.getInstance().viewRange.get()) {
+		if (!MabiIccoProperties.getInstance().enableEdit.get()) {
+			// 編集モード時は境界表示しない
+		} else if (MabiIccoProperties.getInstance().viewRange.get()) {
 			int width = getWidth();
 			int y1 = convertNote2Y(relativeInst.getLowerNote()-1);
 			int y2 = convertNote2Y(relativeInst.getUpperNote());
