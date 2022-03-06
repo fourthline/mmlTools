@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 たんらる
+ * Copyright (C) 2015-2022 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -22,6 +22,7 @@ import java.util.OptionalInt;
 import javax.swing.JTabbedPane;
 import javax.swing.TransferHandler;
 
+import fourthline.mabiicco.midi.MabiDLS;
 
 
 public final class TrackTabbedPane extends JTabbedPane implements DragGestureListener {
@@ -62,6 +63,10 @@ public final class TrackTabbedPane extends JTabbedPane implements DragGestureLis
 	public void dragGestureRecognized(DragGestureEvent event) {
 		Component c = event.getComponent();
 		if (!(c instanceof TrackTabbedPane)) {
+			return;
+		}
+		if (MabiDLS.getInstance().getSequencer().isRunning()) {
+			// 再生中はドラッグ移動を許可しない
 			return;
 		}
 		TrackTabbedPane tabbedPane = (TrackTabbedPane) c;
