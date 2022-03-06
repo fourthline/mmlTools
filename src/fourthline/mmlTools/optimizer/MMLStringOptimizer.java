@@ -52,7 +52,7 @@ public final class MMLStringOptimizer {
 	 * 精密なMML最適化を行う
 	 * 設定によってGen2/Normalを切り替える, Gen2の場合は出力結果を再Parseして検査する.
 	 */
-	public String priciseOptimize() {
+	public String preciseOptimize() {
 		if (enablePreciseOptimize) {
 			String mml1 = optimizeGen2();
 			return (new MMLEventList(mml1).equals(new MMLEventList(originalMML))) ? mml1 : optimize();

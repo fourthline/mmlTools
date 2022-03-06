@@ -103,6 +103,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String SELECT_ALL = "select_all";
 	@Action public static final String SELECT_PREVIOUS_ALL = "select_previous_all";
 	@Action public static final String SELECT_AFTER_ALL = "select_after_all";
+	@Action public static final String SELECT_ALL_SAME_PITCH = "select_all_same_pitch";
 	@Action public static final String MML_IMPORT = "mml_import";
 	@Action public static final String MML_EXPORT = "mml_export";
 	@Action public static final String SWITCH_TRACK_NEXT = "switch_track_next";
@@ -219,9 +220,10 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(MIDI_EXPORT, t -> this.midiExportAction());
 		actionMap.put(FILE_IMPORT, t -> this.fileImportAction());
 		actionMap.put(CLEAR_DLS, t -> this.clearDLSInformation());
-		actionMap.put(SELECT_ALL, t -> this.selectAll());
-		actionMap.put(SELECT_PREVIOUS_ALL, t -> this.selectPreviousAll());
-		actionMap.put(SELECT_AFTER_ALL, t -> this.selectAfterAll());
+		actionMap.put(SELECT_ALL, t -> this.selectAction(() -> editState.selectAll()));
+		actionMap.put(SELECT_PREVIOUS_ALL, t -> this.selectAction(() -> editState.selectPreviousAll()));
+		actionMap.put(SELECT_AFTER_ALL, t -> this.selectAction(() -> editState.selectAfterAll()));
+		actionMap.put(SELECT_ALL_SAME_PITCH, t -> this.selectAction(() -> editState.selectAllSamePitch()));
 		actionMap.put(MML_IMPORT, t -> mmlSeqView.mmlImport());
 		actionMap.put(MML_EXPORT, t -> mmlSeqView.mmlExport());
 		actionMap.put(SWITCH_TRACK_NEXT, t -> mmlSeqView.switchTrack(true));
@@ -613,22 +615,12 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		}
 	}
 
-	private void selectAll() {
-		editState.selectAll();
-		mmlSeqView.repaint();
-		notifyUpdateEditState();
-	}
-
-	// 前方向のノートを選択する.
-	private void selectPreviousAll() {
-		editState.selectPreviousAll();
-		mmlSeqView.repaint();
-		notifyUpdateEditState();
-	}
-
-	// 後ろ方向のノートを選択する.
-	private void selectAfterAll() {
-		editState.selectAfterAll();
+	/**
+	 * 選択アクション
+	 * @param action
+	 */
+	private void selectAction(Runnable action) {
+		action.run();
 		mmlSeqView.repaint();
 		notifyUpdateEditState();
 	}

@@ -40,7 +40,7 @@ import fourthline.mmlTools.MMLTrack;
  */
 public final class MabiIcco {
 	private final String args[];
-	private final Splash splash = new Splash();
+	private final Splash2 splash = new Splash2();
 
 	public MabiIcco(String args[]) {
 		this.args = args;

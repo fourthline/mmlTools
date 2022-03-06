@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2021 たんらる
+ * Copyright (C) 2013-2022 たんらる
  */
 
 package fourthline.mabiicco.midi;
@@ -104,7 +104,7 @@ public final class MabiDLS {
 		// シーケンサとシンセサイザの初期化
 		initializeSynthesizer();
 		Transmitter transmitter = this.sequencer.getTransmitters().get(0);
-		transmitter.setReceiver(new ExtendMessage.ExtendReceiver(this.synthesizer.getReceiver()));
+		transmitter.setReceiver(new ExtendMessage.ExtendReceiver(this.synthesizer.getReceiver(), MAX_MIDI_PART));
 	}
 
 	// ループ再生時にも使用するパラメータ.
@@ -166,6 +166,7 @@ public final class MabiDLS {
 
 			// sustain off
 			ch.controlChange(64, 0);
+			ch.resetAllControllers();
 		}
 	}
 
