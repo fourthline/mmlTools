@@ -102,7 +102,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		loadWindowPeoperties();
 		addComponentListener(this);
-		setIconImage(AppResource.getImageIcon("/img/icon.png").getImage());
+		setIconImage(AppResource.getImageIcon("/img/MabiIcco_Icon(Large).png").getImage());
 
 		setJMenuBar(createMenuBar());
 
