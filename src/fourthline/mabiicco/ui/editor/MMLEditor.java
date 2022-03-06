@@ -91,6 +91,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		newPopupMenu(AppResource.appText("part_change"), ActionDispatcher.PART_CHANGE);
 		newPopupMenu(AppResource.appText("edit.select_previous_all"), ActionDispatcher.SELECT_PREVIOUS_ALL);
 		newPopupMenu(AppResource.appText("edit.select_after_all"), ActionDispatcher.SELECT_AFTER_ALL);
+		newPopupMenu(AppResource.appText("edit.select_all_same_pitch"), ActionDispatcher.SELECT_ALL_SAME_PITCH);
 		newPopupMenu(AppResource.appText("menu.delete"), ActionDispatcher.DELETE, AppResource.appText("menu.delete.icon"));
 		newPopupMenu(AppResource.appText("note.properties"), ActionDispatcher.NOTE_PROPERTY);
 	}
@@ -656,6 +657,18 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		if (editEventList != null) {
 			for (MMLNoteEvent note : editEventList.getMMLNoteEventList()) {
 				if (note.getTickOffset() > popupTargetNote.getTickOffset()) {
+					selectedNote.add(note);
+				}
+			}
+		}
+	}
+
+	@Override
+	public void selectAllSamePitch() {
+		MMLEventList editEventList = mmlManager.getActiveMMLPart();
+		if (editEventList != null) {
+			for (MMLNoteEvent note : editEventList.getMMLNoteEventList()) {
+				if (note.getNote() == popupTargetNote.getNote()) {
 					selectedNote.add(note);
 				}
 			}

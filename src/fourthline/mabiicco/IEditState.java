@@ -18,6 +18,7 @@ public interface IEditState {
 	public void selectAll();
 	public void selectPreviousAll();
 	public void selectAfterAll();
+	public void selectAllSamePitch();
 
 	/** 連続した複数のノートが選択されているかどうかを判定する */
 	public boolean hasSelectedMultipleConsecutiveNotes();
