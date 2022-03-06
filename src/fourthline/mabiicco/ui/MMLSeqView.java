@@ -452,7 +452,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	}
 
 	public void outputClipBoardAction() {
-		MMLOutputPanel outputPanel = new MMLOutputPanel(parentFrame, mmlScore.getTrackList());
+		MMLOutputPanel outputPanel = new MMLOutputPanel(parentFrame, mmlScore.getTrackList(), mmlScore);
 		outputPanel.showDialog();
 	}
 
@@ -471,7 +471,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	public void mmlExport() {
 		int index = getActiveTrackIndex();
 		String text = getMMLScore().getTrack(index).getMabiMML();
-		MMLOutputPanel.copyToClipboard(parentFrame, text);
+		MMLOutputPanel.copyToClipboard(parentFrame, text, AppResource.appText("mml.output.done"));
 	}
 
 	private void updateSelectedTrackAndMMLPart() {
