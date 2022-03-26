@@ -611,6 +611,11 @@ public final class PianoRollView extends JPanel {
 			int x1 = convertTicktoX(paintNoteInfo.getTickOffset());
 			int x2 = convertTicktoX(paintNoteInfo.getEndTick());
 			int y = convertNote2Y(paintNoteInfo.getNote())-2;
+			g.setColor(Color.WHITE);
+			g.drawString(offsetText, x1-1, y-12-1);
+			g.drawString(lenText, x2-1, y-1);
+			g.drawString(offsetText, x1+1, y-12+1);
+			g.drawString(lenText, x2+1, y+1);
 			g.setColor(Color.BLUE);
 			g.drawString(offsetText, x1, y-12);
 			g.drawString(lenText, x2, y);
