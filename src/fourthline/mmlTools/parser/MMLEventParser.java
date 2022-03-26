@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 たんらる
+ * Copyright (C) 2013-2022 たんらる
  */
 
 package fourthline.mmlTools.parser;
@@ -20,6 +20,16 @@ public final class MMLEventParser implements Iterator<MMLEvent> {
 	private final MelodyParser parser;
 
 	public MMLEventParser(String mml) {
+		this(mml, 0);
+	}
+
+	/**
+	 * 開始オフセットを指定してパーサーを生成する
+	 * @param mml
+	 * @param startOffset
+	 */
+	public MMLEventParser(String mml, int startOffset) {
+		this.totalTick = startOffset;
 		tokenizer = new MMLTokenizer(mml);
 		parser = new MelodyParser(mml);
 	}

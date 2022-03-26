@@ -67,7 +67,7 @@ import java.util.function.IntConsumer;
  *  +- {@link MMLTrackView} ({@link TrackTabbedPane} extends JTabbedPane 内)
  * </pre>
  */
-public final class MMLSeqView implements IMMLManager, ChangeListener, ActionListener, MainView {
+public final class MMLSeqView extends AbstractMMLManager implements ChangeListener, ActionListener, MainView {
 	private static final int INITIAL_TRACK_COUNT = 1;
 
 	private int trackCounter;
@@ -79,7 +79,6 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	private final JTabbedPane tabbedPane;
 	private final ColumnPanel columnView;
 
-	private MMLScore mmlScore = new MMLScore();
 	private final MMLScoreUndoEdit undoEdit = new MMLScoreUndoEdit(this);
 
 	private final MMLEditor editor;
@@ -376,11 +375,6 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 		return mmlScore.getTrack(index);
 	}
 
-	@Override
-	public MMLScore getMMLScore() {
-		return mmlScore;
-	}
-
 	public PaintMode getPaintMode() {
 		return pianoRollView.getPaintMode();
 	}
@@ -452,7 +446,7 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	}
 
 	public void outputClipBoardAction() {
-		MMLOutputPanel outputPanel = new MMLOutputPanel(parentFrame, mmlScore.getTrackList());
+		MMLOutputPanel outputPanel = new MMLOutputPanel(parentFrame, mmlScore.getTrackList(), mmlScore);
 		outputPanel.showDialog();
 	}
 
@@ -469,9 +463,8 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	}
 
 	public void mmlExport() {
-		int index = getActiveTrackIndex();
-		String text = getMMLScore().getTrack(index).getMabiMML();
-		MMLOutputPanel.copyToClipboard(parentFrame, text);
+		String text = getActiveTrack().getMabiMML();
+		MMLOutputPanel.copyToClipboard(parentFrame, text, AppResource.appText("mml.output.done"));
 	}
 
 	private void updateSelectedTrackAndMMLPart() {
@@ -499,14 +492,18 @@ public final class MMLSeqView implements IMMLManager, ChangeListener, ActionList
 	}
 
 	@Override
+	public int getActiveMMLPartIndex() {
+		MMLTrackView view = (MMLTrackView) tabbedPane.getSelectedComponent();
+		return view.getSelectedMMLPartIndex();
+	}
+
+	@Override
 	public MMLEventList getActiveMMLPart() {
 		if (!currentEditMode) {
 			return null;
 		}
-		MMLTrackView view = (MMLTrackView) tabbedPane.getSelectedComponent();
-		int mmlPartIndex = view.getSelectedMMLPartIndex();
-		MMLTrack track = mmlScore.getTrack(getActiveTrackIndex());
-		return track.getMMLEventAtIndex(mmlPartIndex);
+		MMLTrack track = getActiveTrack();
+		return track.getMMLEventAtIndex(getActiveMMLPartIndex());
 	}
 
 	/**

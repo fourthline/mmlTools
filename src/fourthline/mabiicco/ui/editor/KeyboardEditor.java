@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 たんらる
+ * Copyright (C) 2017-2022 たんらる
  */
 
 package fourthline.mabiicco.ui.editor;
@@ -533,8 +533,7 @@ public final class KeyboardEditor {
 			partList.clear();
 			int program = mmlManager.getActivePartProgram();
 			boolean enablePart[] = InstClass.getEnablePartByProgram(program);
-			int trackIndex = mmlManager.getActiveTrackIndex();
-			MMLTrack activeTrack = mmlManager.getMMLScore().getTrack(trackIndex);
+			MMLTrack activeTrack = mmlManager.getActiveTrack();
 			for (int i = 0; i < enablePart.length; i++) {
 				if (enablePart[i]) {
 					partList.add(activeTrack.getMMLEventAtIndex(i));

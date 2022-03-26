@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2021 たんらる
+ * Copyright (C) 2015-2022 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -336,15 +336,15 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 
 		// 拡大
 		assertEquals(6.0, view.getWideScale(), 0.001);
-		Stream.of(6.0, 5.0, 4.0, 3.0, 2.0, 1.5, 1.0, 0.75, 0.5, 0.375, 0.25) .forEach(t -> {
+		Stream.of(6.0, 5.0, 4.0, 3.0, 2.0, 1.5, 1.0, 0.75, 0.5, 0.375, 0.25, 0.1) .forEach(t -> {
 			assertEquals(t.doubleValue(), view.getWideScale(), 0.001);
 			obj.getPianoRollScaler().expandPianoViewWide(0);
 		});
-		assertEquals(0.25, view.getWideScale(), 0.001);
+		assertEquals(0.1, view.getWideScale(), 0.001);
 		checkImage(view, "sample1");
 
 		// 縮小
-		Stream.of(0.25, 0.375, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 6.0) .forEach(t -> {
+		Stream.of(0.1, 0.25, 0.375, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 6.0) .forEach(t -> {
 			assertEquals(t.doubleValue(), view.getWideScale(), 0.001);
 			obj.getPianoRollScaler().reducePianoViewWide(0);
 		});

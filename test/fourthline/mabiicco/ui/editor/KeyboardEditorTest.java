@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 たんらる
+ * Copyright (C) 2017-2022 たんらる
  */
 
 package fourthline.mabiicco.ui.editor;
@@ -26,6 +26,7 @@ import fourthline.mabiicco.ui.PianoRollView;
 import fourthline.UseLoadingDLS;
 import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mabiicco.midi.IPlayNote;
+import fourthline.mabiicco.ui.AbstractMMLManager;
 import fourthline.mabiicco.ui.IMMLManager;
 import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLNoteEvent;
@@ -43,7 +44,7 @@ public class KeyboardEditorTest extends UseLoadingDLS {
 	private Receiver reciver;
 	private KeyListener key;
 
-	private class StubMmlManager implements IMMLManager {
+	private class StubMmlManager extends AbstractMMLManager {
 		private MMLScore score;
 
 		private StubMmlManager() {
@@ -107,6 +108,15 @@ public class KeyboardEditorTest extends UseLoadingDLS {
 
 		@Override
 		public void generateActiveTrack() {}
+
+		@Override
+		public MMLTrack getActiveTrack() {
+			return score.getTrack(getActiveTrackIndex());
+		}
+		@Override
+		public int getActiveMMLPartIndex() {
+			return 0;
+		}
 	}
 
 	private class StubPlayer implements IPlayNote {

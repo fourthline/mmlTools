@@ -46,6 +46,13 @@ public final class MMLTrack implements Serializable, Cloneable {
 	private int panpot = 64;
 	private boolean visible = true;
 
+	// start offset function
+	private int commonStartOffset = 0;      // 共通の開始位置
+	private int startDelta = 0;             // 楽器部の開始位置delta
+	private int startSongDelta = 0;         // 歌部の開始位置delta
+	private int attackDelayCorrect = 0;     // 楽器部のアタック遅延補正
+	private int attackSongDelayCorrect = 0; // 歌部のアタック遅延補正
+
 	// for MML input
 	private MMLText originalMML = new MMLText();
 
@@ -56,6 +63,13 @@ public final class MMLTrack implements Serializable, Cloneable {
 	private int songProgram = -1;  // コーラスを使用しない.
 
 	public MMLTrack() {
+		this(0, 0, 0);
+	}
+
+	public MMLTrack(int commonStartOffset, int startDelta, int startSongDelta) {
+		this.commonStartOffset = commonStartOffset;
+		this.startDelta = startDelta;
+		this.startSongDelta = startSongDelta;
 		mmlParse();
 		generated = true;
 	}
@@ -101,7 +115,8 @@ public final class MMLTrack implements Serializable, Cloneable {
 
 		for (int i = 0; i < PART_COUNT; i++) {
 			String s = originalMML.getText(i);
-			mmlParts.add( new MMLEventList(s, globalTempoList) );
+			int startOffset = getStartOffset(i);
+			mmlParts.add( new MMLEventList(s, globalTempoList, startOffset) );
 		}
 	}
 
@@ -216,7 +231,9 @@ public final class MMLTrack implements Serializable, Cloneable {
 	public MMLTrack generate() throws UndefinedTickException {
 		String mml1 = getOriginalMML();
 		originalMML.setMMLText(getMMLStrings(false, false));
-		if (!this.equals(new MMLTrack().setMML(getOriginalMML()))) {
+		var t = new MMLTrack(commonStartOffset, startDelta, startSongDelta).setMML(getOriginalMML());
+		t.setGlobalTempoList(globalTempoList);
+		if (!this.equals(t)) {
 			System.err.println("Verify error.");
 			System.err.println(mml1);
 			System.err.println(getOriginalMML());
@@ -237,18 +254,18 @@ public final class MMLTrack implements Serializable, Cloneable {
 	private String[] getMMLStrings(boolean tailFix, boolean mabiTempo) throws UndefinedTickException {
 		int count = mmlParts.size();
 		String mml[] = new String[count];
-		int totalTick = (int)this.getMaxTickLength();
 
 		for (int i = 0; i < count; i++) {
+			int startOffset = mabiTempo ? getStartOffsetforMabiMML(i) : getStartOffset(i);
 			// メロディパートのMML更新（テンポ, tickLengthにあわせる.
 			MMLEventList eventList = mmlParts.get(i);
 			boolean isPrimaryTempoPart = (i == 0) || (i == 3);
 			if ( isPrimaryTempoPart ) {
 				// part0 の場合, 1,2のパート情報を渡す
 				List<MMLEventList> relationPart = (i == 0) ? mmlParts.subList(1, 3) : null;
-				mml[i] = eventList.toMMLString(true, totalTick, mabiTempo, relationPart);
+				mml[i] = eventList.toMMLString(startOffset, true, mabiTempo, relationPart);
 			} else {
-				mml[i] = eventList.toMMLString();
+				mml[i] = eventList.toMMLString(startOffset);
 			}
 		}
 		if (tailFix) { // 終端補正
@@ -301,7 +318,6 @@ public final class MMLTrack implements Serializable, Cloneable {
 	private String[] getMMLStringsMusicQ() throws UndefinedTickException {
 		int count = mmlParts.size();
 		String mml[] = new String[count];
-		int totalTick = (int)this.getMaxTickLength();
 		LinkedList<MMLTempoEvent> localTempoList = new LinkedList<>(globalTempoList);
 		List<List<MMLEventList>> relationParts = makeRelationPart();
 		boolean allowed = tempoAllowChordPartFunction.apply(program);
@@ -313,7 +329,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 				localTempoList = new LinkedList<>(globalTempoList);
 			}
 			List<MMLEventList> relationPart = ((i < 3) && (allowed)) ? relationParts.get(i) : null;
-			mml[i] = eventList.toMMLStringMusicQ(localTempoList, totalTick, relationPart);
+			mml[i] = eventList.toMMLStringMusicQ(getStartOffsetforMabiMML(i), localTempoList, relationPart);
 
 		}
 		// for mabi MML, メロディ～和音2 までがカラの時にはメロディパートもカラにする.
@@ -370,7 +386,6 @@ public final class MMLTrack implements Serializable, Cloneable {
 	/**
 	 * マビノギでの演奏スキル時間を取得する.
 	 * <p>演奏時間  － 0.6秒 ＜ スキル時間 であれば、切れずに演奏される</p>
-	 * TODO: 歌パートの扱いは調べる必要があります・・・.
 	 * @return 時間（秒）
 	 */
 	public double getMabinogiTime() {
@@ -430,14 +445,117 @@ public final class MMLTrack implements Serializable, Cloneable {
 		return songProgram == -2;
 	}
 
+	/**
+	 * 各種オフセット変更にともなうシフト処理を行う.
+	 * 対応するNoteもシフトする
+	 * @param delta   オフセット変更量
+	 * @param inst　　　　楽器部をシフトするかどうか
+	 * @param song     歌部をシフトするかどうか
+	 */
+	public void updateStartOffsetNoteEvents(int delta, boolean inst, boolean song) {
+		int size = mmlParts.size();
+		for (int i = 0; i < size; i++) {
+			if ( (inst && (i >= 0) && (i <= 2)) || (song && (i == 3)) ) {
+				var part = mmlParts.get(i).getMMLNoteEventList();
+				part.forEach(note -> note.setTickOffset(note.getTickOffset() + delta));
+				// マイナスになったら消す
+				part.removeIf(t -> t.getTickOffset() < 0);
+			}
+		}
+	}
+
+	public MMLTrack setStartOffset(int offset) {
+		updateStartOffsetNoteEvents(offset - commonStartOffset, true, true);
+		commonStartOffset = offset;
+		return this;
+	}
+
+	public MMLTrack setStartDelta(int delta) {
+		if (commonStartOffset + delta >= 0) {
+			updateStartOffsetNoteEvents(delta - startDelta, true, false);
+			startDelta = delta;
+		} else {
+			throw new IllegalArgumentException();
+		}
+		return this;
+	}
+
+	public MMLTrack setStartSongDelta(int delta) {
+		if (commonStartOffset + delta >= 0) {
+			updateStartOffsetNoteEvents(delta - startSongDelta, false, true);
+			startSongDelta = delta;
+		} else {
+			throw new IllegalArgumentException();
+		}
+		return this;
+	}
+
+	public int getStartOffset(int index) {
+		return this.commonStartOffset + 
+				switch (index) {
+				case 0, 1, 2 -> this.startDelta;
+				case 3 ->       this.startSongDelta;
+				default -> throw new IllegalArgumentException();
+				};
+	}
+
+	/**
+	 * MabiMML用のstartOffsetを取得する
+	 * @param index
+	 * @param forMabiMML
+	 * @return
+	 */
+	public int getStartOffsetforMabiMML(int index) {
+		return  getStartOffset(index) - getAttackDelayCorrect(index);
+	}
+
+	public int getCommonStartOffset() {
+		return this.commonStartOffset;
+	}
+
+	public int getStartDelta() {
+		return this.startDelta;
+	}
+
+	public int getStartSongDelta() {
+		return this.startSongDelta;
+	}
+
+	public void setAttackDelayCorrect(int value) {
+		attackDelayCorrect = value;
+	}
+
+	public int getAttackDelayCorrect() {
+		return attackDelayCorrect;
+	}
+
+	public void setAttackSongDelayCorrect(int value) {
+		attackSongDelayCorrect = value;
+	}
+
+	public int getAttackSongDelayCorrect() {
+		return attackSongDelayCorrect;
+	}
+
+	public int getAttackDelayCorrect(int index) {
+		return switch (index) {
+		case 0, 1, 2 -> this.attackDelayCorrect;
+		case 3 ->       this.attackSongDelayCorrect;
+		default -> throw new IllegalArgumentException();
+		};
+	}
+
 	@Override
 	public MMLTrack clone() {
-		MMLTrack o = new MMLTrack().setMML(this.getOriginalMML());
+		MMLTrack o = new MMLTrack(commonStartOffset, startDelta, startSongDelta)
+				.setMML(this.getOriginalMML());
 		o.setGlobalTempoList(globalTempoList);
 		o.setPanpot(panpot);
 		o.setProgram(program);
 		o.setSongProgram(songProgram);
 		o.setTrackName(trackName);
+		o.setAttackDelayCorrect(attackDelayCorrect);
+		o.setAttackSongDelayCorrect(attackSongDelayCorrect);
 		if (generated) {
 			try {
 				o.generate();

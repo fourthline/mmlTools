@@ -25,7 +25,7 @@ public class MMLOutputPanelTest extends UseLoadingDLS {
 		list.add(createMMLTrack(1601, 400, 400, 400, true));
 		list.add(createMMLTrack(0, 0, 0, 800, false));
 
-		MMLOutputPanel panel = new MMLOutputPanel(null, list);
+		MMLOutputPanel panel = new MMLOutputPanel(null, list, null);
 		assertEquals("1", panel.table.getRank(0).getRank());
 		assertEquals("-", panel.table.getRank(1).getRank());
 		assertEquals("6`", panel.table.getRank(2).getRank());
@@ -44,7 +44,7 @@ public class MMLOutputPanelTest extends UseLoadingDLS {
 		MMLTrack e2 = createMMLTrack(1200, 800, 500, 1200, false);
 		MMLTrack e3 = createMMLTrack(0, 800, 500, 00, false);
 
-		MMLOutputPanel panel = new MMLOutputPanel(null, list);
+		MMLOutputPanel panel = new MMLOutputPanel(null, list, null);
 		MMLOutputPanel panel2 = panel.createSelectedTrackMMLSplitPanel(0);
 		assertEquals(e1.getMabiMML(), panel2.outputTextList.get(0));
 		assertEquals(e2.getMabiMML(), panel2.outputTextList.get(1));
@@ -61,7 +61,7 @@ public class MMLOutputPanelTest extends UseLoadingDLS {
 		MMLTrack e2 = createMMLTrack(800, 1200, 900, 0, true);
 		MMLTrack e3 = createMMLTrack(0, 0, 600, 0, true);
 
-		MMLOutputPanel panel = new MMLOutputPanel(null, list);
+		MMLOutputPanel panel = new MMLOutputPanel(null, list, null);
 		MMLOutputPanel panel2 = panel.createSelectedTrackMMLSplitPanel(0);
 		assertEquals(e1.getMabiMML(), panel2.outputTextList.get(0));
 		assertEquals(e2.getMabiMML(), panel2.outputTextList.get(1));

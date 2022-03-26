@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2020 たんらる
+ * Copyright (C) 2013-2022 たんらる
  */
 
 package fourthline.mmlTools;
@@ -106,11 +106,19 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 
 	@Override
 	public String toMMLString() throws UndefinedTickException {
+		return toMMLString(0);
+	}
+
+	private String toMMLString(int prevEndTickOffset) throws UndefinedTickException {
 		if ( (note < -1) || (note >= 108) ) {
 			throw new UndefinedTickException("note = "+note);
 		}
 		String noteName = getNoteName();
-		MMLTicks mmlTick = new MMLTicks(noteName, tick);
+		int actTick = tick;
+		if (getTickOffset() < prevEndTickOffset) {
+			actTick -= prevEndTickOffset - getTickOffset();
+		}
+		MMLTicks mmlTick = new MMLTicks(noteName, actTick);
 		if (tuningBase != null) {
 			return mmlTick.toMMLTextByBase(tuningBase);
 		} else {
@@ -135,7 +143,7 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 			sb.append("v"+velocity);
 		}
 
-		sb.append( toMMLString() );
+		sb.append( toMMLString(prevNoteEvent.getEndTick()) );
 
 		return sb.toString();
 	}

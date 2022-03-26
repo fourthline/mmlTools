@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2017 たんらる
+ * Copyright (C) 2015-2022 たんらる
  */
 
 package fourthline.mabiicco.midi;
@@ -71,7 +71,7 @@ public class MabiDLSTest extends UseLoadingDLS {
 		MMLScore score = new MMLScore();
 		score.addTrack(new MMLTrack().setMML("MML@aat180aa,brb,crc,drd;").setProgram(5));
 		score.getTrack(0).setSongProgram(100);
-		Sequence seq = dls.createSequence(score, 1);
+		Sequence seq = dls.createSequence(score, 1, true);
 		assertEquals(3, seq.getTracks().length);
 		assertEquals(MMLTicks.getTick("1"), seq.getTickLength());
 
@@ -115,7 +115,7 @@ public class MabiDLSTest extends UseLoadingDLS {
 	public void test_createSequence2() throws InvalidMidiDataException, UndefinedTickException {
 		MMLScore score = new MMLScore();
 		score.addTrack(new MMLTrack().setMML("MML@aart180a;"));
-		Sequence seq = dls.createSequence(score, 1);
+		Sequence seq = dls.createSequence(score, 1, true);
 		assertEquals(2, seq.getTracks().length);
 		assertEquals(MMLTicks.getTick("1"), seq.getTickLength());
 
@@ -125,6 +125,43 @@ public class MabiDLSTest extends UseLoadingDLS {
 		assertEquals(MMLTicks.getTick("2"), seq.getTickLength());
 	}
 
+	@Test
+	public void test_createSequence_attackDelayCorrect() throws InvalidMidiDataException, UndefinedTickException {
+		MMLScore score = new MMLScore();
+		score.addTrack(new MMLTrack().setMML("MML@aa,,,dd;"));
+		score.getTrack(0).setSongProgram(121);
+		Sequence seq = dls.createSequence(score, 1, true);
+
+		// 遅延補正なし
+		assertEquals(3, seq.getTracks().length);
+		assertEquals(192, seq.getTracks()[1].ticks());
+		assertEquals(1, seq.getTracks()[1].get(1).getTick());
+		assertEquals(96, seq.getTracks()[1].get(2).getTick());
+		assertEquals(97, seq.getTracks()[1].get(3).getTick());
+		assertEquals(192, seq.getTracks()[1].get(4).getTick());
+		assertEquals(192, seq.getTracks()[2].ticks());
+		assertEquals(1, seq.getTracks()[2].get(1).getTick());
+		assertEquals(96, seq.getTracks()[2].get(2).getTick());
+		assertEquals(97, seq.getTracks()[2].get(3).getTick());
+		assertEquals(192, seq.getTracks()[2].get(4).getTick());
+
+		// 遅延補正あり
+		score.getTrack(0).setAttackDelayCorrect(-6);
+		score.getTrack(0).setAttackSongDelayCorrect(-12);
+		seq = dls.createSequence(score, 1, true);
+
+		assertEquals(3, seq.getTracks().length);
+		assertEquals(192-6, seq.getTracks()[1].ticks());
+		assertEquals(1, seq.getTracks()[1].get(1).getTick());
+		assertEquals(96-6, seq.getTracks()[1].get(2).getTick());
+		assertEquals(97-6, seq.getTracks()[1].get(3).getTick());
+		assertEquals(192-6, seq.getTracks()[1].get(4).getTick());
+		assertEquals(192-12, seq.getTracks()[2].ticks());
+		assertEquals(1, seq.getTracks()[2].get(1).getTick());
+		assertEquals(96-12, seq.getTracks()[2].get(2).getTick());
+		assertEquals(97-12, seq.getTracks()[2].get(3).getTick());
+		assertEquals(192-12, seq.getTracks()[2].get(4).getTick());
+	}
 
 	@Test
 	public void testInstOptions() {

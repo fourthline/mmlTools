@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2021 たんらる
+ * Copyright (C) 2014-2022 たんらる
  */
 
 package fourthline.mabiicco.midi;
@@ -17,6 +17,7 @@ import fourthline.mmlTools.MMLNoteEvent;
 public final class MMLMidiTrack {
 	private final InstClass inst;
 	private final ArrayList<MMLNoteEvent> noteEventList;
+	private int attackDelayCorrect = 0;
 
 	public MMLMidiTrack(InstClass inst) {
 		this.inst = inst;
@@ -25,6 +26,10 @@ public final class MMLMidiTrack {
 
 	public List<MMLNoteEvent> getNoteEventList() {
 		return noteEventList;
+	}
+
+	public void setAttackDelayCorrect(int attackDelayCorrect) {
+		this.attackDelayCorrect = attackDelayCorrect;
 	}
 
 	public void add(List<MMLNoteEvent> list) {
@@ -36,6 +41,18 @@ public final class MMLMidiTrack {
 	private void addItem(MMLNoteEvent addEvent) {
 		int targetTick = addEvent.getTickOffset();
 		int targetIndex = 0;
+
+		// アタック遅延補正分
+		if (attackDelayCorrect != 0) {
+			targetTick += attackDelayCorrect;
+			if (targetTick < 0) {
+				int tick = addEvent.getTick() + targetTick;
+				if (tick <= 0) return;
+				targetTick = 0;
+				addEvent.setTick(tick);
+			}
+			addEvent.setTickOffset(targetTick);
+		}
 
 		for (MMLNoteEvent noteEvent : noteEventList) {
 			if (noteEvent.getTickOffset() > targetTick) {

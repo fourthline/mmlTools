@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 たんらる
+ * Copyright (C) 2013-2022 たんらる
  */
 
 package fourthline.mabiicco.ui;
@@ -15,6 +15,9 @@ public interface IMMLManager {
 	public MMLScore getMMLScore();
 	public void setMMLScore(MMLScore score);
 	public int getActiveTrackIndex();
+	public MMLTrack getActiveTrack();
+	public int getActiveMMLPartIndex();
+	public int getActiveMMLPartStartOffset();
 	public MMLEventList getActiveMMLPart();
 	public void updateActivePart(boolean generate);
 	public void generateActiveTrack();

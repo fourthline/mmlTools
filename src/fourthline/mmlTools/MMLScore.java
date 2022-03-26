@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2020 たんらる
+ * Copyright (C) 2013-2022 たんらる
  */
 
 package fourthline.mmlTools;
@@ -52,6 +52,12 @@ public final class MMLScore implements IMMLFileParser {
 	public synchronized int addTrack(MMLTrack track) {
 		if (trackList.size() >= MAX_TRACK) {
 			return -1;
+		}
+
+		// 既存トラックがあれば、StartOffsetをあわせる
+		if (trackList.size() > 0) {
+			int initialStartOffset = trackList.getFirst().getCommonStartOffset();
+			track.setStartOffset(initialStartOffset);
 		}
 
 		// トラックリストの末尾に追加
@@ -307,14 +313,31 @@ public final class MMLScore implements IMMLFileParser {
 			stream.println("author="+getAuthor());
 			stream.println("time="+getBaseTime());
 			stream.println("tempo="+getTempoObj());
+			if (getStartOffsetAll() > 0) {
+				stream.println("startOffset="+getStartOffsetAll());
+			}
 
 			for (MMLTrack track : trackList) {
+				// インスタンス時に先に指定したいので、オフセットたちは先に出力する
+				if (track.getStartDelta() != 0) {
+					stream.println("startDelta="+track.getStartDelta());
+				}
+				if (track.getStartSongDelta() != 0) {
+					stream.println("startSongDelta="+track.getStartSongDelta());
+				}
+				//　本体
 				stream.println("mml-track="+track.getOriginalMML());
 				stream.println("name="+track.getTrackName());
 				stream.println("program="+track.getProgram());
 				stream.println("songProgram="+track.getSongProgram());
 				stream.println("panpot="+track.getPanpot());
 				stream.println("visible="+track.isVisible());
+				if (track.getAttackDelayCorrect() != 0) {
+					stream.println("attackDelayCorrect="+track.getAttackDelayCorrect());
+				}
+				if (track.getAttackSongDelayCorrect() != 0) {
+					stream.println("attackSongDelayCorrect="+track.getAttackSongDelayCorrect());
+				}
 			}
 
 			if (!markerList.isEmpty()) {
@@ -403,18 +426,40 @@ public final class MMLScore implements IMMLFileParser {
 		return sb.toString();
 	}
 
+	private class ParseCache {
+		private int startOffset = 0;
+		private int startDelta = 0;
+		private int startSongDelta = 0;
+		private void clear() {
+			startOffset = 0;
+			startDelta = 0;
+			startSongDelta = 0;
+		}
+	}
+
 	/**
 	 * parse [mml-score] contents
 	 * @param contents
 	 */
 	private void parseMMLScore(String contents) {
+		var cache = new ParseCache();
 		TextParser.text(fixMMLspace(contents))
-		.pattern("mml-track=",   t -> this.addTrack(new MMLTrack().setMML(t)) )
+		// スタートOffsetはMMLTrack生成時に指定するため事前にみる
+		.pattern("startOffset=",    t -> cache.startOffset = Integer.parseInt(t))
+		.pattern("startDelta=",     t -> cache.startDelta = Integer.parseInt(t))
+		.pattern("startSongDelta=", t -> cache.startSongDelta = Integer.parseInt(t))
+		// for MMLTrack
+		.pattern("mml-track=",   t -> { 
+			this.addTrack(new MMLTrack(cache.startOffset, cache.startDelta, cache.startSongDelta).setMML(t));
+			cache.clear();
+		})
 		.pattern("name=",        t -> this.trackList.getLast().setTrackName(t) )
 		.pattern("program=",     t -> this.trackList.getLast().setProgram(Integer.parseInt(t)) )
 		.pattern("songProgram=", t -> this.trackList.getLast().setSongProgram(Integer.parseInt(t)) )
 		.pattern("panpot=",      t -> this.trackList.getLast().setPanpot(Integer.parseInt(t)) )
 		.pattern("visible=",     t -> this.trackList.getLast().setVisible(Boolean.parseBoolean(t)) )
+		.pattern("attackDelayCorrect=", t -> this.trackList.getLast().setAttackDelayCorrect(Integer.parseInt(t)))
+		.pattern("attackDelaySongCorrect=", t -> this.trackList.getLast().setAttackSongDelayCorrect(Integer.parseInt(t)))
 		.pattern("title=",       this::setTitle )
 		.pattern("author=",      this::setAuthor )
 		.pattern("time=",        this::setBaseTime )
@@ -475,6 +520,78 @@ public final class MMLScore implements IMMLFileParser {
 				}
 			}
 		}
+	}
+
+	/**
+	 * 開始位置の設定を行う
+	 * 設定することによってOffsetがマイナスになる場合は反映しない
+	 * @param startOffset
+	 * @return
+	 */
+	public boolean setStartOffsetAll(int startOffset) {
+		if (startOffset < 0) {
+			throw new IllegalArgumentException();
+		}
+		if (trackList.isEmpty()) {
+			return false;
+		}
+		MMLTrack firstTrack = trackList.getFirst();
+		int oldStartOffset = firstTrack.getCommonStartOffset();
+		for (MMLTrack t : trackList) {
+			if (t.getCommonStartOffset() != oldStartOffset) {
+				throw new IllegalStateException();
+			}
+			if ( (startOffset + t.getStartDelta() < 0) || (startOffset + t.getStartSongDelta() < 0) ) {
+				return false;
+			}
+		}
+
+		int delta = startOffset - oldStartOffset;
+		// すべてのテンポが移動可能かどうかをチェックする
+		for (var t : globalTempoList) {
+			if (t.getTickOffset() + delta < 0) {
+				return false;
+			}
+		}
+		// すべてのマーカが移動可能かどうかをチェックする
+		for (var t : markerList) {
+			if (t.getTickOffset() + delta < 0) {
+				return false;
+			}
+		}
+		// 反映
+		trackList.forEach(t -> t.setStartOffset(startOffset));
+		globalTempoList.forEach(t -> t.setTickOffset(t.getTickOffset() + delta));
+		markerList.forEach(t -> t.setTickOffset(t.getTickOffset() + delta));
+		return true;
+	}
+
+	private int getStartOffsetAll() {
+		if (trackList.size() > 0) {
+			return trackList.getFirst().getCommonStartOffset();
+		}
+		return 0;
+	}
+
+	/**
+	 * tickに対する小節表記を取得する
+	 * @param tick
+	 * @return
+	 */
+	public String getBarTextTick(int tick) {
+		StringBuilder sb = new StringBuilder();
+		try {
+			int sect = MMLTicks.getTick(getBaseOnly());
+			int sectBar = sect * getTimeCountOnly();
+			int bar = tick / sectBar;
+			int barR = (tick % sectBar);
+			int c = barR / sect;
+			int r = barR % sect;
+			sb.append(bar).append(':').append(c).append(':').append(r);			
+		} catch (UndefinedTickException e) {
+			e.printStackTrace();
+		}
+		return sb.toString();
 	}
 
 	public static void main(String args[]) {

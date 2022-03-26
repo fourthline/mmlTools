@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2017 たんらる
+ * Copyright (C) 2014-2022 たんらる
  */
 
 package fourthline.mabiicco.ui.mml;
@@ -30,6 +30,7 @@ import javax.swing.JScrollPane;
 
 import fourthline.mabiicco.AppResource;
 import fourthline.mmlTools.ComposeRank;
+import fourthline.mmlTools.MMLScore;
 import fourthline.mmlTools.MMLTrack;
 import fourthline.mmlTools.core.MMLText;
 
@@ -41,7 +42,8 @@ public final class MMLOutputPanel extends JPanel {
 	private final JButton splitButton = new JButton(AppResource.appText("mml.output.split"));
 
 	private List<MMLTrack> trackList;
-	List<String> outputTextList = new ArrayList<>();
+	private MMLScore score;
+	final List<String> outputTextList = new ArrayList<>();
 
 	public MMLOutputPanel(Frame parentFrame) {
 		this.dialog = null;
@@ -50,7 +52,7 @@ public final class MMLOutputPanel extends JPanel {
 		initializePanel(false);
 	}
 
-	public MMLOutputPanel(Frame parentFrame, List<MMLTrack> trackList) {
+	public MMLOutputPanel(Frame parentFrame, List<MMLTrack> trackList, MMLScore score) {
 		this.dialog = new JDialog(parentFrame, AppResource.appText("mml.output"), true);
 		this.parentFrame = parentFrame;
 		this.table = new TrackListTable(trackList);
@@ -58,16 +60,21 @@ public final class MMLOutputPanel extends JPanel {
 		for (MMLTrack track : trackList) {
 			outputTextList.add(track.getMabiMML());
 		}
+		this.score = score;
 		initializePanel(true);
 	}
 
-	private MMLOutputPanel(Dialog parent, MMLTrack track, List<MMLText> textList) {
+	/**
+	 * 楽譜集生成用
+	 */
+	private MMLOutputPanel(Dialog parent, MMLTrack track, List<MMLText> textList, MMLScore score) {
 		this.dialog = new JDialog(parent, AppResource.appText("mml.output.split"), true);
 		this.parentFrame = parent;
 		this.table = new TrackListTable(track, textList);
 		for (MMLText mmlText : textList) {
 			outputTextList.add(mmlText.getMML());
 		}
+		this.score = score;
 		initializePanel(false);
 	}
 
@@ -77,22 +84,22 @@ public final class MMLOutputPanel extends JPanel {
 		JPanel p = new JPanel();
 		p.setLayout(null);
 
+		JButton nameButton = new JButton(AppResource.appText("mml.output.nameButton"));
+		nameButton.setMargin(new Insets(5, 10, 5, 10));
+		nameButton.setFocusable(false);
+		buttonPanel.add(nameButton);
+		nameButton.addActionListener((event) -> currentSelectedTrackNameOutput());
+
 		JButton copyButton = new JButton(AppResource.appText("mml.output.copyButton"));
 		copyButton.setMargin(new Insets(5, 10, 5, 10));
 		buttonPanel.add(copyButton);
-		copyButton.addActionListener((event) -> {
-			currentSelectedTrackMMLOutput();
-		});
+		copyButton.addActionListener((event) -> currentSelectedTrackMMLOutput());
 
 		if (splitFunc) {
 			splitButton.setMargin(new Insets(5, 10, 5, 10));
 			buttonPanel.add(splitButton);
-			splitButton.addActionListener((event) -> {
-				currentSelectedTrackMMLSplitOutput();
-			});
-			table.getSelectionModel().addListSelectionListener(t -> {
-				checkSplitCopy();
-			});
+			splitButton.addActionListener((event) -> currentSelectedTrackMMLSplitOutput());
+			table.getSelectionModel().addListSelectionListener(t -> checkSplitCopy());
 			checkSplitCopy();
 		}
 
@@ -100,9 +107,7 @@ public final class MMLOutputPanel extends JPanel {
 		closeButton.setMargin(new Insets(5, 10, 5, 10));
 		buttonPanel.add(closeButton);
 		closeButton.setFocusable(false);
-		closeButton.addActionListener((event) -> {
-			dialog.setVisible(false);
-		});
+		closeButton.addActionListener((event) -> dialog.setVisible(false));
 
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(12, 10, 460, 280);
@@ -125,11 +130,11 @@ public final class MMLOutputPanel extends JPanel {
 		add(p, BorderLayout.CENTER);
 	}
 
-	public static void copyToClipboard(Window parent, String text) {
+	public static void copyToClipboard(Window parent, String text, String message) {
 		Toolkit kit = Toolkit.getDefaultToolkit();
 		Clipboard clip = kit.getSystemClipboard();
 		clip.setContents(new StringSelection(text), null);
-		JOptionPane.showMessageDialog(parent, AppResource.appText("mml.output.done"), AppResource.getAppTitle(), JOptionPane.PLAIN_MESSAGE);
+		JOptionPane.showMessageDialog(parent, message, AppResource.getAppTitle(), JOptionPane.PLAIN_MESSAGE);
 	}
 
 
@@ -142,12 +147,27 @@ public final class MMLOutputPanel extends JPanel {
 	}
 
 	/**
+	 * 現在のトラック名をコピーする
+	 */
+	private void currentSelectedTrackNameOutput() {
+		int row = table.getSelectedRow();
+		String trackName = trackList.get(row).getTrackName();
+		if (score != null) {
+			String scoreName = score.getTitle();
+			if (!scoreName.isEmpty()) {
+				trackName += "/" + scoreName;
+			}
+		}
+		copyToClipboard(parentFrame, trackName, AppResource.appText("mml.output.name_done"));
+	}
+
+	/**
 	 * 現在のトラックのMMLをコピーする
 	 */
 	private void currentSelectedTrackMMLOutput() {
 		int row = table.getSelectedRow();
 		String mmlText = outputTextList.get(row);
-		copyToClipboard(parentFrame, mmlText);
+		copyToClipboard(parentFrame, mmlText, AppResource.appText("mml.output.done"));
 		nextSelect(row);
 	}
 
@@ -168,7 +188,7 @@ public final class MMLOutputPanel extends JPanel {
 		MMLText mmlText = new MMLText().setMMLText( outputTextList.get(row) );
 		mmlText.setExcludeSongPart(track.isExcludeSongPart());
 		ComposeRank topRank = !track.isExcludeSongPart() ? ComposeRank.getTopRank() : ComposeRank.getTopExcludeSongRank();
-		return new MMLOutputPanel(dialog, track, mmlText.splitMML(topRank));
+		return new MMLOutputPanel(dialog, track, mmlText.splitMML(topRank), score);
 	}
 
 	private void checkSplitCopy() {

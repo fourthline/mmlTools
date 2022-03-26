@@ -72,6 +72,9 @@ public final class PianoRollView extends JPanel {
 	// 選択中のノートイベント
 	private List<MMLNoteEvent> selectNoteList;
 
+	// ノート情報表示オプション
+	private MMLNoteEvent paintNoteInfo = null;
+
 	// 選択用の枠
 	private Rectangle selectingRect;
 
@@ -96,19 +99,23 @@ public final class PianoRollView extends JPanel {
 
 	private static final Color shadowColor = Color.GRAY;
 
+	private static final Color START_OFFSET_COLOR = new Color(0.9f, 0.8f, 0.8f);
+
 	private static final int DRAW_START_MARGIN = 192;
+
+	private final MabiIccoProperties properties = MabiIccoProperties.getInstance();
 
 	public enum PaintMode {
 		ALL_TRACK("paintMode.all_track"), 
 		ACTIVE_TRACK("paintMode.active_track"),
 		ACTIVE_PART("paintMode.active_part");
 
-		final private String resourceName;
+		private final String resourceName;
 		private PaintMode(String name) {
-			resourceName = name;
+			resourceName = AppResource.appText(name);
 		}
 		public String toString() {
-			return AppResource.appText(resourceName);
+			return resourceName;
 		}
 	}
 	private PaintMode paintMode = PaintMode.ALL_TRACK;
@@ -128,7 +135,6 @@ public final class PianoRollView extends JPanel {
 		super();
 		setPreferredSize(new Dimension(0, getTotalHeight()));
 
-		MabiIccoProperties properties = MabiIccoProperties.getInstance();
 		setNoteHeightIndex( properties.getPianoRollViewHeightScaleProperty() );
 		setSequenceTick(0);
 	}
@@ -156,6 +162,10 @@ public final class PianoRollView extends JPanel {
 		selectNoteList = list;
 	}
 
+	public void setPaintNoteInfo(MMLNoteEvent note) {
+		paintNoteInfo = note;
+	}
+
 	public void setSelectingArea(Rectangle rect) {
 		selectingRect = rect;
 	}
@@ -167,10 +177,11 @@ public final class PianoRollView extends JPanel {
 		MMLScore mmlScore = mmlManager.getMMLScore();
 		long tickLength = mmlScore.getTotalTickLengthWithAll();
 		try {
-			// 最後に4小節分のマージンを作成します.
+			// 最後に12小節分のマージンを作成します.
 			int t1 = MMLTicks.getTick("1");
-			tickLength += t1*4;
+			tickLength += t1*12;
 			tickLength -= tickLength % t1;
+			tickLength += mmlManager.getActiveMMLPartStartOffset();
 		} catch (UndefinedTickException e) {
 			e.printStackTrace();
 		}
@@ -246,6 +257,7 @@ public final class PianoRollView extends JPanel {
 	public final int convertY2Note(int y) {
 		if (y < 0) y = 0;
 		int note = (OCTNUM*12-(y/noteHeight)) -1;
+		if (note < -1) note = -1;
 
 		return note;
 	}
@@ -310,15 +322,16 @@ public final class PianoRollView extends JPanel {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		showAllVelocity = MabiIccoProperties.getInstance().showAllVelocity.get();
+		showAllVelocity = properties.showAllVelocity.get();
 		updateViewTick();
 
 		// FIXME: しぼったほうがいいかも？
 		updateViewWidthTrackLength();
+		int startOffsetX = convertTicktoX(mmlManager.getActiveMMLPartStartOffset());
 
 		Graphics2D g2 = (Graphics2D)g.create();
 		for (int i = 0; i <= OCTNUM; i++) {
-			paintOctPianoLine(g2, i, (char)('0'+OCTNUM-i-1));
+			paintOctPianoLine(g2, i, startOffsetX);
 		}
 
 		paintMeasure(g2);
@@ -327,46 +340,51 @@ public final class PianoRollView extends JPanel {
 		paintOtherTrack(g2);
 		paintActiveTrack(g2);
 		paintSelectedNote(g2);
+		paintNoteInfo(g2);
 		paintSelectingArea(g2);
 		paintSequenceLine(g2, getTotalHeight());
 
 		g2.dispose();
 	}
 
-	private void paintOctPianoLine(Graphics2D g, int pos, char posText) {
+	private void paintOctPianoLine(Graphics2D g, int pos, int startOffsetX) {
 		int startY = 12 * noteHeight * pos;
 		int octave = OCTNUM - pos - 1;
+		int yLimit = getTotalHeight();
 
 		// グリッド
-		int y = startY;
 		int width = getWidth();
 		for (int i = 0; i < 12; i++) {
+			int y = startY + i*noteHeight;
+			if (y > yLimit) return;
 			int line = octave*12 + (11-i);
 			Color fillColor = scaleColor.getColor(i);
-			if (!MabiIccoProperties.getInstance().enableEdit.get()) {
+			if (!properties.enableEdit.get()) {
 				// 編集モード時は境界表示しない
-			} else if (MabiIccoProperties.getInstance().viewRange.get() && !relativeInst.checkPitchRange(line)) {
+			} else if (properties.viewRange.get() && !relativeInst.checkPitchRange(line)) {
 				fillColor = outRangeColor;
-			} else if ( (MabiIccoProperties.getInstance().instAttr.get()) && (relativeInst.isValid(line) == false) ) {
+			} else if ( (properties.instAttr.get()) && (relativeInst.isValid(line) == false) ) {
 				fillColor = noSoundColor;
 			}
 			g.setColor(fillColor);
-			g.fillRect(0, i*noteHeight+y, width, noteHeight);
+			g.fillRect(0, y, width, noteHeight);
+			g.setColor(START_OFFSET_COLOR);
+			g.fillRect(0, y, startOffsetX, noteHeight);
 			if (i == 0) {
 				g.setColor(darkBarBorder);
 			} else {
 				g.setColor(ScaleColor.BORDER_COLOR);
 			}
-			g.drawLine(0, i*noteHeight+y, width, i*noteHeight+y);
+			g.drawLine(0, y, width, y);
 		}
 		g.setColor(darkBarBorder);
-		g.drawLine(0, 12*noteHeight+y, width, 12*noteHeight+y);
+		g.drawLine(0, 12*noteHeight+startY, width, 12*noteHeight+startY);
 	}
 
 	private void paintPitchRangeBorder(Graphics2D g) {
-		if (!MabiIccoProperties.getInstance().enableEdit.get()) {
+		if (!properties.enableEdit.get()) {
 			// 編集モード時は境界表示しない
-		} else if (MabiIccoProperties.getInstance().viewRange.get()) {
+		} else if (properties.viewRange.get()) {
 			int width = getWidth();
 			int y1 = convertNote2Y(relativeInst.getLowerNote()-1);
 			int y2 = convertNote2Y(relativeInst.getUpperNote());
@@ -578,6 +596,29 @@ public final class PianoRollView extends JPanel {
 					paintMMLTrack(g, i, track);
 				}
 			}
+		}
+	}
+
+	private void paintNoteInfo(Graphics2D g) {
+		if (paintNoteInfo != null) {
+			int offset = paintNoteInfo.getTickOffset() - mmlManager.getActiveMMLPartStartOffset();
+			String offsetText = "start = " + offset;
+			String lenText = "N/A";
+			try {
+				lenText = paintNoteInfo.toMMLString();
+			} catch (UndefinedTickException e) {}
+			lenText =  paintNoteInfo.getTick() + ": " + lenText;
+			int x1 = convertTicktoX(paintNoteInfo.getTickOffset());
+			int x2 = convertTicktoX(paintNoteInfo.getEndTick());
+			int y = convertNote2Y(paintNoteInfo.getNote())-2;
+			g.setColor(Color.WHITE);
+			g.drawString(offsetText, x1-1, y-12-1);
+			g.drawString(lenText, x2-1, y-1);
+			g.drawString(offsetText, x1+1, y-12+1);
+			g.drawString(lenText, x2+1, y+1);
+			g.setColor(Color.BLUE);
+			g.drawString(offsetText, x1, y-12);
+			g.drawString(lenText, x2, y);
 		}
 	}
 

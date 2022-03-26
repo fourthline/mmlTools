@@ -1,9 +1,10 @@
 /*
- * Copyright (C) 2013-2017 たんらる
+ * Copyright (C) 2013-2022 たんらる
  */
 
 package fourthline.mabiicco.ui;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -21,6 +22,8 @@ import javax.sound.midi.Sequencer;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 
 import fourthline.mabiicco.MabiIccoProperties;
 import fourthline.mabiicco.midi.MabiDLS;
@@ -28,6 +31,7 @@ import fourthline.mabiicco.ui.color.ColorManager;
 import fourthline.mabiicco.ui.editor.IEditAlign;
 import fourthline.mabiicco.ui.editor.IMarkerEditor;
 import fourthline.mabiicco.ui.editor.MarkerEditor;
+import fourthline.mabiicco.ui.editor.StartOffsetEditor;
 import fourthline.mabiicco.ui.editor.MMLTempoEditor;
 import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLNoteEvent;
@@ -43,7 +47,10 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 	private static final Color TEMPO_MAKER_FILL_COLOR = new Color(0.4f, 0.8f, 0.8f);
 	private static final Color MAKER_FILL_COLOR = new Color(0.2f, 0.8f, 0.2f);
 	private static final Color TARGET_MAKER_FILL_COLOR = new Color(0.9f, 0.7f, 0.0f, 0.6f);
+	private static final Color START_COMMON_OFFSET_COLOR = new Color(255, 167, 227);
+	private static final Color START_OFFSET_COLOR = new Color(255, 202, 227);
 	private static final int DRAW_HEIGHT = 32;
+	private static final int DRAW_OFFSET_HEIGHT = 6;
 
 	private final PianoRollView pianoRollView;
 	private final IMMLManager mmlManager;
@@ -64,14 +71,28 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 
 		markerEditor.add( new MMLTempoEditor(parentFrame, mmlManager, editAlign, this) );
 		markerEditor.add( new MarkerEditor(parentFrame, mmlManager, editAlign, this) );
+		markerEditor.add( new StartOffsetEditor(parentFrame, mmlManager, editAlign, this) );
 
 		// popupMenu に各MenuItemを登録する.
 		markerEditor.forEach(t -> t.getMenuItems().forEach(popupMenu::add));
+
+		popupMenu.addPopupMenuListener(new PopupMenuListener() {
+			@Override
+			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {}
+
+			@Override
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {}
+
+			@Override
+			public void popupMenuCanceled(PopupMenuEvent e) {
+				PaintOff();
+			}
+		});
 	}
 
 	@Override
 	public Dimension getPreferredSize() {
-		return new Dimension(getWidth(), DRAW_HEIGHT);
+		return new Dimension(getWidth(), DRAW_HEIGHT+(DRAW_OFFSET_HEIGHT*2));
 	}
 
 	@Override
@@ -85,6 +106,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D)g.create();
 
+		paintStartOffset(g2);
 		paintRuler(g2);
 		paintMarker(g2);
 		paintTempoEvents(g2);
@@ -96,6 +118,34 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 		}
 
 		g2.dispose();
+	}
+
+	private static final float dash[] = { 2.0f, 4.0f };
+	private static final BasicStroke dashStroke = new BasicStroke(1.0f, 
+			BasicStroke.CAP_BUTT, 
+			BasicStroke.JOIN_MITER, 
+			10.0f, 
+			dash, 
+			0.0f);
+	/**
+	 * スタート位置未満の背景
+	 */
+	private void paintStartOffset(Graphics2D g) {
+		int width = getWidth();
+		var oldStroke = g.getStroke();
+		g.setStroke(dashStroke);
+		g.setColor(Color.GRAY);
+		g.drawLine(0, DRAW_HEIGHT, width, DRAW_HEIGHT);
+		g.setStroke(oldStroke);
+
+		int x1 = pianoRollView.convertTicktoX(mmlManager.getActiveTrack().getCommonStartOffset());
+		int x2 = pianoRollView.convertTicktoX(mmlManager.getActiveMMLPartStartOffset());
+
+		g.setColor(START_COMMON_OFFSET_COLOR);
+		g.fillRect(0, DRAW_HEIGHT, x1, DRAW_OFFSET_HEIGHT);
+
+		g.setColor(START_OFFSET_COLOR);
+		g.fillRect(0, DRAW_HEIGHT+DRAW_OFFSET_HEIGHT, x2, DRAW_OFFSET_HEIGHT);
 	}
 
 	/**
