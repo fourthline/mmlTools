@@ -257,6 +257,7 @@ public final class PianoRollView extends JPanel {
 	public final int convertY2Note(int y) {
 		if (y < 0) y = 0;
 		int note = (OCTNUM*12-(y/noteHeight)) -1;
+		if (note < -1) note = -1;
 
 		return note;
 	}
