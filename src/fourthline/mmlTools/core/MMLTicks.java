@@ -115,7 +115,10 @@ public final class MMLTicks {
 		}
 
 		if (needTie) {
-			return sb.substring(1);
+			if (sb.length() > 0) {
+				return sb.substring(1);
+			}
+			return "";
 		} else {
 			return sb.toString();
 		}

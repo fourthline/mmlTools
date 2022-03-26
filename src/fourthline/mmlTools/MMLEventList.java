@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2021 たんらる
+ * Copyright (C) 2013-2022 たんらる
  */
 
 package fourthline.mmlTools;
@@ -40,11 +40,21 @@ public final class MMLEventList implements Serializable, Cloneable {
 			tempoList = new ArrayList<MMLTempoEvent>();
 		}
 
-		parseMML(mml);
+		parseMML(mml, 0);
 	}
 
-	private void parseMML(String mml) {
-		MMLEventParser parser = new MMLEventParser(mml);
+	public MMLEventList(String mml, List<MMLTempoEvent> globalTempoList, int startOffset) {
+		if (globalTempoList != null) {
+			tempoList = globalTempoList;
+		} else {
+			tempoList = new ArrayList<MMLTempoEvent>();
+		}
+
+		parseMML(mml, startOffset);
+	}
+
+	private void parseMML(String mml, int startOffset) {
+		MMLEventParser parser = new MMLEventParser(mml, startOffset);
 
 		while (parser.hasNext()) {
 			MMLEvent event = parser.next();
@@ -270,15 +280,15 @@ public final class MMLEventList implements Serializable, Cloneable {
 	}
 
 	public String toMMLString() throws UndefinedTickException {
-		return toMMLString(false, 0, true);
+		return toMMLString(false, true);
+	}
+
+	public String toMMLString(int startOffset) throws UndefinedTickException {
+		return toMMLString(startOffset, false, true, null);
 	}
 
 	public String toMMLString(boolean withTempo, boolean mabiTempo) throws UndefinedTickException {
-		return toMMLString(withTempo, 0, mabiTempo);
-	}
-
-	public String toMMLString(boolean withTempo, int totalTick, boolean mabiTempo) throws UndefinedTickException {
-		return toMMLString(withTempo, totalTick, mabiTempo, null);
+		return toMMLString(0, withTempo, mabiTempo, null);
 	}
 
 	/**
@@ -317,7 +327,7 @@ public final class MMLEventList implements Serializable, Cloneable {
 
 	private MMLNoteEvent insertTempoMML(StringBuilder sb, MMLNoteEvent prevNoteEvent, MMLTempoEvent tempoEvent, boolean mabiTempo, List<MMLEventList> relationPart)
 			throws UndefinedTickException {
-		if (prevNoteEvent.getEndTick() != tempoEvent.getTickOffset()) {
+		if (prevNoteEvent.getEndTick() < tempoEvent.getTickOffset()) {
 			int tickLength = tempoEvent.getTickOffset() - prevNoteEvent.getEndTick();
 			int tickOffset = prevNoteEvent.getEndTick();
 			int note = prevNoteEvent.getNote();
@@ -380,6 +390,7 @@ public final class MMLEventList implements Serializable, Cloneable {
 	/**
 	 * テンポ出力を行うかどうかを指定してMML文字列を作成する.
 	 * TODO: 長いなぁ。
+	 * @param startOffset
 	 * @param withTempo    trueを指定すると、tempo指定を含むMMLを返します.
 	 * @param totalTick    最大tick長. これに満たない場合は、末尾を休符分で埋めます.
 	 * @param mabiTempo    MML for mabi
@@ -387,14 +398,22 @@ public final class MMLEventList implements Serializable, Cloneable {
 	 * @return
 	 * @throws UndefinedTickException
 	 */
-	public String toMMLString(boolean withTempo, int totalTick, boolean mabiTempo, List<MMLEventList> relationPart)
+	public String toMMLString(int startOffset, boolean withTempo, boolean mabiTempo, List<MMLEventList> relationPart)
 			throws UndefinedTickException {
-		//　テンポ
+		long totalTick = totalTickRelationPart(relationPart);
+		//　テンポ, startOffset に伴って 使う先頭のあたまがかわる
 		LinkedList<MMLTempoEvent> localTempoList = new LinkedList<>(tempoList);
+		while (localTempoList.size() > 1) {
+			if (localTempoList.get(1).getTickOffset() <= startOffset) {
+				localTempoList.removeFirst();
+			} else {
+				break;
+			}
+		}
 		StringBuilder sb = new StringBuilder(STRING_BUILDER_SIZE);
 
 		// initial note: octave 4, tick 0, offset 0, velocity 8
-		MMLNoteEvent prevNoteEvent = new MMLNoteEvent(12*4, 0, 0, MMLNoteEvent.INIT_VOL);
+		MMLNoteEvent prevNoteEvent = new MMLNoteEvent(12*4, 0, startOffset, MMLNoteEvent.INIT_VOL);
 		for (MMLNoteEvent noteEvent : noteList) {
 			// テンポのMML挿入判定
 			while ( (!localTempoList.isEmpty()) && (localTempoList.getFirst().getTickOffset() <= noteEvent.getTickOffset()) ) {
@@ -508,19 +527,44 @@ public final class MMLEventList implements Serializable, Cloneable {
 	}
 
 	/**
+	 * 関連するパートと合わせたTick長を算出する
+	 * @param relationPart
+	 * @return
+	 */
+	private long totalTickRelationPart(List<MMLEventList> relationPart) {
+		long totalTick = getTickLength();
+		if (relationPart != null) {
+			for (var t : relationPart) {
+				if (totalTick < t.getTickLength()) {
+					totalTick = t.getTickLength();
+				}
+			}
+		}
+		return totalTick;
+	}
+
+	/**
 	 * テンポ出力を行うかどうかを指定してMML文字列を作成する. MusicQ以降用. 関連パートにテンポを入れられる場合はいれない.
 	 * @param localTempoList テンポリスト
 	 * @param relationPart   テンポ補正時に参照する関連するパートの情報
 	 * @return
 	 * @throws UndefinedTickException
 	 */
-	public String toMMLStringMusicQ(List<MMLTempoEvent> localTempoList, int totalTick, List<MMLEventList> relationPart)
+	public String toMMLStringMusicQ(int startOffset, List<MMLTempoEvent> localTempoList, List<MMLEventList> relationPart)
 			throws UndefinedTickException {
+		long totalTick = totalTickRelationPart(relationPart);
 		StringBuilder sb = new StringBuilder(STRING_BUILDER_SIZE);
 		int tempoIndex = 0;
+		while (localTempoList.size() > tempoIndex + 1) {
+			if (localTempoList.get(tempoIndex+1).getTickOffset() <= startOffset) {
+				localTempoList.remove(tempoIndex);
+			} else {
+				break;
+			}
+		}
 
 		// initial note: octave 4, tick 0, offset 0, velocity 8
-		MMLNoteEvent prevNoteEvent = new MMLNoteEvent(12*4, 0, 0, MMLNoteEvent.INIT_VOL);
+		MMLNoteEvent prevNoteEvent = new MMLNoteEvent(12*4, 0, startOffset, MMLNoteEvent.INIT_VOL);
 		for (MMLNoteEvent noteEvent : noteList) {
 			// テンポのMML挿入判定
 			while ( (localTempoList.size() > tempoIndex) && (localTempoList.get(tempoIndex).getTickOffset() <= noteEvent.getTickOffset()) ) {

@@ -1,10 +1,12 @@
 /*
- * Copyright (C) 2013-2021 たんらる
+ * Copyright (C) 2013-2022 たんらる
  */
 
 package fourthline.mmlTools;
 
 import static org.junit.Assert.*;
+
+import java.util.Arrays;
 
 import org.junit.After;
 import org.junit.Before;
@@ -400,5 +402,96 @@ public class MMLTrackTest {
 
 		assertEquals("MML@o8d+o4aa,b8c6,rc,r2d;", t3.getMabiMML());
 		assertEquals("MML@o8d+o4aat130,b8c6,rc,r2dt130;", t3.getOriginalMML());
+	}
+
+	@Test
+	public void test_startOffset_01() {
+		var track = new MMLTrack(0, 0, 0).setMML("MML@a,b,c,d;");
+
+		Arrays.asList(0, 1, 2, 3).forEach(t -> 
+		assertEquals(0, track.getMMLEventAtIndex(t).getMMLNoteEventList().get(0).getTickOffset()));
+
+		// スタートオフセットの設定で全体のノート移動をチェックする
+		track.setStartOffset(96);
+		Arrays.asList(0, 1, 2, 3).forEach(t -> 
+		assertEquals(96, track.getMMLEventAtIndex(t).getMMLNoteEventList().get(0).getTickOffset()));
+	}
+
+	@Test
+	public void test_startOffset_02() {
+		var track = new MMLTrack(96, 0, 0).setMML("MML@a,b,c,d;");
+
+		// 最初からスタートオフセットを設定している場合のチェック
+		Arrays.asList(0, 1, 2, 3).forEach(t -> 
+		assertEquals(96, track.getMMLEventAtIndex(t).getMMLNoteEventList().get(0).getTickOffset()));
+
+		// 個別deltaを設定した場合に対象のみシフトするかどうかをチェック
+		track.setStartDelta(-48);
+		track.setStartSongDelta(+48);
+		Arrays.asList(0, 1, 2).forEach(t -> 
+		assertEquals(96-48, track.getMMLEventAtIndex(t).getMMLNoteEventList().get(0).getTickOffset()));
+		Arrays.asList(3).forEach(t -> 
+		assertEquals(96+48, track.getMMLEventAtIndex(t).getMMLNoteEventList().get(0).getTickOffset()));
+
+		// 再設定
+		track.setStartDelta(-96);
+		track.setStartSongDelta(0);
+		Arrays.asList(0, 1, 2).forEach(t -> 
+		assertEquals(0, track.getMMLEventAtIndex(t).getMMLNoteEventList().get(0).getTickOffset()));
+		Arrays.asList(3).forEach(t -> 
+		assertEquals(96, track.getMMLEventAtIndex(t).getMMLNoteEventList().get(0).getTickOffset()));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void test_startOffset_03() {
+		var track = new MMLTrack(96, 0, 0).setMML("MML@a,b,c,d;");
+
+		// マイナスオフセットは反映しない.
+		track.setStartDelta(-97);
+	}
+
+	@Test
+	public void test_startOffset_mml() throws UndefinedTickException {
+		var track = new MMLTrack(384, 0, -96).setMML("MML@a,b,c,d;");
+		track.getGlobalTempoList().add(new MMLTempoEvent(180, 0));
+		track.getGlobalTempoList().add(new MMLTempoEvent(140, 96));
+		track.getGlobalTempoList().add(new MMLTempoEvent(110, 192));
+		track.getGlobalTempoList().add(new MMLTempoEvent(100, 384));
+		track.generate();
+
+		assertEquals("MML@t100a,b,c,t110d;", track.getMabiMML());
+	}
+
+	@Test
+	public void test_startOffset_mml2() throws UndefinedTickException {
+		MMLTrack.setTempoAllowChordPart(true);
+		var track = new MMLTrack(384, 0, -96).setMML("MML@a,b,c,d;");
+		track.getGlobalTempoList().add(new MMLTempoEvent(180, 0));
+		track.getGlobalTempoList().add(new MMLTempoEvent(140, 96));
+		track.getGlobalTempoList().add(new MMLTempoEvent(110, 192));
+		track.getGlobalTempoList().add(new MMLTempoEvent(100, 384));
+		track.generate();
+
+		assertEquals("MML@t100a,b,c,t110d;", track.getMabiMML());
+	}
+
+	/**
+	 * アタック遅延補正のテスト
+	 * @throws UndefinedTickException
+	 */
+	@Test
+	public void set_attackDelayCorrect_1() throws UndefinedTickException {
+		var track = new MMLTrack(0, 0, 0).setMML("MML@aa,bb,cc,dd;");
+		track.setAttackDelayCorrect(-6);
+		track.setAttackSongDelayCorrect(-12);
+
+		track.generate();
+		assertEquals("MML@aa,bb,cc,dd;", track.getOriginalMML());
+		assertEquals("MML@a8&a9a,b8&b9b,c8&c9c,d8&d16.d;", track.getMabiMML());
+
+		MMLTrack.setTempoAllowChordPart(true);
+		track.generate();
+		assertEquals("MML@aa,bb,cc,dd;", track.getOriginalMML());
+		assertEquals("MML@a8&a9a,b8&b9b,c8&c9c,d8&d16.d;", track.getMabiMML());
 	}
 }

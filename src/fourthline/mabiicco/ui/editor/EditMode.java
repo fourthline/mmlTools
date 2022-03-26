@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2017 たんらる
+ * Copyright (C) 2014-2022 たんらる
  */
 
 package fourthline.mabiicco.ui.editor;
@@ -21,6 +21,9 @@ enum EditMode {
 		@Override
 		public void pressEvent(IEditContext context, MouseEvent e) {
 			startPoint = e.getPoint();
+			if (!context.canEditStartOffset(startPoint)) {
+				return;
+			}
 			if (SwingUtilities.isRightMouseButton(e)) {
 				if (context.onExistNote(startPoint)) {
 					context.selectNoteByPoint(startPoint, 0);
@@ -81,7 +84,11 @@ enum EditMode {
 		@Override
 		public void executeEvent(IEditContext context, MouseEvent e) {
 			// 選択中のNote、Note長を更新.
-			context.updateSelectedNoteAndTick(e.getPoint(), true);
+			boolean alignment = true;
+			if ( (e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) != 0) {
+				alignment = false;
+			}
+			context.updateSelectedNoteAndTick(e.getPoint(), true, alignment);
 		}
 		@Override
 		public void exit(IEditContext context) {
@@ -107,10 +114,14 @@ enum EditMode {
 		public void executeEvent(IEditContext context, MouseEvent e) {
 			// 選択中のNoteを移動
 			boolean shiftOption = false;
+			boolean alignment = true;
 			if ( (e.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK) != 0) {
 				shiftOption = true;
 			}
-			context.moveSelectedMMLNote(startPoint, e.getPoint(), shiftOption);
+			if ( (e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) != 0) {
+				alignment = false;
+			}
+			context.moveSelectedMMLNote(startPoint, e.getPoint(), shiftOption, alignment);
 		}
 		@Override
 		public void exit(IEditContext context) {
@@ -128,7 +139,11 @@ enum EditMode {
 		@Override
 		public void executeEvent(IEditContext context, MouseEvent e) {
 			// 選択中のNote長を更新.（Noteは更新しない）
-			context.updateSelectedNoteAndTick(e.getPoint(), false);
+			boolean alignment = true;
+			if ( (e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) != 0) {
+				alignment = false;
+			}
+			context.updateSelectedNoteAndTick(e.getPoint(), false, alignment);
 		}
 		@Override
 		public void exit(IEditContext context) {

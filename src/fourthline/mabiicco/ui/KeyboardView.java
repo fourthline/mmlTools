@@ -127,6 +127,8 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 	private void paintOctPianoLine(Graphics2D g, int pos, char posText) {
 		int height = pianoRollView.getNoteHeight();
 		int octHeight = pianoRollView.getNoteHeight() * 12;
+		int yLimit = pianoRollView.getTotalHeight();
+
 		// ド～シのしろ鍵盤
 		g.setColor(new Color(0.3f, 0.3f, 0.3f));
 
@@ -134,6 +136,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 		for (int i = 0; i < 7; i++) {
 			double y1 = octHeight * i / 7;
 			double y2 = octHeight * (i+1) / 7;
+			if ((startY+y1) > yLimit) break;
 			g.drawRect(0, (int)(startY+y1), 40, (int)(y2-y1));
 		}
 
@@ -149,6 +152,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 		for (int i = 0; i < black_posIndex.length; i++) {
 			int y = octHeight * black_posIndex[i] / 7 - height / 2-1;
 			y += startY;
+			if (y > yLimit) break;
 
 			g.setColor(new Color(0.0f, 0.0f, 0.0f));
 			g.fillRect(0, y, 20, height);
@@ -162,11 +166,13 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 		g.drawLine(40, startY, width, startY);
 
 		// オクターブ
-		char o_char[] = { 'o', posText };
-		g.setFont(new Font("Arial", Font.PLAIN, 12));
 		int y = startY + octHeight;
-		g.drawChars(o_char, 0, o_char.length, 42, y);
-		g.drawLine(40, y, width, y);
+		if (y < yLimit) {
+			char o_char[] = { 'o', posText };
+			g.setFont(new Font("Arial", Font.PLAIN, 12));
+			g.drawChars(o_char, 0, o_char.length, 42, y);
+			g.drawLine(40, y, width, y);
+		}
 	}
 
 	private void paintOverlapRange(Graphics2D g) {

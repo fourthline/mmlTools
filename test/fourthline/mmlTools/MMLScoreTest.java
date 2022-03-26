@@ -598,6 +598,75 @@ public class MMLScoreTest extends FileSelect {
 		}
 	}
 
+	/**
+	 * Delta設定済みでStartOffsetを設定するテスト
+	 */
+	@Test
+	public void test_setStartOffsetAll_0() {
+		MMLScore score = new MMLScore();
+		score.addTrack(new MMLTrack().setMML("MML@c1"));
+		score.getTrack(0).setStartDelta(96);
+		assertTrue(score.setStartOffsetAll(48));
+		assertEquals(48, score.getTrack(0).getCommonStartOffset());
+	}
+
+	/**
+	 * Delta設定済みでマイナス方向に振り切るテスト
+	 */
+	@Test
+	public void test_setStartOffsetAll_1() {
+		MMLScore score = new MMLScore();
+		score.addTrack(new MMLTrack().setMML("MML@c1"));
+		score.setStartOffsetAll(96);
+		score.getTrack(0).setStartDelta(-48);
+		assertFalse(score.setStartOffsetAll(0));
+		assertEquals(96, score.getTrack(0).getCommonStartOffset());
+	}
+
+	/**
+	 * SongDelta設定済みでStartOffsetを設定するテスト
+	 */
+	@Test
+	public void test_setStartOffsetAll_2() {
+		MMLScore score = new MMLScore();
+		score.addTrack(new MMLTrack().setMML("MML@,,,c1"));
+		score.getTrack(0).setStartSongDelta(96);
+		assertTrue(score.setStartOffsetAll(48));
+		assertEquals(48, score.getTrack(0).getCommonStartOffset());
+	}
+
+	/**
+	 * SongDelta設定済みでマイナス方向に振り切るテスト
+	 */
+	@Test
+	public void test_setStartOffsetAll_3() {
+		MMLScore score = new MMLScore();
+		score.addTrack(new MMLTrack().setMML("MML@,,,c1"));
+		score.setStartOffsetAll(96);
+		score.getTrack(0).setStartSongDelta(-48);
+		assertFalse(score.setStartOffsetAll(0));
+		assertEquals(96, score.getTrack(0).getCommonStartOffset());
+	}
+
+	@Test
+	public void test_barText() {
+		MMLScore score = new MMLScore();
+		assertEquals("0:0:0", score.getBarTextTick(0));
+		assertEquals("0:0:48", score.getBarTextTick(48));
+		assertEquals("0:1:0", score.getBarTextTick(96));
+		assertEquals("1:0:0", score.getBarTextTick(384));
+
+		score.setBaseTime("3/4");
+		assertEquals("0:1:0", score.getBarTextTick(96));
+		assertEquals("1:1:0", score.getBarTextTick(384));
+
+		score.setBaseTime("8/8");
+		assertEquals("0:1:0", score.getBarTextTick(48));
+		assertEquals("0:1:47", score.getBarTextTick(95));
+		assertEquals("0:2:0", score.getBarTextTick(96));
+		assertEquals("1:0:0", score.getBarTextTick(384));
+	}
+
 	public static void main(String args[]) {
 		var o = new MMLScoreTest();
 		MMLScoreTest.setupClass();

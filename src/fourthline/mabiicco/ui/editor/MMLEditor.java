@@ -37,6 +37,7 @@ import fourthline.mabiicco.ui.IMMLManager;
 import fourthline.mabiicco.ui.PianoRollView;
 import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLNoteEvent;
+import fourthline.mmlTools.MMLTrack;
 import fourthline.mmlTools.core.UndefinedTickException;
 
 
@@ -103,6 +104,23 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	@Override
 	public int getEditAlign() {
 		return editAlign;
+	}
+
+	/**
+	 * スタート位置に合わせてアライメントする
+	 * @param tick
+	 * @return
+	 */
+	private long tickAlign(long tick) {
+		MMLTrack t = mmlManager.getActiveTrack();
+		int activePartIndex = mmlManager.getActiveMMLPartIndex();
+		int startOffset = t.getStartOffset(activePartIndex);
+		int commonStartOffset = t.getCommonStartOffset();
+		if ( (startOffset <= commonStartOffset) && (tick >= commonStartOffset) ) {
+			startOffset = commonStartOffset;
+		}
+		long alignTick = tick - (tick - startOffset) % editAlign;
+		return alignTick;
 	}
 
 	/** 
@@ -204,13 +222,12 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	public void newMMLNoteAndSelected(Point p) {
 		int note = pianoRollView.convertY2Note(p.y);
 		long tickOffset = pianoRollView.convertXtoTick(p.x);
-		long alignedTickOffset = tickOffset - (tickOffset % editAlign);
+		long alignedTickOffset = tickAlign(tickOffset);
 		MMLEventList editEventList = mmlManager.getActiveMMLPart();
 		if (editEventList == null) {
 			return;
 		}
 		MMLNoteEvent prevNote = editEventList.searchPrevNoteOnTickOffset(tickOffset);
-
 		MMLNoteEvent noteEvent = new MMLNoteEvent(note, editAlign, (int)alignedTickOffset);
 		if (prevNote != null) {
 			noteEvent.setVelocity(prevNote.getVelocity());
@@ -223,7 +240,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	 * 選択状態のノート、ノート長を更新する（ノート挿入時）
 	 */
 	@Override
-	public void updateSelectedNoteAndTick(Point p, boolean updateNote) {
+	public void updateSelectedNoteAndTick(Point p, boolean updateNote, boolean alignment) {
 		if (selectedNote.size() <= 0) {
 			return;
 		}
@@ -231,8 +248,8 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		MMLNoteEvent noteEvent = selectedNote.get(0);
 		int note = pianoRollView.convertY2Note(p.y);
 		long tickOffset = pianoRollView.convertXtoTick(p.x);
-		long alignedTickOffset = tickOffset - (tickOffset % editAlign);
-		long newTick = (alignedTickOffset - noteEvent.getTickOffset()) + editAlign;
+		long alignedTickOffset = alignment ? tickAlign(tickOffset+editAlign) : tickOffset;
+		long newTick = (alignedTickOffset - noteEvent.getTickOffset());
 		if (newTick < 0) {
 			newTick = 0;
 		}
@@ -240,6 +257,8 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 			noteEvent.setNote(note);
 		}
 		noteEvent.setTick((int)newTick);
+		// ノート情報表示
+		pianoRollView.setPaintNoteInfo(!alignment ? noteEvent : null);
 		notePlayer.playNote(noteEvent.getNote(), noteEvent.getVelocity());
 	}
 
@@ -254,14 +273,22 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	 * 選択状態のノートを移動する
 	 */
 	@Override
-	public void moveSelectedMMLNote(Point start, Point p, boolean shiftOption) {
+	public void moveSelectedMMLNote(Point start, Point p, boolean shiftOption, boolean alignment) {
+		int startOffset = mmlManager.getActiveMMLPartStartOffset();
 		pianoRollView.onViewScrollPoint(p);
-		long targetTick = pianoRollView.convertXtoTick(start.x);
+		long startTick = pianoRollView.convertXtoTick(start.x);
+		long targetTick = pianoRollView.convertXtoTick(p.x);
 		int noteDelta = pianoRollView.convertY2Note(p.y) - pianoRollView.convertY2Note(start.y);
-		long tickOffsetDelta = pianoRollView.convertXtoTick(p.x) - targetTick;
-		long alignedTickOffsetDelta = tickOffsetDelta - (tickOffsetDelta % editAlign);
+		long tickOffsetDelta = targetTick - startTick;
+		long alignedTickOffsetDelta = tickOffsetDelta;
+		if (alignment) {
+			alignedTickOffsetDelta -= (tickOffsetDelta % editAlign);
+		}
 		if (shiftOption) {
 			alignedTickOffsetDelta = 0;
+		}
+		if (detachedNote.get(0).getTickOffset() + alignedTickOffsetDelta < startOffset) {
+			alignedTickOffsetDelta = startOffset - detachedNote.get(0).getTickOffset();
 		}
 
 		int velocity = detachedNote.get(0).getVelocity();
@@ -270,8 +297,10 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 			MMLNoteEvent note2 = selectedNote.get(i);
 			note2.setNote(note1.getNote() + noteDelta);
 			note2.setTickOffset(note1.getTickOffset() + (int)alignedTickOffsetDelta);
-			if ( (note1.getTickOffset() <= targetTick) && (note1.getEndTick() > targetTick) ) {
+			if ( (note1.getTickOffset() <= startTick) && (note1.getEndTick() > startTick) ) {
 				velocity = note2.getVelocity();
+				// ノート情報表示
+				pianoRollView.setPaintNoteInfo(!alignment ? note2 : null);
 			}
 		}
 
@@ -446,6 +475,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		editMode.releaseEvent(this, e);
+		pianoRollView.setPaintNoteInfo(null);
 		pianoRollView.repaint();
 		editObserver.notifyUpdateEditState();
 	}
@@ -747,5 +777,15 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 				popupMenu.show(pianoRollView, point.x, point.y);
 			} catch (IllegalComponentStateException e) {}
 		}
+	}
+
+	/**
+	 * 指定したポイントがスタート位置よりあとかどうかを判定する
+	 */
+	@Override
+	public boolean canEditStartOffset(Point point) {
+		int startOffset = mmlManager.getActiveMMLPartStartOffset();
+		int tickOffset = (int)pianoRollView.convertXtoTick( point.x );
+		return (startOffset <= tickOffset);
 	}
 }
