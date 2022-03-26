@@ -7,6 +7,8 @@ package fourthline.mabiicco.ui.mml;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 import javax.swing.JOptionPane;
@@ -95,6 +97,13 @@ public final class TrackPropertyPanel extends JPanel {
 		add(instOption.createMMLOptionPanel(AppResource.appText("track_propert.mmlOptions1"), 5, 120));
 		// MML出力オプション（歌部）
 		add(songOption.createMMLOptionPanel(AppResource.appText("track_propert.mmlOptions2"), 5, 210));
+
+		// 初期値設定
+		int commonStartOffset = track.getCommonStartOffset();
+		trackNameField.setText(track.getTrackName());
+		panpotSlider.setValue(track.getPanpot());
+		instOption.setValue(track.getStartDelta() + commonStartOffset, track.getAttackDelayCorrect());
+		songOption.setValue(track.getStartSongDelta() + commonStartOffset, track.getAttackSongDelayCorrect());
 	}
 
 	private JLabel newJLabel(String text, int x, int y, int width, int height) {
@@ -125,13 +134,16 @@ public final class TrackPropertyPanel extends JPanel {
 		mmlManager.updateActivePart(true);
 	}
 
-	public void showDialog(Frame parentFrame) {
-		int commonStartOffset = track.getCommonStartOffset();
-		trackNameField.setText(track.getTrackName());
-		panpotSlider.setValue(track.getPanpot());
-		instOption.setValue(track.getStartDelta() + commonStartOffset, track.getAttackDelayCorrect());
-		songOption.setValue(track.getStartSongDelta() + commonStartOffset, track.getAttackSongDelayCorrect());
+	public List<String> getLabelText() {
+		List<String> list = new ArrayList<>();
+		List.of(instOption, songOption).forEach(t -> {
+			list.add(t.startOffsetText.getText());
+			list.add(t.attackDelayCorrectText.getText());
+		});
+		return list;
+	}
 
+	public void showDialog(Frame parentFrame) {
 		int status = JOptionPane.showConfirmDialog(parentFrame, 
 				this,
 				AppResource.appText("track_property"), 
@@ -250,7 +262,7 @@ public final class TrackPropertyPanel extends JPanel {
 			int startOffset = track.getStartOffset(partIndex);
 			var tempoList = track.getGlobalTempoList();
 			long d1 = MMLTempoEvent.getTimeOnTickOffset(tempoList, startOffset);
-			long d2 = MMLTempoEvent.getTimeOnTickOffset(tempoList, startOffset+tick);
+			long d2 = MMLTempoEvent.getTimeOnTickOffset(tempoList, startOffset+Math.abs(tick));
 			long deltaTime = d2 - d1;
 			String s = "";
 			if (tick != 0) {
@@ -264,7 +276,7 @@ public final class TrackPropertyPanel extends JPanel {
 					s = "=N/A";
 				}
 			}
-			o.setText(deltaTime + "ms" + s);
+			o.setText((tick < 0 ? "-" : "") + deltaTime + "ms" + s);
 			ss2.accept(tick);
 			try {
 				sandTrack.generate();
