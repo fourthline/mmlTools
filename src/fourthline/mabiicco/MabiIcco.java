@@ -21,6 +21,8 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.formdev.flatlaf.FlatLightLaf;
+
 import sun.swing.FilePane;
 import fourthline.mabiicco.midi.InstType;
 import fourthline.mabiicco.midi.MabiDLS;
@@ -158,7 +160,12 @@ public final class MabiIcco {
 
 	public static void main(String args[]) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
 		try {
-			UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
+			FlatLightLaf.setup();
+			if (MabiIccoProperties.getInstance().useSystemLaF.get()) {
+				UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
+			} else {
+				UIManager.setLookAndFeel( new FlatLightLaf() );
+			}
 
 			// font
 			String fontName = AppResource.appText("ui.font");

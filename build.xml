@@ -27,9 +27,9 @@
 	<property name="app.vendor" value="fourthline" />
 	<property name="app.id" value="MabiIcco" />
 	<property name="app.name" value="MabiIcco" />
-	<property name="app.version" value="1.1.64" />
+	<property name="app.version" value="1.2.64" />
 	<property name="app.main-class" value="fourthline.mabiicco.MabiIcco" />
-	<property name="class.path" value="lib/commons-compress/commons-compress-1.9.jar" />
+	<property name="class.path" value="lib/commons-compress/commons-compress-1.9.jar;lib/flatlaf/flatlaf-2.1.jar" />
 
 	<!-- clean task -->
 	<target name="clean">
