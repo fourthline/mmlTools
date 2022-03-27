@@ -28,8 +28,11 @@ import javax.sound.midi.MidiSystem;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+import com.formdev.flatlaf.FlatLightLaf;
 
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mabiicco.ui.About;
@@ -119,6 +122,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String INPUT_EMPTY_CORRECTION = "input_empty_correction";
 	@Action public static final String CHANGE_SCALE_COLOR = "change_scale_color";
 	@Action public static final String REMOVE_RESTS_BETWEEN_NOTES = "remote_rests_between_notes";
+	@Action public static final String CHANGE_UI = "change_ui";
 
 	private final HashMap<String, Consumer<Object>> actionMap = new HashMap<>();
 
@@ -240,6 +244,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(INPUT_EMPTY_CORRECTION, t -> this.inputEmptyCorrection());
 		actionMap.put(CHANGE_SCALE_COLOR, t -> this.changeScaleColor(t));
 		actionMap.put(REMOVE_RESTS_BETWEEN_NOTES, t -> editState.removeRestsBetweenNotes());
+		actionMap.put(CHANGE_UI, t -> this.changeUI());
 	}
 
 	@Override
@@ -775,5 +780,16 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	private void duplicateMMLTrack() {
 		MMLTrack track = mmlSeqView.getSelectedTrack().clone();
 		mmlSeqView.addMMLTrack(track);
+	}
+
+	private void changeUI() {
+		try {
+			if (MabiIccoProperties.getInstance().useSystemLaF.get()) {
+				UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
+			} else {
+				UIManager.setLookAndFeel( new FlatLightLaf() );
+			}
+			SwingUtilities.updateComponentTreeUI(mainFrame);
+		} catch (Exception e) {}
 	}
 }

@@ -532,6 +532,9 @@ public final class MMLScore implements IMMLFileParser {
 		if (startOffset < 0) {
 			throw new IllegalArgumentException();
 		}
+		if (startOffset % 6 != 0) {
+			throw new IllegalArgumentException();
+		}
 		if (trackList.isEmpty()) {
 			return false;
 		}

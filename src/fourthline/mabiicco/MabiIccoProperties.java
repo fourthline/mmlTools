@@ -96,6 +96,9 @@ public final class MabiIccoProperties {
 	/** MML空補正 */
 	public final Property<String> mmlEmptyCorrection = new StringProperty("function.mml_empty_correction", AppResource.appText("mml.emptyCorrection.default"), t -> MMLText.setMelodyEmptyStr(t));
 
+	/** システムのL&F */
+	public final Property<Boolean> useSystemLaF = new BooleanProperty("ui.use_system_laf", false);
+
 	public static MabiIccoProperties getInstance() {
 		return instance;
 	}
