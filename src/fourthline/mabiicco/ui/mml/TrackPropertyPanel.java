@@ -198,9 +198,9 @@ public final class TrackPropertyPanel extends JPanel {
 			startOffsetSpinner.addChangeListener(e -> updateStartOffsetText());
 			// attack delay correct
 			mmlOptionsPanel.add(newJLabel(delayCorrectTitle, 20, 50, 140, 14));
-			attackDelayCorrectSpinner.setBounds(160, 50, 50, 20);
+			attackDelayCorrectSpinner.setBounds(160, 50, 60, 20);
 			mmlOptionsPanel.add(attackDelayCorrectSpinner);
-			attackDelayCorrectText.setBounds(220, 53, 120, 14);
+			attackDelayCorrectText.setBounds(230, 53, 120, 14);
 			mmlOptionsPanel.add(attackDelayCorrectText);
 			attackDelayCorrectSpinner.addChangeListener(e -> updateDelayTickText());
 
