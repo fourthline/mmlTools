@@ -67,6 +67,12 @@ public final class MMLTrack implements Serializable, Cloneable {
 	}
 
 	public MMLTrack(int commonStartOffset, int startDelta, int startSongDelta) {
+		if (commonStartOffset < 0) {
+			throw new IllegalArgumentException();
+		}
+		if (commonStartOffset % 6 != 0) {
+			throw new IllegalArgumentException();
+		}
 		this.commonStartOffset = commonStartOffset;
 		this.startDelta = startDelta;
 		this.startSongDelta = startSongDelta;
