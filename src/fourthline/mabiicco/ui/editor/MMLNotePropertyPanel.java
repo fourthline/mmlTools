@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 たんらる
+ * Copyright (C) 2013-2022 たんらる
  */
 
 package fourthline.mabiicco.ui.editor;
@@ -86,7 +86,7 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 		add(velocityCheckBox);
 
 		velocityValueField = createNumberSpinner(8, 0, MMLNoteEvent.MAX_VOL, 1, velocityCheckBox);
-		velocityValueField.setBounds(240, 20, 50, 19);
+		velocityValueField.setBounds(240, 20, 70, 19);
 		add(velocityValueField);
 
 		onlySelectedNoteOption = new JCheckBox(AppResource.appText("note.properties.onlySelectedNoteOption"));
@@ -100,7 +100,7 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 		add(incDecrVelocityEditOption);
 
 		velocityValueField2 = createNumberSpinner(0, -MMLNoteEvent.MAX_VOL, MMLNoteEvent.MAX_VOL, 1, incDecrVelocityEditOption);
-		velocityValueField2.setBounds(240, 80, 50, 19);
+		velocityValueField2.setBounds(240, 80, 70, 19);
 		add(velocityValueField2);
 
 		tuningNoteCheckBox = new JCheckBox(AppResource.appText("note.properties.tuning"));
@@ -109,7 +109,7 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 		add(tuningNoteCheckBox);
 
 		tuningBaseList = new JComboBox<>(TuningBase.values());
-		tuningBaseList.setBounds(240, 110, 50, 21);
+		tuningBaseList.setBounds(240, 110, 70, 21);
 		addMousePressEnableAction(tuningBaseList, tuningNoteCheckBox);
 		add(tuningBaseList);
 
