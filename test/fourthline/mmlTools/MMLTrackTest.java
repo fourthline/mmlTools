@@ -425,21 +425,46 @@ public class MMLTrackTest {
 		Arrays.asList(0, 1, 2, 3).forEach(t -> 
 		assertEquals(96, track.getMMLEventAtIndex(t).getMMLNoteEventList().get(0).getTickOffset()));
 
-		// 個別deltaを設定した場合に対象のみシフトするかどうかをチェック
+		// 個別スタート位置の場合はノート移動しない
 		track.setStartDelta(-48);
-		track.setStartSongDelta(+48);
+		track.setStartSongDelta(-48);
 		Arrays.asList(0, 1, 2).forEach(t -> 
-		assertEquals(96-48, track.getMMLEventAtIndex(t).getMMLNoteEventList().get(0).getTickOffset()));
+		assertEquals(96, track.getMMLEventAtIndex(t).getMMLNoteEventList().get(0).getTickOffset()));
 		Arrays.asList(3).forEach(t -> 
-		assertEquals(96+48, track.getMMLEventAtIndex(t).getMMLNoteEventList().get(0).getTickOffset()));
+		assertEquals(96, track.getMMLEventAtIndex(t).getMMLNoteEventList().get(0).getTickOffset()));
 
 		// 再設定
 		track.setStartDelta(-96);
-		track.setStartSongDelta(0);
+		track.setStartSongDelta(-96);
 		Arrays.asList(0, 1, 2).forEach(t -> 
-		assertEquals(0, track.getMMLEventAtIndex(t).getMMLNoteEventList().get(0).getTickOffset()));
+		assertEquals(96, track.getMMLEventAtIndex(t).getMMLNoteEventList().get(0).getTickOffset()));
 		Arrays.asList(3).forEach(t -> 
 		assertEquals(96, track.getMMLEventAtIndex(t).getMMLNoteEventList().get(0).getTickOffset()));
+	}
+
+	@Test
+	public void test_startOffset_04() {
+		var track = new MMLTrack(96, 0, 0).setMML("MML@ra,rb,rc,rd;");
+
+		// 最初からスタートオフセットを設定している場合のチェック
+		Arrays.asList(0, 1, 2, 3).forEach(t -> 
+		assertEquals(192, track.getMMLEventAtIndex(t).getMMLNoteEventList().get(0).getTickOffset()));
+
+		// 個別スタート位置の場合はノート移動しない
+		track.setStartDelta(48);
+		track.setStartSongDelta(48);
+		Arrays.asList(0, 1, 2).forEach(t -> 
+		assertEquals(192, track.getMMLEventAtIndex(t).getMMLNoteEventList().get(0).getTickOffset()));
+		Arrays.asList(3).forEach(t -> 
+		assertEquals(192, track.getMMLEventAtIndex(t).getMMLNoteEventList().get(0).getTickOffset()));
+
+		// 再設定
+		track.setStartDelta(96);
+		track.setStartSongDelta(96);
+		Arrays.asList(0, 1, 2).forEach(t -> 
+		assertEquals(192, track.getMMLEventAtIndex(t).getMMLNoteEventList().get(0).getTickOffset()));
+		Arrays.asList(3).forEach(t -> 
+		assertEquals(192, track.getMMLEventAtIndex(t).getMMLNoteEventList().get(0).getTickOffset()));
 	}
 
 	@Test(expected = IllegalArgumentException.class)

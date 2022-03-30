@@ -471,14 +471,28 @@ public final class MMLTrack implements Serializable, Cloneable {
 	}
 
 	public MMLTrack setStartOffset(int offset) {
+		// 全体のスタート位置変更の場合はノートも移動する
 		updateStartOffsetNoteEvents(offset - commonStartOffset, true, true);
 		commonStartOffset = offset;
 		return this;
 	}
 
+	private boolean checkStartOffset(int newStartOffset, List<MMLEventList> partList) {
+		for (var part : partList) {
+			var eventList = part.getMMLNoteEventList();
+			if (eventList.size() > 0) {
+				if (eventList.get(0).getTickOffset() < newStartOffset) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
 	public MMLTrack setStartDelta(int delta) {
-		if (commonStartOffset + delta >= 0) {
-			updateStartOffsetNoteEvents(delta - startDelta, true, false);
+		int newStartOffset = commonStartOffset + delta;
+		if ((newStartOffset >= 0) && (checkStartOffset(newStartOffset, mmlParts.subList(0, 3)))) {
+			// ノートの移動を行わない
 			startDelta = delta;
 		} else {
 			throw new IllegalArgumentException();
@@ -487,8 +501,9 @@ public final class MMLTrack implements Serializable, Cloneable {
 	}
 
 	public MMLTrack setStartSongDelta(int delta) {
-		if (commonStartOffset + delta >= 0) {
-			updateStartOffsetNoteEvents(delta - startSongDelta, false, true);
+		int newStartOffset = commonStartOffset + delta;
+		if ((newStartOffset >= 0) && (checkStartOffset(newStartOffset, mmlParts.subList(3, 4)))) {
+			// ノートの移動を行わない
 			startSongDelta = delta;
 		} else {
 			throw new IllegalArgumentException();

@@ -628,10 +628,20 @@ public class MMLScoreTest extends FileSelect {
 	@Test
 	public void test_setStartOffsetAll_0() {
 		MMLScore score = new MMLScore();
-		score.addTrack(new MMLTrack().setMML("MML@c1"));
+		score.addTrack(new MMLTrack().setMML("MML@rrc1"));
 		score.getTrack(0).setStartDelta(96);
 		assertTrue(score.setStartOffsetAll(48));
 		assertEquals(48, score.getTrack(0).getCommonStartOffset());
+	}
+
+	/**
+	 * Delta設定済みでStartOffsetを設定するテスト (エラー)
+	 */
+	@Test(expected=IllegalArgumentException.class)
+	public void test_setStartOffsetAll_0i() {
+		MMLScore score = new MMLScore();
+		score.addTrack(new MMLTrack().setMML("MML@c1"));
+		score.getTrack(0).setStartDelta(96);
 	}
 
 	/**
@@ -653,10 +663,20 @@ public class MMLScoreTest extends FileSelect {
 	@Test
 	public void test_setStartOffsetAll_2() {
 		MMLScore score = new MMLScore();
-		score.addTrack(new MMLTrack().setMML("MML@,,,c1"));
+		score.addTrack(new MMLTrack().setMML("MML@,,,rrc1"));
 		score.getTrack(0).setStartSongDelta(96);
 		assertTrue(score.setStartOffsetAll(48));
 		assertEquals(48, score.getTrack(0).getCommonStartOffset());
+	}
+
+	/**
+	 * SongDelta設定済みでStartOffsetを設定するテスト (エラー)
+	 */
+	@Test(expected=IllegalArgumentException.class)
+	public void test_setStartOffsetAll_2i() {
+		MMLScore score = new MMLScore();
+		score.addTrack(new MMLTrack().setMML("MML@,,,c1"));
+		score.getTrack(0).setStartSongDelta(96);
 	}
 
 	/**
@@ -699,8 +719,8 @@ public class MMLScoreTest extends FileSelect {
 		o.setup();
 		o.testLocalMMLParse();
 
-//		System.out.println(" ==== ");
-//		System.out.println(report.toString());
+		//		System.out.println(" ==== ");
+		//		System.out.println(report.toString());
 		System.exit(0);
 	}
 }
