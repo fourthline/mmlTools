@@ -84,7 +84,10 @@ public final class MMLTempoEvent extends MMLEvent implements Cloneable {
 			}
 		}
 
-		list.add(index, this);
+		// 連続で同じテンポであれば追加しない
+		if ( (index == 0) || (list.get(index-1).getTempo() != this.tempo) ) {
+			list.add(index, this);
+		}
 	}
 
 	public static List<MMLTempoEvent> mergeTempoList(List<MMLTempoEvent> list1, List<MMLTempoEvent> list2) {
