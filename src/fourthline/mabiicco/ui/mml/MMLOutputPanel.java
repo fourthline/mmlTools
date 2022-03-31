@@ -155,10 +155,10 @@ public final class MMLOutputPanel extends JPanel {
 		if (score != null) {
 			String scoreName = score.getTitle();
 			if (!scoreName.isEmpty()) {
-				trackName += "/" + scoreName;
+				trackName = scoreName + "/" + trackName;
 			}
 		}
-		copyToClipboard(parentFrame, trackName, AppResource.appText("mml.output.name_done"));
+		copyToClipboard(parentFrame, trackName, AppResource.appText("mml.output.name_done")+"\n\""+trackName+"\"");
 	}
 
 	/**
