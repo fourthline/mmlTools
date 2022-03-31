@@ -431,7 +431,6 @@ public final class MMLScore implements IMMLFileParser {
 		private int startDelta = 0;
 		private int startSongDelta = 0;
 		private void clear() {
-			startOffset = 0;
 			startDelta = 0;
 			startSongDelta = 0;
 		}

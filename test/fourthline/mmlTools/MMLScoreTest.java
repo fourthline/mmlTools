@@ -249,6 +249,30 @@ public class MMLScoreTest extends FileSelect {
 		checkMMLFileOutput(score.generateAll(), "format2.mmi", mml);
 	}
 
+	@Test
+	public void testMMLFileFormat3() throws UndefinedTickException {
+		MMLTrack.setTempoAllowChordPart(true);
+
+		MMLScore score = new MMLScore();
+		MMLTrack track1 = new MMLTrack(1152, 0, 0).setMML("MML@c1&c,,,;");
+		track1.setTrackName("Track1");
+		score.addTrack(track1);
+
+		MMLTrack track2 = new MMLTrack(1152, 0, 0).setMML("MML@<b1&b,,;");
+		track2.setTrackName("Track2");
+		score.addTrack(track2);
+
+		score.getTempoEventList().add(new MMLTempoEvent(100, 0));
+		score.getTempoEventList().add(new MMLTempoEvent(220, 1152));
+
+		String mml[] = {
+				"MML@t220c1&c,,;",
+				"MML@t220<b1&b,,;",
+		};
+
+		checkMMLFileOutput(score.generateAll(), "format3.mmi", mml);
+	}
+
 	private PrintStream reportStream = null;
 	private void printReport(String s1, String s2) {
 		if (reportStream != null) {
