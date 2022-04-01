@@ -716,6 +716,21 @@ public class MMLScoreTest extends FileSelect {
 		assertEquals(96, score.getTrack(0).getCommonStartOffset());
 	}
 
+	/**
+	 * t120テスト
+	 * @throws UndefinedTickException 
+	 */
+	@Test
+	public void test_setStartOffsetAll_4() throws UndefinedTickException {
+		MMLScore score = new MMLScore();
+		score.addTrack(new MMLTrack(0, 0, 96).setMML("MML@d,,,c"));
+		score.getTrack(0).setSongProgram(110);
+		score.getTempoEventList().add(new MMLTempoEvent(140, 0));
+		score.getTempoEventList().add(new MMLTempoEvent(120, 96));
+		score.generateAll();
+		assertEquals("MML@t140d,,,t120c;", score.getTrack(0).getMabiMML());
+	}
+
 	@Test
 	public void test_barText() {
 		MMLScore score = new MMLScore();
