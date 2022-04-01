@@ -225,6 +225,54 @@ public class MMLScoreTest extends FileSelect {
 		checkMMLFileOutput(score.generateAll(), "format_r1.mmi", mml);
 	}
 
+	@Test
+	public void testMMLFileFormat2() throws UndefinedTickException {
+		MMLTrack.setTempoAllowChordPart(true);
+
+		MMLScore score = new MMLScore();
+		MMLTrack track1 = new MMLTrack(768, -576, -672).setMML("MML@c1,,,e1;");
+		track1.setSongProgram(110);
+		track1.setTrackName("Track1");
+		score.addTrack(track1);
+
+		MMLTrack track2 = new MMLTrack(768, 0, 0).setMML("MML@d1,,;");
+		track2.setTrackName("Track2");
+		score.addTrack(track2);
+
+		score.getTempoEventList().add(new MMLTempoEvent(140, 0));
+
+		String mml[] = {
+				"MML@t140c1,,,t140e1;",
+				"MML@t140d1,,;",
+		};
+
+		checkMMLFileOutput(score.generateAll(), "format2.mmi", mml);
+	}
+
+	@Test
+	public void testMMLFileFormat3() throws UndefinedTickException {
+		MMLTrack.setTempoAllowChordPart(true);
+
+		MMLScore score = new MMLScore();
+		MMLTrack track1 = new MMLTrack(1152, 0, 0).setMML("MML@c1&c,,,;");
+		track1.setTrackName("Track1");
+		score.addTrack(track1);
+
+		MMLTrack track2 = new MMLTrack(1152, 0, 0).setMML("MML@<b1&b,,;");
+		track2.setTrackName("Track2");
+		score.addTrack(track2);
+
+		score.getTempoEventList().add(new MMLTempoEvent(100, 0));
+		score.getTempoEventList().add(new MMLTempoEvent(220, 1152));
+
+		String mml[] = {
+				"MML@t220c1&c,,;",
+				"MML@t220<b1&b,,;",
+		};
+
+		checkMMLFileOutput(score.generateAll(), "format3.mmi", mml);
+	}
+
 	private PrintStream reportStream = null;
 	private void printReport(String s1, String s2) {
 		if (reportStream != null) {
@@ -604,10 +652,20 @@ public class MMLScoreTest extends FileSelect {
 	@Test
 	public void test_setStartOffsetAll_0() {
 		MMLScore score = new MMLScore();
-		score.addTrack(new MMLTrack().setMML("MML@c1"));
+		score.addTrack(new MMLTrack().setMML("MML@rrc1"));
 		score.getTrack(0).setStartDelta(96);
 		assertTrue(score.setStartOffsetAll(48));
 		assertEquals(48, score.getTrack(0).getCommonStartOffset());
+	}
+
+	/**
+	 * Delta設定済みでStartOffsetを設定するテスト (エラー)
+	 */
+	@Test(expected=IllegalArgumentException.class)
+	public void test_setStartOffsetAll_0i() {
+		MMLScore score = new MMLScore();
+		score.addTrack(new MMLTrack().setMML("MML@c1"));
+		score.getTrack(0).setStartDelta(96);
 	}
 
 	/**
@@ -629,10 +687,20 @@ public class MMLScoreTest extends FileSelect {
 	@Test
 	public void test_setStartOffsetAll_2() {
 		MMLScore score = new MMLScore();
-		score.addTrack(new MMLTrack().setMML("MML@,,,c1"));
+		score.addTrack(new MMLTrack().setMML("MML@,,,rrc1"));
 		score.getTrack(0).setStartSongDelta(96);
 		assertTrue(score.setStartOffsetAll(48));
 		assertEquals(48, score.getTrack(0).getCommonStartOffset());
+	}
+
+	/**
+	 * SongDelta設定済みでStartOffsetを設定するテスト (エラー)
+	 */
+	@Test(expected=IllegalArgumentException.class)
+	public void test_setStartOffsetAll_2i() {
+		MMLScore score = new MMLScore();
+		score.addTrack(new MMLTrack().setMML("MML@,,,c1"));
+		score.getTrack(0).setStartSongDelta(96);
 	}
 
 	/**
@@ -646,6 +714,21 @@ public class MMLScoreTest extends FileSelect {
 		score.getTrack(0).setStartSongDelta(-48);
 		assertFalse(score.setStartOffsetAll(0));
 		assertEquals(96, score.getTrack(0).getCommonStartOffset());
+	}
+
+	/**
+	 * t120テスト
+	 * @throws UndefinedTickException 
+	 */
+	@Test
+	public void test_setStartOffsetAll_4() throws UndefinedTickException {
+		MMLScore score = new MMLScore();
+		score.addTrack(new MMLTrack(0, 0, 96).setMML("MML@d,,,c"));
+		score.getTrack(0).setSongProgram(110);
+		score.getTempoEventList().add(new MMLTempoEvent(140, 0));
+		score.getTempoEventList().add(new MMLTempoEvent(120, 96));
+		score.generateAll();
+		assertEquals("MML@t140d,,,t120c;", score.getTrack(0).getMabiMML());
 	}
 
 	@Test
@@ -675,8 +758,8 @@ public class MMLScoreTest extends FileSelect {
 		o.setup();
 		o.testLocalMMLParse();
 
-//		System.out.println(" ==== ");
-//		System.out.println(report.toString());
+		//		System.out.println(" ==== ");
+		//		System.out.println(report.toString());
 		System.exit(0);
 	}
 }
