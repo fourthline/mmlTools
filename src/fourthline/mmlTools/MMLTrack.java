@@ -76,11 +76,19 @@ public final class MMLTrack implements Serializable, Cloneable {
 		this.commonStartOffset = commonStartOffset;
 		this.startDelta = startDelta;
 		this.startSongDelta = startSongDelta;
-		mmlParse();
+		mmlParse(false);
 		generated = true;
 	}
 
 	public MMLTrack setMML(String mml) {
+		return setMML(mml, false);
+	}
+
+	public MMLTrack setMabiMML(String mml) {
+		return setMML(mml, true);
+	}
+
+	public MMLTrack setMML(String mml, boolean delayOption) {
 		if (mml.indexOf('\n') >= 0) {
 			// ゲーム内からコピーされたフォーマットを読む.
 			String parts[] = mml.split("\n", 8);
@@ -103,7 +111,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 		originalMML.setMMLText(mml);
 		mabiMML.setMMLText(mml);
 
-		mmlParse();
+		mmlParse(delayOption);
 		return this;
 	}
 
@@ -111,17 +119,20 @@ public final class MMLTrack implements Serializable, Cloneable {
 		originalMML.setMMLText(mml1, mml2, mml3, mml4);
 		mabiMML.setMMLText(mml1, mml2, mml3, mml4);
 
-		mmlParse();
+		mmlParse(false);
 		return this;
 	}
 
-	private void mmlParse() {
+	private void mmlParse(boolean delayOption) {
 		mmlParts.clear();
 		generated = false;
 
 		for (int i = 0; i < PART_COUNT; i++) {
 			String s = originalMML.getText(i);
 			int startOffset = getStartOffset(i);
+			if (delayOption) {
+				startOffset -= getAttackDelayCorrect(i);
+			}
 			mmlParts.add( new MMLEventList(s, globalTempoList, startOffset) );
 		}
 	}
@@ -470,9 +481,13 @@ public final class MMLTrack implements Serializable, Cloneable {
 		}
 	}
 
-	public MMLTrack setStartOffset(int offset) {
+	public MMLTrack setStartOffset(int offset, List<MMLTempoEvent> globalTempoList) {
 		// 全体のスタート位置変更の場合はノートも移動する
-		updateStartOffsetNoteEvents(offset - commonStartOffset, true, true);
+		int delta = offset - commonStartOffset;
+		updateStartOffsetNoteEvents(delta, true, true);
+		if (this.globalTempoList != globalTempoList) {
+			this.globalTempoList.forEach(t -> t.setTickOffset(t.getTickOffset() + delta));
+		}
 		commonStartOffset = offset;
 		return this;
 	}

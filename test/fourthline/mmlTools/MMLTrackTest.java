@@ -412,7 +412,7 @@ public class MMLTrackTest {
 		assertEquals(0, track.getMMLEventAtIndex(t).getMMLNoteEventList().get(0).getTickOffset()));
 
 		// スタートオフセットの設定で全体のノート移動をチェックする
-		track.setStartOffset(96);
+		track.setStartOffset(96, null);
 		Arrays.asList(0, 1, 2, 3).forEach(t -> 
 		assertEquals(96, track.getMMLEventAtIndex(t).getMMLNoteEventList().get(0).getTickOffset()));
 	}

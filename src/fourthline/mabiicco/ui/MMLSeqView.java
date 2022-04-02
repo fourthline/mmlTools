@@ -456,7 +456,7 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 			return;
 		}
 
-		getSelectedTrack().setMML(text);
+		getSelectedTrack().setMabiMML(text);
 		resetTrackView();
 		undoEdit.saveState();
 		panel.repaint();
