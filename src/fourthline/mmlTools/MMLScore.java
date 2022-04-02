@@ -458,7 +458,7 @@ public final class MMLScore implements IMMLFileParser {
 		.pattern("panpot=",      t -> this.trackList.getLast().setPanpot(Integer.parseInt(t)) )
 		.pattern("visible=",     t -> this.trackList.getLast().setVisible(Boolean.parseBoolean(t)) )
 		.pattern("attackDelayCorrect=", t -> this.trackList.getLast().setAttackDelayCorrect(Integer.parseInt(t)))
-		.pattern("attackDelaySongCorrect=", t -> this.trackList.getLast().setAttackSongDelayCorrect(Integer.parseInt(t)))
+		.pattern("attackSongDelayCorrect=", t -> this.trackList.getLast().setAttackSongDelayCorrect(Integer.parseInt(t)))
 		.pattern("title=",       this::setTitle )
 		.pattern("author=",      this::setAuthor )
 		.pattern("time=",        this::setBaseTime )
