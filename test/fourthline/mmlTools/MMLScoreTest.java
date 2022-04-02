@@ -734,6 +734,52 @@ public class MMLScoreTest extends FileSelect {
 		assertEquals("MML@t140d,,,t120c;", score.getTrack(0).getMabiMML());
 	}
 
+	/**
+	 * addTrack test
+	 * @throws UndefinedTickException 
+	 */
+	@Test
+	public void test_setStartOffsetAll_5() throws UndefinedTickException {
+		MMLScore score = new MMLScore();
+		score.addTrack(new MMLTrack(0, 0, 96).setMML("MML@d,,,c"));
+		score.getTrack(0).setSongProgram(110);
+		score.getTempoEventList().add(new MMLTempoEvent(140, 0));
+		score.getTempoEventList().add(new MMLTempoEvent(120, 96));
+		score.setStartOffsetAll(384);
+		score.generateAll();
+		assertEquals("MML@t140d,,,t120c;", score.getTrack(0).getMabiMML());
+		score.addTrack(new MMLTrack().setMML("MML@t170g"));
+		score.generateAll();
+		assertEquals("MML@t170d,,,t120c;", score.getTrack(0).getMabiMML());
+		assertEquals("MML@t170g,,;", score.getTrack(1).getMabiMML());
+		score.getTrack(0).setMML("MML@t88f");
+		score.generateAll();
+		assertEquals("MML@t88f,,,t120c;", score.getTrack(0).getMabiMML());
+		assertEquals("MML@t88g,,;", score.getTrack(1).getMabiMML());
+	}
+
+	/**
+	 * import MML test (delay)
+	 * @throws UndefinedTickException 
+	 */
+	@Test
+	public void test_setMabiMML_0() throws UndefinedTickException {
+		MMLScore score = new MMLScore();
+		score.addTrack(new MMLTrack(0, 0, 96).setMML("MML@d,,,c"));
+		score.getTempoEventList().add(new MMLTempoEvent(140, 0));
+		score.getTrack(0).setSongProgram(110);
+		score.setStartOffsetAll(384);
+		score.getTrack(0).setAttackDelayCorrect(-6);
+		score.getTrack(0).setAttackSongDelayCorrect(6);
+		score.generateAll();
+		assertEquals("MML@t140d,,,t140c;", score.getTrack(0).getOriginalMML());
+		assertEquals("MML@t140d8&d9,,,t140r64c;", score.getTrack(0).getMabiMML());
+		score.getTrack(0).setMabiMML("MML@t140d8&d9,,,t140r64c;");
+		score.generateAll();
+		assertEquals("MML@t140r64d8&d9,,,t140c;", score.getTrack(0).getOriginalMML());
+		assertEquals("MML@t140d8&d9,,,t140r64c;", score.getTrack(0).getMabiMML());
+	}
+
 	@Test
 	public void test_barText() {
 		MMLScore score = new MMLScore();

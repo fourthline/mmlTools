@@ -57,7 +57,7 @@ public final class MMLScore implements IMMLFileParser {
 		// 既存トラックがあれば、StartOffsetをあわせる
 		if (trackList.size() > 0) {
 			int initialStartOffset = trackList.getFirst().getCommonStartOffset();
-			track.setStartOffset(initialStartOffset);
+			track.setStartOffset(initialStartOffset, globalTempoList);
 		}
 
 		// トラックリストの末尾に追加
@@ -117,6 +117,8 @@ public final class MMLScore implements IMMLFileParser {
 	 */
 	public void setTrack(int index, MMLTrack track) {
 		trackList.set(index, track);
+		int startOffset = trackList.getFirst().getCommonStartOffset();
+		track.setStartOffset(startOffset, globalTempoList);
 
 		// グローバルテンポリストの統合.
 		MMLTempoEvent.mergeTempoList(track.getGlobalTempoList(), globalTempoList);
@@ -562,7 +564,7 @@ public final class MMLScore implements IMMLFileParser {
 			}
 		}
 		// 反映
-		trackList.forEach(t -> t.setStartOffset(startOffset));
+		trackList.forEach(t -> t.setStartOffset(startOffset, globalTempoList));
 		globalTempoList.forEach(t -> t.setTickOffset(t.getTickOffset() + delta));
 		markerList.forEach(t -> t.setTickOffset(t.getTickOffset() + delta));
 		return true;
