@@ -254,8 +254,11 @@ public class MMLScoreTest extends FileSelect {
 		MMLTrack.setTempoAllowChordPart(true);
 
 		MMLScore score = new MMLScore();
-		MMLTrack track1 = new MMLTrack(1152, 0, 0).setMML("MML@c1&c,,,;");
+		MMLTrack track1 = new MMLTrack(1152, 0, 0).setMML("MML@c1&c,,,<d;");
+		track1.setSongProgram(110);
 		track1.setTrackName("Track1");
+		track1.setAttackDelayCorrect(-6);
+		track1.setAttackSongDelayCorrect(-12);
 		score.addTrack(track1);
 
 		MMLTrack track2 = new MMLTrack(1152, 0, 0).setMML("MML@<b1&b,,;");
@@ -266,7 +269,7 @@ public class MMLScoreTest extends FileSelect {
 		score.getTempoEventList().add(new MMLTempoEvent(220, 1152));
 
 		String mml[] = {
-				"MML@t220c1&c,,;",
+				"MML@t220c1&c8&c9,,,t220<d8&d16.;",
 				"MML@t220<b1&b,,;",
 		};
 
