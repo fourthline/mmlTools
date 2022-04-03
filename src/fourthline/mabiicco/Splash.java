@@ -20,8 +20,10 @@ import javax.swing.JTextArea;
 import javax.swing.border.AbstractBorder;
 import javax.swing.border.LineBorder;
 
+import fourthline.mabiicco.MabiIcco.ISplash;
 
-public final class Splash extends JDialog {
+
+public final class Splash extends JDialog implements ISplash {
 	private static final long serialVersionUID = -4276613664298174063L;
 	private final SplashPanel splashPanel = new SplashPanel();
 	public Splash() {
@@ -31,6 +33,7 @@ public final class Splash extends JDialog {
 		setLocationRelativeTo(null);
 	}
 
+	@Override
 	public void updateProgress(String s, int v) {
 		splashPanel.textArea.setText(splashPanel.textArea.getText()+s);
 		splashPanel.progress.setValue(v);
