@@ -262,8 +262,8 @@ public final class TrackPropertyPanel extends JPanel {
 			int startOffset = track.getStartOffset(partIndex);
 			var tempoList = track.getGlobalTempoList();
 			long d1 = MMLTempoEvent.getTimeOnTickOffset(tempoList, startOffset);
-			long d2 = MMLTempoEvent.getTimeOnTickOffset(tempoList, startOffset+Math.abs(tick));
-			long deltaTime = d2 - d1;
+			long d2 = MMLTempoEvent.getTimeOnTickOffset(tempoList, startOffset-tick);
+			long deltaTime = d1 - d2;
 			String s = "";
 			if (tick != 0) {
 				try {
@@ -276,7 +276,7 @@ public final class TrackPropertyPanel extends JPanel {
 					s = "=N/A";
 				}
 			}
-			o.setText((tick < 0 ? "-" : "") + deltaTime + "ms" + s);
+			o.setText(deltaTime + "ms" + s);
 			ss2.accept(tick);
 			try {
 				sandTrack.generate();

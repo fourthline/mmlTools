@@ -519,4 +519,36 @@ public class MMLTrackTest {
 		assertEquals("MML@aa,bb,cc,dd;", track.getOriginalMML());
 		assertEquals("MML@a8&a9a,b8&b9b,c8&c9c,d8&d16.d;", track.getMabiMML());
 	}
+
+	/**
+	 * アタック遅延補正のテスト
+	 * @throws UndefinedTickException
+	 */
+	@Test
+	public void set_attackDelayCorrect_2() throws UndefinedTickException {
+		var track = new MMLTrack(0, 384, 0).setMML("MML@a1,,,b1;");
+		track.getGlobalTempoList().add(new MMLTempoEvent(60, 0));
+		track.getGlobalTempoList().add(new MMLTempoEvent(240, 384));
+		
+		track.setAttackDelayCorrect(-6);
+		track.setAttackSongDelayCorrect(-12);
+		track.generate();
+		assertEquals("MML@t240a1,,,t60b1t240;", track.getOriginalMML());
+		assertEquals("MML@t240a2&a.&a9,,,t60b2&b.&b16.;", track.getMabiMML());
+		MMLTrack.setTempoAllowChordPart(true);
+		track.generate();
+		assertEquals("MML@t240a1,,,t60b1t240;", track.getOriginalMML());
+		assertEquals("MML@t240a2&a.&a9,,,t60b2&b.&b16.;", track.getMabiMML());
+		MMLTrack.setTempoAllowChordPart(false);
+
+		track.setAttackDelayCorrect(6);
+		track.setAttackSongDelayCorrect(12);
+		track.generate();
+		assertEquals("MML@t240a1,,,t60b1t240;", track.getOriginalMML());
+		assertEquals("MML@t60v0c64t240v8a1,,,v0c32t60v8b1;", track.getMabiMML());
+		MMLTrack.setTempoAllowChordPart(true);
+		track.generate();
+		assertEquals("MML@t240a1,,,t60b1t240;", track.getOriginalMML());
+		assertEquals("MML@t60v0c64t240v8a1,,,v0c32t60v8b1;", track.getMabiMML());
+	}
 }

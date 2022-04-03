@@ -14,25 +14,19 @@ public final class MMLBuilder {
 	private static final int STRING_BUILDER_SIZE = 2048;
 
 	private final MMLEventList eventList;
+	private final int startOffset;
 
 	public static final MMLBuilder create(MMLEventList eventList) {
-		return new MMLBuilder(eventList);
+		return new MMLBuilder(eventList, 0);
 	}
 
-	private MMLBuilder(MMLEventList eventList) {
+	public static final MMLBuilder create(MMLEventList eventList, int startOffset) {
+		return new MMLBuilder(eventList, startOffset);
+	}
+
+	private MMLBuilder(MMLEventList eventList, int startOffset) {
 		this.eventList = eventList;
-	}
-
-	public String toMMLString() throws UndefinedTickException {
-		return toMMLString(false, true);
-	}
-
-	public String toMMLString(int startOffset) throws UndefinedTickException {
-		return toMMLString(startOffset, false, true, null);
-	}
-
-	public String toMMLString(boolean withTempo, boolean mabiTempo) throws UndefinedTickException {
-		return toMMLString(0, withTempo, mabiTempo, null);
+		this.startOffset = startOffset;
 	}
 
 	/**
@@ -131,6 +125,14 @@ public final class MMLBuilder {
 		}
 	}
 
+	public String toMMLString() throws UndefinedTickException {
+		return toMMLString(false, true);
+	}
+
+	public String toMMLString(boolean withTempo, boolean mabiTempo) throws UndefinedTickException {
+		return toMMLString(withTempo, mabiTempo, null);
+	}
+
 	/**
 	 * テンポ出力を行うかどうかを指定してMML文字列を作成する.
 	 * TODO: 長いなぁ。
@@ -142,7 +144,7 @@ public final class MMLBuilder {
 	 * @return
 	 * @throws UndefinedTickException
 	 */
-	public String toMMLString(int startOffset, boolean withTempo, boolean mabiTempo, List<MMLEventList> relationPart)
+	public String toMMLString(boolean withTempo, boolean mabiTempo, List<MMLEventList> relationPart)
 			throws UndefinedTickException {
 		long totalTick = totalTickRelationPart(relationPart);
 		//　テンポ, startOffset に伴って 使う先頭のあたまがかわる
@@ -294,7 +296,7 @@ public final class MMLBuilder {
 	 * @return
 	 * @throws UndefinedTickException
 	 */
-	public String toMMLStringMusicQ(int startOffset, List<MMLTempoEvent> localTempoList, List<MMLEventList> relationPart)
+	public String toMMLStringMusicQ(List<MMLTempoEvent> localTempoList, List<MMLEventList> relationPart)
 			throws UndefinedTickException {
 		long totalTick = totalTickRelationPart(relationPart);
 		StringBuilder sb = new StringBuilder(STRING_BUILDER_SIZE);

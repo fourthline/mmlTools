@@ -108,11 +108,11 @@ public final class TrackPropertyPanelTest {
 
 		track.getGlobalTempoList().add(new MMLTempoEvent(60, 0));
 		obj = new TrackPropertyPanel(track, mmlManager);
-		assertEquals(List.of("0:0:0", "500ms=L8", "0:0:0", "0ms"), obj.getLabelText());
+		assertEquals(List.of("0:0:0", "250ms=L8", "0:0:0", "0ms"), obj.getLabelText());
 
 		track.getGlobalTempoList().add(new MMLTempoEvent(240, 0));
 		obj = new TrackPropertyPanel(track, mmlManager);
-		assertEquals(List.of("0:0:0", "125ms=L8", "0:0:0", "0ms"), obj.getLabelText());
+		assertEquals(List.of("0:0:0", "250ms=L8", "0:0:0", "0ms"), obj.getLabelText());
 	}
 
 	@Test
@@ -151,10 +151,10 @@ public final class TrackPropertyPanelTest {
 
 		track.getGlobalTempoList().add(new MMLTempoEvent(60, 0));
 		obj = new TrackPropertyPanel(track, mmlManager);
-		assertEquals(List.of("0:0:0", "0ms", "0:0:0", "500ms=L8"), obj.getLabelText());
+		assertEquals(List.of("0:0:0", "0ms", "0:0:0", "250ms=L8"), obj.getLabelText());
 
 		track.getGlobalTempoList().add(new MMLTempoEvent(240, 0));
 		obj = new TrackPropertyPanel(track, mmlManager);
-		assertEquals(List.of("0:0:0", "0ms", "0:0:0", "125ms=L8"), obj.getLabelText());
+		assertEquals(List.of("0:0:0", "0ms", "0:0:0", "250ms=L8"), obj.getLabelText());
 	}
 }

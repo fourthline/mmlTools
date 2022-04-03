@@ -280,9 +280,9 @@ public final class MMLTrack implements Serializable, Cloneable {
 			if ( isPrimaryTempoPart ) {
 				// part0 の場合, 1,2のパート情報を渡す
 				List<MMLEventList> relationPart = (i == 0) ? mmlParts.subList(1, 3) : null;
-				mml[i] = MMLBuilder.create(eventList).toMMLString(startOffset, true, mabiTempo, relationPart);
+				mml[i] = MMLBuilder.create(eventList, startOffset).toMMLString(true, mabiTempo, relationPart);
 			} else {
-				mml[i] = MMLBuilder.create(eventList).toMMLString(startOffset);
+				mml[i] = MMLBuilder.create(eventList, startOffset).toMMLString();
 			}
 		}
 		if (tailFix) { // 終端補正
@@ -346,7 +346,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 				localTempoList = new LinkedList<>(globalTempoList);
 			}
 			List<MMLEventList> relationPart = ((i < 3) && (allowed)) ? relationParts.get(i) : null;
-			mml[i] = MMLBuilder.create(eventList).toMMLStringMusicQ(getStartOffsetforMabiMML(i), localTempoList, relationPart);
+			mml[i] = MMLBuilder.create(eventList, getStartOffsetforMabiMML(i)).toMMLStringMusicQ(localTempoList, relationPart);
 
 		}
 		// for mabi MML, メロディ～和音2 までがカラの時にはメロディパートもカラにする.
@@ -541,7 +541,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 	 * @param forMabiMML
 	 * @return
 	 */
-	public int getStartOffsetforMabiMML(int index) {
+	private int getStartOffsetforMabiMML(int index) {
 		return  getStartOffset(index) - getAttackDelayCorrect(index);
 	}
 
