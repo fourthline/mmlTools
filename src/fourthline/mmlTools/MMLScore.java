@@ -7,10 +7,6 @@ package fourthline.mmlTools;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -20,17 +16,13 @@ import java.util.Stack;
 import fourthline.mabiicco.midi.MabiDLS;
 import fourthline.mmlTools.core.MMLTicks;
 import fourthline.mmlTools.core.UndefinedTickException;
-import fourthline.mmlTools.parser.IMMLFileParser;
-import fourthline.mmlTools.parser.MMLParseException;
 import fourthline.mmlTools.parser.MMSFile;
-import fourthline.mmlTools.parser.SectionContents;
-import fourthline.mmlTools.parser.TextParser;
 
 
 /**
  * Score
  */
-public final class MMLScore implements IMMLFileParser {
+public final class MMLScore {
 	private final LinkedList<MMLTrack> trackList = new LinkedList<>();
 	private final List<MMLTempoEvent> globalTempoList = new ArrayList<>();
 	private final List<Marker> markerList = new ArrayList<>();
@@ -265,92 +257,19 @@ public final class MMLScore implements IMMLFileParser {
 		return totalTime;
 	}
 
-	private String getTempoObj() {
-		if (globalTempoList.size() == 0) {
-			return "";
-		}
-		StringBuffer sb = new StringBuffer();
-		for (MMLTempoEvent t : globalTempoList) {
-			sb.append(',');
-			sb.append(t.toString());
-		}
-		return sb.substring(1);
-	}
-
-	private void putTempoObj(String s) {
-		if (s.length() > 0) {
-			String l[] = s.split(",");
-			globalTempoList.clear();
-			for (String str : l) {
-				MMLTempoEvent e = MMLTempoEvent.fromString(str);
-				if (e != null) {
-					e.appendToListElement(globalTempoList);
-				}
-			}
-		}
-	}
-
 	public byte[] getObjectState() {
 		ByteArrayOutputStream ostream = new ByteArrayOutputStream();
-		writeToOutputStream(ostream);
+		new MMLScoreSerializer(this).writeToOutputStream(ostream);
 		return ostream.toByteArray();
 	}
 
 	public void putObjectState(byte objState[]) {
 		try {
 			ByteArrayInputStream bis = new ByteArrayInputStream(objState);
-			parse(bis);
+			new MMLScoreSerializer(this).parse(bis);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	public void writeToOutputStream(OutputStream outputStream) {
-		try {
-			PrintStream stream = new PrintStream(outputStream, false, "UTF-8");
-
-			stream.println("[mml-score]");
-			stream.println("version=1");
-			stream.println("title="+getTitle());
-			stream.println("author="+getAuthor());
-			stream.println("time="+getBaseTime());
-			stream.println("tempo="+getTempoObj());
-			if (getStartOffsetAll() > 0) {
-				stream.println("startOffset="+getStartOffsetAll());
-			}
-
-			for (MMLTrack track : trackList) {
-				// インスタンス時に先に指定したいので、オフセットたちは先に出力する
-				if (track.getStartDelta() != 0) {
-					stream.println("startDelta="+track.getStartDelta());
-				}
-				if (track.getStartSongDelta() != 0) {
-					stream.println("startSongDelta="+track.getStartSongDelta());
-				}
-				//　本体
-				stream.println("mml-track="+track.getOriginalMML());
-				stream.println("name="+track.getTrackName());
-				stream.println("program="+track.getProgram());
-				stream.println("songProgram="+track.getSongProgram());
-				stream.println("panpot="+track.getPanpot());
-				stream.println("visible="+track.isVisible());
-				if (track.getAttackDelayCorrect() != 0) {
-					stream.println("attackDelayCorrect="+track.getAttackDelayCorrect());
-				}
-				if (track.getAttackSongDelayCorrect() != 0) {
-					stream.println("attackSongDelayCorrect="+track.getAttackSongDelayCorrect());
-				}
-			}
-
-			if (!markerList.isEmpty()) {
-				stream.println("[marker]");
-				for (Marker marker : markerList) {
-					stream.println(marker.toString());
-				}
-			}
-
-			stream.close();
-		} catch (UnsupportedEncodingException e) {}
 	}
 
 	public List<MMLNoteEvent[]> getNoteListOnTickOffset(long tick) {
@@ -387,103 +306,6 @@ public final class MMLScore implements IMMLFileParser {
 		return this;
 	}
 
-	@Override
-	public MMLScore parse(InputStream istream) throws MMLParseException {
-		this.globalTempoList.clear();
-		this.trackList.clear();
-		this.markerList.clear();
-
-		List<SectionContents> contentsList = SectionContents.makeSectionContentsByInputStream(istream, "UTF-8");
-		if (contentsList.isEmpty()) {
-			throw(new MMLParseException());
-		}
-		for (SectionContents section : contentsList) {
-			if (section.getName().equals("[mml-score]")) {
-				parseMMLScore(section.getContents());
-			} else if (section.getName().equals("[marker]")) {
-				parseMarker(section.getContents());
-			}
-		}
-		return this;
-	}
-
-	/**
-	 * MML@ - ; 内の空白文字を削除する.
-	 * @param text
-	 * @return
-	 */
-	private String fixMMLspace(String text) {
-		StringBuilder sb = new StringBuilder();
-		int index = 0;
-		int start = 0;
-
-		while ( (start = text.indexOf("MML@", index)) >= 0) {
-			int end = text.indexOf(';', start);
-			sb.append(text.substring(index, start));
-			sb.append( text.substring(start, end+1).replaceAll("[ \t\f\r\n]", "") );
-			index = end + 1;
-		}
-
-		sb.append(text.substring(index));
-		return sb.toString();
-	}
-
-	private class ParseCache {
-		private int startOffset = 0;
-		private int startDelta = 0;
-		private int startSongDelta = 0;
-		private void clear() {
-			startDelta = 0;
-			startSongDelta = 0;
-		}
-	}
-
-	/**
-	 * parse [mml-score] contents
-	 * @param contents
-	 */
-	private void parseMMLScore(String contents) {
-		var cache = new ParseCache();
-		TextParser.text(fixMMLspace(contents))
-		// スタートOffsetはMMLTrack生成時に指定するため事前にみる
-		.pattern("startOffset=",    t -> cache.startOffset = Integer.parseInt(t))
-		.pattern("startDelta=",     t -> cache.startDelta = Integer.parseInt(t))
-		.pattern("startSongDelta=", t -> cache.startSongDelta = Integer.parseInt(t))
-		// for MMLTrack
-		.pattern("mml-track=",   t -> { 
-			this.addTrack(new MMLTrack(cache.startOffset, cache.startDelta, cache.startSongDelta).setMML(t));
-			cache.clear();
-		})
-		.pattern("name=",        t -> this.trackList.getLast().setTrackName(t) )
-		.pattern("program=",     t -> this.trackList.getLast().setProgram(Integer.parseInt(t)) )
-		.pattern("songProgram=", t -> this.trackList.getLast().setSongProgram(Integer.parseInt(t)) )
-		.pattern("panpot=",      t -> this.trackList.getLast().setPanpot(Integer.parseInt(t)) )
-		.pattern("visible=",     t -> this.trackList.getLast().setVisible(Boolean.parseBoolean(t)) )
-		.pattern("attackDelayCorrect=", t -> this.trackList.getLast().setAttackDelayCorrect(Integer.parseInt(t)))
-		.pattern("attackSongDelayCorrect=", t -> this.trackList.getLast().setAttackSongDelayCorrect(Integer.parseInt(t)))
-		.pattern("title=",       this::setTitle )
-		.pattern("author=",      this::setAuthor )
-		.pattern("time=",        this::setBaseTime )
-		.pattern("tempo=",       this::putTempoObj )
-		.parse();
-	}
-
-	/**
-	 * parse [marker] contents
-	 * @param contents
-	 */
-	private void parseMarker(String contents) {
-		markerList.clear();
-		for (String s : contents.split("\n")) {
-			// <tickOffset>=<name>
-			int index = s.indexOf('=');
-			if (index > 0) {
-				String tickString = s.substring(0, index);
-				String name = s.substring(index+1);
-				markerList.add( new Marker(name, Integer.parseInt(tickString)) );
-			}
-		}
-	}
 
 	public MMLScore generateOne(int trackIndex) throws UndefinedTickException {
 		trackList.get(trackIndex).generate();
@@ -570,13 +392,6 @@ public final class MMLScore implements IMMLFileParser {
 		return true;
 	}
 
-	private int getStartOffsetAll() {
-		if (trackList.size() > 0) {
-			return trackList.getFirst().getCommonStartOffset();
-		}
-		return 0;
-	}
-
 	/**
 	 * tickに対する小節表記を取得する
 	 * @param tick
@@ -603,11 +418,11 @@ public final class MMLScore implements IMMLFileParser {
 			System.out.println(" --- parse sample.mms ---");
 			MMSFile mms = new MMSFile();
 			MMLScore score = mms.parse(new FileInputStream("sample.mms"));
-			score.writeToOutputStream(System.out);
+			new MMLScoreSerializer(score).writeToOutputStream(System.out);
 
 			System.out.println(" --- parse sample-version1.mmi ---");
 			score = new MMLScore();
-			score.parse(new FileInputStream("sample-version1.mmi"));
+			new MMLScoreSerializer(score).parse(new FileInputStream("sample-version1.mmi"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
