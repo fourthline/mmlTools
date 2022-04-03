@@ -26,6 +26,7 @@ import fourthline.mabiicco.ui.IMMLManager;
 import fourthline.mabiicco.ui.MMLSeqView;
 import fourthline.mabiicco.ui.MMLTrackView;
 import fourthline.mabiicco.ui.PianoRollView;
+import fourthline.mmlTools.MMLBuilder;
 import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.MMLNoteEvent;
 import fourthline.mmlTools.MMLTrack;
@@ -249,11 +250,11 @@ public final class MMLEditorTest extends UseLoadingDLS {
 		check_areaSelect();
 
 		// カット&ペースト.
-		assertEquals(">>g+4<<<e4>>>g+4", eventList.toMMLString());
+		assertEquals(">>g+4<<<e4>>>g+4", MMLBuilder.create(eventList).toMMLString());
 		editor.selectedCut();
-		assertEquals("r4<e4", eventList.toMMLString());
+		assertEquals("r4<e4", MMLBuilder.create(eventList).toMMLString());
 		editor.paste(96+96);
-		assertEquals("r4<e4>>>g+4r4g+4", eventList.toMMLString());
+		assertEquals("r4<e4>>>g+4r4g+4", MMLBuilder.create(eventList).toMMLString());
 	}
 
 	/**
@@ -267,11 +268,11 @@ public final class MMLEditorTest extends UseLoadingDLS {
 		check_areaSelect();
 
 		// コピー&ペースト.
-		assertEquals(">>g+4<<<e4>>>g+4", eventList.toMMLString());
+		assertEquals(">>g+4<<<e4>>>g+4", MMLBuilder.create(eventList).toMMLString());
 		editor.selectedCopy();
-		assertEquals(">>g+4<<<e4>>>g+4", eventList.toMMLString());
+		assertEquals(">>g+4<<<e4>>>g+4", MMLBuilder.create(eventList).toMMLString());
 		editor.paste(96+96+96);
-		assertEquals(">>g+4<<<e4>>>g+4g+4r4g+4", eventList.toMMLString());
+		assertEquals(">>g+4<<<e4>>>g+4g+4r4g+4", MMLBuilder.create(eventList).toMMLString());
 	}
 
 	/**
@@ -285,9 +286,9 @@ public final class MMLEditorTest extends UseLoadingDLS {
 		check_areaSelect();
 
 		// delete.
-		assertEquals(">>g+4<<<e4>>>g+4", eventList.toMMLString());
+		assertEquals(">>g+4<<<e4>>>g+4", MMLBuilder.create(eventList).toMMLString());
 		editor.selectedDelete();
-		assertEquals("r4<e4", eventList.toMMLString());
+		assertEquals("r4<e4", MMLBuilder.create(eventList).toMMLString());
 	}
 
 	/**

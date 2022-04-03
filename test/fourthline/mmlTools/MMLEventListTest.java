@@ -227,7 +227,7 @@ public class MMLEventListTest {
 	public void testToMMLString_0() throws UndefinedTickException {
 		MMLEventList eventList = new MMLEventList("ara");
 
-		String mml = eventList.toMMLString();
+		String mml = MMLBuilder.create(eventList).toMMLString();
 		System.out.println(mml);
 
 		assertEquals(eventList.toString(), new MMLEventList(mml).toString());
@@ -241,7 +241,7 @@ public class MMLEventListTest {
 	public void testToMMLString_1() throws UndefinedTickException {
 		MMLEventList eventList = new MMLEventList("cdef-gab>cdef+gab+<c1");
 
-		String mml = eventList.toMMLString();
+		String mml = MMLBuilder.create(eventList).toMMLString();
 		System.out.println(mml);
 
 		assertEquals(eventList.toString(), new MMLEventList(mml).toString());
@@ -255,7 +255,7 @@ public class MMLEventListTest {
 	public void testToMMLString_2() throws UndefinedTickException {
 		MMLEventList eventList = new MMLEventList("c4&c16g2&g8d1.&d1.&d1.&d24");
 
-		String mml = eventList.toMMLString();
+		String mml = MMLBuilder.create(eventList).toMMLString();
 		System.out.println(mml);
 
 		assertEquals(eventList.toString(), new MMLEventList(mml).toString());
@@ -269,7 +269,7 @@ public class MMLEventListTest {
 	public void testToMMLString_3() throws UndefinedTickException {
 		MMLEventList eventList = new MMLEventList("T150v10c8.g16e4v8g-<at120<b-");
 
-		String mml = eventList.toMMLString(true, true);
+		String mml = MMLBuilder.create(eventList).toMMLString(true, true);
 		System.out.println(mml);
 
 		assertEquals(eventList.toString(), new MMLEventList(mml).toString());
@@ -288,7 +288,7 @@ public class MMLEventListTest {
 		globalTempoList.add(new MMLTempoEvent(130, 96));
 		eventList.setGlobalTempoList(globalTempoList);
 
-		String mml = eventList.toMMLString(true, true);
+		String mml = MMLBuilder.create(eventList).toMMLString(true, true);
 		System.out.println(mml);
 
 		assertEquals(expectMML, mml);
@@ -306,7 +306,7 @@ public class MMLEventListTest {
 		globalTempoList.add(new MMLTempoEvent(150, 96*2+96*12));
 		eventList.setGlobalTempoList(globalTempoList);
 
-		String mml = eventList.toMMLString(true, false);
+		String mml = MMLBuilder.create(eventList).toMMLString(true, false);
 		System.out.println(mml);
 
 		assertEquals(expectMML, mml);
@@ -321,7 +321,7 @@ public class MMLEventListTest {
 		MMLEventList eventList = new MMLEventList("c1r1t150c1");
 		String expectMML = "c1v0c1t150v8c1";
 
-		String mml = eventList.toMMLString(true, true);
+		String mml = MMLBuilder.create(eventList).toMMLString(true, true);
 		System.out.println(mml);
 
 		assertEquals(expectMML, mml);
@@ -336,7 +336,7 @@ public class MMLEventListTest {
 		MMLEventList eventList = new MMLEventList("v12rc");
 		String expectMML = "r4v12c4";
 
-		String mml = eventList.toMMLString(true, true);
+		String mml = MMLBuilder.create(eventList).toMMLString(true, true);
 		System.out.println(mml);
 
 		assertEquals(expectMML, mml);
@@ -351,7 +351,7 @@ public class MMLEventListTest {
 		MMLEventList eventList = new MMLEventList("c64&c64&c64&c64");
 		String expectMML = "c64&c64&c64&c64";
 
-		String mml = eventList.toMMLString(true, true);
+		String mml = MMLBuilder.create(eventList).toMMLString(true, true);
 		System.out.println(mml);
 
 		assertEquals(expectMML, mml);
@@ -390,7 +390,7 @@ public class MMLEventListTest {
 		MMLEventList eventList = new MMLEventList("v12t110rt60rt90c");
 		String expectMML = "t110v0c4t60c4t90v12c4";
 
-		String mml = eventList.toMMLString(true, true);
+		String mml = MMLBuilder.create(eventList).toMMLString(true, true);
 		System.out.println(mml);
 
 		assertEquals(expectMML, mml);
@@ -531,16 +531,16 @@ public class MMLEventListTest {
 		MMLEventList eventList1 = new MMLEventList("rcrc");
 		MMLEventList eventList2 = new MMLEventList("r.c2");
 
-		String mml1 = eventList1.toMMLString();
-		String mml2 = eventList2.toMMLString();
+		String mml1 = MMLBuilder.create(eventList1).toMMLString();
+		String mml2 = MMLBuilder.create(eventList2).toMMLString();
 		int endTick = eventList1.getAlignmentEndTick(eventList2, eventList1.getMMLNoteEventList().get(1).getEndTick());
 
 		eventList1.swap(eventList2, 0, endTick);
 		System.out.println(eventList1.getMMLNoteEventList().size());
 		System.out.println(eventList2.getMMLNoteEventList().size());
 
-		assertEquals(mml1, eventList2.toMMLString());
-		assertEquals(mml2, eventList1.toMMLString());
+		assertEquals(mml1, MMLBuilder.create(eventList2).toMMLString());
+		assertEquals(mml2, MMLBuilder.create(eventList1).toMMLString());
 	}
 
 	/**
@@ -552,15 +552,15 @@ public class MMLEventListTest {
 		MMLEventList eventList1 = new MMLEventList("rcrc");
 		MMLEventList eventList2 = new MMLEventList("r.c2");
 
-		String mml1 = eventList1.toMMLString();
+		String mml1 = MMLBuilder.create(eventList1).toMMLString();
 		int endTick = eventList1.getAlignmentEndTick(eventList2, eventList1.getMMLNoteEventList().get(1).getEndTick());
 
 		eventList1.move(eventList2, 0, endTick);
 		System.out.println(eventList1.getMMLNoteEventList().size());
 		System.out.println(eventList2.getMMLNoteEventList().size());
 
-		assertEquals(mml1, eventList2.toMMLString());
-		assertEquals("", eventList1.toMMLString());
+		assertEquals(mml1, MMLBuilder.create(eventList2).toMMLString());
+		assertEquals("", MMLBuilder.create(eventList1).toMMLString());
 	}
 
 	/**
@@ -572,15 +572,15 @@ public class MMLEventListTest {
 		MMLEventList eventList1 = new MMLEventList("rcrc");
 		MMLEventList eventList2 = new MMLEventList("r.c2");
 
-		String mml1 = eventList1.toMMLString();
+		String mml1 = MMLBuilder.create(eventList1).toMMLString();
 		int endTick = eventList1.getAlignmentEndTick(eventList2, eventList1.getMMLNoteEventList().get(1).getEndTick());
 
 		eventList1.copy(eventList2, 0, endTick);
 		System.out.println(eventList1.getMMLNoteEventList().size());
 		System.out.println(eventList2.getMMLNoteEventList().size());
 
-		assertEquals(mml1, eventList2.toMMLString());
-		assertEquals(mml1, eventList1.toMMLString());
+		assertEquals(mml1, MMLBuilder.create(eventList2).toMMLString());
+		assertEquals(mml1, MMLBuilder.create(eventList1).toMMLString());
 	}
 
 	@Test
@@ -624,7 +624,7 @@ public class MMLEventListTest {
 	@Test
 	public void testV0_4() throws UndefinedTickException {
 		MMLEventList eventList = new MMLEventList("v0cdcd");
-		assertEquals("v0c4d4c4d4", eventList.toMMLString());
+		assertEquals("v0c4d4c4d4", MMLBuilder.create(eventList).toMMLString());
 	}
 
 	@Test
@@ -636,10 +636,10 @@ public class MMLEventListTest {
 		MMLNoteEvent target = eventList.getMMLNoteEventList().get(2);
 
 		eventList.setVelocityCommand(target, 10);
-		assertEquals(eventList2.toMMLString(), eventList.toMMLString());
+		assertEquals(MMLBuilder.create(eventList2).toMMLString(), MMLBuilder.create(eventList).toMMLString());
 
 		eventList.unsetVelocityCommand(target);
-		assertEquals(eventList3.toMMLString(), eventList.toMMLString());
+		assertEquals(MMLBuilder.create(eventList3).toMMLString(), MMLBuilder.create(eventList).toMMLString());
 	}
 
 	@Test
@@ -675,13 +675,13 @@ public class MMLEventListTest {
 		System.out.println(eventList1.getTickLength());
 		MMLEventList eventList2 = new MMLEventList("l8bb+4.ebb+b16c.cc+c2.");
 		System.out.println(eventList2.getTickLength());
-		assertEquals(eventList1.toMMLString(), eventList2.toMMLString());
+		assertEquals(MMLBuilder.create(eventList1).toMMLString(), MMLBuilder.create(eventList2).toMMLString());
 	}
 
 	@Test
 	public void testParse_m1() throws UndefinedTickException {
 		MMLEventList eventList1 = new MMLEventList("o0c-");
-		assertEquals("<<<<c-4", eventList1.toMMLString());
+		assertEquals("<<<<c-4", MMLBuilder.create(eventList1).toMMLString());
 	}
 
 	@Test
