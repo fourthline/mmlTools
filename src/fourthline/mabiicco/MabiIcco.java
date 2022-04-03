@@ -41,10 +41,16 @@ import fourthline.mmlTools.MMLTrack;
  * </pre>
  */
 public final class MabiIcco {
+	public static interface ISplash {
+		public void setVisible(boolean b);
+		public void updateProgress(String s, int v);
+		public void dispose();
+	}
 	private final String args[];
-	private final Splash2 splash = new Splash2();
+	private final ISplash splash;
 
 	public MabiIcco(String args[]) {
+		splash = (System.getProperty("mabiicco.splash") == null) ? new Splash() : new Splash2(); 
 		this.args = args;
 		splash.setVisible(true);
 	}

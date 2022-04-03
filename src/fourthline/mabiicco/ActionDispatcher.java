@@ -46,6 +46,7 @@ import fourthline.mabiicco.ui.editor.MMLTranspose;
 import fourthline.mabiicco.ui.mml.MMLImportPanel;
 import fourthline.mabiicco.ui.mml.MMLScorePropertyPanel;
 import fourthline.mmlTools.MMLScore;
+import fourthline.mmlTools.MMLScoreSerializer;
 import fourthline.mmlTools.MMLTrack;
 import fourthline.mmlTools.core.NanoTime;
 import fourthline.mmlTools.parser.IMMLFileParser;
@@ -372,7 +373,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	private boolean saveMMLFile(File file) {
 		try {
 			FileOutputStream outputStream = new FileOutputStream(file);
-			mmlSeqView.getMMLScore().writeToOutputStream(outputStream);
+			new MMLScoreSerializer(mmlSeqView.getMMLScore()).writeToOutputStream(outputStream);
 			mainFrame.setTitleAndFileName(file.getName());
 			fileState.setOriginalBase();
 			notifyUpdateFileState();

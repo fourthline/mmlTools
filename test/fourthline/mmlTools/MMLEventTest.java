@@ -23,7 +23,7 @@ public class MMLEventTest {
 
 		MMLEvent.insertTick(eventList1.getMMLNoteEventList(), MMLTicks.getTick("2"), MMLTicks.getTick("1"));
 
-		assertEquals(eventList2.toMMLString(), eventList1.toMMLString());
+		assertEquals(MMLBuilder.create(eventList2).toMMLString(), MMLBuilder.create(eventList1).toMMLString());
 	}
 
 	/**
@@ -37,7 +37,7 @@ public class MMLEventTest {
 
 		MMLEvent.removeTick(eventList1.getMMLNoteEventList(), MMLTicks.getTick("2"), MMLTicks.getTick("1")+MMLTicks.getTick("64"));
 
-		assertEquals(eventList2.toMMLString(), eventList1.toMMLString());
+		assertEquals(MMLBuilder.create(eventList2).toMMLString(), MMLBuilder.create(eventList1).toMMLString());
 	}
 
 	/**
@@ -51,6 +51,6 @@ public class MMLEventTest {
 
 		MMLEvent.removeTick(eventList1.getMMLNoteEventList(), MMLTicks.getTick("2")-MMLTicks.getTick("64"), MMLTicks.getTick("1"));
 
-		assertEquals(eventList2.toMMLString(), eventList1.toMMLString());
+		assertEquals(MMLBuilder.create(eventList2).toMMLString(), MMLBuilder.create(eventList1).toMMLString());
 	}
 }

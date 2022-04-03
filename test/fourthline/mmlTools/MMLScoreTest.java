@@ -67,13 +67,13 @@ public class MMLScoreTest extends FileSelect {
 
 			// MMLScore -> mmi check
 			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-			score.writeToOutputStream(outputStream);
+			new MMLScoreSerializer(score).writeToOutputStream(outputStream);
 			String mmiOutput = outputStream.toString("UTF-8");
 			assertEquals(new String(expectBuf), mmiOutput);
 
 			// mmi -> re-parse check
 			ByteArrayInputStream bis = new ByteArrayInputStream(mmiOutput.getBytes());
-			MMLScore reparseScore = new MMLScore().parse(bis);
+			MMLScore reparseScore = new MMLScoreSerializer(new MMLScore()).parse(bis);
 			assertEquals(mmiOutput, new String(reparseScore.getObjectState()));
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -89,7 +89,7 @@ public class MMLScoreTest extends FileSelect {
 
 			/* MMLScore.parse() */
 			inputStream = fileSelect(expectFileName);
-			MMLScore inputScore = new MMLScore().parse(inputStream).generateAll();
+			MMLScore inputScore = new MMLScoreSerializer(new MMLScore()).parse(inputStream).generateAll();
 			inputStream.close();
 			int i = 0;
 			assertEquals(expectMML.length, inputScore.getTrackCount());
@@ -138,8 +138,8 @@ public class MMLScoreTest extends FileSelect {
 	public void testMMLFileFormat1_ex() throws UndefinedTickException {
 		/* MMLScore.parse() */
 		try {
-			MMLScore score1 = new MMLScore().parse(fileSelect("format1.mmi")).generateAll();
-			MMLScore score2 = new MMLScore().parse(fileSelect("format1_ex.mmi")).generateAll();
+			MMLScore score1 = new MMLScoreSerializer(new MMLScore()).parse(fileSelect("format1.mmi")).generateAll();
+			MMLScore score2 = new MMLScoreSerializer(new MMLScore()).parse(fileSelect("format1_ex.mmi")).generateAll();
 
 			assertArrayEquals(score1.getObjectState(), score2.getObjectState());
 		} catch (MMLParseException | IOException e) {
@@ -360,7 +360,7 @@ public class MMLScoreTest extends FileSelect {
 				if (updateOption) {
 					try {
 						score.generateAll();
-						score.writeToOutputStream(new FileOutputStream(file));
+						new MMLScoreSerializer(score).writeToOutputStream(new FileOutputStream(file));
 					} catch (UndefinedTickException e) {
 						fail(e.getMessage());
 					}

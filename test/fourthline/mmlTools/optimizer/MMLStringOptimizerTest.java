@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import fourthline.mmlTools.MMLBuilder;
 import fourthline.mmlTools.MMLEventList;
 import fourthline.mmlTools.core.MMLTicks;
 import fourthline.mmlTools.core.UndefinedTickException;
@@ -48,7 +49,7 @@ public class MMLStringOptimizerTest {
 
 	private void checkMMLStringOptimize(String input, String expect, Function<MMLStringOptimizer, String> f) {
 		try {
-			MMLStringOptimizer optimizer = new MMLStringOptimizer(new MMLEventList(input).toMMLString(true, true));
+			MMLStringOptimizer optimizer = new MMLStringOptimizer(MMLBuilder.create(new MMLEventList(input)).toMMLString(true, true));
 			String mml = f.apply(optimizer);
 
 			System.out.println(input);

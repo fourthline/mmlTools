@@ -131,7 +131,7 @@ public final class MidiFile implements IMMLFileParser {
 				String mml[] = new String[3];
 				for (int i = 0; i < mml.length; i++) {
 					if (!eventList.isEmpty()) {
-						mml[i] = new MMLStringOptimizer(eventList.get(0).toMMLString(false, false)).toString();
+						mml[i] = new MMLStringOptimizer(eventList.get(0).getInternalMMLString()).toString();
 						eventList.remove(0);
 					} else {
 						mml[i] = "";

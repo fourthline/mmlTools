@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2017 たんらる
+ * Copyright (C) 2013-2022 たんらる
  */
 
 package fourthline.mmlTools.parser;
@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.InputStream;
 
 import fourthline.mmlTools.MMLScore;
+import fourthline.mmlTools.MMLScoreSerializer;
 
 /**
  * MMLファイルのparser
@@ -25,7 +26,7 @@ public interface IMMLFileParser {
 		} else if (suffix.endsWith(".mid")) {
 			fileParser = new MidiFile();
 		} else {
-			fileParser = new MMLScore();
+			fileParser = new MMLScoreSerializer(new MMLScore());
 		}
 		return fileParser;
 	}

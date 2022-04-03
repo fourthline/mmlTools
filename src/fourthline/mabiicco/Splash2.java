@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 たんらる
+ * Copyright (C) 2022 たんらる
  */
 
 package fourthline.mabiicco;
@@ -18,17 +18,17 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextArea;
 import javax.swing.border.AbstractBorder;
-import javax.swing.border.LineBorder;
 
 import fourthline.mabiicco.MabiIcco.ISplash;
 
 
-public final class Splash extends JDialog implements ISplash {
-	private static final long serialVersionUID = -4276613664298174063L;
+public final class Splash2 extends JDialog implements ISplash {
+	private static final long serialVersionUID = 6454976933389100203L;
 	private final SplashPanel splashPanel = new SplashPanel();
-	public Splash() {
+	public Splash2() {
 		getContentPane().add(splashPanel);
 		setUndecorated(true);
+		setBackground(new Color(0.0f, 0.0f, 0.0f, 0.0f));
 		pack();
 		setLocationRelativeTo(null);
 	}
@@ -37,12 +37,17 @@ public final class Splash extends JDialog implements ISplash {
 	public void updateProgress(String s, int v) {
 		splashPanel.textArea.setText(splashPanel.textArea.getText()+s);
 		splashPanel.progress.setValue(v);
+		if (v == 100) {
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {}
+		}
 	}
 
 	private final class SplashPanel extends JPanel {
-		private static final long serialVersionUID = 2210455372955295858L;
-		private static final int WIDTH = 300;
-		private static final int HEIGHT = 220; 
+		private static final long serialVersionUID = -3042011501769635754L;
+		private static final int WIDTH = 318;
+		private static final int HEIGHT = 433; 
 		private final ImageIcon img;
 		private final JProgressBar progress = new JProgressBar();
 		private final JLabel version = new JLabel();
@@ -50,20 +55,20 @@ public final class Splash extends JDialog implements ISplash {
 		private SplashPanel() {
 			super();
 			setLayout(null);
-			img = AppResource.getImageIcon("/img/title.png");
+			img = AppResource.getImageIcon("/img/MabiIcco_loading.png");
 			setPreferredSize(new Dimension(WIDTH, HEIGHT));
 			progress.setMaximum(100);
 			add(progress);
-			progress.setBounds(4, 206, 292, 12);
+			progress.setBounds(14, 406, 290, 12);
 			add(version);
 			version.setText("Version: "+AppResource.getVersionText());
-			version.setBounds(160, 60, 120, 14);
+			version.setBounds(200, 290, 120, 14);
 			add(textArea);
 			textArea.setEditable(false);
-			textArea.setBounds(20, 100, WIDTH-40, 80);
+			textArea.setBounds(20, 313, WIDTH-40, 80);
 			textArea.setBorder(new RoundBorder(20, 10));
+			textArea.setOpaque(false);
 			setOpaque(false);
-			setBorder(new LineBorder(Color.GRAY, 1, false));
 		}
 
 		@Override

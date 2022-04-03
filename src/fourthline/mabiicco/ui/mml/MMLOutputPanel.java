@@ -41,14 +41,17 @@ public final class MMLOutputPanel extends JPanel {
 	private final Window parentFrame;
 	private final JButton splitButton = new JButton(AppResource.appText("mml.output.split"));
 
-	private List<MMLTrack> trackList;
+	private final List<MMLTrack> trackList;
 	private MMLScore score;
 	final List<String> outputTextList = new ArrayList<>();
+	private final String trackName;
 
 	public MMLOutputPanel(Frame parentFrame) {
 		this.dialog = null;
 		this.parentFrame = parentFrame;
 		this.table = null;
+		this.trackList = null;
+		this.trackName = null;
 		initializePanel(false);
 	}
 
@@ -57,6 +60,7 @@ public final class MMLOutputPanel extends JPanel {
 		this.parentFrame = parentFrame;
 		this.table = new TrackListTable(trackList);
 		this.trackList = trackList;
+		this.trackName = null;
 		for (MMLTrack track : trackList) {
 			outputTextList.add(track.getMabiMML());
 		}
@@ -74,6 +78,8 @@ public final class MMLOutputPanel extends JPanel {
 		for (MMLText mmlText : textList) {
 			outputTextList.add(mmlText.getMML());
 		}
+		this.trackList = null;
+		this.trackName = track.getTrackName();
 		this.score = score;
 		initializePanel(false);
 	}
@@ -150,15 +156,23 @@ public final class MMLOutputPanel extends JPanel {
 	 * 現在のトラック名をコピーする
 	 */
 	private void currentSelectedTrackNameOutput() {
-		int row = table.getSelectedRow();
-		String trackName = trackList.get(row).getTrackName();
+		System.out.println("currentSelectedTrackNameOutput");
+		String text;
+		if (trackList != null) {
+			int row = table.getSelectedRow();
+			text = trackList.get(row).getTrackName();
+		} else if (trackName != null) {
+			text = trackName;
+		} else {
+			return;
+		}
 		if (score != null) {
 			String scoreName = score.getTitle();
 			if (!scoreName.isEmpty()) {
-				trackName = scoreName + "/" + trackName;
+				text = scoreName + "/" + text;
 			}
 		}
-		copyToClipboard(parentFrame, trackName, AppResource.appText("mml.output.name_done")+"\n\""+trackName+"\"");
+		copyToClipboard(parentFrame, text, AppResource.appText("mml.output.name_done")+"\n\""+text+"\"");
 	}
 
 	/**
