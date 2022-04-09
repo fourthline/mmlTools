@@ -35,6 +35,12 @@ public final class MMLFile implements IMMLFileParser {
 	private final MMLScore score = new MMLScore();
 	private String encoding = "Shift_JIS";
 
+	private final TextParser parser = 
+			new TextParser()
+			.pattern("Title=",    t -> score.setTitle(t))
+			.pattern("Source=",   t -> score.setAuthor(t))
+			.pattern("Encoding=", t -> this.encoding = t);
+
 	// channel sections
 	private LinkedList<String> mmlParts = new LinkedList<>();
 	private List<Extension3mleTrack> trackList = null;
@@ -123,11 +129,7 @@ public final class MMLFile implements IMMLFileParser {
 	 * @param contents
 	 */
 	private void parseSettings(String contents) {
-		TextParser.text(contents)
-		.pattern("Title=",    t -> score.setTitle(t))
-		.pattern("Source=",   t -> score.setAuthor(t))
-		.pattern("Encoding=", t -> this.encoding = t)
-		.parse();
+		parser.parse(contents);
 	}
 
 	/**
