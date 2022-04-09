@@ -9,24 +9,17 @@ import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 public final class TextParser {
-	private final String text;
+	private final Pattern lineSplit = Pattern.compile("\n");
+	private final HashMap<String, Consumer<String>> map = new HashMap<>();
 
-	private TextParser(String text) {
-		this.text = text;
-	}
-
-	public static TextParser text(String test) {
-		return new TextParser(test);
-	}
-
-	private HashMap<String, Consumer<String>> map = new HashMap<>();
+	public TextParser() {}
 	public TextParser pattern(String s, Consumer<String> func) {
 		map.put(s, func);
 		return this;
 	}
 
-	public void parse() {
-		Pattern.compile("\n").splitAsStream(this.text).forEachOrdered((lineText) -> {
+	public void parse(String text) {
+		lineSplit.splitAsStream(text).forEachOrdered((lineText) -> {
 			map.keySet().forEach(key -> {
 				if (lineText.startsWith(key)) {
 					map.get(key).accept( lineText.substring(key.length()) );

@@ -91,12 +91,12 @@ public final class MMSFile implements IMMLFileParser {
 	 * @param contents
 	 */
 	private void parseInfomation(String contents) {
-		TextParser.text(contents)
+		new TextParser()
 		.pattern("title=", score::setTitle)
 		.pattern("auther=", score::setAuthor)
 		.pattern("rythmNum=",  t -> score.setTimeCountOnly(Integer.valueOf(t)) )
 		.pattern("rythmBase=", t -> score.setBaseOnly(Integer.valueOf(t)) )
-		.parse();
+		.parse(contents);
 	}
 
 	/**
@@ -105,13 +105,13 @@ public final class MMSFile implements IMMLFileParser {
 	 */
 	private void parseMarker(String contents) {
 		LinkedList<Marker> markerList = new LinkedList<>();
-		TextParser.text(contents)
+		new TextParser()
 		.pattern("label", t -> markerList.add(new Marker(t.substring(5), 0)))
 		.pattern("position", t -> {
 			int tickOffset = Integer.parseInt(t.substring(5));
 			markerList.getLast().setTickOffset( tickOffset );
 		})
-		.parse();
+		.parse(contents);
 		score.getMarkerList().addAll(markerList);
 	}
 
@@ -124,14 +124,14 @@ public final class MMSFile implements IMMLFileParser {
 		final int intValue[] = { 0, 0 };
 		final String stringValue[] = { "", "", "", "" };
 
-		TextParser.text(contents)
+		new TextParser()
 		.pattern("instrument=", t -> intValue[0] = convertInstProgram(Integer.parseInt(t)) )
 		.pattern("panpot=",     t -> intValue[1] = Integer.parseInt(t) + 64 )
 		.pattern("name=",       t -> stringValue[0] = t)
 		.pattern("ch0_mml=",    t -> stringValue[1] = t)
 		.pattern("ch1_mml=",    t -> stringValue[2] = t)
 		.pattern("ch2_mml=",    t -> stringValue[3] = t)
-		.parse();
+		.parse(contents);
 
 		MMLTrack track = new MMLTrack().setMML(stringValue[1], stringValue[2], stringValue[3], "");
 		track.setTrackName(stringValue[0]);

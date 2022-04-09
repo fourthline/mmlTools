@@ -39,4 +39,12 @@ public final class ResourceLoader extends Control {
 
 		return path;
 	}
+
+	public static String getAppConfigPath(String path) {
+		String s = System.getProperty("user.home");
+		if (s != null) {
+			return Path.of(s, path).toString();
+		}
+		return getAppPath(path);
+	}
 }

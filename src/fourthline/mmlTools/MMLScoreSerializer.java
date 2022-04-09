@@ -44,9 +44,34 @@ public final class MMLScoreSerializer implements IMMLFileParser {
 
 	private final MMLScore score;
 	private MMLTrack lastTrack = null;
+	private final TextParser parser;
+	private final ParseCache cache = new ParseCache();
 
 	public MMLScoreSerializer(MMLScore score) {
 		this.score = score;
+
+		// スタートOffsetはMMLTrack生成時に指定するため事前にみる
+		parser = new TextParser()
+				.pattern(START_OFFSET,    t -> cache.startOffset = Integer.parseInt(t))
+				.pattern(START_DELTA,     t -> cache.startDelta = Integer.parseInt(t))
+				.pattern(START_SONG_DELTA, t -> cache.startSongDelta = Integer.parseInt(t))
+				// for MMLTrack
+				.pattern(MML_TRACK,   t -> { 
+					lastTrack = new MMLTrack(cache.startOffset, cache.startDelta, cache.startSongDelta).setMML(t);
+					score.addTrack(lastTrack);
+					cache.clear();
+				})
+				.pattern(TRACK_NAME,    t -> getLastTrack().setTrackName(t) )
+				.pattern(PROGRAM,       t -> getLastTrack().setProgram(Integer.parseInt(t)) )
+				.pattern(SONG_PROGRAM,  t -> getLastTrack().setSongProgram(Integer.parseInt(t)) )
+				.pattern(PANPOT,        t -> getLastTrack().setPanpot(Integer.parseInt(t)) )
+				.pattern(VISIBLE,       t -> getLastTrack().setVisible(Boolean.parseBoolean(t)) )
+				.pattern(DELAY,         t -> getLastTrack().setAttackDelayCorrect(Integer.parseInt(t)))
+				.pattern(SONG_DELAY,    t -> getLastTrack().setAttackSongDelayCorrect(Integer.parseInt(t)))
+				.pattern(TITLE,         t -> score.setTitle(t) )
+				.pattern(AUTHOR,        t -> score.setAuthor(t) )
+				.pattern(TIME,          t -> score.setBaseTime(t) )
+				.pattern(TEMPO,         t -> putTempoObj(t) );
 	}
 
 	@Override
@@ -81,6 +106,7 @@ public final class MMLScoreSerializer implements IMMLFileParser {
 			}
 		}
 	}
+
 	/**
 	 * MML@ - ; 内の空白文字を削除する.
 	 * @param text
@@ -102,7 +128,7 @@ public final class MMLScoreSerializer implements IMMLFileParser {
 		return sb.toString();
 	}
 
-	private class ParseCache {
+	private final static class ParseCache {
 		private int startOffset = 0;
 		private int startDelta = 0;
 		private int startSongDelta = 0;
@@ -125,30 +151,7 @@ public final class MMLScoreSerializer implements IMMLFileParser {
 	 * @param contents
 	 */
 	private void parseMMLScore(String contents) {
-		var cache = new ParseCache();
-		TextParser.text(fixMMLspace(contents))
-		// スタートOffsetはMMLTrack生成時に指定するため事前にみる
-		.pattern(START_OFFSET,    t -> cache.startOffset = Integer.parseInt(t))
-		.pattern(START_DELTA,     t -> cache.startDelta = Integer.parseInt(t))
-		.pattern(START_SONG_DELTA, t -> cache.startSongDelta = Integer.parseInt(t))
-		// for MMLTrack
-		.pattern(MML_TRACK,   t -> { 
-			lastTrack = new MMLTrack(cache.startOffset, cache.startDelta, cache.startSongDelta).setMML(t);
-			score.addTrack(lastTrack);
-			cache.clear();
-		})
-		.pattern(TRACK_NAME,    t -> getLastTrack().setTrackName(t) )
-		.pattern(PROGRAM,       t -> getLastTrack().setProgram(Integer.parseInt(t)) )
-		.pattern(SONG_PROGRAM,  t -> getLastTrack().setSongProgram(Integer.parseInt(t)) )
-		.pattern(PANPOT,        t -> getLastTrack().setPanpot(Integer.parseInt(t)) )
-		.pattern(VISIBLE,       t -> getLastTrack().setVisible(Boolean.parseBoolean(t)) )
-		.pattern(DELAY,         t -> getLastTrack().setAttackDelayCorrect(Integer.parseInt(t)))
-		.pattern(SONG_DELAY,    t -> getLastTrack().setAttackSongDelayCorrect(Integer.parseInt(t)))
-		.pattern(TITLE,         t -> score.setTitle(t) )
-		.pattern(AUTHOR,        t -> score.setAuthor(t) )
-		.pattern(TIME,          t -> score.setBaseTime(t) )
-		.pattern(TEMPO,         t -> putTempoObj(t) )
-		.parse();
+		parser.parse(fixMMLspace(contents));
 	}
 
 	/**

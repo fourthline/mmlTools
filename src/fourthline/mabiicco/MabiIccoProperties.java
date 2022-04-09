@@ -25,9 +25,10 @@ import fourthline.mmlTools.optimizer.MMLStringOptimizer;
 
 public final class MabiIccoProperties {
 	private final Properties properties = new Properties();
-	private final String configFile = "config.properties";
 
 	private static final MabiIccoProperties instance = new MabiIccoProperties();
+	private final static String CONFIG_FILE = ".mabiicco.config";
+
 
 	/** 最近開いたファイル */
 	private static final String RECENT_FILE = "app.recent_file";
@@ -105,7 +106,7 @@ public final class MabiIccoProperties {
 
 	private MabiIccoProperties() {
 		try {
-			FileInputStream in = new FileInputStream(ResourceLoader.getAppPath(configFile));
+			FileInputStream in = new FileInputStream(ResourceLoader.getAppConfigPath(CONFIG_FILE));
 			properties.load(in);
 			in.close();
 			initFileHistory();
@@ -117,7 +118,7 @@ public final class MabiIccoProperties {
 
 	private void save() {
 		try {
-			FileOutputStream out = new FileOutputStream(ResourceLoader.getAppPath(configFile));
+			FileOutputStream out = new FileOutputStream(ResourceLoader.getAppConfigPath(CONFIG_FILE));
 			properties.store(out, "");
 			out.close();
 		} catch (FileNotFoundException e) {
