@@ -174,8 +174,14 @@ public final class MabiIcco {
 
 	public static void main(String args[]) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
 		try {
+			var properties = MabiIccoProperties.getInstance();
+			if (properties.uiscale10.get()) {
+				System.setProperty("sun.java2d.uiScale", "1.0");
+			}
+
+			// initial flatLAF
 			FlatLightLaf.setup();
-			if (MabiIccoProperties.getInstance().useSystemLaF.get()) {
+			if (properties.useSystemLaF.get()) {
 				UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
 			} else {
 				UIManager.setLookAndFeel( new FlatLightLaf() );
