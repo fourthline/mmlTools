@@ -101,7 +101,7 @@ public final class MabiIccoProperties {
 	public final Property<Boolean> useSystemLaF = new BooleanProperty("ui.use_system_laf", false);
 
 	/** UIスケールを100%に固定する */
-	public final Property<Boolean> uiscale10 = new BooleanProperty("ui.scale10", false);
+	public final Property<Boolean> uiscaleDisable = new BooleanProperty("ui.scale_disable", false);
 
 	public static MabiIccoProperties getInstance() {
 		return instance;

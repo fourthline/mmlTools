@@ -175,8 +175,8 @@ public final class MabiIcco {
 	public static void main(String args[]) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
 		try {
 			var properties = MabiIccoProperties.getInstance();
-			if (properties.uiscale10.get()) {
-				System.setProperty("sun.java2d.uiScale", "1.0");
+			if (properties.uiscaleDisable.get()) {
+				System.setProperty("sun.java2d.uiScale.enabled", "false");
 			}
 
 			// initial flatLAF
