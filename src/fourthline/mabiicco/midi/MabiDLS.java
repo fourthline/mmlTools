@@ -182,6 +182,19 @@ public final class MabiDLS {
 		notifier.add(n);
 	}
 
+	public void loadingDefaultSound() {
+		try {
+			List<InstClass> loadList = InstClass.defaultSoundBank();
+			for (InstClass inst : loadList) {
+				if (!insts.contains(inst)) {
+					insts.add(inst);
+				}
+			}
+		} catch (MidiUnavailableException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public void loadingDLSFile(File file) throws InvalidMidiDataException, IOException {
 		System.out.println("["+file.getName()+"]");
 		if (file.getName().equals("")) {

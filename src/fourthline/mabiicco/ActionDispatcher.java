@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2021 たんらる
+ * Copyright (C) 2014-2022 たんらる
  */
 
 package fourthline.mabiicco;
@@ -103,7 +103,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String ABOUT = "about";
 	@Action public static final String MIDI_EXPORT = "midi_export";
 	@Action public static final String FILE_IMPORT = "file_import";
-	@Action public static final String CLEAR_DLS = "clear_dls";
+	@Action public static final String SELECT_DLS = "select_dls";
 	@Action public static final String SELECT_ALL = "select_all";
 	@Action public static final String SELECT_PREVIOUS_ALL = "select_previous_all";
 	@Action public static final String SELECT_AFTER_ALL = "select_after_all";
@@ -124,6 +124,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String CHANGE_SCALE_COLOR = "change_scale_color";
 	@Action public static final String REMOVE_RESTS_BETWEEN_NOTES = "remote_rests_between_notes";
 	@Action public static final String CHANGE_UI = "change_ui";
+	@Action public static final String USE_DEFAULT_SOUNDBANK = "use_default_soundbank";
 
 	private final HashMap<String, Consumer<Object>> actionMap = new HashMap<>();
 
@@ -224,7 +225,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(ABOUT, t -> new About().show(mainFrame));
 		actionMap.put(MIDI_EXPORT, t -> this.midiExportAction());
 		actionMap.put(FILE_IMPORT, t -> this.fileImportAction());
-		actionMap.put(CLEAR_DLS, t -> this.clearDLSInformation());
+		actionMap.put(SELECT_DLS, t -> this.selectDLSFile());
 		actionMap.put(SELECT_ALL, t -> this.selectAction(() -> editState.selectAll()));
 		actionMap.put(SELECT_PREVIOUS_ALL, t -> this.selectAction(() -> editState.selectPreviousAll()));
 		actionMap.put(SELECT_AFTER_ALL, t -> this.selectAction(() -> editState.selectAfterAll()));
@@ -246,6 +247,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(CHANGE_SCALE_COLOR, t -> this.changeScaleColor(t));
 		actionMap.put(REMOVE_RESTS_BETWEEN_NOTES, t -> editState.removeRestsBetweenNotes());
 		actionMap.put(CHANGE_UI, t -> this.changeUI());
+		actionMap.put(USE_DEFAULT_SOUNDBANK, t -> this.showAppRestartDialog());
 	}
 
 	@Override
@@ -604,23 +606,6 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		}
 	}
 
-	private void clearDLSInformation() {
-		MabiIccoProperties properties = MabiIccoProperties.getInstance();
-		StringBuilder sb = new StringBuilder(AppResource.appText("message.clear_dls"));
-		properties.getDlsFile().stream().forEach(t -> {
-			sb.append("\n * ").append(t.getName());
-		});
-		int status = JOptionPane.showConfirmDialog(mainFrame, 
-				sb.toString(), 
-				AppResource.appText("menu.clear_dls"), 
-				JOptionPane.OK_CANCEL_OPTION, 
-				JOptionPane.WARNING_MESSAGE);
-		if (status == JOptionPane.OK_OPTION) {
-			properties.setDlsFile(null);
-			System.out.println("clearDLSInformation");
-		}
-	}
-
 	/**
 	 * 選択アクション
 	 * @param action
@@ -792,5 +777,26 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			}
 			SwingUtilities.updateComponentTreeUI(mainFrame);
 		} catch (Exception e) {}
+	}
+
+	private void showAppRestartDialog() {
+		JOptionPane.showMessageDialog(mainFrame, AppResource.appText("message.appRestart"), AppResource.getAppTitle(), JOptionPane.INFORMATION_MESSAGE);
+	}
+
+	private void selectDLSFile() {
+		var appProperties = MabiIccoProperties.getInstance();
+		JFileChooser fileChooser = MabiIcco.createFileChooser();
+		fileChooser.setCurrentDirectory(new File("."));
+		FileFilter dlsFilter = new FileNameExtensionFilter(AppResource.appText("file.dls"), "dls");
+		fileChooser.addChoosableFileFilter(dlsFilter);
+		fileChooser.setFileFilter(dlsFilter);
+		fileChooser.setMultiSelectionEnabled(true);
+		fileChooser.setAcceptAllFileFilterUsed(false);
+		int status = fileChooser.showOpenDialog(null);
+		if (status == JFileChooser.APPROVE_OPTION) {
+			appProperties.setDlsFile( fileChooser.getSelectedFiles() );
+			appProperties.useDefaultSoundBank.set(false);
+			showAppRestartDialog();
+		}
 	}
 }

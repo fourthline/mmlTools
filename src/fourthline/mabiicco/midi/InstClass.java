@@ -16,6 +16,7 @@ import java.util.ResourceBundle;
 import javax.sound.midi.Instrument;
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiSystem;
+import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Soundbank;
 
 import com.sun.media.sound.DLSInstrument;
@@ -359,22 +360,31 @@ public final class InstClass {
 		}
 	}
 
+	public static List<InstClass> defaultSoundBank() throws MidiUnavailableException {
+		Soundbank sb = MidiSystem.getSynthesizer().getDefaultSoundbank();
+		return loadSoundBank(sb, false);
+	}
+
 	public static List<InstClass> loadDLS(File dlsFile) throws InvalidMidiDataException, IOException {
 		Soundbank sb = null;
 		try {
 			sb = MidiSystem.getSoundbank(dlsFile);
+			return loadSoundBank(sb, true);
 		} catch (Exception e) {
 			MabiIccoProperties.getInstance().setDlsFile(null);
 			throw new IOException("loadDLS: "+dlsFile.getName());
 		}
+	}
 
+	private static List<InstClass> loadSoundBank(Soundbank sb, boolean nameConvert) {
 		ArrayList<InstClass> instArray = new ArrayList<>();
 		for (Instrument inst : sb.getInstruments()) {
-			String name = instName(inst);
 			String originalName = inst.getName();
+			String name = nameConvert ? instName(inst) : originalName;
 			int bank = inst.getPatch().getBank();
 			int program = inst.getPatch().getProgram();
 			System.out.printf("%d,%d=%s \"%s\"\n", bank, program, originalName, name);
+			if (bank != 0) continue;
 			if ( (name != null) || (debug == true) ) {
 				name = ""+program+": "+name;
 				InstClass instc = new InstClass( name,
@@ -385,7 +395,6 @@ public final class InstClass {
 				instc.dlsInfoWriteToOutputStream(System.out);
 			}
 		}
-
 		return instArray;
 	}
 }
