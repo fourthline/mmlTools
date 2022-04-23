@@ -103,6 +103,9 @@ public final class MabiIccoProperties {
 	/** UIスケールを100%に固定する */
 	public final Property<Boolean> uiscaleDisable = new BooleanProperty("ui.scale_disable", false);
 
+	/** 内蔵音源を使用する */
+	public final Property<Boolean> useDefaultSoundBank = new BooleanProperty("function.use_default_soundbank", false);
+
 	public static MabiIccoProperties getInstance() {
 		return instance;
 	}

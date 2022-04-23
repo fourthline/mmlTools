@@ -18,8 +18,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.formdev.flatlaf.FlatLightLaf;
 
@@ -70,13 +68,18 @@ public final class MabiIcco {
 			return type.allowTempoChordPart();
 		});
 
-		// loading DLS
-		splash.updateProgress(AppResource.appText("init.dls"), 20);
-		if ( !loadDLSFiles(20, 70) ) {
-			JOptionPane.showMessageDialog(null, AppResource.appText("error.needDls"), "ERROR", JOptionPane.ERROR_MESSAGE);
-			System.exit(0);
+		if (MabiIccoProperties.getInstance().useDefaultSoundBank.get()) {
+			MabiDLS.getInstance().loadingDefaultSound();
+		} else {
+			// loading DLS
+			splash.updateProgress(AppResource.appText("init.dls"), 20);
+			if ( !tryloadDLSFiles(20, 70) ) {
+				JOptionPane.showMessageDialog(null, AppResource.appText("message.useDefaultSoundbank"), AppResource.getAppTitle(), JOptionPane.INFORMATION_MESSAGE);
+				MabiIccoProperties.getInstance().useDefaultSoundBank.set(true);
+				MabiDLS.getInstance().loadingDefaultSound();
+			}
+			splash.updateProgress("OK\n", 90);
 		}
-		splash.updateProgress("OK\n", 90);
 
 		// create MainFrame
 		ActionDispatcher dispatcher = ActionDispatcher.getInstance();
@@ -98,35 +101,6 @@ public final class MabiIcco {
 			f = new File(LauncherSupport.getLastCommandLineString());
 		}
 		dispatcher.checkAndOpenMMLFile(f);
-	}
-
-	/**
-	 * DLSのロードを行います. 初回に失敗した場合は、DLSファイル選択ダイアログを表示します.
-	 * @return 1つ以上のInstrumentをロードできれば true.
-	 * @throws InvalidMidiDataException
-	 * @throws IOException
-	 */
-	private boolean loadDLSFiles(double initialProgress, double endProgress) throws InvalidMidiDataException, IOException {
-		MabiIccoProperties appProperties = MabiIccoProperties.getInstance();
-		if (tryloadDLSFiles(initialProgress, endProgress)) {
-			return true;
-		}
-		JOptionPane.showMessageDialog(null, AppResource.appText("msg.dls_title.detail"), AppResource.appText("msg.dls_title"), JOptionPane.INFORMATION_MESSAGE);
-		JFileChooser fileChooser = createFileChooser();
-		fileChooser.setCurrentDirectory(new File("."));
-		FileFilter dlsFilter = new FileNameExtensionFilter(AppResource.appText("file.dls"), "dls");
-		fileChooser.addChoosableFileFilter(dlsFilter);
-		fileChooser.setFileFilter(dlsFilter);
-		fileChooser.setMultiSelectionEnabled(true);
-		fileChooser.setAcceptAllFileFilterUsed(false);
-		int status = fileChooser.showOpenDialog(null);
-		if (status == JFileChooser.APPROVE_OPTION) {
-			appProperties.setDlsFile( fileChooser.getSelectedFiles() );
-		} else {
-			return false;
-		}
-
-		return tryloadDLSFiles(initialProgress, endProgress);
 	}
 
 	/**

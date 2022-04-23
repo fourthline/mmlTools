@@ -354,7 +354,8 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createMenuItem(settingMenu, "mml.emptyCorrection", ActionDispatcher.INPUT_EMPTY_CORRECTION, true);
 		settingMenu.add(new JSeparator());
 		// DLSに関わる設定
-		createMenuItem(settingMenu, "menu.clear_dls", ActionDispatcher.CLEAR_DLS, true);
+		createCheckMenu(settingMenu, "menu.useDefaultSoundbank", properties.useDefaultSoundBank, ActionDispatcher.USE_DEFAULT_SOUNDBANK);
+		createMenuItem(settingMenu, "menu.select_dls", ActionDispatcher.SELECT_DLS, true);
 
 		/************************* Help Menu *************************/
 		JMenu helpMenu = new JMenu(appText("menu.help"));
