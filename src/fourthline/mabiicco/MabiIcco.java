@@ -89,7 +89,7 @@ public final class MabiIcco {
 		dispatcher.setMainFrame(mainFrame).initialize();
 		if (dispatcher.recoveryCheck()) {
 		} else if (args.length > 0) {
-			startOpen(dispatcher, args[args.length-1]);
+			startOpen(dispatcher, args[0]);
 		}
 		mainFrame.setVisible(true);
 		splash.dispose();
@@ -98,7 +98,11 @@ public final class MabiIcco {
 	private void startOpen(ActionDispatcher dispatcher, String s) {
 		File f = new File(s);
 		if (!f.exists()) {
-			f = new File(LauncherSupport.getLastCommandLineString());
+			String arg[] = LauncherSupport.getCommandLineArgs(args.length);
+			if ( (arg == null) || (arg.length == 0) ) {
+				return;
+			}
+			f = new File(arg[0]);
 		}
 		dispatcher.checkAndOpenMMLFile(f);
 	}
