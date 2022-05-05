@@ -30,7 +30,6 @@ import jp.fourthline.mmlTools.optimizer.MMLStringOptimizer;
  */
 public final class MidiFile implements IMMLFileParser {
 	private final MMLScore score = new MMLScore();
-
 	private int resolution;
 
 	@Override
@@ -60,21 +59,31 @@ public final class MidiFile implements IMMLFileParser {
 		}
 	}
 
-	private HashMap<Integer, MMLNoteEvent> activeNoteMap = new HashMap<>();
-	private ArrayList<MMLNoteEvent> curNoteList = new ArrayList<>();
-	private ArrayList<MMLTempoEvent> tempoList = new ArrayList<>();
+	private final HashMap<Integer, MMLNoteEvent> activeNoteMap = new HashMap<>();
+	private final ArrayList<MMLNoteEvent> curNoteList = new ArrayList<>();
+	private final ArrayList<MMLTempoEvent> tempoList = new ArrayList<>();
 
-	class TrackInfo {
-		String name;
-		int panpot = 64;
-		TrackInfo(int count) {
+	private static final class TrackInfo {
+		private String name;
+		private int panpot = 64;
+		private int program = 0;
+		private TrackInfo(int count) {
 			name = "Track"+count;
 		}
-		MMLTrack createMMLTrack() {
+		private MMLTrack createMMLTrack() {
 			MMLTrack track = new MMLTrack();
 			track.setTrackName(name);
 			track.setPanpot(panpot);
+			track.setProgram(program);
 			return track;
+		}
+		private void setName(String name) {
+			if ( (name != null) && (name.length() > 0) ) {
+				this.name = name;
+			}
+		}
+		private void setProgram(int data) {
+			this.program = data;
 		}
 	}
 
@@ -193,6 +202,7 @@ public final class MidiFile implements IMMLFileParser {
 		case 3: // シーケンス名/トラック名
 			String name = new String(data);
 			System.out.println("Name: "+name);
+			trackInfo.setName(name);
 			break;
 		case 1: // テキストイベント
 		case 2: // 著作権表示
@@ -256,6 +266,7 @@ public final class MidiFile implements IMMLFileParser {
 			break;
 		case ShortMessage.PROGRAM_CHANGE:
 			System.out.printf("program change: [%d] [%d]\n", data1, data2);
+			trackInfo.setProgram(data1);
 			break;
 		default:
 			System.out.printf("short: [%x] [%d] [%d] [%d]\n", command, channel, data1, data2);
