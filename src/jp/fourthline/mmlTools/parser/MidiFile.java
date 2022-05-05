@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 たんらる
+ * Copyright (C) 2017-2022 たんらる
  */
 
 package jp.fourthline.mmlTools.parser;
@@ -11,6 +11,9 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 import javax.sound.midi.*;
 
@@ -21,6 +24,7 @@ import jp.fourthline.mmlTools.MMLTempoEvent;
 import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.core.MMLTickTable;
 import jp.fourthline.mmlTools.core.MMLTicks;
+import jp.fourthline.mmlTools.core.ResourceLoader;
 import jp.fourthline.mmlTools.core.UndefinedTickException;
 import jp.fourthline.mmlTools.optimizer.MMLStringOptimizer;
 
@@ -31,6 +35,29 @@ import jp.fourthline.mmlTools.optimizer.MMLStringOptimizer;
 public final class MidiFile implements IMMLFileParser {
 	private final MMLScore score = new MMLScore();
 	private int resolution;
+
+	private static final String PATCH_NAME = "mid_instPatch";
+
+	/* MID->programへの変換 */
+	private static boolean enableConvertInst = false;
+	private final Map<Integer, Integer> midInstTable = new HashMap<>();
+
+	public static void enableInstPatch () {
+		enableConvertInst = true;
+	}
+
+	public MidiFile() {
+		try {
+			ResourceBundle instPatch = ResourceBundle.getBundle(PATCH_NAME, new ResourceLoader());
+			for (String key : instPatch.keySet()) {
+				String newInst = instPatch.getString(key).replaceAll("#.*", "");
+				int keyInt = Integer.parseInt(key.trim());
+				int newInstInt = Integer.parseInt(newInst.trim());
+				System.out.println("[MID-PATCH] " + keyInt + " -> " + newInstInt);
+				midInstTable.put(keyInt, newInstInt);
+			}
+		} catch (MissingResourceException e) {}
+	}
 
 	@Override
 	public MMLScore parse(InputStream istream) throws MMLParseException {
@@ -266,6 +293,10 @@ public final class MidiFile implements IMMLFileParser {
 			break;
 		case ShortMessage.PROGRAM_CHANGE:
 			System.out.printf("program change: [%d] [%d]\n", data1, data2);
+			if (enableConvertInst && midInstTable.containsKey(data1)) {
+				data1 = midInstTable.get(data1);
+				System.out.println("   -> " + data1);
+			}
 			trackInfo.setProgram(data1);
 			break;
 		default:

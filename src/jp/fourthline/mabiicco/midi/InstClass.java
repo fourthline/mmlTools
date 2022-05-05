@@ -380,7 +380,7 @@ public final class InstClass {
 		ArrayList<InstClass> instArray = new ArrayList<>();
 		for (Instrument inst : sb.getInstruments()) {
 			String originalName = inst.getName();
-			String name = nameConvert ? instName(inst) : originalName;
+			String name = nameConvert ? instName(inst) : originalName.trim();
 			int bank = inst.getPatch().getBank();
 			int program = inst.getPatch().getProgram();
 			System.out.printf("%d,%d=%s \"%s\"\n", bank, program, originalName, name);

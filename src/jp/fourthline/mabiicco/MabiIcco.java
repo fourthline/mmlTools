@@ -26,6 +26,7 @@ import jp.fourthline.mabiicco.midi.InstType;
 import jp.fourthline.mabiicco.midi.MabiDLS;
 import jp.fourthline.mabiicco.ui.MainFrame;
 import jp.fourthline.mmlTools.MMLTrack;
+import jp.fourthline.mmlTools.parser.MidiFile;
 
 
 /**
@@ -47,10 +48,15 @@ public final class MabiIcco {
 	private final String args[];
 	private final ISplash splash;
 
+	private final MabiIccoProperties appProperties;
+	private final MabiDLS dls;
+
 	public MabiIcco(String args[]) {
 		splash = (System.getProperty("mabiicco.splash") == null) ? new Splash() : new Splash2(); 
 		this.args = args;
 		splash.setVisible(true);
+		appProperties = MabiIccoProperties.getInstance();
+		dls = MabiDLS.getInstance();
 	}
 
 	public void start() throws Exception {
@@ -60,25 +66,33 @@ public final class MabiIcco {
 
 	private void initialize() throws Exception {
 		// initialize
-		MabiDLS.getInstance().initializeMIDI();
+		dls.initializeMIDI();
 		splash.updateProgress("OK\n", 20);
 
 		MMLTrack.setTempoAllowChardPartFunction(t -> {
-			InstType type = MabiDLS.getInstance().getInstByProgram(t).getType();
-			return type.allowTempoChordPart();
+			var inst = dls.getInstByProgram(t);
+			if (inst != null) {
+				return inst.getType().allowTempoChordPart();
+			}
+			return true;
 		});
 
-		if (MabiIccoProperties.getInstance().useDefaultSoundBank.get()) {
-			MabiDLS.getInstance().loadingDefaultSound();
+		if (appProperties.useDefaultSoundBank.get()) {
+			dls.loadingDefaultSound();
 		} else {
 			// loading DLS
 			splash.updateProgress(AppResource.appText("init.dls"), 20);
 			if ( !tryloadDLSFiles(20, 70) ) {
 				JOptionPane.showMessageDialog(null, AppResource.appText("message.useDefaultSoundbank"), AppResource.getAppTitle(), JOptionPane.INFORMATION_MESSAGE);
-				MabiIccoProperties.getInstance().useDefaultSoundBank.set(true);
-				MabiDLS.getInstance().loadingDefaultSound();
+				appProperties.useDefaultSoundBank.set(true);
+				dls.loadingDefaultSound();
 			}
 			splash.updateProgress("OK\n", 90);
+		}
+
+		if (appProperties.useDefaultSoundBank.get() == false) {
+			// 内蔵音源を使わないときはMIDファイル読み込み時のProgram変換を有効にする
+			MidiFile.enableInstPatch();
 		}
 
 		// create MainFrame
@@ -114,8 +128,6 @@ public final class MabiIcco {
 	 * @throws IOException
 	 */
 	private boolean tryloadDLSFiles(double initialProgress, double endProgress) throws InvalidMidiDataException, IOException {
-		MabiDLS dls = MabiDLS.getInstance();
-		MabiIccoProperties appProperties = MabiIccoProperties.getInstance();
 		List<File> dlsFiles = appProperties.getDlsFile();
 		double progressStep = (endProgress - initialProgress) / dlsFiles.size();
 		double progress = initialProgress;
