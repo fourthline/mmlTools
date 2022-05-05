@@ -8,9 +8,6 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import jp.fourthline.mmlTools.core.MMLTicks;
-import jp.fourthline.mmlTools.core.TuningBase;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
 
 /**
  * 

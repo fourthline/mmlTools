@@ -14,8 +14,6 @@ import org.junit.Test;
 import jp.fourthline.FileSelect;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLScoreTest;
-import jp.fourthline.mmlTools.parser.MMLParseException;
-import jp.fourthline.mmlTools.parser.MMSFile;
 
 public class MMSFileTest extends FileSelect {
 

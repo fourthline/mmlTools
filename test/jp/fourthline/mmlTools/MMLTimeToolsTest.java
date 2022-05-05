@@ -9,9 +9,6 @@ import static org.junit.Assert.*;
 
 import org.junit.*;
 
-import jp.fourthline.mmlTools.MMLTimeTools;
-
-
 
 public class MMLTimeToolsTest {
 

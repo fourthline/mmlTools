@@ -18,8 +18,6 @@ import javax.sound.midi.ShortMessage;
 import org.junit.Test;
 
 import jp.fourthline.UseLoadingDLS;
-import jp.fourthline.mabiicco.midi.InstClass;
-import jp.fourthline.mabiicco.midi.MabiDLS;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.core.MMLTicks;

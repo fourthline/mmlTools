@@ -13,10 +13,6 @@ import java.util.Objects;
 
 import org.junit.Test;
 
-import jp.fourthline.mmlTools.MMLBuilder;
-import jp.fourthline.mmlTools.MMLEventList;
-import jp.fourthline.mmlTools.MMLNoteEvent;
-import jp.fourthline.mmlTools.MMLTempoEvent;
 import jp.fourthline.mmlTools.core.MMLTicks;
 import jp.fourthline.mmlTools.core.UndefinedTickException;
 

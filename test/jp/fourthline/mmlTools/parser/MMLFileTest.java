@@ -15,7 +15,6 @@ import jp.fourthline.FileSelect;
 import jp.fourthline.UseLoadingDLS;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLScoreTest;
-import jp.fourthline.mmlTools.parser.MMLFile;
 
 public class MMLFileTest extends FileSelect {
 

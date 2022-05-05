@@ -7,8 +7,6 @@ package jp.fourthline.mmlTools.core;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
-import jp.fourthline.mmlTools.core.MMLTokenizer;
-
 import java.util.ArrayList;
 
 public class MMLTokenizerTest {

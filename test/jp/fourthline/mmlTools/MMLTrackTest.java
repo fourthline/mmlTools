@@ -13,8 +13,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import jp.fourthline.mmlTools.MMLTempoEvent;
-import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.core.MMLTools;
 import jp.fourthline.mmlTools.core.UndefinedTickException;
 

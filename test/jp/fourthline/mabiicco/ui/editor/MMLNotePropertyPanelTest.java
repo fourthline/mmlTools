@@ -14,7 +14,6 @@ import javax.swing.JComponent;
 
 import org.junit.Test;
 
-import jp.fourthline.mabiicco.ui.editor.MMLNotePropertyPanel;
 import jp.fourthline.mmlTools.MMLEventList;
 import jp.fourthline.mmlTools.MMLNoteEvent;
 

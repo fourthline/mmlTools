@@ -13,7 +13,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import jp.fourthline.mmlTools.ComposeRank;
-import jp.fourthline.mmlTools.core.MMLText;
 
 public final class MMLTextTest {
 

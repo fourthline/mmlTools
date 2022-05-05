@@ -13,7 +13,6 @@ import java.io.IOException;
 import org.junit.Test;
 
 import jp.fourthline.FileSelect;
-import jp.fourthline.mmlTools.core.MMLTickTable;
 
 public final class MMLTickTableTest extends FileSelect {
 

@@ -13,7 +13,6 @@ import java.lang.reflect.Field;
 import org.junit.Test;
 
 import jp.fourthline.UseLoadingDLS;
-import jp.fourthline.mabiicco.ui.MainFrame;
 
 
 public final class MainFrameTest extends UseLoadingDLS {

@@ -12,7 +12,6 @@ import org.junit.Test;
 import jp.fourthline.FileSelect;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLScoreTest;
-import jp.fourthline.mmlTools.parser.MidiFile;
 
 public class MidiFileTest extends FileSelect {
 

@@ -17,7 +17,6 @@ import jp.fourthline.mmlTools.MMLBuilder;
 import jp.fourthline.mmlTools.MMLEventList;
 import jp.fourthline.mmlTools.core.MMLTicks;
 import jp.fourthline.mmlTools.core.UndefinedTickException;
-import jp.fourthline.mmlTools.optimizer.MMLStringOptimizer;
 
 /**
  * MML最適化のテスト.

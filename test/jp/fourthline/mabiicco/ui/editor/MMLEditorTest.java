@@ -26,8 +26,6 @@ import jp.fourthline.mabiicco.ui.IMMLManager;
 import jp.fourthline.mabiicco.ui.MMLSeqView;
 import jp.fourthline.mabiicco.ui.MMLTrackView;
 import jp.fourthline.mabiicco.ui.PianoRollView;
-import jp.fourthline.mabiicco.ui.editor.EditMode;
-import jp.fourthline.mabiicco.ui.editor.MMLEditor;
 import jp.fourthline.mmlTools.MMLBuilder;
 import jp.fourthline.mmlTools.MMLEventList;
 import jp.fourthline.mmlTools.MMLNoteEvent;

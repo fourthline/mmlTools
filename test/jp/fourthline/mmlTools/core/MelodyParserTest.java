@@ -5,12 +5,10 @@
 package jp.fourthline.mmlTools.core;
 
 import static org.junit.Assert.*;
+
+import java.util.List;
+
 import org.junit.Test;
-
-import jp.fourthline.mmlTools.core.MelodyParser;
-
-import java.util.*;
-
 
 
 public class MelodyParserTest {

@@ -8,7 +8,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import jp.fourthline.mmlTools.XylophoneMML;
 import jp.fourthline.mmlTools.core.MMLTools;
 import jp.fourthline.mmlTools.core.UndefinedTickException;
 

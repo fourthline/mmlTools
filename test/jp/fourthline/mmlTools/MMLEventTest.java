@@ -8,9 +8,6 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import jp.fourthline.mmlTools.MMLBuilder;
-import jp.fourthline.mmlTools.MMLEvent;
-import jp.fourthline.mmlTools.MMLEventList;
 import jp.fourthline.mmlTools.core.MMLTicks;
 import jp.fourthline.mmlTools.core.UndefinedTickException;
 

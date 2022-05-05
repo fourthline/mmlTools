@@ -13,9 +13,6 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
-import jp.fourthline.mabiicco.ActionDispatcher;
-
-
 public final class ActionDispatcherTest {
 
 	private ActionDispatcher obj;

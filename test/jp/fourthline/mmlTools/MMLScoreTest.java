@@ -27,12 +27,6 @@ import org.junit.Test;
 
 import jp.fourthline.FileSelect;
 import jp.fourthline.UseLoadingDLS;
-import jp.fourthline.mmlTools.MMLNoteEvent;
-import jp.fourthline.mmlTools.MMLScore;
-import jp.fourthline.mmlTools.MMLScoreSerializer;
-import jp.fourthline.mmlTools.MMLTempoEvent;
-import jp.fourthline.mmlTools.MMLTrack;
-import jp.fourthline.mmlTools.Marker;
 import jp.fourthline.mmlTools.core.MMLText;
 import jp.fourthline.mmlTools.core.NanoTime;
 import jp.fourthline.mmlTools.core.UndefinedTickException;

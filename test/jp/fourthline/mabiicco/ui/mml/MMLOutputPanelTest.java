@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import org.junit.Test;
 
 import jp.fourthline.UseLoadingDLS;
-import jp.fourthline.mabiicco.ui.mml.MMLOutputPanel;
 import jp.fourthline.mmlTools.MMLTrack;
 
 public class MMLOutputPanelTest extends UseLoadingDLS {

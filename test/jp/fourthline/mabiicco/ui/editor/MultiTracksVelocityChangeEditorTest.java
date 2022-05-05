@@ -18,7 +18,6 @@ import org.junit.Test;
 import jp.fourthline.UseLoadingDLS;
 import jp.fourthline.mabiicco.ui.IMMLManager;
 import jp.fourthline.mabiicco.ui.MMLSeqView;
-import jp.fourthline.mabiicco.ui.editor.MultiTracksVelocityChangeEditor;
 import jp.fourthline.mabiicco.ui.mml.TrackListTable;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTrack;

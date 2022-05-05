@@ -28,8 +28,6 @@ import jp.fourthline.mabiicco.midi.IPlayNote;
 import jp.fourthline.mabiicco.ui.AbstractMMLManager;
 import jp.fourthline.mabiicco.ui.IMMLManager;
 import jp.fourthline.mabiicco.ui.PianoRollView;
-import jp.fourthline.mabiicco.ui.editor.IEditAlign;
-import jp.fourthline.mabiicco.ui.editor.KeyboardEditor;
 import jp.fourthline.mmlTools.MMLEventList;
 import jp.fourthline.mmlTools.MMLNoteEvent;
 import jp.fourthline.mmlTools.MMLScore;

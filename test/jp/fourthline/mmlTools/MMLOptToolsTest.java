@@ -9,7 +9,6 @@ import static org.junit.Assert.*;
 
 import org.junit.*;
 
-import jp.fourthline.mmlTools.MMLOptTools;
 import jp.fourthline.mmlTools.core.MelodyParser;
 import jp.fourthline.mmlTools.core.UndefinedTickException;
 

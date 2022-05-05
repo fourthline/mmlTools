@@ -10,9 +10,6 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
-import jp.fourthline.mmlTools.MMLEventList;
-import jp.fourthline.mmlTools.MMLTempoEvent;
-
 /**
  * @author fourthline
  *

@@ -10,7 +10,6 @@ import org.junit.Test;
 
 import jp.fourthline.mabiicco.ui.AbstractMMLManager;
 import jp.fourthline.mabiicco.ui.IMMLManager;
-import jp.fourthline.mabiicco.ui.mml.TrackPropertyPanel;
 import jp.fourthline.mmlTools.MMLEventList;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTempoEvent;
