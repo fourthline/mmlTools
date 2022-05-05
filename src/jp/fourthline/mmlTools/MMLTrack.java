@@ -20,6 +20,8 @@ import jp.fourthline.mmlTools.optimizer.MMLStringOptimizer;
 public final class MMLTrack implements Serializable, Cloneable {
 	private static final long serialVersionUID = 2006880378975808647L;
 
+	private static final int MAX_TRACK_NAME_LEN = 32;
+
 	/** 和音にテンポ出力を許可するかどうかのオプション */
 	private static boolean optTempoAllowChordPart = false;
 	public static void setTempoAllowChordPart(boolean opt) {
@@ -205,7 +207,11 @@ public final class MMLTrack implements Serializable, Cloneable {
 	}
 
 	public void setTrackName(String name) {
-		this.trackName = name;
+		if (name.length() > MAX_TRACK_NAME_LEN) {
+			this.trackName = name.substring(0, MAX_TRACK_NAME_LEN);
+		} else {
+			this.trackName = name;
+		}
 	}
 
 	public String getTrackName() {
