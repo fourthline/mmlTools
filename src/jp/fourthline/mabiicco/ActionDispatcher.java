@@ -45,6 +45,7 @@ import jp.fourthline.mabiicco.ui.editor.MultiTracksVelocityChangeEditor;
 import jp.fourthline.mabiicco.ui.editor.MultiTracksViewEditor;
 import jp.fourthline.mabiicco.ui.mml.MMLImportPanel;
 import jp.fourthline.mabiicco.ui.mml.MMLScorePropertyPanel;
+import jp.fourthline.mabiicco.ui.mml.ParsePropertiesDialog;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLScoreSerializer;
 import jp.fourthline.mmlTools.MMLTrack;
@@ -277,6 +278,9 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		MMLScore score = null;
 		try {
 			IMMLFileParser fileParser = IMMLFileParser.getParser(file);
+			if (new ParsePropertiesDialog(mainFrame, fileParser).showDialog() == false) {
+				return null;
+			}
 			FileInputStream in = new FileInputStream(file);
 			score = fileParser.parse(in);
 			in.close();

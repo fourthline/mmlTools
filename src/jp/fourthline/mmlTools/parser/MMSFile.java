@@ -18,7 +18,7 @@ import jp.fourthline.mmlTools.core.ResourceLoader;
 /**
  * まきまびしーくさんのファイルフォーマットを扱います.
  */
-public final class MMSFile implements IMMLFileParser {
+public final class MMSFile extends AbstractMMLParser {
 	private static final String PATCH_NAME = "mms_instPatch";
 
 	/* MMS->programへの変換テーブル */

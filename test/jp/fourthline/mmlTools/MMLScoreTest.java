@@ -143,7 +143,6 @@ public class MMLScoreTest extends FileSelect {
 
 			assertArrayEquals(score1.getObjectState(), score2.getObjectState());
 		} catch (MMLParseException | IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

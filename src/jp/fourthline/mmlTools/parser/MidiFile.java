@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -22,6 +23,7 @@ import jp.fourthline.mmlTools.MMLNoteEvent;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTempoEvent;
 import jp.fourthline.mmlTools.MMLTrack;
+import jp.fourthline.mmlTools.Marker;
 import jp.fourthline.mmlTools.core.MMLTickTable;
 import jp.fourthline.mmlTools.core.MMLTicks;
 import jp.fourthline.mmlTools.core.ResourceLoader;
@@ -32,21 +34,37 @@ import jp.fourthline.mmlTools.optimizer.MMLStringOptimizer;
 /**
  * "*.mid" MIDIファイルの読み込み.
  */
-public final class MidiFile implements IMMLFileParser {
+public final class MidiFile extends AbstractMMLParser {
 	private final MMLScore score = new MMLScore();
 	private int resolution;
 
 	private static final String PATCH_NAME = "mid_instPatch";
 
+	// Parse Option
+	private static final String PARSE_TRACK_NAME = "parse.midi.trackName";
+	private static final String PARSE_BEAT = "parse.midi.beat";
+	private static final String PARSE_TEMPO = "parse.midi.tempo";
+	private static final String PARSE_MARKER = "parse.midi.marker";
+	private static final String PARSE_CONVERT_INST = "parse.midi.convertInst";
+
 	/* MID->programへの変換 */
-	private static boolean enableConvertInst = false;
+	private static boolean canConvertInst = false;
 	private final Map<Integer, Integer> midInstTable = new HashMap<>();
 
 	public static void enableInstPatch () {
-		enableConvertInst = true;
+		canConvertInst = true;
 	}
 
 	public MidiFile() {
+		parseProperties = new LinkedHashMap<>();
+		parseProperties.put(PARSE_TRACK_NAME, true);
+		parseProperties.put(PARSE_BEAT, true);
+		parseProperties.put(PARSE_TEMPO, true);
+		parseProperties.put(PARSE_MARKER, true);
+		if (canConvertInst) {
+			parseProperties.put(PARSE_CONVERT_INST, false);
+		}
+
 		try {
 			ResourceBundle instPatch = ResourceBundle.getBundle(PATCH_NAME, new ResourceLoader());
 			for (String key : instPatch.keySet()) {
@@ -57,6 +75,11 @@ public final class MidiFile implements IMMLFileParser {
 				midInstTable.put(keyInt, newInstInt);
 			}
 		} catch (MissingResourceException e) {}
+	}
+
+	@Override
+	public String getName() {
+		return "MIDI";
 	}
 
 	@Override
@@ -224,23 +247,44 @@ public final class MidiFile implements IMMLFileParser {
 			buf.put(data);
 			int tempo = 60000000/buf.getInt(0);
 			System.out.println("Tempo: "+tempo);
-			new MMLTempoEvent(tempo, (int)tick).appendToListElement(tempoList);
+			if (parseProperties.getOrDefault(PARSE_TEMPO, false)) {
+				new MMLTempoEvent(tempo, (int)tick).appendToListElement(tempoList);
+			}
 			break;
 		case 3: // シーケンス名/トラック名
 			String name = new String(data);
 			System.out.println("Name: "+name);
-			trackInfo.setName(name);
+			if (parseProperties.getOrDefault(PARSE_TRACK_NAME, false)) {
+				trackInfo.setName(name);
+			}
 			break;
 		case 1: // テキストイベント
+			System.out.println("Text: "+new String(data));
+			break;
 		case 2: // 著作権表示
+			System.out.println("(C): "+new String(data));
+			break;
+		case 6: // マーカー
+			String s = new String(data);
+			System.out.println("Marker: "+s);
+			if (parseProperties.getOrDefault(PARSE_MARKER, false)) {
+				score.getMarkerList().add(new Marker(s, (int) tick));
+			}
+			break;
 		case 4: // 楽器名
 		case 5: // 歌詞
-		case 6: // マーカー
 		case 7: // キューポイント
-			System.out.println("Text: "+new String(data));
+			System.out.println("Text(" + type + "): "+new String(data));
 			break;
 		case 0x58: // 拍子/メトロノーム設定
 			System.out.printf("met: %d %d %d %d\n", data[0], 1<<data[1], data[2], data[3]);
+			if (parseProperties.getOrDefault(PARSE_BEAT, false)) {
+				score.setBaseOnly(1<<data[1]);
+				score.setTimeCountOnly(data[0]);
+			}
+			break;
+		case 0x59: // 調号
+			System.out.printf("sig: %d %d\n", data[0], data[1]);
 			break;
 		default:
 			System.out.printf("Meta: [%x] [%d]\n", type, data.length);
@@ -293,11 +337,13 @@ public final class MidiFile implements IMMLFileParser {
 			break;
 		case ShortMessage.PROGRAM_CHANGE:
 			System.out.printf("program change: [%d] [%d]\n", data1, data2);
-			if (enableConvertInst && midInstTable.containsKey(data1)) {
+			if (!canConvertInst) {
+				trackInfo.setProgram(data1);
+			} else if (parseProperties.getOrDefault(PARSE_CONVERT_INST, false) && midInstTable.containsKey(data1)) {
 				data1 = midInstTable.get(data1);
+				trackInfo.setProgram(data1);
 				System.out.println("   -> " + data1);
 			}
-			trackInfo.setProgram(data1);
 			break;
 		default:
 			System.out.printf("short: [%x] [%d] [%d] [%d]\n", command, channel, data1, data2);

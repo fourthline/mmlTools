@@ -10,12 +10,12 @@ import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
-import jp.fourthline.mmlTools.parser.IMMLFileParser;
+import jp.fourthline.mmlTools.parser.AbstractMMLParser;
 import jp.fourthline.mmlTools.parser.MMLParseException;
 import jp.fourthline.mmlTools.parser.SectionContents;
 import jp.fourthline.mmlTools.parser.TextParser;
 
-public final class MMLScoreSerializer implements IMMLFileParser {
+public final class MMLScoreSerializer extends AbstractMMLParser {
 
 	// score section
 	private static final String SCORE_SECTION = "[mml-score]";

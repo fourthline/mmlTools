@@ -44,7 +44,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 	private boolean generated = false;
 
 	private int program = 0;
-	private String trackName;
+	private String trackName = "";
 	private int panpot = 64;
 	private boolean visible = true;
 
@@ -207,7 +207,9 @@ public final class MMLTrack implements Serializable, Cloneable {
 	}
 
 	public void setTrackName(String name) {
-		if (name.length() > MAX_TRACK_NAME_LEN) {
+		if (name == null) {
+			this.trackName = "";
+		} else if (name.length() > MAX_TRACK_NAME_LEN) {
 			this.trackName = name.substring(0, MAX_TRACK_NAME_LEN);
 		} else {
 			this.trackName = name;

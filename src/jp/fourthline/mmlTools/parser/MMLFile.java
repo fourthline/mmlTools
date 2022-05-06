@@ -31,7 +31,7 @@ import jp.fourthline.mmlTools.Marker;
 /**
  * "*.mml" (3mleさん) のファイルを扱います.
  */
-public final class MMLFile implements IMMLFileParser {
+public final class MMLFile extends AbstractMMLParser {
 	private final MMLScore score = new MMLScore();
 	private String encoding = "Shift_JIS";
 

@@ -6,6 +6,7 @@ package jp.fourthline.mmlTools.parser;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.Map;
 
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLScoreSerializer;
@@ -15,6 +16,8 @@ import jp.fourthline.mmlTools.MMLScoreSerializer;
  */
 public interface IMMLFileParser {
 	public MMLScore parse(InputStream istream) throws MMLParseException;
+	public Map<String, Boolean> getParseProperties();
+	public String getName();
 
 	public static IMMLFileParser getParser(File file) {
 		IMMLFileParser fileParser;
