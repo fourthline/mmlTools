@@ -46,6 +46,24 @@ public final class MidiFile extends AbstractMMLParser {
 	private static final String PARSE_TEMPO = "parse.midi.tempo";
 	private static final String PARSE_MARKER = "parse.midi.marker";
 	private static final String PARSE_CONVERT_INST = "parse.midi.convertInst";
+	private static final String PARSE_MULTI_TRACK = "parse.midi.multiTrack";
+
+	// option value
+	private boolean parseTrackName;
+	private boolean parseBeat;
+	private boolean parseTempo;
+	private boolean parseMarker;
+	private boolean parseConvertInst;
+	private boolean parseMultiTrack;
+
+	private void updateOptions() {
+		parseTrackName = parseProperties.getOrDefault(PARSE_TRACK_NAME, false);
+		parseBeat = parseProperties.getOrDefault(PARSE_BEAT, false);
+		parseTempo = parseProperties.getOrDefault(PARSE_TEMPO, false);
+		parseMarker = parseProperties.getOrDefault(PARSE_MARKER, false);
+		parseConvertInst = parseProperties.getOrDefault(PARSE_CONVERT_INST, false);
+		parseMultiTrack = parseProperties.getOrDefault(PARSE_MULTI_TRACK, false);
+	}
 
 	/* MID->programへの変換 */
 	private static boolean canConvertInst = false;
@@ -60,7 +78,8 @@ public final class MidiFile extends AbstractMMLParser {
 		parseProperties.put(PARSE_TRACK_NAME, true);
 		parseProperties.put(PARSE_BEAT, true);
 		parseProperties.put(PARSE_TEMPO, true);
-		parseProperties.put(PARSE_MARKER, true);
+		parseProperties.put(PARSE_MULTI_TRACK, true);
+		parseProperties.put(PARSE_MARKER, false);
 		if (canConvertInst) {
 			parseProperties.put(PARSE_CONVERT_INST, false);
 		}
@@ -84,6 +103,7 @@ public final class MidiFile extends AbstractMMLParser {
 
 	@Override
 	public MMLScore parse(InputStream istream) throws MMLParseException {
+		updateOptions();
 		try {
 			Sequence seq = MidiSystem.getSequence(istream);
 			resolution = seq.getResolution();
@@ -199,6 +219,9 @@ public final class MidiFile extends AbstractMMLParser {
 				MMLTrack track = trackInfo.createMMLTrack();
 				track.setMML(mml[0], mml[1], mml[2], "");
 				score.addTrack(track);
+				if (!parseMultiTrack) {
+					break;
+				}
 			}
 		} catch (UndefinedTickException e) {
 			e.printStackTrace();
@@ -247,14 +270,14 @@ public final class MidiFile extends AbstractMMLParser {
 			buf.put(data);
 			int tempo = 60000000/buf.getInt(0);
 			System.out.println("Tempo: "+tempo);
-			if (parseProperties.getOrDefault(PARSE_TEMPO, false)) {
+			if (parseTempo) {
 				new MMLTempoEvent(tempo, (int)tick).appendToListElement(tempoList);
 			}
 			break;
 		case 3: // シーケンス名/トラック名
 			String name = new String(data);
 			System.out.println("Name: "+name);
-			if (parseProperties.getOrDefault(PARSE_TRACK_NAME, false)) {
+			if (parseTrackName) {
 				trackInfo.setName(name);
 			}
 			break;
@@ -267,7 +290,7 @@ public final class MidiFile extends AbstractMMLParser {
 		case 6: // マーカー
 			String s = new String(data);
 			System.out.println("Marker: "+s);
-			if (parseProperties.getOrDefault(PARSE_MARKER, false)) {
+			if (parseMarker) {
 				score.getMarkerList().add(new Marker(s, (int) tick));
 			}
 			break;
@@ -278,7 +301,7 @@ public final class MidiFile extends AbstractMMLParser {
 			break;
 		case 0x58: // 拍子/メトロノーム設定
 			System.out.printf("met: %d %d %d %d\n", data[0], 1<<data[1], data[2], data[3]);
-			if (parseProperties.getOrDefault(PARSE_BEAT, false)) {
+			if (parseBeat) {
 				score.setBaseOnly(1<<data[1]);
 				score.setTimeCountOnly(data[0]);
 			}
@@ -339,7 +362,7 @@ public final class MidiFile extends AbstractMMLParser {
 			System.out.printf("program change: [%d] [%d]\n", data1, data2);
 			if (!canConvertInst) {
 				trackInfo.setProgram(data1);
-			} else if (parseProperties.getOrDefault(PARSE_CONVERT_INST, false) && midInstTable.containsKey(data1)) {
+			} else if (parseConvertInst && midInstTable.containsKey(data1)) {
 				data1 = midInstTable.get(data1);
 				trackInfo.setProgram(data1);
 				System.out.println("   -> " + data1);

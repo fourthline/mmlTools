@@ -4,6 +4,7 @@
 
 package jp.fourthline.mabiicco;
 
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -274,38 +275,59 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		}
 	}
 
-	private MMLScore fileParse(File file) {
-		MMLScore score = null;
-		try {
-			IMMLFileParser fileParser = IMMLFileParser.getParser(file);
-			if (new ParsePropertiesDialog(mainFrame, fileParser).showDialog() == false) {
-				return null;
+	private static class FileLoader {
+		private final Frame parent;
+		private final File file;
+		private final IMMLFileParser parser;
+		private boolean prepare = false;
+		private boolean done = false;
+		private MMLScore score = null;
+		private FileLoader(Frame parent, File file) {
+			this.file = file;
+			this.parent = parent;
+			this.parser = IMMLFileParser.getParser(file);
+		}
+		private FileLoader prepare() {
+			if (prepare) {
+				return this;
 			}
-			FileInputStream in = new FileInputStream(file);
-			score = fileParser.parse(in);
-			in.close();
-		} catch (FileNotFoundException e) {
-			JOptionPane.showMessageDialog(mainFrame,
-					AppResource.appText("error.nofile"),
-					AppResource.appText("error.read"),
-					JOptionPane.WARNING_MESSAGE);
-		} catch (MMLParseException e) {
-			JOptionPane.showMessageDialog(mainFrame,
-					AppResource.appText("error.invalid_file"),
-					AppResource.appText("error.read"),
-					JOptionPane.WARNING_MESSAGE);
-		} catch (Throwable e) {
-			JOptionPane.showMessageDialog(mainFrame,
-					e.getClass().getCanonicalName(),
-					AppResource.appText("error.read"),
-					JOptionPane.WARNING_MESSAGE);
+			prepare = true;
+			if (new ParsePropertiesDialog(parent, parser).showDialog() == false) {
+				done = true;
+			}
+			return this;
 		}
+		private MMLScore parse() {
+			if (!done) {
+				try {
+					FileInputStream in = new FileInputStream(file);
+					score = parser.parse(in);
+					in.close();
+				} catch (FileNotFoundException e) {
+					JOptionPane.showMessageDialog(parent,
+							AppResource.appText("error.nofile"),
+							AppResource.appText("error.read"),
+							JOptionPane.WARNING_MESSAGE);
+				} catch (MMLParseException e) {
+					JOptionPane.showMessageDialog(parent,
+							AppResource.appText("error.invalid_file"),
+							AppResource.appText("error.read"),
+							JOptionPane.WARNING_MESSAGE);
+				} catch (Throwable e) {
+					JOptionPane.showMessageDialog(parent,
+							e.getClass().getCanonicalName(),
+							AppResource.appText("error.read"),
+							JOptionPane.WARNING_MESSAGE);
+				}
 
-		// mabiicco由来のファイルであれば, generateされたものにする.
-		if (score != null) {
-			score = score.toGeneratedScore();
+				// mabiicco由来のファイルであれば, generateされたものにする.
+				if (score != null) {
+					score = score.toGeneratedScore();
+				}
+				done = true;
+			}
+			return score;
 		}
-		return score;
 	}
 
 	private void fileOpenWithHistory(Object o) {
@@ -330,8 +352,9 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	}
 
 	private void openMMLFile(File file) {
+		var loader = new FileLoader(mainFrame, file).prepare();
 		NanoTime time = NanoTime.start();
-		MMLScore score = fileParse(file);
+		MMLScore score = loader.parse();
 		if ( (score != null) && (score.getTrackCount() > 0) ) {
 			// ミュートボタンの状態を反映させるために, 先にミュート解除する.
 			MabiDLS.getInstance().all();
@@ -522,8 +545,9 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 
 	public void fileImport(File file) {
 		if (file != null) {
+			var loader = new FileLoader(mainFrame, file).prepare();
 			NanoTime time = NanoTime.start();
-			MMLScore score = fileParse(file);
+			MMLScore score = loader.parse();
 			showTime("import", time);
 			if (score != null) {
 				MabiIccoProperties.getInstance().setRecentFile(file.getPath());
