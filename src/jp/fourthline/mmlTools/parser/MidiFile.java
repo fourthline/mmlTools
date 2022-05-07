@@ -45,6 +45,7 @@ public final class MidiFile extends AbstractMMLParser {
 	private static final String PARSE_BEAT = "parse.midi.beat";
 	private static final String PARSE_TEMPO = "parse.midi.tempo";
 	private static final String PARSE_MARKER = "parse.midi.marker";
+	private static final String PARSE_CONVERT_OCTAVE = "parse.midi.convertOctave";
 	private static final String PARSE_CONVERT_INST = "parse.midi.convertInst";
 	private static final String PARSE_MULTI_TRACK = "parse.midi.multiTrack";
 
@@ -53,6 +54,7 @@ public final class MidiFile extends AbstractMMLParser {
 	private boolean parseBeat;
 	private boolean parseTempo;
 	private boolean parseMarker;
+	private boolean parseConvertOctave;
 	private boolean parseConvertInst;
 	private boolean parseMultiTrack;
 
@@ -61,6 +63,7 @@ public final class MidiFile extends AbstractMMLParser {
 		parseBeat = parseProperties.getOrDefault(PARSE_BEAT, false);
 		parseTempo = parseProperties.getOrDefault(PARSE_TEMPO, false);
 		parseMarker = parseProperties.getOrDefault(PARSE_MARKER, false);
+		parseConvertOctave = parseProperties.getOrDefault(PARSE_CONVERT_OCTAVE, false);
 		parseConvertInst = parseProperties.getOrDefault(PARSE_CONVERT_INST, false);
 		parseMultiTrack = parseProperties.getOrDefault(PARSE_MULTI_TRACK, false);
 	}
@@ -81,6 +84,7 @@ public final class MidiFile extends AbstractMMLParser {
 		parseProperties.put(PARSE_MULTI_TRACK, true);
 		parseProperties.put(PARSE_MARKER, false);
 		if (canConvertInst) {
+			parseProperties.put(PARSE_CONVERT_OCTAVE, true);
 			parseProperties.put(PARSE_CONVERT_INST, false);
 		}
 
@@ -336,7 +340,7 @@ public final class MidiFile extends AbstractMMLParser {
 			break;
 		case ShortMessage.NOTE_ON:
 			if (data2 > 0) {
-				int note = data1 - 12;
+				int note = data1 - (parseConvertOctave ? 12 : 0);
 				int velocity = data2 / 8;
 				if (!activeNoteMap.containsKey(note)) {
 					MMLNoteEvent noteEvent = new MMLNoteEvent(note, 0, (int)tick, velocity);
@@ -347,7 +351,7 @@ public final class MidiFile extends AbstractMMLParser {
 			}
 			// data2 == 0 は Note Off.
 		case ShortMessage.NOTE_OFF:
-			int note = data1 - 12;
+			int note = data1 - (parseConvertOctave ? 12 : 0);
 			MMLNoteEvent noteEvent = activeNoteMap.get(note);
 			if (noteEvent != null) {
 				tick -= noteEvent.getTickOffset();
