@@ -28,6 +28,3 @@ program=0
 songProgram=-1
 panpot=32
 visible=true
-[marker]
-0=Setup
-48=Start

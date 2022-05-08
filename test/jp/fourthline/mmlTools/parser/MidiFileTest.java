@@ -17,6 +17,7 @@ public class MidiFileTest extends FileSelect {
 
 	@Test
 	public final void testParse() throws Exception {
+		MidiFile.enableInstPatch();
 		MMLScore score = new MidiFile().parse(fileSelect("sample4.mid"));
 
 		assertEquals(4, score.getTrackCount());
