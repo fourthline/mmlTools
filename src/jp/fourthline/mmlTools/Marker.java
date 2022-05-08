@@ -6,6 +6,7 @@ package jp.fourthline.mmlTools;
 
 public final class Marker extends MMLEvent implements Comparable<Marker> {
 	private static final long serialVersionUID = -1282880034361350447L;
+	public static final int META = 0x06;
 	private String name;
 
 	public Marker(String name, int tickOffset) {
@@ -19,6 +20,10 @@ public final class Marker extends MMLEvent implements Comparable<Marker> {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public byte[] getMetaData() {
+		return name.getBytes();
 	}
 
 	@Override

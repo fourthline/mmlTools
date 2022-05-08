@@ -291,7 +291,7 @@ public final class MidiFile extends AbstractMMLParser {
 		case 2: // 著作権表示
 			System.out.println("(C): "+new String(data));
 			break;
-		case 6: // マーカー
+		case Marker.META: // マーカー
 			String s = new String(data);
 			System.out.println("Marker: "+s);
 			if (parseMarker) {

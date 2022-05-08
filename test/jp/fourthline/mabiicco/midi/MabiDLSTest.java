@@ -71,7 +71,7 @@ public class MabiDLSTest extends UseLoadingDLS {
 		MMLScore score = new MMLScore();
 		score.addTrack(new MMLTrack().setMML("MML@aat180aa,brb,crc,drd;").setProgram(5));
 		score.getTrack(0).setSongProgram(100);
-		Sequence seq = dls.createSequence(score, 1, true);
+		Sequence seq = dls.createSequence(score, 1, true, false);
 		assertEquals(3, seq.getTracks().length);
 		assertEquals(MMLTicks.getTick("1"), seq.getTickLength());
 
@@ -115,12 +115,12 @@ public class MabiDLSTest extends UseLoadingDLS {
 	public void test_createSequence2() throws InvalidMidiDataException, UndefinedTickException {
 		MMLScore score = new MMLScore();
 		score.addTrack(new MMLTrack().setMML("MML@aart180a;"));
-		Sequence seq = dls.createSequence(score, 1, true);
+		Sequence seq = dls.createSequence(score, 1, true, false);
 		assertEquals(2, seq.getTracks().length);
 		assertEquals(MMLTicks.getTick("1"), seq.getTickLength());
 
 		score.getTrack(0).getMMLEventAtIndex(0).getMMLNoteEventList().remove(2);
-		seq = dls.createSequence(score, 1);
+		seq = dls.createSequence(score, 1, false, false);
 		assertEquals(2, seq.getTracks().length);
 		assertEquals(MMLTicks.getTick("2"), seq.getTickLength());
 	}
@@ -130,7 +130,7 @@ public class MabiDLSTest extends UseLoadingDLS {
 		MMLScore score = new MMLScore();
 		score.addTrack(new MMLTrack().setMML("MML@aa,,,dd;"));
 		score.getTrack(0).setSongProgram(121);
-		Sequence seq = dls.createSequence(score, 1, true);
+		Sequence seq = dls.createSequence(score, 1, true, false);
 
 		// 遅延補正なし
 		assertEquals(3, seq.getTracks().length);
@@ -148,7 +148,7 @@ public class MabiDLSTest extends UseLoadingDLS {
 		// 遅延補正あり
 		score.getTrack(0).setAttackDelayCorrect(-6);
 		score.getTrack(0).setAttackSongDelayCorrect(-12);
-		seq = dls.createSequence(score, 1, true);
+		seq = dls.createSequence(score, 1, true, false);
 
 		assertEquals(3, seq.getTracks().length);
 		assertEquals(192-6, seq.getTracks()[1].ticks());

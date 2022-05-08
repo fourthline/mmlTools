@@ -27,6 +27,7 @@ import jp.fourthline.mmlTools.MMLNoteEvent;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTempoEvent;
 import jp.fourthline.mmlTools.MMLTrack;
+import jp.fourthline.mmlTools.Marker;
 import jp.fourthline.mmlTools.core.MMLTickTable;
 
 /**
@@ -433,11 +434,7 @@ public final class MabiDLS {
 	 * @throws InvalidMidiDataException 
 	 */
 	public Sequence createSequence(MMLScore score) throws InvalidMidiDataException {
-		return createSequence(score, 1, true);
-	}
-
-	public Sequence createSequence(MMLScore score, int startOffset) throws InvalidMidiDataException {
-		return createSequence(score, startOffset, false);
+		return createSequence(score, 1, true, false);
 	}
 
 	/**
@@ -445,15 +442,24 @@ public final class MabiDLS {
 	 * @param score
 	 * @param startOffset
 	 * @param attackDelayCorrect
+	 * @param withMeta
 	 * @return
 	 * @throws InvalidMidiDataException
 	 */
-	public Sequence createSequence(MMLScore score, int startOffset, boolean attackDelayCorrect) throws InvalidMidiDataException {
+	public Sequence createSequence(MMLScore score, int startOffset, boolean attackDelayCorrect, boolean withMeta) throws InvalidMidiDataException {
 		Sequence sequence = new Sequence(Sequence.PPQ, MMLTickTable.TPQN);
 		int totalTick = score.getTotalTickLength();
+		Track track = sequence.createTrack();
+
+		// マーカー
+		if (withMeta) {
+			for (Marker marker : score.getMarkerList()) {
+				var data = marker.getMetaData();
+				track.add(new MidiEvent(new MetaMessage(Marker.META, data, data.length), marker.getTickOffset()));
+			}
+		}
 
 		// グローバルテンポ
-		Track track = sequence.createTrack();
 		List<MMLTempoEvent> globalTempoList = score.getTempoEventList();
 		for (MMLTempoEvent tempoEvent : globalTempoList) {
 			byte tempo[] = tempoEvent.getMetaData();
@@ -461,17 +467,14 @@ public final class MabiDLS {
 			if (tickOffset >= totalTick) {
 				break;
 			}
-
-			MidiMessage message = new MetaMessage(MMLTempoEvent.META, 
-					tempo, tempo.length);
-			track.add(new MidiEvent(message, tickOffset));
+			track.add(new MidiEvent(new MetaMessage(MMLTempoEvent.META, tempo, tempo.length), tickOffset));
 		}
 
 		int trackCount = 0;
 		for (MMLTrack mmlTrack : score.getTrackList()) {
-			convertMidiTrack(sequence.createTrack(), mmlTrack, trackCount, mmlTrack.getProgram(), startOffset, attackDelayCorrect);
+			convertMidiTrack(sequence.createTrack(), mmlTrack, trackCount, mmlTrack.getProgram(), startOffset, attackDelayCorrect, withMeta);
 			if (mmlTrack.getSongProgram() >= 0) {
-				convertMidiTrack(sequence.createTrack(), mmlTrack, trackCount+MIDI_CHORUS_OFFSET, mmlTrack.getSongProgram(), startOffset, attackDelayCorrect);
+				convertMidiTrack(sequence.createTrack(), mmlTrack, trackCount+MIDI_CHORUS_OFFSET, mmlTrack.getSongProgram(), startOffset, attackDelayCorrect, withMeta);
 			}
 			trackCount++;
 			if (trackCount >= this.channel.length) {
@@ -488,15 +491,23 @@ public final class MabiDLS {
 	 * @param channel
 	 * @throws InvalidMidiDataException
 	 */
-	private void convertMidiTrack(Track track, MMLTrack mmlTrack, int channel, int targetProgram, int startOffset, boolean attackDelayCorrect) throws InvalidMidiDataException {
+	private void convertMidiTrack(Track track, MMLTrack mmlTrack, int channel, int targetProgram, int startOffset, boolean attackDelayCorrect, boolean withMeta) throws InvalidMidiDataException {
+		// トラック名
+		if (withMeta) {
+			var nameData = mmlTrack.getTrackName().getBytes();
+			MetaMessage nameMessage = new MetaMessage(3, nameData, nameData.length);
+			track.add(new MidiEvent(nameMessage, 0));
+		}
+
+		// Program Change
 		ShortMessage pcMessage = new ExtendMessage(ShortMessage.PROGRAM_CHANGE, 
 				channel,
 				targetProgram,
 				0);
 		track.add(new MidiEvent(pcMessage, 0));
+
 		boolean enablePart[] = InstClass.getEnablePartByProgram(targetProgram);
 		InstClass instClass = getInstByProgram(targetProgram);
-
 		MMLMidiTrack midiTrack = new MMLMidiTrack(instClass);
 		for (int i = 0; i < enablePart.length; i++) {
 			if (enablePart[i]) {
