@@ -97,6 +97,7 @@ enum EditMode {
 		}
 	},
 	MOVE {
+		private int prevModifiers = -1;
 		@Override
 		public void pressEvent(IEditContext context, MouseEvent e) {
 			// 右クリックで、編集キャンセル
@@ -107,19 +108,24 @@ enum EditMode {
 		}
 		@Override
 		public void enter(IEditContext context) {
+			prevModifiers = -1;
 			// 移動前の選択ノートリストをdetachする.
 			context.detachSelectedMMLNote();
 		}
 		@Override
 		public void executeEvent(IEditContext context, MouseEvent e) {
+			int modifiers = e.getModifiersEx();
 			// 選択中のNoteを移動
 			boolean shiftOption = false;
 			boolean alignment = true;
-			if ( (e.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK) != 0) {
+			if ( (modifiers & InputEvent.SHIFT_DOWN_MASK) != 0) {
 				shiftOption = true;
 			}
-			if ( (e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) != 0) {
+			if ( ((modifiers & InputEvent.CTRL_DOWN_MASK) != 0) && ((prevModifiers & InputEvent.CTRL_DOWN_MASK) == 0)) {
+				// モード中にCTRLを押し始めた
 				alignment = false;
+			} else {
+				prevModifiers = modifiers;
 			}
 			context.moveSelectedMMLNote(startPoint, e.getPoint(), shiftOption, alignment);
 		}
