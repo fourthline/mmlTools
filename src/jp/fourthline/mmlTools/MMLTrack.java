@@ -373,7 +373,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 
 	private static Function<MMLStringOptimizer, String> mabiMMLOptimizeFunc = t -> t.preciseOptimize();
 	public static void setMabiMMLOptimizeFunc(Function<MMLStringOptimizer, String> f) {
-		mabiMMLOptimizeFunc = f;
+		mabiMMLOptimizeFunc = (f != null) ? (f) : (t -> t.preciseOptimize());
 	}
 
 	private String tailFix(String melody, String chord1, String chord2) throws UndefinedTickException {

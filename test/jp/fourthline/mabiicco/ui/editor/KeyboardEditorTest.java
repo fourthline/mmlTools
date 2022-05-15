@@ -33,6 +33,7 @@ import jp.fourthline.mmlTools.MMLNoteEvent;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.optimizer.MMLStringOptimizer;
 
 public class KeyboardEditorTest extends UseLoadingDLS {
 
@@ -280,7 +281,7 @@ public class KeyboardEditorTest extends UseLoadingDLS {
 
 	@Test
 	public void testCharKeyboard_SharpFlat() {
-		MMLTrack expect = new MMLTrack().setMML("MML@l8c+d+g+>c2");
+		MMLTrack expect = new MMLTrack().setMML("MML@l8c+d+g+b+2");
 
 		keyTyped('c');
 		keyTyped('+');
@@ -462,7 +463,7 @@ public class KeyboardEditorTest extends UseLoadingDLS {
 
 	@Test
 	public void testLock() throws InterruptedException, InvalidMidiDataException {
-		MMLTrack expect = new MMLTrack().setMML("MML@<c8>c8,,;");
+		MMLTrack expect = new MMLTrack().setMML("MML@<c8b+8,,;");
 		new Thread(() -> editor.setVisible(true)).start();
 		Thread.sleep(500);
 

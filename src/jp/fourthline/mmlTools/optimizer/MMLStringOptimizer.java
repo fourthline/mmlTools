@@ -20,7 +20,7 @@ public final class MMLStringOptimizer {
 	/**
 	 * Gen2最適化を使うオプション
 	 */
-	private static boolean enablePreciseOptimize = false;
+	public static boolean enablePreciseOptimize = true;
 
 	public static void setDebug(boolean b) {
 		debug = b;

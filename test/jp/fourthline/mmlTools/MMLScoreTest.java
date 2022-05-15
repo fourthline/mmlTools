@@ -21,6 +21,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -39,6 +40,11 @@ public class MMLScoreTest extends FileSelect {
 	@BeforeClass
 	public static void setupClass() {
 		UseLoadingDLS.initializeDefaultDLS();
+	}
+
+	@AfterClass
+	public static void cleanupClass() {
+		MMLTrack.setTempoAllowChordPart(false);
 	}
 
 	@Before
@@ -335,6 +341,7 @@ public class MMLScoreTest extends FileSelect {
 						System.out.println("gen2: " + mabiMMLoptGen2);
 						System.out.println("gen1: " + mabiMMLoptGen1.length() + ", gen2: " + mabiMMLoptGen2.length());
 						assertTrue(mabiMMLoptGen1.length() >= mabiMMLoptGen2.length());
+						MMLTrack.setMabiMMLOptimizeFunc(null);
 
 						// reparse
 						String re1 = new MMLTrack().setMML(mabiMMLoptGen1).generate().getMabiMML();
@@ -567,7 +574,7 @@ public class MMLScoreTest extends FileSelect {
 		/* とちゅうで切る場合 */
 		checkGenerateAll(
 				"MML@l1r.r.rt240,v12ccccdd2deeec2fffggggaaaabbbb>c1,d1d1.d1.;",
-				"MML@l1r.r.v0et240,v12ccccdd2deeec2fffggggaaaabbbb>c1,l1dd.d.;"
+				"MML@l1r.r.v0et240,v12ccccdd2deeec2fffggggaaaabbbbb+1,l1dd.d.;"
 				);
 	}
 
