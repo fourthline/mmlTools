@@ -16,6 +16,8 @@ import jp.fourthline.mmlTools.ComposeRank;
 
 public final class MMLTextTest {
 
+	private String backup = MMLText.getMelodyEmptyStr();
+
 	@Before
 	public void setup() {
 		MMLText.setMelodyEmptyStr("");
@@ -23,7 +25,7 @@ public final class MMLTextTest {
 
 	@After
 	public void cleanup() {
-		MMLText.setMelodyEmptyStr("");
+		MMLText.setMelodyEmptyStr(backup);
 	}
 
 	@Test
