@@ -40,18 +40,18 @@ import jp.fourthline.mmlTools.parser.MidiFile;
  * </pre>
  */
 public final class MabiIcco {
-	public static interface ISplash {
-		public void setVisible(boolean b);
-		public void updateProgress(String s, int v);
-		public void dispose();
+	public interface ISplash {
+		void setVisible(boolean b);
+		void updateProgress(String s, int v);
+		void dispose();
 	}
-	private final String args[];
+	private final String[] args;
 	private final ISplash splash;
 
 	private final MabiIccoProperties appProperties;
 	private final MabiDLS dls;
 
-	public MabiIcco(String args[]) {
+	public MabiIcco(String[] args) {
 		splash = (System.getProperty("mabiicco.splash") == null) ? new Splash() : new Splash2(); 
 		this.args = args;
 		splash.setVisible(true);
@@ -112,7 +112,7 @@ public final class MabiIcco {
 	private void startOpen(ActionDispatcher dispatcher, String s) {
 		File f = new File(s);
 		if (!f.exists()) {
-			String arg[] = LauncherSupport.getCommandLineArgs(args.length);
+			String[] arg = LauncherSupport.getCommandLineArgs(args.length);
 			if ( (arg == null) || (arg.length == 0) ) {
 				return;
 			}
@@ -137,10 +137,7 @@ public final class MabiIcco {
 			splash.updateProgress("", (int)progress);
 		}
 
-		if (dls.getAvailableInstByInstType(InstType.MAIN_INST_LIST).length > 0) {
-			return true;
-		}
-		return false;
+		return dls.getAvailableInstByInstType(InstType.MAIN_INST_LIST).length > 0;
 	}
 
 	private static void setUIFont(javax.swing.plaf.FontUIResource resource) {
@@ -162,7 +159,7 @@ public final class MabiIcco {
 		return chooser;
 	}
 
-	public static void main(String args[]) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
+	public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
 		try {
 			var properties = MabiIccoProperties.getInstance();
 			if (properties.uiscaleDisable.get()) {

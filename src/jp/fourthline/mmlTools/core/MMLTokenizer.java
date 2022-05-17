@@ -28,7 +28,7 @@ public final class MMLTokenizer implements Iterator<String> {
 
 	@Override
 	public boolean hasNext() {
-		return (endIndex < mml_length) ? true : false;
+		return endIndex < mml_length;
 	}
 
 	@Override
@@ -53,17 +53,11 @@ public final class MMLTokenizer implements Iterator<String> {
 	}
 
 	public static boolean isToken(char ch) {
-		if (tokenString.indexOf(ch) < 0)
-			return false;
-
-		return true;
+		return tokenString.indexOf(ch) >= 0;
 	}
 
 	public static boolean isNote(char ch) {
-		if (noteString.indexOf(ch) < 0)
-			return false;
-
-		return true;
+		return noteString.indexOf(ch) >= 0;
 	}
 
 	public static String noteName(String token) {

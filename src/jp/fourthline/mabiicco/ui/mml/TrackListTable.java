@@ -30,7 +30,7 @@ public final class TrackListTable extends JTable {
 				AppResource.appText("mml.output.rank")
 		};
 		private final boolean checkBox;
-		private final boolean checkValue[];
+		private final boolean[] checkValue;
 		private final ArrayList<String[]> dataList = new ArrayList<>();
 		private final ArrayList<ComposeRank> rankList = new ArrayList<>();
 
@@ -112,10 +112,7 @@ public final class TrackListTable extends JTable {
 			if (!checkBox) {
 				columnIndex++;
 			}
-			if (columnIndex == 0) {
-				return true;
-			}
-			return false;
+			return columnIndex == 0;
 		}
 
 		@Override
@@ -126,7 +123,7 @@ public final class TrackListTable extends JTable {
 			if (columnIndex != 0) {
 				return;
 			}
-			checkValue[rowIndex] = aValue.equals(Boolean.TRUE) ? true : false;
+			checkValue[rowIndex] = aValue.equals(Boolean.TRUE);
 		}
 	}
 

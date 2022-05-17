@@ -12,21 +12,21 @@ import jp.fourthline.mmlTools.MMLTrack;
  *
  */
 public interface IMMLManager {
-	public MMLScore getMMLScore();
-	public void setMMLScore(MMLScore score);
-	public int getActiveTrackIndex();
-	public MMLTrack getActiveTrack();
-	public int getActiveMMLPartIndex();
-	public int getActiveMMLPartStartOffset();
-	public MMLEventList getActiveMMLPart();
-	public void updateActivePart(boolean generate);
-	public void generateActiveTrack();
-	public void updateActiveTrackProgram(int trackIndex, int program, int songProgram);
-	public int getActivePartProgram();
-	public boolean selectTrackOnExistNote(int note, int tickOffset);
-	public void setMMLselectedTrack(MMLTrack track);
-	public void addMMLTrack(MMLTrack track);
-	public void moveTrack(int toIndex);
-	public void updatePianoRollView();
-	public void updatePianoRollView(int note);
+	MMLScore getMMLScore();
+	void setMMLScore(MMLScore score);
+	int getActiveTrackIndex();
+	MMLTrack getActiveTrack();
+	int getActiveMMLPartIndex();
+	int getActiveMMLPartStartOffset();
+	MMLEventList getActiveMMLPart();
+	void updateActivePart(boolean generate);
+	void generateActiveTrack();
+	void updateActiveTrackProgram(int trackIndex, int program, int songProgram);
+	int getActivePartProgram();
+	boolean selectTrackOnExistNote(int note, int tickOffset);
+	void setMMLselectedTrack(MMLTrack track);
+	void addMMLTrack(MMLTrack track);
+	void moveTrack(int toIndex);
+	void updatePianoRollView();
+	void updatePianoRollView(int note);
 }

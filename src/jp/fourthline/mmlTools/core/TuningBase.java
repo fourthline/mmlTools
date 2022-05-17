@@ -15,7 +15,7 @@ public enum TuningBase {
 
 	private final String base;
 	private int tick;
-	private TuningBase(String base) {
+	TuningBase(String base) {
 		this.base = base;
 		try {
 			this.tick = MMLTicks.getTick(base);

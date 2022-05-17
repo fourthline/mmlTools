@@ -34,7 +34,7 @@ public final class MMLStringOptimizer {
 		enablePreciseOptimize = enable;
 	}
 
-	private String originalMML;
+	private final String originalMML;
 
 	/**
 	 * @param mml   MMLEventListで出力したMML文字列.
@@ -65,7 +65,7 @@ public final class MMLStringOptimizer {
 	 * MML最適化 Gen2
 	 */
 	public String optimizeGen2() {
-		Optimizer optimizerList[] = {
+		Optimizer[] optimizerList = {
 				new OxLxFixedOptimizer(),
 				new NxBpCmOptimizer()
 		};
@@ -76,7 +76,7 @@ public final class MMLStringOptimizer {
 	 * MML最適化 Normal
 	 */
 	private String optimize() {
-		Optimizer optimizerList[] = {
+		Optimizer[] optimizerList = {
 				new OxLxOptimizer(),
 				new BpCmOptimizer(),
 				new NxOptimizer()
@@ -84,7 +84,7 @@ public final class MMLStringOptimizer {
 		return optimize(optimizerList);
 	}
 
-	private String optimize(Optimizer optimizerList[]) {
+	private String optimize(Optimizer[] optimizerList) {
 		String mml = originalMML;
 		for (Optimizer optimizer : optimizerList) {
 			new MMLTokenizer(mml).forEachRemaining(t -> optimizer.nextToken(t));
@@ -95,11 +95,11 @@ public final class MMLStringOptimizer {
 	}
 
 	public interface Optimizer {
-		public void nextToken(String token);
-		public String getMinString();
+		void nextToken(String token);
+		String getMinString();
 	}
 
-	public static void main(String args[]) {
+	public static void main(String[] args) {
 		MMLStringOptimizer.setDebug(true);
 		// String mml = "c8c2c1c8c2c1c8c2c1c8c2c1";
 		String mml = "c1<a+>rc<a+>c1";

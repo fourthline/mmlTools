@@ -86,7 +86,7 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 
 	private final JPanel panel;
 	private JLabel timeView;
-	private ScheduledThreadPoolExecutor scheduledExecutor = new ScheduledThreadPoolExecutor(8);
+	private final ScheduledThreadPoolExecutor scheduledExecutor = new ScheduledThreadPoolExecutor(8);
 
 	private final Frame parentFrame;
 

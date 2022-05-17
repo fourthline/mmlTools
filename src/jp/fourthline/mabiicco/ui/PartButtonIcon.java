@@ -15,7 +15,7 @@ import jp.fourthline.mmlTools.MMLScore;
 public class PartButtonIcon implements Icon {
 	protected static final int WIDTH = 12;
 
-	private final static PartButtonIcon instance[][];
+	private final static PartButtonIcon[][] instance;
 	private final static int indexSize;
 	private final static PartButtonIcon defaultIcon = new PartButtonIcon() {
 		@Override

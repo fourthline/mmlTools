@@ -131,7 +131,7 @@ public class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 	}
 
 	private static final class FlexDotPattern {
-		private static final FlexDotPattern flexList[] = {
+		private static final FlexDotPattern[] flexList = {
 				new FlexDotPattern(64),
 				new FlexDotPattern(32),
 				new FlexDotPattern(16),
@@ -150,7 +150,7 @@ public class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 
 		private void updatePattern(OptimizerMap map, String noteName, String lenString) {
 			String cName = noteName;
-			if (!noteName.toLowerCase().equals("r")) {
+			if (!noteName.equalsIgnoreCase("r")) {
 				cName = "&" + noteName;
 			}
 
@@ -261,7 +261,7 @@ public class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 	@Override
 	public void nextToken(String token) {
 		char firstC = Character.toLowerCase( token.charAt(0) );
-		String s[] = MMLTokenizer.noteNames(token);
+		String[] s = MMLTokenizer.noteNames(token);
 
 		if (MMLTokenizer.isNote(firstC)) {
 			doPattern(s[0], s[1], tokenStack);

@@ -46,7 +46,7 @@ public class KeyboardEditorTest extends UseLoadingDLS {
 	private KeyListener key;
 
 	private class StubMmlManager extends AbstractMMLManager {
-		private MMLScore score;
+		private final MMLScore score;
 
 		private StubMmlManager() {
 			score = new MMLScore();
@@ -133,7 +133,7 @@ public class KeyboardEditorTest extends UseLoadingDLS {
 
 	private class StubAlign implements IEditAlign, IntConsumer {
 		private int index = 1;
-		private int align[] = { 192, 48, 24 };
+		private final int[] align = { 192, 48, 24 };
 		@Override
 		public int getEditAlign() {
 			return align[index];
@@ -160,7 +160,7 @@ public class KeyboardEditorTest extends UseLoadingDLS {
 		StubAlign align = new StubAlign();
 		editAlign = align;
 		pianoRollView = new PianoRollView();
-		editor = new KeyboardEditor((Frame)null, mmlManager, player, editAlign, pianoRollView);
+		editor = new KeyboardEditor(null, mmlManager, player, editAlign, pianoRollView);
 		editor.setNoteAlignChanger(align);
 
 		reciver = editor.getReciever();
@@ -174,7 +174,7 @@ public class KeyboardEditorTest extends UseLoadingDLS {
 		KeyboardEditor.setDebug(false);
 	}
 
-	private Component dummyComponent = new JButton();
+	private final Component dummyComponent = new JButton();
 	private void keyTyped(char keyChar) {
 		key.keyTyped(new KeyEvent(dummyComponent, 0, 0, 0, 0, keyChar));
 	}

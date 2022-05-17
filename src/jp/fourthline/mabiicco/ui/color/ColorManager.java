@@ -7,15 +7,15 @@ package jp.fourthline.mabiicco.ui.color;
 import java.awt.Color;
 
 public interface ColorManager {
-	public Color getActiveRectColor(int trackIndex);
-	public Color getActiveFillColor(int trackIndex);
+	Color getActiveRectColor(int trackIndex);
+	Color getActiveFillColor(int trackIndex);
 
-	public Color getPartRectColor(int trackIndex, int partIndex);
-	public Color getPartFillColor(int trackIndex, int partIndex);
+	Color getPartRectColor(int trackIndex, int partIndex);
+	Color getPartFillColor(int trackIndex, int partIndex);
 
-	public Color getUnusedFillColor();
+	Color getUnusedFillColor();
 
-	public static ColorManager defaultColor() {
+	static ColorManager defaultColor() {
 		return DefaultColor.instance;
 	}
 }

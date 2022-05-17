@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 final class ColorPalette {
-	private static enum ColorPattern {
+	private enum ColorPattern {
 		ACTIVE(250, 200, 0),
 		MELODY(0, 200, 0),
 		CHORD1(0, 200, 40),
@@ -39,7 +39,7 @@ final class ColorPalette {
 		private final int rectAlpha;
 		private final int fillAlpha;
 		private final int beta;
-		private ColorPattern(int rectAlpha, int fillAlpha, int beta) {
+		ColorPattern(int rectAlpha, int fillAlpha, int beta) {
 			this.rectAlpha = rectAlpha;
 			this.fillAlpha = fillAlpha;
 			this.beta = beta;
@@ -62,7 +62,7 @@ final class ColorPalette {
 		}
 	}
 
-	private static final Color trackBaseColor[] = {
+	private static final Color[] trackBaseColor = {
 		new Color(200, 0, 0),
 		new Color(0, 200, 0),
 		new Color(0, 0, 200),

@@ -84,9 +84,6 @@ public abstract class MMLEvent implements Serializable {
 		}
 
 		MMLEvent event = (MMLEvent) obj;
-		if (this.tickOffset == event.tickOffset) {
-			return true;
-		}
-		return false;
+		return this.tickOffset == event.tickOffset;
 	}
 }

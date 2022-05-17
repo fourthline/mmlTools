@@ -32,20 +32,19 @@ public class MMLTrackTest {
 	}
 
 	/**
-	 * Test method for {@link jp.fourthline.mmlTools.MMLTrack#getMMLStrings()}.
 	 * @throws UndefinedTickException
 	 */
 	@Test
 	public void testGetMMLStrings() throws UndefinedTickException {
 		MMLTrack track = new MMLTrack().setMML("MML@aaa,bbb,ccc,ddd;");
-		String expect[] = {
+		String[] expect = {
 				"a8t150v0a8v8aa", // melodyパートのみテンポ指定.
 				"bbb",
 				"ccc",
 				"d8t150v0d8v8dd"
 		};
 		new MMLTempoEvent(150, 48).appendToListElement(track.getGlobalTempoList());
-		String mml[] = track.generate().getMabiMMLArray();
+		String[] mml = track.generate().getMabiMMLArray();
 
 		assertArrayEquals(expect, mml);
 	}
@@ -54,14 +53,14 @@ public class MMLTrackTest {
 	public void testGetMMLStringsMusicQ() throws UndefinedTickException {
 		MMLTrack.setTempoAllowChordPart(true);
 		MMLTrack track = new MMLTrack().setMML("MML@aaa,bbb,ccc,ddd;");
-		String expect[] = {
+		String[] expect = {
 				"a8t150v0a8v8aa", // melodyパートのみテンポ指定.
 				"bbb",
 				"ccc",
 				"d8t150v0d8v8dd"
 		};
 		new MMLTempoEvent(150, 48).appendToListElement(track.getGlobalTempoList());
-		String mml[] = track.generate().getMabiMMLArray();
+		String[] mml = track.generate().getMabiMMLArray();
 
 		assertArrayEquals(expect, mml);
 	}
@@ -214,7 +213,7 @@ public class MMLTrackTest {
 		MMLTrack track2 = new MMLTrack().setMML("MML@a8.&a16aa");
 		MMLTrack track3 = new MMLTrack().setMML("MML@aab");
 		MMLTrack track4 = new MMLTrack().setMML("MML@at150aa");
-		MMLTrack track5 = new MMLTrack().setMML("MML@aav10a");;
+		MMLTrack track5 = new MMLTrack().setMML("MML@aav10a");
 		MMLTrack track6 = new MMLTrack().setMML("MML@aaa.");
 		MMLTrack track7 = new MMLTrack().setMML("MML@t120aaa");
 		MMLTrack track8 = new MMLTrack().setMML("MML@l16a&a&a&al4aa");

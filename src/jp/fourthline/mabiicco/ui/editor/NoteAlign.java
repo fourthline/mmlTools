@@ -15,7 +15,7 @@ import jp.fourthline.mmlTools.core.UndefinedTickException;
 public final class NoteAlign {
 	public static int DEFAULT_ALIGN_INDEX = 2;
 	public static NoteAlign[] createAlignList() {
-		final String keyList[] = {
+		final String[] keyList = {
 				"editor.note_1",
 				"editor.note_2",
 				"editor.note_4",

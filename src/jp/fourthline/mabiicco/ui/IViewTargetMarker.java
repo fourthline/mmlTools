@@ -8,6 +8,6 @@ package jp.fourthline.mabiicco.ui;
  * 
  */
 public interface IViewTargetMarker {
-	public void PaintOnTarget(int tickOffset);
-	public void PaintOff();
+	void PaintOnTarget(int tickOffset);
+	void PaintOff();
 }

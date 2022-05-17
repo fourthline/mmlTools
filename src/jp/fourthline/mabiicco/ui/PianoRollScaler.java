@@ -20,7 +20,7 @@ public final class PianoRollScaler implements MouseWheelListener {
 	private final MainView parent;
 
 	private int viewScaleIndex = 0;
-	private final double viewScaleTable[] = { 6, 5, 4, 3, 2, 1.5, 1, 0.75, 0.5, 0.375, 0.25, 0.1 };
+	private final double[] viewScaleTable = { 6, 5, 4, 3, 2, 1.5, 1, 0.75, 0.5, 0.375, 0.25, 0.1 };
 
 	public PianoRollScaler(PianoRollView pv, JScrollPane sp, MainView parent) {
 		this.pianoRollView = pv;

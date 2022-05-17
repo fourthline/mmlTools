@@ -75,7 +75,7 @@ public final class AppResource {
 		}
 	}
 
-	private static HashMap<String, ImageIcon> iconMap = new HashMap<>();
+	private static final HashMap<String, ImageIcon> iconMap = new HashMap<>();
 	public static ImageIcon getImageIcon(String path) {
 		ImageIcon icon = iconMap.get(path);
 		if (icon == null) {
@@ -95,7 +95,7 @@ public final class AppResource {
 		return ResourceLoader.getAppPath("err.txt");
 	}
 
-	public static void main(String args[]) {
+	public static void main(String[] args) {
 		System.getProperties().forEach((s1, s2) -> System.out.println(s1+": "+s2));
 	}
 }

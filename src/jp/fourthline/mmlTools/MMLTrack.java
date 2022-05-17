@@ -39,7 +39,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 	}
 
 	private static final int PART_COUNT = 4;
-	private List<MMLEventList> mmlParts = new ArrayList<>();
+	private final List<MMLEventList> mmlParts = new ArrayList<>();
 	private List<MMLTempoEvent> globalTempoList = new ArrayList<>();
 	private boolean generated = false;
 
@@ -56,10 +56,10 @@ public final class MMLTrack implements Serializable, Cloneable {
 	private int attackSongDelayCorrect = 0; // 歌部のアタック遅延補正
 
 	// for MML input
-	private MMLText originalMML = new MMLText();
+	private final MMLText originalMML = new MMLText();
 
 	// for MML output
-	private MMLText mabiMML = new MMLText();
+	private final MMLText mabiMML = new MMLText();
 
 	// コーラスオプション (楽器＋歌）
 	private int songProgram = -1;  // コーラスを使用しない.
@@ -93,7 +93,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 	public MMLTrack setMML(String mml, boolean delayOption) {
 		if (mml.indexOf('\n') >= 0) {
 			// ゲーム内からコピーされたフォーマットを読む.
-			String parts[] = mml.split("\n", 8);
+			String[] parts = mml.split("\n", 8);
 			boolean invalidFormat = false;
 			if (parts.length == 7) {
 				for (int i = 2; i < parts.length-1; i++) {
@@ -170,7 +170,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 	 * @return　各パートのMML文字列
 	 */
 	public String[] getMabiMMLArray() {
-		String mml[] = new String[ PART_COUNT ];
+		String[] mml = new String[ PART_COUNT ];
 		for (int i = 0; i < mml.length; i++) {
 			mml[i] = mabiMML.getText(i);
 		}
@@ -278,7 +278,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 
 	private String[] getMMLStrings(boolean tailFix, boolean mabiTempo) throws UndefinedTickException {
 		int count = mmlParts.size();
-		String mml[] = new String[count];
+		String[] mml = new String[count];
 
 		for (int i = 0; i < count; i++) {
 			int startOffset = mabiTempo ? getStartOffsetforMabiMML(i) : getStartOffset(i);
@@ -342,7 +342,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 	 */
 	private String[] getMMLStringsMusicQ() throws UndefinedTickException {
 		int count = mmlParts.size();
-		String mml[] = new String[count];
+		String[] mml = new String[count];
 		LinkedList<MMLTempoEvent> localTempoList = new LinkedList<>(globalTempoList);
 		List<List<MMLEventList>> relationParts = makeRelationPart();
 		boolean allowed = tempoAllowChordPartFunction.apply(program);
@@ -414,7 +414,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 	 * @return 時間（秒）
 	 */
 	public double getMabinogiTime() {
-		long partTime[] = new long[mmlParts.size()];
+		long[] partTime = new long[mmlParts.size()];
 
 		int melodyTick = (int)mmlParts.get(0).getTickLength();
 		partTime[0] = MMLTempoEvent.getTimeOnTickOffset(globalTempoList, melodyTick);
@@ -451,11 +451,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 			return false;
 		}
 
-		if (Arrays.equals(this.mmlParts.toArray(), mmlTrack.mmlParts.toArray())) {
-			return true;
-		}
-
-		return false;
+		return Arrays.equals(this.mmlParts.toArray(), mmlTrack.mmlParts.toArray());
 	}
 
 	public boolean isVisible() {
@@ -546,7 +542,6 @@ public final class MMLTrack implements Serializable, Cloneable {
 	/**
 	 * MabiMML用のstartOffsetを取得する
 	 * @param index
-	 * @param forMabiMML
 	 * @return
 	 */
 	private int getStartOffsetforMabiMML(int index) {

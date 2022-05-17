@@ -89,10 +89,7 @@ public final class KeyboardEditor {
 			if (debug) System.out.println("lock   "+action.getClass().getSimpleName());
 			currentAction = action;
 			return true;
-		} else if (currentAction == action) {
-			return true;
-		}
-		return false;
+		} else return currentAction == action;
 	}
 
 	private synchronized void unlock(IKeyboardAction action) {
@@ -413,7 +410,7 @@ public final class KeyboardEditor {
 		}
 
 		private void changeNoteAlign(char code) {
-			char select[] = {
+			char[] select = {
 					'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'
 			};
 			for (int i = 0; i < select.length; i++) {
@@ -532,7 +529,7 @@ public final class KeyboardEditor {
 		private void initPartList() {
 			partList.clear();
 			int program = mmlManager.getActivePartProgram();
-			boolean enablePart[] = InstClass.getEnablePartByProgram(program);
+			boolean[] enablePart = InstClass.getEnablePartByProgram(program);
 			MMLTrack activeTrack = mmlManager.getActiveTrack();
 			for (int i = 0; i < enablePart.length; i++) {
 				if (enablePart[i]) {
@@ -573,7 +570,7 @@ public final class KeyboardEditor {
 					}
 				}
 			}
-			int playNote[] = new int[chord.size()];
+			int[] playNote = new int[chord.size()];
 			for (int i = 0; i < playNote.length; i++) {
 				playNote[i] = chord.get(i).getNote();
 			}
@@ -707,7 +704,7 @@ public final class KeyboardEditor {
 	}
 
 	public Receiver getReciever() {
-		ActionListener actionListener[] = midiList.getActionListeners();
+		ActionListener[] actionListener = midiList.getActionListeners();
 		for (ActionListener action : actionListener) {
 			if (action instanceof Receiver) {
 				return (Receiver) action;

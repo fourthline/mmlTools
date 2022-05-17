@@ -11,13 +11,13 @@ import jp.fourthline.mabiicco.midi.InstClass;
  * "[3MLE EXTENSION]" Track
  */
 public final class Extension3mleTrack {
-	private int instrument;
-	private int panpot;
-	private int startMarker;
+	private final int instrument;
+	private final int panpot;
+	private final int startMarker;
 	private int trackCount;
 	private int trackLimit;
-	private int group;
-	private String trackName;
+	private final int group;
+	private final String trackName;
 
 	public Extension3mleTrack(int instrument, int group, int panpot, String trackName, int startMarker) {
 		this.instrument = instrument;

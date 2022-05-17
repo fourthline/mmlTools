@@ -146,7 +146,7 @@ public final class MMLScore {
 	}
 
 	public void setBaseTime(String baseTime) {
-		String s[] = baseTime.split("/");
+		String[] s = baseTime.split("/");
 		this.numTime = Integer.parseInt(s[0]);
 		this.baseTime = Integer.parseInt(s[1]);
 	}
@@ -263,7 +263,7 @@ public final class MMLScore {
 		return ostream.toByteArray();
 	}
 
-	public void putObjectState(byte objState[]) {
+	public void putObjectState(byte[] objState) {
 		try {
 			ByteArrayInputStream bis = new ByteArrayInputStream(objState);
 			new MMLScoreSerializer(this).parse(bis);
@@ -276,7 +276,7 @@ public final class MMLScore {
 		ArrayList<MMLNoteEvent[]> noteListArray = new ArrayList<>();
 		for (MMLTrack track : this.getTrackList()) {
 			int partIndex = 0;
-			MMLNoteEvent noteList[] = new MMLNoteEvent[4];
+			MMLNoteEvent[] noteList = new MMLNoteEvent[4];
 			for (MMLEventList eventList : track.getMMLEventList()) {
 				if (partIndex == 3) {
 					continue;
@@ -413,7 +413,7 @@ public final class MMLScore {
 		return sb.toString();
 	}
 
-	public static void main(String args[]) {
+	public static void main(String[] args) {
 		try {
 			System.out.println(" --- parse sample.mms ---");
 			MMSFile mms = new MMSFile();

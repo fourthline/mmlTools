@@ -130,7 +130,7 @@ public final class MMLEventList implements Serializable, Cloneable {
 	public int[] indexOfMMLString(long tickOffset) {
 		int start = 0;
 		for (MMLNoteEvent noteEvent : noteList) {
-			int index[] = noteEvent.getIndexOfMMLString();
+			int[] index = noteEvent.getIndexOfMMLString();
 			if (noteEvent.getTickOffset() <= tickOffset) {
 				if (tickOffset < noteEvent.getEndTick()) {
 					return index;
@@ -363,11 +363,8 @@ public final class MMLEventList implements Serializable, Cloneable {
 		}
 
 		MMLEventList eventList = (MMLEventList) obj;
-		if ( Arrays.equals(this.noteList.toArray(), eventList.noteList.toArray()) &&
-				Arrays.equals(this.tempoList.toArray(), eventList.tempoList.toArray()) ) {
-			return true;
-		}
-		return false;
+		return Arrays.equals(this.noteList.toArray(), eventList.noteList.toArray()) &&
+				Arrays.equals(this.tempoList.toArray(), eventList.tempoList.toArray());
 	}
 
 	public MMLNoteEvent getLastNote() {

@@ -15,11 +15,11 @@ import jp.fourthline.mmlTools.MMLScoreSerializer;
  * MMLファイルのparser
  */
 public interface IMMLFileParser {
-	public MMLScore parse(InputStream istream) throws MMLParseException;
-	public Map<String, Boolean> getParseProperties();
-	public String getName();
+	MMLScore parse(InputStream istream) throws MMLParseException;
+	Map<String, Boolean> getParseProperties();
+	String getName();
 
-	public static IMMLFileParser getParser(File file) {
+	static IMMLFileParser getParser(File file) {
 		IMMLFileParser fileParser;
 		String suffix = file.toString().toLowerCase();
 		if (suffix.endsWith(".mms")) {

@@ -68,7 +68,7 @@ public final class MMLEditorTest extends UseLoadingDLS {
 			}
 
 			@Override
-			public void playNote(int note[], int velocity) {
+			public void playNote(int[] note, int velocity) {
 				playingNote = note[0];
 			}
 

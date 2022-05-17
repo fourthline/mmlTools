@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Locale;
 import java.util.PropertyResourceBundle;
@@ -26,7 +27,7 @@ public final class ResourceLoader extends Control {
 		String bundleName = toBundleName(baseName, locale);
 		String resourceName = toResourceName(bundleName, "properties");
 		InputStream stream = new FileInputStream(getAppPath("properties/"+resourceName));
-		ResourceBundle resource = new PropertyResourceBundle(new InputStreamReader(stream, "UTF-8"));
+		ResourceBundle resource = new PropertyResourceBundle(new InputStreamReader(stream, StandardCharsets.UTF_8));
 		stream.close();
 		return resource;
 	}

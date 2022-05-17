@@ -15,54 +15,54 @@ public interface InstType {
 	 * 有効なパート情報を取得する. 
 	 * @return サイズは4の配列.
 	 */
-	public boolean[] getEnablePart();
+	boolean[] getEnablePart();
 
 	/**
 	 * @return 移調可能な場合は true, 移調できない場合は falseを返す.
 	 */
-	public boolean allowTranspose();
+	boolean allowTranspose();
 
 	/**
 	 * @return 和音パートにテンポ出力を許容するかどうかを返す.
 	 */
-	public boolean allowTempoChordPart();
+	boolean allowTempoChordPart();
 
 	/**
 	 * mmlのV指定からMidiの音量値に変換する.
 	 * @param mml_velocity
 	 * @return midiの音量値.
 	 */
-	public int convertVelocityMML2Midi(int mml_velocity);
+	int convertVelocityMML2Midi(int mml_velocity);
 
 	/** 使用不可な楽器 */
-	public InstType NONE = new NoneType();
+	InstType NONE = new NoneType();
 
 	/** 通常の楽器 [ melody, chord1, chord2 ]. */
-	public InstType NORMAL = new NormalType(true);
+	InstType NORMAL = new NormalType(true);
 
 	/** 打楽器楽器 [ melody ], 移調できない. */
-	public InstType DRUMS = new PercussionType(false);
+	InstType DRUMS = new PercussionType(false);
 
 	/** 打楽器楽器 [ melody ], 移調できる. (シロフォン) */
-	public InstType KPUR = new PercussionType(true);
+	InstType KPUR = new PercussionType(true);
 
 	/** 歌 [ song ]. */
-	public InstType VOICE = new NormalType(false);
+	InstType VOICE = new NormalType(false);
 
 	/** コーラス [ song ]. */
-	public InstType CHORUS = new NormalType(false);
+	InstType CHORUS = new NormalType(false);
 
 	/**
 	 * 単独で使用可能なメインの楽器のリスト.
 	 */
-	public List<InstType> MAIN_INST_LIST = Arrays.asList(NORMAL, DRUMS, KPUR, VOICE);
+	List<InstType> MAIN_INST_LIST = Arrays.asList(NORMAL, DRUMS, KPUR, VOICE);
 
 	/**
 	 * 単独で使用不能なサブの楽器のリスト.
 	 */
-	public List<InstType> SUB_INST_LIST = Arrays.asList(CHORUS);
+	List<InstType> SUB_INST_LIST = Arrays.asList(CHORUS);
 
-	public static InstType getInstType(String s) {
+	static InstType getInstType(String s) {
 		switch (s) {
 		case "0": return NONE;
 		case "N": return NORMAL;
@@ -74,10 +74,10 @@ public interface InstType {
 		}
 	}
 
-	public static final int VOICE_PLAYBACK_CHANNEL = 10;
+	int VOICE_PLAYBACK_CHANNEL = 10;
 
 	class NoneType implements InstType {
-		private final boolean enablePart[] = new boolean[] { false, false, false, false };
+		private final boolean[] enablePart = new boolean[] { false, false, false, false };
 
 		@Override
 		public boolean[] getEnablePart() {
@@ -104,7 +104,7 @@ public interface InstType {
 	 * 移調可能な通常音量の音源. [ melody, chord1, chord2 ] or [ song ]
 	 */
 	class NormalType implements InstType {
-		private final boolean enablePart[];
+		private final boolean[] enablePart;
 
 		private NormalType(boolean isNormal) {
 			if (isNormal) {
@@ -145,7 +145,7 @@ public interface InstType {
 	 * 打楽器楽器 [ melody ], 移調可否を指定する.
 	 */
 	class PercussionType implements InstType {
-		private final boolean enablePart[] = new boolean[] { true, false, false, false };
+		private final boolean[] enablePart = new boolean[] { true, false, false, false };
 		private final boolean allowTranspose;
 
 		private PercussionType(boolean allowTranspose) {

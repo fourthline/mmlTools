@@ -17,7 +17,7 @@ import java.util.TreeMap;
  * @author たんらる
  */
 public final class MelodyParser {
-	private String mml_src;
+	private final String mml_src;
 	private String mml_L;
 	private int mml_length = -1; // for tick
 	private int mml_oct = 4;
@@ -110,11 +110,7 @@ public final class MelodyParser {
 		if ( minNote == R_NOTE && maxNote == R_NOTE ) {
 			return true;
 		}
-		if ( (minNote >= min ) && (maxNote <= max) ) {
-			return true;
-		} else {
-			return false;
-		}
+		return (minNote >= min) && (maxNote <= max);
 
 	}
 
@@ -161,7 +157,7 @@ public final class MelodyParser {
 			pre_elem = now_elem;
 		}
 
-		length_total /= (double) MMLTickTable.TPQN;
+		length_total /= MMLTickTable.TPQN;
 
 		return length_total;
 	}
@@ -331,7 +327,7 @@ public final class MelodyParser {
 		reset();
 
 		while (mt.hasNext()) {
-			int parseIndex[] = mt.getIndex();
+			int[] parseIndex = mt.getIndex();
 			String item = mt.next();
 
 			try {

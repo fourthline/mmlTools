@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -67,7 +68,7 @@ public final class MMLTickTable {
 	}
 
 	private void add(int l, boolean dot) {
-		int tick = (int)( TPQN*4 / l ); 
+		int tick = TPQN*4 / l;
 		if (dot) {
 			tick += tick / 2;
 		}
@@ -98,7 +99,7 @@ public final class MMLTickTable {
 	}
 
 	private void generateInvTable() {
-		String keys[] = tickTable.keySet().toArray(new String[tickTable.size()]);
+		String[] keys = tickTable.keySet().toArray(new String[tickTable.size()]);
 		int mTick = tickTable.values().stream().max(Integer::compare).get();
 		for (int i = 1; i <= COMBN; i++) {
 			List<List<String>> pattern = new Combination<>(keys, i).getArray();
@@ -120,52 +121,48 @@ public final class MMLTickTable {
 	}
 
 	void writeToOutputStreamInvTable(OutputStream outputStream) {
-		try {
-			PrintStream stream = new PrintStream(outputStream, false, "UTF-8");
-			stream.println("# Generated Text --- ");
-			stream.println("# registered key: " + tickInvTable.size());
+		PrintStream stream = new PrintStream(outputStream, false, StandardCharsets.UTF_8);
+		stream.println("# Generated Text --- ");
+		stream.println("# registered key: " + tickInvTable.size());
 
-			int max = tickInvTable.keySet().stream().max(Integer::compare).get();
-			for (int i = 1; i <= max; i++) {
-				if (tickInvTable.containsKey(i)) {
-					stream.print(i+"=");
-					tickInvTable.get(i).forEach( s -> {
-						stream.print("[" + s + "]");
-					});
-					stream.println();
-				} else {
-					stream.println("# "+i+"=<< not supported >>");
-				}
+		int max = tickInvTable.keySet().stream().max(Integer::compare).get();
+		for (int i = 1; i <= max; i++) {
+			if (tickInvTable.containsKey(i)) {
+				stream.print(i+"=");
+				tickInvTable.get(i).forEach( s -> {
+					stream.print("[" + s + "]");
+				});
+				stream.println();
+			} else {
+				stream.println("# "+i+"=<< not supported >>");
 			}
-		} catch (UnsupportedEncodingException e) {}
+		}
 	}
 
 	private void readFromInputStreamInvTable(InputStream inputStream) {
-		try {
-			InputStreamReader reader = new InputStreamReader(inputStream, "UTF-8");
-			new BufferedReader(reader).lines().forEach(s -> {
-				if (!s.startsWith("#")) {
-					int keySep = s.indexOf('=');
-					String key = s.substring(0, keySep);
-					String itemList = s.substring(keySep+1);
-					ArrayList<String> valueList = new ArrayList<>();
-					while (itemList.length() > 0) {
-						int itemIndex = itemList.indexOf(']');
-						String item = itemList.substring(1, itemIndex);
-						valueList.add(item);
-						itemList = itemList.substring(itemIndex+1);
-					}
-					tickInvTable.put(Integer.parseInt(key), valueList);
+		InputStreamReader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+		new BufferedReader(reader).lines().forEach(s -> {
+			if (!s.startsWith("#")) {
+				int keySep = s.indexOf('=');
+				String key = s.substring(0, keySep);
+				String itemList = s.substring(keySep+1);
+				ArrayList<String> valueList = new ArrayList<>();
+				while (itemList.length() > 0) {
+					int itemIndex = itemList.indexOf(']');
+					String item = itemList.substring(1, itemIndex);
+					valueList.add(item);
+					itemList = itemList.substring(itemIndex+1);
 				}
-			});
-		} catch (UnsupportedEncodingException e) {}
+				tickInvTable.put(Integer.parseInt(key), valueList);
+			}
+		});
 	}
 
 	private void printTickList() {
 		writeToOutputStreamInvTable(System.out);
 	}
 
-	public static void main(String args[]) {
+	public static void main(String[] args) {
 		MMLTickTable tickTable = new MMLTickTable();
 		tickTable.printTickList();
 	}

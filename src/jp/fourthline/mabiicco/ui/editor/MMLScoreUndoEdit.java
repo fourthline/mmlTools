@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Stack;
@@ -54,7 +55,7 @@ public final class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFil
 	@Override
 	public void saveState() {
 		MMLScore score = mmlManager.getMMLScore();
-		byte state[] = score.getObjectState();
+		byte[] state = score.getObjectState();
 		if ( !undoState.empty() && Arrays.equals(state, undoState.lastElement()) ) {
 			return;
 		}
@@ -86,7 +87,7 @@ public final class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFil
 
 		MMLScore score = mmlManager.getMMLScore();
 		if (canUndo()) {
-			byte nextState[] = undoState.pop();
+			byte[] nextState = undoState.pop();
 			score.putObjectState(undoState.lastElement());
 			redoState.push(nextState);
 			makeBackup();
@@ -101,7 +102,7 @@ public final class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFil
 
 		MMLScore score = mmlManager.getMMLScore();
 		if (canRedo()) {
-			byte state[] = redoState.pop();
+			byte[] state = redoState.pop();
 			score.putObjectState(state);
 			undoState.push(state);
 			makeBackup();
@@ -112,11 +113,7 @@ public final class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFil
 
 	@Override
 	public boolean canUndo() {
-		if (undoState.size() > 1) {
-			return true;
-		}
-
-		return false;
+		return undoState.size() > 1;
 	}
 
 	@Override
@@ -126,11 +123,7 @@ public final class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFil
 
 	@Override
 	public boolean isModified() {
-		if ( originalIndex == (undoState.size()-1) ) {
-			return false;
-		}
-
-		return true;
+		return originalIndex != (undoState.size() - 1);
 	}
 
 	@Override
@@ -168,7 +161,7 @@ public final class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFil
 
 	private String makeBackupString() throws IOException {
 		ByteArrayOutputStream bstream = new ByteArrayOutputStream();
-		PrintStream pstream = new PrintStream(bstream, false, "UTF-8");
+		PrintStream pstream = new PrintStream(bstream, false, StandardCharsets.UTF_8);
 		pstream.println(serialVersionUID);
 
 		// undoState@Stack<byte[]>
@@ -181,7 +174,7 @@ public final class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFil
 		pstream.println(originalIndex);
 
 		pstream.close();
-		return new String( bstream.toByteArray() );
+		return bstream.toString();
 	}
 
 	private boolean parseBackupString(String s) throws IOException, NumberFormatException {
@@ -230,7 +223,7 @@ public final class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFil
 				}
 			}
 			bstream.close();
-			return new String(bstream.toByteArray());
+			return bstream.toString();
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
 		}

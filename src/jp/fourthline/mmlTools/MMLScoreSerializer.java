@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import jp.fourthline.mmlTools.parser.AbstractMMLParser;
@@ -96,7 +97,7 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 
 	private void putTempoObj(String s) {
 		if (s.length() > 0) {
-			String l[] = s.split(",");
+			String[] l = s.split(",");
 			score.getTempoEventList().clear();
 			for (String str : l) {
 				MMLTempoEvent e = MMLTempoEvent.fromString(str);
@@ -119,7 +120,7 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 
 		while ( (start = text.indexOf("MML@", index)) >= 0) {
 			int end = text.indexOf(';', start);
-			sb.append(text.substring(index, start));
+			sb.append(text, index, start);
 			sb.append( text.substring(start, end+1).replaceAll("[ \t\f\r\n]", "") );
 			index = end + 1;
 		}
@@ -193,50 +194,48 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 	}
 
 	public void writeToOutputStream(OutputStream outputStream) {
-		try {
-			PrintStream stream = new PrintStream(outputStream, false, "UTF-8");
+		PrintStream stream = new PrintStream(outputStream, false, StandardCharsets.UTF_8);
 
-			stream.println(SCORE_SECTION);
-			stream.println(SCORE_VERSION);
-			stream.println(TITLE + score.getTitle());
-			stream.println(AUTHOR + score.getAuthor());
-			stream.println(TIME + score.getBaseTime());
-			stream.println(TEMPO + getTempoObj());
-			if (getStartOffsetAll() > 0) {
-				stream.println(START_OFFSET + getStartOffsetAll());
+		stream.println(SCORE_SECTION);
+		stream.println(SCORE_VERSION);
+		stream.println(TITLE + score.getTitle());
+		stream.println(AUTHOR + score.getAuthor());
+		stream.println(TIME + score.getBaseTime());
+		stream.println(TEMPO + getTempoObj());
+		if (getStartOffsetAll() > 0) {
+			stream.println(START_OFFSET + getStartOffsetAll());
+		}
+
+		for (MMLTrack track : score.getTrackList()) {
+			// インスタンス時に先に指定したいので、オフセットたちは先に出力する
+			if (track.getStartDelta() != 0) {
+				stream.println(START_DELTA + track.getStartDelta());
 			}
-
-			for (MMLTrack track : score.getTrackList()) {
-				// インスタンス時に先に指定したいので、オフセットたちは先に出力する
-				if (track.getStartDelta() != 0) {
-					stream.println(START_DELTA + track.getStartDelta());
-				}
-				if (track.getStartSongDelta() != 0) {
-					stream.println(START_SONG_DELTA + track.getStartSongDelta());
-				}
-				//　本体
-				stream.println(MML_TRACK + track.getOriginalMML());
-				stream.println(TRACK_NAME + track.getTrackName());
-				stream.println(PROGRAM + track.getProgram());
-				stream.println(SONG_PROGRAM + track.getSongProgram());
-				stream.println(PANPOT + track.getPanpot());
-				stream.println(VISIBLE+track.isVisible());
-				if (track.getAttackDelayCorrect() != 0) {
-					stream.println(DELAY + track.getAttackDelayCorrect());
-				}
-				if (track.getAttackSongDelayCorrect() != 0) {
-					stream.println(SONG_DELAY+track.getAttackSongDelayCorrect());
-				}
+			if (track.getStartSongDelta() != 0) {
+				stream.println(START_SONG_DELTA + track.getStartSongDelta());
 			}
-
-			if (!score.getMarkerList().isEmpty()) {
-				stream.println(MARKER_SECTION);
-				for (Marker marker : score.getMarkerList()) {
-					stream.println(marker.toString());
-				}
+			//　本体
+			stream.println(MML_TRACK + track.getOriginalMML());
+			stream.println(TRACK_NAME + track.getTrackName());
+			stream.println(PROGRAM + track.getProgram());
+			stream.println(SONG_PROGRAM + track.getSongProgram());
+			stream.println(PANPOT + track.getPanpot());
+			stream.println(VISIBLE+track.isVisible());
+			if (track.getAttackDelayCorrect() != 0) {
+				stream.println(DELAY + track.getAttackDelayCorrect());
 			}
+			if (track.getAttackSongDelayCorrect() != 0) {
+				stream.println(SONG_DELAY+track.getAttackSongDelayCorrect());
+			}
+		}
 
-			stream.close();
-		} catch (UnsupportedEncodingException e) {}
+		if (!score.getMarkerList().isEmpty()) {
+			stream.println(MARKER_SECTION);
+			for (Marker marker : score.getMarkerList()) {
+				stream.println(marker.toString());
+			}
+		}
+
+		stream.close();
 	}
 }

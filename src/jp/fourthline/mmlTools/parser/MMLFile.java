@@ -42,7 +42,7 @@ public final class MMLFile extends AbstractMMLParser {
 			.pattern("Encoding=", t -> this.encoding = t);
 
 	// channel sections
-	private LinkedList<String> mmlParts = new LinkedList<>();
+	private final LinkedList<String> mmlParts = new LinkedList<>();
 	private List<Extension3mleTrack> trackList = null;
 
 	@Override
@@ -84,7 +84,7 @@ public final class MMLFile extends AbstractMMLParser {
 	private void createTrack() {
 		for (Extension3mleTrack track : trackList) {
 			int program = track.getInstrument() - 1; // 3MLEのInstruments番号は1がスタート.
-			String text[] = new String[] { "", "", "" };
+			String[] text = new String[] { "", "", "" };
 			for (int i = 0; i < track.getTrackCount(); i++) {
 				text[i] = mmlParts.pop();
 			}
@@ -148,7 +148,7 @@ public final class MMLFile extends AbstractMMLParser {
 			}
 		}
 
-		byte data[] = decode(sb.toString(), c);
+		byte[] data = decode(sb.toString(), c);
 		return parseData(data);
 	}
 
@@ -159,10 +159,10 @@ public final class MMLFile extends AbstractMMLParser {
 			throw new MMLParseException("invalid c="+c+" <> "+crc.getValue());
 		}
 		Decoder decoder = Base64.getDecoder();
-		byte b[] = decoder.decode(dSection);
+		byte[] b = decoder.decode(dSection);
 
 		int dataLength = ByteBuffer.wrap(b, 0, 4).order(ByteOrder.LITTLE_ENDIAN).getInt();
-		byte data[] = new byte[dataLength];
+		byte[] data = new byte[dataLength];
 
 		try {
 			BZip2CompressorInputStream bz2istream = new BZip2CompressorInputStream(new ByteArrayInputStream(b, 12, b.length-12));
@@ -183,7 +183,7 @@ public final class MMLFile extends AbstractMMLParser {
 	 * @param data decompress済みのバイト列
 	 * @return トラック構成情報
 	 */
-	private List<Extension3mleTrack> parseData(byte data[]) {
+	private List<Extension3mleTrack> parseData(byte[] data) {
 		LinkedList<Extension3mleTrack> trackList = new LinkedList<>();
 		trackList.add(new Extension3mleTrack(-1, -1, -1, null, 0)); // dummy
 
@@ -238,7 +238,7 @@ public final class MMLFile extends AbstractMMLParser {
 	}
 
 	private int readLEIntValue(InputStream istream) {
-		byte b[] = new byte[4];
+		byte[] b = new byte[4];
 		try {
 			istream.read(b);
 		} catch (IOException e) {
@@ -268,7 +268,7 @@ public final class MMLFile extends AbstractMMLParser {
 			while ( (b = istream.read()) != 0 ) {
 				ostream.write(b);
 			}
-			return new String(ostream.toByteArray(), encoding);
+			return ostream.toString(encoding);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -62,19 +63,19 @@ public class MMLScoreTest extends FileSelect {
 	 * 最適化向上した際の更新用です.
 	 * 更新するばあい trueに設定.
 	 */
-	private static boolean overwriteToLocalMMLOption = false;
+	private static final boolean overwriteToLocalMMLOption = false;
 
 	public static void checkMMLScoreWriteToOutputStream(MMLScore score, InputStream inputStream) {
 		try {
 			int size = inputStream.available();
-			byte expectBuf[] = new byte[size];
+			byte[] expectBuf = new byte[size];
 			inputStream.read(expectBuf);
 			inputStream.close();
 
 			// MMLScore -> mmi check
 			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 			new MMLScoreSerializer(score).writeToOutputStream(outputStream);
-			String mmiOutput = outputStream.toString("UTF-8");
+			String mmiOutput = outputStream.toString(StandardCharsets.UTF_8);
 			assertEquals(new String(expectBuf), mmiOutput);
 
 			// mmi -> re-parse check
@@ -87,7 +88,7 @@ public class MMLScoreTest extends FileSelect {
 		}
 	}
 
-	private void checkMMLFileOutput(MMLScore score, String expectFileName, String expectMML[]) {
+	private void checkMMLFileOutput(MMLScore score, String expectFileName, String[] expectMML) {
 		try {
 			/* MMLScore.writeToOutputStream() */
 			InputStream inputStream = fileSelect(expectFileName);
@@ -115,7 +116,7 @@ public class MMLScoreTest extends FileSelect {
 		score.addTrack(track);
 		score.getMarkerList().add(new Marker("marker1", 96));
 
-		String mml[] = { "MML@aaa,bbb,ccc,dd1;" };
+		String[] mml = { "MML@aaa,bbb,ccc,dd1;" };
 
 		checkMMLFileOutput(score.generateAll(), "format0.mmi", mml);
 	}
@@ -132,7 +133,7 @@ public class MMLScoreTest extends FileSelect {
 		track2.setSongProgram(120);
 		score.addTrack(track2);
 
-		String mml[] = { 
+		String[] mml = {
 				"MML@at150at120a1,bbb,ccc,dt150dt120v0d2.v8;",
 				"MML@at150at120a2,bbb,ccc,dt150dt120v0dv8;"
 		};
@@ -163,7 +164,7 @@ public class MMLScoreTest extends FileSelect {
 		track.setTrackName("track1");
 		score.addTrack(track);
 
-		String mml[] = { "MML@v0c1t180v8c8,,;" };
+		String[] mml = { "MML@v0c1t180v8c8,,;" };
 
 		checkMMLFileOutput(score.generateAll(), "format_r0.mmi", mml);
 	}
@@ -175,7 +176,7 @@ public class MMLScoreTest extends FileSelect {
 		track.setTrackName("track1");
 		score.addTrack(track);
 
-		String mml[] = { "MML@v0c1t180v8c8,,;" };
+		String[] mml = { "MML@v0c1t180v8c8,,;" };
 
 		checkMMLFileOutput(score.generateAll(), "format_r0.mmi", mml);
 	}
@@ -195,7 +196,7 @@ public class MMLScoreTest extends FileSelect {
 		track3.setTrackName("track3");
 		score.addTrack(track3);
 
-		String mml[] = {
+		String[] mml = {
 				"MML@l1r>f+t120v0f+v8,,;",
 				"MML@l1rv0ct120v8a+,,;",
 				"MML@d1,,;" // 後方にあるテンポは出力しない.
@@ -221,7 +222,7 @@ public class MMLScoreTest extends FileSelect {
 		track3.setTrackName("track3");
 		score.addTrack(track3);
 
-		String mml[] = {
+		String[] mml = {
 				"MML@l1r>f+&f+,l1rv0ct120,;",
 				"MML@l1rv0ct120v8a+,,;",
 				"MML@d1,,;" // 後方にあるテンポは出力しない.
@@ -246,7 +247,7 @@ public class MMLScoreTest extends FileSelect {
 
 		score.getTempoEventList().add(new MMLTempoEvent(140, 0));
 
-		String mml[] = {
+		String[] mml = {
 				"MML@t140c1,,,t140e1;",
 				"MML@t140d1,,;",
 		};
@@ -273,7 +274,7 @@ public class MMLScoreTest extends FileSelect {
 		score.getTempoEventList().add(new MMLTempoEvent(100, 0));
 		score.getTempoEventList().add(new MMLTempoEvent(220, 1152));
 
-		String mml[] = {
+		String[] mml = {
 				"MML@t220c1&c8&c9,,,t220<d8&d16.;",
 				"MML@t220<b1&b,,;",
 		};
@@ -391,7 +392,7 @@ public class MMLScoreTest extends FileSelect {
 				fail("not found "+listFile);
 				return;
 			}
-			InputStreamReader reader = new InputStreamReader(stream, "UTF-8");
+			InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
 			new BufferedReader(reader).lines().forEach(s -> {
 				System.out.println(s);
 				mmlFileParse(s, overwriteToLocalMMLOption);
@@ -412,12 +413,12 @@ public class MMLScoreTest extends FileSelect {
 		score.addTrack(new MMLTrack().setMML("MML@rf,e"));
 		score.addTrack(new MMLTrack().setMML("MML@,ra,g"));
 
-		MMLNoteEvent expect1[] = {
+		MMLNoteEvent[] expect1 = {
 				new MMLNoteEvent(48, 96, 0),
 				new MMLNoteEvent(52, 96, 0),
 				new MMLNoteEvent(55, 96, 0)
 		};
-		MMLNoteEvent expect2[] = {
+		MMLNoteEvent[] expect2 = {
 				new MMLNoteEvent(50, 96, 96),
 				new MMLNoteEvent(53, 96, 96),
 				new MMLNoteEvent(57, 96, 96)
@@ -805,7 +806,7 @@ public class MMLScoreTest extends FileSelect {
 		assertEquals("1:0:0", score.getBarTextTick(384));
 	}
 
-	public static void main(String args[]) {
+	public static void main(String[] args) {
 		var o = new MMLScoreTest();
 		MMLScoreTest.setupClass();
 		var report = new ByteArrayOutputStream();

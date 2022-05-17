@@ -8,6 +8,6 @@ import java.util.List;
 import javax.swing.JMenuItem;
 
 public interface IMarkerEditor {
-	public List<JMenuItem> getMenuItems();
-	public void activateEditMenuItem(int baseTick, int delta);
+	List<JMenuItem> getMenuItems();
+	void activateEditMenuItem(int baseTick, int delta);
 }

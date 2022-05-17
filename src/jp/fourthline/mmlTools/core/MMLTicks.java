@@ -52,7 +52,7 @@ public final class MMLTicks {
 	}
 
 
-	private String noteName;
+	private final String noteName;
 	int tick;
 	boolean needTie;
 

@@ -44,7 +44,7 @@ public final class InstClass {
 	public static boolean debug = false;
 
 	public InstClass(String name, int bank, int program, Instrument inst) {
-		String str[] = name.split(",");
+		String[] str = name.split(",");
 		this.name = str[0];
 		this.inst = inst;
 
@@ -127,11 +127,7 @@ public final class InstClass {
 	}
 
 	public boolean checkPitchRange(int note) {
-		if ( (note < lowerNote) || (note > upperNote) ) {
-			return false;
-		} else {
-			return true;
-		}
+		return (note >= lowerNote) && (note <= upperNote);
 	}
 
 	public int getLowerNote() {
@@ -151,7 +147,7 @@ public final class InstClass {
 	}
 
 	private final static class ExcludeRegion {
-		private static final ExcludeRegion values[] = {
+		private static final ExcludeRegion[] values = {
 				new ExcludeRegion("Pipe_c5", 60 ,71, 60),
 				new ExcludeRegion("Pipe_c5", 48 ,59, 48),
 				new ExcludeRegion("Pipe_c5", 72 ,83, 60),
@@ -184,9 +180,9 @@ public final class InstClass {
 	 */
 	public final class Options {
 		public final static int OPTION_NUM = 256;
-		private final double attentionList[];
-		private final boolean overlapList[];
-		private final boolean validList[];
+		private final double[] attentionList;
+		private final boolean[] overlapList;
+		private final boolean[] validList;
 
 		private Options(Instrument instrument) {
 			if (instrument instanceof DLSInstrument) {
@@ -288,7 +284,7 @@ public final class InstClass {
 	 * @return パート番号
 	 */
 	public static int getFirstPartNumberOnProgram(int program) {
-		boolean b[] = getEnablePartByProgram(program);
+		boolean[] b = getEnablePartByProgram(program);
 
 		for (int i = 0; i < b.length; i++) {
 			if (b[i]) {

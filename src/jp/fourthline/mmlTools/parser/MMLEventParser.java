@@ -127,11 +127,7 @@ public final class MMLEventParser implements Iterator<MMLEvent> {
 			parseNextEvent();
 		}
 
-		if (nextItem == null) {
-			return false;
-		} else {
-			return true;
-		}
+		return nextItem != null;
 	}
 
 	@Override

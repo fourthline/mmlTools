@@ -70,7 +70,7 @@ public final class TrackPropertyPanelTest {
 		public void updatePianoRollView(int note) {}
 	}
 
-	private IMMLManager mmlManager = new MMLManagerStub();
+	private final IMMLManager mmlManager = new MMLManagerStub();
 
 	@Test
 	public void test_delayInst() {

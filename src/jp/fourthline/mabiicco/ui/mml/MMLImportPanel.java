@@ -118,7 +118,7 @@ public final class MMLImportPanel extends JPanel {
 
 	private void importMMLTrack() {
 		MMLScore targetScore = mmlManager.getMMLScore();
-		boolean checkList[] = table.getCheckList();
+		boolean[] checkList = table.getCheckList();
 		for (int i = 0; i < trackList.size(); i++) {
 			if (checkList[i]) {
 				targetScore.addTrack(trackList.get(i));

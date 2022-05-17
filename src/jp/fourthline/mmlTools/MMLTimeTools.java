@@ -32,10 +32,10 @@ public class MMLTimeTools extends MMLTools {
 	 * チューバ
 	 * O1c～O4b  (12 @ 59)
 	 */
-	final private int minTable[] = {
+	final private int[] minTable = {
 			16, 48, 60, 24, 12
 	};
-	final private int maxTable[] = {
+	final private int[] maxTable = {
 			88, 83, 88, 59, 59
 	};
 
@@ -48,11 +48,11 @@ public class MMLTimeTools extends MMLTools {
 
 
 	public boolean[] checkRange() {
-		jp.fourthline.mmlTools.core.MelodyParser parser[] = {
+		jp.fourthline.mmlTools.core.MelodyParser[] parser = {
 				melodyParser, chord1Parser, chord2Parser
 		};
 
-		boolean result[] = new boolean[minTable.length];
+		boolean[] result = new boolean[minTable.length];
 		for (int i = 0; i < result.length; i++) {
 			result[i] = true;
 		}

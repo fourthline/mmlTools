@@ -211,7 +211,7 @@ public final class MidiFile extends AbstractMMLParser {
 	private void createMMLTrack(ArrayList<MMLEventList> eventList, TrackInfo trackInfo) {
 		try {
 			while (eventList.size() > 0) {
-				String mml[] = new String[3];
+				String[] mml = new String[3];
 				for (int i = 0; i < mml.length; i++) {
 					if (!eventList.isEmpty()) {
 						mml[i] = new MMLStringOptimizer(eventList.get(0).getInternalMMLString()).toString();

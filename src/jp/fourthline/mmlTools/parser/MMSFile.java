@@ -22,7 +22,7 @@ public final class MMSFile extends AbstractMMLParser {
 	private static final String PATCH_NAME = "mms_instPatch";
 
 	/* MMS->programへの変換テーブル */
-	private static int mmsInstTable[] = {
+	private static final int[] mmsInstTable = {
 		0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 
 		10, 11, 12, 13, 14, 15, 16, 17, 65, 66, 
 		67, 68,	69, 70, 71, 72, 73, 74, 75, 76, 
@@ -121,8 +121,8 @@ public final class MMSFile extends AbstractMMLParser {
 	 * @return
 	 */
 	private MMLTrack parseMMSPart(String contents) {
-		final int intValue[] = { 0, 0 };
-		final String stringValue[] = { "", "", "", "" };
+		final int[] intValue = { 0, 0 };
+		final String[] stringValue = { "", "", "", "" };
 
 		new TextParser()
 		.pattern("instrument=", t -> intValue[0] = convertInstProgram(Integer.parseInt(t)) )

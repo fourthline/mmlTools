@@ -5,6 +5,6 @@
 package jp.fourthline.mabiicco.midi;
 
 public interface IWavoutState {
-	public long getTime();
-	public long getLen();
+	long getTime();
+	long getLen();
 }

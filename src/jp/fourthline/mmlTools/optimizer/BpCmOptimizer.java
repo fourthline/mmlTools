@@ -35,7 +35,7 @@ public final class BpCmOptimizer implements MMLStringOptimizer.Optimizer {
 			@Override
 			public BpCmState nextStatus(String token) {
 				if (isNoteWithoutR(token)) {
-					if (MMLTokenizer.noteNames(token)[0].toLowerCase().equals("b")) {
+					if (MMLTokenizer.noteNames(token)[0].equalsIgnoreCase("b")) {
 						return B2;
 					}
 					return NONE;
@@ -80,7 +80,7 @@ public final class BpCmOptimizer implements MMLStringOptimizer.Optimizer {
 			@Override
 			public BpCmState nextStatus(String token) {
 				if (isNoteWithoutR(token)) {
-					if (MMLTokenizer.noteNames(token)[0].toLowerCase().equals("c")) {
+					if (MMLTokenizer.noteNames(token)[0].equalsIgnoreCase("c")) {
 						return C2;
 					}
 					return NONE;
@@ -129,10 +129,7 @@ public final class BpCmOptimizer implements MMLStringOptimizer.Optimizer {
 
 		private static boolean isNoteWithoutR(String token) {
 			char firstC = Character.toLowerCase( token.charAt(0) );
-			if ("abcdefg".indexOf(firstC) >= 0) {
-				return true;
-			}
-			return false;
+			return "abcdefg".indexOf(firstC) >= 0;
 		}
 	}
 

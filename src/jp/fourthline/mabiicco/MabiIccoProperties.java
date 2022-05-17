@@ -146,7 +146,7 @@ public final class MabiIccoProperties {
 
 	public List<File> getDlsFile() {
 		String str = dls_file.get();
-		String filenames[] = str.split(",");
+		String[] filenames = str.split(",");
 		ArrayList<File> fileArray = new ArrayList<>();
 		for (String filename : filenames) {
 			fileArray.add(new File(filename));
@@ -154,7 +154,7 @@ public final class MabiIccoProperties {
 		return fileArray;
 	}
 
-	public void setDlsFile(File fileArray[]) {
+	public void setDlsFile(File[] fileArray) {
 		StringBuilder sb = new StringBuilder();
 		if (fileArray != null) {
 			for (File file : fileArray) {
@@ -215,14 +215,12 @@ public final class MabiIccoProperties {
 	}
 
 	public File[] getFileHistory() {
-		File list[] = new File[ fileHistory.size() ];
+		File[] list = new File[ fileHistory.size() ];
 		return fileHistory.toArray( list );
 	}
 
 	public void setFileHistory(File file) {
-		if (fileHistory.contains(file)) {
-			fileHistory.remove(file);
-		}
+		fileHistory.remove(file);
 		fileHistory.addFirst(file);
 		while (fileHistory.size() > MAX_FILE_HISTORY) {
 			fileHistory.removeLast();
@@ -234,8 +232,8 @@ public final class MabiIccoProperties {
 	}
 
 	public interface Property<T> {
-		public void set(T value);
-		public T get();
+		void set(T value);
+		T get();
 	}
 
 	private final class StringProperty implements Property<String> {

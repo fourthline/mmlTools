@@ -16,7 +16,7 @@ import jp.fourthline.mmlTools.ComposeRank;
 
 public final class MMLTextTest {
 
-	private String backup = MMLText.getMelodyEmptyStr();
+	private final String backup = MMLText.getMelodyEmptyStr();
 
 	@Before
 	public void setup() {
@@ -48,18 +48,18 @@ public final class MMLTextTest {
 		List<MMLText> list = text.splitMML(ComposeRank.getTopRank());
 		assertEquals(8, list.size());
 		StringBuilder expect1 = new StringBuilder();
-		expect1.append("MML@").append(s.substring(0, 1200))
-		.append(',').append(s.substring(0, 800))
-		.append(',').append(s.substring(0, 500))
-		.append(',').append(s.substring(0, 1200))
+		expect1.append("MML@").append(s, 0, 1200)
+		.append(',').append(s, 0, 800)
+		.append(',').append(s, 0, 500)
+		.append(',').append(s, 0, 1200)
 		.append(';');
 		assertEquals(expect1.toString(), list.get(0).getMML());
 
 		StringBuilder expect2 = new StringBuilder();
-		expect2.append("MML@").append(s.substring(1200, 2400))
-		.append(',').append(s.substring(800, 1600))
-		.append(',').append(s.substring(500, 1000))
-		.append(',').append(s.substring(1200, 2400))
+		expect2.append("MML@").append(s, 1200, 2400)
+		.append(',').append(s, 800, 1600)
+		.append(',').append(s, 500, 1000)
+		.append(',').append(s, 1200, 2400)
 		.append(';');
 		assertEquals(expect2.toString(), list.get(1).getMML());
 	}
@@ -80,15 +80,15 @@ public final class MMLTextTest {
 		assertEquals(8, list.size());
 		StringBuilder expect1 = new StringBuilder();
 		expect1.append("MML@").append("<>")
-		.append(',').append(s.substring(0, 800))
-		.append(',').append(s.substring(0, 500))
+		.append(',').append(s, 0, 800)
+		.append(',').append(s, 0, 500)
 		.append(';');
 		assertEquals(expect1.toString(), list.get(0).getMML());
 
 		StringBuilder expect2 = new StringBuilder();
 		expect2.append("MML@").append("<>")
-		.append(',').append(s.substring(800, 1600))
-		.append(',').append(s.substring(500, 1000))
+		.append(',').append(s, 800, 1600)
+		.append(',').append(s, 500, 1000)
 		.append(';');
 		assertEquals(expect2.toString(), list.get(1).getMML());
 	}

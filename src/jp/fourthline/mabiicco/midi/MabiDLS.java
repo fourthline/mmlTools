@@ -37,24 +37,24 @@ public final class MabiDLS {
 	private static MabiDLS instance = null;
 	private Synthesizer synthesizer;
 	private Sequencer sequencer;
-	private MidiChannel channel[];
-	private ArrayList<MMLNoteEvent[]> playNoteList = new ArrayList<>();
+	private MidiChannel[] channel;
+	private final ArrayList<MMLNoteEvent[]> playNoteList = new ArrayList<>();
 	private static final int MAX_CHANNEL_PLAY_NOTE = 4;
 	private static final int MAX_MIDI_PART = MMLScore.MAX_TRACK * 2;
 	private static final int MIDI_CHORUS_OFFSET = MMLScore.MAX_TRACK;
 	public static final int KEYBOARD_PLAY_CHANNEL = MAX_MIDI_PART;
-	private ArrayList<InstClass> insts = new ArrayList<>();
+	private final ArrayList<InstClass> insts = new ArrayList<>();
 	private static final int DLS_BANK = (0x79 << 7);
 
-	public static final String DEFALUT_DLS_PATH[] = { 
+	public static final String[] DEFALUT_DLS_PATH = {
 			"Nexon/Mabinogi/mp3/MSXspirit01.dls",
 			"Nexon/Mabinogi/mp3/MSXspirit02.dls",
 			"Nexon/Mabinogi/mp3/MSXspirit03.dls",
 			"Nexon/Mabinogi/mp3/MSXspirit04.dls"
 	};
 
-	private ArrayList<Runnable> notifier = new ArrayList<>();
-	private boolean muteState[] = new boolean[ MAX_MIDI_PART+1 ];
+	private final ArrayList<Runnable> notifier = new ArrayList<>();
+	private final boolean[] muteState = new boolean[ MAX_MIDI_PART+1 ];
 	private WavoutDataLine wavout;
 
 	public static MabiDLS getInstance() {
@@ -90,7 +90,7 @@ public final class MabiDLS {
 			int type = meta.getType();
 			if (type == MMLTempoEvent.META) {
 				// テンポイベントを処理します.
-				byte metaData[] = meta.getData();
+				byte[] metaData = meta.getData();
 				sequencer.setTempoInMPQ(ByteBuffer.wrap(metaData).getInt());
 			} else if (type == 0x2f) {
 				// トラック終端
@@ -209,7 +209,7 @@ public final class MabiDLS {
 					file = aFile;
 					break;
 				}
-			};
+			}
 		}
 		if (file.exists()) {
 			List<InstClass> loadList = InstClass.loadDLS(file);
@@ -310,7 +310,7 @@ public final class MabiDLS {
 	}
 
 	/** 和音再生 */
-	public void playNotes(MMLNoteEvent noteList[], int program, int channel) {
+	public void playNotes(MMLNoteEvent[] noteList, int program, int channel) {
 		/* シーケンサによる再生中は鳴らさない */
 		if (sequencer.isRunning()) {
 			return;
@@ -462,7 +462,7 @@ public final class MabiDLS {
 		// グローバルテンポ
 		List<MMLTempoEvent> globalTempoList = score.getTempoEventList();
 		for (MMLTempoEvent tempoEvent : globalTempoList) {
-			byte tempo[] = tempoEvent.getMetaData();
+			byte[] tempo = tempoEvent.getMetaData();
 			int tickOffset = tempoEvent.getTickOffset();
 			if (tickOffset >= totalTick) {
 				break;
@@ -506,7 +506,7 @@ public final class MabiDLS {
 				0);
 		track.add(new MidiEvent(pcMessage, 0));
 
-		boolean enablePart[] = InstClass.getEnablePartByProgram(targetProgram);
+		boolean[] enablePart = InstClass.getEnablePartByProgram(targetProgram);
 		InstClass instClass = getInstByProgram(targetProgram);
 		MMLMidiTrack midiTrack = new MMLMidiTrack(instClass);
 		for (int i = 0; i < enablePart.length; i++) {
@@ -595,7 +595,7 @@ public final class MabiDLS {
 		return midiDeviceList;
 	}
 
-	public static void main(String args[]) {
+	public static void main(String[] args) {
 		try {
 			InstClass.debug = true;
 			MabiDLS midi = new MabiDLS();

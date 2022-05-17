@@ -120,7 +120,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 		g2.dispose();
 	}
 
-	private static final float dash[] = { 2.0f, 4.0f };
+	private static final float[] dash = { 2.0f, 4.0f };
 	private static final BasicStroke dashStroke = new BasicStroke(1.0f, 
 			BasicStroke.CAP_BUTT, 
 			BasicStroke.JOIN_MITER, 
@@ -194,8 +194,8 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 	}
 
 	private void drawMarker(Graphics2D g, String s, int x, Color color, int dy) {
-		int xPoints[] = { x-3, x+3, x+3, x, x-3 };
-		int yPoints[] = { -10, -10, -4, -1, -4 };
+		int[] xPoints = { x-3, x+3, x+3, x, x-3 };
+		int[] yPoints = { -10, -10, -4, -1, -4 };
 		for (int i = 0; i < yPoints.length; i++) {
 			yPoints[i] += DRAW_HEIGHT + dy;
 		}
@@ -217,8 +217,8 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 		}
 
 		int x = pianoRollView.convertTicktoX( targetMarker.getAsInt() );
-		int xPoints[] = { x-5, x+5, x+5, x, x-5 };
-		int yPoints[] = { 8, 8, DRAW_HEIGHT-5, DRAW_HEIGHT, DRAW_HEIGHT-5 };
+		int[] xPoints = { x-5, x+5, x+5, x, x-5 };
+		int[] yPoints = { 8, 8, DRAW_HEIGHT-5, DRAW_HEIGHT, DRAW_HEIGHT-5 };
 
 		// icon
 		g.setColor(TARGET_MAKER_FILL_COLOR);

@@ -43,7 +43,7 @@ public final class PianoRollView extends JPanel {
 	/**
 	 * ノートの表示高さ
 	 */
-	public static int NOTE_HEIGHT_TABLE[] = { 6, 8, 10, 12, 14 };
+	public static int[] NOTE_HEIGHT_TABLE = { 6, 8, 10, 12, 14 };
 	private int noteHeight = NOTE_HEIGHT_TABLE[3];
 	public int getNoteHeight() {
 		return noteHeight;
@@ -111,7 +111,7 @@ public final class PianoRollView extends JPanel {
 		ACTIVE_PART("paintMode.active_part");
 
 		private final String resourceName;
-		private PaintMode(String name) {
+		PaintMode(String name) {
 			resourceName = AppResource.appText(name);
 		}
 		public String toString() {
@@ -422,7 +422,7 @@ public final class PianoRollView extends JPanel {
 	/**
 	 * 補助線の描画.
 	 */
-	private static final float dash[] = { 2.0f, 4.0f };
+	private static final float[] dash = { 2.0f, 4.0f };
 	private static final BasicStroke dashStroke = new BasicStroke(1.0f, 
 			BasicStroke.CAP_BUTT, 
 			BasicStroke.JOIN_MITER, 
@@ -549,8 +549,8 @@ public final class PianoRollView extends JPanel {
 			return;
 		}
 
-		boolean instEnable[] = InstClass.getEnablePartByProgram(track.getProgram());
-		boolean songExEnable[] = InstClass.getEnablePartByProgram(track.getSongProgram());
+		boolean[] instEnable = InstClass.getEnablePartByProgram(track.getProgram());
+		boolean[] songExEnable = InstClass.getEnablePartByProgram(track.getSongProgram());
 		MMLEventList activePart = mmlManager.getActiveMMLPart();
 
 		int colorIndex = 0;

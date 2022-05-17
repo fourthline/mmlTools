@@ -5,5 +5,5 @@
 package jp.fourthline.mabiicco;
 
 public interface IFileStateObserver {
-	public void notifyUpdateFileState();
+	void notifyUpdateFileState();
 }

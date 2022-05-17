@@ -39,7 +39,7 @@ public final class OxLxFixedOptimizer extends OxLxOptimizer {
 				}
 			}
 		}
-	};
+	}
 
 	/**
 	 * 置換パターン

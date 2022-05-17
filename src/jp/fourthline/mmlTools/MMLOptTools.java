@@ -25,7 +25,7 @@ public class MMLOptTools {
 		return replaceCount;
 	}
 
-	private String orig_tick[] = {
+	private final String[] orig_tick = {
 			"32",
 			"32.",
 			"16",
@@ -49,7 +49,7 @@ public class MMLOptTools {
 	 * 変換パターン
 	 * space: 休符
 	 */
-	private String pattern64_tick[] = {
+	private final String[] pattern64_tick = {
 			"64 64",
 			"32 64",
 			"21 64",

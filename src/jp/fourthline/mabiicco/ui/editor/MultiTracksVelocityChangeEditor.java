@@ -132,10 +132,7 @@ public final class MultiTracksVelocityChangeEditor extends JPanel {
 	}
 
 	private void updateButtonStatus() {
-		boolean enable = true;
-		if (table.getCheckCount() == 0) {
-			enable = false;
-		}
+		boolean enable = table.getCheckCount() != 0;
 		if (spinner.getValue().equals(0)) {
 			enable = false;
 		}
@@ -146,7 +143,7 @@ public final class MultiTracksVelocityChangeEditor extends JPanel {
 	public void apply() {
 		int delta = ((Integer) spinner.getValue()).intValue();
 		List<MMLTrack> trackList = mmlManager.getMMLScore().getTrackList();
-		boolean checkList[] = table.getCheckList();
+		boolean[] checkList = table.getCheckList();
 		for (int i = 0; i < trackList.size(); i++) {
 			if (checkList[i]) {
 				trackList.get(i).getMMLEventList().forEach(t -> {

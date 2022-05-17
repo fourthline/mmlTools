@@ -50,8 +50,8 @@ public final class TrackTabbedPane extends JTabbedPane implements DragGestureLis
 			Rectangle rect = getBoundsAt(targetIndex.getAsInt());
 			int x = rect.x;
 			int y = rect.height;
-			int xPoints[] = { x-4, x+4, x, x, x };
-			int yPoints[] = { 0, 0, 4, y, 4 };
+			int[] xPoints = { x-4, x+4, x, x, x };
+			int[] yPoints = { 0, 0, 4, y, 4 };
 			g.setColor(Color.CYAN);
 			g.fillPolygon(xPoints, yPoints, xPoints.length);
 			g.setColor(Color.BLUE);
@@ -78,7 +78,7 @@ public final class TrackTabbedPane extends JTabbedPane implements DragGestureLis
 
 	private final class TrackTabTransfer implements Transferable {
 		private final TrackTabbedPane content;
-		private DataFlavor f[] = {
+		private final DataFlavor[] f = {
 				new DataFlavor(TrackTabbedPane.class, "obj/TabbedPane")
 		};
 		private TrackTabTransfer(TrackTabbedPane c) {
@@ -135,9 +135,7 @@ public final class TrackTabbedPane extends JTabbedPane implements DragGestureLis
 			if (action == MOVE) {
 				if (support.isDataFlavorSupported(dataFlavor)) {
 					Point dropPoint = support.getDropLocation().getDropPoint();
-					if (pane.updateTargetIndex(getTargetIndex(dropPoint))) {
-						return true;
-					}
+					return pane.updateTargetIndex(getTargetIndex(dropPoint));
 				}
 			}
 			return false;

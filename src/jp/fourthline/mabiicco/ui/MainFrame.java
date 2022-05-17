@@ -90,7 +90,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 
 	private JButton loopButton = null;
 
-	private MenuWithIndex fileHistory[] = new MenuWithIndex[ MabiIccoProperties.MAX_FILE_HISTORY ];
+	private final MenuWithIndex[] fileHistory = new MenuWithIndex[ MabiIccoProperties.MAX_FILE_HISTORY ];
 
 	/**
 	 * Create the frame.
@@ -708,7 +708,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	}
 
 	public void updateFileHistoryMenu() {
-		File fileList[] = MabiIccoProperties.getInstance().getFileHistory();
+		File[] fileList = MabiIccoProperties.getInstance().getFileHistory();
 		for (int i = 0; i < fileHistory.length; i++) {
 			if ( (i < fileList.length) && (fileList[i] != null) ) {
 				fileHistory[i].setText( (i+1) + " " + fileList[i].getName() );

@@ -4,5 +4,5 @@
 package jp.fourthline.mabiicco.ui;
 
 public interface MainView {
-	public void repaint();
+	void repaint();
 }

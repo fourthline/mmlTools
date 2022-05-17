@@ -90,7 +90,7 @@ public class DrumTools extends MMLTools {
 	 * @return
 	 */
 	private String tailLength(double time) {
-		String tickCandidate[] = {
+		String[] tickCandidate = {
 				//				"1", "2", "3", "4", "5", "6", "7", "8", "12", "16", "32"
 				"1", "2", "4", "8", "12", "16", "32"
 		};
@@ -146,7 +146,7 @@ public class DrumTools extends MMLTools {
 	 * @return
 	 */
 	int convDrumVol(int vol) {
-		int table[] = {
+		int[] table = {
 				0, 1, 1, 2, 3, 4, 4, 5, 6, 7, 7, 8, 9, 10, 10, 11 
 		};
 

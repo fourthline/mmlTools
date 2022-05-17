@@ -34,7 +34,7 @@ public final class ExtendMessage extends ShortMessage {
 	 */
 	public static final class ExtendReceiver implements Receiver {
 		private final Receiver target;
-		private final boolean cache[][]; 
+		private final boolean[][] cache;
 
 		public ExtendReceiver(Receiver target, int maxChannel) {
 			this.target = target;

@@ -5,5 +5,5 @@
 package jp.fourthline.mabiicco;
 
 public interface IEditStateObserver {
-	public void notifyUpdateEditState();
+	void notifyUpdateEditState();
 }

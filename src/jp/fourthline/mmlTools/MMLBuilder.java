@@ -38,7 +38,7 @@ public final class MMLBuilder {
 	 * @throws UndefinedTickException
 	 */
 	private char makeTempoChar(List<MMLEventList> relationPart, long offset, int currentOctave) throws UndefinedTickException {
-		boolean f[] = { true, true, true, true, true, true, true };
+		boolean[] f = { true, true, true, true, true, true, true };
 		// relationのパートのオフセット位置の情報をつかって、使用するabcdefg のどれを使うかを決める。
 		if (relationPart != null) {
 			for (MMLEventList t : relationPart) {
@@ -136,9 +136,7 @@ public final class MMLBuilder {
 	/**
 	 * テンポ出力を行うかどうかを指定してMML文字列を作成する.
 	 * TODO: 長いなぁ。
-	 * @param startOffset
 	 * @param withTempo    trueを指定すると、tempo指定を含むMMLを返します.
-	 * @param totalTick    最大tick長. これに満たない場合は、末尾を休符分で埋めます.
 	 * @param mabiTempo    MML for mabi
 	 * @param relationPart テンポ補正時に参照する関連するパートの情報
 	 * @return

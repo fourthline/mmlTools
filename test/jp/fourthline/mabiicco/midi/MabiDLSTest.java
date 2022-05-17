@@ -28,7 +28,7 @@ import jp.fourthline.mmlTools.core.UndefinedTickException;
  */
 public class MabiDLSTest extends UseLoadingDLS {
 
-	private MabiDLS dls = MabiDLS.getInstance();
+	private final MabiDLS dls = MabiDLS.getInstance();
 
 	private void checkMute(int trackIndex, int midiChannel) {
 		System.out.println("checkMute "+trackIndex+" @ "+midiChannel);
@@ -75,10 +75,10 @@ public class MabiDLSTest extends UseLoadingDLS {
 		assertEquals(3, seq.getTracks().length);
 		assertEquals(MMLTicks.getTick("1"), seq.getTickLength());
 
-		byte t0[][] = new byte[][] {
+		byte[][] t0 = new byte[][] {
 			new byte[]{(byte)MetaMessage.META, 81, 3, 5, 22, 21}, // t180
 		};
-		byte t1[][] = new byte[][] {
+		byte[][] t1 = new byte[][] {
 			new byte[]{(byte)ShortMessage.PROGRAM_CHANGE, 0x5},
 			new byte[]{(byte)ShortMessage.NOTE_ON, 69, 39}, // a
 			new byte[]{(byte)ShortMessage.NOTE_ON, 71, 39}, // b
@@ -190,7 +190,7 @@ public class MabiDLSTest extends UseLoadingDLS {
 
 			InputStream inputStream = fileSelect("instOptions.txt");
 			int size = inputStream.available();
-			byte expectBuf[] = new byte[size];
+			byte[] expectBuf = new byte[size];
 			inputStream.read(expectBuf);
 			inputStream.close();
 
@@ -208,7 +208,7 @@ public class MabiDLSTest extends UseLoadingDLS {
 
 			InputStream inputStream = fileSelect("instInfos.txt");
 			int size = inputStream.available();
-			byte expectBuf[] = new byte[size];
+			byte[] expectBuf = new byte[size];
 			inputStream.read(expectBuf);
 			inputStream.close();
 

@@ -22,8 +22,8 @@ public enum ScaleColor {
 
 	private final String name;
 	private final int offset;
-	private final Color colorList[];
-	private ScaleColor(String name, int offset, Color colorList[]) {
+	private final Color[] colorList;
+	ScaleColor(String name, int offset, Color[] colorList) {
 		this.name = name;
 		this.offset = offset;
 		this.colorList = colorList;
@@ -40,9 +40,9 @@ public enum ScaleColor {
 	public static final Color BORDER_COLOR = new Color(0.6f, 0.6f, 0.6f); // 境界線用
 
 	private interface ColorConstants {
-		static final Color wKeyColor = new Color(0.9f, 0.9f, 0.9f); // 白鍵盤用
-		static final Color bKeyColor = new Color(0.8f, 0.8f, 0.8f); // 黒鍵盤用
-		static final Color keyMajorColors[] = new Color[] {
+		Color wKeyColor = new Color(0.9f, 0.9f, 0.9f); // 白鍵盤用
+		Color bKeyColor = new Color(0.8f, 0.8f, 0.8f); // 黒鍵盤用
+		Color[] keyMajorColors = new Color[] {
 				wKeyColor, bKeyColor,   // B, B-
 				wKeyColor, bKeyColor,   // A, A-
 				wKeyColor, bKeyColor,   // G, G-

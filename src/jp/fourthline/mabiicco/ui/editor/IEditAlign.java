@@ -5,5 +5,5 @@
 package jp.fourthline.mabiicco.ui.editor;
 
 public interface IEditAlign {
-	public int getEditAlign();
+	int getEditAlign();
 }

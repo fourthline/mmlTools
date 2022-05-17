@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class MMLTokenizerTest {
 	@Test
 	public void test_token() {
-		String expect[] = { "a16", "b16.", "C", "d+++++", "FH--", "tu80" };
+		String[] expect = { "a16", "b16.", "C", "d+++++", "FH--", "tu80" };
 		MMLTokenizer tokenizer = new MMLTokenizer("a16b16.Cd+++++FH--tu80");
 		ArrayList<String> result = new ArrayList<>();
 		while (tokenizer.hasNext()) {

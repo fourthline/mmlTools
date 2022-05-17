@@ -19,7 +19,7 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 	private int tick;
 	private TuningBase tuningBase = null;
 	private int velocity;
-	private int indexOfMMLString[] = null; // { startIndex, endIndex }
+	private int[] indexOfMMLString = null; // { startIndex, endIndex }
 
 	public MMLNoteEvent(int note, int tickLength, int tickOffset) {
 		this(note, tickLength, tickOffset, INIT_VOL);
@@ -85,7 +85,7 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 		return indexOfMMLString;
 	}
 
-	public void setIndexOfMMLString(int index[]) {
+	public void setIndexOfMMLString(int[] index) {
 		this.indexOfMMLString = index;
 	}
 
@@ -94,7 +94,7 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 		return "[Note] note: " + note + ", tick: " + tick + ", offset: " + getTickOffset() + ", velocity: " + velocity;
 	}
 
-	private static final String noteNameTable[] = {
+	private static final String[] noteNameTable = {
 			"c", "c+", "d", "d+", "e", "f", "f+", "g", "g+", "a", "a+", "b"
 	};
 	private String getNoteName() throws UndefinedTickException {
@@ -205,14 +205,11 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 		}
 
 		MMLNoteEvent noteEvent = (MMLNoteEvent) obj;
-		if ((this.tick == noteEvent.tick) &&
+		return (this.tick == noteEvent.tick) &&
 				(this.note == noteEvent.note) &&
 				(this.velocity == noteEvent.velocity) &&
 				(this.tick == noteEvent.tick) &&
 				(super.equals(noteEvent)) &&
-				(Objects.equals(this.tuningBase, noteEvent.tuningBase))) {
-			return true;
-		}
-		return false;
+				(Objects.equals(this.tuningBase, noteEvent.tuningBase));
 	}
 }

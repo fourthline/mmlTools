@@ -49,7 +49,7 @@ public final class MMLNotePropertyPanelTest {
 			) {
 		MMLEventList eventList = new MMLEventList(mml);
 		List<MMLNoteEvent> noteList = eventList.getMMLNoteEventList();
-		MMLNoteEvent noteEvent[] = new MMLNoteEvent[] { noteList.get(1), noteList.get(2) };
+		MMLNoteEvent[] noteEvent = new MMLNoteEvent[] { noteList.get(1), noteList.get(2) };
 		MMLNotePropertyPanel panel = new MMLNotePropertyPanel(noteEvent, eventList);
 
 		assertNotePropertyEnabled(panel, "velocityCheckBox", velocityCheckBox);
@@ -102,7 +102,7 @@ public final class MMLNotePropertyPanelTest {
 	public void test_editVelocityOptionView() {
 		MMLEventList eventList = new MMLEventList("abc");
 		List<MMLNoteEvent> noteList = eventList.getMMLNoteEventList();
-		MMLNoteEvent noteEvent[] = new MMLNoteEvent[] { noteList.get(1), noteList.get(2) };
+		MMLNoteEvent[] noteEvent = new MMLNoteEvent[] { noteList.get(1), noteList.get(2) };
 		MMLNotePropertyPanel panel = new MMLNotePropertyPanel(noteEvent, eventList);
 
 		// 音量コマンドが選択されていない状態.

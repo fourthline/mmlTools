@@ -132,7 +132,7 @@ public class NxOptimizer implements MMLStringOptimizer.Optimizer {
 	}
 
 	private void doToken(String token) {
-		String s[] = MMLTokenizer.noteNames(token);
+		String[] s = MMLTokenizer.noteNames(token);
 		char firstC = Character.toLowerCase(s[0].charAt(0));
 		if ( (firstC >= 'a') && (firstC <= 'g') ) {
 			notePattern(token, s[0], s[1]);

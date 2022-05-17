@@ -19,6 +19,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.function.Consumer;
 import java.util.function.IntSupplier;
@@ -576,27 +577,19 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 
 		if (openedFile == null) {
 			// 新規ファイルなので、別名保存.
-			if (showDialogSaveFile()) {
-				return true;
-			}
+			return showDialogSaveFile();
 		} else {
+			// ファイルOpenされているが、サポート外なので別名保存.
 			if (isSupportedSaveFile()) {
 				// 上書き保存可.
 				return saveMMLFile(openedFile);
-			} else if (showDialogSaveFile()) {
-				// ファイルOpenされているが、サポート外なので別名保存.
-				return true;
-			}
+			} else return showDialogSaveFile();
 		}
-
-		return false;
 	}
 
 	private boolean isSupportedSaveFile() {
 		if (openedFile != null) {
-			if (openedFile.getName().toLowerCase().endsWith(".mmi")) {
-				return true;
-			}
+			return openedFile.getName().toLowerCase().endsWith(".mmi");
 		}
 
 		return false;
@@ -721,7 +714,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 				return false;
 			}
 			try {
-				BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(recoveryFile),"UTF-8"));
+				BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(recoveryFile), StandardCharsets.UTF_8));
 				String filename = reader.readLine();
 				String data = reader.readLine();
 				reader.close();
@@ -753,7 +746,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 
 		try {
 			File recoveryFile = new File(AppResource.appText("recover.filename"));
-			PrintStream printStream = new PrintStream(new FileOutputStream(recoveryFile), false, "UTF-8");
+			PrintStream printStream = new PrintStream(new FileOutputStream(recoveryFile), false, StandardCharsets.UTF_8);
 			printStream.println(filename);
 			printStream.println(data);
 			printStream.close();

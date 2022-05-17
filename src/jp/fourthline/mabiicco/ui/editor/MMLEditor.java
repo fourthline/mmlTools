@@ -156,11 +156,11 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	 * @param lookNote falseの場合は、tickOffset間にあるすべてのノートが選択される. trueの場合はnote情報もみて判定する.
 	 */
 	private void selectMultipleNote(MMLNoteEvent noteEvent1, MMLNoteEvent noteEvent2, boolean lookNote) {
-		int note[] = {
+		int[] note = {
 				noteEvent1.getNote(),
 				noteEvent2.getNote()
 		};
-		int tickOffset[] = {
+		int[] tickOffset = {
 				noteEvent1.getTickOffset(),
 				noteEvent2.getTickOffset()
 		};
@@ -390,11 +390,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		}
 		MMLNoteEvent noteEvent = editEventList.searchOnTickOffset(tickOffset);
 
-		if ( (noteEvent != null) && (note == noteEvent.getNote()) ) {
-			return true;
-		}
-
-		return false;
+		return (noteEvent != null) && (note == noteEvent.getNote());
 	}
 
 	/**
@@ -428,9 +424,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		MMLNoteEvent noteEvent = editEventList.searchOnTickOffset( tickOffset );
 
 		if ( (noteEvent != null) && (noteEvent.getNote() == note) ) {
-			if (noteEvent.getEndTick() <= tickOffset + (noteEvent.getTick() / 5) ) {
-				return true;
-			}
+			return noteEvent.getEndTick() <= tickOffset + (noteEvent.getTick() / 5);
 		}
 
 		return false;
@@ -570,11 +564,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		if (clipEventList == null) {
 			return false;
 		}
-		if (clipEventList.getMMLNoteEventList().size() == 0) {
-			return false;
-		}
-
-		return true;
+		return clipEventList.getMMLNoteEventList().size() != 0;
 	}
 
 	@Override

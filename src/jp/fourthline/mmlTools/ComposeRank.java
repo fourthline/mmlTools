@@ -33,7 +33,7 @@ public final class ComposeRank {
 	static private void loadRankResource(List<ComposeRank> list, String name) {
 		ResourceBundle bundle = ResourceBundle.getBundle(name, new ResourceLoader());
 		for (String key : Collections.list(bundle.getKeys()) ) {
-			String s[] = bundle.getString(key).split(",");
+			String[] s = bundle.getString(key).split(",");
 			if (s.length != 4) {
 				continue;
 			}
@@ -109,13 +109,10 @@ public final class ComposeRank {
 	}
 
 	public boolean compare(int melody, int chord1, int chord2, int songEx) {
-		if ( (melody <= this.melody) &&
+		return (melody <= this.melody) &&
 				(chord1 <= this.chord1) &&
 				(chord2 <= this.chord2) &&
-				(songEx <= this.melody))
-			return true;
-
-		return false;
+				(songEx <= this.melody);
 	}
 
 	public int getMelody() {

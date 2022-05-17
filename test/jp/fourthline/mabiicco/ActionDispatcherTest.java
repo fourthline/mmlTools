@@ -34,7 +34,7 @@ public final class ActionDispatcherTest {
 		HashMap<?, ?> actionMap = (HashMap<?, ?>) getField("actionMap");
 		Set<?> keySet = actionMap.keySet();
 		System.out.println("keySet size: " + keySet.size());
-		Field fields[] = ActionDispatcher.class.getDeclaredFields();
+		Field[] fields = ActionDispatcher.class.getDeclaredFields();
 		for (Field f : fields) {
 			if (f.isAnnotationPresent(ActionDispatcher.Action.class)) {
 				String key = f.get(obj).toString();

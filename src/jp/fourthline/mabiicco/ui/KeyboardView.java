@@ -24,7 +24,7 @@ import jp.fourthline.mmlTools.MMLNoteEvent;
 public final class KeyboardView extends JPanel implements IPlayNote {
 	private static final long serialVersionUID = -3850112420986284800L;
 
-	private int playNote[] = null;
+	private int[] playNote = null;
 	private final int width = 60;
 	private final int DEFAULT_VELOCITY = 11;
 	private final IMMLManager mmlManager;
@@ -106,7 +106,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 	}
 
 	private void paintPlayNote(Graphics2D g) {
-		int yAdd[] = { -2, -2, -1, -2, 1, -3, -2, -2, -1, 0, 0, 2 }; // 補正値
+		int[] yAdd = { -2, -2, -1, -2, 1, -3, -2, -2, -1, 0, 0, 2 }; // 補正値
 		if (playNote == null) {
 			return;
 		}
@@ -141,7 +141,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 		}
 
 		// 黒鍵盤
-		int black_posIndex[] = { 
+		int[] black_posIndex = {
 				1, // A#
 				2, // G#
 				3, // F#
@@ -168,7 +168,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 		// オクターブ
 		int y = startY + octHeight;
 		if (y < yLimit) {
-			char o_char[] = { 'o', posText };
+			char[] o_char = { 'o', posText };
 			g.setFont(new Font("Arial", Font.PLAIN, 12));
 			g.drawChars(o_char, 0, o_char.length, 42, y);
 			g.drawLine(40, y, width, y);
@@ -210,13 +210,13 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 	}
 
 	@Override
-	public void playNote(int note[], int velocity) {
+	public void playNote(int[] note, int velocity) {
 		if (note == null) {
 			offNote();
 			return;
 		}
 		playNote = note;
-		MMLNoteEvent noteEvent[] = new MMLNoteEvent[note.length];
+		MMLNoteEvent[] noteEvent = new MMLNoteEvent[note.length];
 		for (int i = 0; i < note.length; i++) {
 			noteEvent[i] = new MMLNoteEvent(note[i], 0, 0, velocity);
 		}

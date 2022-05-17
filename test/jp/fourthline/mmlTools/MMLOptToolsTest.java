@@ -14,7 +14,7 @@ import jp.fourthline.mmlTools.core.UndefinedTickException;
 
 
 public class MMLOptToolsTest {
-	private String orig_tick[] = {
+	private final String[] orig_tick = {
 			"32",
 			"32.",
 			"16",
@@ -40,7 +40,7 @@ public class MMLOptToolsTest {
 			int result1 = parser1.getLength();
 			int result2 = parser2.getLength();
 			System.out.printf("*** %d, %d\n", result1, result2);
-			int result[] = { result1, result2 };
+			int[] result = { result1, result2 };
 			return result;
 		} catch (UndefinedTickException e) {}
 
@@ -57,7 +57,7 @@ public class MMLOptToolsTest {
 				String orig = "c";
 				String s = tools.replaceTail64(orig, orig_tick[i]);
 
-				int result[] = mmlTimeTest(orig+orig_tick[i], s);
+				int[] result = mmlTimeTest(orig+orig_tick[i], s);
 				assertEquals(result[0], result[1]);
 			} catch (UndefinedTickException e) {
 				e.printStackTrace();
@@ -87,7 +87,7 @@ public class MMLOptToolsTest {
 		String expect = "c4<b+4>c8&c9r64c8&c9r64c4d4d-d8&d9r64d";
 
 		String s = mml_conv(input);
-		int result[] = mmlTimeTest(input, s);
+		int[] result = mmlTimeTest(input, s);
 		assertEquals(result[0], result[1]);
 		assertEquals(expect, s);
 	}

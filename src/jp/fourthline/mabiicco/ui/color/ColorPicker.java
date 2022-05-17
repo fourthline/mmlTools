@@ -72,7 +72,7 @@ public final class ColorPicker implements ColorSelectionModel {
 		private final int HEIGHT = 14;
 		private int selectedIndex = 0;
 
-		private ColorPicker parent;
+		private final ColorPicker parent;
 
 		public PreviewPane(ColorPicker parent) {
 			this.parent = parent;
@@ -141,7 +141,7 @@ public final class ColorPicker implements ColorSelectionModel {
 		public void mouseExited(MouseEvent e) {}
 	}
 
-	public static void main(String args[]) {
+	public static void main(String[] args) {
 		ColorPicker colorPicker = new ColorPicker();
 		colorPicker.show();
 	}

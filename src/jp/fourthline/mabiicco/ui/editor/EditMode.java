@@ -84,10 +84,7 @@ enum EditMode {
 		@Override
 		public void executeEvent(IEditContext context, MouseEvent e) {
 			// 選択中のNote、Note長を更新.
-			boolean alignment = true;
-			if ( (e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) != 0) {
-				alignment = false;
-			}
+			boolean alignment = (e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) == 0;
 			context.updateSelectedNoteAndTick(e.getPoint(), true, alignment);
 		}
 		@Override
@@ -145,10 +142,7 @@ enum EditMode {
 		@Override
 		public void executeEvent(IEditContext context, MouseEvent e) {
 			// 選択中のNote長を更新.（Noteは更新しない）
-			boolean alignment = true;
-			if ( (e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) != 0) {
-				alignment = false;
-			}
+			boolean alignment = (e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) == 0;
 			context.updateSelectedNoteAndTick(e.getPoint(), false, alignment);
 		}
 		@Override
@@ -177,7 +171,7 @@ enum EditMode {
 
 	private static Point startPoint;
 
-	private EditMode() {}
+	EditMode() {}
 
 	public void pressEvent(IEditContext context, MouseEvent e) {}
 	public void executeEvent(IEditContext context, MouseEvent e) {}

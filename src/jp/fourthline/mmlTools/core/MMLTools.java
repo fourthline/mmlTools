@@ -54,7 +54,7 @@ public class MMLTools {
 	public double getMabinogiTime() throws UndefinedTickException {
 		if (mabinogi_length < 0.0) {
 			double max = 0.0;
-			double timeList[] = {
+			double[] timeList = {
 					melodyParser.getPlayLengthByTempoList(),
 					chord1Parser.getPlayLengthByTempoList(),
 					chord2Parser.getPlayLengthByTempoList()
@@ -115,7 +115,7 @@ public class MMLTools {
 
 		mml = mml.substring(start, end);
 
-		String parts[] = mml.split(",");
+		String[] parts = mml.split(",");
 		if (parts.length > 0)
 			mml_melody = parts[0];
 		if (parts.length > 1)
@@ -154,11 +154,7 @@ public class MMLTools {
 	}
 
 	protected boolean hasSongPart() {
-		if ( (mml_songEx != null) && (mml_songEx.length() > 0) ) {
-			return true;
-		}
-
-		return false;
+		return (mml_songEx != null) && (mml_songEx.length() > 0);
 	}
 
 	/**
@@ -200,13 +196,8 @@ public class MMLTools {
 		parseMMLforMabinogi();
 		parsePlayMode(false);
 
-		if (
-				melodyParser.checkPitch(min, max) &&
-				chord1Parser.checkPitch(min, max) && 
-				chord2Parser.checkPitch(min, max) ) {
-			return true;
-		} else {
-			return false;
-		}
+		return melodyParser.checkPitch(min, max) &&
+				chord1Parser.checkPitch(min, max) &&
+				chord2Parser.checkPitch(min, max);
 	}
 }

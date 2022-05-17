@@ -38,24 +38,24 @@ import java.util.HashMap;
 public final class MMLTrackView extends JPanel implements ActionListener {
 
 	private static final long serialVersionUID = 4955513242349170508L;
-	public static final String MMLPART_NAME[] = {
+	public static final String[] MMLPART_NAME = {
 			AppResource.appText("melody"),
 			AppResource.appText("chord1"),
 			AppResource.appText("chord2"),
 			AppResource.appText("song")
 	};
-	private JToggleButton partButton[];
-	private JTextField mmlText[];
+	private final JToggleButton[] partButton;
+	private final JTextField[] mmlText;
 
-	private JComboBox<InstClass> comboBox;
-	private JComboBox<InstClass> songComboBox;
+	private final JComboBox<InstClass> comboBox;
+	private final JComboBox<InstClass> songComboBox;
 
-	private JLabel trackComposeLabel;
-	private JToolBar toolBar;
+	private final JLabel trackComposeLabel;
+	private final JToolBar toolBar;
 	private JButton muteButton;
 	private JButton soloButton;
 	private JButton allButton;
-	private JLabel trackIndexLabel = new JLabel();
+	private final JLabel trackIndexLabel = new JLabel();
 
 	private IMMLManager mmlManager;
 
@@ -64,7 +64,7 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 	private int trackIndex;
 	private boolean disableAction = false;
 
-	private JPanel mmlTextPanel = new JPanel();
+	private final JPanel mmlTextPanel = new JPanel();
 
 	public void setVisibleMMLTextPanel(boolean b) {
 		if (b) {
@@ -166,7 +166,7 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 	 * マウスクリックで関連するボタンを選択状態にする.
 	 */
 	private class ButtonCombAdapter extends MouseAdapter {
-		private JToggleButton button;
+		private final JToggleButton button;
 		private ButtonCombAdapter(JToggleButton b) {
 			button = b;
 		}
@@ -212,7 +212,7 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 		soloButton.addActionListener(this);
 		allButton.addActionListener(this);
 	}
-	private static HashMap<Integer, MMLTrackView> instanceList = new HashMap<>();
+	private static final HashMap<Integer, MMLTrackView> instanceList = new HashMap<>();
 	public static MMLTrackView getInstance(int trackIndex, ActionListener actionListener, IMMLManager mmlManager) {
 		MMLTrackView view;
 		if (instanceList.containsKey(trackIndex)) {
@@ -270,7 +270,7 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 
 	public void updateTrack() {
 		MMLTrack mmlTrack = mmlManager.getMMLScore().getTrack(trackIndex);
-		String mml[] = mmlTrack.getMabiMMLArray();
+		String[] mml = mmlTrack.getMabiMMLArray();
 		for (int i = 0, len = mmlText.length; i < len; i++) {
 			if (i < mml.length) {
 				mmlText[i].setText(mml[i]);
@@ -335,11 +335,7 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 		InstClass inst = (InstClass) comboBox.getSelectedItem();
 		MMLTrack track = mmlManager.getMMLScore().getTrack(trackIndex);
 
-		if (inst.getType() == InstType.VOICE) {
-			songComboBox.setVisible(false);
-		} else {
-			songComboBox.setVisible(true);
-		}
+		songComboBox.setVisible(inst.getType() != InstType.VOICE);
 
 		updatePartButtonStatus();
 
@@ -359,8 +355,8 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 		InstClass songInst = ((InstClass) songComboBox.getSelectedItem());
 
 		// 選択された楽器にあわせて、MMLパートの有効/無効化を行う.
-		boolean instEnable[] = inst.getType().getEnablePart();
-		boolean songExEnable[] = songInst.getType().getEnablePart();
+		boolean[] instEnable = inst.getType().getEnablePart();
+		boolean[] songExEnable = songInst.getType().getEnablePart();
 		int iconIndex = 0;
 		for (int i = 0; i < partButton.length; i++) {
 			boolean b = (instEnable[i] || songExEnable[i]);

@@ -39,7 +39,7 @@ public final class MultiTracksViewEditor extends JPanel {
 	private final IMMLManager mmlManager;
 	private final Frame parentFrame;
 
-	private boolean oldValue[];
+	private boolean[] oldValue;
 
 	public MultiTracksViewEditor(Frame parentFrame, IMMLManager mmlManager) {
 		this.dialog = new JDialog(parentFrame, AppResource.appText("edit.tracks.view"), true);
@@ -135,7 +135,7 @@ public final class MultiTracksViewEditor extends JPanel {
 		return new Dimension(440, 300);
 	}
 
-	public void apply(boolean list[]) {
+	public void apply(boolean[] list) {
 		List<MMLTrack> trackList = mmlManager.getMMLScore().getTrackList();
 		for (int i = 0; i < trackList.size(); i++) {
 			trackList.get(i).setVisible(list[i]);

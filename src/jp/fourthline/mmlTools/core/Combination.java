@@ -8,14 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class Combination<T> {
-	private List<List<T>> combinations;
+	private final List<List<T>> combinations;
 
 	/**
 	 * 配列データから組み合わせを作成します.
 	 * @param array  データ
 	 * @param r      組み合わせる個数
 	 */
-	public Combination(T array[], int r) {
+	public Combination(T[] array, int r) {
 		combinations = comb(array, 0, r);
 	}
 
@@ -23,7 +23,7 @@ public final class Combination<T> {
 		return combinations;
 	}
 
-	private List<List<T>> comb(T array[], int n, int r) {
+	private List<List<T>> comb(T[] array, int n, int r) {
 		if (r > 1) {
 			List<List<T>> resultList = new ArrayList<>();
 			for (int i = n; i < array.length-1; i++) {
@@ -47,8 +47,8 @@ public final class Combination<T> {
 		}
 	}
 
-	public static void main(String args[]) {
-		String data[] = { "1", "2", "3", "4", "5", "6" };
+	public static void main(String[] args) {
+		String[] data = { "1", "2", "3", "4", "5", "6" };
 		new Combination<>(data, 3).getArray().forEach(t -> {
 			System.out.println(t);
 		});

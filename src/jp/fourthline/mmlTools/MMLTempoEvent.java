@@ -37,7 +37,7 @@ public final class MMLTempoEvent extends MMLEvent implements Cloneable {
 	public byte[] getMetaData() {
 		ByteBuffer buf = ByteBuffer.allocate(4);
 		buf.putInt(60000000/tempo);
-		byte array[] = buf.array();
+		byte[] array = buf.array();
 		return Arrays.copyOfRange(array, 1, array.length);
 	}
 
@@ -54,7 +54,7 @@ public final class MMLTempoEvent extends MMLEvent implements Cloneable {
 		if ((str == null) || (str.length() == 0)) {
 			return null;
 		}
-		String s[] = str.split("T");
+		String[] s = str.split("T");
 		if (s.length != 2) {
 			return null;
 		}
@@ -206,10 +206,7 @@ public final class MMLTempoEvent extends MMLEvent implements Cloneable {
 		}
 
 		MMLTempoEvent tempoEvent = (MMLTempoEvent) obj;
-		if ((this.tempo == tempoEvent.tempo) &&
-				(super.equals(tempoEvent))) {
-			return true;
-		}
-		return false;
+		return (this.tempo == tempoEvent.tempo) &&
+				(super.equals(tempoEvent));
 	}
 }

@@ -41,15 +41,15 @@ import javax.swing.JSpinner;
 public final class MMLNotePropertyPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 646262293010195918L;
 
-	private JSpinner velocityValueField;
-	private JSpinner velocityValueField2;
-	private JCheckBox velocityCheckBox; // 音量コマンド
-	private JCheckBox tuningNoteCheckBox;
-	private JCheckBox onlySelectedNoteOption;
-	private JCheckBox incDecrVelocityEditOption;
-	private JComboBox<TuningBase> tuningBaseList;
-	private MMLNoteEvent noteEvent[];
-	private MMLEventList eventList;
+	private final JSpinner velocityValueField;
+	private final JSpinner velocityValueField2;
+	private final JCheckBox velocityCheckBox; // 音量コマンド
+	private final JCheckBox tuningNoteCheckBox;
+	private final JCheckBox onlySelectedNoteOption;
+	private final JCheckBox incDecrVelocityEditOption;
+	private final JComboBox<TuningBase> tuningBaseList;
+	private final MMLNoteEvent[] noteEvent;
+	private final MMLEventList eventList;
 
 	// 調律属性は指定されたノートの調律属性がすべて同じ場合に編集可能
 	private boolean enableTuningEdit;
@@ -76,7 +76,7 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 	/**
 	 * Create the panel.
 	 */
-	public MMLNotePropertyPanel(MMLNoteEvent noteEvent[], MMLEventList eventList) {
+	public MMLNotePropertyPanel(MMLNoteEvent[] noteEvent, MMLEventList eventList) {
 		super();
 		setLayout(null);
 
@@ -191,11 +191,7 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 		MMLNoteEvent prevNote = eventList.searchPrevNoteOnTickOffset(noteEvent[0].getTickOffset());
 		int velocity = noteEvent[0].getVelocity();
 		velocityValueField.setValue(velocity);
-		if ( (prevNote == null) || (prevNote.getVelocity() != velocity) ) {
-			velocityCheckBox.setSelected(true);
-		} else {
-			velocityCheckBox.setSelected(false);
-		}
+		velocityCheckBox.setSelected((prevNote == null) || (prevNote.getVelocity() != velocity));
 	}
 
 	/**

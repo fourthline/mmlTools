@@ -16,8 +16,8 @@ import jp.fourthline.mmlTools.ComposeRank;
  * {@code MML@aaa,bbb,ccc;} 形式を扱います。
  */
 public final class MMLText {
-	private static int DEFAULT_PART_NUM = 4;
-	private String text[];
+	private static final int DEFAULT_PART_NUM = 4;
+	private final String[] text;
 
 	/** 歌パートを除いて他のパートの文字数を増やすオプション (2021/11/18 MabiKR) */
 	private boolean excludeSongPart = false;
@@ -53,12 +53,12 @@ public final class MMLText {
 
 		mml = mml.substring(start, end);
 
-		String parts[] = mml.split(",");
+		String[] parts = mml.split(",");
 		setMMLText(parts);
 		return this;
 	}
 
-	public MMLText setMMLText(String parts[]) {
+	public MMLText setMMLText(String[] parts) {
 		for (int i = 0; (i < parts.length) && (i < this.text.length); i++) {
 			this.text[i] = parts[i];
 		}
@@ -89,7 +89,7 @@ public final class MMLText {
 			songEx = "";
 		}
 
-		String parts[] = { melody, chord1, chord2, songEx };
+		String[] parts = { melody, chord1, chord2, songEx };
 		setMMLText(parts);
 		return this;
 	}
@@ -170,15 +170,15 @@ public final class MMLText {
 	 * @return
 	 */
 	public List<MMLText> splitMML(ComposeRank rank) {
-		int cut[] = { rank.getMelody(), rank.getChord1(), rank.getChord2(), rank.getMelody() };
-		StringBuffer sb[] = new StringBuffer[cut.length];
+		int[] cut = { rank.getMelody(), rank.getChord1(), rank.getChord2(), rank.getMelody() };
+		StringBuffer[] sb = new StringBuffer[cut.length];
 		for (int i = 0; i < sb.length; i++) {
 			sb[i] = new StringBuffer(text[i]);
 		}
 
 		ArrayList<MMLText> mmlList = new ArrayList<>();
 		while (Arrays.asList(sb).stream().anyMatch(s -> s.length() != 0)) {
-			String parts[] = new String[sb.length];
+			String[] parts = new String[sb.length];
 			for (int i = 0; i < sb.length; i++) {
 				int min = Math.min( sb[i].length(), cut[i] );
 				parts[i] = sb[i].substring(0, min);

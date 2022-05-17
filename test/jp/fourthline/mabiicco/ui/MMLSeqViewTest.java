@@ -379,9 +379,9 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 	 * 任意のfuncを実行したあとのActiveTrackを検査する.
 	 */
 	private class TP1 {
-		private Runnable func;
-		private int track;
-		private int part;
+		private final Runnable func;
+		private final int track;
+		private final int part;
 		/**
 		 * @param func 実行する内容.
 		 * @param track funcを実行したあとに期待するTrackのIndex.
