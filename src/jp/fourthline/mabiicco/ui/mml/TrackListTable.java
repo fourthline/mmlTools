@@ -21,7 +21,7 @@ import jp.fourthline.mmlTools.core.MMLText;
 public final class TrackListTable extends JTable {
 	private static final long serialVersionUID = -710966050907225119L;
 
-	private final class InCheckTableModel extends AbstractTableModel {
+	private static final class InCheckTableModel extends AbstractTableModel {
 		private static final long serialVersionUID = -5732476297298041942L;
 		private final String[] columnNames = new String[] {
 				"",

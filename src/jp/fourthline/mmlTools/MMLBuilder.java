@@ -16,11 +16,11 @@ public final class MMLBuilder {
 	private final MMLEventList eventList;
 	private final int startOffset;
 
-	public static final MMLBuilder create(MMLEventList eventList) {
+	public static MMLBuilder create(MMLEventList eventList) {
 		return new MMLBuilder(eventList, 0);
 	}
 
-	public static final MMLBuilder create(MMLEventList eventList, int startOffset) {
+	public static MMLBuilder create(MMLEventList eventList, int startOffset) {
 		return new MMLBuilder(eventList, startOffset);
 	}
 
@@ -121,7 +121,7 @@ public final class MMLBuilder {
 			sb.append( divNoteEvent.toMMLString(prevNoteEvent) );
 		}
 		if (noteEvent.getVelocity() != divNoteEvent.getVelocity()) {
-			sb.append("v"+noteEvent.getVelocity());
+			sb.append("v").append(noteEvent.getVelocity());
 		}
 	}
 
@@ -225,7 +225,7 @@ public final class MMLBuilder {
 			sb.append( divNoteEvent.toMMLString(prevNoteEvent) );
 		}
 		if (noteEvent.getVelocity() != divNoteEvent.getVelocity()) {
-			sb.append("v"+noteEvent.getVelocity());
+			sb.append("v").append(noteEvent.getVelocity());
 		}
 
 		return index;

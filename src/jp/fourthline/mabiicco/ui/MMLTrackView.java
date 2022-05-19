@@ -165,7 +165,7 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 	/**
 	 * マウスクリックで関連するボタンを選択状態にする.
 	 */
-	private class ButtonCombAdapter extends MouseAdapter {
+	private static class ButtonCombAdapter extends MouseAdapter {
 		private final JToggleButton button;
 		private ButtonCombAdapter(JToggleButton b) {
 			button = b;

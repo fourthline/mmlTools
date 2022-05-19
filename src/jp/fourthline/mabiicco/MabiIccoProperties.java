@@ -135,8 +135,7 @@ public final class MabiIccoProperties {
 	}
 
 	public String getRecentFile() {
-		String str = properties.getProperty(RECENT_FILE, "");
-		return str;
+		return properties.getProperty(RECENT_FILE, "");
 	}
 
 	public void setRecentFile(String path) {
@@ -171,14 +170,12 @@ public final class MabiIccoProperties {
 		String width = properties.getProperty(WINDOW_WIDTH, "-1");
 		String height = properties.getProperty(WINDOW_HEIGHT, "-1");
 
-		Rectangle rect = new Rectangle(
-				Integer.parseInt(x), 
+		return new Rectangle(
+				Integer.parseInt(x),
 				Integer.parseInt(y),
 				Integer.parseInt(width),
 				Integer.parseInt(height)
 				);
-
-		return rect;
 	}
 
 	public void setWindowRect(Rectangle rect) {

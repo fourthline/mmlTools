@@ -4,24 +4,6 @@
 
 package jp.fourthline.mabiicco.ui.editor;
 
-import static org.junit.Assert.*;
-
-import java.awt.Component;
-import java.awt.Frame;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.util.List;
-import java.util.function.IntConsumer;
-
-import javax.sound.midi.InvalidMidiDataException;
-import javax.sound.midi.Receiver;
-import javax.sound.midi.ShortMessage;
-import javax.swing.JButton;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import jp.fourthline.UseLoadingDLS;
 import jp.fourthline.mabiicco.MabiIccoProperties;
 import jp.fourthline.mabiicco.midi.IPlayNote;
@@ -33,7 +15,21 @@ import jp.fourthline.mmlTools.MMLNoteEvent;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.core.UndefinedTickException;
-import jp.fourthline.mmlTools.optimizer.MMLStringOptimizer;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import javax.sound.midi.InvalidMidiDataException;
+import javax.sound.midi.Receiver;
+import javax.sound.midi.ShortMessage;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.List;
+import java.util.function.IntConsumer;
+
+import static org.junit.Assert.*;
 
 public class KeyboardEditorTest extends UseLoadingDLS {
 

@@ -293,7 +293,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 				return this;
 			}
 			prepare = true;
-			if (new ParsePropertiesDialog(parent, parser).showDialog() == false) {
+			if (!new ParsePropertiesDialog(parent, parser).showDialog()) {
 				done = true;
 			}
 			return this;
@@ -450,8 +450,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		openFileChooser.setCurrentDirectory(new File(recentPath).getParentFile());
 		int status = openFileChooser.showOpenDialog(mainFrame);
 		if (status == JFileChooser.APPROVE_OPTION) {
-			File file = openFileChooser.getSelectedFile();
-			return file;
+			return openFileChooser.getSelectedFile();
 		}
 		return null;
 	}

@@ -164,8 +164,7 @@ public final class MelodyParser {
 
 
 	private int mmlGT(String gt) throws UndefinedTickException {
-		int tick = MMLTicks.getTick(gt);
-		return tick;
+		return MMLTicks.getTick(gt);
 	}
 
 	/**

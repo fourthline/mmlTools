@@ -60,7 +60,7 @@ public interface InstType {
 	/**
 	 * 単独で使用不能なサブの楽器のリスト.
 	 */
-	List<InstType> SUB_INST_LIST = Arrays.asList(CHORUS);
+	List<InstType> SUB_INST_LIST = List.of(CHORUS);
 
 	static InstType getInstType(String s) {
 		switch (s) {

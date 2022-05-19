@@ -221,14 +221,12 @@ public final class KeyboardEditor {
 
 	private int nextTick(int tickOffset) {
 		int tickLength = editAlign.getEditAlign();
-		int nextTick = tickOffset + tickLength;
-		return nextTick;
+		return tickOffset + tickLength;
 	}
 
 	private int prevTick(int tickOffset) {
 		int tickLength = editAlign.getEditAlign();
-		int nextTick = tickOffset - tickLength;
-		return nextTick;
+		return tickOffset - tickLength;
 	}
 
 	/**
@@ -275,8 +273,7 @@ public final class KeyboardEditor {
 
 		private int charToNote(char code) {
 			int octave = ((Integer) octaveValueField.getValue()).intValue();
-			int note = MMLEventParser.firstNoteNumber("o"+octave+code);
-			return note;
+			return MMLEventParser.firstNoteNumber("o"+octave+code);
 		}
 
 		@Override

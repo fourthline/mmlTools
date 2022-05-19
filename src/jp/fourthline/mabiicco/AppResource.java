@@ -29,8 +29,7 @@ public final class AppResource {
 	}
 
 	public static String getVersionText() {
-		String versionText = getManifestValue("MabiIcco-Version");
-		return versionText;
+		return getManifestValue("MabiIcco-Version");
 	}
 
 	public static String getAppTitle() {

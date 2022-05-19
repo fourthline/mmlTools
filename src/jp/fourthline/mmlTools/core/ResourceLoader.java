@@ -15,8 +15,6 @@ import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
 
-import jp.fourthline.mmlTools.core.ResourceLoader;
-
 /**
  * properties/ 配下のリソースファイルをUTF-8で読み取る.
  */

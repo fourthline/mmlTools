@@ -140,7 +140,7 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 
 		// 前のノートとの音量が違う場合、音量コマンドを挿入する.
 		if (prevNoteEvent.getVelocity() != velocity) {
-			sb.append("v"+velocity);
+			sb.append("v").append(velocity);
 		}
 
 		sb.append( toMMLString(prevNoteEvent.getEndTick()) );
@@ -208,7 +208,6 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 		return (this.tick == noteEvent.tick) &&
 				(this.note == noteEvent.note) &&
 				(this.velocity == noteEvent.velocity) &&
-				(this.tick == noteEvent.tick) &&
 				(super.equals(noteEvent)) &&
 				(Objects.equals(this.tuningBase, noteEvent.tuningBase));
 	}

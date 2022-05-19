@@ -78,7 +78,7 @@ public final class MMLTicks {
 	}
 
 	private String mmlNotePart(String phoneticString) {
-		return mmlNotePart(Arrays.asList(phoneticString));
+		return mmlNotePart(List.of(phoneticString));
 	}
 
 	private String mmlNotePart(List<String> phoneticString) {

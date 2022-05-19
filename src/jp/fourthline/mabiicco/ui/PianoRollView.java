@@ -363,7 +363,7 @@ public final class PianoRollView extends JPanel {
 				// 編集モード時は境界表示しない
 			} else if (properties.viewRange.get() && !relativeInst.checkPitchRange(line)) {
 				fillColor = outRangeColor;
-			} else if ( (properties.instAttr.get()) && (relativeInst.isValid(line) == false) ) {
+			} else if ( (properties.instAttr.get()) && (!relativeInst.isValid(line)) ) {
 				fillColor = noSoundColor;
 			}
 			g.setColor(fillColor);

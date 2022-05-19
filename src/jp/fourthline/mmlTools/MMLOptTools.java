@@ -131,9 +131,7 @@ public class MMLOptTools {
 			noteIndex++;
 		}
 
-		String note = token.substring(0, noteIndex);
-
-		return note;
+		return token.substring(0, noteIndex);
 	}
 
 	/**

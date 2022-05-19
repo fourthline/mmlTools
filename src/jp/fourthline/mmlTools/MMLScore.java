@@ -253,8 +253,7 @@ public final class MMLScore {
 	 */
 	public long getTotalTime() {
 		int totalTick = getTotalTickLength();
-		long totalTime = MMLTempoEvent.getTimeOnTickOffset(globalTempoList, totalTick);
-		return totalTime;
+		return MMLTempoEvent.getTimeOnTickOffset(globalTempoList, totalTick);
 	}
 
 	public byte[] getObjectState() {

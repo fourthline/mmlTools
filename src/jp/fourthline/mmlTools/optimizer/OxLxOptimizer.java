@@ -89,12 +89,11 @@ public class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 	}
 
 	protected StringBuilder newBuilder(StringBuilder sb, String lenString, String s, int insertBack) {
-		StringBuilder changeBuilder = sb;
-		int len = changeBuilder.length();
+		int len = sb.length();
 		// &や他の指示よりも前に配置する.
-		changeBuilder.insert(len-insertBack, "l"+lenString);
-		changeBuilder.append(s);
-		return changeBuilder;
+		sb.insert(len-insertBack, "l"+lenString);
+		sb.append(s);
+		return sb;
 	}
 
 	private final Map<String, StringBuilder> newBuilderMap = new HashMap<>();

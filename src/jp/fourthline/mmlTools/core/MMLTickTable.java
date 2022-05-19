@@ -4,18 +4,9 @@
 
 package jp.fourthline.mmlTools.core;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public final class MMLTickTable {
 
@@ -99,7 +90,7 @@ public final class MMLTickTable {
 	}
 
 	private void generateInvTable() {
-		String[] keys = tickTable.keySet().toArray(new String[tickTable.size()]);
+		String[] keys = tickTable.keySet().toArray(new String[0]);
 		int mTick = tickTable.values().stream().max(Integer::compare).get();
 		for (int i = 1; i <= COMBN; i++) {
 			List<List<String>> pattern = new Combination<>(keys, i).getArray();

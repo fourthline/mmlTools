@@ -97,8 +97,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 
 	@Override
 	public int getWidth() {
-		int width = pianoRollView.getWidth();
-		return width;
+		return pianoRollView.getWidth();
 	}
 
 	@Override
@@ -212,7 +211,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 	}
 
 	private void paintTargetMarker(Graphics2D g) {
-		if (!targetMarker.isPresent()) {
+		if (targetMarker.isEmpty()) {
 			return;
 		}
 

@@ -44,7 +44,7 @@ public final class Splash2 extends JDialog implements ISplash {
 		}
 	}
 
-	private final class SplashPanel extends JPanel {
+	private static final class SplashPanel extends JPanel {
 		private static final long serialVersionUID = -3042011501769635754L;
 		private static final int WIDTH = 318;
 		private static final int HEIGHT = 433; 

@@ -26,7 +26,7 @@ public class NxOptimizer implements MMLStringOptimizer.Optimizer {
 		private OptionalInt offset = OptionalInt.empty();
 
 		private void addOctToken(int offset, String token) {
-			if (!this.offset.isPresent()) {
+			if (this.offset.isEmpty()) {
 				this.offset = OptionalInt.of( offset );
 			}
 		}
@@ -89,7 +89,7 @@ public class NxOptimizer implements MMLStringOptimizer.Optimizer {
 			return;
 		}
 		prevMap.forEach(t -> {
-			t.builder.append("n"+noteNumber);
+			t.builder.append("n").append(noteNumber);
 			t.nCount++;
 		});
 		builderList.add( minStack(prevMap) );

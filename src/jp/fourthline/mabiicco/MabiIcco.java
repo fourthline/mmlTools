@@ -90,7 +90,7 @@ public final class MabiIcco {
 			splash.updateProgress("OK\n", 90);
 		}
 
-		if (appProperties.useDefaultSoundBank.get() == false) {
+		if (!appProperties.useDefaultSoundBank.get()) {
 			// 内蔵音源を使わないときはMIDファイル読み込み時のProgram変換を有効にする
 			MidiFile.enableInstPatch();
 		}

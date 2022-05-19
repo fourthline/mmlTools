@@ -137,7 +137,6 @@ public final class ComposeRank {
 
 	@Override
 	public String toString() {
-		String result = "Rank " + rank + " ( " + melody + ", " + chord1 + ", " + chord2 + " )";
-		return result;
+		return "Rank " + rank + " ( " + melody + ", " + chord1 + ", " + chord2 + " )";
 	}
 }

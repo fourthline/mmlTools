@@ -45,7 +45,7 @@ public final class NoteAlign {
 			}
 		}
 
-		return list.toArray(new NoteAlign[list.size()]);
+		return list.toArray(new NoteAlign[0]);
 	}
 
 	private final String viewText;

@@ -68,11 +68,11 @@ public final class Extension3mleTrack {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("[ ");
-		sb.append(group+" ");
-		sb.append(instrument+" ");
-		sb.append(panpot+" ");
-		sb.append(trackCount+" ");
-		sb.append(trackName + " ]");
+		sb.append(group).append(" ");
+		sb.append(instrument).append(" ");
+		sb.append(panpot).append(" ");
+		sb.append(trackCount).append(" ");
+		sb.append(trackName).append(" ]");
 		return sb.toString();
 	}
 }

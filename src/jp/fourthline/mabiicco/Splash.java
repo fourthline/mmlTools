@@ -39,7 +39,7 @@ public final class Splash extends JDialog implements ISplash {
 		splashPanel.progress.setValue(v);
 	}
 
-	private final class SplashPanel extends JPanel {
+	private static final class SplashPanel extends JPanel {
 		private static final long serialVersionUID = 2210455372955295858L;
 		private static final int WIDTH = 300;
 		private static final int HEIGHT = 220; 

@@ -4,17 +4,16 @@
 
 package jp.fourthline.mmlTools;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-
 import jp.fourthline.mmlTools.parser.AbstractMMLParser;
 import jp.fourthline.mmlTools.parser.MMLParseException;
 import jp.fourthline.mmlTools.parser.SectionContents;
 import jp.fourthline.mmlTools.parser.TextParser;
+
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 public final class MMLScoreSerializer extends AbstractMMLParser {
 

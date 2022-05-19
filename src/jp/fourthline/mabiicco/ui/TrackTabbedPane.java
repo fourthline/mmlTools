@@ -76,7 +76,7 @@ public final class TrackTabbedPane extends JTabbedPane implements DragGestureLis
 		}
 	}
 
-	private final class TrackTabTransfer implements Transferable {
+	private static final class TrackTabTransfer implements Transferable {
 		private final TrackTabbedPane content;
 		private final DataFlavor[] f = {
 				new DataFlavor(TrackTabbedPane.class, "obj/TabbedPane")
@@ -102,7 +102,7 @@ public final class TrackTabbedPane extends JTabbedPane implements DragGestureLis
 	}
 
 
-	private final class TrackTabTransferHandler extends TransferHandler {
+	private static final class TrackTabTransferHandler extends TransferHandler {
 		private static final long serialVersionUID = -145263268894584091L;
 
 		private final DataFlavor dataFlavor;

@@ -487,8 +487,7 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 
 	@Override
 	public int getActiveTrackIndex() {
-		int trackIndex = tabbedPane.getSelectedIndex();
-		return trackIndex;
+		return tabbedPane.getSelectedIndex();
 	}
 
 	@Override
@@ -539,7 +538,7 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 		if (mmlScore.getTrackCount() > 0) {
 			MMLTrack track = mmlScore.getTrack(selectedTab);
 			int program = track.getProgram();
-			if (InstClass.getEnablePartByProgram(program)[selectedPart] == false) {
+			if (!InstClass.getEnablePartByProgram(program)[selectedPart]) {
 				if ( (selectedPart == 3) && (track.getSongProgram() >= 0) ) {
 				} else {
 					selectedPart = InstClass.getFirstPartNumberOnProgram(program);

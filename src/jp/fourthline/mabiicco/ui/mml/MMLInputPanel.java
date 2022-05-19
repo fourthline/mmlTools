@@ -153,7 +153,6 @@ public final class MMLInputPanel extends JPanel {
 
 	/**
 	 * トラック名を指定して、ダイアログを表示する.
-	 * @param trackName トラック名
 	 */
 	public void showDialog() {
 		String mml = getClipboardString();

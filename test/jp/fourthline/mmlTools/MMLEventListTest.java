@@ -23,7 +23,6 @@ import jp.fourthline.mmlTools.core.UndefinedTickException;
 public class MMLEventListTest {
 
 	/**
-	 * Test method for {@link jp.fourthline.mmlTools.MMLEventList#getMMLNoteEventList(jp.fourthline.mmlTools.MMLNoteEvent)}.
 	 * @throws UndefinedTickException 
 	 */
 	@Test
@@ -171,7 +170,6 @@ public class MMLEventListTest {
 	}
 
 	/**
-	 * Test method for {@link jp.fourthline.mmlTools.MMLEventList#searchOnTickOffset(jp.fourthline.mmlTools.MMLNoteEvent)}.
 	 * @throws UndefinedTickException 
 	 */
 	@Test
@@ -198,7 +196,6 @@ public class MMLEventListTest {
 	}
 
 	/**
-	 * Test method for {@link jp.fourthline.mmlTools.MMLEventList#searchPrevNoteOnTickOffset(jp.fourthline.mmlTools.MMLNoteEvent)}.
 	 * @throws UndefinedTickException 
 	 */
 	@Test

@@ -67,10 +67,9 @@ public final class BpCmOptimizer implements MMLStringOptimizer.Optimizer {
 			public String optimize(StringBuilder sb) {
 				sb.deleteCharAt( sb.lastIndexOf("<") );
 				sb.deleteCharAt( sb.lastIndexOf(">") );
-				String s = sb.toString()
+				return sb.toString()
 						.replace("b", "c-")
 						.replace("B", "C-");
-				return s;
 			}
 		},
 		C1 {
@@ -112,10 +111,9 @@ public final class BpCmOptimizer implements MMLStringOptimizer.Optimizer {
 			public String optimize(StringBuilder sb) {
 				sb.deleteCharAt( sb.lastIndexOf("<") );
 				sb.deleteCharAt( sb.lastIndexOf(">") );
-				String s = sb.toString()
+				return sb.toString()
 						.replace("c", "b+")
 						.replace("C", "B+");
-				return s;
 			}
 		};
 

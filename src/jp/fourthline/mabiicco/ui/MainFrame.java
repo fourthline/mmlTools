@@ -367,7 +367,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		return menuBar;
 	}
 
-	private class CheckBoxMenuWithIndex extends JCheckBoxMenuItem implements IntSupplier {
+	private static class CheckBoxMenuWithIndex extends JCheckBoxMenuItem implements IntSupplier {
 		private static final long serialVersionUID = -2688552233736202101L;
 		private final int index;
 		private CheckBoxMenuWithIndex(String text, int index) {
@@ -380,7 +380,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		}
 	}
 
-	private class CheckBoxMenuWith<T> extends JCheckBoxMenuItem implements Supplier<T> {
+	private static class CheckBoxMenuWith<T> extends JCheckBoxMenuItem implements Supplier<T> {
 		private static final long serialVersionUID = -7786833458520626015L;
 		private final T obj;
 		private CheckBoxMenuWith(String text, T obj) {
@@ -393,7 +393,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		}
 	}
 
-	private class MenuWithIndex extends JMenuItem implements IntSupplier {
+	private static class MenuWithIndex extends JMenuItem implements IntSupplier {
 		private static final long serialVersionUID = -7944526274796801310L;
 		private int index;
 		private MenuWithIndex() {
@@ -415,7 +415,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		ButtonGroup group = new ButtonGroup();
 		int index = 0;
 		for (int value : PianoRollView.NOTE_HEIGHT_TABLE) {
-			CheckBoxMenuWithIndex menu = new CheckBoxMenuWithIndex(value+"px", index++);
+			CheckBoxMenuWithIndex menu = new CheckBoxMenuWithIndex(value + "px", index++);
 			menu.setActionCommand(ActionDispatcher.CHANGE_NOTE_HEIGHT_INT);
 			menu.addActionListener(listener);
 			noteHeightMenu.add(menu);
@@ -758,7 +758,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		new KeyAction(name, stroke, contentPane, func);
 	}
 
-	private final class KeyAction extends AbstractAction {
+	private static final class KeyAction extends AbstractAction {
 		private static final long serialVersionUID = -5439131294063926971L;
 		private Runnable function;
 		private KeyAction() {}

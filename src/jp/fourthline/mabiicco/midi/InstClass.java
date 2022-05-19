@@ -178,7 +178,7 @@ public final class InstClass {
 	/**
 	 * DLSの情報に基づくOptions
 	 */
-	public final class Options {
+	public static final class Options {
 		public final static int OPTION_NUM = 256;
 		private final double[] attentionList;
 		private final boolean[] overlapList;
@@ -297,8 +297,7 @@ public final class InstClass {
 
 	private static String instName(Instrument inst) {
 		try {
-			String name = instResource.getString(""+inst.getPatch().getProgram());
-			return name;
+			return instResource.getString(""+inst.getPatch().getProgram());
 		} catch (MissingResourceException e) {
 			return null;
 		}
@@ -381,7 +380,7 @@ public final class InstClass {
 			int program = inst.getPatch().getProgram();
 			System.out.printf("%d,%d=%s \"%s\"\n", bank, program, originalName, name);
 			if (bank != 0) continue;
-			if ( (name != null) || (debug == true) ) {
+			if ( (name != null) || (debug) ) {
 				name = ""+program+": "+name;
 				InstClass instc = new InstClass( name,
 						bank,
