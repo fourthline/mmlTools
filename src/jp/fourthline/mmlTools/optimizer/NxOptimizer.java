@@ -5,6 +5,7 @@
 package jp.fourthline.mmlTools.optimizer;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.OptionalInt;
 
@@ -66,13 +67,7 @@ public class NxOptimizer implements MMLStringOptimizer.Optimizer {
 	}
 
 	private NxBuilder minStack(List<NxBuilder> stack) {
-		return stack.stream().min((t1, t2) -> {
-			int ret = t1.builder.length() - t2.builder.length();
-			if (ret == 0) {
-				ret = t1.nCount - t2.nCount;
-			}
-			return ret;
-		}).get();
+		return stack.stream().min(Comparator.comparingInt((NxBuilder t) -> t.builder.length()).thenComparingInt(t -> t.nCount)).get();
 	}
 
 	protected int getCurrentNoteNumber() {
@@ -97,22 +92,16 @@ public class NxOptimizer implements MMLStringOptimizer.Optimizer {
 	}
 
 	private void addOctToken(String token) {
-		builderList.forEach(t -> {
-			t.addOctToken(t.builder.length(), token);
-		});
+		builderList.forEach(t -> t.addOctToken(t.builder.length(), token));
 	}
 
 	private void clearOctToken() {
-		builderList.forEach(t -> {
-			t.offset = OptionalInt.empty();
-		});
+		builderList.forEach(t -> t.offset = OptionalInt.empty());
 	}
 
 	private List<NxBuilder> listClone() {
 		List<NxBuilder> cloneList = new ArrayList<>();
-		builderList.forEach(t -> {
-			cloneList.add(t.clone());
-		});
+		builderList.forEach(t -> cloneList.add(t.clone()));
 		return cloneList;
 	}
 
@@ -160,16 +149,12 @@ public class NxOptimizer implements MMLStringOptimizer.Optimizer {
 	}
 
 	private void addToken(String token) {
-		builderList.forEach(t -> {
-			t.builder.append(token);
-		});
+		builderList.forEach(t -> t.builder.append(token));
 	}
 
 	private void printMap() {
 		if (MMLStringOptimizer.getDebug()) {
-			builderList.forEach(t -> {
-				System.out.println(t.toString());
-			});
+			builderList.forEach(t -> System.out.println(t.toString()));
 			System.out.println(" -- ");
 		}
 	}

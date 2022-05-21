@@ -87,7 +87,7 @@ public final class MMLStringOptimizer {
 	private String optimize(Optimizer[] optimizerList) {
 		String mml = originalMML;
 		for (Optimizer optimizer : optimizerList) {
-			new MMLTokenizer(mml).forEachRemaining(t -> optimizer.nextToken(t));
+			new MMLTokenizer(mml).forEachRemaining(optimizer::nextToken);
 			mml = optimizer.getMinString();
 		}
 

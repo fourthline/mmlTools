@@ -50,9 +50,7 @@ public final class OxLxFixedOptimizer extends OxLxOptimizer {
 
 	@Override
 	protected void fixPattern(Map<String, StringBuilder> map) {
-		map.forEach((key, builder) -> {
-			pattern.forEach(t -> t.patternApply(key, builder));
-		});
+		map.forEach((key, builder) -> pattern.forEach(t -> t.patternApply(key, builder)));
 	}
 
 	/**
@@ -114,7 +112,7 @@ public final class OxLxFixedOptimizer extends OxLxOptimizer {
 		private static int calcSubNxBpCmOptLength(String mml, int commonLen, int octave) {
 			String initStr = mml.substring(0, commonLen);
 			NxBpCmOptimizer optimizer = new NxBpCmOptimizer(octave, initStr);
-			new MMLTokenizer(mml.substring(commonLen)).forEachRemaining(t -> optimizer.nextToken(t));
+			new MMLTokenizer(mml.substring(commonLen)).forEachRemaining(optimizer::nextToken);
 			return optimizer.getMinString().length();
 		}
 

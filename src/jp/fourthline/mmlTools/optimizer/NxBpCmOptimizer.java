@@ -72,9 +72,7 @@ public final class NxBpCmOptimizer extends NxOptimizer {
 		});
 
 		builderList.clear();
-		map.forEach((key, str) -> {
-			builderList.add(new NxBuilder(key, str));
-		});
+		map.forEach((key, str) -> builderList.add(new NxBuilder(key, str)));
 		map.clear();
 	}
 }

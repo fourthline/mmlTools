@@ -124,7 +124,7 @@ public class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 		map.forEach((key, builder) -> updateBuilder(key, builder, minString, noteName, lenString, insertBack));
 
 		// 新規のbuilderで保有mapを更新.
-		newBuilderMap.forEach((key, builder) -> map.updateMapMinLength(key, builder));
+		newBuilderMap.forEach(map::updateMapMinLength);
 
 		FlexDotPattern.updateFlexDot(map, noteName, lenString);
 	}
