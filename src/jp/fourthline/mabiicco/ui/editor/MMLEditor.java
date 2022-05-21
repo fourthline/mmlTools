@@ -642,6 +642,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 
 		MMLEventList editEventList = mmlManager.getActiveMMLPart();
 		if (editEventList != null) {
+			new MMLNotePropertyPanel(selectedNote.toArray(new MMLNoteEvent[selectedNote.size()]), editEventList).showDialog(parentFrame);
 			mmlManager.generateActiveTrack();
 		}
 	}
