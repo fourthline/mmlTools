@@ -205,8 +205,8 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 		toolBar.add(allButton);
 		toolBar.add(trackIndexLabel);
 
-		for (int i = 0; i < partButton.length; i++) {
-			partButton[i].addActionListener(actionListener);
+		for (JToggleButton button : partButton) {
+			button.addActionListener(actionListener);
 		}
 		muteButton.addActionListener(this);
 		soloButton.addActionListener(this);

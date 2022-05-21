@@ -176,7 +176,7 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 		if (globalTempoList.size() == 0) {
 			return "";
 		}
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		for (MMLTempoEvent t : globalTempoList) {
 			sb.append(',');
 			sb.append(t.toString());

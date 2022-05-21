@@ -62,11 +62,11 @@ public final class MMLScorePropertyPanel extends JPanel {
 		authorField.setBounds(125, 70, 152, 19);
 		add(authorField);
 
-		timeCount = new JComboBox<String>();
+		timeCount = new JComboBox<>();
 		timeCount.setBounds(125, 102, 63, 19);
 		add(timeCount);
 
-		timeBase = new JComboBox<String>();
+		timeBase = new JComboBox<>();
 		timeBase.setBounds(214, 102, 63, 19);
 		add(timeBase);
 	}

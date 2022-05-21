@@ -34,7 +34,7 @@ public final class MMLEventList implements Serializable, Cloneable {
 		if (globalTempoList != null) {
 			tempoList = globalTempoList;
 		} else {
-			tempoList = new ArrayList<MMLTempoEvent>();
+			tempoList = new ArrayList<>();
 		}
 
 		parseMML(mml, 0);
@@ -44,7 +44,7 @@ public final class MMLEventList implements Serializable, Cloneable {
 		if (globalTempoList != null) {
 			tempoList = globalTempoList;
 		} else {
-			tempoList = new ArrayList<MMLTempoEvent>();
+			tempoList = new ArrayList<>();
 		}
 
 		parseMML(mml, startOffset);

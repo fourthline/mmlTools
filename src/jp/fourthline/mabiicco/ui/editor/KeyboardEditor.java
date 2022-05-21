@@ -557,13 +557,13 @@ public final class KeyboardEditor {
 				chord.add(addNoteEvent);
 			}
 			Iterator<MMLNoteEvent> noteList = chord.iterator();
-			for (int i = 0; i < partList.size(); i++) {
+			for (MMLEventList mmlEventList : partList) {
 				if (noteList.hasNext()) {
-					partList.get(i).addMMLNoteEvent( noteList.next() );
+					mmlEventList.addMMLNoteEvent(noteList.next());
 				} else {
-					MMLNoteEvent deleteNoteEvent = partList.get(i).searchOnTickOffset(tickOffset);
+					MMLNoteEvent deleteNoteEvent = mmlEventList.searchOnTickOffset(tickOffset);
 					if (deleteNoteEvent != null) {
-						partList.get(i).deleteMMLEvent(deleteNoteEvent);
+						mmlEventList.deleteMMLEvent(deleteNoteEvent);
 					}
 				}
 			}

@@ -111,14 +111,13 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 			return;
 		}
 
-		for (int i = 0; i < playNote.length; i++) {
+		for (int note : playNote) {
 			int x = 15;
-			int note = playNote[i];
-			if ( isWhiteKey(note) ) {
+			if (isWhiteKey(note)) {
 				x += 20;
 			}
 
-			int y = pianoRollView.convertNote2Y(note) + yAdd[(note+12)%12];
+			int y = pianoRollView.convertNote2Y(note) + yAdd[(note + 12) % 12];
 			g.setColor(Color.RED);
 			g.fillOval(x, y, 4, 4);
 		}
@@ -149,8 +148,8 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 				6  // C#
 		};
 
-		for (int i = 0; i < black_posIndex.length; i++) {
-			int y = octHeight * black_posIndex[i] / 7 - height / 2-1;
+		for (int i : black_posIndex) {
+			int y = octHeight * i / 7 - height / 2 - 1;
 			y += startY;
 			if (y > yLimit) break;
 

@@ -361,9 +361,8 @@ public final class InstClass {
 	}
 
 	public static List<InstClass> loadDLS(File dlsFile) throws InvalidMidiDataException, IOException {
-		Soundbank sb = null;
 		try {
-			sb = MidiSystem.getSoundbank(dlsFile);
+			Soundbank sb = MidiSystem.getSoundbank(dlsFile);
 			return loadSoundBank(sb, true);
 		} catch (Exception e) {
 			MabiIccoProperties.getInstance().setDlsFile(null);

@@ -146,8 +146,8 @@ public final class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFil
 
 	private void writeStack(PrintStream out, Stack<byte[]> data) throws IOException {
 		out.println(data.size());
-		for (int i = 0; i < data.size(); i++) {
-			out.println( Base64.getEncoder().encodeToString( data.get(i) ));
+		for (byte[] datum : data) {
+			out.println(Base64.getEncoder().encodeToString(datum));
 		}
 	}
 
