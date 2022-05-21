@@ -21,6 +21,8 @@ import jp.fourthline.mmlTools.core.UndefinedTickException;
 public class NxOptimizer implements MMLStringOptimizer.Optimizer {
 
 	protected static final class NxBuilder implements Cloneable {
+		private static final Comparator<NxBuilder> comparator = Comparator.comparingInt((NxBuilder t) -> t.builder.length()).thenComparingInt(t -> t.nCount);
+
 		protected StringBuilder builder = new StringBuilder();
 		private int nCount = 0;
 		protected int prevOct;
@@ -67,7 +69,7 @@ public class NxOptimizer implements MMLStringOptimizer.Optimizer {
 	}
 
 	private NxBuilder minStack(List<NxBuilder> stack) {
-		return stack.stream().min(Comparator.comparingInt((NxBuilder t) -> t.builder.length()).thenComparingInt(t -> t.nCount)).get();
+		return stack.stream().min(NxBuilder.comparator).get();
 	}
 
 	protected int getCurrentNoteNumber() {
