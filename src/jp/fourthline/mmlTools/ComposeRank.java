@@ -4,10 +4,7 @@
 
 package jp.fourthline.mmlTools;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import jp.fourthline.mmlTools.core.ResourceLoader;
 
@@ -43,10 +40,7 @@ public final class ComposeRank {
 			list.add( new ComposeRank(melody, chord1, chord2, s[3].trim()) );
 		}
 
-		list.sort((rank1, rank2) -> {
-			return (rank1.melody + rank1.chord1 + rank1.chord2)
-					- (rank2.melody + rank2.chord1 + rank2.chord2);
-		});
+		list.sort(Comparator.comparingInt(rank -> (rank.melody + rank.chord1 + rank.chord2)));
 	}
 
 	public static ComposeRank getTopRank() {

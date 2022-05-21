@@ -26,6 +26,7 @@ import jp.fourthline.mabiicco.MabiIcco.ISplash;
 public final class Splash extends JDialog implements ISplash {
 	private static final long serialVersionUID = -4276613664298174063L;
 	private final SplashPanel splashPanel = new SplashPanel();
+
 	public Splash() {
 		getContentPane().add(splashPanel);
 		setUndecorated(true);
@@ -35,18 +36,19 @@ public final class Splash extends JDialog implements ISplash {
 
 	@Override
 	public void updateProgress(String s, int v) {
-		splashPanel.textArea.setText(splashPanel.textArea.getText()+s);
+		splashPanel.textArea.setText(splashPanel.textArea.getText() + s);
 		splashPanel.progress.setValue(v);
 	}
 
-	private static final class SplashPanel extends JPanel {
+	public static final class SplashPanel extends JPanel {
 		private static final long serialVersionUID = 2210455372955295858L;
 		private static final int WIDTH = 300;
-		private static final int HEIGHT = 220; 
+		private static final int HEIGHT = 220;
 		private final ImageIcon img;
 		private final JProgressBar progress = new JProgressBar();
 		private final JLabel version = new JLabel();
 		private final JTextArea textArea = new JTextArea();
+
 		private SplashPanel() {
 			super();
 			setLayout(null);
@@ -56,11 +58,11 @@ public final class Splash extends JDialog implements ISplash {
 			add(progress);
 			progress.setBounds(4, 206, 292, 12);
 			add(version);
-			version.setText("Version: "+AppResource.getVersionText());
+			version.setText("Version: " + AppResource.getVersionText());
 			version.setBounds(160, 60, 120, 14);
 			add(textArea);
 			textArea.setEditable(false);
-			textArea.setBounds(20, 100, WIDTH-40, 80);
+			textArea.setBounds(20, 100, WIDTH - 40, 80);
 			textArea.setBorder(new RoundBorder(20, 10));
 			setOpaque(false);
 			setBorder(new LineBorder(Color.GRAY, 1, false));
@@ -71,30 +73,31 @@ public final class Splash extends JDialog implements ISplash {
 			g.drawImage(img.getImage(), 0, 0, this);
 			super.paint(g);
 		}
+	}
 
-		private final class RoundBorder extends AbstractBorder {
-			private static final long serialVersionUID = 429150943820077975L;
-			private final int r;
-			private final Insets insets;
-			private RoundBorder(int r, int m) {
-				this.r = r;
-				this.insets = new Insets(m, m, m, m);
-			}
+	static final class RoundBorder extends AbstractBorder {
+		private static final long serialVersionUID = 429150943820077975L;
+		private final int r;
+		private final Insets insets;
 
-			@Override
-			public void paintBorder(Component c, Graphics g, int x, int y, int w, int h) {
-				Graphics2D g2 = (Graphics2D) g.create();
-				g2.setColor(new Color(0.7f, 0.7f, 0.7f));
-				g2.drawRoundRect(0, 0, w-1, h-1, r, r);
-				g2.setColor(new Color(0.6f, 0.6f, 0.6f));
-				g2.drawRoundRect(1, 1, w-3, h-3, r, r);
-				g2.dispose();
-			}
+		RoundBorder(int r, int m) {
+			this.r = r;
+			this.insets = new Insets(m, m, m, m);
+		}
 
-			@Override
-			public Insets getBorderInsets(Component c) {
-				return insets;
-			}
+		@Override
+		public void paintBorder(Component c, Graphics g, int x, int y, int w, int h) {
+			Graphics2D g2 = (Graphics2D) g.create();
+			g2.setColor(new Color(0.7f, 0.7f, 0.7f));
+			g2.drawRoundRect(0, 0, w - 1, h - 1, r, r);
+			g2.setColor(new Color(0.6f, 0.6f, 0.6f));
+			g2.drawRoundRect(1, 1, w - 3, h - 3, r, r);
+			g2.dispose();
+		}
+
+		@Override
+		public Insets getBorderInsets(Component c) {
+			return insets;
 		}
 	}
 }

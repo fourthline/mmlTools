@@ -66,7 +66,7 @@ public final class Splash2 extends JDialog implements ISplash {
 			add(textArea);
 			textArea.setEditable(false);
 			textArea.setBounds(20, 313, WIDTH-40, 80);
-			textArea.setBorder(new RoundBorder(20, 10));
+			textArea.setBorder(new Splash.RoundBorder(20, 10));
 			textArea.setOpaque(false);
 			setOpaque(false);
 		}
@@ -75,31 +75,6 @@ public final class Splash2 extends JDialog implements ISplash {
 		public void paint(Graphics g) {
 			g.drawImage(img.getImage(), 0, 0, this);
 			super.paint(g);
-		}
-
-		private final class RoundBorder extends AbstractBorder {
-			private static final long serialVersionUID = 429150943820077975L;
-			private final int r;
-			private final Insets insets;
-			private RoundBorder(int r, int m) {
-				this.r = r;
-				this.insets = new Insets(m, m, m, m);
-			}
-
-			@Override
-			public void paintBorder(Component c, Graphics g, int x, int y, int w, int h) {
-				Graphics2D g2 = (Graphics2D) g.create();
-				g2.setColor(new Color(0.7f, 0.7f, 0.7f));
-				g2.drawRoundRect(0, 0, w-1, h-1, r, r);
-				g2.setColor(new Color(0.6f, 0.6f, 0.6f));
-				g2.drawRoundRect(1, 1, w-3, h-3, r, r);
-				g2.dispose();
-			}
-
-			@Override
-			public Insets getBorderInsets(Component c) {
-				return insets;
-			}
 		}
 	}
 }
