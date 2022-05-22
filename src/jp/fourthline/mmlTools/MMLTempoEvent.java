@@ -91,8 +91,10 @@ public final class MMLTempoEvent extends MMLEvent implements Cloneable {
 	}
 
 	public static List<MMLTempoEvent> mergeTempoList(List<MMLTempoEvent> list1, List<MMLTempoEvent> list2) {
-		for (MMLTempoEvent tempoEvent : list1) {
-			tempoEvent.appendToListElement(list2);
+		if (list1 != list2) {
+			for (MMLTempoEvent tempoEvent : list1) {
+				tempoEvent.appendToListElement(list2);
+			}
 		}
 
 		return list2;
