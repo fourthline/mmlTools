@@ -4,9 +4,6 @@
 
 package jp.fourthline.mabiicco.ui.editor;
 
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
-
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
@@ -14,7 +11,6 @@ import javax.swing.SpinnerNumberModel;
  * 
  */
 public final class NumberSpinner {
-
 	private NumberSpinner() {}
 
 	public static JSpinner createSpinner(int initial, int min, int max, int step) {
