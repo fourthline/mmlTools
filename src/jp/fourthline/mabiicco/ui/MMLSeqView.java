@@ -5,7 +5,7 @@
 package jp.fourthline.mabiicco.ui;
 
 import javax.sound.midi.Sequencer;
-import javax.swing.JLabel;
+import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -85,7 +85,7 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 	private final KeyboardEditor keyboardEditor;
 
 	private final JPanel panel;
-	private JLabel timeView;
+	private final JComboBox<StringBuffer> timeBox;
 	private final ScheduledThreadPoolExecutor scheduledExecutor = new ScheduledThreadPoolExecutor(8);
 
 	private final Frame parentFrame;
@@ -94,8 +94,9 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 	 * Create the panel.
 	 * @param parentFrame 関連付けるFrame
 	 */
-	public MMLSeqView(Frame parentFrame) {
+	public MMLSeqView(Frame parentFrame, JComboBox<StringBuffer> timeBox) {
 		this.parentFrame = parentFrame;
+		this.timeBox = timeBox;
 		panel = new JPanel(false);
 		panel.setLayout(new BorderLayout(0, 0));
 
@@ -726,10 +727,6 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 		updateSelectedTrackAndMMLPart();
 	}
 
-	public void setTimeView(JLabel timeView) {
-		this.timeView = timeView;
-	}
-
 	public IFileState getFileState() {
 		return undoEdit;
 	}
@@ -770,8 +767,11 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 				(time/60/1000), (time/1000%60), (time/100%10),
 				(totalTime/60/1000), (totalTime/1000%60), (totalTime/100%10),
 				tempo);
-		if (timeView != null) {
-			timeView.setText(str);
+		String str2 = mmlScore.getBarTextTick((int)position) + "/" + mmlScore.getBarTextTick(mmlScore.getTotalTickLength()) + " (t" + tempo + ")";
+		if (timeBox != null) {
+			timeBox.getItemAt(0).replace(0, 32, str);
+			timeBox.getItemAt(1).replace(0, 32, str2);
+			timeBox.repaint();
 		}
 	}
 

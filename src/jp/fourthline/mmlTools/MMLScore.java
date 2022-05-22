@@ -397,7 +397,6 @@ public final class MMLScore {
 	 * @return
 	 */
 	public String getBarTextTick(int tick) {
-		StringBuilder sb = new StringBuilder();
 		try {
 			int sect = MMLTicks.getTick(getBaseOnly());
 			int sectBar = sect * getTimeCountOnly();
@@ -405,11 +404,11 @@ public final class MMLScore {
 			int barR = (tick % sectBar);
 			int c = barR / sect;
 			int r = barR % sect;
-			sb.append(bar).append(':').append(c).append(':').append(r);			
+			return String.format("%d:%02d:%02d", bar, c, r);
 		} catch (UndefinedTickException e) {
 			e.printStackTrace();
 		}
-		return sb.toString();
+		return "N/A";
 	}
 
 	public static void main(String[] args) {

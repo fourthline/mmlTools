@@ -35,6 +35,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
@@ -43,7 +44,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -70,7 +70,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	private final MMLSeqView mmlSeqView;
 	private final JComboBox<NoteAlign> noteTypeSelect = new JComboBox<>(NoteAlign.createAlignList());
 	private final JComboBox<PaintMode> paintModeSelect = new JComboBox<>(PaintMode.values());
-	private final JLabel timeView = new JLabel("time MM:SS/MM:SS (120)");
+	private final JComboBox<StringBuffer> timeBox = new JComboBox<>( List.of(new StringBuffer("time MM:SS/MM:SS (t120)     "), new StringBuffer() ).toArray(new StringBuffer[0]) );
 
 	private final ActionListener listener;
 
@@ -116,8 +116,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		contentPane.add(northPanel, BorderLayout.NORTH);
 
-		mmlSeqView = new MMLSeqView(this);
-		mmlSeqView.setTimeView(timeView);
+		mmlSeqView = new MMLSeqView(this, timeBox);
 		mmlSeqView.setNoteAlignChanger(t -> {
 			if ( (t >= 0) && (t < noteTypeSelect.getItemCount()) )
 				noteTypeSelect.setSelectedIndex(t);
@@ -549,8 +548,9 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		toolBar.add(paintModeSelect);
 
 		toolBar.add(newToolBarSeparator());
-		timeView.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-		toolBar.add(timeView);
+		timeBox.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+		timeBox.setFocusable(false);
+		toolBar.add(timeBox);
 
 		return toolBar;
 	}
@@ -574,7 +574,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 
 		Rectangle rect = properties.getWindowRect();
 		if (rect.getX() < 0.0) {
-			setSize(850, 650);
+			setSize(1024, 768);
 			setLocationRelativeTo(null);
 		} else {
 			setBounds(rect);

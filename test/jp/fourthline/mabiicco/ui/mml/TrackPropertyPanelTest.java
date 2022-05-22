@@ -77,42 +77,42 @@ public final class TrackPropertyPanelTest {
 		MMLTrack track = new MMLTrack();
 		mmlManager.getMMLScore().addTrack(track);
 		var obj = new TrackPropertyPanel(track, mmlManager);
-		assertEquals(List.of("0:0:0", "0ms", "0:0:0", "0ms"), obj.getLabelText());
+		assertEquals(List.of("0:00:00", "0ms", "0:00:00", "0ms"), obj.getLabelText());
 
 		// マイナス方向のDelay
 		track.setAttackDelayCorrect(-5);
 		obj = new TrackPropertyPanel(track, mmlManager);
-		assertEquals(List.of("0:0:0", "-20ms=N/A", "0:0:0", "0ms"), obj.getLabelText());
+		assertEquals(List.of("0:00:00", "-20ms=N/A", "0:00:00", "0ms"), obj.getLabelText());
 
 		track.setAttackDelayCorrect(-48);
 		obj = new TrackPropertyPanel(track, mmlManager);
-		assertEquals(List.of("0:0:0", "-250ms=-L8", "0:0:0", "0ms"), obj.getLabelText());
+		assertEquals(List.of("0:00:00", "-250ms=-L8", "0:00:00", "0ms"), obj.getLabelText());
 
 		track.getGlobalTempoList().add(new MMLTempoEvent(60, 0));
 		obj = new TrackPropertyPanel(track, mmlManager);
-		assertEquals(List.of("0:0:0", "-500ms=-L8", "0:0:0", "0ms"), obj.getLabelText());
+		assertEquals(List.of("0:00:00", "-500ms=-L8", "0:00:00", "0ms"), obj.getLabelText());
 
 		track.getGlobalTempoList().add(new MMLTempoEvent(240, 0));
 		obj = new TrackPropertyPanel(track, mmlManager);
-		assertEquals(List.of("0:0:0", "-125ms=-L8", "0:0:0", "0ms"), obj.getLabelText());
+		assertEquals(List.of("0:00:00", "-125ms=-L8", "0:00:00", "0ms"), obj.getLabelText());
 
 		// プラス方向のDelay
 		track.getGlobalTempoList().add(new MMLTempoEvent(120, 0));
 		track.setAttackDelayCorrect(5);
 		obj = new TrackPropertyPanel(track, mmlManager);
-		assertEquals(List.of("0:0:0", "20ms=N/A", "0:0:0", "0ms"), obj.getLabelText());
+		assertEquals(List.of("0:00:00", "20ms=N/A", "0:00:00", "0ms"), obj.getLabelText());
 
 		track.setAttackDelayCorrect(48);
 		obj = new TrackPropertyPanel(track, mmlManager);
-		assertEquals(List.of("0:0:0", "250ms=L8", "0:0:0", "0ms"), obj.getLabelText());
+		assertEquals(List.of("0:00:00", "250ms=L8", "0:00:00", "0ms"), obj.getLabelText());
 
 		track.getGlobalTempoList().add(new MMLTempoEvent(60, 0));
 		obj = new TrackPropertyPanel(track, mmlManager);
-		assertEquals(List.of("0:0:0", "250ms=L8", "0:0:0", "0ms"), obj.getLabelText());
+		assertEquals(List.of("0:00:00", "250ms=L8", "0:00:00", "0ms"), obj.getLabelText());
 
 		track.getGlobalTempoList().add(new MMLTempoEvent(240, 0));
 		obj = new TrackPropertyPanel(track, mmlManager);
-		assertEquals(List.of("0:0:0", "250ms=L8", "0:0:0", "0ms"), obj.getLabelText());
+		assertEquals(List.of("0:00:00", "250ms=L8", "0:00:00", "0ms"), obj.getLabelText());
 	}
 
 	@Test
@@ -120,41 +120,41 @@ public final class TrackPropertyPanelTest {
 		MMLTrack track = new MMLTrack();
 		mmlManager.getMMLScore().addTrack(track);
 		var obj = new TrackPropertyPanel(track, mmlManager);
-		assertEquals(List.of("0:0:0", "0ms", "0:0:0", "0ms"), obj.getLabelText());
+		assertEquals(List.of("0:00:00", "0ms", "0:00:00", "0ms"), obj.getLabelText());
 
 		// マイナス方向のDelay
 		track.setAttackSongDelayCorrect(-5);
 		obj = new TrackPropertyPanel(track, mmlManager);
-		assertEquals(List.of("0:0:0", "0ms", "0:0:0", "-20ms=N/A"), obj.getLabelText());
+		assertEquals(List.of("0:00:00", "0ms", "0:00:00", "-20ms=N/A"), obj.getLabelText());
 
 		track.setAttackSongDelayCorrect(-48);
 		obj = new TrackPropertyPanel(track, mmlManager);
-		assertEquals(List.of("0:0:0", "0ms", "0:0:0", "-250ms=-L8"), obj.getLabelText());
+		assertEquals(List.of("0:00:00", "0ms", "0:00:00", "-250ms=-L8"), obj.getLabelText());
 
 		track.getGlobalTempoList().add(new MMLTempoEvent(60, 0));
 		obj = new TrackPropertyPanel(track, mmlManager);
-		assertEquals(List.of("0:0:0", "0ms", "0:0:0", "-500ms=-L8"), obj.getLabelText());
+		assertEquals(List.of("0:00:00", "0ms", "0:00:00", "-500ms=-L8"), obj.getLabelText());
 
 		track.getGlobalTempoList().add(new MMLTempoEvent(240, 0));
 		obj = new TrackPropertyPanel(track, mmlManager);
-		assertEquals(List.of("0:0:0", "0ms", "0:0:0", "-125ms=-L8"), obj.getLabelText());
+		assertEquals(List.of("0:00:00", "0ms", "0:00:00", "-125ms=-L8"), obj.getLabelText());
 
 		// プラス方向のDelay
 		track.getGlobalTempoList().add(new MMLTempoEvent(120, 0));
 		track.setAttackSongDelayCorrect(5);
 		obj = new TrackPropertyPanel(track, mmlManager);
-		assertEquals(List.of("0:0:0", "0ms", "0:0:0", "20ms=N/A"), obj.getLabelText());
+		assertEquals(List.of("0:00:00", "0ms", "0:00:00", "20ms=N/A"), obj.getLabelText());
 
 		track.setAttackSongDelayCorrect(48);
 		obj = new TrackPropertyPanel(track, mmlManager);
-		assertEquals(List.of("0:0:0", "0ms", "0:0:0", "250ms=L8"), obj.getLabelText());
+		assertEquals(List.of("0:00:00", "0ms", "0:00:00", "250ms=L8"), obj.getLabelText());
 
 		track.getGlobalTempoList().add(new MMLTempoEvent(60, 0));
 		obj = new TrackPropertyPanel(track, mmlManager);
-		assertEquals(List.of("0:0:0", "0ms", "0:0:0", "250ms=L8"), obj.getLabelText());
+		assertEquals(List.of("0:00:00", "0ms", "0:00:00", "250ms=L8"), obj.getLabelText());
 
 		track.getGlobalTempoList().add(new MMLTempoEvent(240, 0));
 		obj = new TrackPropertyPanel(track, mmlManager);
-		assertEquals(List.of("0:0:0", "0ms", "0:0:0", "250ms=L8"), obj.getLabelText());
+		assertEquals(List.of("0:00:00", "0ms", "0:00:00", "250ms=L8"), obj.getLabelText());
 	}
 }
