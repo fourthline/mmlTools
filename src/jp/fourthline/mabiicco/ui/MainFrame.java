@@ -341,7 +341,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createCheckMenu(settingMenu, "view.instAttr", properties.instAttr);
 		createCheckMenu(settingMenu, "view.showAllVelocity", properties.showAllVelocity);
 		createCheckMenu(settingMenu, "view.velocity", properties.viewVelocityLine);
-		createCheckMenu(settingMenu, "ui.use_system_laf", properties.useSystemLaF, ActionDispatcher.CHANGE_UI);
+		createCheckMenu(settingMenu, "ui.use_system_laf", properties.useSystemLaF, ActionDispatcher.CHANGE_UI, false);
 		createCheckMenu(settingMenu, "ui.scale_disable", properties.uiscaleDisable);
 		settingMenu.add(new JSeparator());
 		// 機能に関わる設定
@@ -355,7 +355,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createMenuItem(settingMenu, "mml.emptyCorrection", ActionDispatcher.INPUT_EMPTY_CORRECTION, true);
 		settingMenu.add(new JSeparator());
 		// DLSに関わる設定
-		createCheckMenu(settingMenu, "menu.useDefaultSoundbank", properties.useDefaultSoundBank, ActionDispatcher.USE_DEFAULT_SOUNDBANK);
+		createCheckMenu(settingMenu, "menu.useDefaultSoundbank", properties.useDefaultSoundBank, ActionDispatcher.USE_DEFAULT_SOUNDBANK, true);
 		createMenuItem(settingMenu, "menu.select_dls", ActionDispatcher.SELECT_DLS, true);
 
 		/************************* Help Menu *************************/
@@ -451,10 +451,10 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	 * @param settingMenu
 	 */
 	private void createCheckMenu(JMenu settingMenu, String itemName, MabiIccoProperties.Property<Boolean> property) {
-		createCheckMenu(settingMenu, itemName, property, null);
+		createCheckMenu(settingMenu, itemName, property, null, false);
 	}
 
-	private void createCheckMenu(JMenu settingMenu, String itemName, MabiIccoProperties.Property<Boolean> property, String actionCommand) {
+	private void createCheckMenu(JMenu settingMenu, String itemName, MabiIccoProperties.Property<Boolean> property, String actionCommand, boolean noplayFunction) {
 		JCheckBoxMenuItem clickPlayMenu = new JCheckBoxMenuItem(appText(itemName));
 		settingMenu.add(clickPlayMenu);
 
@@ -471,6 +471,9 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 				this.listener.actionPerformed(e);
 			}
 		});
+		if (noplayFunction) {
+			noplayFunctions.add(clickPlayMenu);
+		}
 	}
 
 	private JButton createToolButton(JComponent target, String title, String command, boolean noplayFunction) {
