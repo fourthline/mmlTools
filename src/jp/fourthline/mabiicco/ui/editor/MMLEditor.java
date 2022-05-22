@@ -270,6 +270,15 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	}
 	/**
 	 * 選択状態のノートを移動する
+	 * 
+	 * --------------------------------------------------------------
+	 * | shiftOption | alignment |  function                        |
+	 * --------------------------------------------------------------
+	 * |    false    |   false   |アライメントなしで移動する                 |
+	 * |    false    |   true    |NoteAlign設定に基づいて移動する(default)|
+	 * |    true     |   false   |横方向固定でオクターブ単位でノート移動する    |
+	 * |    true     |   true    |横方向固定でノート変更のみで移動する       |
+	 * --------------------------------------------------------------
 	 */
 	@Override
 	public void moveSelectedMMLNote(Point start, Point p, boolean shiftOption, boolean alignment) {
@@ -280,11 +289,15 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		int noteDelta = pianoRollView.convertY2Note(p.y) - pianoRollView.convertY2Note(start.y);
 		long tickOffsetDelta = targetTick - startTick;
 		long alignedTickOffsetDelta = tickOffsetDelta;
-		if (alignment) {
-			alignedTickOffsetDelta -= (tickOffsetDelta % editAlign);
-		}
 		if (shiftOption) {
 			alignedTickOffsetDelta = 0;
+			if (!alignment) {
+				noteDelta -= noteDelta % 12;
+			}
+		} else {
+			if (alignment) {
+				alignedTickOffsetDelta -= (tickOffsetDelta % editAlign);
+			}
 		}
 		if (detachedNote.get(0).getTickOffset() + alignedTickOffsetDelta < startOffset) {
 			alignedTickOffsetDelta = startOffset - detachedNote.get(0).getTickOffset();
