@@ -1,0 +1,27 @@
+[mml-score]
+version=1
+title=
+author=
+time=4/4
+tempo=96T150,192T120
+mml-track=MML@at150
+at120a1,bb
+  b,ccc,d
+  t150  d  t120& d2. ;
+name=track1
+program=0
+songProgram=-1
+panpot=64
+visible=true
+mml-track=MML@
+   at150at120a2,
+   bbb  ,  
+   c c c,
+   dt150
+   dt120&
+   d;
+name=track2
+program=4
+songProgram=120
+panpot=64
+visible=true

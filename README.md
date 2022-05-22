@@ -3,7 +3,7 @@ mmlTools
 
 ### 最新版のダウンロード
 
-* リリースを参照ください https://github.com/fourthline/mmlTools/releases
+* https://fourthline.jp/mabiicco/
 * Windowsのみです.
 
 
