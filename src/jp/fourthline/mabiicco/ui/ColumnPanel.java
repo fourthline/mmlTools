@@ -59,6 +59,9 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 	private final JPopupMenu popupMenu = new JPopupMenu();
 	private final ArrayList<IMarkerEditor> markerEditor = new ArrayList<>();
 
+	private final MabiDLS dls = MabiDLS.getInstance();
+	private final MabiIccoProperties appProperties = MabiIccoProperties.getInstance();
+
 	private OptionalInt targetMarker = OptionalInt.empty();
 
 	public ColumnPanel(Frame parentFrame, PianoRollView pianoRollView, IMMLManager mmlManager, IEditAlign editAlign) {
@@ -112,7 +115,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 		pianoRollView.paintSequenceLine(g2, getHeight());
 		paintTargetMarker(g2);
 
-		if (MabiIccoProperties.getInstance().viewVelocityLine.get()) {
+		if (appProperties.viewVelocityLine.get()) {
 			paintVelocityLine(g2);
 		}
 
@@ -170,18 +173,20 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 	 * テンポを表示します.
 	 */
 	private void paintTempoEvents(Graphics2D g) {
-		MMLScore score = mmlManager.getMMLScore();
+		if (appProperties.enableViewTempo.get()) {
+			MMLScore score = mmlManager.getMMLScore();
 
-		for (MMLTempoEvent tempoEvent : score.getTempoEventList()) {
-			int tick = tempoEvent.getTickOffset();
-			int x = pianoRollView.convertTicktoX(tick);
-			String s = "t" + tempoEvent.getTempo();
-			drawMarker(g, s, x, TEMPO_MAKER_FILL_COLOR, 0);
+			for (MMLTempoEvent tempoEvent : score.getTempoEventList()) {
+				int tick = tempoEvent.getTickOffset();
+				int x = pianoRollView.convertTicktoX(tick);
+				String s = "t" + tempoEvent.getTempo();
+				drawMarker(g, s, x, TEMPO_MAKER_FILL_COLOR, 0);
+			}
 		}
 	}
 
 	private void paintMarker(Graphics2D g) {
-		if (MabiIccoProperties.getInstance().enableViewMarker.get()) {
+		if (appProperties.enableViewMarker.get()) {
 			MMLScore score = mmlManager.getMMLScore();
 
 			for (Marker marker : score.getMarkerList()) {
@@ -248,7 +253,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 	}
 
 	private void setSequenceBar(int x) {
-		Sequencer sequencer = MabiDLS.getInstance().getSequencer();
+		Sequencer sequencer = dls.getSequencer();
 		if (!sequencer.isRunning()) {
 			long tick = pianoRollView.convertXtoTick(x);
 			tick -= tick % editAlign.getEditAlign();
@@ -266,8 +271,8 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 	}
 
 	private void playAllNoteOnTick(int x) {
-		Sequencer sequencer = MabiDLS.getInstance().getSequencer();
-		if (!MabiIccoProperties.getInstance().enableClickPlay.get()) {
+		Sequencer sequencer = dls.getSequencer();
+		if (!appProperties.enableClickPlay.get()) {
 			return;
 		}
 		if (!sequencer.isRunning()) {
@@ -278,9 +283,9 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 			for (MMLNoteEvent[] noteList : noteListArray) {
 				int program = score.getTrack(trackIndex).getProgram();
 				if (x < 0) {
-					MabiDLS.getInstance().playNotes(null, program, trackIndex);
+					dls.playNotes(null, program, trackIndex);
 				} else {
-					MabiDLS.getInstance().playNotes(noteList, program, trackIndex);
+					dls.playNotes(noteList, program, trackIndex);
 				}
 
 				trackIndex++;

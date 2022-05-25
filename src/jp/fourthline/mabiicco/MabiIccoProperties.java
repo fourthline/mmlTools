@@ -57,6 +57,9 @@ public final class MabiIccoProperties {
 	/** クリック再生機能の有効/無効 */
 	public final Property<Boolean> enableClickPlay = new BooleanProperty("function.enable_click_play", true);
 
+	/** テンポ表示の有効/無効 */
+	public final Property<Boolean> enableViewTempo = new BooleanProperty("function.enable_view_tempo", true);
+
 	/** マーカー表示の有効/無効 */
 	public final Property<Boolean> enableViewMarker = new BooleanProperty("function.enable_view_marker", true);
 

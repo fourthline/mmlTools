@@ -335,6 +335,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		// 表示に関わる設定
 		createNoteHeightMenu(settingMenu);
 		createScaleColorMenu(settingMenu);
+		createCheckMenu(settingMenu, "view.tempo", properties.enableViewTempo);
 		createCheckMenu(settingMenu, "view.marker", properties.enableViewMarker);
 		createCheckMenu(settingMenu, "view.range", properties.viewRange);
 		createCheckMenu(settingMenu, "view.instAttr", properties.instAttr);
