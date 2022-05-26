@@ -24,7 +24,6 @@ public final class VelocityChangeMenu {
 
 	private final JSlider slider = new JSlider(0, 15, 8);
 	private final JMenu menu = new JMenu(appText("edit.velocity"));
-//	private final JButton defaultButton = new JButton(appText("edit.default"));
 	private final JButton applyButton = new JButton(appText("edit.apply"));
 	private final JButton cancelButton = new JButton(appText("edit.cancel"));
 	private final JButton selectedApplyButton = new JButton(appText("edit.selected_apply"));
@@ -41,10 +40,6 @@ public final class VelocityChangeMenu {
 		slider.setMajorTickSpacing(3);
 		slider.setPaintLabels(true);
 
-//		defaultButton.addActionListener(t -> {
-//			int v = getter.get();
-//			setValue(v);
-//		});
 		applyButton.addActionListener(t -> {
 			setter.accept(slider.getValue());
 			parent.setVisible(false);
@@ -58,7 +53,6 @@ public final class VelocityChangeMenu {
 		});
 
 		JPanel p1 = new JPanel();
-//		p1.add(defaultButton);
 		p1.add(applyButton);
 		p1.add(selectedApplyButton);
 		p1.add(cancelButton);
