@@ -673,6 +673,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	public void selectPreviousAll() {
 		MMLEventList editEventList = mmlManager.getActiveMMLPart();
 		if (editEventList != null) {
+			selectedNote.clear();
 			for (MMLNoteEvent note : editEventList.getMMLNoteEventList()) {
 				if (note.getTickOffset() < popupTargetNote.getTickOffset()) {
 					selectedNote.add(note);
@@ -687,6 +688,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	public void selectAfterAll() {
 		MMLEventList editEventList = mmlManager.getActiveMMLPart();
 		if (editEventList != null) {
+			selectedNote.clear();
 			for (MMLNoteEvent note : editEventList.getMMLNoteEventList()) {
 				if (note.getTickOffset() > popupTargetNote.getTickOffset()) {
 					selectedNote.add(note);
@@ -699,6 +701,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	public void selectAllSamePitch() {
 		MMLEventList editEventList = mmlManager.getActiveMMLPart();
 		if (editEventList != null) {
+			selectedNote.clear();
 			for (MMLNoteEvent note : editEventList.getMMLNoteEventList()) {
 				if (note.getNote() == popupTargetNote.getNote()) {
 					selectedNote.add(note);
