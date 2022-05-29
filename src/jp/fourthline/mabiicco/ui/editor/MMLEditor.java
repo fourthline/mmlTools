@@ -293,7 +293,8 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		pianoRollView.onViewScrollPoint(p);
 		long startTick = pianoRollView.convertXtoTick(start.x);
 		long targetTick = pianoRollView.convertXtoTick(p.x);
-		int noteDelta = pianoRollView.convertY2Note(p.y) - pianoRollView.convertY2Note(start.y);
+		int pivNote = pianoRollView.convertY2Note(start.y);
+		int noteDelta = pianoRollView.convertY2Note(p.y) - pivNote;
 		long tickOffsetDelta = targetTick - startTick;
 		long alignedTickOffsetDelta = tickOffsetDelta;
 		if (shiftOption) {
@@ -323,7 +324,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 			}
 		}
 
-		notePlayer.playNote( pianoRollView.convertY2Note(p.y), velocity );
+		notePlayer.playNote( pivNote + noteDelta, velocity );
 	}
 
 	@Override
