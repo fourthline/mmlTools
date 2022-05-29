@@ -320,7 +320,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 			if ( (note1.getTickOffset() <= startTick) && (note1.getEndTick() > startTick) ) {
 				velocity = note2.getVelocity();
 				// ノート情報表示
-				pianoRollView.setPaintNoteInfo(!alignment ? note2 : null);
+				pianoRollView.setPaintNoteInfo(!alignment && !shiftOption ? note2 : null);
 			}
 		}
 
