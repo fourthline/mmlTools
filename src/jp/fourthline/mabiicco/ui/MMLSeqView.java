@@ -760,14 +760,15 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 		long position = pianoRollView.getSequencePlayPosition();
 		List<MMLTempoEvent> tempoList = mmlScore.getTempoEventList();
 		long time = MMLTempoEvent.getTimeOnTickOffset(tempoList, (int)position);
-		long totalTime = mmlScore.getTotalTime();
+		int totalTick = mmlScore.getTotalTickLength();
+		long totalTime = MMLTempoEvent.getTimeOnTickOffset(tempoList, totalTick);
 		int tempo = MMLTempoEvent.searchOnTick(tempoList, (int)position);
 
 		String str = String.format("time %d:%02d.%d/%d:%02d.%d (t%d)", 
 				(time/60/1000), (time/1000%60), (time/100%10),
 				(totalTime/60/1000), (totalTime/1000%60), (totalTime/100%10),
 				tempo);
-		String str2 = mmlScore.getBarTextTick((int)position) + "/" + mmlScore.getBarTextTick(mmlScore.getTotalTickLength()) + " (t" + tempo + ")";
+		String str2 = mmlScore.getBarTextTick((int)position) + "/" + mmlScore.getBarTextTick(totalTick) + " (t" + tempo + ")";
 		if (timeBox != null) {
 			timeBox.getItemAt(0).replace(0, 32, str);
 			timeBox.getItemAt(1).replace(0, 32, str2);
