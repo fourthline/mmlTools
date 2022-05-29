@@ -53,6 +53,7 @@ import javax.swing.JToolBar;
 import javax.swing.JComboBox;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 import java.awt.event.InputEvent;
 import java.io.File;
@@ -553,6 +554,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		timeBox.setFocusable(false);
 		timeBox.setSelectedIndex(MabiIccoProperties.getInstance().getTimeBoxIndex());
 		timeBox.addActionListener((t) -> MabiIccoProperties.getInstance().setTimeBoxIndex(timeBox.getSelectedIndex()));
+		timeBox.setPreferredSize(new Dimension(240, 20));
 		toolBar.add(timeBox);
 
 		return toolBar;
