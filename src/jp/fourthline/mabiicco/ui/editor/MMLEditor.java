@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputListener;
 
@@ -90,9 +91,15 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 					mmlManager.generateActiveTrack();
 				});
 		newPopupMenu(AppResource.appText("part_change"), ActionDispatcher.PART_CHANGE);
+		popupMenu.add(new JSeparator());
 		newPopupMenu(AppResource.appText("edit.select_previous_all"), ActionDispatcher.SELECT_PREVIOUS_ALL);
 		newPopupMenu(AppResource.appText("edit.select_after_all"), ActionDispatcher.SELECT_AFTER_ALL);
 		newPopupMenu(AppResource.appText("edit.select_all_same_pitch"), ActionDispatcher.SELECT_ALL_SAME_PITCH);
+		popupMenu.add(new JSeparator());
+		newPopupMenu(AppResource.appText("edit.set_temp_mute"), ActionDispatcher.SET_TEMP_MUTE);
+		newPopupMenu(AppResource.appText("edit.unset_temp_mute"), ActionDispatcher.UNSET_TEMP_MUTE);
+		newPopupMenu(AppResource.appText("edit.unset_temp_mute_all"), ActionDispatcher.UNSET_TEMP_MUTE_ALL);
+		popupMenu.add(new JSeparator());
 		newPopupMenu(AppResource.appText("menu.delete"), ActionDispatcher.DELETE, AppResource.appText("menu.delete.icon"));
 		newPopupMenu(AppResource.appText("note.properties"), ActionDispatcher.NOTE_PROPERTY);
 	}
@@ -675,7 +682,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		if (editEventList != null) {
 			selectedNote.clear();
 			for (MMLNoteEvent note : editEventList.getMMLNoteEventList()) {
-				if (note.getTickOffset() < popupTargetNote.getTickOffset()) {
+				if (note.getTickOffset() <= popupTargetNote.getTickOffset()) {
 					selectedNote.add(note);
 				} else {
 					break;
@@ -690,7 +697,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		if (editEventList != null) {
 			selectedNote.clear();
 			for (MMLNoteEvent note : editEventList.getMMLNoteEventList()) {
-				if (note.getTickOffset() > popupTargetNote.getTickOffset()) {
+				if (note.getTickOffset() >= popupTargetNote.getTickOffset()) {
 					selectedNote.add(note);
 				}
 			}
@@ -708,6 +715,26 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 				}
 			}
 		}
+	}
+
+	@Override
+	public void setTempMute(boolean mute) {
+		for (MMLNoteEvent noteEvent : selectedNote) {
+			noteEvent.setMute(mute);
+		}
+		pianoRollView.repaint();
+	}
+
+	@Override
+	public void setTempMuteAll() {
+		for (MMLTrack track : mmlManager.getMMLScore().getTrackList()) {
+			for (var eventList : track.getMMLEventList()) {
+				for (var notes : eventList.getMMLNoteEventList()) {
+					notes.setMute(false);
+				}
+			}
+		}
+		pianoRollView.repaint();
 	}
 
 	public void changePart(MMLEventList from, MMLEventList to, boolean useSelectedNoteList, ChangePartAction action) {

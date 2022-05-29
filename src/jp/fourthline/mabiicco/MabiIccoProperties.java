@@ -54,6 +54,9 @@ public final class MabiIccoProperties {
 	/** ピアノロール表示の高さスケール */
 	private static final String HEIGHT_SCALE = "view.pianoRoll.heightScale";
 
+	/** timeBox Index */
+	private static final String TIMEBOX = "view.timeBox";
+
 	/** クリック再生機能の有効/無効 */
 	public final Property<Boolean> enableClickPlay = new BooleanProperty("function.enable_click_play", true);
 
@@ -201,6 +204,20 @@ public final class MabiIccoProperties {
 
 	public void setPianoRollViewHeightScaleProperty(int index) {
 		properties.setProperty(HEIGHT_SCALE, ""+index);
+		save();
+	}
+
+	public int getTimeBoxIndex() {
+		String s = properties.getProperty(TIMEBOX, "0");
+		int index = Integer.parseInt(s);
+		if ( (index < 0) || (index > 1) ) {
+			index = 0;
+		}
+		return index;
+	}
+
+	public void setTimeBoxIndex(int index) {
+		properties.setProperty(TIMEBOX, ""+index);
 		save();
 	}
 

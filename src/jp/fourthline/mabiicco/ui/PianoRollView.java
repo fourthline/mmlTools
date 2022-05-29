@@ -524,6 +524,8 @@ public final class PianoRollView extends JPanel {
 	 */
 	private void paintMMLPart(Graphics2D g, List<MMLNoteEvent> mmlPart, Color rectColor, Color fillColor, boolean drawOption) {
 		MMLNoteEvent prevNote = new MMLNoteEvent(0, 0, 0, MMLNoteEvent.INIT_VOL);
+		Color tempMuteColor = ColorManager.defaultColor().getUnusedFillColor();
+
 		// 現在のView範囲のみを描画する.
 		for (MMLNoteEvent noteEvent : mmlPart) {
 			if ( (noteEvent.getEndTick() < startViewTick) && (noteEvent.getTickOffset() < startViewTick - DRAW_START_MARGIN) ) {
@@ -534,7 +536,7 @@ public final class PianoRollView extends JPanel {
 				break;
 			}
 
-			drawNote(g, noteEvent, rectColor, fillColor, drawOption, prevNote);
+			drawNote(g, noteEvent, rectColor, noteEvent.isMute() ? tempMuteColor : fillColor, drawOption, prevNote);
 			prevNote = noteEvent;
 		}
 	}

@@ -128,6 +128,9 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String REMOVE_RESTS_BETWEEN_NOTES = "remote_rests_between_notes";
 	@Action public static final String CHANGE_UI = "change_ui";
 	@Action public static final String USE_DEFAULT_SOUNDBANK = "use_default_soundbank";
+	@Action public static final String SET_TEMP_MUTE = "set_temp_mute";
+	@Action public static final String UNSET_TEMP_MUTE = "unset_temp_mute";
+	@Action public static final String UNSET_TEMP_MUTE_ALL = "unset_temp_mute_all";
 
 	private final HashMap<String, Consumer<Object>> actionMap = new HashMap<>();
 
@@ -251,6 +254,9 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(REMOVE_RESTS_BETWEEN_NOTES, t -> editState.removeRestsBetweenNotes());
 		actionMap.put(CHANGE_UI, t -> this.changeUI());
 		actionMap.put(USE_DEFAULT_SOUNDBANK, t -> this.showAppRestartDialog());
+		actionMap.put(SET_TEMP_MUTE, t -> editState.setTempMute(true));
+		actionMap.put(UNSET_TEMP_MUTE, t -> editState.setTempMute(false));
+		actionMap.put(UNSET_TEMP_MUTE_ALL, t -> editState.setTempMuteAll());
 	}
 
 	@Override
@@ -517,7 +523,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		File file = showSaveDialog(exportFileChooser, "mid");
 		if (file != null) {
 			try {
-				MidiSystem.write(MabiDLS.getInstance().createSequence(mmlSeqView.getMMLScore(), 0, false, true), 1, file);
+				MidiSystem.write(MabiDLS.getInstance().createSequence(mmlSeqView.getMMLScore(), 0, false, true, false), 1, file);
 			} catch (IOException | InvalidMidiDataException e) {
 				JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
 			}

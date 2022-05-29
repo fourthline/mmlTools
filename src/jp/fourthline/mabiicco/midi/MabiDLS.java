@@ -434,7 +434,7 @@ public final class MabiDLS {
 	 * @throws InvalidMidiDataException 
 	 */
 	public Sequence createSequence(MMLScore score) throws InvalidMidiDataException {
-		return createSequence(score, 1, true, false);
+		return createSequence(score, 1, true, false, true);
 	}
 
 	/**
@@ -446,7 +446,7 @@ public final class MabiDLS {
 	 * @return
 	 * @throws InvalidMidiDataException
 	 */
-	public Sequence createSequence(MMLScore score, int startOffset, boolean attackDelayCorrect, boolean withMeta) throws InvalidMidiDataException {
+	public Sequence createSequence(MMLScore score, int startOffset, boolean attackDelayCorrect, boolean withMeta, boolean withMute) throws InvalidMidiDataException {
 		Sequence sequence = new Sequence(Sequence.PPQ, MMLTickTable.TPQN);
 		int totalTick = score.getTotalTickLength();
 		Track track = sequence.createTrack();
@@ -472,9 +472,9 @@ public final class MabiDLS {
 
 		int trackCount = 0;
 		for (MMLTrack mmlTrack : score.getTrackList()) {
-			convertMidiTrack(sequence.createTrack(), mmlTrack, trackCount, mmlTrack.getProgram(), startOffset, attackDelayCorrect, withMeta);
+			convertMidiTrack(sequence.createTrack(), mmlTrack, trackCount, mmlTrack.getProgram(), startOffset, attackDelayCorrect, withMeta, withMute);
 			if (mmlTrack.getSongProgram() >= 0) {
-				convertMidiTrack(sequence.createTrack(), mmlTrack, trackCount+MIDI_CHORUS_OFFSET, mmlTrack.getSongProgram(), startOffset, attackDelayCorrect, withMeta);
+				convertMidiTrack(sequence.createTrack(), mmlTrack, trackCount+MIDI_CHORUS_OFFSET, mmlTrack.getSongProgram(), startOffset, attackDelayCorrect, withMeta, withMute);
 			}
 			trackCount++;
 			if (trackCount >= this.channel.length) {
@@ -491,7 +491,7 @@ public final class MabiDLS {
 	 * @param channel
 	 * @throws InvalidMidiDataException
 	 */
-	private void convertMidiTrack(Track track, MMLTrack mmlTrack, int channel, int targetProgram, int startOffset, boolean attackDelayCorrect, boolean withMeta) throws InvalidMidiDataException {
+	private void convertMidiTrack(Track track, MMLTrack mmlTrack, int channel, int targetProgram, int startOffset, boolean attackDelayCorrect, boolean withMeta, boolean withMute) throws InvalidMidiDataException {
 		// トラック名
 		if (withMeta) {
 			var nameData = mmlTrack.getTrackName().getBytes();
@@ -518,14 +518,17 @@ public final class MabiDLS {
 				midiTrack.add(eventList.getMMLNoteEventList());
 			}
 		}
-		convertMidiPart(track, midiTrack.getNoteEventList(), channel, instClass, startOffset);
+		convertMidiPart(track, midiTrack.getNoteEventList(), channel, instClass, startOffset, withMute);
 	}
 
-	private void convertMidiPart(Track track, List<MMLNoteEvent> eventList, int channel, InstClass inst, int startOffset) {
+	private void convertMidiPart(Track track, List<MMLNoteEvent> eventList, int channel, InstClass inst, int startOffset, boolean withMute) {
 		int velocity = MMLNoteEvent.INIT_VOL;
 
 		// Noteイベントの変換
 		for ( MMLNoteEvent noteEvent : eventList ) {
+			if (withMute && noteEvent.isMute()) {
+				continue;
+			}
 			int note = noteEvent.getNote();
 			int tick = noteEvent.getTick();
 			int tickOffset = noteEvent.getTickOffset() + startOffset;

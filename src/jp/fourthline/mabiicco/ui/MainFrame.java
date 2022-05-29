@@ -551,6 +551,8 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		toolBar.add(newToolBarSeparator());
 		timeBox.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
 		timeBox.setFocusable(false);
+		timeBox.setSelectedIndex(MabiIccoProperties.getInstance().getTimeBoxIndex());
+		timeBox.addActionListener((t) -> MabiIccoProperties.getInstance().setTimeBoxIndex(timeBox.getSelectedIndex()));
 		toolBar.add(timeBox);
 
 		return toolBar;

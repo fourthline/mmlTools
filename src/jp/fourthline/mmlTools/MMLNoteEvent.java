@@ -21,6 +21,8 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 	private int velocity;
 	private int[] indexOfMMLString = null; // { startIndex, endIndex }
 
+	private boolean mute = false; // 一時ミュート
+
 	public MMLNoteEvent(int note, int tickLength, int tickOffset) {
 		this(note, tickLength, tickOffset, INIT_VOL);
 	}
@@ -87,6 +89,14 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 
 	public void setIndexOfMMLString(int[] index) {
 		this.indexOfMMLString = index;
+	}
+
+	public boolean isMute() {
+		return mute;
+	}
+
+	public void setMute(boolean mute) {
+		this.mute = mute;
 	}
 
 	@Override

@@ -19,6 +19,8 @@ public interface IEditState {
 	void selectPreviousAll();
 	void selectAfterAll();
 	void selectAllSamePitch();
+	void setTempMute(boolean mute);
+	void setTempMuteAll();
 
 	/** 連続した複数のノートが選択されているかどうかを判定する */
 	boolean hasSelectedMultipleConsecutiveNotes();
