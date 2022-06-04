@@ -18,6 +18,11 @@ import jp.fourthline.mabiicco.MabiIccoProperties;
  */
 enum EditMode {
 	SELECT {
+		private int prevModifiers = -1;
+		@Override
+		public void enter(IEditContext context) {
+			prevModifiers = -1;
+		}
 		@Override
 		public void pressEvent(IEditContext context, MouseEvent e) {
 			startPoint = e.getPoint();
@@ -52,16 +57,24 @@ enum EditMode {
 		}
 		@Override
 		public void executeEvent(IEditContext context, MouseEvent e) {
+			int modifiers = e.getModifiersEx();
+			boolean shiftOption = (modifiers & InputEvent.SHIFT_DOWN_MASK) != 0;
+			boolean ctrlOption = false;
+			if ( ((modifiers & InputEvent.CTRL_DOWN_MASK) != 0) && ((prevModifiers & InputEvent.CTRL_DOWN_MASK) == 0)) {
+				// モード中にCTRLを押し始めた
+				ctrlOption = true;
+			} else {
+				prevModifiers = modifiers;
+			}
 			int cursorType = Cursor.DEFAULT_CURSOR;
 			Point p = e.getPoint();
-			boolean onOption = (e.getModifiersEx() == InputEvent.SHIFT_DOWN_MASK + InputEvent.CTRL_DOWN_MASK);
 			if (context.onExistNote(p)) {
 				if (context.isEditLengthPosition(p)) {
 					cursorType = Cursor.E_RESIZE_CURSOR;
 				} else {
 					cursorType = Cursor.MOVE_CURSOR;
 				}
-			} else if (onOption) {
+			} else if (shiftOption && ctrlOption) {
 				context.selectTrackOnExistNote(p);
 			}
 			context.setCursor(Cursor.getPredefinedCursor(cursorType));
@@ -114,14 +127,14 @@ enum EditMode {
 			int modifiers = e.getModifiersEx();
 			// 選択中のNoteを移動
 			boolean shiftOption = (modifiers & InputEvent.SHIFT_DOWN_MASK) != 0;
-			boolean alignment = true;
+			boolean ctrlOption = false;
 			if ( ((modifiers & InputEvent.CTRL_DOWN_MASK) != 0) && ((prevModifiers & InputEvent.CTRL_DOWN_MASK) == 0)) {
 				// モード中にCTRLを押し始めた
-				alignment = false;
+				ctrlOption = true;
 			} else {
 				prevModifiers = modifiers;
 			}
-			context.moveSelectedMMLNote(startPoint, e.getPoint(), shiftOption, alignment, !alignment);
+			context.moveSelectedMMLNote(startPoint, e.getPoint(), shiftOption, !ctrlOption, ctrlOption);
 		}
 		@Override
 		public void exit(IEditContext context) {

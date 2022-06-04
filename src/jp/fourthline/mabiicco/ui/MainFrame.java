@@ -281,9 +281,9 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createMenuItem(editMenu, "edit.tracks.velocity", ActionDispatcher.TRACKS_EDIT, true);
 		removeRestsBetweenNotesMenu = createMenuItem(editMenu, "edit.remove_rests_between_notes", ActionDispatcher.REMOVE_RESTS_BETWEEN_NOTES);
 		octUpMenu = createMenuItem(editMenu, "edit.oct_up", ActionDispatcher.OCTAVE_UP, true,
-				KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.SHIFT_DOWN_MASK));
 		octDownMenu = createMenuItem(editMenu, "edit.oct_down", ActionDispatcher.OCTAVE_DOWN, true,
-				KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.SHIFT_DOWN_MASK));
 
 		editMenu.add(new JSeparator());
 
