@@ -113,18 +113,15 @@ enum EditMode {
 		public void executeEvent(IEditContext context, MouseEvent e) {
 			int modifiers = e.getModifiersEx();
 			// 選択中のNoteを移動
-			boolean shiftOption = false;
+			boolean shiftOption = (modifiers & InputEvent.SHIFT_DOWN_MASK) != 0;
 			boolean alignment = true;
-			if ( (modifiers & InputEvent.SHIFT_DOWN_MASK) != 0) {
-				shiftOption = true;
-			}
 			if ( ((modifiers & InputEvent.CTRL_DOWN_MASK) != 0) && ((prevModifiers & InputEvent.CTRL_DOWN_MASK) == 0)) {
 				// モード中にCTRLを押し始めた
 				alignment = false;
 			} else {
 				prevModifiers = modifiers;
 			}
-			context.moveSelectedMMLNote(startPoint, e.getPoint(), shiftOption, alignment);
+			context.moveSelectedMMLNote(startPoint, e.getPoint(), shiftOption, alignment, !alignment);
 		}
 		@Override
 		public void exit(IEditContext context) {

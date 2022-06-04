@@ -18,7 +18,7 @@ interface IEditContext {
 	void newMMLNoteAndSelected(Point p);
 	void detachSelectedMMLNote();
 	void updateSelectedNoteAndTick(Point p, boolean updateNote, boolean alignment);
-	void moveSelectedMMLNote(Point start, Point p, boolean shiftOption, boolean alignment);
+	void moveSelectedMMLNote(Point start, Point p, boolean shiftOption, boolean alignment, boolean octaveAlign);
 	void cancelMove();
 	void applyEditNote(boolean select);
 	void setCursor(Cursor cursor);
