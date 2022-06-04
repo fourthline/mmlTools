@@ -462,7 +462,7 @@ public final class MMLEditorTest extends UseLoadingDLS {
 	 * @param selectIndex2 index1と違う値であれば範囲選択にする。ただし、Noteの高さは同じであること。
 	 * @param r
 	 */
-	private void checkOneSelectActionButton3(String input, String expect, int selectIndex1, int selectIndex2,Runnable r) {
+	private void checkOneSelectActionButton3(String input, String expect, int selectIndex1, int selectIndex2, Runnable r) {
 		MMLTrack track = new MMLTrack().setMML(input);
 		mmlManager.setMMLselectedTrack(track);
 
@@ -535,5 +535,37 @@ public final class MMLEditorTest extends UseLoadingDLS {
 			assertEquals(true, b);
 			editor.removeRestsBetweenNotes();
 		});
+	}
+
+	@Test
+	public void test_octaveUp() {
+		String input = "MML@ccc";
+		String expect = "MML@o8ccc,,;";
+		MMLTrack track = new MMLTrack().setMML(input);
+		mmlManager.setMMLselectedTrack(track);
+		editor.selectAll();
+		editor.octaveUp();
+		editor.octaveUp();
+		editor.octaveUp();
+		editor.octaveUp();
+		editor.octaveUp();
+		editor.octaveUp();
+		assertEquals(expect, track.getOriginalMML());
+	}
+
+	@Test
+	public void test_octaveDown() {
+		String input = "MML@bbb";
+		String expect = "MML@o0c-c-c-,,;";
+		MMLTrack track = new MMLTrack().setMML(input);
+		mmlManager.setMMLselectedTrack(track);
+		editor.selectAll();
+		editor.octaveDown();
+		editor.octaveDown();
+		editor.octaveDown();
+		editor.octaveDown();
+		editor.octaveDown();
+		editor.octaveDown();
+		assertEquals(expect, track.getOriginalMML());
 	}
 }

@@ -88,6 +88,8 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	private JMenuItem pasteMenu = null;
 	private JMenuItem deleteMenu = null;
 	private JMenuItem removeRestsBetweenNotesMenu = null;
+	private JMenuItem octUpMenu = null;
+	private JMenuItem octDownMenu = null;
 
 	private JButton loopButton = null;
 
@@ -278,6 +280,10 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createMenuItem(editMenu, "edit.transpose", ActionDispatcher.TRANSPOSE, true);
 		createMenuItem(editMenu, "edit.tracks.velocity", ActionDispatcher.TRACKS_EDIT, true);
 		removeRestsBetweenNotesMenu = createMenuItem(editMenu, "edit.remove_rests_between_notes", ActionDispatcher.REMOVE_RESTS_BETWEEN_NOTES);
+		octUpMenu = createMenuItem(editMenu, "edit.oct_up", ActionDispatcher.OCTAVE_UP, true,
+				KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+		octDownMenu = createMenuItem(editMenu, "edit.oct_down", ActionDispatcher.OCTAVE_DOWN, true,
+				KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
 
 		editMenu.add(new JSeparator());
 
@@ -701,6 +707,8 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		cutMenu.setEnabled(b);
 		copyMenu.setEnabled(b);
 		deleteMenu.setEnabled(b);
+		octUpMenu.setEnabled(b);
+		octDownMenu.setEnabled(b);
 	}
 
 	public void setPasteEnable(boolean b) {

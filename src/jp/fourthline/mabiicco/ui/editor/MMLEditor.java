@@ -546,6 +546,36 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		mmlManager.generateActiveTrack();
 	}
 
+	/**
+	 * 選択されたノートを指定数上下させる
+	 * @param value
+	 */
+	private void selectedNoteUpDown(int value) {
+		MMLEventList editEventList = mmlManager.getActiveMMLPart();
+		if (editEventList == null) {
+			return;
+		}
+		for (MMLNoteEvent noteEvent : selectedNote) {
+			var note = noteEvent.getNote() + value;
+			if ( (note < -1) || (note >= 108) ) {
+				// 移動後に1つでも範囲外となる場合は処理しない.
+				return;
+			}
+		}
+		selectedNote.forEach(t -> t.setNote(t.getNote() + value));
+		mmlManager.updateActivePart(true);
+	}
+
+	@Override
+	public void octaveUp() {
+		selectedNoteUpDown(12);
+	}
+
+	@Override
+	public void octaveDown() {
+		selectedNoteUpDown(-12);
+	}
+
 	@Override
 	public void setEditStateObserver(IEditStateObserver observer) {
 		this.editObserver = observer;

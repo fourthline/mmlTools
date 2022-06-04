@@ -131,6 +131,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String SET_TEMP_MUTE = "set_temp_mute";
 	@Action public static final String UNSET_TEMP_MUTE = "unset_temp_mute";
 	@Action public static final String UNSET_TEMP_MUTE_ALL = "unset_temp_mute_all";
+	@Action public static final String OCTAVE_UP = "octave_up";
+	@Action public static final String OCTAVE_DOWN = "octave_down";
 
 	private final HashMap<String, Consumer<Object>> actionMap = new HashMap<>();
 
@@ -257,6 +259,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(SET_TEMP_MUTE, t -> editState.setTempMute(true));
 		actionMap.put(UNSET_TEMP_MUTE, t -> editState.setTempMute(false));
 		actionMap.put(UNSET_TEMP_MUTE_ALL, t -> editState.setTempMuteAll());
+		actionMap.put(OCTAVE_UP, t -> editState.octaveUp());
+		actionMap.put(OCTAVE_DOWN, t -> editState.octaveDown());
 	}
 
 	@Override

@@ -28,5 +28,8 @@ public interface IEditState {
 	/** 音符間の休符を削除する */
 	void removeRestsBetweenNotes();
 
+	void octaveUp();
+	void octaveDown();
+
 	void setEditStateObserver(IEditStateObserver observer);
 }
