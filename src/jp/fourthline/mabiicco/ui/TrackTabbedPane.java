@@ -34,6 +34,7 @@ public final class TrackTabbedPane extends JTabbedPane implements DragGestureLis
 		super(JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT);
 		new DragSource().createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_MOVE, this);
 		setTransferHandler(new TrackTabTransferHandler(this, mmlManager));
+		setFocusable(false);
 	}
 
 	public boolean updateTargetIndex(OptionalInt index) {
