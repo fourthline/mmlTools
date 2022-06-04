@@ -11,6 +11,7 @@ import java.awt.Point;
  * EditModeから使用するContext.
  */
 interface IEditContext {
+	boolean hasSelectedNote();
 	boolean onExistNote(Point point);
 	boolean selectTrackOnExistNote(Point point);
 	boolean isEditLengthPosition(Point point);

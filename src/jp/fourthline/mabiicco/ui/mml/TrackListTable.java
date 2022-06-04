@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2019 たんらる
+ * Copyright (C) 2014-2022 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.mml;
@@ -206,5 +206,19 @@ public final class TrackListTable extends JTable {
 
 	public ComposeRank getRank(int index) {
 		return checkTableModel.rankList.get(index);
+	}
+
+	public String getTableListInfo() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(AppResource.appText("mml.output.trackName")).append('\t')
+		.append(AppResource.appText("mml.output.instrument")).append('\t')
+		.append(AppResource.appText("mml.output.rank")).append('\n');
+		for (var data : checkTableModel.dataList) {
+			for (var s : data) {
+				sb.append(s).append('\t');
+			}
+			sb.deleteCharAt(sb.length()-1).append('\n');
+		}
+		return sb.toString();
 	}
 }

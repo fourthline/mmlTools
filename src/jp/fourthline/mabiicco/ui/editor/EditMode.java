@@ -18,11 +18,6 @@ import jp.fourthline.mabiicco.MabiIccoProperties;
  */
 enum EditMode {
 	SELECT {
-		private int prevModifiers = -1;
-		@Override
-		public void enter(IEditContext context) {
-			prevModifiers = -1;
-		}
 		@Override
 		public void pressEvent(IEditContext context, MouseEvent e) {
 			startPoint = e.getPoint();
@@ -59,13 +54,7 @@ enum EditMode {
 		public void executeEvent(IEditContext context, MouseEvent e) {
 			int modifiers = e.getModifiersEx();
 			boolean shiftOption = (modifiers & InputEvent.SHIFT_DOWN_MASK) != 0;
-			boolean ctrlOption = false;
-			if ( ((modifiers & InputEvent.CTRL_DOWN_MASK) != 0) && ((prevModifiers & InputEvent.CTRL_DOWN_MASK) == 0)) {
-				// モード中にCTRLを押し始めた
-				ctrlOption = true;
-			} else {
-				prevModifiers = modifiers;
-			}
+			boolean ctrlOption = (modifiers & InputEvent.CTRL_DOWN_MASK) != 0;
 			int cursorType = Cursor.DEFAULT_CURSOR;
 			Point p = e.getPoint();
 			if (context.onExistNote(p)) {
@@ -74,7 +63,7 @@ enum EditMode {
 				} else {
 					cursorType = Cursor.MOVE_CURSOR;
 				}
-			} else if (shiftOption && ctrlOption) {
+			} else if (shiftOption && ctrlOption && !context.hasSelectedNote()) {
 				context.selectTrackOnExistNote(p);
 			}
 			context.setCursor(Cursor.getPredefinedCursor(cursorType));
@@ -107,7 +96,6 @@ enum EditMode {
 		}
 	},
 	MOVE {
-		private int prevModifiers = -1;
 		@Override
 		public void pressEvent(IEditContext context, MouseEvent e) {
 			// 右クリックで、編集キャンセル
@@ -118,7 +106,6 @@ enum EditMode {
 		}
 		@Override
 		public void enter(IEditContext context) {
-			prevModifiers = -1;
 			// 移動前の選択ノートリストをdetachする.
 			context.detachSelectedMMLNote();
 		}
@@ -127,13 +114,7 @@ enum EditMode {
 			int modifiers = e.getModifiersEx();
 			// 選択中のNoteを移動
 			boolean shiftOption = (modifiers & InputEvent.SHIFT_DOWN_MASK) != 0;
-			boolean ctrlOption = false;
-			if ( ((modifiers & InputEvent.CTRL_DOWN_MASK) != 0) && ((prevModifiers & InputEvent.CTRL_DOWN_MASK) == 0)) {
-				// モード中にCTRLを押し始めた
-				ctrlOption = true;
-			} else {
-				prevModifiers = modifiers;
-			}
+			boolean ctrlOption = (modifiers & InputEvent.CTRL_DOWN_MASK) != 0;
 			context.moveSelectedMMLNote(startPoint, e.getPoint(), shiftOption, !ctrlOption, ctrlOption);
 		}
 		@Override

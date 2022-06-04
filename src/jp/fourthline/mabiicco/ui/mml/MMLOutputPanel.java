@@ -90,6 +90,13 @@ public final class MMLOutputPanel extends JPanel {
 		JPanel p = new JPanel();
 		p.setLayout(null);
 
+		JButton tableListInfoButton = new JButton(AppResource.getImageIcon("/img/list.png"));
+		tableListInfoButton.setToolTipText(AppResource.appText("mml.output.tableListInfoButton"));
+		tableListInfoButton.setMargin(new Insets(5, 10, 5, 10));
+		tableListInfoButton.setFocusable(false);
+		buttonPanel.add(tableListInfoButton);
+		tableListInfoButton.addActionListener((event) -> tableListOutput());
+
 		JButton nameButton = new JButton(AppResource.appText("mml.output.nameButton"));
 		nameButton.setMargin(new Insets(5, 10, 5, 10));
 		nameButton.setFocusable(false);
@@ -153,10 +160,17 @@ public final class MMLOutputPanel extends JPanel {
 	}
 
 	/**
+	 * テーブル情報をコピーする
+	 */
+	private void tableListOutput() {
+		String text = table.getTableListInfo();
+		copyToClipboard(parentFrame, text, AppResource.appText("mml.output.table_list_done"));
+	}
+
+	/**
 	 * 現在のトラック名をコピーする
 	 */
 	private void currentSelectedTrackNameOutput() {
-		System.out.println("currentSelectedTrackNameOutput");
 		String text;
 		if (trackList != null) {
 			int row = table.getSelectedRow();
