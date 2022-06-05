@@ -288,7 +288,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	 * --------------------------------------------------------------
 	 */
 	@Override
-	public void moveSelectedMMLNote(Point start, Point p, boolean shiftOption, boolean alignment, boolean octaveAlign) {
+	public void moveSelectedMMLNote(Point start, Point p, boolean shiftOption, boolean alignment, boolean octaveAlign, boolean showInfo) {
 		int startOffset = mmlManager.getActiveMMLPartStartOffset();
 		pianoRollView.onViewScrollPoint(p);
 		long startTick = pianoRollView.convertXtoTick(start.x);
@@ -321,7 +321,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 			if ( (note1.getTickOffset() <= startTick) && (note1.getEndTick() > startTick) ) {
 				velocity = note2.getVelocity();
 				// ノート情報表示
-				pianoRollView.setPaintNoteInfo(!alignment && !shiftOption ? note2 : null);
+				pianoRollView.setPaintNoteInfo(showInfo ? note2 : null);
 			}
 		}
 

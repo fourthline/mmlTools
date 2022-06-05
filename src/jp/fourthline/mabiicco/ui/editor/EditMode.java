@@ -115,7 +115,7 @@ enum EditMode {
 			// 選択中のNoteを移動
 			boolean shiftOption = (modifiers & InputEvent.SHIFT_DOWN_MASK) != 0;
 			boolean ctrlOption = (modifiers & InputEvent.CTRL_DOWN_MASK) != 0;
-			context.moveSelectedMMLNote(startPoint, e.getPoint(), shiftOption, !ctrlOption, ctrlOption);
+			context.moveSelectedMMLNote(startPoint, e.getPoint(), shiftOption, !ctrlOption, ctrlOption, !shiftOption && ctrlOption);
 		}
 		@Override
 		public void exit(IEditContext context) {
