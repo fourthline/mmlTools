@@ -30,6 +30,7 @@ public final class MMLEventParser implements Iterator<MMLEvent> {
 	 */
 	public MMLEventParser(String mml, int startOffset) {
 		this.totalTick = startOffset;
+		this.startOffset = startOffset;
 		tokenizer = new MMLTokenizer(mml);
 		parser = new MelodyParser(mml);
 	}
@@ -51,6 +52,7 @@ public final class MMLEventParser implements Iterator<MMLEvent> {
 	// MMLパース用
 	private boolean hasTie = false;
 	private int totalTick = 0;
+	private final int startOffset;
 	private MMLNoteEvent prevNoteEvent = null;
 	private int volumn = MMLNoteEvent.INIT_VOL;
 
@@ -79,7 +81,7 @@ public final class MMLEventParser implements Iterator<MMLEvent> {
 			if ( (firstC == 't') || (firstC == 'T') ) {
 				try {
 					int tempo = Integer.parseInt( token.substring(1) );
-					nextItem = new MMLTempoEvent(tempo, totalTick);
+					nextItem = new MMLTempoEvent(tempo, totalTick, totalTick == startOffset);
 				} catch (IllegalArgumentException e) {
 					continue;
 				}

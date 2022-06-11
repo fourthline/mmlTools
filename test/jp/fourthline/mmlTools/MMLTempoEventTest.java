@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2017 たんらる
+ * Copyright (C) 2013-2022 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -25,11 +25,16 @@ public class MMLTempoEventTest {
 		ArrayList<MMLTempoEvent> expectList = new ArrayList<MMLTempoEvent>();
 		MMLTempoEvent tempoEvent1 = new MMLTempoEvent(120, 10);
 		MMLTempoEvent tempoEvent2 = new MMLTempoEvent(150, 10);
+		MMLTempoEvent tempoEvent3 = new MMLTempoEvent(150, 20);       // 違う位置に同じテンポも追加できる
+		MMLTempoEvent tempoEvent4 = new MMLTempoEvent(150, 30, true); // isFirstの場合は追加されない
 
 		tempoEvent1.appendToListElement(tempoList);
 		tempoEvent2.appendToListElement(tempoList);
+		tempoEvent3.appendToListElement(tempoList);
+		tempoEvent4.appendToListElement(tempoList);
 
 		tempoEvent2.appendToListElement(expectList);
+		tempoEvent3.appendToListElement(expectList);
 		System.out.println(tempoList);
 
 		assertEquals(expectList.toString(), tempoList.toString());

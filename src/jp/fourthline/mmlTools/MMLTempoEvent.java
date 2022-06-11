@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2017 たんらる
+ * Copyright (C) 2013-2022 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -15,15 +15,21 @@ public final class MMLTempoEvent extends MMLEvent implements Cloneable {
 	private static final long serialVersionUID = 8014294359518840951L;
 
 	private int tempo;
+	private final boolean isFirst;
 	public static final int META = 0x51;  /* MIDI meta: tempo */
 	public static final int INITIAL_TEMPO = 120;
 
 	public MMLTempoEvent(int tempo, int tickOffset) throws IllegalArgumentException {
+		this(tempo, tickOffset, false);
+	}
+
+	public MMLTempoEvent(int tempo, int tickOffset, boolean isFirst) throws IllegalArgumentException {
 		super(tickOffset);
 		if (tempo <= 0) {
 			throw new IllegalArgumentException("tempo "+tempo);
 		}
 		this.tempo = tempo;
+		this.isFirst = isFirst;
 	}
 
 	public int getTempo() {
@@ -85,7 +91,7 @@ public final class MMLTempoEvent extends MMLEvent implements Cloneable {
 		}
 
 		// 連続で同じテンポであれば追加しない
-		if ( (index == 0) || (list.get(index-1).getTempo() != this.tempo) ) {
+		if ( (index == 0) || (list.get(index-1).getTempo() != this.tempo) || !isFirst ) {
 			list.add(index, this);
 		}
 	}
@@ -197,8 +203,12 @@ public final class MMLTempoEvent extends MMLEvent implements Cloneable {
 	}
 
 	@Override
-	public MMLTempoEvent clone() throws CloneNotSupportedException {
-		return (MMLTempoEvent) super.clone();
+	public MMLTempoEvent clone() {
+		try {
+			return (MMLTempoEvent) super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new InternalError(e.toString());
+		}
 	}
 
 	@Override
