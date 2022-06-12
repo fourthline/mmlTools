@@ -153,11 +153,6 @@ public final class PianoRollView extends JPanel {
 		this.mmlManager = mmlManager;
 	}
 
-	public void setWidth(int width) {
-		super.setPreferredSize(new Dimension(width, getTotalHeight()));
-		revalidate();
-	}
-
 	public void setSelectNote(List<MMLNoteEvent> list) {
 		selectNoteList = list;
 	}
@@ -185,7 +180,9 @@ public final class PianoRollView extends JPanel {
 		} catch (UndefinedTickException e) {
 			e.printStackTrace();
 		}
-		setWidth( convertTicktoX(tickLength) );
+		int width = convertTicktoX(tickLength);
+		super.setPreferredSize(new Dimension(width, getTotalHeight()));
+		revalidate();
 	}
 
 	/**
