@@ -149,14 +149,14 @@ public final class MMLTempoEvent extends MMLEvent implements Cloneable {
 
 			int currentTempo = tempoEvent.getTempo();
 			if (tempo != currentTempo) {
-				totalTime += (currentTempoTick - currentTick) * 60 / tempo * 1000;
+				totalTime += (currentTempoTick - currentTick) * 60000 / tempo;
 				currentTick = currentTempoTick;
 			}
 
 			tempo = currentTempo;
 		}
 
-		totalTime += (tickOffset - currentTick) * 60 / tempo * 1000;
+		totalTime += (tickOffset - currentTick) * 60000 / tempo;
 		totalTime /= (double) MMLTickTable.TPQN;
 		return totalTime;
 	}

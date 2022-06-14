@@ -152,14 +152,12 @@ public final class MelodyParser {
 			if ( now_elem.getValue().equals(pre_elem.getValue()) ) 
 				continue; // now tempo == pre tempo
 
-			length_total += (now_elem.getKey() - pre_elem.getKey())*60 / pre_elem.getValue();
+			length_total += (now_elem.getKey() - pre_elem.getKey())*60000 / pre_elem.getValue();
 
 			pre_elem = now_elem;
 		}
 
-		length_total /= MMLTickTable.TPQN;
-
-		return length_total;
+		return length_total / MMLTickTable.TPQN / 1000;
 	}
 
 

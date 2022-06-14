@@ -82,7 +82,7 @@ public final class TrackPropertyPanelTest {
 		// マイナス方向のDelay
 		track.setAttackDelayCorrect(-5);
 		obj = new TrackPropertyPanel(track, mmlManager);
-		assertEquals(List.of("0:00:00", "-20ms=N/A", "0:00:00", "0ms"), obj.getLabelText());
+		assertEquals(List.of("0:00:00", "-26ms=N/A", "0:00:00", "0ms"), obj.getLabelText());
 
 		track.setAttackDelayCorrect(-48);
 		obj = new TrackPropertyPanel(track, mmlManager);
@@ -100,7 +100,7 @@ public final class TrackPropertyPanelTest {
 		track.getGlobalTempoList().add(new MMLTempoEvent(120, 0));
 		track.setAttackDelayCorrect(5);
 		obj = new TrackPropertyPanel(track, mmlManager);
-		assertEquals(List.of("0:00:00", "20ms=N/A", "0:00:00", "0ms"), obj.getLabelText());
+		assertEquals(List.of("0:00:00", "26ms=N/A", "0:00:00", "0ms"), obj.getLabelText());
 
 		track.setAttackDelayCorrect(48);
 		obj = new TrackPropertyPanel(track, mmlManager);
@@ -125,7 +125,7 @@ public final class TrackPropertyPanelTest {
 		// マイナス方向のDelay
 		track.setAttackSongDelayCorrect(-5);
 		obj = new TrackPropertyPanel(track, mmlManager);
-		assertEquals(List.of("0:00:00", "0ms", "0:00:00", "-20ms=N/A"), obj.getLabelText());
+		assertEquals(List.of("0:00:00", "0ms", "0:00:00", "-26ms=N/A"), obj.getLabelText());
 
 		track.setAttackSongDelayCorrect(-48);
 		obj = new TrackPropertyPanel(track, mmlManager);
@@ -143,7 +143,7 @@ public final class TrackPropertyPanelTest {
 		track.getGlobalTempoList().add(new MMLTempoEvent(120, 0));
 		track.setAttackSongDelayCorrect(5);
 		obj = new TrackPropertyPanel(track, mmlManager);
-		assertEquals(List.of("0:00:00", "0ms", "0:00:00", "20ms=N/A"), obj.getLabelText());
+		assertEquals(List.of("0:00:00", "0ms", "0:00:00", "26ms=N/A"), obj.getLabelText());
 
 		track.setAttackSongDelayCorrect(48);
 		obj = new TrackPropertyPanel(track, mmlManager);
