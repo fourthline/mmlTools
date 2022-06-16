@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 たんらる
+ * Copyright (C) 2013-2022 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -17,14 +17,23 @@ import jp.fourthline.mmlTools.core.UndefinedTickException;
 public abstract class MMLEvent implements Serializable {
 	private static final long serialVersionUID = -6142467143073639266L;
 
+	public static final int MAX_TICK = 3840000;
+
 	// イベントの開始オフセット
 	private int tickOffset;
 
 	protected MMLEvent(int tickOffset) {
+		if ( (tickOffset <= -MAX_TICK) || (tickOffset >= MAX_TICK)) {
+			// 負数側はdelayで使用している範囲もある.
+			throw new IllegalArgumentException("illegal tick = " + tickOffset);
+		}
 		this.tickOffset = tickOffset;
 	}
 
 	public void setTickOffset(int tickOffset) {
+		if ( (tickOffset < 0) || (tickOffset >= MAX_TICK) ) {
+			throw new IllegalArgumentException();
+		}
 		this.tickOffset = tickOffset;
 	}
 
