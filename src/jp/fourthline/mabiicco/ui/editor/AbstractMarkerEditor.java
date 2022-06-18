@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 たんらる
+ * Copyright (C) 2014-2022 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.editor;
@@ -84,7 +84,7 @@ abstract public class AbstractMarkerEditor<T extends MMLEvent> implements IMarke
 		}
 	}
 
-	private JMenuItem newMenuItem(String name) {
+	protected JMenuItem newMenuItem(String name) {
 		JMenuItem menu = new JMenuItem(name);
 		menu.addActionListener(this);
 		menu.addMouseListener(new MouseListener() {
@@ -147,13 +147,14 @@ abstract public class AbstractMarkerEditor<T extends MMLEvent> implements IMarke
 		String actionCommand = event.getActionCommand();
 		if (actionCommand.equals(insertCommand)) {
 			insertAction();
+			mmlManager.updateActivePart(true);
 		} else if (actionCommand.equals(editCommand)) {
 			editAction();
+			mmlManager.updateActivePart(true);
 		} else if (actionCommand.equals(deleteCommand)) {
 			deleteAction();
+			mmlManager.updateActivePart(true);
 		}
-
-		mmlManager.updateActivePart(true);
 	}
 
 	protected final void setDefaultFocus(JTextField textField) {

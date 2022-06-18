@@ -1,14 +1,17 @@
 /*
- * Copyright (C) 2014 たんらる
+ * Copyright (C) 2014-2022 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.editor;
 
 import java.awt.BorderLayout;
 import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
@@ -29,10 +32,14 @@ import jp.fourthline.mmlTools.MMLTempoEvent;
 public final class MMLTempoEditor extends AbstractMarkerEditor<MMLTempoEvent> {
 
 	private final Frame parentFrame;
+	private final JMenuItem tempoProcMenu;
+	private final String tempoProcCommand = "tempoProc";
 
 	public MMLTempoEditor(Frame parentFrame, IMMLManager mmlManager, IEditAlign editAlign, IViewTargetMarker viewTargetMarker) {
 		super("tempo", mmlManager, editAlign, viewTargetMarker);
 		this.parentFrame = parentFrame;
+		this.tempoProcMenu = newMenuItem(AppResource.appText("edit."+tempoProcCommand));
+		this.tempoProcMenu.setActionCommand(tempoProcCommand);
 	}
 
 	private int showTempoInputDialog(String title, int tempo) {
@@ -85,5 +92,60 @@ public final class MMLTempoEditor extends AbstractMarkerEditor<MMLTempoEvent> {
 	protected void deleteAction() {
 		getEventList().remove(targetEvent);
 		System.out.println("delete tempo.");
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent event) {
+		super.actionPerformed(event);
+		String actionCommand = event.getActionCommand();
+		if (actionCommand.equals(tempoProcCommand)) {
+			tempoProcAction();
+			mmlManager.updateActivePart(true);
+		}
+	}
+
+	private void tempoProcAction() {
+		System.out.println("tempoProc " + targetEvent);
+		int tempo = (targetEvent != null) ? targetEvent.getTempo() : mmlManager.getMMLScore().getTempoOnTick(targetTick);
+		int targetTick = (targetEvent != null) ? targetEvent.getTickOffset() : this.targetTick;
+		tempo = showTempoInputDialog(AppResource.appText("edit."+tempoProcCommand), tempo);
+		if (tempo < 0) {
+			return;
+		}
+		tempoProc(tempo, targetTick);
+	}
+
+	void tempoProc(int tempo, int targetTick) {
+		MMLTempoEvent insertTempo = new MMLTempoEvent(tempo, targetTick);
+
+		// 指定Tickより後ろのテンポを消して、新たなテンポイベントにするリストを作成する
+		var tempoList = mmlManager.getMMLScore().getTempoEventList();
+		ArrayList<MMLTempoEvent> newTempoList = new ArrayList<>();
+		for (var tempoEvent : tempoList) {
+			if (tempoEvent.getTickOffset() < targetTick) {
+				newTempoList.add(tempoEvent);
+			}
+		}
+		newTempoList.add(insertTempo);
+
+		// 変換する
+		for (var track : mmlManager.getMMLScore().getTrackList()) {
+			for (var eventList : track.getMMLEventList()) {
+				for (var noteEvent : eventList.getMMLNoteEventList()) {
+					long endTick = MMLTempoEvent.getTickOffsetOnTime(newTempoList,
+							MMLTempoEvent.getTimeOnTickOffset(tempoList, noteEvent.getEndTick()));
+					long tickOffset = MMLTempoEvent.getTickOffsetOnTime(newTempoList,
+							MMLTempoEvent.getTimeOnTickOffset(tempoList, noteEvent.getTickOffset()));
+					noteEvent.setTickOffset((int)tickOffset);
+					noteEvent.setTick((int)(endTick - tickOffset));
+				}
+			}
+		}
+		tempoList.clear();
+		tempoList.addAll(newTempoList);
+	}
+	
+	public JMenuItem getTempoProcMenu() {
+		return tempoProcMenu;
 	}
 }

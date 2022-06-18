@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.fourthline.mmlTools.core.IllegalTickOffsetException;
 import jp.fourthline.mmlTools.core.UndefinedTickException;
 
 
@@ -25,14 +26,14 @@ public abstract class MMLEvent implements Serializable {
 	protected MMLEvent(int tickOffset) {
 		if ( (tickOffset <= -MAX_TICK) || (tickOffset >= MAX_TICK)) {
 			// 負数側はdelayで使用している範囲もある.
-			throw new IllegalArgumentException("illegal tick = " + tickOffset);
+			throw new IllegalTickOffsetException(tickOffset);
 		}
 		this.tickOffset = tickOffset;
 	}
 
 	public void setTickOffset(int tickOffset) {
 		if ( (tickOffset < 0) || (tickOffset >= MAX_TICK) ) {
-			throw new IllegalArgumentException();
+			throw new IllegalTickOffsetException(tickOffset);
 		}
 		this.tickOffset = tickOffset;
 	}

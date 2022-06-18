@@ -21,6 +21,7 @@ import java.util.OptionalInt;
 import javax.sound.midi.Sequencer;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
@@ -72,12 +73,17 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 		addMouseListener(this);
 		addMouseMotionListener(this);
 
-		markerEditor.add( new MMLTempoEditor(parentFrame, mmlManager, editAlign, this) );
+		var tempoEditor = new MMLTempoEditor(parentFrame, mmlManager, editAlign, this);
+		markerEditor.add( tempoEditor );
 		markerEditor.add( new MarkerEditor(parentFrame, mmlManager, editAlign, this) );
 		markerEditor.add( new StartOffsetEditor(parentFrame, mmlManager, editAlign, this) );
 
 		// popupMenu に各MenuItemを登録する.
 		markerEditor.forEach(t -> t.getMenuItems().forEach(popupMenu::add));
+
+		// 個別メニューの追加
+		popupMenu.add(new JSeparator());
+		popupMenu.add( tempoEditor.getTempoProcMenu() );    // テンポに合わせて音符休符の長さを変換する
 
 		popupMenu.addPopupMenuListener(new PopupMenuListener() {
 			@Override

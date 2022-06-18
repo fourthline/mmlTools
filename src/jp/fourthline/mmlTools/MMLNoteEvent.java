@@ -6,6 +6,7 @@ package jp.fourthline.mmlTools;
 
 import java.util.Objects;
 
+import jp.fourthline.mmlTools.core.IllegalTickOffsetException;
 import jp.fourthline.mmlTools.core.MMLTicks;
 import jp.fourthline.mmlTools.core.TuningBase;
 import jp.fourthline.mmlTools.core.UndefinedTickException;
@@ -29,6 +30,9 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 
 	public MMLNoteEvent(int note, int tickLength, int tickOffset, int velocity) {
 		super(tickOffset);
+		if (tickOffset + tickLength >= MMLEvent.MAX_TICK) {
+			throw new IllegalTickOffsetException(tickOffset + tickLength);
+		}
 		if ( (velocity < 0) || (velocity > MAX_VOL) ) {
 			throw new IllegalArgumentException("velocity  "+velocity);
 		}

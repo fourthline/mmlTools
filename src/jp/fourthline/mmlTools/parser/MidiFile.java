@@ -18,6 +18,7 @@ import java.util.ResourceBundle;
 
 import javax.sound.midi.*;
 
+import jp.fourthline.mmlTools.MMLEvent;
 import jp.fourthline.mmlTools.MMLEventList;
 import jp.fourthline.mmlTools.MMLNoteEvent;
 import jp.fourthline.mmlTools.MMLScore;
@@ -181,6 +182,7 @@ public final class MidiFile extends AbstractMMLParser {
 		for (MidiEvent event : midiEventList) {
 			MidiMessage msg = event.getMessage();
 			long tick = convTick( event.getTick() );
+			if (tick >= MMLEvent.MAX_TICK) continue;
 			if (msg instanceof MetaMessage) {
 				parseMetaMessage((MetaMessage)msg, tick, trackInfo);
 			} else if (msg instanceof ShortMessage) {
