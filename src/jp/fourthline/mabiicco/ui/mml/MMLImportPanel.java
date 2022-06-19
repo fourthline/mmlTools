@@ -40,6 +40,8 @@ public final class MMLImportPanel extends JPanel {
 
 	private JButton importButton;
 
+	private final Dimension prefSize = new Dimension(440, 300);
+
 	/**
 	 * @wbp.parser.constructor
 	 */
@@ -129,7 +131,7 @@ public final class MMLImportPanel extends JPanel {
 
 	@Override
 	public Dimension getPreferredSize() {
-		return new Dimension(440, 240);
+		return prefSize;
 	}
 
 	/**

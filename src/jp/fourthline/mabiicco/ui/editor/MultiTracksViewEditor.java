@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 たんらる
+ * Copyright (C) 2019-2022 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.editor;
@@ -40,6 +40,8 @@ public final class MultiTracksViewEditor extends JPanel {
 	private final Frame parentFrame;
 
 	private boolean[] oldValue;
+
+	private final Dimension prefSize = new Dimension(440, 300);
 
 	public MultiTracksViewEditor(Frame parentFrame, IMMLManager mmlManager) {
 		this.dialog = new JDialog(parentFrame, AppResource.appText("edit.tracks.view"), true);
@@ -132,7 +134,7 @@ public final class MultiTracksViewEditor extends JPanel {
 
 	@Override
 	public Dimension getPreferredSize() {
-		return new Dimension(440, 300);
+		return prefSize;
 	}
 
 	public void apply(boolean[] list) {

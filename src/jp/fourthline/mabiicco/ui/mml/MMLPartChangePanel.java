@@ -59,6 +59,8 @@ public final class MMLPartChangePanel extends JPanel {
 	private JRadioButton radioCopy;
 	private JComboBox<String> partSelectComboBox;
 
+	private final Dimension prefSize = new Dimension(440, 450);
+
 	public MMLPartChangePanel() {
 		this.dialog = null;
 		this.mmlManager = null;
@@ -239,7 +241,7 @@ public final class MMLPartChangePanel extends JPanel {
 
 	@Override
 	public Dimension getPreferredSize() {
-		return new Dimension(440, 450);
+		return prefSize;
 	}
 
 	/**

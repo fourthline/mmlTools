@@ -51,6 +51,8 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 	private final MMLNoteEvent[] noteEvent;
 	private final MMLEventList eventList;
 
+	private final Dimension prefSize = new Dimension(350, 150);
+
 	// 調律属性は指定されたノートの調律属性がすべて同じ場合に編集可能
 	private boolean enableTuningEdit;
 
@@ -250,7 +252,7 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 
 	@Override
 	public Dimension getPreferredSize() {
-		return new Dimension(350, 150);
+		return prefSize;
 	}
 
 	@Override

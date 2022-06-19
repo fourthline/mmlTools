@@ -58,6 +58,8 @@ public final class MMLInputPanel extends JPanel {
 	private MMLTrack track;
 	private final Window parentFrame;
 
+	private final Dimension prefSize = new Dimension(350, 380);
+
 	/**
 	 * @param mmlManager
 	 */
@@ -148,7 +150,7 @@ public final class MMLInputPanel extends JPanel {
 
 	@Override
 	public Dimension getPreferredSize() {
-		return new Dimension(350, 380);
+		return prefSize;
 	}
 
 	/**

@@ -45,6 +45,8 @@ public final class TrackPropertyPanel extends JPanel {
 	private final MMLTrack track;
 	private final MMLTrack sandTrack;
 
+	private final Dimension prefSize = new Dimension(350, 300);
+
 	/**
 	 * Create the dialog.
 	 */
@@ -114,7 +116,7 @@ public final class TrackPropertyPanel extends JPanel {
 
 	@Override
 	public Dimension getPreferredSize() {
-		return new Dimension(350, 300);
+		return prefSize;
 	}
 
 	private void applyProperty() {

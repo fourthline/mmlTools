@@ -28,6 +28,8 @@ public final class MMLScorePropertyPanel extends JPanel {
 	private JComboBox<String> timeCount;
 	private JComboBox<String> timeBase;
 
+	private final Dimension prefSize = new Dimension(300, 170);
+
 	public MMLScorePropertyPanel() {
 		initializePanel();
 	}
@@ -73,7 +75,7 @@ public final class MMLScorePropertyPanel extends JPanel {
 
 	@Override
 	public Dimension getPreferredSize() {
-		return new Dimension(300, 170);
+		return prefSize;
 	}
 
 	private void initialComboBox(String baseTime) {
