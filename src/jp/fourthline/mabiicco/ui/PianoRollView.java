@@ -171,6 +171,7 @@ public final class PianoRollView extends JPanel {
 	private void updateViewWidthTrackLength() {
 		MMLScore mmlScore = mmlManager.getMMLScore();
 		long tickLength = mmlScore.getTotalTickLengthWithAll();
+		long userTickLength = mmlScore.getUserViewMeasure() * mmlScore.getMeasureTick();
 		try {
 			// 最後に12小節分のマージンを作成します.
 			int t1 = MMLTicks.getTick("1");
@@ -181,7 +182,16 @@ public final class PianoRollView extends JPanel {
 			e.printStackTrace();
 		}
 		int width = convertTicktoX(tickLength);
-		super.setPreferredSize(new Dimension(width, getTotalHeight()));
+		int userWidth = convertTicktoX(userTickLength);
+		if (width < userWidth) {
+			width = userWidth;
+		}
+
+		var dim = getPreferredSize();
+		var height = getTotalHeight();
+		if ((dim.width != width) || (dim.height != height)) {
+			super.setPreferredSize(new Dimension(width, height));
+		}
 		revalidate();
 	}
 

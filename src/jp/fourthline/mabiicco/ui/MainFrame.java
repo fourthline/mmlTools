@@ -287,6 +287,8 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 
 		editMenu.add(new JSeparator());
 
+		createMenuItem(editMenu, "view.setUserViewMeasure", ActionDispatcher.SET_USER_VIEW_MEASURE, true, 
+				KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_DOWN_MASK));
 		createMenuItem(editMenu, "edit.allClearTempo", ActionDispatcher.ALL_CLEAR_TEMPO, true);
 		createMenuItem(editMenu, "mml.generate", ActionDispatcher.MML_GENERATE, true);
 		createMenuItem(editMenu, "edit.keyboard.input", ActionDispatcher.KEYBOARD_INPUT, true,

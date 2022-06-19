@@ -36,6 +36,9 @@ public final class MMLScore {
 
 	private final Stack<UndefinedTickException> exceptionStack = new Stack<>();
 
+	public static final int MAX_USER_VIEW_MEASURE = 200;
+	private int userViewMeasure;
+
 	/**
 	 * 新たにトラックを追加します.
 	 * @param track
@@ -181,6 +184,15 @@ public final class MMLScore {
 		} catch (UndefinedTickException e) {
 			throw new AssertionError();
 		}
+	}
+
+	public void setUserViewMeasure(int measure) {
+		if (measure > MAX_USER_VIEW_MEASURE) measure = MAX_USER_VIEW_MEASURE;
+		this.userViewMeasure = measure;
+	}
+
+	public int getUserViewMeasure() {
+		return this.userViewMeasure;
 	}
 
 	public void addTicks(int tickPosition, int tick) {

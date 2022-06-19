@@ -4,6 +4,7 @@
 
 package jp.fourthline.mabiicco;
 
+import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -28,7 +29,10 @@ import java.util.function.Supplier;
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiSystem;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
@@ -45,6 +49,7 @@ import jp.fourthline.mabiicco.ui.color.ScaleColor;
 import jp.fourthline.mabiicco.ui.editor.MMLTranspose;
 import jp.fourthline.mabiicco.ui.editor.MultiTracksVelocityChangeEditor;
 import jp.fourthline.mabiicco.ui.editor.MultiTracksViewEditor;
+import jp.fourthline.mabiicco.ui.editor.NumberSpinner;
 import jp.fourthline.mabiicco.ui.mml.MMLImportPanel;
 import jp.fourthline.mabiicco.ui.mml.MMLScorePropertyPanel;
 import jp.fourthline.mabiicco.ui.mml.ParsePropertiesDialog;
@@ -133,6 +138,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String UNSET_TEMP_MUTE_ALL = "unset_temp_mute_all";
 	@Action public static final String OCTAVE_UP = "octave_up";
 	@Action public static final String OCTAVE_DOWN = "octave_down";
+	@Action public static final String SET_USER_VIEW_MEASURE = "set_user_view_measure";
 
 	private final HashMap<String, Consumer<Object>> actionMap = new HashMap<>();
 
@@ -261,6 +267,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(UNSET_TEMP_MUTE_ALL, t -> editState.setTempMuteAll());
 		actionMap.put(OCTAVE_UP, t -> editState.octaveUp());
 		actionMap.put(OCTAVE_DOWN, t -> editState.octaveDown());
+		actionMap.put(SET_USER_VIEW_MEASURE, t -> setUserViewMeasure());
 	}
 
 	@Override
@@ -827,6 +834,23 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			appProperties.setDlsFile( fileChooser.getSelectedFiles() );
 			appProperties.useDefaultSoundBank.set(false);
 			showAppRestartDialog();
+		}
+	}
+
+	private void setUserViewMeasure() {
+		JPanel panel = new JPanel();
+		panel.add(new JLabel(AppResource.appText("view.setUserViewMeasure.label")));
+		JSpinner spinner = NumberSpinner.createSpinner(mmlSeqView.getMMLScore().getUserViewMeasure(), 0, MMLScore.MAX_USER_VIEW_MEASURE, 1);
+		spinner.setFocusable(false);
+		panel.add(spinner);
+		JPanel cPanel = new JPanel(new BorderLayout());
+		cPanel.add(panel, BorderLayout.CENTER);
+
+		int status = JOptionPane.showConfirmDialog(mainFrame, cPanel, AppResource.appText("view.setUserViewMeasure"), JOptionPane.OK_CANCEL_OPTION);
+		if (status == JOptionPane.OK_OPTION) {
+			int value = ((Integer) spinner.getValue()).intValue();
+			mmlSeqView.getMMLScore().setUserViewMeasure(value);
+			mmlSeqView.repaint();
 		}
 	}
 }
