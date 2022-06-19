@@ -83,7 +83,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 
 		// 個別メニューの追加
 		popupMenu.add(new JSeparator());
-		popupMenu.add( tempoEditor.getTempoProcMenu() );    // テンポに合わせて音符休符の長さを変換する
+		popupMenu.add( tempoEditor.getTempoConvertMenu() );    // テンポに合わせて音符休符の長さを変換する
 
 		popupMenu.addPopupMenuListener(new PopupMenuListener() {
 			@Override

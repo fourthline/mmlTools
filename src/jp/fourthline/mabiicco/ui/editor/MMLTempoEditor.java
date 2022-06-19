@@ -32,14 +32,14 @@ import jp.fourthline.mmlTools.MMLTempoEvent;
 public final class MMLTempoEditor extends AbstractMarkerEditor<MMLTempoEvent> {
 
 	private final Frame parentFrame;
-	private final JMenuItem tempoProcMenu;
-	private final String tempoProcCommand = "tempoProc";
+	private final JMenuItem tempoConvertMenu;
+	private final String tempoConvertCommand = "tempoConvert";
 
 	public MMLTempoEditor(Frame parentFrame, IMMLManager mmlManager, IEditAlign editAlign, IViewTargetMarker viewTargetMarker) {
 		super("tempo", mmlManager, editAlign, viewTargetMarker);
 		this.parentFrame = parentFrame;
-		this.tempoProcMenu = newMenuItem(AppResource.appText("edit."+tempoProcCommand));
-		this.tempoProcMenu.setActionCommand(tempoProcCommand);
+		this.tempoConvertMenu = newMenuItem(AppResource.appText("edit."+tempoConvertCommand));
+		this.tempoConvertMenu.setActionCommand(tempoConvertCommand);
 	}
 
 	private int showTempoInputDialog(String title, int tempo) {
@@ -96,26 +96,26 @@ public final class MMLTempoEditor extends AbstractMarkerEditor<MMLTempoEvent> {
 
 	@Override
 	public void actionPerformed(ActionEvent event) {
-		super.actionPerformed(event);
 		String actionCommand = event.getActionCommand();
-		if (actionCommand.equals(tempoProcCommand)) {
-			tempoProcAction();
+		if (actionCommand.equals(tempoConvertCommand)) {
+			tempoConvertAction();
 			mmlManager.updateActivePart(true);
+		} else {
+			super.actionPerformed(event);
 		}
 	}
 
-	private void tempoProcAction() {
-		System.out.println("tempoProc " + targetEvent);
+	private void tempoConvertAction() {
 		int tempo = (targetEvent != null) ? targetEvent.getTempo() : mmlManager.getMMLScore().getTempoOnTick(targetTick);
 		int targetTick = (targetEvent != null) ? targetEvent.getTickOffset() : this.targetTick;
-		tempo = showTempoInputDialog(AppResource.appText("edit."+tempoProcCommand), tempo);
+		tempo = showTempoInputDialog(AppResource.appText("edit."+tempoConvertCommand), tempo);
 		if (tempo < 0) {
 			return;
 		}
-		tempoProc(tempo, targetTick);
+		tempoConvert(tempo, targetTick);
 	}
 
-	void tempoProc(int tempo, int targetTick) {
+	void tempoConvert(int tempo, int targetTick) {
 		MMLTempoEvent insertTempo = new MMLTempoEvent(tempo, targetTick);
 
 		// 指定Tickより後ろのテンポを消して、新たなテンポイベントにするリストを作成する
@@ -145,7 +145,7 @@ public final class MMLTempoEditor extends AbstractMarkerEditor<MMLTempoEvent> {
 		tempoList.addAll(newTempoList);
 	}
 	
-	public JMenuItem getTempoProcMenu() {
-		return tempoProcMenu;
+	public JMenuItem getTempoConvertMenu() {
+		return tempoConvertMenu;
 	}
 }
