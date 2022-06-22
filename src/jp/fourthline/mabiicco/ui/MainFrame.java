@@ -586,7 +586,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		MabiIccoProperties properties = MabiIccoProperties.getInstance();
 
 		Rectangle rect = properties.getWindowRect();
-		if (rect.getX() < 0.0) {
+		if (rect == null) {
 			setSize(1024, 768);
 			setLocationRelativeTo(null);
 		} else {

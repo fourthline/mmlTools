@@ -17,7 +17,6 @@ import javax.swing.Action;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 
 import com.formdev.flatlaf.FlatLightLaf;
 
@@ -159,7 +158,7 @@ public final class MabiIcco {
 		return chooser;
 	}
 
-	public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
+	public static void main(String[] args) {
 		try {
 			var properties = MabiIccoProperties.getInstance();
 			if (properties.uiscaleDisable.get()) {

@@ -171,11 +171,14 @@ public final class MabiIccoProperties {
 	}
 
 	public Rectangle getWindowRect() {
-		String x = properties.getProperty(WINDOW_X, "-1");
-		String y = properties.getProperty(WINDOW_Y, "-1");
-		String width = properties.getProperty(WINDOW_WIDTH, "-1");
-		String height = properties.getProperty(WINDOW_HEIGHT, "-1");
+		String x = properties.getProperty(WINDOW_X, null);
+		String y = properties.getProperty(WINDOW_Y, null);
+		String width = properties.getProperty(WINDOW_WIDTH, null);
+		String height = properties.getProperty(WINDOW_HEIGHT, null);
 
+		if ( (x == null) || (y == null) || (width == null) || (height == null) ) {
+			return null;
+		}
 		return new Rectangle(
 				Integer.parseInt(x),
 				Integer.parseInt(y),
