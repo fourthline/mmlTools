@@ -22,7 +22,7 @@ import jp.fourthline.mmlTools.parser.MMSFile;
 /**
  * Score
  */
-public final class MMLScore {
+public final class MMLScore implements Cloneable {
 	private final LinkedList<MMLTrack> trackList = new LinkedList<>();
 	private final List<MMLTempoEvent> globalTempoList = new ArrayList<>();
 	private final List<Marker> markerList = new ArrayList<>();
@@ -421,6 +421,14 @@ public final class MMLScore {
 			e.printStackTrace();
 		}
 		return "N/A";
+	}
+
+	@Override
+	public MMLScore clone() {
+		var obj = this.getObjectState();
+		var score = new MMLScore();
+		score.putObjectState(obj);
+		return score;
 	}
 
 	public static void main(String[] args) {

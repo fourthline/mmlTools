@@ -20,6 +20,8 @@ import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.ui.IMMLManager;
 import jp.fourthline.mabiicco.ui.IViewTargetMarker;
 import jp.fourthline.mabiicco.ui.UIUtils;
+import jp.fourthline.mmlTools.MMLScore;
+import jp.fourthline.mmlTools.MMLTempoConverter;
 import jp.fourthline.mmlTools.MMLTempoEvent;
 
 /**
@@ -100,7 +102,6 @@ public final class MMLTempoEditor extends AbstractMarkerEditor<MMLTempoEvent> {
 		String actionCommand = event.getActionCommand();
 		if (actionCommand.equals(tempoConvertCommand)) {
 			tempoConvertAction();
-			mmlManager.updateActivePart(true);
 		} else {
 			super.actionPerformed(event);
 		}
@@ -113,14 +114,24 @@ public final class MMLTempoEditor extends AbstractMarkerEditor<MMLTempoEvent> {
 		if (tempo < 0) {
 			return;
 		}
-		tempoConvert(tempo, targetTick);
+
+		// 複製データに対して変換実施.
+		long diff = tempoConvert(tempo, targetTick, mmlManager.getMMLScore().clone());
+		String title = AppResource.appText("edit.tempoConvert.result");
+		String message = AppResource.appText("edit.tempoConvert.result_label") + " = " + diff;
+		int ret = JOptionPane.showConfirmDialog(parentFrame, message, title, JOptionPane.OK_CANCEL_OPTION);
+		if (ret == JOptionPane.OK_OPTION) {
+			// 実際のデータに対して変換実施.
+			tempoConvert(tempo, targetTick, mmlManager.getMMLScore());
+			mmlManager.updateActivePart(true);
+		}
 	}
 
-	void tempoConvert(int tempo, int targetTick) {
+	long tempoConvert(int tempo, int targetTick, MMLScore score) {
 		MMLTempoEvent insertTempo = new MMLTempoEvent(tempo, targetTick);
 
 		// 指定Tickより後ろのテンポを消して、新たなテンポイベントにするリストを作成する
-		var tempoList = mmlManager.getMMLScore().getTempoEventList();
+		var tempoList = score.getTempoEventList();
 		ArrayList<MMLTempoEvent> newTempoList = new ArrayList<>();
 		for (var tempoEvent : tempoList) {
 			if (tempoEvent.getTickOffset() < targetTick) {
@@ -129,23 +140,11 @@ public final class MMLTempoEditor extends AbstractMarkerEditor<MMLTempoEvent> {
 		}
 		newTempoList.add(insertTempo);
 
-		// 変換する
-		for (var track : mmlManager.getMMLScore().getTrackList()) {
-			for (var eventList : track.getMMLEventList()) {
-				for (var noteEvent : eventList.getMMLNoteEventList()) {
-					long endTick = MMLTempoEvent.getTickOffsetOnTime(newTempoList,
-							MMLTempoEvent.getTimeOnTickOffset(tempoList, noteEvent.getEndTick()));
-					long tickOffset = MMLTempoEvent.getTickOffsetOnTime(newTempoList,
-							MMLTempoEvent.getTimeOnTickOffset(tempoList, noteEvent.getTickOffset()));
-					noteEvent.setTickOffset((int)tickOffset);
-					noteEvent.setTick((int)(endTick - tickOffset));
-				}
-			}
-		}
-		tempoList.clear();
-		tempoList.addAll(newTempoList);
+		MMLTempoConverter converter = new MMLTempoConverter(newTempoList);
+		converter.convert(score);
+		return converter.getConversionDiff();
 	}
-	
+
 	public JMenuItem getTempoConvertMenu() {
 		return tempoConvertMenu;
 	}

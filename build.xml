@@ -27,7 +27,7 @@
 	<property name="app.vendor" value="fourthline.jp" />
 	<property name="app.id" value="MabiIcco" />
 	<property name="app.name" value="MabiIcco" />
-	<property name="app.version" value="1.2.75" />
+	<property name="app.version" value="1.2.76" />
 	<property name="app.main-class" value="jp.fourthline.mabiicco.MabiIcco" />
 	<property name="class.path" value="lib/commons-compress/commons-compress-1.9.jar;lib/flatlaf/flatlaf-2.1.jar;lib/jna/jna-5.11.0.jar" />
 
