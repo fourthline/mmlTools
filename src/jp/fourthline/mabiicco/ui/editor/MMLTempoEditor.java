@@ -19,6 +19,7 @@ import javax.swing.JSpinner;
 import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.ui.IMMLManager;
 import jp.fourthline.mabiicco.ui.IViewTargetMarker;
+import jp.fourthline.mabiicco.ui.UIUtils;
 import jp.fourthline.mmlTools.MMLTempoEvent;
 
 /**
@@ -51,7 +52,7 @@ public final class MMLTempoEditor extends AbstractMarkerEditor<MMLTempoEvent> {
 		JPanel cPanel = new JPanel(new BorderLayout());
 		cPanel.add(panel, BorderLayout.CENTER);
 
-		setDefaultFocus(((JSpinner.NumberEditor)spinner.getEditor()).getTextField());
+		UIUtils.setDefaultFocus(spinner);
 		int status = JOptionPane.showConfirmDialog(this.parentFrame, cPanel, title, JOptionPane.OK_CANCEL_OPTION);
 		if (status == JOptionPane.OK_OPTION) {
 			return ((Integer) spinner.getValue()).intValue();

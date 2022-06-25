@@ -16,6 +16,7 @@ import javax.swing.JTextField;
 import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.ui.IMMLManager;
 import jp.fourthline.mabiicco.ui.IViewTargetMarker;
+import jp.fourthline.mabiicco.ui.UIUtils;
 import jp.fourthline.mmlTools.Marker;
 
 /**
@@ -40,7 +41,7 @@ public final class MarkerEditor extends AbstractMarkerEditor<Marker> {
 		JPanel panel = new JPanel();
 		panel.add(new JLabel(AppResource.appText("edit.label_"+suffix)));
 		JTextField textField = new JTextField(text, 10);
-		setDefaultFocus(textField);
+		UIUtils.setDefaultFocus(textField);
 		panel.add(textField);
 		JPanel cPanel = new JPanel(new BorderLayout());
 		cPanel.add(panel, BorderLayout.CENTER);

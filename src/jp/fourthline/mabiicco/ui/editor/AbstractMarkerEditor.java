@@ -12,9 +12,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JMenuItem;
-import javax.swing.JTextField;
-import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
 
 import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.ui.IMMLManager;
@@ -153,22 +150,6 @@ abstract public class AbstractMarkerEditor<T extends MMLEvent> implements IMarke
 			deleteAction();
 		}
 		mmlManager.updateActivePart(true);
-	}
-
-	protected final void setDefaultFocus(JTextField textField) {
-		textField.addAncestorListener(new AncestorListener() {
-			@Override
-			public void ancestorRemoved(AncestorEvent event) {}
-
-			@Override
-			public void ancestorMoved(AncestorEvent event) {}
-
-			@Override
-			public void ancestorAdded(AncestorEvent event) {
-				textField.requestFocusInWindow();
-				textField.selectAll();
-			}
-		});
 	}
 
 	protected abstract List<T> getEventList();
