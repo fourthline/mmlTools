@@ -116,9 +116,9 @@ public final class MMLTempoEditor extends AbstractMarkerEditor<MMLTempoEvent> {
 		}
 
 		// 複製データに対して変換実施.
-		long diff = tempoConvert(tempo, targetTick, mmlManager.getMMLScore().clone());
+		var converter = tempoConvert(tempo, targetTick, mmlManager.getMMLScore().clone());
 		String title = AppResource.appText("edit.tempoConvert.result");
-		String message = AppResource.appText("edit.tempoConvert.result_label") + " = " + diff;
+		String message = AppResource.appText("edit.tempoConvert.result_label") + " = " + converter.getConversionDiff();
 		int ret = JOptionPane.showConfirmDialog(parentFrame, message, title, JOptionPane.OK_CANCEL_OPTION);
 		if (ret == JOptionPane.OK_OPTION) {
 			// 実際のデータに対して変換実施.
@@ -127,7 +127,7 @@ public final class MMLTempoEditor extends AbstractMarkerEditor<MMLTempoEvent> {
 		}
 	}
 
-	long tempoConvert(int tempo, int targetTick, MMLScore score) {
+	MMLTempoConverter tempoConvert(int tempo, int targetTick, MMLScore score) {
 		MMLTempoEvent insertTempo = new MMLTempoEvent(tempo, targetTick);
 
 		// 指定Tickより後ろのテンポを消して、新たなテンポイベントにするリストを作成する
@@ -142,7 +142,7 @@ public final class MMLTempoEditor extends AbstractMarkerEditor<MMLTempoEvent> {
 
 		MMLTempoConverter converter = new MMLTempoConverter(newTempoList);
 		converter.convert(score);
-		return converter.getConversionDiff();
+		return converter;
 	}
 
 	public JMenuItem getTempoConvertMenu() {

@@ -10,6 +10,7 @@ public final class MMLTempoConverter {
 
 	private final List<MMLTempoEvent> newTempoList;
 	private long conversionDiff = 0;
+	private int conversionDiffCount = 0;
 
 	public MMLTempoConverter(List<MMLTempoEvent> newTempoList) {
 		this.newTempoList = newTempoList;
@@ -34,8 +35,12 @@ public final class MMLTempoConverter {
 					long reTick = convertEvent(newTempoList, tempoList, (int) endTick);
 					long reTickOffset = convertEvent(newTempoList, tempoList, (int) tickOffset);
 
-					conversionDiff += Math.abs(reTick - noteEvent.getEndTick());
-					conversionDiff += Math.abs(reTickOffset - noteEvent.getTickOffset());
+					long diff =  Math.abs(reTick - noteEvent.getEndTick())
+							+ Math.abs(reTickOffset - noteEvent.getTickOffset());
+					if (diff != 0) {
+						conversionDiff += diff;
+						conversionDiffCount++;
+					}
 
 					noteEvent.setTickOffset((int)tickOffset);
 					noteEvent.setTick((int)(endTick - tickOffset));
@@ -47,7 +52,7 @@ public final class MMLTempoConverter {
 		tempoList.addAll(newTempoList);
 	}
 
-	public long getConversionDiff() {
-		return conversionDiff;
+	public String getConversionDiff() {
+		return conversionDiff + "/" + conversionDiffCount;
 	}
 }
