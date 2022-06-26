@@ -35,6 +35,7 @@ public final class MMLTempoConverter {
 					long reTick = convertEvent(newTempoList, tempoList, (int) endTick);
 					long reTickOffset = convertEvent(newTempoList, tempoList, (int) tickOffset);
 
+					// 誤差算出
 					long diff =  Math.abs(reTick - noteEvent.getEndTick())
 							+ Math.abs(reTickOffset - noteEvent.getTickOffset());
 					if (diff != 0) {
@@ -48,6 +49,10 @@ public final class MMLTempoConverter {
 			}
 		}
 
+		// マーカーの変換
+		score.getMarkerList().forEach(t -> t.setTickOffset((int)convertEvent(tempoList, newTempoList, t.getTickOffset())));
+
+		// テンポリスト更新
 		tempoList.clear();
 		tempoList.addAll(newTempoList);
 	}
