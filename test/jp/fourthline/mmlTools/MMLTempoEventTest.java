@@ -48,7 +48,7 @@ public class MMLTempoEventTest {
 
 		int tick = (int) eventList.getTickLength();
 		System.out.println("tick: " + tick);
-		long time = MMLTempoEvent.getTimeOnTickOffset(tempoList, tick);
+		long time = Math.round(MMLTempoEvent.getTimeOnTickOffset(tempoList, tick));
 		assertEquals(expect, time);
 		assertEquals(tick, MMLTempoEvent.getTickOffsetOnTime(tempoList, time));
 	}
@@ -139,39 +139,40 @@ public class MMLTempoEventTest {
 		List<MMLTempoEvent> empty = List.of();
 		List<MMLTempoEvent> t240 = List.of(new MMLTempoEvent(240, 0));
 		List<MMLTempoEvent> t60 = List.of(new MMLTempoEvent(60, 0));
+		double delta = 0.1;
 
-		assertEquals(5, MMLTempoEvent.getTimeOnTickOffset(empty, 1));
-		assertEquals(10, MMLTempoEvent.getTimeOnTickOffset(empty, 2));
-		assertEquals(16, MMLTempoEvent.getTimeOnTickOffset(empty, 3));
-		assertEquals(21, MMLTempoEvent.getTimeOnTickOffset(empty, 4));
-		assertEquals(26, MMLTempoEvent.getTimeOnTickOffset(empty, 5));
-		assertEquals(31, MMLTempoEvent.getTimeOnTickOffset(empty, 6));
-		assertEquals(36, MMLTempoEvent.getTimeOnTickOffset(empty, 7));
-		assertEquals(42, MMLTempoEvent.getTimeOnTickOffset(empty, 8));
-		assertEquals(47, MMLTempoEvent.getTimeOnTickOffset(empty, 9));
-		assertEquals(52, MMLTempoEvent.getTimeOnTickOffset(empty, 10));
+		assertEquals(5.2, MMLTempoEvent.getTimeOnTickOffset(empty, 1), delta);
+		assertEquals(10.4, MMLTempoEvent.getTimeOnTickOffset(empty, 2), delta);
+		assertEquals(15.6, MMLTempoEvent.getTimeOnTickOffset(empty, 3), delta);
+		assertEquals(20.8, MMLTempoEvent.getTimeOnTickOffset(empty, 4), delta);
+		assertEquals(26.0, MMLTempoEvent.getTimeOnTickOffset(empty, 5), delta);
+		assertEquals(31.2, MMLTempoEvent.getTimeOnTickOffset(empty, 6), delta);
+		assertEquals(36.5, MMLTempoEvent.getTimeOnTickOffset(empty, 7), delta);
+		assertEquals(41.7, MMLTempoEvent.getTimeOnTickOffset(empty, 8), delta);
+		assertEquals(46.8, MMLTempoEvent.getTimeOnTickOffset(empty, 9), delta);
+		assertEquals(52.0, MMLTempoEvent.getTimeOnTickOffset(empty, 10), delta);
 
-		assertEquals(3, MMLTempoEvent.getTimeOnTickOffset(t240, 1));
-		assertEquals(5, MMLTempoEvent.getTimeOnTickOffset(t240, 2));
-		assertEquals(8, MMLTempoEvent.getTimeOnTickOffset(t240, 3));
-		assertEquals(10, MMLTempoEvent.getTimeOnTickOffset(t240, 4));
-		assertEquals(13, MMLTempoEvent.getTimeOnTickOffset(t240, 5));
-		assertEquals(16, MMLTempoEvent.getTimeOnTickOffset(t240, 6));
-		assertEquals(18, MMLTempoEvent.getTimeOnTickOffset(t240, 7));
-		assertEquals(21, MMLTempoEvent.getTimeOnTickOffset(t240, 8));
-		assertEquals(23, MMLTempoEvent.getTimeOnTickOffset(t240, 9));
-		assertEquals(26, MMLTempoEvent.getTimeOnTickOffset(t240, 10));
+		assertEquals(2.6, MMLTempoEvent.getTimeOnTickOffset(t240, 1), delta);
+		assertEquals(5.2, MMLTempoEvent.getTimeOnTickOffset(t240, 2), delta);
+		assertEquals(7.8, MMLTempoEvent.getTimeOnTickOffset(t240, 3), delta);
+		assertEquals(10.4, MMLTempoEvent.getTimeOnTickOffset(t240, 4), delta);
+		assertEquals(13.0, MMLTempoEvent.getTimeOnTickOffset(t240, 5), delta);
+		assertEquals(15.6, MMLTempoEvent.getTimeOnTickOffset(t240, 6), delta);
+		assertEquals(18.2, MMLTempoEvent.getTimeOnTickOffset(t240, 7), delta);
+		assertEquals(20.8, MMLTempoEvent.getTimeOnTickOffset(t240, 8), delta);
+		assertEquals(23.4, MMLTempoEvent.getTimeOnTickOffset(t240, 9), delta);
+		assertEquals(26.0, MMLTempoEvent.getTimeOnTickOffset(t240, 10), delta);
 
-		assertEquals(10, MMLTempoEvent.getTimeOnTickOffset(t60, 1));
-		assertEquals(21, MMLTempoEvent.getTimeOnTickOffset(t60, 2));
-		assertEquals(31, MMLTempoEvent.getTimeOnTickOffset(t60, 3));
-		assertEquals(42, MMLTempoEvent.getTimeOnTickOffset(t60, 4));
-		assertEquals(52, MMLTempoEvent.getTimeOnTickOffset(t60, 5));
-		assertEquals(63, MMLTempoEvent.getTimeOnTickOffset(t60, 6));
-		assertEquals(73, MMLTempoEvent.getTimeOnTickOffset(t60, 7));
-		assertEquals(83, MMLTempoEvent.getTimeOnTickOffset(t60, 8));
-		assertEquals(94, MMLTempoEvent.getTimeOnTickOffset(t60, 9));
-		assertEquals(104, MMLTempoEvent.getTimeOnTickOffset(t60, 10));
+		assertEquals(10.4, MMLTempoEvent.getTimeOnTickOffset(t60, 1), delta);
+		assertEquals(20.8, MMLTempoEvent.getTimeOnTickOffset(t60, 2), delta);
+		assertEquals(31.2, MMLTempoEvent.getTimeOnTickOffset(t60, 3), delta);
+		assertEquals(41.7, MMLTempoEvent.getTimeOnTickOffset(t60, 4), delta);
+		assertEquals(52.0, MMLTempoEvent.getTimeOnTickOffset(t60, 5), delta);
+		assertEquals(62.5, MMLTempoEvent.getTimeOnTickOffset(t60, 6), delta);
+		assertEquals(73.0, MMLTempoEvent.getTimeOnTickOffset(t60, 7), delta);
+		assertEquals(83.3, MMLTempoEvent.getTimeOnTickOffset(t60, 8), delta);
+		assertEquals(93.8, MMLTempoEvent.getTimeOnTickOffset(t60, 9), delta);
+		assertEquals(104.2, MMLTempoEvent.getTimeOnTickOffset(t60, 10), delta);
 	}
 
 	@Test
@@ -181,36 +182,36 @@ public class MMLTempoEventTest {
 		List<MMLTempoEvent> t60 = List.of(new MMLTempoEvent(60, 0));
 
 		assertEquals(0, MMLTempoEvent.getTickOffsetOnTime(empty, 1));
-		assertEquals(0, MMLTempoEvent.getTickOffsetOnTime(empty, 2));
-		assertEquals(0, MMLTempoEvent.getTickOffsetOnTime(empty, 3));
-		assertEquals(0, MMLTempoEvent.getTickOffsetOnTime(empty, 4));
+		assertEquals(1, MMLTempoEvent.getTickOffsetOnTime(empty, 2));
+		assertEquals(1, MMLTempoEvent.getTickOffsetOnTime(empty, 3));
+		assertEquals(1, MMLTempoEvent.getTickOffsetOnTime(empty, 4));
 		assertEquals(1, MMLTempoEvent.getTickOffsetOnTime(empty, 5));
 		assertEquals(1, MMLTempoEvent.getTickOffsetOnTime(empty, 6));
-		assertEquals(1, MMLTempoEvent.getTickOffsetOnTime(empty, 7));
-		assertEquals(1, MMLTempoEvent.getTickOffsetOnTime(empty, 8));
-		assertEquals(1, MMLTempoEvent.getTickOffsetOnTime(empty, 9));
+		assertEquals(2, MMLTempoEvent.getTickOffsetOnTime(empty, 7));
+		assertEquals(2, MMLTempoEvent.getTickOffsetOnTime(empty, 8));
+		assertEquals(2, MMLTempoEvent.getTickOffsetOnTime(empty, 9));
 		assertEquals(2, MMLTempoEvent.getTickOffsetOnTime(empty, 10));
 
-		assertEquals(0, MMLTempoEvent.getTickOffsetOnTime(t240, 1));
+		assertEquals(1, MMLTempoEvent.getTickOffsetOnTime(t240, 1));
 		assertEquals(1, MMLTempoEvent.getTickOffsetOnTime(t240, 2));
-		assertEquals(1, MMLTempoEvent.getTickOffsetOnTime(t240, 3));
-		assertEquals(1, MMLTempoEvent.getTickOffsetOnTime(t240, 4));
+		assertEquals(2, MMLTempoEvent.getTickOffsetOnTime(t240, 3));
+		assertEquals(2, MMLTempoEvent.getTickOffsetOnTime(t240, 4));
 		assertEquals(2, MMLTempoEvent.getTickOffsetOnTime(t240, 5));
-		assertEquals(2, MMLTempoEvent.getTickOffsetOnTime(t240, 6));
+		assertEquals(3, MMLTempoEvent.getTickOffsetOnTime(t240, 6));
 		assertEquals(3, MMLTempoEvent.getTickOffsetOnTime(t240, 7));
 		assertEquals(3, MMLTempoEvent.getTickOffsetOnTime(t240, 8));
-		assertEquals(3, MMLTempoEvent.getTickOffsetOnTime(t240, 9));
+		assertEquals(4, MMLTempoEvent.getTickOffsetOnTime(t240, 9));
 		assertEquals(4, MMLTempoEvent.getTickOffsetOnTime(t240, 10));
 
 		assertEquals(0, MMLTempoEvent.getTickOffsetOnTime(t60, 1));
 		assertEquals(0, MMLTempoEvent.getTickOffsetOnTime(t60, 2));
 		assertEquals(0, MMLTempoEvent.getTickOffsetOnTime(t60, 3));
 		assertEquals(0, MMLTempoEvent.getTickOffsetOnTime(t60, 4));
-		assertEquals(0, MMLTempoEvent.getTickOffsetOnTime(t60, 5));
-		assertEquals(0, MMLTempoEvent.getTickOffsetOnTime(t60, 6));
-		assertEquals(0, MMLTempoEvent.getTickOffsetOnTime(t60, 7));
-		assertEquals(0, MMLTempoEvent.getTickOffsetOnTime(t60, 8));
-		assertEquals(0, MMLTempoEvent.getTickOffsetOnTime(t60, 9));
+		assertEquals(1, MMLTempoEvent.getTickOffsetOnTime(t60, 5));
+		assertEquals(1, MMLTempoEvent.getTickOffsetOnTime(t60, 6));
+		assertEquals(1, MMLTempoEvent.getTickOffsetOnTime(t60, 7));
+		assertEquals(1, MMLTempoEvent.getTickOffsetOnTime(t60, 8));
+		assertEquals(1, MMLTempoEvent.getTickOffsetOnTime(t60, 9));
 		assertEquals(1, MMLTempoEvent.getTickOffsetOnTime(t60, 10));
 		assertEquals(1, MMLTempoEvent.getTickOffsetOnTime(t60, 11));
 	}
@@ -223,7 +224,7 @@ public class MMLTempoEventTest {
 
 		for (int i = 0; i < MMLEvent.MAX_TICK; i++) {
 			for (List<MMLTempoEvent> t : Arrays.asList(empty, t240, t60)) {
-				long time = MMLTempoEvent.getTimeOnTickOffset(t, i);
+				double time = MMLTempoEvent.getTimeOnTickOffset(t, i);
 				assertEquals(i, MMLTempoEvent.getTickOffsetOnTime(t, time));
 			}
 		}
@@ -238,7 +239,7 @@ public class MMLTempoEventTest {
 				new MMLTempoEvent(255, 703498));
 
 		for (int i = 0; i < MMLEvent.MAX_TICK; i++) {
-			long time = MMLTempoEvent.getTimeOnTickOffset(tempoList, i);
+			double time = MMLTempoEvent.getTimeOnTickOffset(tempoList, i);
 			assertEquals(i, MMLTempoEvent.getTickOffsetOnTime(tempoList, time));
 		}
 	}

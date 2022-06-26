@@ -263,9 +263,9 @@ public final class TrackPropertyPanel extends JPanel {
 		private void updateLabelTickToMML(JLabel o, int tick, int partIndex) {
 			int startOffset = track.getStartOffset(partIndex);
 			var tempoList = track.getGlobalTempoList();
-			long d1 = MMLTempoEvent.getTimeOnTickOffset(tempoList, startOffset);
-			long d2 = MMLTempoEvent.getTimeOnTickOffset(tempoList, startOffset-tick);
-			long deltaTime = d1 - d2;
+			double d1 = MMLTempoEvent.getTimeOnTickOffset(tempoList, startOffset);
+			double d2 = MMLTempoEvent.getTimeOnTickOffset(tempoList, startOffset-tick);
+			long deltaTime = Math.round(d1 - d2);
 			String s = "";
 			if (tick != 0) {
 				try {

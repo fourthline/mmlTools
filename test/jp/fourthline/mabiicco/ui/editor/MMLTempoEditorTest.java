@@ -36,6 +36,6 @@ public final class MMLTempoEditorTest extends UseLoadingDLS {
 		mmlManager.addMMLTrack(track1);
 		editor.tempoConvert(200, 0, mmlManager.getMMLScore());
 		mmlManager.updateActivePart(true);
-		assertEquals("MML@t200a8b6&b18c&c14l1c&c9&c38c.&c&c2&c5&c7.,d2&d7.&d10e.&e20f16&f22,l32aaaaaaa29aaaal27aa29aaa29;", track1.getOriginalMML());
+		assertEquals("MML@t200a15l16&ab6&b18c5.&c48c1&c13&cc1.&c1&c2&c5&c7.,d2&d7.&d10e3&e16.f14.,l32aa29aaaaaaaa29aa29l27aaa29a;", track1.getOriginalMML());
 	}
 }

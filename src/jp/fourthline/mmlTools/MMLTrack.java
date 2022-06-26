@@ -403,8 +403,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 	 */
 	public double getPlayTime() {
 		int totalTick = (int)getMaxTickLength();
-		long playTime = MMLTempoEvent.getTimeOnTickOffset(globalTempoList, totalTick);
-
+		double playTime = MMLTempoEvent.getTimeOnTickOffset(globalTempoList, totalTick);
 		return playTime/1000.0;
 	}	
 
@@ -414,7 +413,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 	 * @return 時間（秒）
 	 */
 	public double getMabinogiTime() {
-		long[] partTime = new long[mmlParts.size()];
+		double[] partTime = new double[mmlParts.size()];
 
 		int melodyTick = (int)mmlParts.get(0).getTickLength();
 		partTime[0] = MMLTempoEvent.getTimeOnTickOffset(globalTempoList, melodyTick);
@@ -431,8 +430,8 @@ public final class MMLTrack implements Serializable, Cloneable {
 			partTime[i] = MMLTempoEvent.getTimeOnTickOffset(globalTailTempo, tick);
 		}
 
-		long maxTime = 0;
-		for (long time : partTime) {
+		double maxTime = 0;
+		for (double time : partTime) {
 			if (maxTime < time) {
 				maxTime = time;
 			}

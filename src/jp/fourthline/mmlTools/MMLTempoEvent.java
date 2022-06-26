@@ -136,7 +136,7 @@ public final class MMLTempoEvent extends MMLEvent implements Cloneable {
 	 * @param tickOffset
 	 * @return 先頭からの時間（ms）
 	 */
-	public static long getTimeOnTickOffset(List<MMLTempoEvent> tempoList, int tickOffset) {
+	public static double getTimeOnTickOffset(List<MMLTempoEvent> tempoList, int tickOffset) {
 		double totalTime = 0L;
 
 		int tempo = INITIAL_TEMPO;
@@ -157,7 +157,7 @@ public final class MMLTempoEvent extends MMLEvent implements Cloneable {
 		}
 
 		totalTime += (tickOffset - currentTick) * 60000.0 / tempo;
-		return Math.round(totalTime / MMLTickTable.TPQN);
+		return totalTime / MMLTickTable.TPQN;
 	}
 
 	/**
@@ -167,11 +167,15 @@ public final class MMLTempoEvent extends MMLEvent implements Cloneable {
 	 * @return tickオフセット
 	 */
 	public static long getTickOffsetOnTime(List<MMLTempoEvent> tempoList, long time) {
+		return getTickOffsetOnTime(tempoList, (double)time);
+	}
+
+	public static long getTickOffsetOnTime(List<MMLTempoEvent> tempoList, double time) {
 		int tempo = INITIAL_TEMPO;
-		long pointTime = 0;
+		double pointTime = 0;
 		long tick = 0;
 		for (MMLTempoEvent tempoEvent : tempoList) {
-			long tempoTime = getTimeOnTickOffset(tempoList, tempoEvent.getTickOffset());
+			double tempoTime = getTimeOnTickOffset(tempoList, tempoEvent.getTickOffset());
 			if (time <= tempoTime) {
 				break;
 			}
@@ -180,7 +184,7 @@ public final class MMLTempoEvent extends MMLEvent implements Cloneable {
 			tick = tempoEvent.getTickOffset();
 		}
 
-		tick += (time - pointTime + 1) * MMLTickTable.TPQN * tempo / 60 / 1000;
+		tick += Math.round(((double)time - pointTime + 1) * MMLTickTable.TPQN * tempo / 60 / 1000);
 		return tick;
 	}
 

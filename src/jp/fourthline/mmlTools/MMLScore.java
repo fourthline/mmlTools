@@ -265,7 +265,7 @@ public final class MMLScore implements Cloneable {
 	 */
 	public long getTotalTime() {
 		int totalTick = getTotalTickLength();
-		return MMLTempoEvent.getTimeOnTickOffset(globalTempoList, totalTick);
+		return Math.round(MMLTempoEvent.getTimeOnTickOffset(globalTempoList, totalTick));
 	}
 
 	public byte[] getObjectState() {
