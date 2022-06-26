@@ -25,7 +25,7 @@ public final class MMLTempoConverter {
 		List<MMLTempoEvent> tempoList = score.getTempoEventList();
 
 		// 変換する
-		for (var track : score.getTrackList()) {
+		score.getTrackList().parallelStream().forEach(track -> {
 			for (var eventList : track.getMMLEventList()) {
 				for (var noteEvent : eventList.getMMLNoteEventList()) {
 					long endTick = convertEvent(tempoList, newTempoList, noteEvent.getEndTick());
@@ -47,7 +47,7 @@ public final class MMLTempoConverter {
 					noteEvent.setTick((int)(endTick - tickOffset));
 				}
 			}
-		}
+		});
 
 		// マーカーの変換
 		score.getMarkerList().forEach(t -> t.setTickOffset((int)convertEvent(tempoList, newTempoList, t.getTickOffset())));
