@@ -157,14 +157,14 @@ public final class MMLTempoEvent extends MMLEvent implements Cloneable {
 		}
 
 		totalTime += (tickOffset - currentTick) * 60000.0 / tempo;
-		return (long)(totalTime / MMLTickTable.TPQN);
+		return Math.round(totalTime / MMLTickTable.TPQN);
 	}
 
 	/**
 	 * 指定した時間からtickオフセットを返します.
 	 * @param tempoList
 	 * @param time
-	 * @return 先頭からの時間（ms）
+	 * @return tickオフセット
 	 */
 	public static long getTickOffsetOnTime(List<MMLTempoEvent> tempoList, long time) {
 		int tempo = INITIAL_TEMPO;
