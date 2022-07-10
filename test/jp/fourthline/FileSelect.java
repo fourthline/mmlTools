@@ -7,7 +7,7 @@ package jp.fourthline;
 import java.io.IOException;
 import java.io.InputStream;
 
-abstract public class FileSelect {
+public abstract class FileSelect {
 	protected final InputStream fileSelect(String name) throws IOException {
 		return getClass().getResourceAsStream(name);
 	}

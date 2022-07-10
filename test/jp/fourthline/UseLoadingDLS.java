@@ -19,7 +19,7 @@ import jp.fourthline.mabiicco.midi.InstType;
 import jp.fourthline.mabiicco.midi.MabiDLS;
 import jp.fourthline.mmlTools.MMLTrack;
 
-abstract public class UseLoadingDLS extends FileSelect {
+public abstract class UseLoadingDLS extends FileSelect {
 	@BeforeClass
 	public static void initializeDefaultDLS() {
 		InstClass.debug = true;

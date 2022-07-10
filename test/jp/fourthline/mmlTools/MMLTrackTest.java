@@ -528,7 +528,7 @@ public class MMLTrackTest {
 		var track = new MMLTrack(0, 384, 0).setMML("MML@a1,,,b1;");
 		track.getGlobalTempoList().add(new MMLTempoEvent(60, 0));
 		track.getGlobalTempoList().add(new MMLTempoEvent(240, 384));
-		
+
 		track.setAttackDelayCorrect(-6);
 		track.setAttackSongDelayCorrect(-12);
 		track.generate();

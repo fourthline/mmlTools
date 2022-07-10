@@ -6,12 +6,12 @@ package jp.fourthline.mabiicco.ui.editor;
 
 import java.awt.BorderLayout;
 import java.awt.Frame;
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
@@ -20,9 +20,9 @@ import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.ui.IMMLManager;
 import jp.fourthline.mabiicco.ui.IViewTargetMarker;
 import jp.fourthline.mabiicco.ui.UIUtils;
-import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTempoConverter;
 import jp.fourthline.mmlTools.MMLTempoEvent;
+import jp.fourthline.mmlTools.core.UndefinedTickException;
 
 /**
  * MMLTempo Editor
@@ -35,24 +35,31 @@ import jp.fourthline.mmlTools.MMLTempoEvent;
 public final class MMLTempoEditor extends AbstractMarkerEditor<MMLTempoEvent> {
 
 	private final Frame parentFrame;
-	private final JMenuItem tempoConvertMenu;
-	private final String tempoConvertCommand = "tempoConvert";
+
+	private final JCheckBox convertBox = new JCheckBox(AppResource.appText("edit.tempoConvert"));
+	private final JCheckBox deleteSubseqBox = new JCheckBox(AppResource.appText("edit.delete_subseq_tempo"));
 
 	public MMLTempoEditor(Frame parentFrame, IMMLManager mmlManager, IEditAlign editAlign, IViewTargetMarker viewTargetMarker) {
 		super("tempo", mmlManager, editAlign, viewTargetMarker);
 		this.parentFrame = parentFrame;
-		this.tempoConvertMenu = newMenuItem(AppResource.appText("edit."+tempoConvertCommand));
-		this.tempoConvertMenu.setActionCommand(tempoConvertCommand);
+		this.convertBox.setToolTipText(AppResource.appText("edit.tempoConvert.detail"));
 	}
 
-	private int showTempoInputDialog(String title, int tempo) {
+	private int showTempoInputDialog(String title, int tempo, boolean tempoBox) {
 		JPanel panel = new JPanel();
 		panel.add(new JLabel(AppResource.appText("edit.label_"+suffix)));
 		JSpinner spinner = NumberSpinner.createSpinner(tempo, 32, 255, 1);
 		spinner.setFocusable(false);
+		spinner.setEnabled(tempoBox);
 		panel.add(spinner);
+
+		JPanel p1 = new JPanel();
+		p1.setLayout(new BoxLayout(p1, BoxLayout.Y_AXIS));
+		p1.add(convertBox);
+		p1.add(deleteSubseqBox);
 		JPanel cPanel = new JPanel(new BorderLayout());
 		cPanel.add(panel, BorderLayout.CENTER);
+		cPanel.add(p1, BorderLayout.SOUTH);
 
 		UIUtils.setDefaultFocus(spinner);
 		int status = JOptionPane.showConfirmDialog(this.parentFrame, cPanel, title, JOptionPane.OK_CANCEL_OPTION);
@@ -69,83 +76,106 @@ public final class MMLTempoEditor extends AbstractMarkerEditor<MMLTempoEvent> {
 	}
 
 	@Override
-	protected void insertAction() {
+	protected boolean insertAction() {
+		convertBox.setSelected(false);
+		deleteSubseqBox.setSelected(false);
+		boolean ret = true;
 		int tempo = mmlManager.getMMLScore().getTempoOnTick(targetTick);
-		tempo = showTempoInputDialog(AppResource.appText("edit."+insertCommand), tempo);
-		if (tempo < 0) {
-			return;
-		}
+		do {
+			tempo = showTempoInputDialog(AppResource.appText("edit."+insertCommand), tempo, true);
+			if (tempo < 0) {
+				return false;
+			}
 
-		// tempo align
-		MMLTempoEvent insertTempo = new MMLTempoEvent(tempo, targetTick);
-		insertTempo.appendToListElement(getEventList());
-		System.out.println("insert tempo." + tempo);
+			// tempo align
+			List<MMLTempoEvent> newTempoList = new ArrayList<>(getEventList());
+			new MMLTempoEvent(tempo, targetTick).appendToListElement(newTempoList);
+			ret = updateTempoListWithTempoConvertOptions(newTempoList, targetTick);
+		} while (ret == false);
+		return true;
 	}
 
 	@Override
-	protected void editAction() {
-		int tempo = showTempoInputDialog(AppResource.appText("edit."+editCommand), targetEvent.getTempo());
-		if (tempo < 0) {
-			return;
-		}
-		targetEvent.setTempo(tempo);
+	protected boolean editAction() {
+		convertBox.setSelected(false);
+		deleteSubseqBox.setSelected(false);
+		boolean ret = true;
+		int tempo = targetEvent.getTempo();
+		do {
+			tempo = showTempoInputDialog(AppResource.appText("edit."+editCommand), tempo, true);
+			if (tempo < 0) {
+				return false;
+			}
+			List<MMLTempoEvent> newTempoList = new ArrayList<>(getEventList());
+			new MMLTempoEvent(tempo, targetEvent.getTickOffset()).appendToListElement(newTempoList);
+			ret = updateTempoListWithTempoConvertOptions(newTempoList, targetEvent.getTickOffset());
+		} while (ret == false);
+		return true;
 	}
 
 	@Override
-	protected void deleteAction() {
-		getEventList().remove(targetEvent);
-		System.out.println("delete tempo.");
+	protected boolean deleteAction() {
+		convertBox.setSelected(false);
+		deleteSubseqBox.setSelected(false);
+		boolean ret = true;
+		int tempo = targetEvent.getTempo();
+		do {
+			tempo = showTempoInputDialog(AppResource.appText("edit."+deleteCommand), tempo, false);
+			if (tempo < 0) {
+				return false;
+			}
+			List<MMLTempoEvent> newTempoList = new ArrayList<>(getEventList());
+			newTempoList.remove(targetEvent);
+			ret = updateTempoListWithTempoConvertOptions(newTempoList, targetEvent.getTickOffset());
+		} while (ret == false);
+		return true;
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent event) {
-		String actionCommand = event.getActionCommand();
-		if (actionCommand.equals(tempoConvertCommand)) {
-			tempoConvertAction();
-		} else {
-			super.actionPerformed(event);
+	private boolean updateTempoListWithTempoConvertOptions(List<MMLTempoEvent> newTempoList, int targetTick) {
+		return updateTempoList(newTempoList, targetTick, true, convertBox.isSelected(), deleteSubseqBox.isSelected());
+	}
+
+	/**
+	 * テンポリストの更新を行う
+	 * @param newTempoList  新しいテンポリスト
+	 * @param targetTick    ターゲットTick
+	 * @param confirm       確認ダイアログ表示オプション
+	 * @param convertTick   tick変換オプション
+	 * @param deleteSubseq  targetTick以降のテンポを削除するオプション
+	 */
+	boolean updateTempoList(List<MMLTempoEvent> newTempoList, int targetTick, boolean confirm, boolean convertTick, boolean deleteSubseq) {
+		List<MMLTempoEvent> list = new ArrayList<>(newTempoList);
+		if (deleteSubseq) {
+			list.removeIf(t -> t.getTickOffset() > targetTick);
 		}
-	}
-
-	private void tempoConvertAction() {
-		int tempo = (targetEvent != null) ? targetEvent.getTempo() : mmlManager.getMMLScore().getTempoOnTick(targetTick);
-		int targetTick = (targetEvent != null) ? targetEvent.getTickOffset() : this.targetTick;
-		tempo = showTempoInputDialog(AppResource.appText("edit."+tempoConvertCommand), tempo);
-		if (tempo < 0) {
-			return;
+		if (!convertTick) {
+			var t = mmlManager.getMMLScore().getTempoEventList();
+			t.clear();
+			t.addAll(list);
+			return true;
 		}
 
 		// 複製データに対して変換実施.
-		var converter = tempoConvert(tempo, targetTick, mmlManager.getMMLScore().clone());
-		String title = AppResource.appText("edit.tempoConvert.result");
-		String message = AppResource.appText("edit.tempoConvert.result_label") + " = " + converter.getConversionDiff();
-		int ret = JOptionPane.showConfirmDialog(parentFrame, message, title, JOptionPane.OK_CANCEL_OPTION);
+		int ret = JOptionPane.OK_OPTION;
+		if (confirm) {
+			var preScore = mmlManager.getMMLScore().clone();
+			var converter = MMLTempoConverter.convert(preScore, list);
+			try {
+				preScore.generateAll();
+			} catch (UndefinedTickException e) {
+				JOptionPane.showMessageDialog(parentFrame, e.getMessage(), AppResource.getAppTitle(), JOptionPane.WARNING_MESSAGE);
+				return false;
+			}
+
+			String title = AppResource.appText("edit.tempoConvert.result");
+			String message = AppResource.appText("edit.tempoConvert.result_label") + " = " + converter.getConversionDiff();
+			ret = JOptionPane.showConfirmDialog(parentFrame, message, title, JOptionPane.OK_CANCEL_OPTION);
+		}
 		if (ret == JOptionPane.OK_OPTION) {
 			// 実際のデータに対して変換実施.
-			tempoConvert(tempo, targetTick, mmlManager.getMMLScore());
-			mmlManager.updateActivePart(true);
+			MMLTempoConverter.convert(mmlManager.getMMLScore(), list);
+			return true;
 		}
-	}
-
-	MMLTempoConverter tempoConvert(int tempo, int targetTick, MMLScore score) {
-		MMLTempoEvent insertTempo = new MMLTempoEvent(tempo, targetTick);
-
-		// 指定Tickより後ろのテンポを消して、新たなテンポイベントにするリストを作成する
-		var tempoList = score.getTempoEventList();
-		ArrayList<MMLTempoEvent> newTempoList = new ArrayList<>();
-		for (var tempoEvent : tempoList) {
-			if (tempoEvent.getTickOffset() < targetTick) {
-				newTempoList.add(tempoEvent);
-			}
-		}
-		newTempoList.add(insertTempo);
-
-		MMLTempoConverter converter = new MMLTempoConverter(newTempoList);
-		converter.convert(score);
-		return converter;
-	}
-
-	public JMenuItem getTempoConvertMenu() {
-		return tempoConvertMenu;
+		return false;
 	}
 }

@@ -60,28 +60,31 @@ public final class MarkerEditor extends AbstractMarkerEditor<Marker> {
 	}
 
 	@Override
-	protected void insertAction() {
+	protected boolean insertAction() {
 		String text = showTextInputDialog(AppResource.appText("edit."+insertCommand), AppResource.appText("edit.new.marker"));
 		if ((text == null) || (text.length() == 0)) {
-			return;
+			return false;
 		}
 
 		// tempo align
 		Marker marker = new Marker(text, targetTick);
 		getEventList().add(marker);
+		return true;
 	}
 
 	@Override
-	protected void editAction() {
+	protected boolean editAction() {
 		String text = showTextInputDialog(AppResource.appText("edit."+editCommand), targetEvent.getName());
 		if (text == null) {
-			return;
+			return false;
 		}
 		targetEvent.setName(text);
+		return true;
 	}
 
 	@Override
-	protected void deleteAction() {
+	protected boolean deleteAction() {
 		getEventList().remove(targetEvent);
+		return true;
 	}
 }

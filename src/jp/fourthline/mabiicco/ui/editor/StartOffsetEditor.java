@@ -6,9 +6,6 @@ package jp.fourthline.mabiicco.ui.editor;
 
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.List;
 
 import javax.swing.JMenuItem;
@@ -20,15 +17,15 @@ import jp.fourthline.mabiicco.ui.IViewTargetMarker;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTrack;
 
-public final class StartOffsetEditor implements IMarkerEditor, ActionListener {
+public final class StartOffsetEditor extends AbstractColumnEditor {
 
 	private final static String START_OFFSET = "startOffset";
 	private final static String START_DELTA = "startDelta";
 	private final static String START_SONG_DELTA = "startSongDelta";
 
-	private final JMenuItem startOffsetMenu = newMenuItem(START_OFFSET);
-	private final JMenuItem startDeltaMenu = newMenuItem(START_DELTA);
-	private final JMenuItem startSongDeltaMenu = newMenuItem(START_SONG_DELTA);
+	private final JMenuItem startOffsetMenu = newMenuItem(AppResource.appText("edit.label_"+START_OFFSET), START_OFFSET);
+	private final JMenuItem startDeltaMenu = newMenuItem(AppResource.appText("edit.label_"+START_DELTA), START_DELTA);
+	private final JMenuItem startSongDeltaMenu = newMenuItem(AppResource.appText("edit.label_"+START_SONG_DELTA), START_SONG_DELTA);
 
 	private final Frame parentFrame;
 	private final IMMLManager mmlManager;
@@ -44,44 +41,13 @@ public final class StartOffsetEditor implements IMarkerEditor, ActionListener {
 		this.viewTargetMarker = viewTargetMarker;
 	}
 
-
-	private void viewTargetMarker(JMenuItem menu, boolean b) {
+	@Override
+	protected void viewTargetMarker(JMenuItem menu, boolean b) {
 		if (!b || !menu.isEnabled()) {
 			viewTargetMarker.PaintOff();
 		} else {
 			viewTargetMarker.PaintOnTarget(targetTick);
 		}
-	}
-
-	private JMenuItem newMenuItem(String name) {
-		JMenuItem menu = new JMenuItem( AppResource.appText("edit.label_"+name) );
-		menu.setActionCommand(name);
-		menu.addActionListener(this);
-		menu.addMouseListener(new MouseListener() {
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				viewTargetMarker(menu, false);
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e) {
-				viewTargetMarker(menu, false);
-			}
-
-			@Override
-			public void mousePressed(MouseEvent e) {
-				viewTargetMarker(menu, true);
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				viewTargetMarker(menu, true);
-			}
-
-			@Override
-			public void mouseClicked(MouseEvent e) {}
-		});
-		return menu;
 	}
 
 	@Override

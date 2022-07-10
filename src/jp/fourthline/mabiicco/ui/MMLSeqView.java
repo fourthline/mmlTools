@@ -34,6 +34,7 @@ import jp.fourthline.mabiicco.ui.mml.TrackPropertyPanel;
 import jp.fourthline.mmlTools.MMLEventList;
 import jp.fourthline.mmlTools.MMLNoteEvent;
 import jp.fourthline.mmlTools.MMLScore;
+import jp.fourthline.mmlTools.MMLTempoConverter;
 import jp.fourthline.mmlTools.MMLTempoEvent;
 import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.core.MMLTicks;
@@ -759,9 +760,9 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 	private void updateTimeView() {
 		long position = pianoRollView.getSequencePlayPosition();
 		List<MMLTempoEvent> tempoList = mmlScore.getTempoEventList();
-		long time = Math.round(MMLTempoEvent.getTimeOnTickOffset(tempoList, (int)position));
+		long time = Math.round(MMLTempoConverter.getTimeOnTickOffset(tempoList, (int)position));
 		int totalTick = mmlScore.getTotalTickLength();
-		long totalTime = Math.round(MMLTempoEvent.getTimeOnTickOffset(tempoList, totalTick));
+		long totalTime = Math.round(MMLTempoConverter.getTimeOnTickOffset(tempoList, totalTick));
 		int tempo = MMLTempoEvent.searchOnTick(tempoList, (int)position);
 
 		String str = String.format("time %d:%02d.%d/%d:%02d.%d (t%d)", 

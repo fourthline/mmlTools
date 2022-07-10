@@ -16,7 +16,7 @@ import javax.swing.JSpinner;
 import jp.fourthline.mabiicco.ui.UIUtils;
 
 
-abstract public class AbstractNumberDialogAction {
+public abstract class AbstractNumberDialogAction {
 	private final Frame parentFrame;
 	private final String title;
 	private final JPanel cPanel;

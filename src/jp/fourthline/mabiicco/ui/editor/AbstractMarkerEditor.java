@@ -5,9 +5,6 @@
 package jp.fourthline.mabiicco.ui.editor;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,7 +28,7 @@ import jp.fourthline.mmlTools.MMLEvent;
  * @see MMLTempoEditor
  * @see MarkerEditor
  */
-abstract public class AbstractMarkerEditor<T extends MMLEvent> implements IMarkerEditor, ActionListener {
+public abstract class AbstractMarkerEditor<T extends MMLEvent> extends AbstractColumnEditor {
 
 	private final JMenuItem insertMenu;
 	private final JMenuItem editMenu;
@@ -58,12 +55,9 @@ abstract public class AbstractMarkerEditor<T extends MMLEvent> implements IMarke
 		this.editAlign = editAlign;
 		this.viewTargetMarker = viewTargetMarker;
 
-		insertMenu = newMenuItem(AppResource.appText("edit."+insertCommand));
-		insertMenu.setActionCommand(insertCommand);
-		editMenu = newMenuItem(AppResource.appText("edit."+editCommand));
-		editMenu.setActionCommand(editCommand);
-		deleteMenu = newMenuItem(AppResource.appText("edit."+deleteCommand));
-		deleteMenu.setActionCommand(deleteCommand);
+		insertMenu = newMenuItem(AppResource.appText("edit."+insertCommand), insertCommand);
+		editMenu = newMenuItem(AppResource.appText("edit."+editCommand), editCommand);
+		deleteMenu = newMenuItem(AppResource.appText("edit."+deleteCommand), deleteCommand);
 	}
 
 	@Override
@@ -71,7 +65,8 @@ abstract public class AbstractMarkerEditor<T extends MMLEvent> implements IMarke
 		return Arrays.asList(insertMenu, editMenu, deleteMenu);
 	}
 
-	private void viewTargetMarker(JMenuItem menu, boolean b) {
+	@Override
+	protected void viewTargetMarker(JMenuItem menu, boolean b) {
 		if (!b || !menu.isEnabled()) {
 			viewTargetMarker.PaintOff();
 		} else if (targetEvent != null) {
@@ -81,51 +76,16 @@ abstract public class AbstractMarkerEditor<T extends MMLEvent> implements IMarke
 		}
 	}
 
-	protected JMenuItem newMenuItem(String name) {
-		JMenuItem menu = new JMenuItem(name);
-		menu.addActionListener(this);
-		menu.addMouseListener(new MouseListener() {
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				viewTargetMarker(menu, false);
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e) {
-				viewTargetMarker(menu, false);
-			}
-
-			@Override
-			public void mousePressed(MouseEvent e) {
-				viewTargetMarker(menu, true);
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				viewTargetMarker(menu, true);
-			}
-
-			@Override
-			public void mouseClicked(MouseEvent e) {}
-		});
-		return menu;
-	}
-
 	@Override
 	public void activateEditMenuItem(int baseTick, int delta) {
 		this.targetTick = baseTick - (baseTick % this.editAlign.getEditAlign());
 		targetEvent = getTempoEventOnTick(baseTick, delta);
 
 		// 指定範囲内にイベントがなければ、挿入のみを有効にします.
-		if (targetEvent == null) {
-			insertMenu.setEnabled(true);
-			editMenu.setEnabled(false);
-			deleteMenu.setEnabled(false);
-		} else {
-			insertMenu.setEnabled(false);
-			editMenu.setEnabled(true);
-			deleteMenu.setEnabled(true);
-		}
+		boolean existTarget = (targetEvent != null);
+		insertMenu.setEnabled(!existTarget);
+		editMenu.setEnabled(existTarget);
+		deleteMenu.setEnabled(existTarget);
 	}
 
 	private T getTempoEventOnTick(int baseTick, int delta) {
@@ -142,18 +102,21 @@ abstract public class AbstractMarkerEditor<T extends MMLEvent> implements IMarke
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		String actionCommand = event.getActionCommand();
+		boolean b = false;
 		if (actionCommand.equals(insertCommand)) {
-			insertAction();
+			b = insertAction();
 		} else if (actionCommand.equals(editCommand)) {
-			editAction();
+			b = editAction();
 		} else if (actionCommand.equals(deleteCommand)) {
-			deleteAction();
+			b = deleteAction();
 		}
-		mmlManager.updateActivePart(true);
+		if (b) {
+			mmlManager.updateActivePart(true);
+		}
 	}
 
 	protected abstract List<T> getEventList();
-	protected abstract void insertAction();
-	protected abstract void editAction();
-	protected abstract void deleteAction();
+	protected abstract boolean insertAction();
+	protected abstract boolean editAction();
+	protected abstract boolean deleteAction();
 }

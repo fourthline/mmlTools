@@ -8,8 +8,6 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 
-import jp.fourthline.mmlTools.core.MMLTickTable;
-
 
 public final class MMLTempoEvent extends MMLEvent implements Cloneable {
 	private static final long serialVersionUID = 8014294359518840951L;
@@ -128,64 +126,6 @@ public final class MMLTempoEvent extends MMLEvent implements Cloneable {
 			}
 		}
 		return false;
-	}
-
-	/**
-	 * 指定したtickオフセット位置の先頭からの時間を返します.
-	 * @param tempoList
-	 * @param tickOffset
-	 * @return 先頭からの時間（ms）
-	 */
-	public static double getTimeOnTickOffset(List<MMLTempoEvent> tempoList, int tickOffset) {
-		double totalTime = 0L;
-
-		int tempo = INITIAL_TEMPO;
-		int currentTick = 0;
-		for (MMLTempoEvent tempoEvent : tempoList) {
-			int currentTempoTick = tempoEvent.getTickOffset();
-			if (tickOffset < currentTempoTick) {
-				break;
-			}
-
-			int currentTempo = tempoEvent.getTempo();
-			if (tempo != currentTempo) {
-				totalTime += (currentTempoTick - currentTick) * 60000.0 / tempo;
-				currentTick = currentTempoTick;
-			}
-
-			tempo = currentTempo;
-		}
-
-		totalTime += (tickOffset - currentTick) * 60000.0 / tempo;
-		return totalTime / MMLTickTable.TPQN;
-	}
-
-	/**
-	 * 指定した時間からtickオフセットを返します.
-	 * @param tempoList
-	 * @param time
-	 * @return tickオフセット
-	 */
-	public static long getTickOffsetOnTime(List<MMLTempoEvent> tempoList, long time) {
-		return getTickOffsetOnTime(tempoList, (double)time);
-	}
-
-	public static long getTickOffsetOnTime(List<MMLTempoEvent> tempoList, double time) {
-		int tempo = INITIAL_TEMPO;
-		double pointTime = 0;
-		long tick = 0;
-		for (MMLTempoEvent tempoEvent : tempoList) {
-			double tempoTime = getTimeOnTickOffset(tempoList, tempoEvent.getTickOffset());
-			if (time <= tempoTime) {
-				break;
-			}
-			pointTime = tempoTime;
-			tempo = tempoEvent.getTempo();
-			tick = tempoEvent.getTickOffset();
-		}
-
-		tick += Math.round(((double)time - pointTime + 1) * MMLTickTable.TPQN * tempo / 60 / 1000);
-		return tick;
 	}
 
 	/**

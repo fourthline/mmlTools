@@ -4,60 +4,121 @@
 
 package jp.fourthline.mmlTools;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import jp.fourthline.mmlTools.core.IllegalTickOffsetException;
+import jp.fourthline.mmlTools.core.MMLTickTable;
 
 public final class MMLTempoConverter {
 
+	private final List<MMLTempoEvent> oldTempoList;
 	private final List<MMLTempoEvent> newTempoList;
-	private long conversionDiff = 0;
-	private int conversionDiffCount = 0;
+	private double convertD = 0.0;
+	private int convertDCount = 0;
 
-	public MMLTempoConverter(List<MMLTempoEvent> newTempoList) {
-		this.newTempoList = newTempoList;
+	MMLTempoConverter(List<MMLTempoEvent> oldTempoList, List<MMLTempoEvent> newTempoList) {
+		this.oldTempoList = oldTempoList;
+		this.newTempoList =  new ArrayList<>();
+		newTempoList.forEach(t -> this.newTempoList.add(new MMLTempoEvent(t.getTempo(), convertEvent(t.getTickOffset(), false))));
 	}
 
-	private long convertEvent(List<MMLTempoEvent> t1, List<MMLTempoEvent> t2, int value) {
-		return MMLTempoEvent.getTickOffsetOnTime(t2,
-				MMLTempoEvent.getTimeOnTickOffset(t1, value));
+	int convertEvent(int value, boolean diff) {
+		double newTick = getTickOffsetOnTime(newTempoList,
+				getTimeOnTickOffset(oldTempoList, value));
+		long r = (long) Math.round(newTick);
+		if (Math.abs(r) > MMLEvent.MAX_TICK) {
+			throw new IllegalTickOffsetException((int)r);
+		}
+		int tick = (int)r;
+		if (diff) {
+			convertD += Math.abs(newTick - tick);
+			convertDCount++;
+		}
+		return tick;
 	}
 
-	public void convert(MMLScore score) {
+	public static MMLTempoConverter convert(MMLScore score, List<MMLTempoEvent> newTempoList) {
 		List<MMLTempoEvent> tempoList = score.getTempoEventList();
+		var converter = new MMLTempoConverter(tempoList, newTempoList);
 
 		// 変換する
 		score.getTrackList().parallelStream().forEach(track -> {
 			for (var eventList : track.getMMLEventList()) {
 				for (var noteEvent : eventList.getMMLNoteEventList()) {
-					long endTick = convertEvent(tempoList, newTempoList, noteEvent.getEndTick());
-					long tickOffset = convertEvent(tempoList, newTempoList, noteEvent.getTickOffset());
-
-					// 逆変換
-					long reTick = convertEvent(newTempoList, tempoList, (int) endTick);
-					long reTickOffset = convertEvent(newTempoList, tempoList, (int) tickOffset);
-
-					// 誤差算出
-					long diff =  Math.abs(reTick - noteEvent.getEndTick())
-							+ Math.abs(reTickOffset - noteEvent.getTickOffset());
-					if (diff != 0) {
-						conversionDiff += diff;
-						conversionDiffCount++;
-					}
-
-					noteEvent.setTickOffset((int)tickOffset);
-					noteEvent.setTick((int)(endTick - tickOffset));
+					int endTick = converter.convertEvent(noteEvent.getEndTick(), true);
+					int tickOffset = converter.convertEvent(noteEvent.getTickOffset(), true);
+					noteEvent.setTickOffset(tickOffset);
+					noteEvent.setTick(endTick - tickOffset);
 				}
 			}
 		});
 
 		// マーカーの変換
-		score.getMarkerList().forEach(t -> t.setTickOffset((int)convertEvent(tempoList, newTempoList, t.getTickOffset())));
+		score.getMarkerList().forEach(t -> t.setTickOffset(converter.convertEvent(t.getTickOffset(), true)));
 
 		// テンポリスト更新
 		tempoList.clear();
-		tempoList.addAll(newTempoList);
+		tempoList.addAll(converter.newTempoList);
+
+		return converter;
 	}
 
 	public String getConversionDiff() {
-		return conversionDiff + "/" + conversionDiffCount;
+		return String.format("%.3f/%d", convertD, convertDCount);
+	}
+
+	/**
+	 * 指定したtickオフセット位置の先頭からの時間を返します.
+	 * @param tempoList
+	 * @param tickOffset
+	 * @return 先頭からの時間（ms）
+	 */
+	public static double getTimeOnTickOffset(List<MMLTempoEvent> tempoList, int tickOffset) {
+		double totalTime = 0L;
+
+		int tempo = MMLTempoEvent.INITIAL_TEMPO;
+		int currentTick = 0;
+		for (MMLTempoEvent tempoEvent : tempoList) {
+			int currentTempoTick = tempoEvent.getTickOffset();
+			if (tickOffset < currentTempoTick) {
+				break;
+			}
+
+			int currentTempo = tempoEvent.getTempo();
+			if (tempo != currentTempo) {
+				totalTime += (currentTempoTick - currentTick) * 60000.0 / tempo;
+				currentTick = currentTempoTick;
+			}
+
+			tempo = currentTempo;
+		}
+
+		totalTime += (tickOffset - currentTick) * 60000.0 / tempo;
+		return totalTime / MMLTickTable.TPQN;
+	}
+
+	/**
+	 * 指定した時間からtickオフセットを返します.
+	 * @param tempoList
+	 * @param time
+	 * @return tickオフセット
+	 */
+	public static double getTickOffsetOnTime(List<MMLTempoEvent> tempoList, double time) {
+		int tempo = MMLTempoEvent.INITIAL_TEMPO;
+		double pointTime = 0;
+		double tick = 0;
+		for (MMLTempoEvent tempoEvent : tempoList) {
+			double tempoTime = getTimeOnTickOffset(tempoList, tempoEvent.getTickOffset());
+			if (time <= tempoTime) {
+				break;
+			}
+			pointTime = tempoTime;
+			tempo = tempoEvent.getTempo();
+			tick = tempoEvent.getTickOffset();
+		}
+
+		tick += (time - pointTime) * MMLTickTable.TPQN * tempo / 60 / 1000;
+		return tick;
 	}
 }

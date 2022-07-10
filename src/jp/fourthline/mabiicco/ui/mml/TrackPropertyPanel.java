@@ -23,7 +23,7 @@ import javax.swing.JSpinner;
 import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.ui.IMMLManager;
 import jp.fourthline.mabiicco.ui.editor.NumberSpinner;
-import jp.fourthline.mmlTools.MMLTempoEvent;
+import jp.fourthline.mmlTools.MMLTempoConverter;
 import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.core.MMLTicks;
 import jp.fourthline.mmlTools.core.UndefinedTickException;
@@ -263,8 +263,8 @@ public final class TrackPropertyPanel extends JPanel {
 		private void updateLabelTickToMML(JLabel o, int tick, int partIndex) {
 			int startOffset = track.getStartOffset(partIndex);
 			var tempoList = track.getGlobalTempoList();
-			double d1 = MMLTempoEvent.getTimeOnTickOffset(tempoList, startOffset);
-			double d2 = MMLTempoEvent.getTimeOnTickOffset(tempoList, startOffset-tick);
+			double d1 = MMLTempoConverter.getTimeOnTickOffset(tempoList, startOffset);
+			double d2 = MMLTempoConverter.getTimeOnTickOffset(tempoList, startOffset-tick);
 			long deltaTime = Math.round(d1 - d2);
 			String s = "";
 			if (tick != 0) {
