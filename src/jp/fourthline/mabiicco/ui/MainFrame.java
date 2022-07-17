@@ -357,6 +357,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createCheckMenu(settingMenu, "edit.enable", properties.enableEdit);
 		createCheckMenu(settingMenu, "edit.active_part_switch", properties.activePartSwitch);
 		createCheckMenu(settingMenu, "clickPlayMenu", properties.enableClickPlay);
+		createCheckMenu(settingMenu, "edit.tempoDeleteWithConvert", properties.enableTempoDeleteWithConvert);
 		settingMenu.add(new JSeparator());
 		// MML生成に関わる設定
 		createCheckMenu(settingMenu, "mml.precise_optimize", properties.enableMMLPreciseOptimize);

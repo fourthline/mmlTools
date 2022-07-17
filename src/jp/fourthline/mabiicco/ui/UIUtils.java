@@ -25,7 +25,7 @@ public final class UIUtils {
 	 * @param textField
 	 */
 	public static void setDefaultFocus(JTextField textField) {
-			textField.addAncestorListener(new AncestorListener() {
+		textField.addAncestorListener(new AncestorListener() {
 			@Override
 			public void ancestorRemoved(AncestorEvent event) {}
 

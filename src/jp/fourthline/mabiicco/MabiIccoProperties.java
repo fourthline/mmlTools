@@ -112,6 +112,9 @@ public final class MabiIccoProperties {
 	/** 内蔵音源を使用する */
 	public final Property<Boolean> useDefaultSoundBank = new BooleanProperty("function.use_default_soundbank", false);
 
+	/** テンポ削除時にもTick変換のダイアログ表示をする */
+	public final Property<Boolean> enableTempoDeleteWithConvert = new BooleanProperty("function.tempoDeleteWithConvert", false);
+
 	public static MabiIccoProperties getInstance() {
 		return instance;
 	}

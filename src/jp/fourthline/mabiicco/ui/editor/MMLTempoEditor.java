@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 
 import jp.fourthline.mabiicco.AppResource;
+import jp.fourthline.mabiicco.MabiIccoProperties;
 import jp.fourthline.mabiicco.ui.IMMLManager;
 import jp.fourthline.mabiicco.ui.IViewTargetMarker;
 import jp.fourthline.mabiicco.ui.UIUtils;
@@ -36,39 +37,11 @@ public final class MMLTempoEditor extends AbstractMarkerEditor<MMLTempoEvent> {
 
 	private final Frame parentFrame;
 
-	private final JCheckBox convertBox = new JCheckBox(AppResource.appText("edit.tempoConvert"));
-	private final JCheckBox deleteSubseqBox = new JCheckBox(AppResource.appText("edit.delete_subseq_tempo"));
-
 	public MMLTempoEditor(Frame parentFrame, IMMLManager mmlManager, IEditAlign editAlign, IViewTargetMarker viewTargetMarker) {
 		super("tempo", mmlManager, editAlign, viewTargetMarker);
 		this.parentFrame = parentFrame;
-		this.convertBox.setToolTipText(AppResource.appText("edit.tempoConvert.detail"));
 	}
 
-	private int showTempoInputDialog(String title, int tempo, boolean tempoBox) {
-		JPanel panel = new JPanel();
-		panel.add(new JLabel(AppResource.appText("edit.label_"+suffix)));
-		JSpinner spinner = NumberSpinner.createSpinner(tempo, 32, 255, 1);
-		spinner.setFocusable(false);
-		spinner.setEnabled(tempoBox);
-		panel.add(spinner);
-
-		JPanel p1 = new JPanel();
-		p1.setLayout(new BoxLayout(p1, BoxLayout.Y_AXIS));
-		p1.add(convertBox);
-		p1.add(deleteSubseqBox);
-		JPanel cPanel = new JPanel(new BorderLayout());
-		cPanel.add(panel, BorderLayout.CENTER);
-		cPanel.add(p1, BorderLayout.SOUTH);
-
-		UIUtils.setDefaultFocus(spinner);
-		int status = JOptionPane.showConfirmDialog(this.parentFrame, cPanel, title, JOptionPane.OK_CANCEL_OPTION);
-		if (status == JOptionPane.OK_OPTION) {
-			return ((Integer) spinner.getValue()).intValue();
-		}
-
-		return -1;
-	}
 
 	@Override
 	protected List<MMLTempoEvent> getEventList() {
@@ -77,12 +50,11 @@ public final class MMLTempoEditor extends AbstractMarkerEditor<MMLTempoEvent> {
 
 	@Override
 	protected boolean insertAction() {
-		convertBox.setSelected(false);
-		deleteSubseqBox.setSelected(false);
 		boolean ret = true;
 		int tempo = mmlManager.getMMLScore().getTempoOnTick(targetTick);
+		var dialog = new TempoInputDialog(parentFrame, tempo, true);
 		do {
-			tempo = showTempoInputDialog(AppResource.appText("edit."+insertCommand), tempo, true);
+			tempo = dialog.showTempoInputDialog(AppResource.appText("edit."+insertCommand), AppResource.appText("edit.label_"+suffix));
 			if (tempo < 0) {
 				return false;
 			}
@@ -90,49 +62,48 @@ public final class MMLTempoEditor extends AbstractMarkerEditor<MMLTempoEvent> {
 			// tempo align
 			List<MMLTempoEvent> newTempoList = new ArrayList<>(getEventList());
 			new MMLTempoEvent(tempo, targetTick).appendToListElement(newTempoList);
-			ret = updateTempoListWithTempoConvertOptions(newTempoList, targetTick);
+			ret = updateTempoList(newTempoList, targetTick, true, dialog.isConvert(), dialog.isDeleteSubseq());
 		} while (ret == false);
 		return true;
 	}
 
 	@Override
 	protected boolean editAction() {
-		convertBox.setSelected(false);
-		deleteSubseqBox.setSelected(false);
 		boolean ret = true;
 		int tempo = targetEvent.getTempo();
+		var dialog = new TempoInputDialog(parentFrame, tempo, true);
 		do {
-			tempo = showTempoInputDialog(AppResource.appText("edit."+editCommand), tempo, true);
+			tempo = dialog.showTempoInputDialog(AppResource.appText("edit."+editCommand), AppResource.appText("edit.label_"+suffix));
 			if (tempo < 0) {
 				return false;
 			}
 			List<MMLTempoEvent> newTempoList = new ArrayList<>(getEventList());
 			new MMLTempoEvent(tempo, targetEvent.getTickOffset()).appendToListElement(newTempoList);
-			ret = updateTempoListWithTempoConvertOptions(newTempoList, targetEvent.getTickOffset());
+			ret = updateTempoList(newTempoList, targetEvent.getTickOffset(), true, dialog.isConvert(), dialog.isDeleteSubseq());
 		} while (ret == false);
 		return true;
 	}
 
 	@Override
 	protected boolean deleteAction() {
-		convertBox.setSelected(false);
-		deleteSubseqBox.setSelected(false);
-		boolean ret = true;
-		int tempo = targetEvent.getTempo();
-		do {
-			tempo = showTempoInputDialog(AppResource.appText("edit."+deleteCommand), tempo, false);
-			if (tempo < 0) {
-				return false;
-			}
-			List<MMLTempoEvent> newTempoList = new ArrayList<>(getEventList());
-			newTempoList.remove(targetEvent);
-			ret = updateTempoListWithTempoConvertOptions(newTempoList, targetEvent.getTickOffset());
-		} while (ret == false);
+		if (!MabiIccoProperties.getInstance().enableTempoDeleteWithConvert.get()) {
+			getEventList().remove(targetEvent);
+		} else {
+			// テンポ削除時にもTick変換のダイアログ表示をする
+			boolean ret = true;
+			int tempo = targetEvent.getTempo();
+			var dialog = new TempoInputDialog(parentFrame, tempo, false);
+			do {
+				tempo = dialog.showTempoInputDialog(AppResource.appText("edit."+deleteCommand), AppResource.appText("edit.label_"+suffix));
+				if (tempo < 0) {
+					return false;
+				}
+				List<MMLTempoEvent> newTempoList = new ArrayList<>(getEventList());
+				newTempoList.remove(targetEvent);
+				ret = updateTempoList(newTempoList, targetEvent.getTickOffset(), true, dialog.isConvert(), dialog.isDeleteSubseq());
+			} while (ret == false);
+		}
 		return true;
-	}
-
-	private boolean updateTempoListWithTempoConvertOptions(List<MMLTempoEvent> newTempoList, int targetTick) {
-		return updateTempoList(newTempoList, targetTick, true, convertBox.isSelected(), deleteSubseqBox.isSelected());
 	}
 
 	/**
@@ -177,5 +148,54 @@ public final class MMLTempoEditor extends AbstractMarkerEditor<MMLTempoEvent> {
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * テンポ入力用ダイアログ
+	 */
+	private static class TempoInputDialog {
+		private final Frame parentFrame;
+		private final JCheckBox convertBox = new JCheckBox(AppResource.appText("edit.tempoConvert"));
+		private final JCheckBox deleteSubseqBox = new JCheckBox(AppResource.appText("edit.delete_subseq_tempo"));
+		private final JSpinner spinner;
+
+		private TempoInputDialog(Frame parentFrame, int tempo, boolean tempoBox) {
+			this.parentFrame = parentFrame;
+			this.spinner = NumberSpinner.createSpinner(tempo, 32, 255, 1);
+			spinner.setFocusable(false);
+			spinner.setEnabled(tempoBox);
+			UIUtils.setDefaultFocus(spinner);
+			convertBox.setSelected(false);
+			deleteSubseqBox.setSelected(false);
+		}
+
+		private int showTempoInputDialog(String title, String message) {
+			JPanel panel = new JPanel();
+			panel.add(new JLabel(message));
+			panel.add(spinner);
+
+			JPanel p1 = new JPanel();
+			p1.setLayout(new BoxLayout(p1, BoxLayout.Y_AXIS));
+			p1.add(convertBox);
+			p1.add(deleteSubseqBox);
+			JPanel cPanel = new JPanel(new BorderLayout());
+			cPanel.add(panel, BorderLayout.CENTER);
+			cPanel.add(p1, BorderLayout.SOUTH);
+
+			int status = JOptionPane.showConfirmDialog(this.parentFrame, cPanel, title, JOptionPane.OK_CANCEL_OPTION);
+			if (status == JOptionPane.OK_OPTION) {
+				return ((Integer) spinner.getValue()).intValue();
+			}
+
+			return -1;
+		}
+
+		private boolean isConvert() {
+			return convertBox.isSelected();
+		}
+
+		private boolean isDeleteSubseq() {
+			return deleteSubseqBox.isSelected();
+		}
 	}
 }
