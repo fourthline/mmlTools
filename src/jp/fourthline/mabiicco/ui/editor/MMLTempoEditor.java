@@ -166,6 +166,7 @@ public final class MMLTempoEditor extends AbstractMarkerEditor<MMLTempoEvent> {
 			spinner.setEnabled(tempoBox);
 			UIUtils.setDefaultFocus(spinner);
 			convertBox.setSelected(false);
+			convertBox.setToolTipText(AppResource.appText("edit.tempoConvert.detail"));
 			deleteSubseqBox.setSelected(false);
 		}
 

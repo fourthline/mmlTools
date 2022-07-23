@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2021 たんらる
+ * Copyright (C) 2014-2022 たんらる
  */
 
 package jp.fourthline.mabiicco.midi;
@@ -38,7 +38,7 @@ public interface InstType {
 	InstType NONE = new NoneType();
 
 	/** 通常の楽器 [ melody, chord1, chord2 ]. */
-	InstType NORMAL = new NormalType(true);
+	InstType NORMAL = new NormalType();
 
 	/** 打楽器楽器 [ melody ], 移調できない. */
 	InstType DRUMS = new PercussionType(false);
@@ -47,10 +47,10 @@ public interface InstType {
 	InstType KPUR = new PercussionType(true);
 
 	/** 歌 [ song ]. */
-	InstType VOICE = new NormalType(false);
+	InstType VOICE = new SongType();
 
 	/** コーラス [ song ]. */
-	InstType CHORUS = new NormalType(false);
+	InstType CHORUS = new SongType();
 
 	/**
 	 * 単独で使用可能なメインの楽器のリスト.
@@ -103,8 +103,12 @@ public interface InstType {
 	/**
 	 * 移調可能な通常音量の音源. [ melody, chord1, chord2 ] or [ song ]
 	 */
-	class NormalType implements InstType {
+	public class NormalType implements InstType {
 		private final boolean[] enablePart;
+
+		private NormalType() {
+			this(true);
+		}
 
 		private NormalType(boolean isNormal) {
 			if (isNormal) {
@@ -141,10 +145,16 @@ public interface InstType {
 		}
 	}
 
+	public class SongType extends NormalType {
+		private SongType() {
+			super(false);
+		}
+	}
+
 	/**
 	 * 打楽器楽器 [ melody ], 移調可否を指定する.
 	 */
-	class PercussionType implements InstType {
+	public class PercussionType implements InstType {
 		private final boolean[] enablePart = new boolean[] { true, false, false, false };
 		private final boolean allowTranspose;
 

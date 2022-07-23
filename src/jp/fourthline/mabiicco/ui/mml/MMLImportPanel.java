@@ -87,7 +87,7 @@ public final class MMLImportPanel extends JPanel {
 		});
 
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(12, 10, 422, 169);
+		scrollPane.setBounds(12, 10, 422, 229);
 		p.add(scrollPane);
 
 		table = new TrackListTable(trackList, true);
@@ -98,7 +98,7 @@ public final class MMLImportPanel extends JPanel {
 		scrollPane.setViewportView(table);
 
 		JLabel lblNewLabel = new JLabel(AppResource.appText("mml.input.import.possibleImport")+": "+possibleImportTrackCount);
-		lblNewLabel.setBounds(22, 182, 300, 14);
+		lblNewLabel.setBounds(22, 242, 300, 14);
 		p.add(lblNewLabel);
 
 		table.setDefaultEditor(Object.class, null);

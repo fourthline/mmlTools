@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.sound.midi.*;
 import javax.sound.sampled.LineUnavailableException;
@@ -44,6 +46,7 @@ public final class MabiDLS {
 	private static final int MIDI_CHORUS_OFFSET = MMLScore.MAX_TRACK;
 	public static final int KEYBOARD_PLAY_CHANNEL = MAX_MIDI_PART;
 	private final ArrayList<InstClass> insts = new ArrayList<>();
+	private final Map<File, List<InstClass>> instsMap = new TreeMap<>();
 	private static final int DLS_BANK = (0x79 << 7);
 
 	public static final String[] DEFALUT_DLS_PATH = {
@@ -212,13 +215,22 @@ public final class MabiDLS {
 			}
 		}
 		if (file.exists()) {
-			List<InstClass> loadList = InstClass.loadDLS(file);
-			for (InstClass inst : loadList) {
-				if (!insts.contains(inst)) {
-					insts.add(inst);
+			ArrayList<InstClass> addList = new ArrayList<>();
+			if (!instsMap.containsKey(file)) {
+				List<InstClass> loadList = InstClass.loadDLS(file);
+				for (InstClass inst : loadList) {
+					if (!insts.contains(inst)) {
+						insts.add(inst);
+						addList.add(inst);
+					}
 				}
+				instsMap.put(file, addList);
 			}
 		}
+	}
+
+	public Map<File, List<InstClass>> getInstsMap() {
+		return this.instsMap;
 	}
 
 	public synchronized void loadRequiredInstruments(MMLScore score) {
