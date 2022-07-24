@@ -32,8 +32,10 @@ public final class MMLTempoConverter {
 		}
 		int tick = (int)r;
 		if (diff) {
-			convertD += Math.abs(newTick - tick);
-			convertDCount++;
+			synchronized(this) {
+				convertD += Math.abs(newTick - tick);
+				convertDCount++;
+			}
 		}
 		return tick;
 	}
