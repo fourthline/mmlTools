@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
@@ -31,8 +32,9 @@ import jp.fourthline.mmlTools.core.UndefinedTickException;
 
 public final class TrackPropertyPanel extends JPanel {
 	private static final long serialVersionUID = 7599129671956571455L;
-	private JTextField trackNameField;
-	private JSlider panpotSlider;
+	private final JTextField trackNameField = new JTextField();
+	private final JSlider panpotSlider = new JSlider();
+	private final JSpinner volumnSpinner = NumberSpinner.createSpinner(0, 0, 127, 1);
 
 	// 楽器部のオプション
 	private final MMLOutputOptions instOption;
@@ -65,35 +67,41 @@ public final class TrackPropertyPanel extends JPanel {
 		setLayout(null);
 
 		// トラック名
-		add(newJLabel(AppResource.appText("track_property.trackname"), 20, 23, 100, 14));
-
-		trackNameField = new JTextField();
-		trackNameField.setBounds(120, 20, 200, 19);
+		add(newJLabel(AppResource.appText("track_property.trackname"), 20, 3, 100, 14));
+		trackNameField.setBounds(120, 0, 200, 19);
 		trackNameField.setEditable(true);
 		add(trackNameField);
 		trackNameField.setColumns(10);
 
 		// パンポット
-		panpotSlider = new JSlider();
 		panpotSlider.setSnapToTicks(true);
 		panpotSlider.setPaintTicks(true);
-		panpotSlider.setValue(64);
 		panpotSlider.setMinorTickSpacing(16);
 		panpotSlider.setMajorTickSpacing(16);
 		panpotSlider.setMaximum(128);
-		panpotSlider.setBounds(120, 60, 200, 23);
+		panpotSlider.setBounds(120, 30, 200, 23);
 		add(panpotSlider);
 
 		JLabel panpotL = new JLabel("L64");
-		panpotL.setBounds(120, 80, 30, 23);
+		panpotL.setBounds(120, 50, 30, 23);
 		add(panpotL);
 		JLabel panpotC = new JLabel("0");
-		panpotC.setBounds(217, 80, 30, 23);
+		panpotC.setBounds(217, 50, 30, 23);
 		add(panpotC);
 		JLabel panpotR = new JLabel("R64");
-		panpotR.setBounds(302, 80, 30, 23);
+		panpotR.setBounds(302, 50, 30, 23);
 		add(panpotR);
-		add(newJLabel(AppResource.appText("track_property.panpot"), 20, 60, 100, 14));
+		add(newJLabel(AppResource.appText("track_property.panpot"), 20, 40, 100, 14));
+
+		// Volumn
+		volumnSpinner.setBounds(180, 80, 60, 23);
+		add(volumnSpinner);
+		JButton volumnResetButton = new JButton("reset");
+		volumnResetButton.addActionListener(t -> volumnSpinner.setValue(MMLTrack.INITIAL_VOLUMN));
+		volumnResetButton.setBounds(260, 82, 60, 18);
+		volumnResetButton.putClientProperty("JButton.buttonType", "roundRect");
+		add(volumnResetButton);
+		add(newJLabel(AppResource.appText("track_property.volumn"), 20, 83, 100, 14));
 
 		// MML出力オプション（楽器部）
 		add(instOption.createMMLOptionPanel(AppResource.appText("track_propert.mmlOptions1"), 5, 120));
@@ -104,6 +112,7 @@ public final class TrackPropertyPanel extends JPanel {
 		int commonStartOffset = track.getCommonStartOffset();
 		trackNameField.setText(track.getTrackName());
 		panpotSlider.setValue(track.getPanpot());
+		volumnSpinner.setValue(track.getVolumn());
 		instOption.setValue(track.getStartDelta() + commonStartOffset, track.getAttackDelayCorrect());
 		songOption.setValue(track.getStartSongDelta() + commonStartOffset, track.getAttackSongDelayCorrect());
 	}
@@ -123,6 +132,7 @@ public final class TrackPropertyPanel extends JPanel {
 		int commonStartOffset = track.getCommonStartOffset();
 		track.setTrackName( trackNameField.getText() );
 		track.setPanpot( panpotSlider.getValue() );
+		track.setVolumn( (Integer) volumnSpinner.getValue() );
 		try {
 			track.setStartDelta( instOption.getStartOffset() - commonStartOffset);
 			track.setStartSongDelta( songOption.getStartOffset() - commonStartOffset);

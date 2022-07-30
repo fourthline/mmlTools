@@ -326,6 +326,7 @@ public final class MabiDLS {
 		changeProgram(program, channel);
 		this.channel[channel].setMute(false); // TODO: ミュート & エレキギター/チェロ/ヴァイオリンなどのチャネルだと、残音が残ってしまう.
 		setChannelPanpot(channel, 64);
+		setChannelVolumn(channel, MMLTrack.INITIAL_VOLUMN);
 		MidiChannel midiChannel = this.channel[channel];
 		MMLNoteEvent[] playNoteEvents = this.playNoteList.get(channel);
 
@@ -379,6 +380,20 @@ public final class MabiDLS {
 		}
 	}
 
+	/**
+	 * 指定したチャンネルのメイン・ボリュームを設定します.
+	 * @param ch
+	 * @param panpot
+	 */
+	public void setChannelVolumn(int ch, int volumn) {
+		if (ch < channel.length) {
+			channel[ch].controlChange(7, volumn);
+		}
+		if (ch < MIDI_CHORUS_OFFSET) {
+			channel[ch+MIDI_CHORUS_OFFSET].controlChange(7, volumn);
+		}
+	}
+
 	public void toggleMute(int ch) {
 		muteState[ch] = !muteState[ch];
 		if (ch < MIDI_CHORUS_OFFSET) {
@@ -426,8 +441,8 @@ public final class MabiDLS {
 	public void updateMidiControl(MMLScore score) {
 		int trackCount = 0;
 		for (MMLTrack mmlTrack : score.getTrackList()) {
-			int panpot = mmlTrack.getPanpot();
-			this.setChannelPanpot(trackCount, panpot);
+			this.setChannelPanpot(trackCount, mmlTrack.getPanpot());
+			this.setChannelVolumn(trackCount, mmlTrack.getVolumn());
 			this.changeProgram(mmlTrack.getProgram(), trackCount);
 			this.changeProgram(mmlTrack.getSongProgram(), trackCount+MIDI_CHORUS_OFFSET);
 			trackCount++;

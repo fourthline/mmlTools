@@ -35,6 +35,7 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 	private static final String PROGRAM = "program=";
 	private static final String SONG_PROGRAM = "songProgram=";
 	private static final String PANPOT = "panpot=";
+	private static final String VOLUMN = "volumn=";
 	private static final String VISIBLE = "visible=";
 	private static final String START_OFFSET = "startOffset=";
 	private static final String START_DELTA = "startDelta=";
@@ -65,6 +66,7 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 				.pattern(PROGRAM,       t -> getLastTrack().setProgram(Integer.parseInt(t)) )
 				.pattern(SONG_PROGRAM,  t -> getLastTrack().setSongProgram(Integer.parseInt(t)) )
 				.pattern(PANPOT,        t -> getLastTrack().setPanpot(Integer.parseInt(t)) )
+				.pattern(VOLUMN,        t -> getLastTrack().setVolumn(Integer.parseInt(t)) )
 				.pattern(VISIBLE,       t -> getLastTrack().setVisible(Boolean.parseBoolean(t)) )
 				.pattern(DELAY,         t -> getLastTrack().setAttackDelayCorrect(Integer.parseInt(t)))
 				.pattern(SONG_DELAY,    t -> getLastTrack().setAttackSongDelayCorrect(Integer.parseInt(t)))
@@ -219,6 +221,9 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 			stream.println(PROGRAM + track.getProgram());
 			stream.println(SONG_PROGRAM + track.getSongProgram());
 			stream.println(PANPOT + track.getPanpot());
+			if (track.getVolumn() != MMLTrack.INITIAL_VOLUMN) {
+				stream.println(VOLUMN + track.getVolumn());
+			}
 			stream.println(VISIBLE+track.isVisible());
 			if (track.getAttackDelayCorrect() != 0) {
 				stream.println(DELAY + track.getAttackDelayCorrect());
