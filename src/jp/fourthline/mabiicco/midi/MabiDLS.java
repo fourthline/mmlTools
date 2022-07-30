@@ -5,8 +5,6 @@
 package jp.fourthline.mabiicco.midi;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.FileSystems;
@@ -149,14 +147,9 @@ public final class MabiDLS {
 		return wavout;
 	}
 
-	public void startWavout(MMLScore mmlScore, File outFile, Runnable endNotify) {
+	public void startWavout(MMLScore mmlScore, File outFile, Runnable endNotify) throws IOException {
+		wavout.startRec(outFile, endNotify);
 		createSequenceAndStart(mmlScore, 0);
-		try {
-			wavout.startRec(new FileOutputStream(outFile), endNotify);
-		} catch (FileNotFoundException e) {
-			wavout.stopRec();
-			e.printStackTrace();
-		}
 	}
 
 	public void stopWavout() {

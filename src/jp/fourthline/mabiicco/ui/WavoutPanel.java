@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 たんらる
+ * Copyright (C) 2017-2022 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
@@ -8,10 +8,12 @@ import static jp.fourthline.mabiicco.AppResource.appText;
 
 import java.awt.BorderLayout;
 import java.io.File;
+import java.io.IOException;
 import java.text.DecimalFormat;
 
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
@@ -52,6 +54,7 @@ public final class WavoutPanel extends JPanel {
 		long totalBytes = (long)(totalTime * 44.1 * 4);
 		progress.setMaximum((int)totalBytes);
 		progress.setValue(0);
+		progress.setStringPainted(true);
 
 		p1.add(new JLabel("File: "+file.getName()));
 		p1.add(new JLabel("Size: "+df.format((double)totalBytes/1024.0/1024.0)+"MB"));
@@ -71,15 +74,22 @@ public final class WavoutPanel extends JPanel {
 		run = true;
 		startButton.setEnabled(false);
 		parentFrame.disableNoplayItems();
-		MabiDLS.getInstance().startWavout(mmlManager.getMMLScore(), file, this::stopWavout);
+		var dls = MabiDLS.getInstance();
+		try {
+			dls.startWavout(mmlManager.getMMLScore(), file, this::stopWavout);
+		} catch (IOException e) {
+			dls.stopWavout();
+			JOptionPane.showMessageDialog(parentFrame, e.getLocalizedMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
 		new Thread(() -> {
 			while (run) {
 				try {
-					Thread.sleep(1000);
+					Thread.sleep(200);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				int len = (int) MabiDLS.getInstance().getWavout().getLen();
+				int len = (int) dls.getWavout().getLen();
 				progress.setValue(len);
 			}
 		}).start();

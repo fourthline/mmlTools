@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 たんらる
+ * Copyright (C) 2017-2022 たんらる
  */
 
 package jp.fourthline.mabiicco.midi;
@@ -48,18 +48,26 @@ public final class WavoutDataLine implements SourceDataLine, IWavoutState {
 	@Override
 	public long getLen() { return curLen; }
 
-	public void startRec(OutputStream outputStream, Runnable endNotify) {
+	public void startRec(File outFile, Runnable endNotify) throws IOException {
 		try {
-			tempFile = new File("wavout_"+(int)(Math.random()*100)+".raw");
+			tempFile = File.createTempFile("wavout_", ".tmp", outFile.getParentFile());
 			System.out.println("startRec:" + tempFile);
-			tempOutputStream = new BufferedOutputStream(new FileOutputStream(tempFile));
+			tempOutputStream = new BufferedOutputStream(new FileOutputStream(tempFile), 65536);
 			this.rec = true;
-			this.outputStream = outputStream;
+			this.outputStream = new FileOutputStream(outFile);
 			this.endNotify = endNotify;
 			time = 0;
 			curLen = 0;
 		} catch (IOException e) {
-			e.printStackTrace();
+			if (tempOutputStream != null) {
+				tempOutputStream.close();
+				tempOutputStream = null;
+			}
+			if (tempFile != null) {
+				tempFile.delete();
+				tempFile = null;
+			}
+			throw e;
 		}
 	}
 
@@ -209,11 +217,11 @@ public final class WavoutDataLine implements SourceDataLine, IWavoutState {
 					AudioSystem.write(in, AudioFileFormat.Type.WAVE, outputStream);
 					in.close();
 					outputStream.close();
-					tempFile.delete();
 					System.out.println("stopRec: "+size);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
+				tempFile.delete();
 				tempOutputStream = null;
 			}
 		}
