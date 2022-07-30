@@ -10,6 +10,7 @@ import java.awt.BorderLayout;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -36,12 +37,16 @@ public final class WavoutPanel extends JPanel {
 	private final JProgressBar progress = new JProgressBar();
 
 	private boolean run = false;
+	private final long totalTime;
+	private final long totalBytes;
 
 	public WavoutPanel(MainFrame parentFrame, IMMLManager mmlManager, File file) {
 		this.dialog = new JDialog(parentFrame, appText("wavout"), true);
 		this.parentFrame = parentFrame;
 		this.mmlManager = mmlManager;
 		this.file = file;
+		this.totalTime = mmlManager.getMMLScore().getTotalTime();
+		this.totalBytes = (long)(totalTime * 44.1 * 4);
 		initializePanel();
 	}
 
@@ -50,10 +55,8 @@ public final class WavoutPanel extends JPanel {
 		JPanel p1 = new JPanel();
 		p1.setLayout(new BoxLayout(p1, BoxLayout.Y_AXIS));
 		DecimalFormat df = new DecimalFormat("#.0");
-		long totalTime = mmlManager.getMMLScore().getTotalTime()+1000;
-		long totalBytes = (long)(totalTime * 44.1 * 4);
 		progress.setMaximum((int)totalBytes);
-		progress.setValue(0);
+		updateProgress(0);
 		progress.setStringPainted(true);
 
 		p1.add(new JLabel("File: "+file.getName()));
@@ -68,6 +71,12 @@ public final class WavoutPanel extends JPanel {
 
 		add(p1, BorderLayout.NORTH);
 		add(p2, BorderLayout.SOUTH);
+	}
+
+	private void updateProgress(int now) {
+		progress.setValue(now);
+		var f = NumberFormat.getInstance();
+		progress.setString(f.format(now>>10) + "/" + f.format(totalBytes>>10));
 	}
 
 	private void startWavout() {
@@ -85,12 +94,12 @@ public final class WavoutPanel extends JPanel {
 		new Thread(() -> {
 			while (run) {
 				try {
-					Thread.sleep(200);
+					Thread.sleep(100);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 				int len = (int) dls.getWavout().getLen();
-				progress.setValue(len);
+				updateProgress(len);
 			}
 		}).start();
 	}
