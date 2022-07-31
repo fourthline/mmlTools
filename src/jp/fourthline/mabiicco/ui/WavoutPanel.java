@@ -80,6 +80,7 @@ public final class WavoutPanel extends JPanel {
 	}
 
 	private void startWavout() {
+		System.out.println("startWavout(): "+totalBytes);
 		run = true;
 		startButton.setEnabled(false);
 		parentFrame.disableNoplayItems();

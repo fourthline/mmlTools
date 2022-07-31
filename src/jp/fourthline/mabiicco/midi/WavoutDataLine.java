@@ -212,8 +212,8 @@ public final class WavoutDataLine implements SourceDataLine, IWavoutState {
 			if (stop) {
 				try {
 					tempOutputStream.close();
-					long size = tempFile.length()/format.getFrameSize();
-					AudioInputStream in = new AudioInputStream(new FileInputStream(tempFile), format, size);
+					long size = tempFile.length();
+					AudioInputStream in = new AudioInputStream(new FileInputStream(tempFile), format, size/format.getFrameSize());
 					AudioSystem.write(in, AudioFileFormat.Type.WAVE, outputStream);
 					in.close();
 					outputStream.close();

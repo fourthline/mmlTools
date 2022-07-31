@@ -97,6 +97,7 @@ public final class TrackPropertyPanel extends JPanel {
 		volumnSpinner.setBounds(180, 80, 60, 23);
 		add(volumnSpinner);
 		JButton volumnResetButton = new JButton("reset");
+		volumnResetButton.setFocusable(false);
 		volumnResetButton.addActionListener(t -> volumnSpinner.setValue(MMLTrack.INITIAL_VOLUMN));
 		volumnResetButton.setBounds(260, 82, 60, 18);
 		volumnResetButton.putClientProperty("JButton.buttonType", "roundRect");

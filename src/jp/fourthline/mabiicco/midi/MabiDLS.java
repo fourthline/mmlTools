@@ -128,16 +128,24 @@ public final class MabiDLS {
 	 * @param startTick
 	 */
 	public void createSequenceAndStart(MMLScore mmlScore, long startTick) {
+		createSequenceAndStandby(mmlScore, startTick);
+		sequenceStart();
+	}
+
+	/**
+	 * MMLScoreからMIDIシーケンスに変換して, 再生を準備をする.
+	 * @param mmlScore
+	 * @param startTick
+	 */
+	private void createSequenceAndStandby(MMLScore mmlScore, long startTick) {
 		try {
 			MabiDLS.getInstance().loadRequiredInstruments(mmlScore);
 			Sequencer sequencer = MabiDLS.getInstance().getSequencer();
 			Sequence sequence = createSequence(mmlScore);
-
 			sequencer.setSequence(sequence);
 			this.startTick = startTick;
 			this.startTempo = mmlScore.getTempoOnTick(startTick);
 			updateMidiControl(mmlScore);
-			sequenceStart();
 		} catch (InvalidMidiDataException e) {
 			e.printStackTrace();
 		}
@@ -148,8 +156,9 @@ public final class MabiDLS {
 	}
 
 	public void startWavout(MMLScore mmlScore, File outFile, Runnable endNotify) throws IOException {
+		createSequenceAndStandby(mmlScore, 0);
 		wavout.startRec(outFile, endNotify);
-		createSequenceAndStart(mmlScore, 0);
+		sequenceStart();
 	}
 
 	public void stopWavout() {
@@ -442,7 +451,9 @@ public final class MabiDLS {
 		int trackCount = 0;
 		for (MMLTrack mmlTrack : score.getTrackList()) {
 			this.setChannelPanpot(trackCount, mmlTrack.getPanpot());
+			this.setChannelPanpot(trackCount+MIDI_CHORUS_OFFSET, mmlTrack.getPanpot());
 			this.setChannelVolumn(trackCount, mmlTrack.getVolumn());
+			this.setChannelVolumn(trackCount+MIDI_CHORUS_OFFSET, mmlTrack.getVolumn());
 			this.changeProgram(mmlTrack.getProgram(), trackCount);
 			this.changeProgram(mmlTrack.getSongProgram(), trackCount+MIDI_CHORUS_OFFSET);
 			trackCount++;
