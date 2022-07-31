@@ -712,10 +712,14 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 		if (toNext) {
 			if (trackIndex+1 < tabbedPane.getTabCount()) {
 				trackIndex++;
+			} else {
+				trackIndex = 0;
 			}
 		} else {
 			if (trackIndex-1 >= 0) {
 				trackIndex--;
+			} else {
+				trackIndex = tabbedPane.getTabCount() - 1;
 			}
 		}
 		tabbedPane.setSelectedIndex(trackIndex);

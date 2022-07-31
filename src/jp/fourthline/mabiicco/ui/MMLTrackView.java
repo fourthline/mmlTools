@@ -386,14 +386,25 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 				break;
 			}
 		}
+		int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
+		for (int i = 0; i < partButton.length; i++) {
+			if (partButton[i].isEnabled()) {
+				min = Math.min(min, i);
+				max = Math.max(max, i);
+			}
+		}
 
 		if (toNext) {
 			if ( (partIndex+1 < partButton.length) && (partButton[partIndex+1].isEnabled()) ) {
 				partIndex++;
+			} else {
+				partIndex = min;
 			}
 		} else {
 			if ( (partIndex-1 >= 0) && (partButton[partIndex-1].isEnabled()) ) {
 				partIndex--;
+			} else {
+				partIndex = max;
 			}
 		}
 		partButton[partIndex].setSelected(true);

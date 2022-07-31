@@ -756,17 +756,17 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 				() -> paintModeSelect.setSelectedItem(PaintMode.ALL_TRACK));
 
 		createKeyAction(ActionDispatcher.SWITCH_TRACK_NEXT,
-				KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.CTRL_DOWN_MASK),
+				KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0),
 				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.SWITCH_TRACK_NEXT)));
 		createKeyAction(ActionDispatcher.SWITCH_TRACK_PREV,
-				KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.CTRL_DOWN_MASK),
+				KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0),
 				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.SWITCH_TRACK_PREV)));
 
 		createKeyAction(ActionDispatcher.SWITCH_MMLPART_NEXT,
-				KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.CTRL_DOWN_MASK),
+				KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0),
 				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.SWITCH_MMLPART_NEXT)));
 		createKeyAction(ActionDispatcher.SWITCH_MMLPART_PREV,
-				KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_DOWN_MASK),
+				KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0),
 				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.SWITCH_MMLPART_PREV)));
 
 		createKeyAction(ActionDispatcher.PLAY,
