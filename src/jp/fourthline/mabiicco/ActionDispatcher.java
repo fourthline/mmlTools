@@ -136,6 +136,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String OCTAVE_DOWN = "octave_down";
 	@Action public static final String SET_USER_VIEW_MEASURE = "set_user_view_measure";
 	@Action public static final String INST_LIST = "inst_list";
+	@Action public static final String SHORTCUT_INFO = "shortcut_info";
 
 	private final HashMap<String, Consumer<Object>> actionMap = new HashMap<>();
 
@@ -266,6 +267,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(OCTAVE_DOWN, t -> editState.octaveDown());
 		actionMap.put(SET_USER_VIEW_MEASURE, t -> new UserViewWidthDialog(mainFrame, mmlSeqView).showDialog());
 		actionMap.put(INST_LIST, t -> new About().showInstList(mainFrame));
+		actionMap.put(SHORTCUT_INFO, t -> new About().showShortcutInfo(mainFrame, mainFrame.getShortcutMap()));
 	}
 
 	@Override

@@ -35,7 +35,9 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
@@ -77,6 +79,9 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 
 	/** シーケンス再生中に無効化する機能のリスト */
 	private final ArrayList<JComponent> noplayFunctions = new ArrayList<>();
+
+	/** ショートカットキー情報 */
+	private final Map<KeyStroke, String> shortcutMap = new LinkedHashMap<>();
 
 	/** 状態が変化するメニューたち */
 	private JMenuItem reloadMenuItem = null;
@@ -203,6 +208,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		}
 		if (keyStroke != null) {
 			menuItem.setAccelerator(keyStroke);
+			addShortcutMap(keyStroke, menuItem.getText());
 		}
 
 		menu.add(menuItem);
@@ -373,6 +379,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		menuBar.add(helpMenu);
 
 		createMenuItem(helpMenu, "menu.about", ActionDispatcher.ABOUT);
+		createMenuItem(helpMenu, "menu.shortcutInfo", ActionDispatcher.SHORTCUT_INFO);
 		createMenuItem(helpMenu, "menu.instList", ActionDispatcher.INST_LIST);
 
 		return menuBar;
@@ -744,38 +751,58 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		statusField.setText(text);
 	}
 
+	private void addShortcutMap(KeyStroke keyStroke, String text) {
+		if (shortcutMap.containsKey(keyStroke)) {
+			new AssertionError();
+		}
+		shortcutMap.put(keyStroke, text);
+	}
+
+	public Map<KeyStroke, String> getShortcutMap() {
+		return shortcutMap;
+	}
+
 	private void initKeyAction() {
 		createKeyAction("select_paintMode.activePart",
 				KeyStroke.getKeyStroke(KeyEvent.VK_F10, 0),
-				() -> paintModeSelect.setSelectedItem(PaintMode.ACTIVE_PART));
+				() -> paintModeSelect.setSelectedItem(PaintMode.ACTIVE_PART),
+				appText("shortcut.select_paintMode.activePart"));
 		createKeyAction("select_paintMode.activeTrack",
 				KeyStroke.getKeyStroke(KeyEvent.VK_F11, 0),
-				() -> paintModeSelect.setSelectedItem(PaintMode.ACTIVE_TRACK));
+				() -> paintModeSelect.setSelectedItem(PaintMode.ACTIVE_TRACK),
+				appText("shortcut.select_paintMode.activeTrack"));
 		createKeyAction("select_paintMode.allTrack",
 				KeyStroke.getKeyStroke(KeyEvent.VK_F12, 0),
-				() -> paintModeSelect.setSelectedItem(PaintMode.ALL_TRACK));
+				() -> paintModeSelect.setSelectedItem(PaintMode.ALL_TRACK),
+				appText("shortcut.select_paintMode.allTrack"));
 
 		createKeyAction(ActionDispatcher.SWITCH_TRACK_NEXT,
 				KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0),
-				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.SWITCH_TRACK_NEXT)));
+				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.SWITCH_TRACK_NEXT)),
+				appText("shortcut.track_next"));
 		createKeyAction(ActionDispatcher.SWITCH_TRACK_PREV,
 				KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0),
-				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.SWITCH_TRACK_PREV)));
+				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.SWITCH_TRACK_PREV)),
+				appText("shortcut.track_prev"));
 
 		createKeyAction(ActionDispatcher.SWITCH_MMLPART_NEXT,
 				KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0),
-				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.SWITCH_MMLPART_NEXT)));
+				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.SWITCH_MMLPART_NEXT)),
+				appText("shortcut.part_next"));
 		createKeyAction(ActionDispatcher.SWITCH_MMLPART_PREV,
 				KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0),
-				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.SWITCH_MMLPART_PREV)));
+				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.SWITCH_MMLPART_PREV)),
+				appText("shortcut.part_prev"));
 
 		createKeyAction(ActionDispatcher.PLAY,
 				KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0),
-				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.PLAY)));
+				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.PLAY)),
+				appText("shortcut.play"));
 	}
 
-	private void createKeyAction(String name, KeyStroke stroke, Runnable func) {
+	private void createKeyAction(String name, KeyStroke stroke, Runnable func, String text) {
 		new KeyAction(name, stroke, contentPane, func);
+		addShortcutMap(stroke, text);
 	}
 
 	private static final class KeyAction extends AbstractAction {
