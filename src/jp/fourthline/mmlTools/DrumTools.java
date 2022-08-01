@@ -163,7 +163,7 @@ public class DrumTools extends MMLTools {
 	 * 分割前に実行すること。
 	 * @throws UndefinedTickException
 	 */
-	public String disDrumVolumn() throws UndefinedTickException {
+	public String disDrumVolume() throws UndefinedTickException {
 		MMLTokenizer mt = new MMLTokenizer(mml_melody);
 		StringBuffer sb = new StringBuffer(mml_melody.length());
 

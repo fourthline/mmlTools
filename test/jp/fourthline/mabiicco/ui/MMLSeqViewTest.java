@@ -410,13 +410,13 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 		Runnable toPrev = () -> obj.switchTrack(false);
 
 		Stream.of(
-				new TP1(toNext, 2, 0),
+				new TP1(toNext, 0, 0),
+				new TP1(toPrev, 2, 0),
 				new TP1(toPrev, 1, 0),
-				new TP1(toPrev, 0, 0),
 				new TP1(toPrev, 0, 0),
 				new TP1(toNext, 1, 0),
 				new TP1(toNext, 2, 0),
-				new TP1(toNext, 2, 0)).forEach(t -> t.check());
+				new TP1(toNext, 0, 0)).forEach(t -> t.check());
 	}
 
 	@Test
@@ -430,9 +430,9 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 		Stream.of(
 				new TP1(toNext, 2, 1),
 				new TP1(toNext, 2, 2),
-				new TP1(toNext, 2, 2),
+				new TP1(toNext, 2, 0),
+				new TP1(toPrev, 2, 2),
 				new TP1(toPrev, 2, 1),
-				new TP1(toPrev, 2, 0),
 				new TP1(toPrev, 2, 0)).forEach(t -> t.check());
 
 		// コーラスパート有効.
@@ -442,7 +442,7 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 				new TP1(toNext, 2, 1),
 				new TP1(toNext, 2, 2),
 				new TP1(toNext, 2, 3),
-				new TP1(toNext, 2, 3)).forEach(t -> t.check());
+				new TP1(toNext, 2, 0)).forEach(t -> t.check());
 	}
 
 	@Test

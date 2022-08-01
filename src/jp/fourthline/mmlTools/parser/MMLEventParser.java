@@ -54,7 +54,7 @@ public final class MMLEventParser implements Iterator<MMLEvent> {
 	private int totalTick = 0;
 	private final int startOffset;
 	private MMLNoteEvent prevNoteEvent = null;
-	private int volumn = MMLNoteEvent.INIT_VOL;
+	private int volume = MMLNoteEvent.INIT_VOL;
 
 	/**
 	 * @return すべてMMLパースが終っているときは、nullを返す.
@@ -69,9 +69,9 @@ public final class MMLEventParser implements Iterator<MMLEvent> {
 			}
 			if ( (firstC == 'v') || (firstC == 'V') ) {
 				try {
-					int nextVolumn = Integer.parseInt( token.substring(1) );
-					if ( (nextVolumn >= 0) && (nextVolumn <= MMLNoteEvent.MAX_VOL) ) {
-						volumn = nextVolumn;
+					int nextVolume = Integer.parseInt( token.substring(1) );
+					if ( (nextVolume >= 0) && (nextVolume <= MMLNoteEvent.MAX_VOL) ) {
+						volume = nextVolume;
 					}
 					continue;
 				} catch (NumberFormatException e) {
@@ -101,7 +101,7 @@ public final class MMLEventParser implements Iterator<MMLEvent> {
 						prevNoteEvent.getIndexOfMMLString()[1] = tokenizer.getIndex()[1];
 					} else if (parser.getNoteNumber() >= -1) {
 						nextItem = prevNoteEvent;
-						prevNoteEvent = new MMLNoteEvent(parser.getNoteNumber(), tick, totalTick, volumn);
+						prevNoteEvent = new MMLNoteEvent(parser.getNoteNumber(), tick, totalTick, volume);
 						prevNoteEvent.setIndexOfMMLString(tokenizer.getIndex());
 					}
 

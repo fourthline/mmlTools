@@ -216,7 +216,7 @@ public final class MMLFile extends AbstractMMLParser {
 		// parse Track
 		istream.skip(3);
 		int trackNo = istream.read();
-		istream.skip(1); // volumn
+		istream.skip(1); // volume
 		int panpot = istream.read();
 		istream.skip(5);
 		int startMarker = istream.read();

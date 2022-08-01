@@ -263,7 +263,7 @@ public class MMLScoreTest extends FileSelect {
 
 		MMLTrack track2 = new MMLTrack(1152, 0, 0).setMML("MML@<b1&b,,;");
 		track2.setTrackName("Track2");
-		track2.setVolumn(25);
+		track2.setVolume(25);
 		score.addTrack(track2);
 
 		score.getTempoEventList().add(new MMLTempoEvent(100, 0));

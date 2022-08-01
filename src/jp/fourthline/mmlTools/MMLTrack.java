@@ -21,7 +21,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 	private static final long serialVersionUID = 2006880378975808647L;
 
 	private static final int MAX_TRACK_NAME_LEN = 32;
-	public static final int INITIAL_VOLUMN = 100;
+	public static final int INITIAL_VOLUME = 100;
 
 	/** 和音にテンポ出力を許可するかどうかのオプション */
 	private static boolean optTempoAllowChordPart = false;
@@ -47,7 +47,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 	private int program = 0;
 	private String trackName = "";
 	private int panpot = 64;
-	private int volumn = INITIAL_VOLUMN;
+	private int volume = INITIAL_VOLUME;
 	private boolean visible = true;
 
 	// start offset function
@@ -235,15 +235,15 @@ public final class MMLTrack implements Serializable, Cloneable {
 		return this.panpot;
 	}
 
-	public void setVolumn(int volumn) {
-		if ( (volumn < 0) || (volumn > 127) ) {
-			throw new IllegalArgumentException("illeagl volumn: " + volumn);
+	public void setVolume(int volume) {
+		if ( (volume < 0) || (volume > 127) ) {
+			throw new IllegalArgumentException("illeagl volume: " + volume);
 		}
-		this.volumn = volumn;
+		this.volume = volume;
 	}
 
-	public int getVolumn() {
-		return this.volumn;
+	public int getVolume() {
+		return this.volume;
 	}
 
 	public MMLEventList getMMLEventAtIndex(int index) {
@@ -602,7 +602,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 				.setMML(this.getOriginalMML());
 		o.setGlobalTempoList(globalTempoList);
 		o.setPanpot(panpot);
-		o.setVolumn(volumn);
+		o.setVolume(volume);
 		o.setProgram(program);
 		o.setSongProgram(songProgram);
 		o.setTrackName(trackName);

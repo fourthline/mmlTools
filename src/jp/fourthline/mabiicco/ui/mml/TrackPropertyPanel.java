@@ -34,7 +34,7 @@ public final class TrackPropertyPanel extends JPanel {
 	private static final long serialVersionUID = 7599129671956571455L;
 	private final JTextField trackNameField = new JTextField();
 	private final JSlider panpotSlider = new JSlider();
-	private final JSpinner volumnSpinner = NumberSpinner.createSpinner(0, 0, 127, 1);
+	private final JSpinner volumeSpinner = NumberSpinner.createSpinner(0, 0, 127, 1);
 
 	// 楽器部のオプション
 	private final MMLOutputOptions instOption;
@@ -93,16 +93,16 @@ public final class TrackPropertyPanel extends JPanel {
 		add(panpotR);
 		add(newJLabel(AppResource.appText("track_property.panpot"), 20, 40, 100, 14));
 
-		// Volumn
-		volumnSpinner.setBounds(180, 80, 60, 23);
-		add(volumnSpinner);
-		JButton volumnResetButton = new JButton("reset");
-		volumnResetButton.setFocusable(false);
-		volumnResetButton.addActionListener(t -> volumnSpinner.setValue(MMLTrack.INITIAL_VOLUMN));
-		volumnResetButton.setBounds(260, 82, 60, 18);
-		volumnResetButton.putClientProperty("JButton.buttonType", "roundRect");
-		add(volumnResetButton);
-		add(newJLabel(AppResource.appText("track_property.volumn"), 20, 83, 100, 14));
+		// Volume
+		volumeSpinner.setBounds(180, 80, 60, 23);
+		add(volumeSpinner);
+		JButton volumeResetButton = new JButton("reset");
+		volumeResetButton.setFocusable(false);
+		volumeResetButton.addActionListener(t -> volumeSpinner.setValue(MMLTrack.INITIAL_VOLUME));
+		volumeResetButton.setBounds(260, 82, 60, 18);
+		volumeResetButton.putClientProperty("JButton.buttonType", "roundRect");
+		add(volumeResetButton);
+		add(newJLabel(AppResource.appText("track_property.volume"), 20, 83, 100, 14));
 
 		// MML出力オプション（楽器部）
 		add(instOption.createMMLOptionPanel(AppResource.appText("track_propert.mmlOptions1"), 5, 120));
@@ -113,7 +113,7 @@ public final class TrackPropertyPanel extends JPanel {
 		int commonStartOffset = track.getCommonStartOffset();
 		trackNameField.setText(track.getTrackName());
 		panpotSlider.setValue(track.getPanpot());
-		volumnSpinner.setValue(track.getVolumn());
+		volumeSpinner.setValue(track.getVolume());
 		instOption.setValue(track.getStartDelta() + commonStartOffset, track.getAttackDelayCorrect());
 		songOption.setValue(track.getStartSongDelta() + commonStartOffset, track.getAttackSongDelayCorrect());
 	}
@@ -133,7 +133,7 @@ public final class TrackPropertyPanel extends JPanel {
 		int commonStartOffset = track.getCommonStartOffset();
 		track.setTrackName( trackNameField.getText() );
 		track.setPanpot( panpotSlider.getValue() );
-		track.setVolumn( (Integer) volumnSpinner.getValue() );
+		track.setVolume( (Integer) volumeSpinner.getValue() );
 		try {
 			track.setStartDelta( instOption.getStartOffset() - commonStartOffset);
 			track.setStartSongDelta( songOption.getStartOffset() - commonStartOffset);

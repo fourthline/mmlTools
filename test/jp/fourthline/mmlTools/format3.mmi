@@ -18,5 +18,5 @@ name=Track2
 program=0
 songProgram=-1
 panpot=64
-volumn=25
+volume=25
 visible=true
