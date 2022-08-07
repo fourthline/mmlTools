@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2021 たんらる
+ * Copyright (C) 2013-2022 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
@@ -59,8 +59,8 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 
 	private IMMLManager mmlManager;
 
-	private final InstClass noUseSongEx = new InstClass(AppResource.appText("instrument.nouse_chorus")+",0", -1, -1, null);
-	private final InstClass excludeSongPart = new InstClass(AppResource.appText("instrument.excludeSongPart")+",0", -2, -2, null);
+	private final InstClass noUseSongEx = new InstClass(AppResource.appText("instrument.nouse_chorus")+",0", MMLTrack.NO_CHORUS, MMLTrack.NO_CHORUS, null);
+	private final InstClass excludeSongPart = new InstClass(AppResource.appText("instrument.excludeSongPart")+",0", MMLTrack.EXCLUDE_SONG, MMLTrack.EXCLUDE_SONG, null);
 	private int trackIndex;
 	private boolean disableAction = false;
 
@@ -386,27 +386,19 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 				break;
 			}
 		}
-		int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
-		for (int i = 0; i < partButton.length; i++) {
-			if (partButton[i].isEnabled()) {
-				min = Math.min(min, i);
-				max = Math.max(max, i);
-			}
-		}
-
-		if (toNext) {
-			if ( (partIndex+1 < partButton.length) && (partButton[partIndex+1].isEnabled()) ) {
+		do {
+			if (toNext) {
 				partIndex++;
+				if (partIndex >= partButton.length) {
+					partIndex = 0;
+				}
 			} else {
-				partIndex = min;
-			}
-		} else {
-			if ( (partIndex-1 >= 0) && (partButton[partIndex-1].isEnabled()) ) {
 				partIndex--;
-			} else {
-				partIndex = max;
+				if (partIndex < 0) {
+					partIndex = partButton.length - 1;
+				}
 			}
-		}
+		} while (!partButton[partIndex].isEnabled());
 		partButton[partIndex].setSelected(true);
 	}
 

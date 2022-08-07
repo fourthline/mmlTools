@@ -23,6 +23,9 @@ public final class MMLTrack implements Serializable, Cloneable {
 	private static final int MAX_TRACK_NAME_LEN = 32;
 	public static final int INITIAL_VOLUME = 100;
 
+	public static final int NO_CHORUS = -1;
+	public static final int EXCLUDE_SONG = -2;
+
 	/** 和音にテンポ出力を許可するかどうかのオプション */
 	private static boolean optTempoAllowChordPart = false;
 	public static void setTempoAllowChordPart(boolean opt) {
@@ -64,7 +67,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 	private final MMLText mabiMML = new MMLText();
 
 	// コーラスオプション (楽器＋歌）
-	private int songProgram = -1;  // コーラスを使用しない.
+	private int songProgram = NO_CHORUS;  // コーラスを使用しない.
 
 	public MMLTrack() {
 		this(0, 0, 0);
@@ -475,7 +478,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 	}
 
 	public boolean isExcludeSongPart() {
-		return songProgram == -2;
+		return songProgram == EXCLUDE_SONG;
 	}
 
 	/**

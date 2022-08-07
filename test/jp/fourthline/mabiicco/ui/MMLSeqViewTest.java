@@ -443,6 +443,33 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 				new TP1(toNext, 2, 2),
 				new TP1(toNext, 2, 3),
 				new TP1(toNext, 2, 0)).forEach(t -> t.check());
+
+		// 打楽器 & コーラス
+		obj.updateActiveTrackProgram(obj.getActiveTrackIndex(), 66, 100);
+		obj.updateActivePart(true);
+		Stream.of(
+				new TP1(toNext, 2, 3),
+				new TP1(toNext, 2, 0),
+				new TP1(toNext, 2, 3),
+				new TP1(toNext, 2, 0),
+				new TP1(toPrev, 2, 3),
+				new TP1(toPrev, 2, 0),
+				new TP1(toPrev, 2, 3),
+				new TP1(toPrev, 2, 0)).forEach(t -> t.check());
+
+		// 打楽器
+		obj.updateActiveTrackProgram(obj.getActiveTrackIndex(), 66, MMLTrack.NO_CHORUS);
+		obj.updateActivePart(true);
+		Stream.of(
+				new TP1(toNext, 2, 0),
+				new TP1(toPrev, 2, 0)).forEach(t -> t.check());
+
+		// 歌
+		obj.updateActiveTrackProgram(obj.getActiveTrackIndex(), 120, MMLTrack.NO_CHORUS);
+		obj.updateActivePart(true);
+		Stream.of(
+				new TP1(toNext, 2, 3),
+				new TP1(toPrev, 2, 3)).forEach(t -> t.check());
 	}
 
 	@Test
@@ -487,7 +514,7 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 		MMLScore score = new MMLScore();
 		score.addTrack(track1);
 		obj.setMMLScore(score);
-		
+
 		JTabbedPane tabbedPane = (JTabbedPane) getField("tabbedPane");
 		MMLTrackView view = (MMLTrackView) tabbedPane.getComponentAt(0);
 
