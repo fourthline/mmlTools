@@ -51,10 +51,10 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 	private final JComboBox<InstClass> songComboBox;
 
 	private final JLabel trackComposeLabel;
-	private final JToolBar toolBar;
-	private JButton muteButton;
-	private JButton soloButton;
-	private JButton allButton;
+	private final JToolBar toolBar = new JToolBar();
+	private final JButton muteButton = new JButton("");;
+	private final JButton soloButton = new JButton("");;
+	private final JButton allButton = new JButton("");;
 	private final JLabel trackIndexLabel = new JLabel();
 
 	private IMMLManager mmlManager;
@@ -121,7 +121,6 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 		songComboBox.setMaximumRowCount(30);
 		songComboBox.setPreferredSize(new Dimension(140, 20));
 
-		toolBar = new JToolBar();
 		toolBar.setFloatable(false);
 		northPanel.add(toolBar);
 
@@ -189,16 +188,13 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 		this();
 		this.trackIndex = trackIndex;
 
-		muteButton = new JButton("");
 		muteButton.setFocusable(false);
 		muteButton.setToolTipText(AppResource.appText("mmltrack.mute"));
 		toolBar.add(muteButton);
-		soloButton = new JButton("");
 		soloButton.setFocusable(false);
 		soloButton.setIcon(AppResource.getImageIcon(AppResource.appText("mmltrack.solo.icon")));
 		soloButton.setToolTipText(AppResource.appText("mmltrack.solo"));
 		toolBar.add(soloButton);
-		allButton = new JButton("");
 		allButton.setFocusable(false);
 		allButton.setIcon(AppResource.getImageIcon(AppResource.appText("mmltrack.all.icon")));
 		allButton.setToolTipText(AppResource.appText("mmltrack.all"));
