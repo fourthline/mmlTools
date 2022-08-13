@@ -42,13 +42,21 @@ public final class MidiFile extends AbstractMMLParser {
 	private static final String PATCH_NAME = "mid_instPatch";
 
 	// Parse Option
-	private static final String PARSE_TRACK_NAME = "parse.midi.trackName";
-	private static final String PARSE_BEAT = "parse.midi.beat";
-	private static final String PARSE_TEMPO = "parse.midi.tempo";
-	private static final String PARSE_MARKER = "parse.midi.marker";
-	private static final String PARSE_CONVERT_OCTAVE = "parse.midi.convertOctave";
-	private static final String PARSE_CONVERT_INST = "parse.midi.convertInst";
-	private static final String PARSE_MULTI_TRACK = "parse.midi.multiTrack";
+	public static final String PARSE_TRACK_NAME = "parse.midi.trackName";
+	public static final String PARSE_BEAT = "parse.midi.beat";
+	public static final String PARSE_TEMPO = "parse.midi.tempo";
+	public static final String PARSE_MARKER = "parse.midi.marker";
+	public static final String PARSE_CONVERT_OCTAVE = "parse.midi.convertOctave";
+	public static final String PARSE_CONVERT_INST = "parse.midi.convertInst";
+	public static final String PARSE_MULTI_TRACK = "parse.midi.multiTrack";
+
+	// Parse Attribute
+	public static final String PARSE_ALIGN = "parse.midi.align";
+	public static final String PARSE_ALIGN_1 = "parse.midi.align.1";
+	public static final String PARSE_ALIGN_2 = "parse.midi.align.2";
+	public static final String PARSE_ALIGN_6 = "parse.midi.align.6";
+	private final Map<String, Integer> attrMap = new LinkedHashMap<>();
+	private int parse_align;
 
 	// option value
 	private boolean parseTrackName;
@@ -67,6 +75,7 @@ public final class MidiFile extends AbstractMMLParser {
 		parseConvertOctave = parseProperties.getOrDefault(PARSE_CONVERT_OCTAVE, false);
 		parseConvertInst = parseProperties.getOrDefault(PARSE_CONVERT_INST, false);
 		parseMultiTrack = parseProperties.getOrDefault(PARSE_MULTI_TRACK, false);
+		System.out.println("parse_align: " + parse_align);
 	}
 
 	/* MID->programへの変換 */
@@ -78,6 +87,7 @@ public final class MidiFile extends AbstractMMLParser {
 	}
 
 	public MidiFile() {
+		// parse properties
 		parseProperties = new LinkedHashMap<>();
 		parseProperties.put(PARSE_TRACK_NAME, true);
 		parseProperties.put(PARSE_BEAT, true);
@@ -88,6 +98,14 @@ public final class MidiFile extends AbstractMMLParser {
 			parseProperties.put(PARSE_CONVERT_OCTAVE, true);
 			parseProperties.put(PARSE_CONVERT_INST, false);
 		}
+
+		// parse attributes
+		parse_align = 1;
+		attrMap.put(PARSE_ALIGN_1, 1);
+		attrMap.put(PARSE_ALIGN_2, 2);
+		attrMap.put(PARSE_ALIGN_6, 6);
+		parseAttributes = new LinkedHashMap<>();
+		parseAttributes.put(PARSE_ALIGN, attrMap.keySet());
 
 		try {
 			ResourceBundle instPatch = ResourceBundle.getBundle(PATCH_NAME, new ResourceLoader());
@@ -113,7 +131,7 @@ public final class MidiFile extends AbstractMMLParser {
 			Sequence seq = MidiSystem.getSequence(istream);
 			resolution = seq.getResolution();
 			System.out.println(seq.getTracks().length);
-			System.out.println(resolution);
+			System.out.println("resolution: "+resolution);
 			System.out.println(seq.getDivisionType());
 			System.out.println(seq.getMicrosecondLength());
 			System.out.println(seq.getTickLength());
@@ -256,6 +274,8 @@ public final class MidiFile extends AbstractMMLParser {
 			}
 		}
 
+		eventList.forEach(t -> t.deleteMinRest());
+
 		return eventList;
 	}
 
@@ -385,10 +405,20 @@ public final class MidiFile extends AbstractMMLParser {
 	 * @return
 	 */
 	private long convTick(long tick) {
-		int min = MMLTicks.minimumTick();
-		long value = (tick * MMLTickTable.TPQN / resolution) + (min/2);
-		value -= value % min;
+		long value = (tick * MMLTickTable.TPQN / resolution);
+		if (parse_align > 1) {
+			value += (parse_align/2);
+			value -= value % parse_align;
+		}
 		return value;
+	}
+
+	@Override
+	public void setParseAttribute(String key, String value) {
+		System.out.println("setParseAttribute "+key+":"+value);
+		if (key == PARSE_ALIGN) {
+			parse_align = attrMap.get(value);
+		}
 	}
 
 	public static void main(String[] args) {

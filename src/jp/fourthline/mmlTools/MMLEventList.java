@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import jp.fourthline.mmlTools.core.MMLTicks;
 import jp.fourthline.mmlTools.core.UndefinedTickException;
 import jp.fourthline.mmlTools.parser.MMLEventParser;
 
@@ -203,7 +204,8 @@ public final class MMLEventList implements Serializable, Cloneable {
 	 */
 	public boolean isOverlapNote(MMLNoteEvent noteEvent) {
 		int i;
-		for (i = 0; i < noteList.size(); i++) {
+		int size = noteList.size();
+		for (i = 0; i < size; i++) {
 			MMLNoteEvent e = noteList.get(i);
 			if (noteEvent.getTickOffset() < e.getEndTick()) {
 				if (noteEvent.getTickOffset() >= e.getTickOffset()) {
@@ -212,7 +214,7 @@ public final class MMLEventList implements Serializable, Cloneable {
 				break;
 			}
 		}
-		for (i = 0; i < noteList.size(); i++) {
+		for (; i < size; i++) {
 			MMLNoteEvent e = noteList.get(i);
 			if (noteEvent.getEndTick() <= e.getEndTick()) {
 				if (noteEvent.getEndTick()-1 >= e.getTickOffset()) {
@@ -352,6 +354,28 @@ public final class MMLEventList implements Serializable, Cloneable {
 		for (MMLNoteEvent noteEvent : noteList) {
 			if ( (noteEvent.getTickOffset() >= startTick) && (noteEvent.getEndTick() <= endTick) ) {
 				list2.addMMLNoteEvent( noteEvent.clone() );
+			}
+		}
+	}
+
+	/**
+	 * ノート間の最小Tick未満の休符を詰めて消す.
+	 * @param eventList
+	 */
+	public void deleteMinRest() {
+		int min = MMLTicks.minimumTick();
+		int size = noteList.size();
+		for (int i = 1; i < size; i++) {
+			var note1 = noteList.get(i-1);
+			var note2 = noteList.get(i);
+			int delta = note2.getTickOffset() - note1.getEndTick();
+			if ((delta > 0) && (delta < min)) {
+				int t = note1.getTick() -  min + delta;
+				if (t >= min) {
+					note1.setTick(t);
+				} else {
+					note1.setTick(note1.getTick() + delta);
+				}
 			}
 		}
 	}

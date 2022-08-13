@@ -13,12 +13,14 @@ import jp.fourthline.FileSelect;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLScoreTest;
 
-public class MidiFileTest extends FileSelect {
+public final class MidiFileTest extends FileSelect {
 
 	@Test
-	public final void testParse() throws Exception {
+	public void testParse1() throws Exception {
 		MidiFile.enableInstPatch();
-		MMLScore score = new MidiFile().parse(fileSelect("sample4.mid"));
+		IMMLFileParser parser = new MidiFile();
+		parser.setParseAttribute(MidiFile.PARSE_ALIGN, MidiFile.PARSE_ALIGN_6);
+		MMLScore score = parser.parse(fileSelect("sample4.mid"));
 
 		assertEquals(4, score.getTrackCount());
 
@@ -26,4 +28,16 @@ public class MidiFileTest extends FileSelect {
 		MMLScoreTest.checkMMLScoreWriteToOutputStream(score.generateAll(), inputStream);
 	}
 
+	@Test
+	public void testParse2() throws Exception {
+		MidiFile.enableInstPatch();
+		IMMLFileParser parser = new MidiFile();
+		parser.setParseAttribute(MidiFile.PARSE_ALIGN, MidiFile.PARSE_ALIGN_1);
+		MMLScore score = parser.parse(fileSelect("sample4.mid"));
+
+		assertEquals(4, score.getTrackCount());
+
+		InputStream inputStream = fileSelect("sample4_1.mmi");
+		MMLScoreTest.checkMMLScoreWriteToOutputStream(score.generateAll(), inputStream);
+	}
 }

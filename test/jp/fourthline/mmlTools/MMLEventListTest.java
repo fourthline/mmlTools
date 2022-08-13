@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2017 たんらる
+ * Copyright (C) 2013-2022 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -683,8 +683,8 @@ public class MMLEventListTest {
 
 	@Test
 	public void testOverlap() {
-		MMLEventList eventList = new MMLEventList("crc");
-		MMLNoteEvent e1 = new MMLEventList("rc").getMMLNoteEventList().get(0);
+		MMLEventList eventList = new MMLEventList("c8c8rc8c8");
+		MMLNoteEvent e1 = new MMLNoteEvent(48, 96, 96, 8);
 		assertEquals(false, eventList.isOverlapNote(e1));
 
 		e1.setTickOffset(e1.getTickOffset()-1);
@@ -695,5 +695,24 @@ public class MMLEventListTest {
 
 		e1.setTick(e1.getTick()-1);
 		assertEquals(false, eventList.isOverlapNote(e1));
+	}
+
+	private int deleteMinRestPattern(int start1, int tick1, int start2, int tick2) {
+		MMLEventList eventList = new MMLEventList("");
+		eventList.addMMLNoteEvent(new MMLNoteEvent(67, tick1, start1, 10));
+		eventList.addMMLNoteEvent(new MMLNoteEvent(61, tick2, start2, 10));
+		eventList.deleteMinRest();
+		return eventList.getMMLNoteEventList().get(0).getTick();
+	}
+
+	@Test
+	public void deleteMinRest() {
+		assertEquals(6, deleteMinRestPattern(12, 6, 12+6, 48));
+		assertEquals(7, deleteMinRestPattern(12, 6, 12+7, 48));
+		assertEquals(8, deleteMinRestPattern(12, 7, 12+7+1, 48));
+		assertEquals(6, deleteMinRestPattern(12, 7, 12+7+5, 48));
+		assertEquals(11, deleteMinRestPattern(12, 11, 12+11, 48));
+		assertEquals(6, deleteMinRestPattern(12, 11, 12+11+1, 48));
+		assertEquals(7, deleteMinRestPattern(12, 11, 12+11+2, 48));
 	}
 }
