@@ -21,6 +21,7 @@ public interface IEditState {
 	void selectAllSamePitch();
 	void setTempMute(boolean mute);
 	void setTempMuteAll();
+	void convertTuplet();
 
 	/** 連続した複数のノートが選択されているかどうかを判定する */
 	boolean hasSelectedMultipleConsecutiveNotes();

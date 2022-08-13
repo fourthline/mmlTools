@@ -137,6 +137,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String SET_USER_VIEW_MEASURE = "set_user_view_measure";
 	@Action public static final String INST_LIST = "inst_list";
 	@Action public static final String SHORTCUT_INFO = "shortcut_info";
+	@Action public static final String CONVERT_TUPLET = "convert_tuplet";
 
 	private final HashMap<String, Consumer<Object>> actionMap = new HashMap<>();
 
@@ -268,6 +269,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(SET_USER_VIEW_MEASURE, t -> new UserViewWidthDialog(mainFrame, mmlSeqView).showDialog());
 		actionMap.put(INST_LIST, t -> new About().showInstList(mainFrame));
 		actionMap.put(SHORTCUT_INFO, t -> new About().showShortcutInfo(mainFrame, mainFrame.getShortcutMap()));
+		actionMap.put(CONVERT_TUPLET, t -> editState.convertTuplet());
 	}
 
 	@Override

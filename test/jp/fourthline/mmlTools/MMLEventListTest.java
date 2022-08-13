@@ -714,5 +714,10 @@ public class MMLEventListTest {
 		assertEquals(11, deleteMinRestPattern(12, 11, 12+11, 48));
 		assertEquals(6, deleteMinRestPattern(12, 11, 12+11+1, 48));
 		assertEquals(7, deleteMinRestPattern(12, 11, 12+11+2, 48));
+		assertEquals(8, deleteMinRestPattern(12, 11, 12+11+3, 48));
+		assertEquals(9, deleteMinRestPattern(12, 11, 12+11+4, 48));
+		assertEquals(10, deleteMinRestPattern(12, 11, 12+11+5, 48));
+		assertEquals(11, deleteMinRestPattern(12, 11, 12+11+6, 48));
+		assertEquals(11, deleteMinRestPattern(12, 11, 12+11+7, 48));
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2017 たんらる
+ * Copyright (C) 2015-2022 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.editor;
@@ -566,6 +566,28 @@ public final class MMLEditorTest extends UseLoadingDLS {
 		editor.octaveDown();
 		editor.octaveDown();
 		editor.octaveDown();
+		assertEquals(expect, track.getOriginalMML());
+	}
+
+	@Test
+	public void test_convertTuplet1() {
+		String input = "MML@r1l8crcc";
+		String expect = "MML@r1l6ccc,,;";
+		MMLTrack track = new MMLTrack().setMML(input);
+		mmlManager.setMMLselectedTrack(track);
+		editor.selectAll();
+		editor.convertTuplet();
+		assertEquals(expect, track.getOriginalMML());
+	}
+
+	@Test
+	public void test_convertTuplet2() {
+		String input = "MML@r1l8crcccccc";
+		String expect = "MML@r1c7c8l54&cc8&cc8&cc8&cc8&cc8&c,,;";
+		MMLTrack track = new MMLTrack().setMML(input);
+		mmlManager.setMMLselectedTrack(track);
+		editor.selectAll();
+		editor.convertTuplet();
 		assertEquals(expect, track.getOriginalMML());
 	}
 }

@@ -20,6 +20,7 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.JMenuItem;
@@ -62,6 +63,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 
 	private final JPopupMenu popupMenu = new JPopupMenu();
 	private final VelocityChangeMenu velocityChangeMenu;
+	private final JMenuItem createTupletMenu;
 
 	private final Frame parentFrame;
 
@@ -100,6 +102,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		newPopupMenu(AppResource.appText("edit.unset_temp_mute"), ActionDispatcher.UNSET_TEMP_MUTE);
 		newPopupMenu(AppResource.appText("edit.unset_temp_mute_all"), ActionDispatcher.UNSET_TEMP_MUTE_ALL);
 		popupMenu.add(new JSeparator());
+		createTupletMenu = newPopupMenu(AppResource.appText("edit.convert_tuplet"), ActionDispatcher.CONVERT_TUPLET);
 		newPopupMenu(AppResource.appText("menu.delete"), ActionDispatcher.DELETE, AppResource.appText("menu.delete.icon"));
 		newPopupMenu(AppResource.appText("note.properties"), ActionDispatcher.NOTE_PROPERTY);
 	}
@@ -769,6 +772,37 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		pianoRollView.repaint();
 	}
 
+	@Override
+	public void convertTuplet() {
+		MMLEventList editEventList = mmlManager.getActiveMMLPart();
+		if (editEventList == null) {
+			return;
+		}
+		int size = selectedNote.size();
+		if (size < 3) {
+			return;
+		}
+
+		selectedNote.sort(Comparator.comparingInt(t -> t.getTickOffset()));
+		int startTick = selectedNote.get(0).getTickOffset();
+		int tick = selectedNote.get(size-1).getEndTick() - startTick;
+		for (MMLNoteEvent noteEvent : selectedNote) {
+			editEventList.deleteMMLEvent(noteEvent);
+		}
+		for (int i = 0; i < size; i++) {
+			var noteEvent = selectedNote.get(i);
+			int t1 = tick * i / size;
+			int t2 = tick * (i+1) / size;
+			noteEvent.setTickOffset(t1+startTick);
+			noteEvent.setTick(t2-t1);
+			editEventList.addMMLNoteEvent(noteEvent);
+		}
+
+		selectNote(null);
+		editObserver.notifyUpdateEditState();
+		mmlManager.updateActivePart(true);
+	}
+
 	public void changePart(MMLEventList from, MMLEventList to, boolean useSelectedNoteList, ChangePartAction action) {
 		int startTick = 0;
 		int endTick;
@@ -835,6 +869,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		}
 		popupTargetNote = editEventList.searchOnTickOffset(tickOffset);
 		velocityChangeMenu.setValue(popupTargetNote.getVelocity());
+		createTupletMenu.setEnabled(selectedNote.size() >= 3);
 
 		if (hasSelectedNote()) {
 			try {
