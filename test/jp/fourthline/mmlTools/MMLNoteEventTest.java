@@ -1,13 +1,20 @@
 /*
- * Copyright (C) 2013 たんらる
+ * Copyright (C) 2013-2022 たんらる
  */
 
 package jp.fourthline.mmlTools;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
 import org.junit.Test;
 
+import jp.fourthline.FileSelect;
+import jp.fourthline.mmlTools.core.MMLTicks;
 import jp.fourthline.mmlTools.core.TuningBase;
 import jp.fourthline.mmlTools.core.UndefinedTickException;
 
@@ -16,7 +23,7 @@ import jp.fourthline.mmlTools.core.UndefinedTickException;
  * @author fourthline
  *
  */
-public class MMLNoteEventTest {
+public class MMLNoteEventTest extends FileSelect {
 
 	@Test
 	public void testGetOctave() {
@@ -98,5 +105,71 @@ public class MMLNoteEventTest {
 		MMLEventList eventList2 = new MMLEventList("V14L16O5aacc");
 
 		assertEquals(eventList1.toString(), eventList2.toString());
+	}
+
+	private String getExpect(String filename) throws IOException {
+		StringBuilder sb = new StringBuilder();
+		var scanner = new Scanner(fileSelect(filename));
+		while (scanner.hasNextLine()) {
+			sb.append(scanner.nextLine()).append('\n');
+		}
+		scanner.close();
+		return sb.toString();
+	}
+
+	private Map<Integer, String> parseTableList(String list) {
+		Map<Integer, String> map = new HashMap<>();
+		var scanner = new Scanner(list);
+		while (scanner.hasNextLine()) {
+			String s = scanner.nextLine();
+			var t = s.split("=");
+			map.put(Integer.parseInt(t[0]), t[1]);
+		}
+		scanner.close();
+		return map;
+	}
+
+	private boolean checkTable(String expect, String actual) {
+		boolean ret = true;
+		var m1 = parseTableList(expect);
+		var m2 = parseTableList(actual);
+		for (var key : m1.keySet()) {
+			String s1 = m1.get(key);
+			String s2 = m2.get(key);
+			if (s1.length() < s2.length()) {
+				System.out.println(key+":"+s2+" > "+s1);
+				ret = false;
+			}
+		}
+		return ret;
+	}
+
+	@Test
+	public void testNoteTexts() throws UndefinedTickException, IOException {
+		StringBuilder sb = new StringBuilder();
+		for (int i = MMLTicks.minimumTick(); i <= 768; i++) {
+			MMLNoteEvent event = new MMLNoteEvent(48, i, 0);
+			String s = event.toMMLString();
+			sb.append(i+"=").append(s).append(':').append(s.length()).append('\n');
+		}
+		String expect = getExpect("noteTexts.txt");
+		String actual = sb.toString();
+		assertTrue(checkTable(expect, actual));
+		assertEquals(expect, actual);
+	}
+
+	@Test
+	public void testRestTexts() throws UndefinedTickException, IOException {
+		StringBuilder sb = new StringBuilder();
+		MMLNoteEvent prev = new MMLNoteEvent(48, 48, 0);
+		for (int i = MMLTicks.minimumTick(); i <= 768; i++) {
+			MMLNoteEvent event = new MMLNoteEvent(48, 0, 48+i);
+			String s = event.toMMLString(prev);
+			sb.append(i+"=").append(s).append(':').append(s.length()).append('\n');
+		}
+		String expect = getExpect("restTexts.txt");
+		String actual = sb.toString();
+		assertTrue(checkTable(expect, actual));
+		assertEquals(expect, actual);
 	}
 }

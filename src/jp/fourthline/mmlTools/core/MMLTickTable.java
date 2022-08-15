@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2017 たんらる
+ * Copyright (C) 2015-2022 たんらる
  */
 
 package jp.fourthline.mmlTools.core;
@@ -24,7 +24,11 @@ public final class MMLTickTable {
 	private final Map<Integer, List<String>> tickInvTable = new LinkedHashMap<>(1024);
 
 	public static MMLTickTable createTickTable() {
-		InputStream preTable = MMLTickTable.class.getResourceAsStream("ticktable.txt");
+		InputStream preTable = null;
+		String preLoadFile = System.getProperty("mabiicco.ticktable");
+		if (preLoadFile != null) {
+			preTable = MMLTickTable.class.getResourceAsStream(preLoadFile);
+		}
 
 		MMLTickTable tickTable;
 		if (preTable == null) {
