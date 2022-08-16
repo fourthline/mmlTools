@@ -95,7 +95,7 @@ public final class MMLTickTable {
 
 	private void generateInvTable() {
 		String[] keys = tickTable.keySet().toArray(new String[0]);
-		int mTick = tickTable.values().stream().max(Integer::compare).get();
+		int mTick = tickTable.get("1") * 2 - 1;
 		for (int i = 1; i <= COMBN; i++) {
 			List<List<String>> pattern = new Combination<>(keys, i).getArray();
 			for (List<String> list : pattern) {

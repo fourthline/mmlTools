@@ -40,7 +40,7 @@ public final class MMLTempoEditorTest extends UseLoadingDLS {
 		mmlManager.addMMLTrack(track1);
 		editor.updateTempoList(List.of(new MMLTempoEvent(200, 0)), 0, false, true, true);
 		mmlManager.updateActivePart(true);
-		assertEquals("MML@t200a8b6&b18c&c14l1c&c9&c38c.&c&c2&c4.&c27,d2&d7.&d10e.&e20f16&f22,l32aaaaa29aaaaaal27aaa29aa;", track1.getOriginalMML());
+		assertEquals("MML@t200a8b6&b18c&c14l1c&c9&c38c.&c.&c4.&c27,d2&d7.&d10e.&e20f16&f22,l32aaaaa29aaaaaal27aaa29aa;", track1.getOriginalMML());
 	}
 
 	@Test

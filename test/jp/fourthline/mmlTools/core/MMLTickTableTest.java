@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 たんらる
+ * Copyright (C) 2015-2022 たんらる
  */
 
 package jp.fourthline.mmlTools.core;
@@ -46,6 +46,6 @@ public final class MMLTickTableTest extends FileSelect {
 	public void test_create() {
 		MMLTickTable tickTable = MMLTickTable.createTickTable();
 		assertNotNull(tickTable);
-		assertEquals(567, tickTable.getInvTable().size());
+		assertEquals(750, tickTable.getInvTable().size());
 	}
 }
