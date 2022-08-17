@@ -720,4 +720,20 @@ public class MMLEventListTest {
 		assertEquals(11, deleteMinRestPattern(12, 11, 12+11+6, 48));
 		assertEquals(11, deleteMinRestPattern(12, 11, 12+11+7, 48));
 	}
+
+	@Test
+	public void deleteMinRestTopNote() {
+		String s = "<unknown>";
+		for (int i = 1; i <= 6; i++) {
+			MMLEventList eventList = new MMLEventList("");
+			eventList.addMMLNoteEvent(new MMLNoteEvent(52, 6, i));
+			eventList.deleteMinRest();
+			try {
+				s = eventList.getInternalMMLString();
+			} catch (UndefinedTickException e) {
+				assertEquals("Undefined tick table: "+i+"/"+i, e.getMessage());
+			}
+		}
+		assertEquals("r64e64", s);
+	}
 }
