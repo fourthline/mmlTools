@@ -570,7 +570,9 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			showTime("import", time);
 			if (score != null) {
 				MabiIccoProperties.getInstance().setRecentFile(file.getPath());
-				new MMLImportPanel(mainFrame, score, mmlSeqView).showDialog();
+				// 新規ファイルに何も変更していない状態でインポートする場合は既存トラックを削除する
+				boolean newImport = (openedFile == null) && (!fileState.isModified());
+				new MMLImportPanel(mainFrame, score, mmlSeqView, newImport).showDialog();
 			}
 		}
 	}
