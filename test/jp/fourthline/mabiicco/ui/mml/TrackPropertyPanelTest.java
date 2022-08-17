@@ -8,68 +8,11 @@ import static org.junit.Assert.*;
 import java.util.List;
 import org.junit.Test;
 
-import jp.fourthline.mabiicco.ui.AbstractMMLManager;
 import jp.fourthline.mabiicco.ui.IMMLManager;
-import jp.fourthline.mmlTools.MMLEventList;
-import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTempoEvent;
 import jp.fourthline.mmlTools.MMLTrack;
 
 public final class TrackPropertyPanelTest {
-	private class MMLManagerStub extends AbstractMMLManager {
-		@Override
-		public void setMMLScore(MMLScore score) {}
-
-		@Override
-		public int getActiveTrackIndex() {
-			return 0;
-		}
-
-		@Override
-		public int getActiveMMLPartIndex() {
-			return 0;
-		}
-
-		@Override
-		public MMLEventList getActiveMMLPart() {
-			return null;
-		}
-
-		@Override
-		public void updateActivePart(boolean generate) {}
-
-		@Override
-		public void generateActiveTrack() {}
-
-		@Override
-		public void updateActiveTrackProgram(int trackIndex, int program, int songProgram) {}
-
-		@Override
-		public int getActivePartProgram() {
-			return 0;
-		}
-
-		@Override
-		public boolean selectTrackOnExistNote(int note, int tickOffset) {
-			return false;
-		}
-
-		@Override
-		public void setMMLselectedTrack(MMLTrack track) {}
-
-		@Override
-		public void addMMLTrack(MMLTrack track) {}
-
-		@Override
-		public void moveTrack(int toIndex) {}
-
-		@Override
-		public void updatePianoRollView() {}
-
-		@Override
-		public void updatePianoRollView(int note) {}
-	}
-
 	private final IMMLManager mmlManager = new MMLManagerStub();
 
 	@Test

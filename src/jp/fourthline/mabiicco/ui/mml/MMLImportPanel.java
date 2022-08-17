@@ -34,8 +34,8 @@ public final class MMLImportPanel extends JPanel {
 	private final JDialog dialog;
 	private final Frame parentFrame;
 
-	private List<MMLTrack> trackList;
-	private IMMLManager mmlManager;
+	private final MMLScore importedScore;
+	private final IMMLManager mmlManager;
 	private final int possibleImportTrackCount;
 	private final boolean newImport;
 
@@ -52,7 +52,7 @@ public final class MMLImportPanel extends JPanel {
 	 */
 	public MMLImportPanel(Frame parentFrame, MMLScore score, IMMLManager mmlManager, boolean newImport) {
 		this.dialog = new JDialog(parentFrame, AppResource.appText("mml.input.import"), true);
-		this.trackList = score.getTrackList();
+		this.importedScore = score;
 		this.mmlManager = mmlManager;
 		this.parentFrame = parentFrame;
 		this.newImport = newImport;
@@ -60,11 +60,10 @@ public final class MMLImportPanel extends JPanel {
 				score.getTrackCount() :
 					Math.min(MMLScore.MAX_TRACK - mmlManager.getMMLScore().getTrackCount(),
 							score.getTrackCount());
-		initializePanel(trackList);
+		initializePanel(score.getTrackList());
 	}
 
 	private void initializePanel(List<MMLTrack> trackList) {
-		this.trackList = trackList;
 		setLayout(new BorderLayout());
 		JPanel buttonPanel = new JPanel();
 		JPanel p = new JPanel();
@@ -93,7 +92,7 @@ public final class MMLImportPanel extends JPanel {
 		table = new TrackListTable(trackList, true);
 		table.setInitialCheck(possibleImportTrackCount);
 		table.addPropertyChangeListener(evt -> {
-			importButton.setEnabled( table.getCheckCount() <= possibleImportTrackCount );
+			importButton.setEnabled( (table.getCheckCount() > 0) && (table.getCheckCount() <= possibleImportTrackCount) );
 			updateLabel();
 		});
 		scrollPane.setViewportView(table);
@@ -123,12 +122,16 @@ public final class MMLImportPanel extends JPanel {
 		lblNewLabel.setText(AppResource.appText("mml.input.import.possibleImport")+": "+table.getCheckCount()+"/"+possibleImportTrackCount);
 	}
 
-	private void importMMLTrack() {
+	void importMMLTrack() {
+		var trackList = importedScore.getTrackList();
 		MMLScore targetScore = mmlManager.getMMLScore();
 		if (newImport) {
 			for (int i = 0; i < targetScore.getTrackCount(); i++) {
 				targetScore.removeTrack(0);
 			}
+			targetScore.setAuthor(importedScore.getAuthor());
+			targetScore.setTitle(importedScore.getTitle());
+			targetScore.setBaseTime(importedScore.getBaseTime());
 		}
 		boolean[] checkList = table.getCheckList();
 		for (int i = 0; i < trackList.size(); i++) {
