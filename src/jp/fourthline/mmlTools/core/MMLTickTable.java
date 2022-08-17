@@ -100,14 +100,9 @@ public final class MMLTickTable {
 			List<List<String>> pattern = new Combination<>(keys, i).getArray();
 			for (List<String> list : pattern) {
 				int tick = list.stream().mapToInt(tickTable::get).sum();
-				if (tick > mTick) {
-					continue;
-				}
-				if (!tickInvTable.containsKey(tick)) {
-					tickInvTable.put(tick, list);
-				} else {
+				if (tick <= mTick) {
 					List<String> currentList = tickInvTable.get(tick);
-					if ( (patternLength(list) <= patternLength(currentList)) ) {
+					if ( (currentList == null) || (patternLength(list) <= patternLength(currentList)) ) {
 						tickInvTable.put(tick, list);
 					}
 				}

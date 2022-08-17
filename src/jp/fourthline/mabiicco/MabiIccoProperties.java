@@ -194,11 +194,13 @@ public final class MabiIccoProperties {
 	}
 
 	public void setWindowRect(Rectangle rect) {
-		properties.setProperty(WINDOW_X, Integer.toString((int)rect.getX()));
-		properties.setProperty(WINDOW_Y, Integer.toString((int)rect.getY()));
-		properties.setProperty(WINDOW_WIDTH, Integer.toString((int)rect.getWidth()));
-		properties.setProperty(WINDOW_HEIGHT, Integer.toString((int)rect.getHeight()));
-		save();
+		if (!windowMaximize.get()) {
+			properties.setProperty(WINDOW_X, Integer.toString((int)rect.getX()));
+			properties.setProperty(WINDOW_Y, Integer.toString((int)rect.getY()));
+			properties.setProperty(WINDOW_WIDTH, Integer.toString((int)rect.getWidth()));
+			properties.setProperty(WINDOW_HEIGHT, Integer.toString((int)rect.getHeight()));
+			save();
+		}
 	}
 
 	public int getPianoRollViewHeightScaleProperty() {

@@ -110,9 +110,7 @@ public class MMLNoteEventTest extends FileSelect {
 	private String getExpect(String filename) throws IOException {
 		StringBuilder sb = new StringBuilder();
 		var scanner = new Scanner(fileSelect(filename));
-		while (scanner.hasNextLine()) {
-			sb.append(scanner.nextLine()).append('\n');
-		}
+		scanner.forEachRemaining(s -> sb.append(s).append('\n'));
 		scanner.close();
 		return sb.toString();
 	}
@@ -120,11 +118,10 @@ public class MMLNoteEventTest extends FileSelect {
 	private Map<Integer, String> parseTableList(String list) {
 		Map<Integer, String> map = new HashMap<>();
 		var scanner = new Scanner(list);
-		while (scanner.hasNextLine()) {
-			String s = scanner.nextLine();
+		scanner.forEachRemaining(s -> {
 			var t = s.split("=");
 			map.put(Integer.parseInt(t[0]), t[1]);
-		}
+		});
 		scanner.close();
 		return map;
 	}
