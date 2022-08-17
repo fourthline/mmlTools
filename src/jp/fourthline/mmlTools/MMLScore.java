@@ -303,14 +303,15 @@ public final class MMLScore implements Cloneable {
 
 	/**
 	 * generateした結果が同じであれば, generateした状態のMMLScoreにする.
+	 * @param force  trueの場合は旧データとの比較をしない
 	 * @return
 	 */
-	public MMLScore toGeneratedScore() {
+	public MMLScore toGeneratedScore(boolean force) {
 		try {
 			MMLScore score = new MMLScore();
 			score.putObjectState( this.getObjectState() );
 			score.generateAll();
-			if ( Arrays.equals(this.getObjectState(), score.getObjectState()) ) {
+			if ( force || Arrays.equals(this.getObjectState(), score.getObjectState()) ) {
 				return score;
 			}
 		} catch (UndefinedTickException e) {}

@@ -115,6 +115,9 @@ public final class MabiIccoProperties {
 	/** テンポ削除時にもTick変換のダイアログ表示をする */
 	public final Property<Boolean> enableTempoDeleteWithConvert = new BooleanProperty("function.tempoDeleteWithConvert", false);
 
+	/** ファイルOpen時にMML再生成する (旧データとの比較をしない) */
+	public final Property<Boolean> reGenerateWithOpen = new BooleanProperty("function.reGenerateWithOpen", true);
+
 	public static MabiIccoProperties getInstance() {
 		return instance;
 	}

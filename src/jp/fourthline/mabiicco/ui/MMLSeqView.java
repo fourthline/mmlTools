@@ -147,7 +147,7 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 		boolean result = undoEdit.recover(s);
 		System.out.println("recover: "+result);
 		if (result) {
-			mmlScore = mmlScore.toGeneratedScore();
+			mmlScore = mmlScore.toGeneratedScore(false);
 			undoEdit.revertState();
 			updateTrackTabIcon();
 			updateActivePart(false);
@@ -556,7 +556,7 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 	public void undo() {
 		if (undoEdit.canUndo()) {
 			undoEdit.undo();
-			mmlScore = mmlScore.toGeneratedScore();
+			mmlScore = mmlScore.toGeneratedScore(false);
 			resetTrackView();
 			updateSelectedTrackAndMMLPart();
 			updateActivePart(false);
@@ -566,7 +566,7 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 	public void redo() {
 		if (undoEdit.canRedo()) {
 			undoEdit.redo();
-			mmlScore = mmlScore.toGeneratedScore();
+			mmlScore = mmlScore.toGeneratedScore(false);
 			resetTrackView();
 			updateSelectedTrackAndMMLPart();
 			updateActivePart(false);

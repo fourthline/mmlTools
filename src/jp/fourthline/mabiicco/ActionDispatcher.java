@@ -342,7 +342,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 
 				// mabiicco由来のファイルであれば, generateされたものにする.
 				if (score != null) {
-					score = score.toGeneratedScore();
+					score = score.toGeneratedScore(MabiIccoProperties.getInstance().reGenerateWithOpen.get());
 				}
 				done = true;
 			}
