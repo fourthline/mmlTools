@@ -200,7 +200,7 @@ public final class MMLEditorTest extends UseLoadingDLS {
 	 * 範囲選択.
 	 * @throws Exception
 	 */
-	private void check_areaSelect() throws Exception {
+	private void check_areaSelect(int addModifiers, boolean startHasSelectedNote, int startNoteCount) throws Exception {
 		MMLEventList eventList = mmlManager.getActiveMMLPart();
 
 		// note1iのノートだけを範囲選択してカット&ペースト, コピー&ペースト, delete.
@@ -218,15 +218,15 @@ public final class MMLEditorTest extends UseLoadingDLS {
 		int x2 = pianoRollView.convertTicktoX(96+96+30);
 
 		// 右クリック指定.
-		MouseEvent mouseEvent1 = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON3_DOWN_MASK, x1, y-1, 1, false);
-		MouseEvent mouseEvent2 = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON3_DOWN_MASK, x2, y+1, 1, false);
+		MouseEvent mouseEvent1 = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON3_DOWN_MASK | addModifiers, x1, y-1, 1, false);
+		MouseEvent mouseEvent2 = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON3_DOWN_MASK | addModifiers, x2, y+1, 1, false);
 
 		// エリア右クリックによる選択開始.
 		assertEquals(EditMode.SELECT, getEditMode());
 		editor.mousePressed(mouseEvent1);
 		assertEquals(EditMode.AREA, getEditMode());
-		assertEquals(false, editor.hasSelectedNote()); // まだ選択できるノートはない.
-		assertEquals(3, eventList.getMMLNoteEventList().size());
+		assertEquals(startHasSelectedNote, editor.hasSelectedNote());
+		assertEquals(startNoteCount, eventList.getMMLNoteEventList().size());
 
 		// ドラッグによるエリア確定.
 		editor.mouseDragged(mouseEvent2);
@@ -247,7 +247,7 @@ public final class MMLEditorTest extends UseLoadingDLS {
 	public void test_areaSelectCut() throws Exception {
 		MMLEventList eventList = mmlManager.getActiveMMLPart();
 		// 範囲選択.
-		check_areaSelect();
+		check_areaSelect(0, false, 3);
 
 		// カット&ペースト.
 		assertEquals(">>g+4<<<e4>>>g+4", MMLBuilder.create(eventList).toMMLString());
@@ -265,7 +265,7 @@ public final class MMLEditorTest extends UseLoadingDLS {
 	public void test_areaSelectCopy() throws Exception {
 		MMLEventList eventList = mmlManager.getActiveMMLPart();
 		// 範囲選択.
-		check_areaSelect();
+		check_areaSelect(0, false, 3);
 
 		// コピー&ペースト.
 		assertEquals(">>g+4<<<e4>>>g+4", MMLBuilder.create(eventList).toMMLString());
@@ -283,10 +283,25 @@ public final class MMLEditorTest extends UseLoadingDLS {
 	public void test_areaSelectDelete() throws Exception {
 		MMLEventList eventList = mmlManager.getActiveMMLPart();
 		// 範囲選択.
-		check_areaSelect();
+		check_areaSelect(0, false, 3);
 
 		// delete.
 		assertEquals(">>g+4<<<e4>>>g+4", MMLBuilder.create(eventList).toMMLString());
+		editor.selectedDelete();
+		assertEquals("r4<e4", MMLBuilder.create(eventList).toMMLString());
+	}
+
+	@Test
+	public void test_addAreaSelect() throws Exception {
+		MMLEventList eventList = mmlManager.getActiveMMLPart();
+		eventList.addMMLNoteEvent(new MMLNoteEvent(55, 48, 384));
+		editor.selectAll();
+
+		// 範囲選択.
+		check_areaSelect(InputEvent.CTRL_DOWN_MASK, true, 4);
+
+		// delete.
+		assertEquals(">>g+4<<<e4>>>g+4r4<<g8", MMLBuilder.create(eventList).toMMLString());
 		editor.selectedDelete();
 		assertEquals("r4<e4", MMLBuilder.create(eventList).toMMLString());
 	}

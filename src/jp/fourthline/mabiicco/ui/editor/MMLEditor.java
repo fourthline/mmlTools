@@ -155,16 +155,13 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		}
 	}
 
-	private void selectMultipleNote(MMLNoteEvent noteEvent1, MMLNoteEvent noteEvent2) {
-		selectMultipleNote(noteEvent1, noteEvent2, true);
-	}
-
 	/**
 	 * @param noteEvent1
 	 * @param noteEvent2
 	 * @param lookNote falseの場合は、tickOffset間にあるすべてのノートが選択される. trueの場合はnote情報もみて判定する.
+	 * @param hadNotes    追加選択しているノートのリスト
 	 */
-	private void selectMultipleNote(MMLNoteEvent noteEvent1, MMLNoteEvent noteEvent2, boolean lookNote) {
+	private void selectMultipleNote(MMLNoteEvent noteEvent1, MMLNoteEvent noteEvent2, boolean lookNote, List<MMLNoteEvent> hadNotes) {
 		int[] note = {
 				noteEvent1.getNote(),
 				noteEvent2.getNote()
@@ -183,6 +180,9 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		}
 
 		selectedNote.clear();
+		if (hadNotes != null) {
+			selectedNote.addAll(hadNotes);
+		}
 		MMLEventList editEventList = mmlManager.getActiveMMLPart();
 		if (editEventList == null) {
 			return;
@@ -191,7 +191,9 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 			if ( (noteEvent.getNote() >= note[0]) && (noteEvent.getNote() <= note[1]) 
 					&& (noteEvent.getEndTick() > tickOffset[0])
 					&& (noteEvent.getTickOffset() <= tickOffset[1]) ) {
-				selectedNote.add(noteEvent);
+				if (!selectedNote.contains(noteEvent)) {
+					selectedNote.add(noteEvent);
+				}
 			}
 		}
 	}
@@ -216,7 +218,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 			}
 
 			if ( (selectedNote.size() == 1) && ((selectModifiers & InputEvent.SHIFT_DOWN_MASK) != 0) ) {
-				selectMultipleNote(selectedNote.get(0), noteEvent, false);
+				selectMultipleNote(selectedNote.get(0), noteEvent, false, null);
 			} else {
 				selectNote(noteEvent, ((selectModifiers & InputEvent.CTRL_DOWN_MASK) != 0));
 			}
@@ -368,7 +370,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	}
 
 	@Override
-	public void areaSelectingAction(Point startPoint, Point point) {
+	public void areaSelectingAction(Point startPoint, Point point, List<MMLNoteEvent> list) {
 		int x1 = startPoint.x;
 		int x2 = point.x;
 		if (x1 > x2) {
@@ -391,7 +393,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 
 		selectMultipleNote(
 				new MMLNoteEvent(note1, 0, tickOffset1, 0),
-				new MMLNoteEvent(note2, 0, tickOffset2, 0) );
+				new MMLNoteEvent(note2, 0, tickOffset2, 0), true, list);
 	}
 
 	@Override
@@ -886,5 +888,10 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		int startOffset = mmlManager.getActiveMMLPartStartOffset();
 		int tickOffset = (int)pianoRollView.convertXtoTick( point.x );
 		return (startOffset <= tickOffset);
+	}
+
+	@Override
+	public List<MMLNoteEvent> getSelectedNote() {
+		return new ArrayList<>(selectedNote);
 	}
 }
