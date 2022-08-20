@@ -49,7 +49,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 
 	// 編集選択中のノート
 	private final ArrayList<MMLNoteEvent> selectedNote = new ArrayList<>();
-	// 複数ノート移動時のdetachリスト
+	// 編集中のdetachノートリスト
 	private final ArrayList<MMLNoteEvent> detachedNote = new ArrayList<>();
 
 	// 編集align (tick base)
@@ -334,13 +334,15 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	}
 
 	@Override
-	public void cancelMove() {
+	public void cancelEdit() {
 		int i = 0;
 		for (MMLNoteEvent noteEvent : selectedNote) {
 			MMLNoteEvent revertNote = detachedNote.get(i++);
 			noteEvent.setNote(revertNote.getNote());
 			noteEvent.setTickOffset(revertNote.getTickOffset());
+			noteEvent.setTick(revertNote.getTick());
 		}
+		detachedNote.clear();
 	}
 
 	/**

@@ -8,7 +8,6 @@ import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.util.List;
-import java.awt.event.InputEvent;
 
 import javax.swing.SwingUtilities;
 
@@ -54,9 +53,8 @@ enum EditMode {
 		}
 		@Override
 		public void executeEvent(IEditContext context, MouseEvent e) {
-			int modifiers = e.getModifiersEx();
-			boolean shiftOption = (modifiers & InputEvent.SHIFT_DOWN_MASK) != 0;
-			boolean ctrlOption = (modifiers & InputEvent.CTRL_DOWN_MASK) != 0;
+			boolean shiftOption = e.isShiftDown();
+			boolean ctrlOption = e.isControlDown();
 			int cursorType = Cursor.DEFAULT_CURSOR;
 			Point p = e.getPoint();
 			if (context.onExistNote(p)) {
@@ -88,8 +86,7 @@ enum EditMode {
 		@Override
 		public void executeEvent(IEditContext context, MouseEvent e) {
 			// 選択中のNote、Note長を更新.
-			boolean alignment = (e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) == 0;
-			context.updateSelectedNoteAndTick(e.getPoint(), true, alignment);
+			context.updateSelectedNoteAndTick(e.getPoint(), true, !e.isControlDown());
 		}
 		@Override
 		public void exit(IEditContext context) {
@@ -102,7 +99,7 @@ enum EditMode {
 		public void pressEvent(IEditContext context, MouseEvent e) {
 			// 右クリックで、編集キャンセル
 			if (SwingUtilities.isRightMouseButton(e)) {
-				context.cancelMove();
+				context.cancelEdit();
 				context.changeState(SELECT).executeEvent(context, e);
 			}
 		}
@@ -113,10 +110,9 @@ enum EditMode {
 		}
 		@Override
 		public void executeEvent(IEditContext context, MouseEvent e) {
-			int modifiers = e.getModifiersEx();
 			// 選択中のNoteを移動
-			boolean shiftOption = (modifiers & InputEvent.SHIFT_DOWN_MASK) != 0;
-			boolean ctrlOption = (modifiers & InputEvent.CTRL_DOWN_MASK) != 0;
+			boolean shiftOption = e.isShiftDown();
+			boolean ctrlOption = e.isControlDown();
 			context.moveSelectedMMLNote(startPoint, e.getPoint(), shiftOption, !ctrlOption, ctrlOption, !shiftOption && ctrlOption);
 		}
 		@Override
@@ -127,16 +123,25 @@ enum EditMode {
 	},
 	LENGTH {
 		@Override
+		public void pressEvent(IEditContext context, MouseEvent e) {
+			// 右クリックで、編集キャンセル
+			if (SwingUtilities.isRightMouseButton(e)) {
+				context.cancelEdit();
+				context.changeState(SELECT).executeEvent(context, e);
+			}
+		}
+		@Override
 		public void enter(IEditContext context) {
 			// 単音選択
 			context.selectNoteByPoint(null, 0);
 			context.selectNoteByPoint(startPoint, 0);
+			// 編集前の選択ノートリストをdetachする.
+			context.detachSelectedMMLNote();
 		}
 		@Override
 		public void executeEvent(IEditContext context, MouseEvent e) {
 			// 選択中のNote長を更新.（Noteは更新しない）
-			boolean alignment = (e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) == 0;
-			context.updateSelectedNoteAndTick(e.getPoint(), false, alignment);
+			context.updateSelectedNoteAndTick(e.getPoint(), false, !e.isControlDown());
 		}
 		@Override
 		public void exit(IEditContext context) {
@@ -152,7 +157,7 @@ enum EditMode {
 		}
 		@Override
 		public void executeEvent(IEditContext context, MouseEvent e) {
-			boolean ctrlOption = (e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) != 0;
+			boolean ctrlOption = e.isControlDown();
 			if (hadNotes == null) {
 				if (!ctrlOption) {
 					context.selectNoteByPoint(null, 0);

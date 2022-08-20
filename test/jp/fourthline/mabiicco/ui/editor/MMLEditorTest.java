@@ -142,12 +142,102 @@ public final class MMLEditorTest extends UseLoadingDLS {
 		assertEquals(tickOffset2, noteEventList.get(0).getTickOffset());
 
 		// マウスリリースによる挿入確定.
-		editor.mouseReleased(mouseEvent1);
+		editor.mouseReleased(mouseEvent2);
 		assertEquals(EditMode.SELECT, getEditMode());
 		assertEquals(true, editor.hasSelectedNote());
 		assertEquals(1, noteEventList.size());
 		assertEquals(note2, noteEventList.get(0).getNote());
 		assertEquals(tickOffset2, noteEventList.get(0).getTickOffset());
+		assertEquals(-1, playingNote);
+	}
+
+	/**
+	 * ノートを挿入, キャンセル.
+	 * @throws Exception
+	 */
+	@Test
+	public void test_insertCancel() throws Exception {
+		List<MMLNoteEvent> noteEventList = mmlManager.getActiveMMLPart().getMMLNoteEventList();
+
+		assertEquals(0, noteEventList.size());
+		assertEquals(-1, playingNote);
+		assertEquals(false, editor.hasSelectedNote());
+
+		int note1 = pianoRollView.convertY2Note(200);
+		MouseEvent mouseEvent1 = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON1_DOWN_MASK, 0, 200, 1, false);
+		MouseEvent mouseEvent3 = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON1_DOWN_MASK | InputEvent.BUTTON3_DOWN_MASK, 0, 200, 1, false);
+
+		// マウスクリックによる挿入ノート候補選択状態.
+		assertEquals(EditMode.SELECT, getEditMode());
+		editor.mousePressed(mouseEvent1);
+		assertEquals(EditMode.INSERT, getEditMode());
+		assertEquals(true, editor.hasSelectedNote());
+		assertEquals(note1, playingNote);
+		assertEquals(0, noteEventList.size());
+
+		// キャンセル.
+		editor.mousePressed(mouseEvent3);
+		assertEquals(EditMode.SELECT, getEditMode());
+		assertEquals(false, editor.hasSelectedNote());
+		assertEquals(0, noteEventList.size());
+		assertEquals(-1, playingNote);
+
+		// マウスリリース
+		editor.mouseReleased(mouseEvent3);
+		assertEquals(EditMode.SELECT, getEditMode());
+		assertEquals(false, editor.hasSelectedNote());
+		assertEquals(0, noteEventList.size());
+		assertEquals(-1, playingNote);
+	}
+
+	/**
+	 * ノートを移動, キャンセル
+	 * @throws Exception
+	 */
+	@Test
+	public void test_moveNoteCancel() throws Exception {
+		List<MMLNoteEvent> noteEventList = mmlManager.getActiveMMLPart().getMMLNoteEventList();
+
+		int note1 = pianoRollView.convertY2Note(200);
+		int note2 = pianoRollView.convertY2Note(100);
+		long tickOffset1 = 0;
+		long tickOffset2 = pianoRollView.convertXtoTick(100);
+		tickOffset2 -= ( tickOffset2 % editor.getEditAlign() );
+		MouseEvent mouseEvent1 = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON1_DOWN_MASK, 0, 200, 1, false);
+		MouseEvent mouseEvent2 = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON1_DOWN_MASK, 100, 100, 1, false);
+		MouseEvent mouseEvent3 = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON1_DOWN_MASK | InputEvent.BUTTON3_DOWN_MASK, 100, 100, 1, false);
+		noteEventList.add(new MMLNoteEvent(note1, 96, 0));
+
+		// ノート選択
+		editor.mousePressed(mouseEvent1);
+		assertEquals(EditMode.MOVE, getEditMode());
+		assertEquals(true, editor.hasSelectedNote());
+		assertEquals(note1, playingNote);
+		assertEquals(tickOffset1, noteEventList.get(0).getTickOffset());
+
+		// ノート移動.
+		editor.mouseDragged(mouseEvent2);
+		assertEquals(EditMode.MOVE, getEditMode());
+		assertEquals(true, editor.hasSelectedNote());
+		assertEquals(note2, playingNote);
+		assertEquals(tickOffset2, noteEventList.get(0).getTickOffset());
+
+		// キャンセル
+		editor.mousePressed(mouseEvent3);
+		assertEquals(EditMode.SELECT, getEditMode());
+		assertEquals(true, editor.hasSelectedNote());
+		assertEquals(1, noteEventList.size());
+		assertEquals(note1, noteEventList.get(0).getNote());
+		assertEquals(tickOffset1, noteEventList.get(0).getTickOffset());
+		assertEquals(-1, playingNote);
+
+		// マウスリリース
+		editor.mouseReleased(mouseEvent3);
+		assertEquals(EditMode.SELECT, getEditMode());
+		assertEquals(true, editor.hasSelectedNote());
+		assertEquals(1, noteEventList.size());
+		assertEquals(note1, noteEventList.get(0).getNote());
+		assertEquals(tickOffset1, noteEventList.get(0).getTickOffset());
 		assertEquals(-1, playingNote);
 	}
 
@@ -194,6 +284,59 @@ public final class MMLEditorTest extends UseLoadingDLS {
 		assertEquals(-1, playingNote);
 		assertEquals(1, noteEventList.size());
 		assertEquals(note2.toString(), noteEventList.get(0).toString());
+	}
+
+	/**
+	 * ノートの端をつまんで tickを変更, キャンセル
+	 * @throws Exception
+	 */
+	@Test
+	public void test_lengthModifyCancel() throws Exception {
+		List<MMLNoteEvent> noteEventList = mmlManager.getActiveMMLPart().getMMLNoteEventList();
+
+		// 初期ノートをつまんで、1/4 -> 1/2 にする.
+		int note = 80;
+		MMLNoteEvent note1 = new MMLNoteEvent(note, 96, 0);
+		noteEventList.add(new MMLNoteEvent(note, 96, 0));
+
+		int y = pianoRollView.convertNote2Y(note);
+		int x1 = pianoRollView.convertTicktoX(95);
+		int x2 = pianoRollView.convertTicktoX(96*2-1);
+		MouseEvent mouseEvent1 = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON1_DOWN_MASK, x1, y, 1, false);
+		MouseEvent mouseEvent2 = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON1_DOWN_MASK, x2, y, 1, false);
+		MouseEvent mouseEvent3 = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON1_DOWN_MASK | InputEvent.BUTTON3_DOWN_MASK, x1, y, 1, false);
+
+		// マウスクリックでノートの長さ変更開始.
+		assertEquals(note1.toString(), noteEventList.get(0).toString());
+		assertEquals(EditMode.SELECT, getEditMode());
+		editor.mousePressed(mouseEvent1);
+		assertEquals(EditMode.LENGTH, getEditMode());
+		assertEquals(true, editor.hasSelectedNote());
+		assertEquals(note, playingNote);
+		assertEquals(1, noteEventList.size());
+
+		// 変更位置までドラッグ.
+		editor.mouseDragged(mouseEvent2);
+		assertEquals(EditMode.LENGTH, getEditMode());
+		assertEquals(true, editor.hasSelectedNote());
+		assertEquals(note, playingNote);
+		assertEquals(1, noteEventList.size());
+
+		// キャンセル
+		editor.mousePressed(mouseEvent3);
+		assertEquals(EditMode.SELECT, getEditMode());
+		assertEquals(false, editor.hasSelectedNote());
+		assertEquals(-1, playingNote);
+		assertEquals(1, noteEventList.size());
+		assertEquals(note1.toString(), noteEventList.get(0).toString());
+
+		// マウスリリース
+		editor.mouseReleased(mouseEvent3);
+		assertEquals(EditMode.SELECT, getEditMode());
+		assertEquals(false, editor.hasSelectedNote());
+		assertEquals(-1, playingNote);
+		assertEquals(1, noteEventList.size());
+		assertEquals(note1.toString(), noteEventList.get(0).toString());
 	}
 
 	/**

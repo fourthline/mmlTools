@@ -23,7 +23,7 @@ interface IEditContext {
 	void detachSelectedMMLNote();
 	void updateSelectedNoteAndTick(Point p, boolean updateNote, boolean alignment);
 	void moveSelectedMMLNote(Point start, Point p, boolean shiftOption, boolean alignment, boolean octaveAlign, boolean showInfo);
-	void cancelMove();
+	void cancelEdit();
 	void applyEditNote(boolean select);
 	void setCursor(Cursor cursor);
 	void areaSelectingAction(Point startPoint, Point point, List<MMLNoteEvent> list);
