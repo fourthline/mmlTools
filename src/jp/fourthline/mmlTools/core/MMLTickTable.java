@@ -21,7 +21,7 @@ public final class MMLTickTable {
 	/**
 	 * For tick -> MML text
 	 */
-	private final Map<Integer, List<String>> tickInvTable = new LinkedHashMap<>(1024);
+	private final IntMap<List<String>> tickInvTable;
 
 	public static MMLTickTable createTickTable() {
 		InputStream preTable = null;
@@ -29,32 +29,17 @@ public final class MMLTickTable {
 		if (preLoadFile != null) {
 			preTable = MMLTickTable.class.getResourceAsStream(preLoadFile);
 		}
-
-		MMLTickTable tickTable;
-		if (preTable == null) {
-			tickTable = new MMLTickTable();
-		} else {
-			tickTable = new MMLTickTable(preTable);
-		}
-		return tickTable;
-	}
-
-	MMLTickTable() {
-		NanoTime time = NanoTime.start();
-		generateTickTable();
-		generateInvTable();
-		System.out.println("MMLTickTable " + time.ms() + "ms");
+		return new MMLTickTable(preTable);
 	}
 
 	MMLTickTable(InputStream inputStream) {
-		long startTime = System.currentTimeMillis();
+		NanoTime time = NanoTime.start();
 		generateTickTable();
-		readFromInputStreamInvTable(inputStream);
-		long endTime = System.currentTimeMillis();
-		System.out.println("MMLTickTable(load) " + (endTime - startTime) + "ms");
+		tickInvTable = (inputStream == null) ? generateInvTable() : readFromInputStreamInvTable(inputStream);
+		System.out.println("MMLTickTable " + time.ms() + "ms");
 	}
 
-	public Map<Integer, List<String>> getInvTable() {
+	public IntMap<List<String>> getInvTable() {
 		return this.tickInvTable;
 	}
 
@@ -93,7 +78,8 @@ public final class MMLTickTable {
 		return len + pattern.size()*10;
 	}
 
-	private void generateInvTable() {
+	private IntMap<List<String>> generateInvTable() {
+		var table = new HashMap<Integer, List<String>>(1024);
 		String[] keys = tickTable.keySet().toArray(new String[0]);
 		int mTick = tickTable.get("1") * 2 - 1;
 		for (int i = 1; i <= COMBN; i++) {
@@ -101,21 +87,22 @@ public final class MMLTickTable {
 			for (List<String> list : pattern) {
 				int tick = list.stream().mapToInt(tickTable::get).sum();
 				if (tick <= mTick) {
-					List<String> currentList = tickInvTable.get(tick);
+					List<String> currentList = table.get(tick);
 					if ( (currentList == null) || (patternLength(list) <= patternLength(currentList)) ) {
-						tickInvTable.put(tick, list);
+						table.put(tick, list);
 					}
 				}
 			}
 		}
+		return new IntMap<>(table);
 	}
 
 	void writeToOutputStreamInvTable(OutputStream outputStream) {
 		PrintStream stream = new PrintStream(outputStream, false, StandardCharsets.UTF_8);
 		stream.println("# Generated Text --- ");
-		stream.println("# registered key: " + tickInvTable.size());
+		stream.println("# registered key: " + tickInvTable.validCount());
 
-		int max = tickInvTable.keySet().stream().max(Integer::compare).get();
+		int max = tickInvTable.max();
 		for (int i = 1; i <= max; i++) {
 			if (tickInvTable.containsKey(i)) {
 				stream.print(i+"=");
@@ -129,7 +116,8 @@ public final class MMLTickTable {
 		}
 	}
 
-	private void readFromInputStreamInvTable(InputStream inputStream) {
+	private IntMap<List<String>> readFromInputStreamInvTable(InputStream inputStream) {
+		var table = new HashMap<Integer, List<String>>(1024);
 		InputStreamReader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
 		new BufferedReader(reader).lines().forEach(s -> {
 			if (!s.startsWith("#")) {
@@ -143,9 +131,46 @@ public final class MMLTickTable {
 					valueList.add(item);
 					itemList = itemList.substring(itemIndex+1);
 				}
-				tickInvTable.put(Integer.parseInt(key), valueList);
+				table.put(Integer.parseInt(key), valueList);
 			}
 		});
+		return new IntMap<>(table);
+	}
+
+	public final static class IntMap<T> {
+		private final T[] array;
+
+		@SuppressWarnings("unchecked")
+		public IntMap(Map<Integer, T> map) {
+			var list = new ArrayList<T>();
+			int max = map.keySet().stream().max(Integer::compare).get();
+			for (int i = 0; i <= max; i++) {
+				list.add(map.get(i));
+			}
+			array = (T[]) list.toArray();
+		}
+
+		public int max() {
+			return array.length;
+		}
+
+		public int validCount() {
+			int count = 0;
+			for (var a : array) {
+				if (a != null) {
+					count++;
+				}
+			}
+			return count;
+		}
+
+		public boolean containsKey(int key) {
+			return (key >= 0) && (key < array.length) ? array[key] != null : false;
+		}
+
+		public T get(int key) {
+			return (key >= 0) && (key < array.length) ? array[key] : null;
+		}
 	}
 
 	private void printTickList() {
@@ -153,7 +178,7 @@ public final class MMLTickTable {
 	}
 
 	public static void main(String[] args) {
-		MMLTickTable tickTable = new MMLTickTable();
+		MMLTickTable tickTable = new MMLTickTable(null);
 		tickTable.printTickList();
 	}
 }

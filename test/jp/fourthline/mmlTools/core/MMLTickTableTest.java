@@ -18,7 +18,7 @@ public final class MMLTickTableTest extends FileSelect {
 
 	@Test
 	public void test_writeAndReadInvTable() {
-		MMLTickTable tickTable1 = new MMLTickTable();
+		MMLTickTable tickTable1 = new MMLTickTable(null);
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		tickTable1.writeToOutputStreamInvTable(outputStream);
 
@@ -33,7 +33,7 @@ public final class MMLTickTableTest extends FileSelect {
 
 	@Test
 	public void test_invTable() throws IOException {
-		MMLTickTable tickTable1 = new MMLTickTable();
+		MMLTickTable tickTable1 = new MMLTickTable(null);
 		MMLTickTable tickTable2 = new MMLTickTable( fileSelect("tickInvTable.txt") );
 		ByteArrayOutputStream outputStream1 = new ByteArrayOutputStream();
 		ByteArrayOutputStream outputStream2 = new ByteArrayOutputStream();
@@ -46,6 +46,6 @@ public final class MMLTickTableTest extends FileSelect {
 	public void test_create() {
 		MMLTickTable tickTable = MMLTickTable.createTickTable();
 		assertNotNull(tickTable);
-		assertEquals(750, tickTable.getInvTable().size());
+		assertEquals(750, tickTable.getInvTable().validCount());
 	}
 }

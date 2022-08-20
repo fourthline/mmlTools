@@ -299,6 +299,7 @@ public final class MMLEditorTest extends UseLoadingDLS {
 
 		// 範囲選択.
 		check_areaSelect(InputEvent.CTRL_DOWN_MASK, true, 4);
+		check_areaSelect(InputEvent.CTRL_DOWN_MASK, true, 4); // 増殖してないことを確認
 
 		// delete.
 		assertEquals(">>g+4<<<e4>>>g+4r4<<g8", MMLBuilder.create(eventList).toMMLString());
