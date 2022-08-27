@@ -7,12 +7,10 @@ package jp.fourthline.mabiicco.ui.editor;
 import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
-import java.util.List;
 
 import javax.swing.SwingUtilities;
 
 import jp.fourthline.mabiicco.MabiIccoProperties;
-import jp.fourthline.mmlTools.MMLNoteEvent;
 
 /**
  * MMLEditorの編集状態と振る舞い.
@@ -150,25 +148,23 @@ enum EditMode {
 		}
 	},
 	AREA {
-		private List<MMLNoteEvent> hadNotes; // 追加選択時の既存選択ノートのリスト
+		private MouseEvent firstEvent;
 		@Override
 		public void enter(IEditContext context) {
-			hadNotes = null;
+			firstEvent = null;
 		}
 		@Override
 		public void executeEvent(IEditContext context, MouseEvent e) {
 			boolean ctrlOption = e.isControlDown();
-			if (hadNotes == null) {
+			if (firstEvent == null) {
+				firstEvent = e;
 				if (!ctrlOption) {
 					context.selectNoteByPoint(null, 0);
-					hadNotes = List.of();
-				} else {
-					// Ctrlキー押下時は追加選択する
-					hadNotes = context.getSelectedNote();
 				}
+				context.detachSelectedMMLNote();
 			}
 			// 範囲選択.
-			context.areaSelectingAction(startPoint, e.getPoint(), hadNotes);
+			context.areaSelectingAction(startPoint, e.getPoint());
 		}
 		@Override
 		public void exit(IEditContext context) {

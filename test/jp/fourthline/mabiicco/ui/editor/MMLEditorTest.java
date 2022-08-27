@@ -152,6 +152,34 @@ public final class MMLEditorTest extends UseLoadingDLS {
 	}
 
 	/**
+	 * 複数の非連続ノートを選択して移動する.
+	 * @throws Exception
+	 */
+	@Test
+	public void test_moveSelectedNote() throws Exception {
+		mmlManager.getActiveMMLPart().addMMLNoteEvent(new MMLNoteEvent(52, 48, 0));
+		mmlManager.getActiveMMLPart().addMMLNoteEvent(new MMLNoteEvent(52, 48, 48));
+		mmlManager.getActiveMMLPart().addMMLNoteEvent(new MMLNoteEvent(54, 48, 96+48));
+		mmlManager.getActiveMMLPart().addMMLNoteEvent(new MMLNoteEvent(54, 48, 96+96));
+		editor.selectAll();
+		mmlManager.getActiveMMLPart().addMMLNoteEvent(new MMLNoteEvent(53, 48, 96));
+
+		int x1 = pianoRollView.convertTicktoX(0+1);
+		int x2 = pianoRollView.convertTicktoX(96+96+1);
+		int y1 = pianoRollView.convertNote2Y(52);
+		int y2 = pianoRollView.convertNote2Y(54);
+		MouseEvent mouseEvent1 = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON1_DOWN_MASK, x1, y1, 1, false);
+		MouseEvent mouseEvent2 = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON1_DOWN_MASK, x2, y2, 1, false);
+
+		// 選択したノートの移動
+		editor.mousePressed(mouseEvent1);
+		editor.mouseDragged(mouseEvent2);
+		editor.mouseReleased(mouseEvent2);
+		assertEquals(5, mmlManager.getActiveMMLPart().getMMLNoteEventList().size());
+		assertEquals("r4f8r8f+8f+8r8g+8g+8", mmlManager.getActiveMMLPart().getInternalMMLString());
+	}
+
+	/**
 	 * ノートを挿入, キャンセル.
 	 * @throws Exception
 	 */
@@ -477,17 +505,19 @@ public final class MMLEditorTest extends UseLoadingDLS {
 		MMLEventList to = track.getMMLEventAtIndex(2);
 
 		if (select) {
-			// select
-			MMLNoteEvent note = new MMLEventList("ccc").getMMLNoteEventList().get(1);
+			for (var i : List.of(0, 2)) {
+				// select
+				MMLNoteEvent note = new MMLEventList("ccc").getMMLNoteEventList().get(i);
 
-			int y = pianoRollView.convertNote2Y( note.getNote());
-			int x = pianoRollView.convertTicktoX( note.getTickOffset() );
-			MouseEvent e = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON1_DOWN_MASK, x+1, y+1, 1, false);
+				int y = pianoRollView.convertNote2Y( note.getNote());
+				int x = pianoRollView.convertTicktoX( note.getTickOffset() );
+				MouseEvent e = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON1_DOWN_MASK | InputEvent.CTRL_DOWN_MASK, x+1, y+1, 1, false);
 
-			editor.mousePressed(e);
-			assertEquals(EditMode.MOVE, getEditMode());
-			editor.mouseReleased(e);
-			assertEquals(EditMode.SELECT, getEditMode());
+				editor.mousePressed(e);
+				assertEquals(EditMode.MOVE, getEditMode());
+				editor.mouseReleased(e);
+				assertEquals(EditMode.SELECT, getEditMode());
+			}
 		}
 
 		editor.changePart(from, to, select, mode);
@@ -529,35 +559,35 @@ public final class MMLEditorTest extends UseLoadingDLS {
 	}
 
 	/**
-	 * 選択された部分の交換.
+	 * 選択された部分の交換. （選択されたノートの先頭～末尾までの範囲が対象）
 	 * @throws Exception
 	 */
 	@Test
 	public void test_changePartSelectedSwap() throws Exception {
 		String mml =    "MML@ccc,ddd,eee;";
-		String expect = "MML@cec,ddd,ece;";
+		String expect = "MML@eee,ddd,ccc;";
 		check_changePart(mml, expect, MMLEditor.ChangePartAction.SWAP, true);
 	}
 
 	/**
-	 * 選択された部分の移動.
+	 * 選択された部分の移動. （選択されたノートの先頭～末尾までの範囲が対象）
 	 * @throws Exception
 	 */
 	@Test
 	public void test_changePartSelectedMove() throws Exception {
 		String mml =    "MML@ccc,ddd,eee;";
-		String expect = "MML@crc,ddd,ece;";
+		String expect = "MML@<>,ddd,ccc;";
 		check_changePart(mml, expect, MMLEditor.ChangePartAction.MOVE, true);
 	}
 
 	/**
-	 * 選択された部分のコピー.
+	 * 選択された部分のコピー. （選択されたノートの先頭～末尾までの範囲が対象）
 	 * @throws Exception
 	 */
 	@Test
 	public void test_changePartSelectedCopy() throws Exception {
 		String mml =    "MML@ccc,ddd,eee;";
-		String expect = "MML@ccc,ddd,ece;";
+		String expect = "MML@ccc,ddd,ccc;";
 		check_changePart(mml, expect, MMLEditor.ChangePartAction.COPY, true);
 	}
 
