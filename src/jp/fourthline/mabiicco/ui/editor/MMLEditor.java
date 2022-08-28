@@ -802,15 +802,25 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		mmlManager.updateActivePart(true);
 	}
 
+	public record TickRange(int start, int end) {}
+	public TickRange selectedRange(MMLEventList from, MMLEventList to) {
+		if (selectedNote.size() == 0) {
+			return null;
+		}
+		MMLNoteEvent startNote = selectedNote.stream().min(Comparator.comparingInt(t -> t.getTickOffset())).get();
+		MMLNoteEvent endNote = selectedNote.stream().max(Comparator.comparingInt(t -> t.getEndTick())).get();
+		int startTick = from.getAlignmentStartTick(to, startNote.getTickOffset());
+		int endTick = from.getAlignmentEndTick(to, endNote.getEndTick());
+		return new TickRange(startTick, endTick);
+	}
+
 	public void changePart(MMLEventList from, MMLEventList to, boolean useSelectedNoteList, ChangePartAction action) {
 		int startTick = 0;
 		int endTick;
 		if (useSelectedNoteList && (selectedNote.size() > 0) ) {
-			MMLNoteEvent startNote = selectedNote.get(0);
-			MMLNoteEvent endNote = selectedNote.get(selectedNote.size()-1);
-
-			startTick = from.getAlignmentStartTick(to, startNote.getTickOffset());
-			endTick = from.getAlignmentEndTick(to, endNote.getEndTick());
+			var range = selectedRange(from, to);
+			startTick = range.start();
+			endTick = range.end();
 		} else {
 			endTick = (int) from.getTickLength();
 			int toEndTick = (int) to.getTickLength();

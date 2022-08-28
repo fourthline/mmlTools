@@ -1,12 +1,11 @@
 /*
- * Copyright (C) 2014-2015 たんらる
+ * Copyright (C) 2014-2022 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.color;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 final class ColorPalette {
@@ -119,7 +118,11 @@ final class ColorPalette {
 	}
 
 	private Color getColor(List<Color> colorList, ColorPattern pattern) {
-		int index = Arrays.binarySearch(ColorPattern.values(), pattern);
+		int index = 0;
+		var list = ColorPattern.values();
+		for (; index < list.length; index++) {
+			if (list[index] == pattern) break;
+		}
 		return colorList.get(index % colorList.size());
 	}
 

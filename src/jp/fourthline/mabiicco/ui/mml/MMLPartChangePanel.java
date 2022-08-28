@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 たんらる
+ * Copyright (C) 2014-2022 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.mml;
@@ -58,6 +58,7 @@ public final class MMLPartChangePanel extends JPanel {
 	private JRadioButton radioMove;
 	private JRadioButton radioCopy;
 	private JComboBox<String> partSelectComboBox;
+	private final JLabel selectedRange = new JLabel();
 
 	private final Dimension prefSize = new Dimension(440, 450);
 
@@ -108,6 +109,8 @@ public final class MMLPartChangePanel extends JPanel {
 		radioSelectArea.setBounds(8, 22, 113, 21);
 		applyPanel.add(radioSelectArea);
 		applyGroup.add(radioSelectArea);
+		selectedRange.setBounds(8, 43, 260, 14);
+		applyPanel.add(selectedRange);
 
 		radioAllArea = new JRadioButton(AppResource.appText("part_change.all"));
 		radioAllArea.setBounds(138, 22, 113, 21);
@@ -140,6 +143,7 @@ public final class MMLPartChangePanel extends JPanel {
 
 		partSelectComboBox = new JComboBox<>();
 		partSelectComboBox.setBounds(100, 206, 131, 19);
+		partSelectComboBox.addActionListener(t -> updateRange());
 		destSelectPanel.add(partSelectComboBox);
 
 		JScrollPane scrollPane = new JScrollPane();
@@ -156,7 +160,7 @@ public final class MMLPartChangePanel extends JPanel {
 		table.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
-				updatePartSelectBox();
+				updateView();
 			}
 		});
 
@@ -195,7 +199,12 @@ public final class MMLPartChangePanel extends JPanel {
 				dialog.setVisible(false);
 			}});
 
+		updateView();
+	}
+
+	private void updateView() {
 		updatePartSelectBox();
+		updateRange();
 	}
 
 	private void updatePartSelectBox() {
@@ -216,13 +225,45 @@ public final class MMLPartChangePanel extends JPanel {
 		}
 	}
 
+	/**
+	 * 処理先のMMLEventListを取得する.
+	 * @return
+	 */
+	private MMLEventList getToPart() {
+		MMLEventList toPart = null;
+		int trackIndex = table.getSelectedRow();
+		MMLTrack selectedTrack = mmlManager.getMMLScore().getTrack(trackIndex);
+		var selectedPart = partSelectComboBox.getSelectedItem();
+		if (selectedPart != null) {
+			int partIndex = Arrays.asList(MMLTrackView.MMLPART_NAME).indexOf(selectedPart);
+			if (partIndex >= 0) {
+				toPart = selectedTrack.getMMLEventAtIndex(partIndex);
+			}
+		}
+		return toPart;
+	}
+
+	/**
+	 * 区間表示の更新
+	 */
+	private void updateRange() {
+		String str = "";
+		MMLEventList fromPart = mmlManager.getActiveMMLPart();
+		MMLEventList toPart = getToPart();
+		if ((fromPart != null) && (toPart != null)) {
+			var range = editor.selectedRange(fromPart, toPart);
+			var score = mmlManager.getMMLScore();
+			if (range != null) { 
+				str = "[ " + score.getBarTextTick(range.start()) + ", " + score.getBarTextTick(range.end()) + " ]";
+			}
+		}
+		selectedRange.setText(str);
+	}
+
 	private void changePartAction() {
 		if (mmlManager == null) {
 			return;
 		}
-		int trackIndex = table.getSelectedRow();
-		MMLTrack selectedTrack = mmlManager.getMMLScore().getTrack(trackIndex);
-		int partIndex = Arrays.binarySearch(MMLTrackView.MMLPART_NAME, partSelectComboBox.getSelectedItem());
 
 		MMLEditor.ChangePartAction action = MMLEditor.ChangePartAction.SWAP;
 		if (radioMove.isSelected()) {
@@ -232,11 +273,10 @@ public final class MMLPartChangePanel extends JPanel {
 		}
 
 		MMLEventList fromPart = mmlManager.getActiveMMLPart();
-		if (fromPart == null) {
-			return;
+		MMLEventList toPart = getToPart();
+		if ((fromPart != null) && (toPart != null)) {
+			editor.changePart(fromPart, toPart, radioSelectArea.isSelected(), action);
 		}
-		MMLEventList toPart = selectedTrack.getMMLEventAtIndex(partIndex);
-		editor.changePart(fromPart, toPart, radioSelectArea.isSelected(), action);
 	}
 
 	@Override
