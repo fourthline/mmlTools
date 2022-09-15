@@ -329,7 +329,7 @@ public final class MMLBuilder {
 			}
 			// 関連パートに接触ノートがある場合は自パートにテンポ挿入しない
 			if (!searchRelationPartOnTick(relationPart, tempoTick)) {
-				insertTempoMML(sb, prevNoteEvent, localTempoList.get(tempoIndex), true, relationPart);
+				prevNoteEvent = insertTempoMML(sb, prevNoteEvent, localTempoList.get(tempoIndex), true, relationPart);
 				localTempoList.remove(tempoIndex);
 			} else {
 				tempoIndex++;

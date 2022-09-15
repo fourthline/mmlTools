@@ -351,7 +351,7 @@ public class MMLTrackTest {
 		MMLTrack.setTempoAllowChordPart(true);
 
 		String mml = "MML@a2,l1c&c&c&c,l1<a&a;";
-		String expect = "MML@l2av0dt121l1r.v0dt123,l1c.&c.&c,l1<a&at122;";
+		String expect = "MML@l2av0dt121l1rdt123,l1c.&c.&c,l1<a&at122;";
 		MMLTrack track = new MMLTrack().setMML(mml);
 		track.getGlobalTempoList().add(new MMLTempoEvent(121, 96*4));
 		track.getGlobalTempoList().add(new MMLTempoEvent(122, 96*8));
