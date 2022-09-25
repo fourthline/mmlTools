@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import jp.fourthline.mmlTools.MMLBuilder;
 import jp.fourthline.mmlTools.core.MMLTokenizer;
 
 
@@ -197,10 +198,15 @@ public class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 	}
 
 	private String section = "4";
-	private int octave = 4;
+	private int octave = MMLBuilder.INIT_OCT;
 	private int octD = 0;
 
 	private int tokenStack = 0;
+
+	public void resetOctave() {
+		this.octave = MMLBuilder.INIT_OCT;
+		this.octD = 0;
+	}
 
 	private void doPattern(String noteName, String lenString, int insertBack) {
 		insertOxPattern(insertBack);

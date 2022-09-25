@@ -181,6 +181,7 @@ public final class MabiIcco {
 
 			new MabiIcco(args).start();
 		} catch (Throwable e) {
+			e.printStackTrace();
 			try {
 				e.printStackTrace(new PrintStream(AppResource.getErrFile()));
 			} catch (FileNotFoundException e1) {}

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2021 たんらる
+ * Copyright (C) 2013-2022 たんらる
  */
 
 package jp.fourthline.mabiicco.midi;
@@ -39,9 +39,27 @@ public final class InstClass {
 	private final Instrument inst;
 	private final Options options;
 
-	private static final String RESOURCE_NAME = "instrument";
-	private static final ResourceBundle instResource = ResourceBundle.getBundle(RESOURCE_NAME, new ResourceLoader());
+	private static ResourceBundle instResource = null;
+	static {
+		try {
+			String instName = SoundEnv.values()[MabiIccoProperties.getInstance().getSoundEnvIndex()].getInstrumentName();
+			instResource = ResourceBundle.getBundle(instName, new ResourceLoader());
+		} catch (Exception e) {}
+	}
+
 	public static boolean debug = false;
+
+	public static int DRUM = 0x100;
+	private static int logicalProgramNum(Instrument inst) {
+		if (inst == null) {
+			throw new IllegalArgumentException("inst is null");
+		}
+		int program = inst.getPatch().getProgram();
+		if (inst.toString().startsWith("Drumkit: ")) {
+			program += DRUM;
+		}
+		return program;
+	}
 
 	public InstClass(String name, int bank, int program, Instrument inst) {
 		String[] str = name.split(",");
@@ -64,7 +82,7 @@ public final class InstClass {
 		this.upperNote = region.to;
 
 		this.bank = bank;
-		this.program = program;
+		this.program = (inst != null) ? logicalProgramNum(inst) : program;
 
 		this.options = new Options(inst);
 	}
@@ -295,9 +313,16 @@ public final class InstClass {
 		throw new AssertionError("Invalid Inst Part Number.");
 	}
 
-	private static String instName(Instrument inst) {
+	private static String instName(Instrument inst, ResourceBundle resource) {
+		if (resource == null) {
+			return inst.getName().trim();
+		}
 		try {
-			return instResource.getString(""+inst.getPatch().getProgram());
+			String s = resource.getString(""+logicalProgramNum(inst));
+			if (s.equals("-")) {
+				return inst.getName().trim();
+			}
+			return s;
 		} catch (MissingResourceException e) {
 			return null;
 		}
@@ -321,7 +346,7 @@ public final class InstClass {
 
 	public void dlsInfoWriteToOutputStream(OutputStream outputStream) {
 		PrintStream out = new PrintStream(outputStream);
-		String name = instName(inst);
+		String name = instName(inst, instResource);
 		String originalName = inst.getName();
 		int bank = inst.getPatch().getBank();
 		int program = inst.getPatch().getProgram();
@@ -357,7 +382,7 @@ public final class InstClass {
 
 	public static List<InstClass> defaultSoundBank() throws MidiUnavailableException {
 		Soundbank sb = MidiSystem.getSynthesizer().getDefaultSoundbank();
-		return loadSoundBank(sb, false);
+		return loadSoundBank(sb, true);
 	}
 
 	public static List<InstClass> loadDLS(File dlsFile) throws InvalidMidiDataException, IOException {
@@ -374,14 +399,15 @@ public final class InstClass {
 		ArrayList<InstClass> instArray = new ArrayList<>();
 		for (Instrument inst : sb.getInstruments()) {
 			String originalName = inst.getName();
-			String name = nameConvert ? instName(inst) : originalName.trim();
+			String name = nameConvert ? instName(inst, instResource) : originalName.trim();
 			int bank = inst.getPatch().getBank();
 			int program = inst.getPatch().getProgram();
-			System.out.printf("%d,%d=%s \"%s\"\n", bank, program, originalName, name);
+			int lProgram = logicalProgramNum(inst);
+			System.out.printf("%d,%d(%d)=%s \"%s\"\n", bank, program, lProgram ,originalName, name);
 			if (bank != 0) continue;
 			if ( (name != null) || (debug) ) {
-				name = ""+program+": "+name;
-				InstClass instc = new InstClass( name,
+				name = ""+lProgram+": "+name;
+				InstClass instc = new InstClass(name,
 						bank,
 						program,
 						inst);

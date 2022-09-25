@@ -19,6 +19,7 @@ import jp.fourthline.mabiicco.MabiIccoProperties;
 import jp.fourthline.mabiicco.midi.IPlayNote;
 import jp.fourthline.mabiicco.midi.InstClass;
 import jp.fourthline.mabiicco.midi.MabiDLS;
+import jp.fourthline.mabiicco.midi.SoundEnv;
 import jp.fourthline.mmlTools.MMLNoteEvent;
 
 public final class KeyboardView extends JPanel implements IPlayNote {
@@ -32,6 +33,9 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 	private final PianoRollView pianoRollView;
 
 	private InstClass relativeInst = null;
+
+	// オクターブ変化量
+	private final int octDelta;
 
 	/**
 	 * Create the panel.
@@ -61,6 +65,8 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 				playNote( note, DEFAULT_VELOCITY );
 			}
 		});
+
+		octDelta = SoundEnv.values()[MabiIccoProperties.getInstance().getSoundEnvIndex()].pianoRollOctDelta();
 	}
 
 	public void updateHeight() {
@@ -80,7 +86,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 		g2.fillRect(0, 0, width, height);
 
 		for (int i = 0; i <= PianoRollView.OCTNUM; i++) {
-			paintOctPianoLine(g2, i, (char)('0'+PianoRollView.OCTNUM-i-1));
+			paintOctPianoLine(g2, i, (char)('0'+PianoRollView.OCTNUM-i-1 + octDelta));
 		}
 
 		paintOverlapRange(g2);

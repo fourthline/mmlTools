@@ -352,16 +352,17 @@ public final class MMLTrack implements Serializable, Cloneable {
 	}
 
 	/**
-	 * MusicQ以降用のMabinogi用MML生成.
+	 * 最適化前のMML列を取得する.
+	 * TODO: 別クラスでもいいかも？
+	 * @param allowTempoChord   テンポを和音パートに出力許可するか
 	 * @return
 	 * @throws UndefinedTickException
 	 */
-	private String[] getMMLStringsMusicQ() throws UndefinedTickException {
+	public String[] getGenericMMLStrings(boolean allowTempoChord) throws UndefinedTickException {
 		int count = mmlParts.size();
 		String[] mml = new String[count];
 		LinkedList<MMLTempoEvent> localTempoList = new LinkedList<>(globalTempoList);
 		List<List<MMLEventList>> relationParts = makeRelationPart();
-		boolean allowed = tempoAllowChordPartFunction.apply(program);
 
 		for (int i = 0; i < count; i++) {
 			// メロディパートのMML更新（テンポ, tickLengthにあわせる.
@@ -369,15 +370,26 @@ public final class MMLTrack implements Serializable, Cloneable {
 			if (i == 3) {
 				localTempoList = new LinkedList<>(globalTempoList);
 			}
-			List<MMLEventList> relationPart = ((i < 3) && (allowed)) ? relationParts.get(i) : null;
-			mml[i] = MMLBuilder.create(eventList, getStartOffsetforMabiMML(i)).toMMLStringMusicQ(localTempoList, relationPart);
+			List<MMLEventList> relationPart = ((i < 3) && (allowTempoChord)) ? relationParts.get(i) : null;
+			mml[i] = MMLBuilder.create(eventList, getStartOffsetforMabiMML(i), MMLBuilder.INIT_OCT).toMMLStringMusicQ(localTempoList, relationPart);
 
 		}
 		// for mabi MML, メロディ～和音2 までがカラの時にはメロディパートもカラにする.
 		if ( mmlParts.get(0).getMMLNoteEventList().isEmpty() && mml[1].equals("") && mml[2].equals("") ) {
 			mml[0] = "";
 		}
-		for (int i = 0; i < count; i++) {
+		return mml;
+	}
+
+	/**
+	 * MusicQ以降用のMabinogi用MML生成.
+	 * @return
+	 * @throws UndefinedTickException
+	 */
+	private String[] getMMLStringsMusicQ() throws UndefinedTickException {
+		boolean allowed = tempoAllowChordPartFunction.apply(program);
+		String[] mml = getGenericMMLStrings(allowed);
+		for (int i = 0; i < mml.length; i++) {
 			mml[i] = mabiMMLOptimizeFunc.apply(new MMLStringOptimizer(mml[i]));
 		}
 		if ((mmlParts.get(3).getTickLength() == 0)) {

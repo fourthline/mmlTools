@@ -13,7 +13,7 @@ import java.util.Iterator;
  */
 public final class MMLTokenizer implements Iterator<String> {
 	private static final String noteString = "abcdefgABCDEFGnNrR";
-	private static final String tokenString = noteString + "tToOlLvV<>&";
+	private static final String tokenString = noteString + "tToOlLvV<>&,";
 	private final String mml_src;
 	private final int mml_length;
 	private final char[] mml_charArray;

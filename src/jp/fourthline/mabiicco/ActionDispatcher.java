@@ -20,6 +20,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.function.Consumer;
 import java.util.function.IntSupplier;
@@ -37,15 +38,18 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import com.formdev.flatlaf.FlatLightLaf;
 
 import jp.fourthline.mabiicco.midi.MabiDLS;
+import jp.fourthline.mabiicco.midi.SoundEnv;
 import jp.fourthline.mabiicco.ui.About;
 import jp.fourthline.mabiicco.ui.MMLSeqView;
 import jp.fourthline.mabiicco.ui.MainFrame;
+import jp.fourthline.mabiicco.ui.PianoRollView;
 import jp.fourthline.mabiicco.ui.WavoutPanel;
 import jp.fourthline.mabiicco.ui.color.ScaleColor;
 import jp.fourthline.mabiicco.ui.editor.MMLTranspose;
 import jp.fourthline.mabiicco.ui.editor.MultiTracksVelocityChangeEditor;
 import jp.fourthline.mabiicco.ui.editor.MultiTracksViewEditor;
 import jp.fourthline.mabiicco.ui.editor.UserViewWidthDialog;
+import jp.fourthline.mabiicco.ui.mml.MMLExportPanel;
 import jp.fourthline.mabiicco.ui.mml.MMLImportPanel;
 import jp.fourthline.mabiicco.ui.mml.MMLScorePropertyPanel;
 import jp.fourthline.mabiicco.ui.mml.ParsePropertiesDialog;
@@ -138,6 +142,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String INST_LIST = "inst_list";
 	@Action public static final String SHORTCUT_INFO = "shortcut_info";
 	@Action public static final String CONVERT_TUPLET = "convert_tuplet";
+	@Action public static final String OTHER_MML_EXPORT = "other_mml_export";
+	@Action public static final String CHANGE_SOUND_ENV = "change_sound_env";
 
 	private final HashMap<String, Consumer<Object>> actionMap = new HashMap<>();
 
@@ -146,14 +152,16 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	private final FileFilter mmsFilter = new FileNameExtensionFilter(AppResource.appText("file.mms"), "mms");
 	private final FileFilter mmiFilter = new FileNameExtensionFilter(AppResource.appText("file.mmi"), "mmi");
 	private final FileFilter mmlFilter = new FileNameExtensionFilter(AppResource.appText("file.mml"), "mml");
-	private final FileFilter allFilter = new FileNameExtensionFilter(AppResource.appText("file.all"), "mmi", "mms", "mml", "mid");
+	private final FileFilter allFilter = new FileNameExtensionFilter(AppResource.appText("file.all"), "mmi", "mms", "mml", "mid", "txt");
 	private final FileFilter midFilter = new FileNameExtensionFilter(AppResource.appText("file.mid"), "mid");
 	private final FileFilter wavFilter = new FileNameExtensionFilter(AppResource.appText("file.wav"), "wav");
+	private final FileFilter txtFilter = new FileNameExtensionFilter(AppResource.appText("file.txt"), "txt");
 
 	private final JFileChooser openFileChooser;
 	private final JFileChooser saveFileChooser;
 	private final JFileChooser exportFileChooser;
 	private final JFileChooser wavoutFileChooser;
+	private final JFileChooser txtFileChooser;
 
 	private static ActionDispatcher instance = null;
 	public static ActionDispatcher getInstance() {
@@ -168,6 +176,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		saveFileChooser = MabiIcco.createFileChooser();
 		exportFileChooser = MabiIcco.createFileChooser();
 		wavoutFileChooser = MabiIcco.createFileChooser();
+		txtFileChooser = MabiIcco.createFileChooser();
 	}
 
 	public ActionDispatcher setMainFrame(MainFrame mainFrame) {
@@ -193,9 +202,11 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		openFileChooser.addChoosableFileFilter(mmsFilter);
 		openFileChooser.addChoosableFileFilter(mmlFilter);
 		openFileChooser.addChoosableFileFilter(midFilter);
+		openFileChooser.addChoosableFileFilter(txtFilter);
 		saveFileChooser.addChoosableFileFilter(mmiFilter);
 		exportFileChooser.addChoosableFileFilter(midFilter);
 		wavoutFileChooser.addChoosableFileFilter(wavFilter);
+		txtFileChooser.addChoosableFileFilter(txtFilter);
 	}
 
 	private void initializeActionMap() {
@@ -270,6 +281,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(INST_LIST, t -> new About().showInstList(mainFrame));
 		actionMap.put(SHORTCUT_INFO, t -> new About().showShortcutInfo(mainFrame, mainFrame.getShortcutMap()));
 		actionMap.put(CONVERT_TUPLET, t -> editState.convertTuplet());
+		actionMap.put(OTHER_MML_EXPORT, t -> this.otherMmlExportAction());
+		actionMap.put(CHANGE_SOUND_ENV, t -> this.changeSoundEnv(t));
 	}
 
 	@Override
@@ -288,10 +301,13 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	 * @param source    高さ設定indexのSupplier
 	 */
 	private void changeNoteHeight(Object source) {
-		if (source instanceof IntSupplier) {
-			int index = ((IntSupplier)source).getAsInt();
-			mmlSeqView.setPianoRollHeightScaleIndex(index);
-			MabiIccoProperties.getInstance().setPianoRollViewHeightScaleProperty(index);
+		if (source instanceof Supplier<?>) {
+			Object o = ((Supplier<?>) source).get();
+			if (o instanceof PianoRollView.NoteHeight h) {
+				int index = Arrays.asList(PianoRollView.NoteHeight.values()).indexOf(h);
+				mmlSeqView.setPianoRollHeightScaleIndex(index);
+				MabiIccoProperties.getInstance().setPianoRollViewHeightScaleProperty(index);
+			}
 		}
 	}
 
@@ -497,7 +513,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		int status = fileChooser.showSaveDialog(mainFrame);
 		if (status == JFileChooser.APPROVE_OPTION) {
 			File file = fileChooser.getSelectedFile();
-			if (!file.toString().endsWith("."+suffix)) {
+			if ((suffix != null) && (!file.toString().endsWith("."+suffix))) {
 				file = new File(file+"."+suffix);
 			}
 
@@ -541,6 +557,14 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 				JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
 			}
 		}
+	}
+
+	/**
+	 * export MML
+	 */
+	private void otherMmlExportAction() {
+		var export = new MMLExportPanel(mainFrame, mmlSeqView.getMMLScore(), () -> showSaveDialog(txtFileChooser, "txt"));
+		export.showDialog();
 	}
 
 	/**
@@ -838,6 +862,21 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			appProperties.setDlsFile( fileChooser.getSelectedFiles() );
 			appProperties.useDefaultSoundBank.set(false);
 			showAppRestartDialog();
+		}
+	}
+
+	private void changeSoundEnv(Object source) {
+		if (source instanceof Supplier<?>) {
+			Object o = ((Supplier<?>) source).get();
+			if (o instanceof SoundEnv ss) {
+				int index = Arrays.asList(SoundEnv.values()).indexOf(ss);
+				if (index >= 0) {
+					var appProperties = MabiIccoProperties.getInstance();
+					appProperties.setSoundEnvIndex(index);
+					appProperties.useDefaultSoundBank.set(!ss.useDLS());
+					showAppRestartDialog();
+				}
+			}
 		}
 	}
 }

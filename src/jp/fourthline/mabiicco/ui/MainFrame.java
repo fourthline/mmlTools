@@ -20,6 +20,7 @@ import jp.fourthline.mabiicco.ActionDispatcher;
 import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.IEditStateObserver;
 import jp.fourthline.mabiicco.MabiIccoProperties;
+import jp.fourthline.mabiicco.midi.SoundEnv;
 import jp.fourthline.mabiicco.ui.PianoRollView.PaintMode;
 import jp.fourthline.mabiicco.ui.color.ScaleColor;
 import jp.fourthline.mabiicco.ui.editor.NoteAlign;
@@ -237,6 +238,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createMenuItem(fileMenu, "mml.input.import", ActionDispatcher.FILE_IMPORT, true);
 		createMenuItem(fileMenu, "menu.midiExport", ActionDispatcher.MIDI_EXPORT);
 		createMenuItem(fileMenu, "wavout", ActionDispatcher.WAVOUT, true);
+		createMenuItem(fileMenu, "mml.export", ActionDispatcher.OTHER_MML_EXPORT);
 		createMenuItem(fileMenu, "menu.scoreProperty", ActionDispatcher.SCORE_PROPERTY);
 
 		fileMenu.add(new JSeparator());
@@ -348,8 +350,8 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		JMenu settingMenu = new JMenu(appText("menu.setting"));
 		menuBar.add(settingMenu);
 		// 表示に関わる設定
-		createNoteHeightMenu(settingMenu);
-		createScaleColorMenu(settingMenu);
+		createGroupMenu(settingMenu, "menu.noteHeight", PianoRollView.NoteHeight.values(), ActionDispatcher.CHANGE_NOTE_HEIGHT_INT, () -> MabiIccoProperties.getInstance().getPianoRollViewHeightScaleProperty());
+		createGroupMenu(settingMenu, "menu.scale_color", ScaleColor.values(), ActionDispatcher.CHANGE_SCALE_COLOR, null);
 		createCheckMenu(settingMenu, "view.tempo", properties.enableViewTempo);
 		createCheckMenu(settingMenu, "view.marker", properties.enableViewMarker);
 		createCheckMenu(settingMenu, "view.range", properties.viewRange);
@@ -372,6 +374,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createCheckMenu(settingMenu, "mml.regenerate_with_open", properties.reGenerateWithOpen);
 		settingMenu.add(new JSeparator());
 		// DLSに関わる設定
+		createGroupMenu(settingMenu, "menu.sound_env", SoundEnv.values(), ActionDispatcher.CHANGE_SOUND_ENV, () -> MabiIccoProperties.getInstance().getSoundEnvIndex());
 		createCheckMenu(settingMenu, "menu.useDefaultSoundbank", properties.useDefaultSoundBank, ActionDispatcher.USE_DEFAULT_SOUNDBANK, true);
 		createMenuItem(settingMenu, "menu.select_dls", ActionDispatcher.SELECT_DLS, true);
 
@@ -381,22 +384,11 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 
 		createMenuItem(helpMenu, "menu.about", ActionDispatcher.ABOUT);
 		createMenuItem(helpMenu, "menu.shortcutInfo", ActionDispatcher.SHORTCUT_INFO);
-		createMenuItem(helpMenu, "menu.instList", ActionDispatcher.INST_LIST);
+		if (!properties.useDefaultSoundBank.get()) {
+			createMenuItem(helpMenu, "menu.instList", ActionDispatcher.INST_LIST);
+		}
 
 		return menuBar;
-	}
-
-	private static class CheckBoxMenuWithIndex extends JCheckBoxMenuItem implements IntSupplier {
-		private static final long serialVersionUID = -2688552233736202101L;
-		private final int index;
-		private CheckBoxMenuWithIndex(String text, int index) {
-			super(text);
-			this.index = index;
-		}
-		@Override
-		public int getAsInt() {
-			return this.index;
-		}
 	}
 
 	private static class CheckBoxMenuWith<T> extends JCheckBoxMenuItem implements Supplier<T> {
@@ -427,42 +419,32 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		}
 	}
 
-	private void createNoteHeightMenu(JMenu settingMenu) {
-		JMenu noteHeightMenu = new JMenu(appText("menu.noteHeight"));
-		settingMenu.add(noteHeightMenu);
-
-		ButtonGroup group = new ButtonGroup();
-		int index = 0;
-		for (int value : PianoRollView.NOTE_HEIGHT_TABLE) {
-			CheckBoxMenuWithIndex menu = new CheckBoxMenuWithIndex(value + "px", index++);
-			menu.setActionCommand(ActionDispatcher.CHANGE_NOTE_HEIGHT_INT);
-			menu.addActionListener(listener);
-			noteHeightMenu.add(menu);
-			group.add(menu);
-		}
-
-		MabiIccoProperties properties = MabiIccoProperties.getInstance();
-		index = properties.getPianoRollViewHeightScaleProperty();
-		Collections.list(group.getElements()).get(index).setSelected(true);
-	}
-
 	/**
-	 * 音階表示設定メニュー
+	 * チェックボックのメニューグループを作成する
+	 * @param settingMenu
+	 * @param menuName
+	 * @param items
+	 * @param actionCommand
+	 * @param supplier
 	 */
-	private void createScaleColorMenu(JMenu settingMenu) {
-		JMenu plotScaleMenu = new JMenu(appText("menu.scale_color"));
-		settingMenu.add(plotScaleMenu);
+	private void createGroupMenu(JMenu settingMenu, String menuName, SettingButtonGroupItem[] items, String actionCommand, IntSupplier supplier) {
+		JMenu menu = new JMenu(appText(menuName));
+		settingMenu.add(menu);
 
 		ButtonGroup group = new ButtonGroup();
-		for (ScaleColor p : ScaleColor.values()) {
-			CheckBoxMenuWith<ScaleColor> menu = new CheckBoxMenuWith<>(appText(p.getName()), p);
-			menu.setActionCommand(ActionDispatcher.CHANGE_SCALE_COLOR);
-			menu.addActionListener(listener);
-			plotScaleMenu.add(menu);
-			group.add(menu);
+		for (SettingButtonGroupItem item : items) {
+			CheckBoxMenuWith<SettingButtonGroupItem> itemMenu = new CheckBoxMenuWith<>(appText(item.getButtonName()), item);
+			itemMenu.setActionCommand(actionCommand);
+			itemMenu.addActionListener(listener);
+			menu.add(itemMenu);
+			group.add(itemMenu);
 		}
 
-		Collections.list(group.getElements()).get(0).setSelected(true);
+		int index = 0;
+		if (supplier != null) {
+			index = supplier.getAsInt();
+		}
+		Collections.list(group.getElements()).get(index).setSelected(true);
 	}
 
 	/**

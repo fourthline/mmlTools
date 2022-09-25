@@ -75,4 +75,22 @@ public class MMLFileTest extends FileSelect {
 		InputStream inputStream = fileSelect("sample3.mmi");
 		MMLScoreTest.checkMMLScoreWriteToOutputStream(score, inputStream);
 	}
+
+	@Test
+	public void testEx1() {
+		String text = "// test\nabc";
+		assertEquals("abc", MMLFile.toMMLText(text));
+	}
+
+	@Test
+	public void testEx2() {
+		String text = "// test\r\nabc";
+		assertEquals("abc", MMLFile.toMMLText(text));
+	}
+
+	@Test
+	public void testEx3() {
+		String text = "/* test */abc";
+		assertEquals("abc", MMLFile.toMMLText(text));
+	}
 }

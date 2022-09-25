@@ -18,6 +18,7 @@ import java.util.ResourceBundle;
 
 import javax.sound.midi.*;
 
+import jp.fourthline.mabiicco.midi.InstClass;
 import jp.fourthline.mmlTools.MMLEvent;
 import jp.fourthline.mmlTools.MMLEventList;
 import jp.fourthline.mmlTools.MMLNoteEvent;
@@ -72,7 +73,7 @@ public final class MidiFile extends AbstractMMLParser {
 		parseBeat = parseProperties.getOrDefault(PARSE_BEAT, false);
 		parseTempo = parseProperties.getOrDefault(PARSE_TEMPO, false);
 		parseMarker = parseProperties.getOrDefault(PARSE_MARKER, false);
-		parseConvertOctave = parseProperties.getOrDefault(PARSE_CONVERT_OCTAVE, false);
+		parseConvertOctave = parseProperties.getOrDefault(PARSE_CONVERT_OCTAVE, true);
 		parseConvertInst = parseProperties.getOrDefault(PARSE_CONVERT_INST, false);
 		parseMultiTrack = parseProperties.getOrDefault(PARSE_MULTI_TRACK, false);
 		System.out.println("parse_align: " + parse_align);
@@ -385,9 +386,13 @@ public final class MidiFile extends AbstractMMLParser {
 			}
 			break;
 		case ShortMessage.PROGRAM_CHANGE:
-			System.out.printf("program change: [%d] [%d]\n", data1, data2);
+			System.out.printf("program change: [%d] [%d] (%d)\n", data1, data2, channel);
 			if (!canConvertInst) {
-				trackInfo.setProgram(data1);
+				if (channel == 9) {
+					trackInfo.setProgram(InstClass.DRUM);
+				} else {
+					trackInfo.setProgram(data1);
+				}
 			} else if (parseConvertInst && midInstTable.containsKey(data1)) {
 				data1 = midInstTable.get(data1);
 				trackInfo.setProgram(data1);

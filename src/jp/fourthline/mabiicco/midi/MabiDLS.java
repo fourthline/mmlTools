@@ -46,6 +46,7 @@ public final class MabiDLS {
 	private final ArrayList<InstClass> insts = new ArrayList<>();
 	private final Map<File, List<InstClass>> instsMap = new TreeMap<>();
 	private static final int DLS_BANK = (0x79 << 7);
+	private static final int DRUM_BANK = (0x78 << 7);
 
 	public static final String[] DEFALUT_DLS_PATH = {
 			"Nexon/Mabinogi/mp3/MSXspirit01.dls",
@@ -57,6 +58,7 @@ public final class MabiDLS {
 	private final ArrayList<Runnable> notifier = new ArrayList<>();
 	private final boolean[] muteState = new boolean[ MAX_MIDI_PART+1 ];
 	private WavoutDataLine wavout;
+	private boolean allLoaded = false;
 
 	public static MabiDLS getInstance() {
 		if (instance == null) {
@@ -199,6 +201,11 @@ public final class MabiDLS {
 		} catch (MidiUnavailableException e) {
 			e.printStackTrace();
 		}
+
+		for (var inst : insts) {
+			this.synthesizer.loadInstrument(inst.getInstrument());
+		}
+		allLoaded = true;
 	}
 
 	public void loadingDLSFile(File file) throws InvalidMidiDataException, IOException {
@@ -236,6 +243,10 @@ public final class MabiDLS {
 	}
 
 	public synchronized void loadRequiredInstruments(MMLScore score) {
+		if (allLoaded) {
+			return;
+		}
+
 		ArrayList<InstClass> requiredInsts = new ArrayList<>();
 		ArrayList<MMLTrack> trackList = new ArrayList<>(score.getTrackList());
 		for (MMLTrack track : trackList) {
@@ -363,7 +374,9 @@ public final class MabiDLS {
 	}
 
 	private void changeProgram(int program, int ch) {
-		if (channel[ch].getProgram() != program) {
+		if ((program & InstClass.DRUM) != 0) {
+			channel[ch].programChange(DRUM_BANK, (program - InstClass.DRUM));
+		} else {
 			channel[ch].programChange(DLS_BANK, program);
 		}
 	}
@@ -533,7 +546,7 @@ public final class MabiDLS {
 		// Program Change
 		ShortMessage pcMessage = new ExtendMessage(ShortMessage.PROGRAM_CHANGE, 
 				channel,
-				targetProgram,
+				targetProgram & 0xff,
 				0);
 		track.add(new MidiEvent(pcMessage, 0));
 

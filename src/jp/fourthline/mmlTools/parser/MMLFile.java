@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 たんらる
+ * Copyright (C) 2014-2022 たんらる
  */
 
 package jp.fourthline.mmlTools.parser;
@@ -60,9 +60,20 @@ public final class MMLFile extends AbstractMMLParser {
 		return score;
 	}
 
+	private static final Pattern CRLF_PATTERN = Pattern.compile("\r\n");
+	private static final Pattern CR_PATTERN = Pattern.compile("\r");
 	private static final Pattern END_LINE_PATTERN = Pattern.compile("//.*\n");
 	private static final Pattern COMMENT_PATTERN = Pattern.compile("/\\*/?([^/]|[^*]/)*\\*/");
 	private static final Pattern SPACE_PATTERN = Pattern.compile("[ \t\n]");
+	public static String toMMLText(String text) {
+		String s = text;
+		s = CRLF_PATTERN.matcher(s).replaceAll("\n");
+		s = CR_PATTERN.matcher(s).replaceAll("\n");
+		s = END_LINE_PATTERN.matcher(s).replaceAll("\n");
+		s = COMMENT_PATTERN.matcher(s).replaceAll("");
+		s = SPACE_PATTERN.matcher(s).replaceAll("");
+		return s;
+	}
 
 	private void parseSection(List<SectionContents> contentsList) throws MMLParseException {
 		for (SectionContents contents : contentsList) {
@@ -70,10 +81,7 @@ public final class MMLFile extends AbstractMMLParser {
 				trackList = parse3mleExtension(contents.getContents());
 			} else if (contents.getName().matches("\\[Channel[0-9]*\\]")) {
 				String s = contents.getContents();
-				s = END_LINE_PATTERN.matcher(s).replaceAll("\n");
-				s = COMMENT_PATTERN.matcher(s).replaceAll("");
-				s = SPACE_PATTERN.matcher(s).replaceAll("");
-				mmlParts.add(s);
+				mmlParts.add(toMMLText(s));
 			} else if (contents.getName().equals("[Settings]")) {
 				parseSettings(contents.getContents());
 			}

@@ -1,12 +1,14 @@
 /*
- * Copyright (C) 2021 たんらる
+ * Copyright (C) 2021-2022 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.color;
 
 import java.awt.Color;
 
-public enum ScaleColor {
+import jp.fourthline.mabiicco.ui.SettingButtonGroupItem;
+
+public enum ScaleColor implements SettingButtonGroupItem {
 	C_MAJOR( "scale_color.c_major",  0,  ColorConstants.keyMajorColors), // ハ長調, イ短調
 	G_MAJOR( "scale_color.g_major",  7,  ColorConstants.keyMajorColors), // ト長調, ホ短調
 	D_MAJOR( "scale_color.d_major",  2,  ColorConstants.keyMajorColors), // ニ長調, ロ短調
@@ -29,7 +31,8 @@ public enum ScaleColor {
 		this.colorList = colorList;
 	}
 
-	public String getName() {
+	@Override
+	public String getButtonName() {
 		return this.name;
 	}
 

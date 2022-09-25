@@ -42,21 +42,25 @@ public final class ParsePropertiesDialog extends JPanel {
 
 	private void initializePanel() {
 		setLayout(new GridLayout(0, 1, 0, 0));
-		for (String key : parser.getParseProperties().keySet()) {
-			JCheckBox checkBox = new JCheckBox(AppResource.appText(key), parser.getParseProperties().get(key));
-			add(checkBox);
-			checkBoxList.add(checkBox);
+		if (parser.getParseProperties() != null) {
+			for (String key : parser.getParseProperties().keySet()) {
+				JCheckBox checkBox = new JCheckBox(AppResource.appText(key), parser.getParseProperties().get(key));
+				add(checkBox);
+				checkBoxList.add(checkBox);
+			}
 		}
-		for (String key : parser.getParseAttributes().keySet()) {
-			var items = parser.getParseAttributes().get(key).stream().map(t -> AppResource.appText(t)).toArray(String[]::new);
-			JComboBox<String> c = new JComboBox<>(items);
-			c.setFocusable(false);
-			JLabel label = new JLabel(AppResource.appText(key));
-			JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
-			p.add(label);
-			p.add(c);
-			add(p);
-			comboMap.put(key, c);
+		if (parser.getParseAttributes() != null) {
+			for (String key : parser.getParseAttributes().keySet()) {
+				var items = parser.getParseAttributes().get(key).stream().map(t -> AppResource.appText(t)).toArray(String[]::new);
+				JComboBox<String> c = new JComboBox<>(items);
+				c.setFocusable(false);
+				JLabel label = new JLabel(AppResource.appText(key));
+				JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
+				p.add(label);
+				p.add(c);
+				add(p);
+				comboMap.put(key, c);
+			}
 		}
 	}
 

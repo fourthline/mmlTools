@@ -43,18 +43,30 @@ public final class PianoRollView extends JPanel {
 	/**
 	 * ノートの表示高さ
 	 */
-	public static int[] NOTE_HEIGHT_TABLE = { 6, 8, 10, 12, 14 };
-	private int noteHeight = NOTE_HEIGHT_TABLE[3];
-	public int getNoteHeight() {
-		return noteHeight;
+	public enum NoteHeight implements SettingButtonGroupItem {
+		H6(6), H8(8), H10(10), H12(12), H14(14);
+		private final int h;
+		NoteHeight(int height) {
+			this.h = height;
+		}
+		@Override
+		public String getButtonName() {
+			return h + "px";
+		}
 	}
+
+	private NoteHeight noteHeight = NoteHeight.H10;
+	public int getNoteHeight() {
+		return noteHeight.h;
+	}
+
 	public void setNoteHeightIndex(int index) {
-		if ( (index >= 0) && (index < NOTE_HEIGHT_TABLE.length) ) {
-			noteHeight = NOTE_HEIGHT_TABLE[index];
+		if ( (index >= 0) && (index < NoteHeight.values().length) ) {
+			noteHeight = NoteHeight.values()[index];
 		}
 	}
 	public int getTotalHeight() {
-		return (12*OCTNUM*noteHeight)+noteHeight;
+		return (12*OCTNUM*noteHeight.h)+noteHeight.h;
 	}
 
 	private double wideScale = 6; // ピアノロールの拡大/縮小率 (1~6)
@@ -216,7 +228,7 @@ public final class PianoRollView extends JPanel {
 	public void onViewScrollPoint(Point point) {
 		int y = point.y;
 		int y1 = viewport.getViewPosition().y;
-		int y2 = y1 + viewport.getHeight() - noteHeight;
+		int y2 = y1 + viewport.getHeight() - noteHeight.h;
 		int x = viewport.getViewPosition().x;
 		if (x + viewport.getWidth() < point.x) {
 			x++;
@@ -224,19 +236,19 @@ public final class PianoRollView extends JPanel {
 
 		if (y < y1) {
 			// up-scroll
-			y1 -= noteHeight;
+			y1 -= noteHeight.h;
 			if (y1 < 0) {
 				y1 = 0;
 			}
 			y = y1;
 		} else if (y > y2) {
 			// down-scroll
-			y1 += noteHeight;
+			y1 += noteHeight.h;
 			if (y1 > getHeight() - viewport.getHeight()) {
 				y1 = getHeight() - viewport.getHeight();
 				y = y2;
 			} else {
-				y = y2 + noteHeight;
+				y = y2 + noteHeight.h;
 			}
 		}
 
@@ -263,7 +275,7 @@ public final class PianoRollView extends JPanel {
 	 */
 	public int convertY2Note(int y) {
 		if (y < 0) y = 0;
-		int note = (OCTNUM*12-(y/noteHeight)) -1;
+		int note = (OCTNUM*12-(y/noteHeight.h)) -1;
 		if (note < -1) note = -1;
 
 		return note;
@@ -276,7 +288,7 @@ public final class PianoRollView extends JPanel {
 	 */
 	public int convertNote2Y(int note) {
 		int y = OCTNUM*12 - note - 1;
-		y *= noteHeight;
+		y *= noteHeight.h;
 		return y;
 	}
 
@@ -355,14 +367,14 @@ public final class PianoRollView extends JPanel {
 	}
 
 	private void paintOctPianoLine(Graphics2D g, int pos, int startOffsetX) {
-		int startY = 12 * noteHeight * pos;
+		int startY = 12 * noteHeight.h * pos;
 		int octave = OCTNUM - pos - 1;
 		int yLimit = getTotalHeight();
 
 		// グリッド
 		int width = getWidth();
 		for (int i = 0; i < 12; i++) {
-			int y = startY + i*noteHeight;
+			int y = startY + i*noteHeight.h;
 			if (y > yLimit) return;
 			int line = octave*12 + (11-i);
 			Color fillColor = scaleColor.getColor(i);
@@ -374,9 +386,9 @@ public final class PianoRollView extends JPanel {
 				fillColor = noSoundColor;
 			}
 			g.setColor(fillColor);
-			g.fillRect(0, y, width, noteHeight);
+			g.fillRect(0, y, width, noteHeight.h);
 			g.setColor(START_OFFSET_COLOR);
-			g.fillRect(0, y, startOffsetX, noteHeight);
+			g.fillRect(0, y, startOffsetX, noteHeight.h);
 			if (i == 0) {
 				g.setColor(darkBarBorder);
 			} else {
@@ -385,7 +397,7 @@ public final class PianoRollView extends JPanel {
 			g.drawLine(0, y, width, y);
 		}
 		g.setColor(darkBarBorder);
-		g.drawLine(0, 12*noteHeight+startY, width, 12*noteHeight+startY);
+		g.drawLine(0, 12*noteHeight.h+startY, width, 12*noteHeight.h+startY);
 	}
 
 	private void paintPitchRangeBorder(Graphics2D g) {
@@ -504,7 +516,7 @@ public final class PianoRollView extends JPanel {
 		int x = convertTicktoX(offset);
 		int y = convertNote2Y(note) +1;
 		int width = convertTicktoX(tick) -1;
-		int height = noteHeight-2;
+		int height = noteHeight.h-2;
 		if (width > 1) width--;
 
 		if (drawOption) {

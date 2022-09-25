@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.function.Consumer;
 
+import jp.fourthline.mabiicco.midi.SoundEnv;
 import jp.fourthline.mabiicco.ui.PianoRollView;
 import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.core.MMLText;
@@ -56,6 +57,9 @@ public final class MabiIccoProperties {
 
 	/** timeBox Index */
 	private static final String TIMEBOX = "view.timeBox";
+
+	/** 音源設定 Index */
+	private static final String SOUND_ENV = "function.sound_env";
 
 	/** クリック再生機能の有効/無効 */
 	public final Property<Boolean> enableClickPlay = new BooleanProperty("function.enable_click_play", true);
@@ -206,7 +210,7 @@ public final class MabiIccoProperties {
 	public int getPianoRollViewHeightScaleProperty() {
 		String s = properties.getProperty(HEIGHT_SCALE, "1");
 		int index = Integer.parseInt(s);
-		if ( (index < 0) || (index >= PianoRollView.NOTE_HEIGHT_TABLE.length) ) {
+		if ( (index < 0) || (index >= PianoRollView.NoteHeight.values().length) ) {
 			index = 1;
 		}
 
@@ -229,6 +233,20 @@ public final class MabiIccoProperties {
 
 	public void setTimeBoxIndex(int index) {
 		properties.setProperty(TIMEBOX, ""+index);
+		save();
+	}
+
+	public int getSoundEnvIndex() {
+		String s = properties.getProperty(SOUND_ENV, "0");
+		int index = Integer.parseInt(s);
+		if ( (index < 0) || (index >= SoundEnv.values().length) ) {
+			index = 0;
+		}
+		return index;
+	}
+
+	public void setSoundEnvIndex(int index) {
+		properties.setProperty(SOUND_ENV, Integer.toString(index));
 		save();
 	}
 

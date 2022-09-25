@@ -15,18 +15,26 @@ public final class MMLBuilder {
 
 	private final MMLEventList eventList;
 	private final int startOffset;
+	private final int initOct;
+
+	public static final int INIT_OCT = 4;
 
 	public static MMLBuilder create(MMLEventList eventList) {
-		return new MMLBuilder(eventList, 0);
+		return new MMLBuilder(eventList, 0, INIT_OCT);
 	}
 
 	public static MMLBuilder create(MMLEventList eventList, int startOffset) {
-		return new MMLBuilder(eventList, startOffset);
+		return new MMLBuilder(eventList, startOffset, INIT_OCT);
 	}
 
-	private MMLBuilder(MMLEventList eventList, int startOffset) {
+	public static MMLBuilder create(MMLEventList eventList, int startOffset, int initOct) {
+		return new MMLBuilder(eventList, startOffset, initOct);
+	}
+
+	private MMLBuilder(MMLEventList eventList, int startOffset, int initOct) {
 		this.eventList = eventList;
 		this.startOffset = startOffset;
+		this.initOct = initOct;
 	}
 
 	/**
@@ -157,7 +165,7 @@ public final class MMLBuilder {
 		StringBuilder sb = new StringBuilder(STRING_BUILDER_SIZE);
 
 		// initial note: octave 4, tick 0, offset 0, velocity 8
-		MMLNoteEvent prevNoteEvent = new MMLNoteEvent(12*4, 0, startOffset, MMLNoteEvent.INIT_VOL);
+		MMLNoteEvent prevNoteEvent = new MMLNoteEvent(12*initOct, 0, startOffset, MMLNoteEvent.INIT_VOL);
 		for (MMLNoteEvent noteEvent : eventList.getMMLNoteEventList()) {
 			// テンポのMML挿入判定
 			while ( (!localTempoList.isEmpty()) && (localTempoList.getFirst().getTickOffset() <= noteEvent.getTickOffset()) ) {
@@ -308,7 +316,7 @@ public final class MMLBuilder {
 		}
 
 		// initial note: octave 4, tick 0, offset 0, velocity 8
-		MMLNoteEvent prevNoteEvent = new MMLNoteEvent(12*4, 0, startOffset, MMLNoteEvent.INIT_VOL);
+		MMLNoteEvent prevNoteEvent = new MMLNoteEvent(12*initOct, 0, startOffset, MMLNoteEvent.INIT_VOL);
 		for (MMLNoteEvent noteEvent : eventList.getMMLNoteEventList()) {
 			// テンポのMML挿入判定
 			while ( (localTempoList.size() > tempoIndex) && (localTempoList.get(tempoIndex).getTickOffset() <= noteEvent.getTickOffset()) ) {

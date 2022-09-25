@@ -31,6 +31,8 @@ public interface IMMLFileParser {
 			fileParser = new MMLFile();
 		} else if (suffix.endsWith(".mid")) {
 			fileParser = new MidiFile();
+		} else if (suffix.endsWith(".txt")) {
+			fileParser = new TxtFile();
 		} else {
 			fileParser = new MMLScoreSerializer(new MMLScore());
 		}
