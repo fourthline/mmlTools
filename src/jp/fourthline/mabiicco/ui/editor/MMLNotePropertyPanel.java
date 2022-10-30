@@ -113,6 +113,7 @@ public final class MMLNotePropertyPanel extends JPanel implements ActionListener
 		tuningBaseList = new JComboBox<>(TuningBase.values());
 		tuningBaseList.setBounds(240, 110, 70, 21);
 		addMousePressEnableAction(tuningBaseList, tuningNoteCheckBox);
+		tuningBaseList.setMaximumRowCount(3);   // JComboBoxの性能劣化対策
 		add(tuningBaseList);
 
 		this.noteEvent = noteEvent;

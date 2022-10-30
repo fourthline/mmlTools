@@ -76,10 +76,20 @@ public abstract class AbstractMarkerEditor<T extends MMLEvent> extends AbstractC
 		}
 	}
 
+	/**
+	 * ターゲットTickを編集対象にあわせる
+	 * 
+	 * @param baseTick
+	 * @return
+	 */
+	protected int targetTickAlign(int baseTick) {
+		return baseTick - (baseTick % this.editAlign.getEditAlign());
+	}
+
 	@Override
 	public void activateEditMenuItem(int baseTick, int delta) {
-		this.targetTick = baseTick - (baseTick % this.editAlign.getEditAlign());
-		targetEvent = getTempoEventOnTick(baseTick, delta);
+		this.targetTick = targetTickAlign(baseTick);
+		targetEvent = getTempoEventOnTick(this.targetTick, delta);
 
 		// 指定範囲内にイベントがなければ、挿入のみを有効にします.
 		boolean existTarget = (targetEvent != null);

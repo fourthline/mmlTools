@@ -33,11 +33,15 @@ import jp.fourthline.mabiicco.ui.editor.IMarkerEditor;
 import jp.fourthline.mabiicco.ui.editor.MMLTempoEditor;
 import jp.fourthline.mabiicco.ui.editor.MarkerEditor;
 import jp.fourthline.mabiicco.ui.editor.StartOffsetEditor;
+import jp.fourthline.mabiicco.ui.editor.TimeSignatureEditor;
+import jp.fourthline.mmlTools.MMLEvent;
 import jp.fourthline.mmlTools.MMLEventList;
 import jp.fourthline.mmlTools.MMLNoteEvent;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTempoEvent;
 import jp.fourthline.mmlTools.Marker;
+import jp.fourthline.mmlTools.TimeSignature;
+import jp.fourthline.mmlTools.core.UndefinedTickException;
 
 
 public final class ColumnPanel extends JPanel implements MouseListener, MouseMotionListener, IViewTargetMarker {
@@ -46,6 +50,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 	private static final Color BEAT_BORDER_COLOR = new Color(0.4f, 0.4f, 0.4f);
 	private static final Color TEMPO_MAKER_FILL_COLOR = new Color(0.4f, 0.8f, 0.8f);
 	private static final Color MAKER_FILL_COLOR = new Color(0.2f, 0.8f, 0.2f);
+	private static final Color TIME_SIGNATURE_FILL_COLOR = new Color(255, 165, 0);
 	private static final Color TARGET_MAKER_FILL_COLOR = new Color(0.9f, 0.7f, 0.0f, 0.6f);
 	private static final Color START_COMMON_OFFSET_COLOR = new Color(255, 167, 227);
 	private static final Color START_OFFSET_COLOR = new Color(255, 202, 227);
@@ -75,6 +80,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 		var tempoEditor = new MMLTempoEditor(parentFrame, mmlManager, editAlign, this);
 		markerEditor.add( tempoEditor );
 		markerEditor.add( new MarkerEditor(parentFrame, mmlManager, editAlign, this) );
+		markerEditor.add( new TimeSignatureEditor(parentFrame, mmlManager, editAlign, this) );
 		markerEditor.add( new StartOffsetEditor(parentFrame, mmlManager, editAlign, this) );
 
 		// popupMenu に各MenuItemを登録する.
@@ -113,6 +119,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 		paintRuler(g2);
 		paintMarker(g2);
 		paintTempoEvents(g2);
+		paintTimeSignature(g2);
 		pianoRollView.paintSequenceLine(g2, getHeight());
 		paintTargetMarker(g2);
 
@@ -155,18 +162,35 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 	 * ルーラを表示します。
 	 */
 	private void paintRuler(Graphics2D g) {
-		long measure = mmlManager.getMMLScore().getMeasureTick();
+		MMLScore score = mmlManager.getMMLScore();
+		var timeSignatureIterator = score.getTimeSignatureList().iterator();
+		int measureTick = score.getTimeCountOnly() * score.getBeatTick();
+		int m = 0;
+		int md = 0;
+		int y2 = getHeight();
 		long length = pianoRollView.convertXtoTick( getWidth() );
 		g.setColor(BEAT_BORDER_COLOR);
-		int count = 0;
-		for (long i = 0; i < length; i += measure) {
-			int x = pianoRollView.convertTicktoX(i);
-			int y1 = 0;
-			int y2 = getHeight();
-			g.drawLine(x, y1, x, y2);
 
-			String s = "" + (count++);
-			g.drawString(s, x+2, y1+10);
+		int nextMeasureOffset = 0;
+		TimeSignature timeSignature = timeSignatureIterator.hasNext() ? timeSignatureIterator.next() : null;
+		if (timeSignature != null) {
+			nextMeasureOffset = timeSignature.getMeasureOffset();
+		}
+		while (md < length) {
+			int x = pianoRollView.convertTicktoX(md);
+			int y1 = 0;
+			g.drawLine(x, y1, x, y2);
+			g.drawString(Integer.toString(m), x+2, y1+10);
+
+			if ( (timeSignature != null) && (m >= nextMeasureOffset) ) {
+				measureTick = timeSignature.getNumTime() * timeSignature.getBaseTick();
+				timeSignature = timeSignatureIterator.hasNext() ? timeSignatureIterator.next() : null;
+				if (timeSignature != null) {
+					nextMeasureOffset = timeSignature.getMeasureOffset();
+				}
+			}
+			m++;
+			md += measureTick;
 		}
 	}
 
@@ -175,45 +199,48 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 	 */
 	private void paintTempoEvents(Graphics2D g) {
 		if (appProperties.enableViewTempo.get()) {
-			MMLScore score = mmlManager.getMMLScore();
-
-			for (MMLTempoEvent tempoEvent : score.getTempoEventList()) {
-				int tick = tempoEvent.getTickOffset();
-				int x = pianoRollView.convertTicktoX(tick);
-				String s = "t" + tempoEvent.getTempo();
-				drawMarker(g, s, x, TEMPO_MAKER_FILL_COLOR, 0);
+			for (MMLTempoEvent tempoEvent : mmlManager.getMMLScore().getTempoEventList()) {
+				drawMarker(g, tempoEvent, TEMPO_MAKER_FILL_COLOR, 0);
 			}
 		}
 	}
 
 	private void paintMarker(Graphics2D g) {
 		if (appProperties.enableViewMarker.get()) {
-			MMLScore score = mmlManager.getMMLScore();
-
-			for (Marker marker : score.getMarkerList()) {
-				int tick = marker.getTickOffset();
-				int x = pianoRollView.convertTicktoX(tick);
-				drawMarker(g, marker.getName(), x, MAKER_FILL_COLOR, -11);
+			for (Marker marker : mmlManager.getMMLScore().getMarkerList()) {
+				drawMarker(g, marker, MAKER_FILL_COLOR, -11);
 			}
 		}
 	}
 
-	private void drawMarker(Graphics2D g, String s, int x, Color color, int dy) {
-		int[] xPoints = { x-3, x+3, x+3, x, x-3 };
-		int[] yPoints = { -10, -10, -4, -1, -4 };
-		for (int i = 0; i < yPoints.length; i++) {
-			yPoints[i] += DRAW_HEIGHT + dy;
+	private void paintTimeSignature(Graphics2D g) {
+		for (TimeSignature ts : mmlManager.getMMLScore().getTimeSignatureList()) {
+			drawMarker(g, ts, TIME_SIGNATURE_FILL_COLOR, 11);
 		}
+	}
 
-		// label
-		g.setColor(Color.DARK_GRAY);
-		g.drawString(s, x+6, DRAW_HEIGHT-2+dy);
+	private void drawMarker(Graphics2D g, MMLEvent event, Color color, int dy) {
+		try {
+			String s = event.toMMLString();
+			int x = pianoRollView.convertTicktoX(event.getTickOffset());
+			int[] xPoints = { x-3, x+3, x+3, x, x-3 };
+			int[] yPoints = { -10, -10, -4, -1, -4 };
+			for (int i = 0; i < yPoints.length; i++) {
+				yPoints[i] += DRAW_HEIGHT + dy;
+			}
 
-		// icon
-		g.setColor(color);
-		g.fillPolygon(xPoints, yPoints, xPoints.length);
-		g.setColor(BEAT_BORDER_COLOR);
-		g.drawPolygon(xPoints, yPoints, xPoints.length);
+			// label
+			g.setColor(Color.DARK_GRAY);
+			g.drawString(s, x+6, DRAW_HEIGHT-2+dy);
+
+			// icon
+			g.setColor(color);
+			g.fillPolygon(xPoints, yPoints, xPoints.length);
+			g.setColor(BEAT_BORDER_COLOR);
+			g.drawPolygon(xPoints, yPoints, xPoints.length);
+		} catch (UndefinedTickException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void paintTargetMarker(Graphics2D g) {

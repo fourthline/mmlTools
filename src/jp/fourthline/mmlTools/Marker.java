@@ -32,16 +32,16 @@ public final class Marker extends MMLEvent implements Comparable<Marker> {
 	}
 
 	@Override
+	public String toMMLString() {
+		return name;
+	}
+
+	@Override
 	public int compareTo(Marker o) {
 		if (this.getTickOffset() == o.getTickOffset()) {
 			return this.name.compareTo(o.name);
 		} else {
 			return (this.getTickOffset() - o.getTickOffset());
 		}
-	}
-
-	@Override
-	public String toMMLString() {
-		return "";
 	}
 }

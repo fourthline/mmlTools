@@ -22,6 +22,7 @@ import jp.fourthline.mabiicco.IFileState;
 import jp.fourthline.mabiicco.MabiIccoProperties;
 import jp.fourthline.mabiicco.midi.InstClass;
 import jp.fourthline.mabiicco.midi.MabiDLS;
+import jp.fourthline.mabiicco.ui.PianoRollView.NoteHeight;
 import jp.fourthline.mabiicco.ui.PianoRollView.PaintMode;
 import jp.fourthline.mabiicco.ui.color.ScaleColor;
 import jp.fourthline.mabiicco.ui.editor.KeyboardEditor;
@@ -37,6 +38,7 @@ import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTempoConverter;
 import jp.fourthline.mmlTools.MMLTempoEvent;
 import jp.fourthline.mmlTools.MMLTrack;
+import jp.fourthline.mmlTools.Measure;
 import jp.fourthline.mmlTools.core.MMLTicks;
 import jp.fourthline.mmlTools.core.NanoTime;
 import jp.fourthline.mmlTools.core.UndefinedTickException;
@@ -404,8 +406,8 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 		}
 	}
 
-	public void setPianoRollHeightScaleIndex(int index) {
-		pianoRollView.setNoteHeightIndex(index);
+	public void setPianoRollHeightScale(NoteHeight nh) {
+		pianoRollView.setNoteHeight(nh);
 		keyboardView.updateHeight();
 		panel.repaint();
 	}
@@ -574,29 +576,26 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 	}
 
 	public void nextStepTimeTo(boolean next) {
-		try {
-			int step = MMLTicks.getTick(mmlScore.getBaseOnly());
-			int deltaTick = mmlScore.getTimeCountOnly() * step;
-			Sequencer sequencer = MabiDLS.getInstance().getSequencer();
-			long tick = pianoRollView.getSequencePlayPosition();
-			if (next) {
-				tick += deltaTick;
-			} else {
-				tick -= step;
-			}
-			tick -= tick % deltaTick;
-			if (!sequencer.isRunning()) {
-				pianoRollView.setSequenceTick(tick);
-				panel.repaint();
-			} else {
-				// 移動先のテンポに設定する.
-				int tempo = mmlScore.getTempoOnTick(tick);
-				sequencer.setTickPosition(tick);
-				sequencer.setTempoInBPM(tempo);
-			}
+		int tick = (int) pianoRollView.getSequencePlayPosition();
+		var measure = new Measure(mmlScore, (int)tick);
+		if (next) {
+			tick += measure.getMeasureTick();
+		} else {
+			tick -= measure.getBeatTick();
+		}
+		tick = new Measure(mmlScore, tick).measuredTick();
+		Sequencer sequencer = MabiDLS.getInstance().getSequencer();
+		if (!sequencer.isRunning()) {
+			pianoRollView.setSequenceTick(tick);
+			panel.repaint();
+		} else {
+			// 移動先のテンポに設定する.
+			int tempo = mmlScore.getTempoOnTick(tick);
+			sequencer.setTickPosition(tick);
+			sequencer.setTempoInBPM(tempo);
+		}
 
-			updatePianoRollView();
-		} catch (UndefinedTickException e) {}
+		updatePianoRollView();
 	}
 
 	public void partChange() {
@@ -744,15 +743,15 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 		return pianoRollView.getSequencePosition();
 	}
 
-	public void addTicks(int tick) {
+	public void addTicks(boolean isMeasure) {
 		int tickPosition = (int) pianoRollView.getSequencePosition();
-		mmlScore.addTicks(tickPosition, tick);
+		mmlScore.addTicks(tickPosition, isMeasure);
 		updateActivePart(true);
 	}
 
-	public void removeTicks(int tick) {
+	public void removeTicks(boolean isMeasure) {
 		int tickPosition = (int) pianoRollView.getSequencePosition();
-		mmlScore.removeTicks(tickPosition, tick);
+		mmlScore.removeTicks(tickPosition, isMeasure);
 		updateActivePart(true);
 	}
 
@@ -803,20 +802,19 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 	@Override
 	public void updatePianoRollView(int note) {
 		pianoRollView.updateRunningSequencePosition();
-		int measure = pianoRollView.getMeasureWidth();
 		long positionX = pianoRollView.getSequencePlayPosition();
-		positionX = pianoRollView.convertTicktoX(positionX);
-		positionX -= positionX % measure;
+		var measure = new Measure(mmlScore, (int)positionX);
+		positionX = pianoRollView.convertTicktoX(measure.measuredTick());
 		JViewport viewport = scrollPane.getViewport();
 		Point point = viewport.getViewPosition();
 		Dimension dim = viewport.getExtentSize();
 		int x1 = point.x;
-		int x2 = x1 + dim.width - measure;
+		int x2 = pianoRollView.convertTicktoX(Measure.measuredTick(mmlScore, (int)pianoRollView.convertXtoTick(x1 + dim.width) - measure.getMeasureTick()));
 		if ( (positionX < x1) || (positionX > x2) ) {
 			/* ビュー外にあるので、現在のポジションにあわせる */
 			if (positionX + dim.width > pianoRollView.getWidth()) {
 				positionX = (pianoRollView.getWidth() - dim.width);
-				positionX -= positionX % measure;
+				positionX = pianoRollView.convertTicktoX(Measure.measuredTick(mmlScore, (int)positionX));
 			}
 		} else {
 			positionX = point.x;

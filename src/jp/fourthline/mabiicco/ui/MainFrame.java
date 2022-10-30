@@ -72,7 +72,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	private final JPanel contentPane;
 	private final JTextField statusField;
 	private final MMLSeqView mmlSeqView;
-	private final JComboBox<NoteAlign> noteTypeSelect = new JComboBox<>(NoteAlign.createAlignList());
+	private final JComboBox<NoteAlign> noteTypeSelect = new JComboBox<>(NoteAlign.values());
 	private final JComboBox<PaintMode> paintModeSelect = new JComboBox<>(PaintMode.values());
 	private final JComboBox<StringBuffer> timeBox = new JComboBox<>( List.of(new StringBuffer("time MM:SS/MM:SS (t120)     "), new StringBuffer() ).toArray(new StringBuffer[0]) );
 
@@ -350,8 +350,8 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		JMenu settingMenu = new JMenu(appText("menu.setting"));
 		menuBar.add(settingMenu);
 		// 表示に関わる設定
-		createGroupMenu(settingMenu, "menu.noteHeight", PianoRollView.NoteHeight.values(), ActionDispatcher.CHANGE_NOTE_HEIGHT_INT, () -> MabiIccoProperties.getInstance().getPianoRollViewHeightScaleProperty());
-		createGroupMenu(settingMenu, "menu.scale_color", ScaleColor.values(), ActionDispatcher.CHANGE_SCALE_COLOR, null);
+		createGroupMenu(settingMenu, "menu.noteHeight", PianoRollView.NoteHeight.values(), () -> MabiIccoProperties.getInstance().getPianoRollViewHeightScaleProperty());
+		createGroupMenu(settingMenu, "menu.scale_color", ScaleColor.values(), null);
 		createCheckMenu(settingMenu, "view.tempo", properties.enableViewTempo);
 		createCheckMenu(settingMenu, "view.marker", properties.enableViewMarker);
 		createCheckMenu(settingMenu, "view.range", properties.viewRange);
@@ -374,7 +374,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createCheckMenu(settingMenu, "mml.regenerate_with_open", properties.reGenerateWithOpen);
 		settingMenu.add(new JSeparator());
 		// DLSに関わる設定
-		createGroupMenu(settingMenu, "menu.sound_env", SoundEnv.values(), ActionDispatcher.CHANGE_SOUND_ENV, () -> MabiIccoProperties.getInstance().getSoundEnvIndex());
+		createGroupMenu(settingMenu, "menu.sound_env", SoundEnv.values(), () -> MabiIccoProperties.getInstance().getSoundEnvIndex());
 		createCheckMenu(settingMenu, "menu.useDefaultSoundbank", properties.useDefaultSoundBank, ActionDispatcher.USE_DEFAULT_SOUNDBANK, true);
 		createMenuItem(settingMenu, "menu.select_dls", ActionDispatcher.SELECT_DLS, true);
 
@@ -427,14 +427,14 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	 * @param actionCommand
 	 * @param supplier
 	 */
-	private void createGroupMenu(JMenu settingMenu, String menuName, SettingButtonGroupItem[] items, String actionCommand, IntSupplier supplier) {
+	private void createGroupMenu(JMenu settingMenu, String menuName, SettingButtonGroupItem[] items, IntSupplier supplier) {
 		JMenu menu = new JMenu(appText(menuName));
 		settingMenu.add(menu);
 
 		ButtonGroup group = new ButtonGroup();
 		for (SettingButtonGroupItem item : items) {
 			CheckBoxMenuWith<SettingButtonGroupItem> itemMenu = new CheckBoxMenuWith<>(appText(item.getButtonName()), item);
-			itemMenu.setActionCommand(actionCommand);
+			itemMenu.setActionCommand(ActionDispatcher.CHANGE_ACTION);
 			itemMenu.addActionListener(listener);
 			menu.add(itemMenu);
 			group.add(itemMenu);
@@ -539,7 +539,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		// 編集ノートタイプ
 		noteTypeSelect.setFocusable(false);
 		noteTypeSelect.addActionListener(this); // MainFrameでAction処理します.
-		noteTypeSelect.setSelectedIndex(NoteAlign.DEFAULT_ALIGN_INDEX);
+		noteTypeSelect.setSelectedItem(NoteAlign.DEFAULT_ALIGN);
 		setEditAlign();
 		toolBar.add(noteTypeSelect);
 

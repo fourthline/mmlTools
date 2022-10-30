@@ -26,6 +26,7 @@ public final class MMLScore implements Cloneable {
 	private final LinkedList<MMLTrack> trackList = new LinkedList<>();
 	private final List<MMLTempoEvent> globalTempoList = new ArrayList<>();
 	private final List<Marker> markerList = new ArrayList<>();
+	private final List<TimeSignature> timeSignatureList = new ArrayList<>();
 
 	public static final int MAX_TRACK = 24;
 
@@ -132,6 +133,10 @@ public final class MMLScore implements Cloneable {
 		return markerList;
 	}
 
+	public List<TimeSignature> getTimeSignatureList() {
+		return timeSignatureList;
+	}
+
 	public void setTitle(String title) {
 		this.title = title;
 	}
@@ -152,14 +157,11 @@ public final class MMLScore implements Cloneable {
 		String[] s = baseTime.split("/");
 		this.numTime = Integer.parseInt(s[0]);
 		this.baseTime = Integer.parseInt(s[1]);
+		TimeSignature.recalcTimeSignatureList(this);
 	}
 
 	public String getBaseTime() {
 		return numTime + "/" + baseTime;
-	}
-
-	public String getBaseOnly() {
-		return String.valueOf(baseTime);
 	}
 
 	public void setBaseOnly(int base) {
@@ -180,7 +182,7 @@ public final class MMLScore implements Cloneable {
 
 	public int getBeatTick() {
 		try {
-			return MMLTicks.getTick(getBaseOnly());
+			return MMLTicks.getTick(String.valueOf(baseTime));
 		} catch (UndefinedTickException e) {
 			throw new AssertionError();
 		}
@@ -195,7 +197,12 @@ public final class MMLScore implements Cloneable {
 		return this.userViewMeasure;
 	}
 
-	public void addTicks(int tickPosition, int tick) {
+	public void addTicks(int tickPosition, boolean isMeasure) {
+		var measure = new Measure(this, tickPosition);
+		int tick = measure.getBeatTick();
+		if (isMeasure) {
+			tick *= measure.getNumTime();
+		}
 		for (MMLTrack track : getTrackList()) {
 			for (MMLEventList eventList : track.getMMLEventList()) {
 				MMLEvent.insertTick(eventList.getMMLNoteEventList(), tickPosition, tick);
@@ -209,7 +216,12 @@ public final class MMLScore implements Cloneable {
 		MMLEvent.insertTick(markerList, tickPosition, tick);
 	}
 
-	public void removeTicks(int tickPosition, int tick) {
+	public void removeTicks(int tickPosition, boolean isMeasure) {
+		var measure = new Measure(this, tickPosition);
+		int tick = measure.getBeatTick();
+		if (isMeasure) {
+			tick *= measure.getNumTime();
+		}
 		for (MMLTrack track : getTrackList()) {
 			for (MMLEventList eventList : track.getMMLEventList()) {
 				MMLEvent.removeTick(eventList.getMMLNoteEventList(), tickPosition, tick);
@@ -410,18 +422,18 @@ public final class MMLScore implements Cloneable {
 	 * @return
 	 */
 	public String getBarTextTick(int tick) {
-		try {
-			int sect = MMLTicks.getTick(getBaseOnly());
-			int sectBar = sect * getTimeCountOnly();
-			int bar = tick / sectBar;
-			int barR = (tick % sectBar);
-			int c = barR / sect;
-			int r = barR % sect;
-			return String.format("%d:%02d:%02d", bar, c, r);
-		} catch (UndefinedTickException e) {
-			e.printStackTrace();
-		}
-		return "N/A";
+		return new Measure(this, tick).toString();
+	}
+
+	public void addTimeSignature(TimeSignature ts) {
+		timeSignatureList.removeAll(timeSignatureList.stream().filter(t -> t.getMeasureOffset() == ts.getMeasureOffset()).toList());
+		timeSignatureList.add(ts);
+		TimeSignature.recalcTimeSignatureList(this);
+	}
+
+	public void removeTimeSignature(TimeSignature ts) {
+		timeSignatureList.remove(ts);
+		TimeSignature.recalcTimeSignatureList(this);
 	}
 
 	@Override

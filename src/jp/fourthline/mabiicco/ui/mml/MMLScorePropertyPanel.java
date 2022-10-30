@@ -23,10 +23,10 @@ import javax.swing.JComboBox;
 public final class MMLScorePropertyPanel extends JPanel {
 	private static final long serialVersionUID = -3976816581383137814L;
 
-	private JTextField titleField;
-	private JTextField authorField;
-	private JComboBox<String> timeCount;
-	private JComboBox<String> timeBase;
+	private final JTextField titleField = new JTextField();
+	private final JTextField authorField = new JTextField();;
+	private final JComboBox<String> timeCount = new JComboBox<>();;
+	private final JComboBox<String> timeBase = new JComboBox<>();;
 
 	private final Dimension prefSize = new Dimension(300, 170);
 
@@ -54,31 +54,16 @@ public final class MMLScorePropertyPanel extends JPanel {
 		label4.setBounds(198, 105, 15, 14);
 		add(label4);
 
-		titleField = new JTextField();
 		titleField.setBounds(125, 37, 152, 19);
 		add(titleField);
 		titleField.setColumns(10);
 
-		authorField = new JTextField();
 		authorField.setColumns(10);
 		authorField.setBounds(125, 70, 152, 19);
-		add(authorField);
 
-		timeCount = new JComboBox<>();
 		timeCount.setBounds(125, 102, 63, 19);
-		add(timeCount);
-
-		timeBase = new JComboBox<>();
 		timeBase.setBounds(214, 102, 63, 19);
-		add(timeBase);
-	}
 
-	@Override
-	public Dimension getPreferredSize() {
-		return prefSize;
-	}
-
-	private void initialComboBox(String baseTime) {
 		String[] timeBaseList = { "1", "2", "4", "8", "16", "32", "64" };
 
 		for (int i = 1; i <= 32; i++) {
@@ -88,6 +73,19 @@ public final class MMLScorePropertyPanel extends JPanel {
 		for (String s : timeBaseList) {
 			timeBase.addItem(s);
 		}
+		timeBase.setMaximumRowCount(4);   // JComboBoxの性能劣化対策
+
+		add(timeCount);
+		add(timeBase);
+		add(authorField);
+	}
+
+	@Override
+	public Dimension getPreferredSize() {
+		return prefSize;
+	}
+
+	private void initialComboBox(String baseTime) {
 
 		timeCount.setSelectedItem("4");
 		timeBase.setSelectedItem("4");

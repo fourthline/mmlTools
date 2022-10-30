@@ -283,14 +283,14 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 		// 2拍目に1拍追加する.
 		obj.getMMLScore().setTimeCountOnly(2);
 		obj.nextStepTimeTo(true);
-		obj.addTicks(96);
+		obj.addTicks(false);
 		assertEquals("MML@ccrcc,ddrdd,eeree,ffrff;", obj.getMMLScore().getTrack(0).getOriginalMML());
 		assertEquals("MML@ggrgg,aaraa,bbrbb,>ccrcc;", obj.getMMLScore().getTrack(1).getOriginalMML());
 		assertEquals(96*5, obj.getMMLScore().getTotalTickLength());
 
 		// 先頭の1拍を削除する.
 		obj.nextStepTimeTo(false);
-		obj.removeTicks(96);
+		obj.removeTicks(false);
 		assertEquals("MML@crcc,drdd,eree,frff;", obj.getMMLScore().getTrack(0).getOriginalMML());
 		assertEquals("MML@grgg,araa,brbb,>crcc;", obj.getMMLScore().getTrack(1).getOriginalMML());
 		assertEquals(96*4, obj.getMMLScore().getTotalTickLength());

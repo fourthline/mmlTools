@@ -4,6 +4,7 @@
 
 package jp.fourthline.mmlTools;
 
+import jp.fourthline.mmlTools.core.UndefinedTickException;
 import jp.fourthline.mmlTools.parser.AbstractMMLParser;
 import jp.fourthline.mmlTools.parser.MMLParseException;
 import jp.fourthline.mmlTools.parser.SectionContents;
@@ -21,6 +22,8 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 	private static final String SCORE_SECTION = "[mml-score]";
 	// marker section
 	private static final String MARKER_SECTION = "[marker]";
+	// time signature section
+	private static final String TIME_SIGNATURE_SECTION = "[time-signature]";
 
 	// score element
 	private static final String SCORE_VERSION = "version=1"; 
@@ -83,6 +86,7 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 		score.getTempoEventList().clear();
 		score.getTrackList().clear();
 		score.getMarkerList().clear();
+		score.getTimeSignatureList().clear();
 
 		List<SectionContents> contentsList = SectionContents.makeSectionContentsByInputStream(istream, "UTF-8");
 		if (contentsList.isEmpty()) {
@@ -93,6 +97,8 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 				parseMMLScore(section.getContents());
 			} else if (section.getName().equals(MARKER_SECTION)) {
 				parseMarker(section.getContents());
+			} else if (section.getName().equals(TIME_SIGNATURE_SECTION)) {
+				parseTimeSignature(section.getContents());
 			}
 		}
 		return score;
@@ -175,6 +181,29 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 		}
 	}
 
+	/**
+	 * parse [time-signature] contents
+	 * @param contents
+	 */
+	private void parseTimeSignature(String contents) {
+		score.getTimeSignatureList().clear();
+		for (String s : contents.split("\n")) {
+			// <tickOffset>=<num>/<base>
+			int index = s.indexOf('=');
+			if (index > 0) {
+				String tickString = s.substring(0, index);
+				String sig[] = s.substring(index+1).split("/");
+				int numTime = Integer.parseInt(sig[0]);
+				int baseTime = Integer.parseInt(sig[1]);
+				try {
+					score.addTimeSignature(new TimeSignature(score, Integer.parseInt(tickString), numTime, baseTime));
+				} catch (NumberFormatException | UndefinedTickException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
 	private String getTempoObj() {
 		var globalTempoList = score.getTempoEventList();
 		if (globalTempoList.size() == 0) {
@@ -194,6 +223,15 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 			return trackList.get(0).getCommonStartOffset();
 		}
 		return 0;
+	}
+
+	private void writeMMLEventList(PrintStream stream, String name, List <? extends MMLEvent> list) {
+		if (!list.isEmpty()) {
+			stream.println(name);
+			for (MMLEvent event : list) {
+				stream.println(event.toString());
+			}
+		}
 	}
 
 	public void writeToOutputStream(OutputStream outputStream) {
@@ -235,12 +273,8 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 			}
 		}
 
-		if (!score.getMarkerList().isEmpty()) {
-			stream.println(MARKER_SECTION);
-			for (Marker marker : score.getMarkerList()) {
-				stream.println(marker.toString());
-			}
-		}
+		writeMMLEventList(stream, MARKER_SECTION, score.getMarkerList());
+		writeMMLEventList(stream, TIME_SIGNATURE_SECTION, score.getTimeSignatureList());
 
 		stream.close();
 	}

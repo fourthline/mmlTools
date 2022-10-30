@@ -59,6 +59,7 @@ public final class ParsePropertiesDialog extends JPanel {
 				p.add(label);
 				p.add(c);
 				add(p);
+				add(new JPanel());   // JComboBoxの性能劣化対策
 				comboMap.put(key, c);
 			}
 		}

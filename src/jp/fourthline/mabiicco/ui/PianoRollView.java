@@ -28,6 +28,8 @@ import jp.fourthline.mmlTools.MMLEventList;
 import jp.fourthline.mmlTools.MMLNoteEvent;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTrack;
+import jp.fourthline.mmlTools.Measure;
+import jp.fourthline.mmlTools.TimeSignature;
 import jp.fourthline.mmlTools.core.MMLTicks;
 import jp.fourthline.mmlTools.core.UndefinedTickException;
 
@@ -60,11 +62,16 @@ public final class PianoRollView extends JPanel {
 		return noteHeight.h;
 	}
 
-	public void setNoteHeightIndex(int index) {
+	public void setNoteHeight(NoteHeight nh) {
+		noteHeight = nh;
+	}
+
+	private void setNoteHeightIndex(int index) {
 		if ( (index >= 0) && (index < NoteHeight.values().length) ) {
 			noteHeight = NoteHeight.values()[index];
 		}
 	}
+
 	public int getTotalHeight() {
 		return (12*OCTNUM*noteHeight.h)+noteHeight.h;
 	}
@@ -183,7 +190,7 @@ public final class PianoRollView extends JPanel {
 	private void updateViewWidthTrackLength() {
 		MMLScore mmlScore = mmlManager.getMMLScore();
 		long tickLength = mmlScore.getTotalTickLengthWithAll();
-		long userTickLength = mmlScore.getUserViewMeasure() * mmlScore.getMeasureTick();
+		long userTickLength = TimeSignature.measureToTick(mmlScore, mmlScore.getUserViewMeasure());
 		try {
 			// 最後に12小節分のマージンを作成します.
 			int t1 = MMLTicks.getTick("1");
@@ -424,21 +431,6 @@ public final class PianoRollView extends JPanel {
 	}
 
 	/**
-	 * 現在のスコアを基準とした1小節の幅を取得する.
-	 * @return
-	 */
-	public int getMeasureWidth() {
-		try {
-			int sect = MMLTicks.getTick(mmlManager.getMMLScore().getBaseOnly());
-			sect = convertTicktoX(sect);
-			int borderCount = mmlManager.getMMLScore().getTimeCountOnly();
-			return (sect * borderCount);
-		} catch (UndefinedTickException e) {
-			throw new AssertionError();
-		}
-	}
-
-	/**
 	 * 補助線の描画.
 	 */
 	private static final float[] dash = { 2.0f, 4.0f };
@@ -469,29 +461,36 @@ public final class PianoRollView extends JPanel {
 	 * メジャーを表示します。
 	 */
 	private void paintMeasure(Graphics2D g) {
-		int width = (int)convertXtoTick(getWidth());
-		try {
-			int sect = MMLTicks.getTick(mmlManager.getMMLScore().getBaseOnly());
-			int borderCount = mmlManager.getMMLScore().getTimeCountOnly();
-			int y = getTotalHeight();
-			for (int i = 0; i*sect < width; i++) {
-				if (i*sect < startViewTick-sect) {
-					continue;
-				}
-				if (i*sect > endViewTick) {
-					break;
-				}
-				if (i%borderCount == 0) {
+		MMLScore score = mmlManager.getMMLScore();
+		int beatCount = 0;
+		int totalTick = 0;
+		int y = getTotalHeight();
+
+		var measure = new Measure(score, (int) startViewTick);
+		totalTick = measure.measuredTick();
+		int numTime = measure.getNumTime();
+		int beatTick = measure.getBeatTick();
+
+		while (totalTick <= endViewTick) {
+			if (totalTick >= startViewTick-beatTick) {
+				if (beatCount%numTime == 0) {
 					g.setColor(darkBarBorder);
 				} else {
 					g.setColor(barBorder);
 				}
-				int x = convertTicktoX(i*sect);
+				int x = convertTicktoX(totalTick);
 				g.drawLine(x, 0, x, y);
-				paintHalfMeasure(g, x, convertTicktoX(sect));
+				paintHalfMeasure(g, x, convertTicktoX(beatTick));
 			}
-		} catch (UndefinedTickException e) {
-			e.printStackTrace();
+
+			totalTick += beatTick;
+			beatCount++;
+			if (beatCount >= numTime) {
+				beatCount = 0;
+				measure = new Measure(score, totalTick);
+				numTime = measure.getNumTime();
+				beatTick = measure.getBeatTick();
+			}
 		}
 	}
 
@@ -575,20 +574,22 @@ public final class PianoRollView extends JPanel {
 		MMLEventList activePart = mmlManager.getActiveMMLPart();
 
 		int colorIndex = 0;
-		for (int i = 0; i < track.getMMLEventList().size(); i++) {
-			MMLEventList targetPart = track.getMMLEventAtIndex(i);
+		int trackIndex = 0;
+		for (MMLEventList targetPart : track.getMMLEventList()) {
 			if (targetPart == activePart) {
 				colorIndex++;
+				trackIndex++;
 				continue;
 			}
 			Color rectColor = ColorManager.defaultColor().getPartRectColor(index, colorIndex);
 			Color fillColor = ColorManager.defaultColor().getPartFillColor(index, colorIndex);
-			if ( !instEnable[i] && !songExEnable[i] ) {
+			if ( !instEnable[trackIndex] && !songExEnable[trackIndex] ) {
 				fillColor = ColorManager.defaultColor().getUnusedFillColor();
 			} else {
 				colorIndex++;
 			}
-			paintMMLPart(g, track.getMMLEventList().get(i).getMMLNoteEventList(), rectColor, fillColor, false);
+			paintMMLPart(g, targetPart.getMMLNoteEventList(), rectColor, fillColor, false);
+			trackIndex++;
 		}
 	}
 
@@ -611,10 +612,11 @@ public final class PianoRollView extends JPanel {
 			return;
 		}
 		if (mmlScore != null) {
-			for (int i = 0; i < mmlScore.getTrackCount(); i++) {
-				MMLTrack track = mmlScore.getTrack(i);
-				if (track != mmlScore.getTrack(mmlManager.getActiveTrackIndex())) {
-					paintMMLTrack(g, i, track);
+			int index = 0;
+			MMLTrack activeTrack = mmlManager.getActiveTrack();
+			for (MMLTrack track : mmlScore.getTrackList()) {
+				if (track != activeTrack) {
+					paintMMLTrack(g, index++, track);
 				}
 			}
 		}

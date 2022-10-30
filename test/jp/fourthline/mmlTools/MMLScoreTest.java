@@ -770,24 +770,6 @@ public class MMLScoreTest extends FileSelect {
 	}
 
 	@Test
-	public void test_barText() {
-		assertEquals("0:00:00", score.getBarTextTick(0));
-		assertEquals("0:00:48", score.getBarTextTick(48));
-		assertEquals("0:01:00", score.getBarTextTick(96));
-		assertEquals("1:00:00", score.getBarTextTick(384));
-
-		score.setBaseTime("3/4");
-		assertEquals("0:01:00", score.getBarTextTick(96));
-		assertEquals("1:01:00", score.getBarTextTick(384));
-
-		score.setBaseTime("8/8");
-		assertEquals("0:01:00", score.getBarTextTick(48));
-		assertEquals("0:01:47", score.getBarTextTick(95));
-		assertEquals("0:02:00", score.getBarTextTick(96));
-		assertEquals("1:00:00", score.getBarTextTick(384));
-	}
-
-	@Test
 	public void test_trackClone() throws UndefinedTickException {
 		score.addTrack(new MMLTrack().setMML("MML@T60aaaT90bbbb;"));
 		score.addTrack(score.getTrack(0).clone());

@@ -99,7 +99,6 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String NEXT_TIME = "next_time";
 	@Action public static final String PREV_TIME = "prev_time";
 	@Action public static final String PART_CHANGE = "part_change";
-	@Action public static final String CHANGE_NOTE_HEIGHT_INT = "change_note_height";
 	@Action public static final String ADD_MEASURE = "add_measure";
 	@Action public static final String REMOVE_MEASURE = "remove_measure";
 	@Action public static final String ADD_BEAT = "add_beat";
@@ -129,7 +128,6 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String WAVOUT = "wavout";
 	@Action public static final String KEYBOARD_INPUT = "keyboard_input";
 	@Action public static final String INPUT_EMPTY_CORRECTION = "input_empty_correction";
-	@Action public static final String CHANGE_SCALE_COLOR = "change_scale_color";
 	@Action public static final String REMOVE_RESTS_BETWEEN_NOTES = "remote_rests_between_notes";
 	@Action public static final String CHANGE_UI = "change_ui";
 	@Action public static final String USE_DEFAULT_SOUNDBANK = "use_default_soundbank";
@@ -143,7 +141,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String SHORTCUT_INFO = "shortcut_info";
 	@Action public static final String CONVERT_TUPLET = "convert_tuplet";
 	@Action public static final String OTHER_MML_EXPORT = "other_mml_export";
-	@Action public static final String CHANGE_SOUND_ENV = "change_sound_env";
+	@Action public static final String CHANGE_ACTION = "change_action";
 
 	private final HashMap<String, Consumer<Object>> actionMap = new HashMap<>();
 
@@ -238,10 +236,10 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(NEXT_TIME, t -> mmlSeqView.nextStepTimeTo(true));
 		actionMap.put(PREV_TIME, t -> mmlSeqView.nextStepTimeTo(false));
 		actionMap.put(PART_CHANGE, t -> mmlSeqView.partChange());
-		actionMap.put(ADD_MEASURE, t -> this.addMeasure());
-		actionMap.put(REMOVE_MEASURE, t -> this.removeMeasure());
-		actionMap.put(ADD_BEAT, t -> this.addBeat());
-		actionMap.put(REMOVE_BEAT, t -> this.removeBeat());
+		actionMap.put(ADD_MEASURE, t -> mmlSeqView.addTicks(true));
+		actionMap.put(REMOVE_MEASURE, t -> mmlSeqView.removeTicks(true));
+		actionMap.put(ADD_BEAT, t -> mmlSeqView.addTicks(false));
+		actionMap.put(REMOVE_BEAT, t -> mmlSeqView.removeTicks(false));
 		actionMap.put(NOTE_PROPERTY, t -> editState.noteProperty());
 		actionMap.put(TRANSPOSE, t -> new MMLTranspose(mainFrame, mmlSeqView).showDialog());
 		actionMap.put(TRACKS_EDIT, t -> new MultiTracksVelocityChangeEditor(mainFrame, mmlSeqView).showDialog());
@@ -261,14 +259,12 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(SWITCH_MMLPART_NEXT, t -> mmlSeqView.switchMMLPart(true));
 		actionMap.put(SWITCH_MMLPART_PREV, t -> mmlSeqView.switchMMLPart(false));
 		actionMap.put(TOGGLE_LOOP, t -> this.toggleLoop());
-		actionMap.put(CHANGE_NOTE_HEIGHT_INT, t -> this.changeNoteHeight(t));
 		actionMap.put(FILE_OPEN_WITH_HISTORY, t -> this.fileOpenWithHistory(t));
 		actionMap.put(ALL_CLEAR_TEMPO, t -> this.allClearTempo());
 		actionMap.put(MML_GENERATE, t -> mmlSeqView.updateActivePart(true));
 		actionMap.put(WAVOUT, t -> this.startWavOutAction());
 		actionMap.put(KEYBOARD_INPUT, t -> mmlSeqView.showKeyboardInput());
 		actionMap.put(INPUT_EMPTY_CORRECTION, t -> this.inputEmptyCorrection());
-		actionMap.put(CHANGE_SCALE_COLOR, t -> this.changeScaleColor(t));
 		actionMap.put(REMOVE_RESTS_BETWEEN_NOTES, t -> editState.removeRestsBetweenNotes());
 		actionMap.put(CHANGE_UI, t -> this.changeUI());
 		actionMap.put(USE_DEFAULT_SOUNDBANK, t -> this.showAppRestartDialog());
@@ -282,7 +278,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(SHORTCUT_INFO, t -> new About().showShortcutInfo(mainFrame, mainFrame.getShortcutMap()));
 		actionMap.put(CONVERT_TUPLET, t -> editState.convertTuplet());
 		actionMap.put(OTHER_MML_EXPORT, t -> this.otherMmlExportAction());
-		actionMap.put(CHANGE_SOUND_ENV, t -> this.changeSoundEnv(t));
+		actionMap.put(CHANGE_ACTION, t -> this.changeAction(t));
 	}
 
 	@Override
@@ -293,21 +289,6 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			func.accept( e.getSource() );
 		} else {
 			System.err.println("not found Action: " + command);
-		}
-	}
-
-	/**
-	 * ノートの表示している高さを変更する.
-	 * @param source    高さ設定indexのSupplier
-	 */
-	private void changeNoteHeight(Object source) {
-		if (source instanceof Supplier<?>) {
-			Object o = ((Supplier<?>) source).get();
-			if (o instanceof PianoRollView.NoteHeight h) {
-				int index = Arrays.asList(PianoRollView.NoteHeight.values()).indexOf(h);
-				mmlSeqView.setPianoRollHeightScaleIndex(index);
-				MabiIccoProperties.getInstance().setPianoRollViewHeightScaleProperty(index);
-			}
 		}
 	}
 
@@ -681,22 +662,6 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		notifyUpdateEditState();
 	}
 
-	private void addMeasure() {
-		mmlSeqView.addTicks( mmlSeqView.getMMLScore().getMeasureTick() );
-	}
-
-	private void addBeat() {
-		mmlSeqView.addTicks( mmlSeqView.getMMLScore().getBeatTick() );
-	}
-
-	private void removeMeasure() {
-		mmlSeqView.removeTicks( mmlSeqView.getMMLScore().getMeasureTick() );
-	}
-
-	private void removeBeat() {
-		mmlSeqView.removeTicks( mmlSeqView.getMMLScore().getBeatTick() );
-	}
-
 	@Override
 	public void notifyUpdateFileState() {
 		mainFrame.setCanSaveFile(false);
@@ -815,19 +780,6 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		}
 	}
 
-	private void changeScaleColor(Object source) {
-		if (source instanceof Supplier<?>) {
-			Object o = ((Supplier<?>) source).get();
-			if (o instanceof ScaleColor) {
-				mmlSeqView.setScaleColor((ScaleColor)o);
-			} else {
-				System.err.println("changeScaleColor invalid param (not Supplier<ScaleColor>)");
-			}
-		} else {
-			System.err.println("changeScaleColor invalid param (not Supplier)");
-		}
-	}
-
 	private void duplicateMMLTrack() {
 		MMLTrack track = mmlSeqView.getSelectedTrack().clone();
 		mmlSeqView.addMMLTrack(track);
@@ -865,10 +817,19 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		}
 	}
 
-	private void changeSoundEnv(Object source) {
+	private void changeAction(Object source) {
 		if (source instanceof Supplier<?>) {
 			Object o = ((Supplier<?>) source).get();
-			if (o instanceof SoundEnv ss) {
+			if (o instanceof PianoRollView.NoteHeight h) {
+				// ノートの表示している高さを変更する.
+				mmlSeqView.setPianoRollHeightScale(h);
+				int index = Arrays.asList(PianoRollView.NoteHeight.values()).indexOf(h);
+				MabiIccoProperties.getInstance().setPianoRollViewHeightScaleProperty(index);
+			} else if (o instanceof ScaleColor) {
+				// 音階表示を変更する.
+				mmlSeqView.setScaleColor((ScaleColor)o);
+			} else if (o instanceof SoundEnv ss) {
+				// 音源環境を変更する.
 				int index = Arrays.asList(SoundEnv.values()).indexOf(ss);
 				if (index >= 0) {
 					var appProperties = MabiIccoProperties.getInstance();
@@ -876,6 +837,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 					appProperties.useDefaultSoundBank.set(!ss.useDLS());
 					showAppRestartDialog();
 				}
+			} else {
+				System.err.println("changeAction invalid param " + source.getClass().toString());
 			}
 		}
 	}
