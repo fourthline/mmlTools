@@ -2,7 +2,7 @@
 version=1
 title=
 author=
-time=4/4
+time=3/4
 tempo=0T60,48T120
 mml-track=MML@t60r8t120rv12d+d+d+r21l19.<eg+,r.r19.v12<a9l16&ag+9&g+g+8&g+32a9&a,r2r.v12l21<c+c+32d+r19.c16.;
 name=Track2
@@ -28,3 +28,6 @@ program=0
 songProgram=-1
 panpot=32
 visible=true
+[time-signature]
+576=4/4
+1344=32/32

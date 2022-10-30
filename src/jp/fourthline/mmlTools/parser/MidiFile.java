@@ -26,6 +26,7 @@ import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTempoEvent;
 import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.Marker;
+import jp.fourthline.mmlTools.TimeSignature;
 import jp.fourthline.mmlTools.core.MMLTickTable;
 import jp.fourthline.mmlTools.core.MMLTicks;
 import jp.fourthline.mmlTools.core.ResourceLoader;
@@ -329,8 +330,20 @@ public final class MidiFile extends AbstractMMLParser {
 		case 0x58: // 拍子/メトロノーム設定
 			System.out.printf("met: %d %d %d %d\n", data[0], 1<<data[1], data[2], data[3]);
 			if (parseBeat) {
-				score.setBaseOnly(1<<data[1]);
-				score.setTimeCountOnly(data[0]);
+				int base = 1 << data[1];
+				int timeCount = data[0];
+				if ((base <= 32) && (timeCount > 0) && (timeCount <= 32)) {
+					if (tick == 0) {
+						score.setBaseOnly(base);
+						score.setTimeCountOnly(timeCount);
+					} else {
+						try {
+							score.addTimeSignature(new TimeSignature(score, (int) tick, timeCount, base));
+						} catch (UndefinedTickException e) {
+							e.printStackTrace();
+						}
+					}
+				}
 			}
 			break;
 		case 0x59: // 調号
