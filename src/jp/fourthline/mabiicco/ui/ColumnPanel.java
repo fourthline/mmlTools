@@ -96,6 +96,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 			@Override
 			public void popupMenuCanceled(PopupMenuEvent e) {
 				PaintOff();
+				pianoRollView.repaint();
 			}
 		});
 	}
