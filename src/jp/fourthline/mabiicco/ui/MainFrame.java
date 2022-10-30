@@ -35,6 +35,7 @@ import java.awt.event.ComponentListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -126,10 +127,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		contentPane.add(northPanel, BorderLayout.NORTH);
 
 		mmlSeqView = new MMLSeqView(this, timeBox);
-		mmlSeqView.setNoteAlignChanger(t -> {
-			if ( (t >= 0) && (t < noteTypeSelect.getItemCount()) )
-				noteTypeSelect.setSelectedIndex(t);
-		});
+		mmlSeqView.setNoteAlignChanger(this::changeNoteTypeSelect);
 		contentPane.add(mmlSeqView.getPanel(), BorderLayout.CENTER);
 		contentPane.setFocusable(false);
 
@@ -734,6 +732,15 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		statusField.setText(text);
 	}
 
+	/**
+	 * 編集中ノート変更
+	 * @param index
+	 */
+	private void changeNoteTypeSelect(int index) {
+		if ( (index >= 0) && (index < noteTypeSelect.getItemCount()) )
+			noteTypeSelect.setSelectedIndex(index);
+	}
+
 	private void addShortcutMap(KeyStroke keyStroke, String text) {
 		if (shortcutMap.containsKey(keyStroke)) {
 			new AssertionError();
@@ -781,6 +788,16 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 				KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0),
 				() -> this.listener.actionPerformed(new ActionEvent(this, 0, ActionDispatcher.PLAY)),
 				appText("shortcut.play"));
+
+		// 編集ノート長選択
+		for (var noteAlign : NoteAlign.values()) {
+			if (noteAlign.getKeyCode() != 0) {
+				createKeyAction(noteAlign.name(),
+						KeyStroke.getKeyStroke(noteAlign.getKeyCode(), 0),
+						() -> changeNoteTypeSelect(Arrays.asList(NoteAlign.values()).indexOf(noteAlign)),
+						noteAlign.toString());
+			}
+		}
 	}
 
 	private void createKeyAction(String name, KeyStroke stroke, Runnable func, String text) {
