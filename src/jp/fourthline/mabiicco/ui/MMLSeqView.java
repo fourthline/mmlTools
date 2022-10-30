@@ -757,7 +757,7 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 
 	// TimeViewを更新するためのスレッドを開始します.
 	private void startTimeViewUpdateThread() {
-		scheduledExecutor.scheduleWithFixedDelay(this::updateTimeView, 500, 100, TimeUnit.MILLISECONDS);
+		scheduledExecutor.scheduleWithFixedDelay(this::updateTimeView, 500, 25, TimeUnit.MILLISECONDS);
 	}
 
 	private void updateTimeView() {
