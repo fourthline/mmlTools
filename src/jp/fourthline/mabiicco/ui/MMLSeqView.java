@@ -802,7 +802,7 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 	@Override
 	public void updatePianoRollView(int note) {
 		pianoRollView.updateRunningSequencePosition();
-		long positionX = pianoRollView.getSequencePlayPosition();
+		int positionX = (int) pianoRollView.getSequencePlayPosition();
 		var measure = new Measure(mmlScore, (int)positionX);
 		positionX = pianoRollView.convertTicktoX(measure.measuredTick());
 		JViewport viewport = scrollPane.getViewport();
@@ -814,7 +814,7 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 			/* ビュー外にあるので、現在のポジションにあわせる */
 			if (positionX + dim.width > pianoRollView.getWidth()) {
 				positionX = (pianoRollView.getWidth() - dim.width);
-				positionX = pianoRollView.convertTicktoX(Measure.measuredTick(mmlScore, (int)positionX));
+				positionX = pianoRollView.convertTicktoX(Measure.measuredTick(mmlScore, (int)pianoRollView.convertXtoTick(positionX)));
 			}
 		} else {
 			positionX = point.x;
