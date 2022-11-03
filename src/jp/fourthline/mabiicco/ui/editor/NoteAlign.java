@@ -5,6 +5,7 @@
 package jp.fourthline.mabiicco.ui.editor;
 
 import java.awt.event.KeyEvent;
+import java.util.List;
 
 import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mmlTools.core.MMLTicks;
@@ -13,16 +14,16 @@ import jp.fourthline.mmlTools.core.UndefinedTickException;
 
 
 public enum NoteAlign {
-	N1("1", KeyEvent.VK_1),
-	N2("2", KeyEvent.VK_2),
-	N4("4", KeyEvent.VK_3),
-	N8("8", KeyEvent.VK_4),
-	N16("16", KeyEvent.VK_5),
-	N32("32", KeyEvent.VK_6),
-	N64("64", KeyEvent.VK_7),
-	N12("12", KeyEvent.VK_8),
-	N24("24", KeyEvent.VK_9),
-	N48("48", KeyEvent.VK_0),
+	N1("1", List.of(KeyEvent.VK_1, KeyEvent.VK_NUMPAD1)),
+	N2("2", List.of(KeyEvent.VK_2, KeyEvent.VK_NUMPAD2)),
+	N4("4", List.of(KeyEvent.VK_3, KeyEvent.VK_NUMPAD3)),
+	N8("8", List.of(KeyEvent.VK_4, KeyEvent.VK_NUMPAD4)),
+	N16("16", List.of(KeyEvent.VK_5, KeyEvent.VK_NUMPAD5)),
+	N32("32", List.of(KeyEvent.VK_6, KeyEvent.VK_NUMPAD6)),
+	N64("64", List.of(KeyEvent.VK_7, KeyEvent.VK_NUMPAD7)),
+	N12("12", List.of(KeyEvent.VK_8, KeyEvent.VK_NUMPAD8)),
+	N24("24", List.of(KeyEvent.VK_9, KeyEvent.VK_NUMPAD9)),
+	N48("48", List.of(KeyEvent.VK_0, KeyEvent.VK_NUMPAD0)),
 	N2D("2."),
 	N4D("4."),
 	N8D("8."),
@@ -33,11 +34,11 @@ public enum NoteAlign {
 	public static final NoteAlign DEFAULT_ALIGN = N4;
 	private final String viewText;
 	private int alignTick;
-	private int keyCode;
+	private List<Integer> keyCodeList;
 	private NoteAlign(String s) {
-		this(s, 0);
+		this(s, null);
 	}
-	private NoteAlign(String s, int keyCode) {
+	private NoteAlign(String s, List<Integer> keyCodeList) {
 		viewText = AppResource.appText("editor.note_" + s);
 		try {
 			alignTick = MMLTicks.getTick(s);
@@ -45,11 +46,11 @@ public enum NoteAlign {
 			e.printStackTrace();
 			System.exit(1);
 		}
-		this.keyCode = keyCode;
+		this.keyCodeList = keyCodeList;
 	}
 
-	public int getKeyCode() {
-		return keyCode;
+	public List<Integer> getKeyCodeList() {
+		return keyCodeList;
 	}
 
 	public String toString() {

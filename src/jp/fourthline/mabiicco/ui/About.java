@@ -10,6 +10,7 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -43,22 +44,28 @@ public final class About {
 
 
 	@SuppressWarnings("deprecation")
-	private String getAccText(KeyStroke acc) {
-		String accText = "";
-		if (acc != null) {
-			int modifiers = acc.getModifiers();
-			if (modifiers > 0) {
-				accText = KeyEvent.getKeyModifiersText(modifiers);
-				accText += "+";
+	private String getAccText(List<KeyStroke> accList) {
+		StringBuilder accText = new StringBuilder();
+		accList.forEach(acc -> {
+			if (acc != null) {
+				int modifiers = acc.getModifiers();
+				if (modifiers > 0) {
+					accText.append(KeyEvent.getKeyModifiersText(modifiers));
+					accText.append("+");
+				}
+				int keyCode = acc.getKeyCode();
+				if (keyCode != 0) {
+					accText.append(KeyEvent.getKeyText(keyCode));
+				} else {
+					accText.append(acc.getKeyChar());
+				}
+				accText.append(", ");
 			}
-			int keyCode = acc.getKeyCode();
-			if (keyCode != 0) {
-				accText += KeyEvent.getKeyText(keyCode);
-			} else {
-				accText += acc.getKeyChar();
-			}
+		});
+		if (accList.size() > 0) {
+			accText.delete(accText.length()-2, accText.length());
 		}
-		return accText;
+		return accText.toString();
 	}
 
 	/**
@@ -66,7 +73,7 @@ public final class About {
 	 * @param parentFrame
 	 * @param map
 	 */
-	public void showShortcutInfo(Frame parentFrame, Map<KeyStroke, String> map) {
+	public void showShortcutInfo(Frame parentFrame, Map<String, List<KeyStroke>> map) {
 		Vector<String> column = new Vector<>();
 		column.add(AppResource.appText("shortcut.table.key"));
 		column.add(AppResource.appText("shortcut.table.function"));
@@ -76,8 +83,8 @@ public final class About {
 			var key = t.getKey();
 			var value = t.getValue();
 			var v = new Vector<String>();
-			v.add(getAccText(key));
-			v.add(value);
+			v.add(getAccText(value));
+			v.add(key);
 			list.add(v);
 		});
 

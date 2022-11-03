@@ -40,6 +40,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
@@ -83,7 +84,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	private final ArrayList<JComponent> noplayFunctions = new ArrayList<>();
 
 	/** ショートカットキー情報 */
-	private final Map<KeyStroke, String> shortcutMap = new LinkedHashMap<>();
+	private final Map<String, List<KeyStroke>> shortcutMap = new LinkedHashMap<>();
 
 	/** 状態が変化するメニューたち */
 	private JMenuItem reloadMenuItem = null;
@@ -207,7 +208,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		}
 		if (keyStroke != null) {
 			menuItem.setAccelerator(keyStroke);
-			addShortcutMap(keyStroke, menuItem.getText());
+			addShortcutMap(menuItem.getText(), keyStroke);
 		}
 
 		menu.add(menuItem);
@@ -741,14 +742,24 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 			noteTypeSelect.setSelectedIndex(index);
 	}
 
-	private void addShortcutMap(KeyStroke keyStroke, String text) {
-		if (shortcutMap.containsKey(keyStroke)) {
-			new AssertionError();
+	private void addShortcutMap(String text, KeyStroke keyStroke) {
+		shortcutMap.values().forEach(t -> {
+			t.forEach(k -> {
+				if (k.equals(keyStroke)) {
+					new AssertionError();
+				}
+			});
+		});
+		if (shortcutMap.containsKey(text)) {
+			shortcutMap.get(text).add(keyStroke);
+		} else {
+			var list = new ArrayList<KeyStroke>();
+			list.add(keyStroke);
+			shortcutMap.put(text, list);
 		}
-		shortcutMap.put(keyStroke, text);
 	}
 
-	public Map<KeyStroke, String> getShortcutMap() {
+	public Map<String, List<KeyStroke>> getShortcutMap() {
 		return shortcutMap;
 	}
 
@@ -791,18 +802,20 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 
 		// 編集ノート長選択
 		for (var noteAlign : NoteAlign.values()) {
-			if (noteAlign.getKeyCode() != 0) {
-				createKeyAction(noteAlign.name(),
-						KeyStroke.getKeyStroke(noteAlign.getKeyCode(), 0),
+			if (noteAlign.getKeyCodeList() != null) {
+				AtomicInteger i = new AtomicInteger();
+				noteAlign.getKeyCodeList().forEach(keyCode -> 
+				createKeyAction(noteAlign.name()+"."+(i.incrementAndGet()),
+						KeyStroke.getKeyStroke(keyCode, 0),
 						() -> changeNoteTypeSelect(Arrays.asList(NoteAlign.values()).indexOf(noteAlign)),
-						noteAlign.toString());
+						noteAlign.toString()));
 			}
 		}
 	}
 
 	private void createKeyAction(String name, KeyStroke stroke, Runnable func, String text) {
 		new KeyAction(name, stroke, contentPane, func);
-		addShortcutMap(stroke, text);
+		addShortcutMap(text, stroke);
 	}
 
 	private static final class KeyAction extends AbstractAction {
