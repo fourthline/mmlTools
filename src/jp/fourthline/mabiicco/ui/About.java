@@ -48,6 +48,9 @@ public final class About {
 		StringBuilder accText = new StringBuilder();
 		accList.forEach(acc -> {
 			if (acc != null) {
+				if (accText.length() > 0) {
+					accText.append(", ");
+				}
 				int modifiers = acc.getModifiers();
 				if (modifiers > 0) {
 					accText.append(KeyEvent.getKeyModifiersText(modifiers));
@@ -59,12 +62,8 @@ public final class About {
 				} else {
 					accText.append(acc.getKeyChar());
 				}
-				accText.append(", ");
 			}
 		});
-		if (accList.size() > 0) {
-			accText.delete(accText.length()-2, accText.length());
-		}
 		return accText.toString();
 	}
 

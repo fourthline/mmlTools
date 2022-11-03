@@ -574,22 +574,20 @@ public final class PianoRollView extends JPanel {
 		MMLEventList activePart = mmlManager.getActiveMMLPart();
 
 		int colorIndex = 0;
-		int trackIndex = 0;
-		for (MMLEventList targetPart : track.getMMLEventList()) {
+		for (int i = 0; i < track.getMMLEventList().size(); i++) {
+			MMLEventList targetPart = track.getMMLEventAtIndex(i);
 			if (targetPart == activePart) {
 				colorIndex++;
-				trackIndex++;
 				continue;
 			}
 			Color rectColor = ColorManager.defaultColor().getPartRectColor(index, colorIndex);
 			Color fillColor = ColorManager.defaultColor().getPartFillColor(index, colorIndex);
-			if ( !instEnable[trackIndex] && !songExEnable[trackIndex] ) {
+			if ( !instEnable[i] && !songExEnable[i] ) {
 				fillColor = ColorManager.defaultColor().getUnusedFillColor();
 			} else {
 				colorIndex++;
 			}
 			paintMMLPart(g, targetPart.getMMLNoteEventList(), rectColor, fillColor, false);
-			trackIndex++;
 		}
 	}
 
@@ -612,11 +610,11 @@ public final class PianoRollView extends JPanel {
 			return;
 		}
 		if (mmlScore != null) {
-			int index = 0;
-			MMLTrack activeTrack = mmlManager.getActiveTrack();
-			for (MMLTrack track : mmlScore.getTrackList()) {
+			var activeTrack = mmlManager.getActiveTrack();
+			for (int i = 0; i < mmlScore.getTrackCount(); i++) {
+				MMLTrack track = mmlScore.getTrack(i);
 				if (track != activeTrack) {
-					paintMMLTrack(g, index++, track);
+					paintMMLTrack(g, i, track);
 				}
 			}
 		}
