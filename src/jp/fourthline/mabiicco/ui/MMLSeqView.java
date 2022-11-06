@@ -784,11 +784,7 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 			positionX = curPositionX;
 		} else if (measuredPositionX > x2) {
 			if (dim.width > pianoRollView.convertTicktoX(measure.getMeasureTick())) {
-				/* ビュー外にあるので、現在のポジションにあわせる */
-				if (measuredPositionX + dim.width > pianoRollView.getWidth()) {
-					positionX = (pianoRollView.getWidth() - dim.width);
-					positionX = pianoRollView.convertTicktoX(Measure.measuredTick(mmlScore, (int)pianoRollView.convertXtoTick(positionX)));
-				} else {
+				if (pianoRollView.getWidth() - dim.width > x1) {
 					positionX = measuredPositionX;
 				}
 			}
