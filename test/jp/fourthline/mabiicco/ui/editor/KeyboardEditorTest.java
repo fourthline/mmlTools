@@ -114,6 +114,10 @@ public class KeyboardEditorTest extends UseLoadingDLS {
 		public int getActiveMMLPartIndex() {
 			return 0;
 		}
+		@Override
+		public long getSequencePosition() {
+			return 0;
+		}
 	}
 
 	private class StubPlayer implements IPlayNote {

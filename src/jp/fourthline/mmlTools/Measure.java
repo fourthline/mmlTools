@@ -83,6 +83,9 @@ public final class Measure {
 	}
 
 	public String toString() {
+		if (beatTick >= 100) {
+			return String.format("%d:%02d:%03d", measure, beat, tick);
+		}
 		return String.format("%d:%02d:%02d", measure, beat, tick);
 	}
 }

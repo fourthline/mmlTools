@@ -39,7 +39,7 @@ public final class MultiTracksVelocityChangeEditorTest extends UseLoadingDLS {
 
 	@Before
 	public void setUp() {
-		mmlManager = new MMLSeqView(null, null);
+		mmlManager = new MMLSeqView(null);
 	}
 
 	private void createObj(MMLScore mmlScore) {

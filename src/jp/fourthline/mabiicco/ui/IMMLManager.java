@@ -29,4 +29,5 @@ public interface IMMLManager {
 	void moveTrack(int toIndex);
 	void updatePianoRollView();
 	void updatePianoRollView(int note);
+	long getSequencePosition();
 }

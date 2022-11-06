@@ -52,7 +52,7 @@ public final class MMLEditorTest extends UseLoadingDLS {
 
 	@Before
 	public void initializeObj() throws Exception {
-		this.mmlManager = new MMLSeqView(null, null);
+		this.mmlManager = new MMLSeqView(null);
 		MMLTrackView.getInstance(0, null, mmlManager).setSelectMMLPartOfIndex(0);
 		Field f = MMLSeqView.class.getDeclaredField("pianoRollView");
 		f.setAccessible(true);

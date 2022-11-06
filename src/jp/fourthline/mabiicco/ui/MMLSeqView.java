@@ -5,7 +5,6 @@
 package jp.fourthline.mabiicco.ui;
 
 import javax.sound.midi.Sequencer;
-import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -35,8 +34,6 @@ import jp.fourthline.mabiicco.ui.mml.TrackPropertyPanel;
 import jp.fourthline.mmlTools.MMLEventList;
 import jp.fourthline.mmlTools.MMLNoteEvent;
 import jp.fourthline.mmlTools.MMLScore;
-import jp.fourthline.mmlTools.MMLTempoConverter;
-import jp.fourthline.mmlTools.MMLTempoEvent;
 import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.Measure;
 import jp.fourthline.mmlTools.core.MMLTicks;
@@ -50,7 +47,6 @@ import java.awt.Frame;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.IntConsumer;
@@ -88,8 +84,7 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 	private final KeyboardEditor keyboardEditor;
 
 	private final JPanel panel;
-	private final JComboBox<StringBuffer> timeBox;
-	private final ScheduledThreadPoolExecutor scheduledExecutor = new ScheduledThreadPoolExecutor(8);
+	private final ScheduledThreadPoolExecutor scheduledExecutor = new ScheduledThreadPoolExecutor(4);
 
 	private final Frame parentFrame;
 
@@ -97,9 +92,8 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 	 * Create the panel.
 	 * @param parentFrame 関連付けるFrame
 	 */
-	public MMLSeqView(Frame parentFrame, JComboBox<StringBuffer> timeBox) {
+	public MMLSeqView(Frame parentFrame) {
 		this.parentFrame = parentFrame;
-		this.timeBox = timeBox;
 		panel = new JPanel(false);
 		panel.setLayout(new BorderLayout(0, 0));
 
@@ -138,7 +132,6 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 		initializeMMLTrack();
 
 		startSequenceThread();
-		startTimeViewUpdateThread();
 	}
 
 	public void setNoteAlignChanger(IntConsumer noteAlignChanger) {
@@ -755,31 +748,6 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 		updateActivePart(true);
 	}
 
-	// TimeViewを更新するためのスレッドを開始します.
-	private void startTimeViewUpdateThread() {
-		scheduledExecutor.scheduleWithFixedDelay(this::updateTimeView, 500, 25, TimeUnit.MILLISECONDS);
-	}
-
-	private void updateTimeView() {
-		long position = pianoRollView.getSequencePlayPosition();
-		List<MMLTempoEvent> tempoList = mmlScore.getTempoEventList();
-		long time = Math.round(MMLTempoConverter.getTimeOnTickOffset(tempoList, (int)position));
-		int totalTick = mmlScore.getTotalTickLength();
-		long totalTime = Math.round(MMLTempoConverter.getTimeOnTickOffset(tempoList, totalTick));
-		int tempo = MMLTempoEvent.searchOnTick(tempoList, (int)position);
-
-		String str = String.format("time %d:%02d.%d/%d:%02d.%d (t%d)", 
-				(time/60/1000), (time/1000%60), (time/100%10),
-				(totalTime/60/1000), (totalTime/1000%60), (totalTime/100%10),
-				tempo);
-		String str2 = mmlScore.getBarTextTick((int)position) + "/" + mmlScore.getBarTextTick(totalTick) + " (t" + tempo + ")";
-		if (timeBox != null) {
-			timeBox.getItemAt(0).replace(0, 32, str);
-			timeBox.getItemAt(1).replace(0, 32, str2);
-			timeBox.repaint();
-		}
-	}
-
 	// PianoRoll, Sequence系の描画を行うスレッドを開始します.
 	private void startSequenceThread() {
 		scheduledExecutor.scheduleWithFixedDelay(() -> {
@@ -802,22 +770,28 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 	@Override
 	public void updatePianoRollView(int note) {
 		pianoRollView.updateRunningSequencePosition();
-		int positionX = (int) pianoRollView.getSequencePlayPosition();
-		var measure = new Measure(mmlScore, (int)positionX);
-		positionX = pianoRollView.convertTicktoX(measure.measuredTick());
+		int curPositionTick = (int) pianoRollView.getSequencePlayPosition();
+		int curPositionX = pianoRollView.convertTicktoX(curPositionTick);
+		var measure = new Measure(mmlScore, curPositionTick);
+		int measuredPositionX = pianoRollView.convertTicktoX(measure.measuredTick());
 		JViewport viewport = scrollPane.getViewport();
 		Point point = viewport.getViewPosition();
 		Dimension dim = viewport.getExtentSize();
 		int x1 = point.x;
+		int positionX = point.x;
 		int x2 = pianoRollView.convertTicktoX(Measure.measuredTick(mmlScore, (int)pianoRollView.convertXtoTick(x1 + dim.width) - measure.getMeasureTick()));
-		if ( (positionX < x1) || (positionX > x2) ) {
-			/* ビュー外にあるので、現在のポジションにあわせる */
-			if (positionX + dim.width > pianoRollView.getWidth()) {
-				positionX = (pianoRollView.getWidth() - dim.width);
-				positionX = pianoRollView.convertTicktoX(Measure.measuredTick(mmlScore, (int)pianoRollView.convertXtoTick(positionX)));
+		if ( (x1 > curPositionX) || (x1 + dim.width < curPositionX) ) {
+			positionX = curPositionX;
+		} else if (measuredPositionX > x2) {
+			if (dim.width > pianoRollView.convertTicktoX(measure.getMeasureTick())) {
+				/* ビュー外にあるので、現在のポジションにあわせる */
+				if (measuredPositionX + dim.width > pianoRollView.getWidth()) {
+					positionX = (pianoRollView.getWidth() - dim.width);
+					positionX = pianoRollView.convertTicktoX(Measure.measuredTick(mmlScore, (int)pianoRollView.convertXtoTick(positionX)));
+				} else {
+					positionX = measuredPositionX;
+				}
 			}
-		} else {
-			positionX = point.x;
 		}
 
 		long positionY = pianoRollView.convertNote2Y(note);
@@ -864,5 +838,10 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 	public void setScaleColor(ScaleColor scaleColor) {
 		pianoRollView.setScaleColor(scaleColor);
 		pianoRollView.repaint();
+	}
+
+	@Override
+	public long getSequencePosition() {
+		return pianoRollView.getSequencePlayPosition();
 	}
 }

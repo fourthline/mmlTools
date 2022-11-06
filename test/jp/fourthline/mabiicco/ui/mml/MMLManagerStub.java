@@ -61,4 +61,9 @@ class MMLManagerStub extends AbstractMMLManager {
 
 	@Override
 	public void updatePianoRollView(int note) {}
+
+	@Override
+	public long getSequencePosition() {
+		return 0;
+	}
 }

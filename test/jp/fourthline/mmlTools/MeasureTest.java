@@ -30,6 +30,11 @@ public final class MeasureTest {
 		assertEquals("0:01:47", score.getBarTextTick(95));
 		assertEquals("0:02:00", score.getBarTextTick(96));
 		assertEquals("1:00:00", score.getBarTextTick(384));
+
+		score.setBaseTime("2/2");
+		assertEquals("0:00:048", score.getBarTextTick(48));
+		assertEquals("0:00:120", score.getBarTextTick(120));
+		assertEquals("0:01:100", score.getBarTextTick(292));
 	}
 
 	@Test

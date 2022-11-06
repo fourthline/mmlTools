@@ -76,7 +76,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	private final MMLSeqView mmlSeqView;
 	private final JComboBox<NoteAlign> noteTypeSelect = new JComboBox<>(NoteAlign.values());
 	private final JComboBox<PaintMode> paintModeSelect = new JComboBox<>(PaintMode.values());
-	private final JComboBox<StringBuffer> timeBox = new JComboBox<>( List.of(new StringBuffer("time MM:SS/MM:SS (t120)     "), new StringBuffer() ).toArray(new StringBuffer[0]) );
+	private final TimeBox timeBox;
 
 	private final ActionListener listener;
 
@@ -127,11 +127,12 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		contentPane.add(northPanel, BorderLayout.NORTH);
 
-		mmlSeqView = new MMLSeqView(this, timeBox);
+		mmlSeqView = new MMLSeqView(this);
 		mmlSeqView.setNoteAlignChanger(this::changeNoteTypeSelect);
 		contentPane.add(mmlSeqView.getPanel(), BorderLayout.CENTER);
 		contentPane.setFocusable(false);
 
+		timeBox = new TimeBox(mmlSeqView);
 		JToolBar toolBar = createToolBar();
 		toolBar.setFloatable(false);
 		northPanel.add(toolBar);

@@ -19,7 +19,7 @@ import jp.fourthline.mmlTools.MMLTrack;
 
 public final class MMLTempoEditorTest extends UseLoadingDLS {
 
-	private final IMMLManager mmlManager = new MMLSeqView(null, null);
+	private final IMMLManager mmlManager = new MMLSeqView(null);
 	private final MMLTempoEditor editor = new MMLTempoEditor(null, mmlManager, null, null);
 
 	@Test
