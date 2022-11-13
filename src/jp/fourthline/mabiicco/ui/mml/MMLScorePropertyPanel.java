@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 たんらる
+ * Copyright (C) 2014-2022 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.mml;
@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.IFileState;
 import jp.fourthline.mmlTools.MMLScore;
+import jp.fourthline.mmlTools.TimeSignature;
 
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
@@ -24,9 +25,9 @@ public final class MMLScorePropertyPanel extends JPanel {
 	private static final long serialVersionUID = -3976816581383137814L;
 
 	private final JTextField titleField = new JTextField();
-	private final JTextField authorField = new JTextField();;
-	private final JComboBox<String> timeCount = new JComboBox<>();;
-	private final JComboBox<String> timeBase = new JComboBox<>();;
+	private final JTextField authorField = new JTextField();
+	private final JComboBox<String> timeCount = new JComboBox<>(TimeSignature.TIME_COUNT_LIST);
+	private final JComboBox<String> timeBase = new JComboBox<>(TimeSignature.TIME_BASE_LIST);
 
 	private final Dimension prefSize = new Dimension(300, 170);
 
@@ -64,15 +65,6 @@ public final class MMLScorePropertyPanel extends JPanel {
 		timeCount.setBounds(125, 102, 63, 19);
 		timeBase.setBounds(214, 102, 63, 19);
 
-		String[] timeBaseList = { "1", "2", "4", "8", "16", "32", "64" };
-
-		for (int i = 1; i <= 32; i++) {
-			timeCount.addItem(Integer.toString(i));
-		}
-		timeCount.addItem(Integer.toString(64));
-		for (String s : timeBaseList) {
-			timeBase.addItem(s);
-		}
 		timeBase.setMaximumRowCount(4);   // JComboBoxの性能劣化対策
 
 		add(timeCount);

@@ -4,6 +4,7 @@
 
 package jp.fourthline.mmlTools;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 
 import jp.fourthline.mmlTools.core.MMLTicks;
@@ -12,6 +13,21 @@ import jp.fourthline.mmlTools.core.UndefinedTickException;
 
 public final class TimeSignature extends MMLEvent {
 	private static final long serialVersionUID = 8326662121191415432L;
+
+	/** 拍子の分子 */
+	public static final String[] TIME_COUNT_LIST;
+
+	/** 拍子の分母 */
+	public static final String[] TIME_BASE_LIST = { "1", "2", "4", "8", "16", "32", "64" };
+
+	static {
+		ArrayList<String> list = new ArrayList<>();
+		for (int i = 1; i <= 32; i++) {
+			list.add(Integer.toString(i));
+		}
+		list.add(Integer.toString(64));
+		TIME_COUNT_LIST = list.toArray(String[]::new);
+	}
 
 	private int numTime;
 	private int baseTick;
@@ -28,6 +44,10 @@ public final class TimeSignature extends MMLEvent {
 		this(score, tickOffset, Integer.parseInt(numTime), Integer.parseInt(baseTime));
 	}
 
+	/**
+	 * TimeSignatureリストのOffset情報を再計算する
+	 * @param score
+	 */
 	static void recalcTimeSignatureList(MMLScore score) {
 		var list = score.getTimeSignatureList();
 		list.sort(Comparator.comparingInt(t -> t.getMeasureOffset()));
@@ -37,6 +57,12 @@ public final class TimeSignature extends MMLEvent {
 		}
 	}
 
+	/**
+	 * tickを小節番号へ変換する
+	 * @param score
+	 * @param tick
+	 * @return
+	 */
 	public static int tickToMeasure(MMLScore score, int tick) {
 		var timeSignatureIterator = score.getTimeSignatureList().iterator();
 		int numTime = score.getTimeCountOnly();

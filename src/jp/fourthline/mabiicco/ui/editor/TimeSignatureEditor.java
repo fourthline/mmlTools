@@ -29,27 +29,13 @@ import jp.fourthline.mmlTools.core.UndefinedTickException;
 public final class TimeSignatureEditor extends AbstractMarkerEditor<TimeSignature> {
 
 	private final Frame parentFrame;
-	private final JComboBox<String> timeCount = new JComboBox<>();
-	private final JComboBox<String> timeBase = new JComboBox<>();
+	private final JComboBox<String> timeCount = new JComboBox<>(TimeSignature.TIME_COUNT_LIST);
+	private final JComboBox<String> timeBase = new JComboBox<>(TimeSignature.TIME_BASE_LIST);
 	private final JLabel sepLabel = new JLabel("/");
 
 	public TimeSignatureEditor(Frame parentFrame, IMMLManager mmlManager, IEditAlign editAlign, IViewTargetMarker viewTargetMarker) {
 		super("timeSign", mmlManager, editAlign, viewTargetMarker);
 		this.parentFrame = parentFrame;
-		initialComboBox();
-	}
-
-	private void initialComboBox() {
-		String[] timeBaseList = { "1", "2", "4", "8", "16", "32", "64" };
-
-		for (int i = 1; i <= 32; i++) {
-			timeCount.addItem(Integer.toString(i));
-		}
-		timeCount.addItem(Integer.toString(64));
-
-		for (String s : timeBaseList ) {
-			timeBase.addItem(s);
-		}
 		timeBase.setMaximumRowCount(2);   // JComboBoxの性能劣化対策
 	}
 
