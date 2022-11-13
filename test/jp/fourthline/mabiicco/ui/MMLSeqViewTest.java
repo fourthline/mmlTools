@@ -7,7 +7,10 @@ package jp.fourthline.mabiicco.ui;
 
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.awt.image.RenderedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.stream.Stream;
 
@@ -296,6 +299,20 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 		assertEquals(96*4, obj.getMMLScore().getTotalTickLength());
 	}
 
+	private void assertImage(InputStream expectStream, RenderedImage actual) {
+		ByteArrayOutputStream bos1 = new ByteArrayOutputStream();
+		ByteArrayOutputStream bos2 = new ByteArrayOutputStream();
+		try {
+			var expect = ImageIO.read(expectStream);
+			ImageIO.write(expect, "png", bos1);
+			ImageIO.write(actual, "png", bos2);
+			assertArrayEquals(bos1.toByteArray(), bos2.toByteArray());
+		} catch (IOException e) {
+			e.printStackTrace();
+			new AssertionError();
+		}
+	}
+
 	private void checkImage(PianoRollView view, String filename) throws Exception {
 		JViewport viewport = new JViewport();
 		int width = view.convertTicktoX( obj.getMMLScore().getTotalTickLength() );
@@ -307,14 +324,14 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 		view.setSize(width, height);
 		view.setViewportAndParent(viewport, obj);
 		view.paintComponent(image.getGraphics());
-		ImageIO.write(image, "png", new File(filename+"_pianoRoll.png"));
+		assertImage(fileSelect(filename+"_pianoRoll.png"), image);
 
 		// ColumnPanel画像の作成.
 		ColumnPanel columnView = (ColumnPanel) getField("columnView");
 		BufferedImage image2 = new BufferedImage(width, columnView.getPreferredSize().height, BufferedImage.TYPE_INT_ARGB);
 		columnView.setSize(width, columnView.getPreferredSize().height);
 		columnView.paintComponent(image2.getGraphics());
-		ImageIO.write(image2, "png", new File(filename+"_column.png"));
+		assertImage(fileSelect(filename+"_column.png"), image2);
 
 		// KeyboardView画像の作成.
 		KeyboardView keyboardView = (KeyboardView) getField("keyboardView");
@@ -322,7 +339,7 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 		BufferedImage image3 = new BufferedImage(keyboardView.getPreferredSize().width, height, BufferedImage.TYPE_INT_ARGB);
 		keyboardView.paintComponent(image3.getGraphics());
 		keyboardView.offNote();
-		ImageIO.write(image3, "png", new File(filename+"_keyboard.png"));
+		assertImage(fileSelect(filename+"_keyboard.png"), image3);
 	}
 
 	@Test
