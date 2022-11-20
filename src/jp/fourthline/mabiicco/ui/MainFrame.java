@@ -368,8 +368,9 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createCheckMenu(settingMenu, "edit.tempoDeleteWithConvert", properties.enableTempoDeleteWithConvert);
 		settingMenu.add(new JSeparator());
 		// MML生成に関わる設定
-		createCheckMenu(settingMenu, "mml.precise_optimize", properties.enableMMLPreciseOptimize);
-		createCheckMenu(settingMenu, "mml.tempo_allow_chord_part", properties.mmlTempoAllowChordPart);
+		createCheckMenu(settingMenu, "mml.precise_optimize", properties.enableMMLPreciseOptimize, ActionDispatcher.MML_GENERATE);
+		createCheckMenu(settingMenu, "mml.tempo_allow_chord_part", properties.mmlTempoAllowChordPart, ActionDispatcher.MML_GENERATE);
+		createCheckMenu(settingMenu, "mml.disable_vzero_tempo", properties.disableVZeroTempo, ActionDispatcher.MML_GENERATE);
 		createMenuItem(settingMenu, "mml.emptyCorrection", ActionDispatcher.INPUT_EMPTY_CORRECTION, true);
 		createCheckMenu(settingMenu, "mml.regenerate_with_open", properties.reGenerateWithOpen);
 		settingMenu.add(new JSeparator());
@@ -453,6 +454,10 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	 */
 	private void createCheckMenu(JMenu settingMenu, String itemName, MabiIccoProperties.Property<Boolean> property) {
 		createCheckMenu(settingMenu, itemName, property, null, false);
+	}
+
+	private void createCheckMenu(JMenu settingMenu, String itemName, MabiIccoProperties.Property<Boolean> property, String actionCommand) {
+		createCheckMenu(settingMenu, itemName, property, actionCommand, false);
 	}
 
 	private void createCheckMenu(JMenu settingMenu, String itemName, MabiIccoProperties.Property<Boolean> property, String actionCommand, boolean noplayFunction) {

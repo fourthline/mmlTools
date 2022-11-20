@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2021 たんらる
+ * Copyright (C) 2014-2022 たんらる
  */
 
 package jp.fourthline.mmlTools.core;
@@ -22,7 +22,7 @@ public final class MMLText {
 	/** 歌パートを除いて他のパートの文字数を増やすオプション (2021/11/18 MabiKR) */
 	private boolean excludeSongPart = false;
 
-	/* メロディパートが空のときに作曲スキルで怒られないようにするために入れる文字列 */
+	/** メロディパートが空のときに作曲スキルで怒られないようにするために入れる文字列 */
 	private static String melody_empty_str = "";
 
 	public static void setMelodyEmptyStr(String str) {

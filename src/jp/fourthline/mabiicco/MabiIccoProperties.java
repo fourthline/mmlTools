@@ -19,6 +19,7 @@ import java.util.function.Consumer;
 
 import jp.fourthline.mabiicco.midi.SoundEnv;
 import jp.fourthline.mabiicco.ui.PianoRollView;
+import jp.fourthline.mmlTools.MMLBuilder;
 import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.core.MMLText;
 import jp.fourthline.mmlTools.core.ResourceLoader;
@@ -106,6 +107,9 @@ public final class MabiIccoProperties {
 
 	/** MML空補正 */
 	public final Property<String> mmlEmptyCorrection = new StringProperty("function.mml_empty_correction", AppResource.appText("mml.emptyCorrection.default"), t -> MMLText.setMelodyEmptyStr(t));
+
+	/** VZero Tempo　の無効化 */
+	public final Property<Boolean> disableVZeroTempo = new BooleanProperty("function.disable_vzero_tempo", false, t -> MMLBuilder.setDisableVZeroTempo(t.booleanValue()));
 
 	/** システムのL&F */
 	public final Property<Boolean> useSystemLaF = new BooleanProperty("ui.use_system_laf", false);
