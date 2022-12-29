@@ -130,27 +130,34 @@ public final class MabiIccoProperties {
 		return instance;
 	}
 
+	private final boolean test_mode;
+
 	private MabiIccoProperties() {
-		try {
-			FileInputStream in = new FileInputStream(ResourceLoader.getAppConfigPath(CONFIG_FILE));
-			properties.load(in);
-			in.close();
-			initFileHistory();
-		} catch (InvalidPropertiesFormatException e) {
-		} catch (FileNotFoundException e) {
-		} catch (IOException e) {
+		test_mode = System.getProperty("mabiicco.test_mode") != null;
+		if (!test_mode) {
+			try {
+				FileInputStream in = new FileInputStream(ResourceLoader.getAppConfigPath(CONFIG_FILE));
+				properties.load(in);
+				in.close();
+				initFileHistory();
+			} catch (InvalidPropertiesFormatException e) {
+			} catch (FileNotFoundException e) {
+			} catch (IOException e) {
+			}
 		}
 	}
 
 	private void save() {
-		try {
-			FileOutputStream out = new FileOutputStream(ResourceLoader.getAppConfigPath(CONFIG_FILE));
-			properties.store(out, "");
-			out.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (!test_mode) {
+			try {
+				FileOutputStream out = new FileOutputStream(ResourceLoader.getAppConfigPath(CONFIG_FILE));
+				properties.store(out, "");
+				out.close();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
