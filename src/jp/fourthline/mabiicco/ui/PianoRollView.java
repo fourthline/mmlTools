@@ -350,6 +350,7 @@ public final class PianoRollView extends JPanel {
 		super.paintComponent(g);
 		showAllVelocity = properties.showAllVelocity.get();
 		updateViewTick();
+		int height = getTotalHeight();
 
 		// FIXME: しぼったほうがいいかも？
 		updateViewWidthTrackLength();
@@ -368,7 +369,13 @@ public final class PianoRollView extends JPanel {
 		paintSelectedNote(g2);
 		paintNoteInfo(g2);
 		paintSelectingArea(g2);
-		paintSequenceLine(g2, getTotalHeight());
+		paintSequenceLine(g2, height);
+
+		// 残りの領域があれば塗りつぶす
+		if (height < getHeight()) {
+			g2.setColor(Color.LIGHT_GRAY);
+			g2.fillRect(0, height+1, getWidth(), getHeight() - height);
+		}
 
 		g2.dispose();
 	}

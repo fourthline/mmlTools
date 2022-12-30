@@ -375,7 +375,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 			x1 = point.x;
 		}
 		int y1 = startPoint.y;
-		int y2 = point.y;
+		int y2 = Math.min(point.y, pianoRollView.getTotalHeight());
 		if (y1 > y2) {
 			y2 = startPoint.y;
 			y1 = point.y;
@@ -405,6 +405,9 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	 */
 	@Override
 	public boolean onExistNote(Point point) {
+		if (point.y > pianoRollView.getTotalHeight()) {
+			return false;
+		}
 		int note = pianoRollView.convertY2Note( point.y );
 		int tickOffset = (int)pianoRollView.convertXtoTick( point.x );
 		MMLEventList editEventList = mmlManager.getActiveMMLPart();
@@ -485,6 +488,9 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 
 	@Override
 	public void mousePressed(MouseEvent e) {
+		if (e.getY() > pianoRollView.getTotalHeight()) {
+			return;
+		}
 		editMode.pressEvent(this, e);
 		pianoRollView.repaint();
 	}

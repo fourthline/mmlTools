@@ -37,6 +37,9 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 	// オクターブ変化量
 	private final int octDelta;
 
+	private final Color borderColor = new Color(0.3f, 0.3f, 0.3f);
+	private final Color octaveBorderColor = new Color(0.3f, 0.3f, 0.6f);
+
 	/**
 	 * Create the panel.
 	 * @param manager 関連付けるIMMLManager
@@ -79,7 +82,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 	 */
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		int height = pianoRollView.getTotalHeight()-1;
+		int height = pianoRollView.getTotalHeight();
 
 		Graphics2D g2 = (Graphics2D)g.create();
 		g2.setColor(Color.WHITE);
@@ -91,6 +94,12 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 
 		paintOverlapRange(g2);
 		paintPlayNote(g2);
+
+		// 残りの領域があれば塗りつぶす
+		if (height < getHeight()) {
+			g2.setColor(Color.LIGHT_GRAY);
+			g2.fillRect(0, height+1, width, getHeight() - height);
+		}
 
 		g2.dispose();
 	}
@@ -135,7 +144,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 		int yLimit = pianoRollView.getTotalHeight();
 
 		// ド～シのしろ鍵盤
-		g.setColor(new Color(0.3f, 0.3f, 0.3f));
+		g.setColor(borderColor);
 
 		int startY = octHeight * pos;
 		for (int i = 0; i < 7; i++) {
@@ -157,17 +166,17 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 		for (int i : black_posIndex) {
 			int y = octHeight * i / 7 - height / 2 - 1;
 			y += startY;
-			if (y > yLimit) break;
+			if (y + height > yLimit) break;
 
-			g.setColor(new Color(0.0f, 0.0f, 0.0f));
+			g.setColor(Color.BLACK);
 			g.fillRect(0, y, 20, height);
 
-			g.setColor(new Color(0.3f, 0.3f, 0.3f));
+			g.setColor(borderColor);
 			g.drawRect(0, y, 20, height);
 		}
 
 		// グリッド
-		g.setColor(new Color(0.3f, 0.3f, 0.6f));
+		g.setColor(octaveBorderColor);
 		g.drawLine(40, startY, width, startY);
 
 		// オクターブ

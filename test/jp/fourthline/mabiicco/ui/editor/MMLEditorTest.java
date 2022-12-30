@@ -6,6 +6,7 @@ package jp.fourthline.mabiicco.ui.editor;
 
 import static org.junit.Assert.*;
 
+import java.awt.Point;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.Field;
@@ -778,5 +779,59 @@ public final class MMLEditorTest extends UseLoadingDLS {
 		editor.selectAll();
 		editor.convertTuplet();
 		assertEquals(expect, track.getOriginalMML());
+	}
+
+	/**
+	 * 範囲外操作
+	 * @throws Exception
+	 */
+	@Test
+	public void test_outView() throws Exception {
+		List<MMLNoteEvent> noteEventList = mmlManager.getActiveMMLPart().getMMLNoteEventList();
+		int y = pianoRollView.getTotalHeight() + 1;
+		assertEquals(873, y);
+
+		assertEquals(0, noteEventList.size());
+		assertEquals(-1, playingNote);
+		assertEquals(false, editor.hasSelectedNote());
+
+		int note1 = pianoRollView.convertY2Note(200);
+		int note2 = pianoRollView.convertY2Note(y);
+		long tickOffset1 = 0;
+		long tickOffset2 = pianoRollView.convertXtoTick(100);
+		tickOffset2 -= ( tickOffset2 % editor.getEditAlign() );
+		MouseEvent mouseEvent1 = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON1_DOWN_MASK, 0, 200, 1, false);
+		MouseEvent mouseEvent2 = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON1_DOWN_MASK, 0, y, 1, false);
+		MouseEvent mouseEvent3 = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON3_DOWN_MASK, 0, y, 1, false);
+
+		// マウスクリックによる挿入ノート候補選択状態.
+		assertEquals(EditMode.SELECT, getEditMode());
+		editor.mousePressed(mouseEvent1);
+		assertEquals(EditMode.INSERT, getEditMode());
+		assertEquals(true, editor.hasSelectedNote());
+		assertEquals(note1, playingNote);
+		assertEquals(0, noteEventList.size());
+
+		// 範囲外マウスドラッグと確定
+		editor.mouseDragged(mouseEvent2);
+		editor.mouseReleased(mouseEvent2);
+		assertEquals(EditMode.SELECT, getEditMode());
+		assertEquals(false, editor.hasSelectedNote());
+		assertEquals(1, noteEventList.size());
+		assertEquals(note2, noteEventList.get(0).getNote());
+		assertEquals(tickOffset1, noteEventList.get(0).getTickOffset());
+		assertEquals(-1, playingNote);
+		assertTrue(editor.onExistNote(new Point(0, 872)));
+		assertFalse(editor.onExistNote(new Point(0, 873)));
+
+		// 範囲外マウスクリック
+		editor.mousePressed(mouseEvent2);
+		assertEquals(EditMode.SELECT, getEditMode());
+		editor.mouseReleased(mouseEvent2);
+		assertEquals(EditMode.SELECT, getEditMode());
+		editor.mousePressed(mouseEvent3);
+		assertEquals(EditMode.SELECT, getEditMode());
+		editor.mouseReleased(mouseEvent3);
+		assertEquals(EditMode.SELECT, getEditMode());
 	}
 }
