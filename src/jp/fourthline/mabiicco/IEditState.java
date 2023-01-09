@@ -1,8 +1,10 @@
 /*
- * Copyright (C) 2014 たんらる
+ * Copyright (C) 2014-2023 たんらる
  */
 
 package jp.fourthline.mabiicco;
+
+import java.awt.Point;
 
 /**
  * 編集関連の動作インタフェース.
@@ -31,6 +33,8 @@ public interface IEditState {
 
 	void octaveUp();
 	void octaveDown();
+
+	void notesModifyVelocity(Point point, boolean inc);
 
 	void setEditStateObserver(IEditStateObserver observer);
 }

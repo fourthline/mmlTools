@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2022 たんらる
+ * Copyright (C) 2014-2023 たんらる
  */
 
 package jp.fourthline.mabiicco;
@@ -136,6 +136,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String UNSET_TEMP_MUTE_ALL = "unset_temp_mute_all";
 	@Action public static final String OCTAVE_UP = "octave_up";
 	@Action public static final String OCTAVE_DOWN = "octave_down";
+	@Action public static final String VELOCITY_UP = "velocity_up";
+	@Action public static final String VELOCITY_DOWN = "velocity_down";
 	@Action public static final String SET_USER_VIEW_MEASURE = "set_user_view_measure";
 	@Action public static final String INST_LIST = "inst_list";
 	@Action public static final String SHORTCUT_INFO = "shortcut_info";
@@ -273,6 +275,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(UNSET_TEMP_MUTE_ALL, t -> editState.setTempMuteAll());
 		actionMap.put(OCTAVE_UP, t -> editState.octaveUp());
 		actionMap.put(OCTAVE_DOWN, t -> editState.octaveDown());
+		actionMap.put(VELOCITY_UP, t -> editState.notesModifyVelocity(null, true));
+		actionMap.put(VELOCITY_DOWN, t -> editState.notesModifyVelocity(null, false));
 		actionMap.put(SET_USER_VIEW_MEASURE, t -> new UserViewWidthDialog(mainFrame, mmlSeqView).showDialog());
 		actionMap.put(INST_LIST, t -> new About().showInstList(mainFrame));
 		actionMap.put(SHORTCUT_INFO, t -> new About().showShortcutInfo(mainFrame, mainFrame.getShortcutMap()));

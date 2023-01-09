@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 たんらる
+ * Copyright (C) 2022-2023 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -21,6 +21,17 @@ public final class Measure {
 
 	public static int measuredTick(MMLScore score, int tick) {
 		return new Measure(score, tick).measuredTick();
+	}
+
+	public static int nextMeasure(MMLScore score, int tick, boolean next) {
+		var measure = new Measure(score, tick);
+		if (next) {
+			tick += measure.getMeasureTick();
+		} else {
+			tick -= measure.getBeatTick();
+		}
+		tick = new Measure(score, tick).measuredTick();
+		return tick;
 	}
 
 	public Measure(MMLScore score, int tick) {

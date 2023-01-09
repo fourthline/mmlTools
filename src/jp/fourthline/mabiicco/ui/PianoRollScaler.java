@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2021-2022 たんらる
+ * Copyright (C) 2021-2023 たんらる
  */
 package jp.fourthline.mabiicco.ui;
 
 import java.awt.Point;
-import java.awt.event.InputEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.function.IntConsumer;
@@ -12,20 +11,26 @@ import java.util.function.IntConsumer;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 
+import jp.fourthline.mabiicco.IEditState;
 import jp.fourthline.mabiicco.midi.MabiDLS;
+import jp.fourthline.mmlTools.Measure;
 
 public final class PianoRollScaler implements MouseWheelListener {
+	private final IMMLManager mmlManager;
 	private final PianoRollView pianoRollView;
 	private final JScrollPane scrollPane;
 	private final MainView parent;
+	private final IEditState editState;
 
 	private int viewScaleIndex = 0;
 	private final double[] viewScaleTable = { 6, 5, 4, 3, 2, 1.5, 1, 0.75, 0.5, 0.375, 0.25, 0.1 };
 
-	public PianoRollScaler(PianoRollView pv, JScrollPane sp, MainView parent) {
+	public PianoRollScaler(IMMLManager mmlManager, PianoRollView pv, JScrollPane sp, MainView parent, IEditState editState) {
+		this.mmlManager = mmlManager;
 		this.pianoRollView = pv;
 		this.scrollPane = sp;
 		this.parent = parent;
+		this.editState = editState;
 		pv.addMouseWheelListener(this);
 	}
 
@@ -100,27 +105,32 @@ public final class PianoRollScaler implements MouseWheelListener {
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		JViewport viewport = scrollPane.getViewport();
 		Point p = viewport.getViewPosition();
-		int modifiers = e.getModifiersEx();
 		int rotation = e.getWheelRotation();
-		if (modifiers == InputEvent.CTRL_DOWN_MASK) {
+		if (e.isControlDown() && e.isShiftDown()) {
+			// 編集アクションの実行
+			editState.notesModifyVelocity(e.getPoint(), rotation < 0);
+		} else if (e.isControlDown()) {
 			// 幅の拡大縮小
 			if (rotation < 0) {
 				expandPianoViewWide( e.getX() - p.x );
 			} else {
 				reducePianoViewWide( e.getX() - p.x );
 			}
-		} else if (modifiers == InputEvent.SHIFT_DOWN_MASK) {
+		} else if (e.isShiftDown()) {
 			// 横方向の移動
-			p.x += (rotation * 16);
+			int tickOffset = Measure.nextMeasure(mmlManager.getMMLScore(), (int) pianoRollView.convertXtoTick(p.x) ,rotation > 0);
+			p.x = pianoRollView.convertTicktoX(tickOffset);
 			if (p.x < 0) {
 				p.x = 0;
 			}
 			scrollPane.getViewport().setViewPosition(p);
 			parent.repaint();
 		} else {
-			for (MouseWheelListener listener : scrollPane.getMouseWheelListeners()) {
-				listener.mouseWheelMoved(e);
-			}
+			// 縦方向の移動
+			int delta = pianoRollView.getNoteHeight() * 2;
+			p.y += (rotation > 0) ? delta : -delta; 
+			scrollPane.getViewport().setViewPosition(p);
+			parent.repaint();
 		}
 	}
 }

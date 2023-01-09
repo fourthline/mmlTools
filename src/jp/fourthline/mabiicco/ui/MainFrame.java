@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2022 たんらる
+ * Copyright (C) 2013-2023 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
@@ -98,6 +98,8 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	private JMenuItem removeRestsBetweenNotesMenu = null;
 	private JMenuItem octUpMenu = null;
 	private JMenuItem octDownMenu = null;
+	private JMenuItem velocityUpMenu = null;
+	private JMenuItem velocityDownMenu = null;
 
 	private JButton loopButton = null;
 
@@ -292,6 +294,10 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 				KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.SHIFT_DOWN_MASK));
 		octDownMenu = createMenuItem(editMenu, "edit.oct_down", ActionDispatcher.OCTAVE_DOWN, true,
 				KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.SHIFT_DOWN_MASK));
+		velocityUpMenu = createMenuItem(editMenu, "edit.velocity_up", ActionDispatcher.VELOCITY_UP, true,
+				KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+		velocityDownMenu = createMenuItem(editMenu, "edit.velocity_down", ActionDispatcher.VELOCITY_DOWN, true,
+				KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
 
 		editMenu.add(new JSeparator());
 
@@ -708,6 +714,8 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		deleteMenu.setEnabled(b);
 		octUpMenu.setEnabled(b);
 		octDownMenu.setEnabled(b);
+		velocityUpMenu.setEnabled(b);
+		velocityDownMenu.setEnabled(b);
 	}
 
 	public void setPasteEnable(boolean b) {

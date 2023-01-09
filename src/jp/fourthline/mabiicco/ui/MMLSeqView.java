@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2022 たんらる
+ * Copyright (C) 2013-2023 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
@@ -109,9 +109,6 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 		panel.add(scrollPane, BorderLayout.CENTER);
 		pianoRollView.setViewportAndParent(scrollPane.getViewport(), this);
 
-		// PianoRollScaler
-		pianoRollScaler = new PianoRollScaler(pianoRollView, scrollPane, this);
-
 		// MMLTrackView (tab) - SOUTH
 		tabbedPane = new TrackTabbedPane(this);
 		tabbedPane.addChangeListener(this);
@@ -121,6 +118,9 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 		// create mml editor
 		editor = new MMLEditor(parentFrame, keyboardView, pianoRollView, this);
 		columnView = new ColumnPanel(parentFrame, pianoRollView, this, editor);
+
+		// PianoRollScaler
+		pianoRollScaler = new PianoRollScaler(this, pianoRollView, scrollPane, this, editor);
 
 		// create keyboard editor
 		keyboardEditor = new KeyboardEditor(parentFrame, this, keyboardView, editor, pianoRollView);
@@ -570,13 +570,7 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 
 	public void nextStepTimeTo(boolean next) {
 		int tick = (int) pianoRollView.getSequencePlayPosition();
-		var measure = new Measure(mmlScore, (int)tick);
-		if (next) {
-			tick += measure.getMeasureTick();
-		} else {
-			tick -= measure.getBeatTick();
-		}
-		tick = new Measure(mmlScore, tick).measuredTick();
+		tick = Measure.nextMeasure(mmlScore, tick, next);
 		Sequencer sequencer = MabiDLS.getInstance().getSequencer();
 		if (!sequencer.isRunning()) {
 			pianoRollView.setSequenceTick(tick);

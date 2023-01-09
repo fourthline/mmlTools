@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2022 たんらる
+ * Copyright (C) 2013-2023 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.editor;
@@ -196,6 +196,32 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	}
 
 	/**
+	 * ポイント上にあるアクティブパートのノートを得る
+	 * @param point
+	 * @return   ポイント上にアクティブパートのノートがなければ nullを返す.
+	 */
+	private MMLNoteEvent pointToNote(Point point) {
+		if (point != null) {
+			if (point.y > pianoRollView.getTotalHeight()) {
+				return null;
+			}
+
+			MMLEventList editEventList = mmlManager.getActiveMMLPart();
+			if (editEventList == null) {
+				return null;
+			}
+
+			int note = pianoRollView.convertY2Note(point.y);
+			long tickOffset = pianoRollView.convertXtoTick(point.x);
+			MMLNoteEvent noteEvent = editEventList.searchOnTickOffset(tickOffset);
+			if ((noteEvent != null) && (noteEvent.getNote() == note)) {
+				return noteEvent;
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * @param point  nullのときはクリアする.
 	 */
 	@Override
@@ -203,14 +229,8 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		if (point == null) {
 			selectNote(null);
 		} else {
-			int note = pianoRollView.convertY2Note(point.y);
-			long tickOffset = pianoRollView.convertXtoTick(point.x);
-			MMLEventList editEventList = mmlManager.getActiveMMLPart();
-			if (editEventList == null) {
-				return;
-			}
-			MMLNoteEvent noteEvent = editEventList.searchOnTickOffset(tickOffset);
-			if (noteEvent.getNote() != note) {
+			MMLNoteEvent noteEvent = pointToNote(point);
+			if (noteEvent == null) {
 				return;
 			}
 
@@ -405,18 +425,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	 */
 	@Override
 	public boolean onExistNote(Point point) {
-		if (point.y > pianoRollView.getTotalHeight()) {
-			return false;
-		}
-		int note = pianoRollView.convertY2Note( point.y );
-		int tickOffset = (int)pianoRollView.convertXtoTick( point.x );
-		MMLEventList editEventList = mmlManager.getActiveMMLPart();
-		if (editEventList == null) {
-			return false;
-		}
-		MMLNoteEvent noteEvent = editEventList.searchOnTickOffset(tickOffset);
-
-		return (noteEvent != null) && (note == noteEvent.getNote());
+		return pointToNote(point) != null;
 	}
 
 	/**
@@ -901,5 +910,22 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		int startOffset = mmlManager.getActiveMMLPartStartOffset();
 		int tickOffset = (int)pianoRollView.convertXtoTick( point.x );
 		return (startOffset <= tickOffset);
+	}
+
+	/**
+	 * ノート音量の変更
+	 * 選択されたノートの音量を変更する. 選択されたノートがなければ、ポイント上のノートの音量を変更する.
+	 * @param point
+	 * @param inc
+	 */
+	public void notesModifyVelocity(Point point, boolean inc) {
+		MMLNoteEvent noteEvent = pointToNote(point);
+		if (!selectedNote.isEmpty()) {
+			selectedNote.forEach(t -> t.setVelocity(t.getVelocity() + ( inc ? 1 : -1) ));
+			mmlManager.updateActivePart(true);
+		} else if (noteEvent != null) {
+			noteEvent.setVelocity(noteEvent.getVelocity() + ( inc ? 1 : -1) );
+			mmlManager.updateActivePart(true);
+		}
 	}
 }
