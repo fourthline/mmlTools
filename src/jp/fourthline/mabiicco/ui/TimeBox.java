@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 たんらる
+ * Copyright (C) 2022-2023 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
@@ -73,10 +73,12 @@ public final class TimeBox extends JComboBox<StringBuffer> implements Runnable {
 	@Override
 	public void run() {
 		while (true) {
-			update(mmlManager.getSequencePosition());
 			try {
+				update(mmlManager.getSequencePosition());
 				Thread.sleep(sequencer.isRunning() ? RUNNING_UPDATE_TIME : UPDATE_TIME);
-			} catch (InterruptedException e) {}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 }
