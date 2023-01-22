@@ -13,10 +13,10 @@ import jp.fourthline.mmlTools.core.UndefinedTickException;
 public final class MMLBuilder {
 	private static final int STRING_BUILDER_SIZE = 2048;
 
-	/** VZero Tempo　の無効化 */
-	private static boolean disableVZeroTempo = false;
-	public static void setDisableVZeroTempo(boolean b) {
-		disableVZeroTempo = b;
+	/** VZero Tempo */
+	private static boolean mmlVZeroTempo = true;
+	public static void setMMLVZeroTempo(boolean b) {
+		mmlVZeroTempo = b;
 	}
 
 	private final MMLEventList eventList;
@@ -89,7 +89,7 @@ public final class MMLBuilder {
 			MMLTicks ticks = new MMLTicks("r", tickLength, false);
 			prevNoteEvent = new MMLNoteEvent(prevNoteEvent.getNote(), tickLength, tickOffset, prevNoteEvent.getVelocity());
 			sb.append(ticks.toMMLText());
-			if (mabiTempo && !disableVZeroTempo) {
+			if (mabiTempo && mmlVZeroTempo) {
 				// 最後の1つのrだけを補正文字に置換する.
 				int lastIndex = sb.lastIndexOf("r");
 				sb.replace(lastIndex, lastIndex+1, "c");

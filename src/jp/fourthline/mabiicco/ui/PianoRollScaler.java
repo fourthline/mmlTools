@@ -116,7 +116,7 @@ public final class PianoRollScaler implements MouseWheelListener {
 			} else {
 				reducePianoViewWide( e.getX() - p.x );
 			}
-		} else if (e.isAltDown() && !e.isControlDown() && e.isShiftDown()) {
+		} else if (!e.isAltDown() && !e.isControlDown() && e.isShiftDown()) {
 			// 横方向の移動
 			int tickOffset = Measure.nextMeasure(mmlManager.getMMLScore(), (int) pianoRollView.convertXtoTick(p.x) ,rotation > 0);
 			p.x = pianoRollView.convertTicktoX(tickOffset);

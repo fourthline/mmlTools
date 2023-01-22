@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2022 たんらる
+ * Copyright (C) 2013-2023 たんらる
  */
 
 package jp.fourthline.mabiicco;
@@ -108,8 +108,8 @@ public final class MabiIccoProperties {
 	/** MML空補正 */
 	public final Property<String> mmlEmptyCorrection = new StringProperty("function.mml_empty_correction", AppResource.appText("mml.emptyCorrection.default"), t -> MMLText.setMelodyEmptyStr(t));
 
-	/** VZero Tempo　の無効化 */
-	public final Property<Boolean> disableVZeroTempo = new BooleanProperty("function.disable_vzero_tempo", false, t -> MMLBuilder.setDisableVZeroTempo(t.booleanValue()));
+	/** VZero Tempo */
+	public final Property<Boolean> mmlVZeroTempo = new BooleanProperty("function.mml_vzero_tempo", true, t -> MMLBuilder.setMMLVZeroTempo(t.booleanValue()));
 
 	/** システムのL&F */
 	public final Property<Boolean> useSystemLaF = new BooleanProperty("ui.use_system_laf", false);

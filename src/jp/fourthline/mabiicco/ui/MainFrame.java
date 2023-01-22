@@ -376,7 +376,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		// MML生成に関わる設定
 		createCheckMenu(settingMenu, "mml.precise_optimize", properties.enableMMLPreciseOptimize, ActionDispatcher.MML_GENERATE);
 		createCheckMenu(settingMenu, "mml.tempo_allow_chord_part", properties.mmlTempoAllowChordPart, ActionDispatcher.MML_GENERATE);
-		createCheckMenu(settingMenu, "mml.disable_vzero_tempo", properties.disableVZeroTempo, ActionDispatcher.MML_GENERATE);
+		createCheckMenu(settingMenu, "mml.vzero_tempo", properties.mmlVZeroTempo, ActionDispatcher.MML_GENERATE);
 		createMenuItem(settingMenu, "mml.emptyCorrection", ActionDispatcher.INPUT_EMPTY_CORRECTION, true);
 		createCheckMenu(settingMenu, "mml.regenerate_with_open", properties.reGenerateWithOpen);
 		settingMenu.add(new JSeparator());
@@ -468,6 +468,11 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 
 	private void createCheckMenu(JMenu settingMenu, String itemName, MabiIccoProperties.Property<Boolean> property, String actionCommand, boolean noplayFunction) {
 		JCheckBoxMenuItem clickPlayMenu = new JCheckBoxMenuItem(appText(itemName));
+		String detail = itemName+".detail";
+		String toolTipText = appText(detail); 
+		if (toolTipText != detail) {
+			clickPlayMenu.setToolTipText(toolTipText);
+		}
 		settingMenu.add(clickPlayMenu);
 
 		clickPlayMenu.setSelected( property.get() );
