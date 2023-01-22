@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2022 たんらる
+ * Copyright (C) 2014-2023 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -557,7 +557,7 @@ public class MMLScoreTest extends FileSelect {
 		/* 長い休符の場合最後のみ */
 		checkGenerateAll(
 				"MML@l1r.r.rrt130,,l1r.r.rrc;",
-				"MML@l1r.r.rv0ct130,,l1r.r.rrc;"
+				"MML@l1r.r.rv0dt130,,l1r.r.rrc;"
 				);
 	}
 

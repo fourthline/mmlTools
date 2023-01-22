@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 たんらる
+ * Copyright (C) 2022-2023 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -46,22 +46,24 @@ public final class MMLBuilder {
 	/**
 	 * テンポ補正に使う文字を決定する.
 	 * @param relationPart     関連するパートの情報
-	 * @param offset           判定するtickのオフセット
+	 * @param noteEvent        判定するtickのノートイベント
 	 * @param currentOctave    現在のオクターブ
 	 * @return                 テンポ補正に使う文字
 	 * @throws UndefinedTickException
 	 */
-	private char makeTempoChar(List<MMLEventList> relationPart, long offset, int currentOctave) throws UndefinedTickException {
+	private char makeTempoChar(List<MMLEventList> relationPart, MMLNoteEvent noteEvent, int currentOctave) throws UndefinedTickException {
 		boolean[] f = { true, true, true, true, true, true, true };
 		// relationのパートのオフセット位置の情報をつかって、使用するabcdefg のどれを使うかを決める。
 		if (relationPart != null) {
-			for (MMLEventList t : relationPart) {
-				MMLNoteEvent e = t.searchOnTickOffset(offset);
-				if (e != null) {
-					if (e.getOctave() == currentOctave) {
-						char c = e.toMMLString().toLowerCase().charAt(0);
-						int index = c - 'a';
-						f[index] = false;
+			for (var offset : List.of(noteEvent.getTickOffset(), noteEvent.getEndTick())) {
+				for (MMLEventList t : relationPart) {
+					MMLNoteEvent e = t.searchOnTickOffset(offset);
+					if (e != null) {
+						if (e.getOctave() == currentOctave) {
+							char c = e.toMMLString().toLowerCase().charAt(0);
+							int index = c - 'a';
+							f[index] = false;
+						}
 					}
 				}
 			}
@@ -91,8 +93,8 @@ public final class MMLBuilder {
 				// 最後の1つのrだけを補正文字に置換する.
 				int lastIndex = sb.lastIndexOf("r");
 				sb.replace(lastIndex, lastIndex+1, "c");
-				long offset = new MMLEventList(sb.toString()).getLastNote().getTickOffset();
-				char inChar = makeTempoChar(relationPart, offset, currentOctave);
+				var noteEvent = new MMLEventList(sb.toString()).getLastNote();
+				char inChar = makeTempoChar(relationPart, noteEvent, currentOctave);
 				sb.replace(lastIndex, lastIndex+1, (prevNoteEvent.getVelocity() != 0) ? "v0"+inChar : ""+inChar);
 				prevNoteEvent = new MMLNoteEvent(note, tickLength, tickOffset, 0);
 			}

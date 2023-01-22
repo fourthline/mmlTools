@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2022 たんらる
+ * Copyright (C) 2013-2023 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -341,7 +341,7 @@ public class MMLTrackTest {
 		MMLTrack.setTempoAllowChordPart(true);
 
 		String mml = "MML@a&a&a,rrt120,rc&c";
-		String expect = "MML@a2.,v0c2t120,rc2;";
+		String expect = "MML@a2.,v0d2t120,rc2;";
 		MMLTrack track = new MMLTrack().setMML(mml).generate();
 		assertEquals(expect, track.getMabiMML());
 	}

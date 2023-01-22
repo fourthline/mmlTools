@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2022 たんらる
+ * Copyright (C) 2013-2023 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -85,6 +85,10 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 			velocity = MAX_VOL;
 		}
 		this.velocity = velocity;
+	}
+
+	public void modifyVelocity(boolean inc) {
+		setVelocity(velocity + (inc ? 1 : -1));
 	}
 
 	public int[] getIndexOfMMLString() {
