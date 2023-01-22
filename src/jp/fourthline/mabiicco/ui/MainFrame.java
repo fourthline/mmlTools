@@ -295,9 +295,9 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		octDownMenu = createMenuItem(editMenu, "edit.oct_down", ActionDispatcher.OCTAVE_DOWN, true,
 				KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.SHIFT_DOWN_MASK));
 		velocityUpMenu = createMenuItem(editMenu, "edit.velocity_up", ActionDispatcher.VELOCITY_UP, true,
-				KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.ALT_DOWN_MASK));
 		velocityDownMenu = createMenuItem(editMenu, "edit.velocity_down", ActionDispatcher.VELOCITY_DOWN, true,
-				KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.ALT_DOWN_MASK));
 
 		editMenu.add(new JSeparator());
 

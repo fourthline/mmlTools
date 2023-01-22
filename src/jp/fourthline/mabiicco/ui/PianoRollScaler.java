@@ -106,17 +106,17 @@ public final class PianoRollScaler implements MouseWheelListener {
 		JViewport viewport = scrollPane.getViewport();
 		Point p = viewport.getViewPosition();
 		int rotation = e.getWheelRotation();
-		if (e.isControlDown() && e.isShiftDown()) {
+		if (e.isAltDown() && !e.isControlDown() && !e.isShiftDown()) {
 			// 編集アクションの実行
 			editState.notesModifyVelocity(e.getPoint(), rotation < 0);
-		} else if (e.isControlDown()) {
+		} else if (!e.isAltDown() && e.isControlDown() && !e.isShiftDown()) {
 			// 幅の拡大縮小
 			if (rotation < 0) {
 				expandPianoViewWide( e.getX() - p.x );
 			} else {
 				reducePianoViewWide( e.getX() - p.x );
 			}
-		} else if (e.isShiftDown()) {
+		} else if (e.isAltDown() && !e.isControlDown() && e.isShiftDown()) {
 			// 横方向の移動
 			int tickOffset = Measure.nextMeasure(mmlManager.getMMLScore(), (int) pianoRollView.convertXtoTick(p.x) ,rotation > 0);
 			p.x = pianoRollView.convertTicktoX(tickOffset);

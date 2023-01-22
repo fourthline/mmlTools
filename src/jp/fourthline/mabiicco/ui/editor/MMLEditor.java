@@ -921,10 +921,10 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	public void notesModifyVelocity(Point point, boolean inc) {
 		MMLNoteEvent noteEvent = pointToNote(point);
 		if (!selectedNote.isEmpty()) {
-			selectedNote.forEach(t -> t.setVelocity(t.getVelocity() + ( inc ? 1 : -1) ));
+			selectedNote.forEach(t -> t.modifyVelocity(inc));
 			mmlManager.updateActivePart(true);
 		} else if (noteEvent != null) {
-			noteEvent.setVelocity(noteEvent.getVelocity() + ( inc ? 1 : -1) );
+			noteEvent.modifyVelocity(inc);
 			mmlManager.updateActivePart(true);
 		}
 	}
