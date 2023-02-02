@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2022 たんらる
+ * Copyright (C) 2013-2023 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.mml;
@@ -76,7 +76,7 @@ public final class TrackPropertyPanel extends JPanel {
 		// パンポット
 		panpotSlider.setSnapToTicks(true);
 		panpotSlider.setPaintTicks(true);
-		panpotSlider.setMinorTickSpacing(16);
+		panpotSlider.setMinorTickSpacing(4);
 		panpotSlider.setMajorTickSpacing(16);
 		panpotSlider.setMaximum(128);
 		panpotSlider.setBounds(120, 30, 200, 23);
