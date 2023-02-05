@@ -228,7 +228,7 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 		MabiDLS.getInstance().setMute(trackIndex, false);
 
 		// エディタ更新
-		updateActivePart(false);
+		updateActivePart(true);
 		updateSelectedTrackAndMMLPart();
 		updateProgramSelect();
 	}
@@ -287,7 +287,7 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 			updateSelectedTrackAndMMLPart();
 		}
 
-		undoEdit.saveState();
+		updateActivePart(true);
 	}
 
 	private void updateTrackTabIcon() {
