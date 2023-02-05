@@ -24,11 +24,13 @@ public class MMLTrackTest {
 	@Before
 	public void setup() {
 		MMLTrack.setTempoAllowChordPart(false);
+		MMLBuilder.setMMLVZeroTempo(true);
 	}
 
 	@After
 	public void cleanup() {
 		MMLTrack.setTempoAllowChordPart(true);
+		MMLBuilder.setMMLVZeroTempo(true);
 	}
 
 	/**
@@ -504,7 +506,7 @@ public class MMLTrackTest {
 	 * @throws UndefinedTickException
 	 */
 	@Test
-	public void set_attackDelayCorrect_1() throws UndefinedTickException {
+	public void test_attackDelayCorrect_1() throws UndefinedTickException {
 		var track = new MMLTrack(0, 0, 0).setMML("MML@aa,bb,cc,dd;");
 		track.setAttackDelayCorrect(-6);
 		track.setAttackSongDelayCorrect(-12);
@@ -524,7 +526,7 @@ public class MMLTrackTest {
 	 * @throws UndefinedTickException
 	 */
 	@Test
-	public void set_attackDelayCorrect_2() throws UndefinedTickException {
+	public void test_attackDelayCorrect_2() throws UndefinedTickException {
 		var track = new MMLTrack(0, 384, 0).setMML("MML@a1,,,b1;");
 		track.getGlobalTempoList().add(new MMLTempoEvent(60, 0));
 		track.getGlobalTempoList().add(new MMLTempoEvent(240, 384));
@@ -549,5 +551,67 @@ public class MMLTrackTest {
 		track.generate();
 		assertEquals("MML@t240a1,,,t60b1t240;", track.getOriginalMML());
 		assertEquals("MML@t60v0c64t240v8a1,,,v0c32t60v8b1;", track.getMabiMML());
+	}
+
+	/**
+	 * 64bit-mabi 合奏ズレ補正
+	 * @throws UndefinedTickException 
+	 */
+	@Test
+	public void test_64bitMabi_01() throws UndefinedTickException {
+		var track = new MMLTrack();
+		track.setFix64(true);
+		track.setMML("MML@a1a1a1");
+		assertEquals("MML@l1aaa,,;", track.generate().getMabiMML());
+
+		track.getGlobalTempoList().add(new MMLTempoEvent(130, 0));
+		assertEquals("MML@t130l1aaa,,;", track.generate().getMabiMML());
+
+		track.getGlobalTempoList().add(new MMLTempoEvent(60, 384));
+		track.getGlobalTempoList().add(new MMLTempoEvent(240, 3840));
+		assertEquals("MML@t130l1at60aat130,,;", track.generate().getMabiMML());
+
+		track.getGlobalTempoList().remove(0);
+		assertEquals("MML@l1at60aat120,,;", track.generate().getMabiMML());
+
+		// 初期テンポと終了位置が同じ
+		track.setMML("MML@a1");
+		assertEquals("MML@a1,,;", track.generate().getMabiMML());
+
+		// 歌パート
+		track.setMML("MML@,,,a1");
+		assertEquals("MML@,,,a1;", track.generate().getMabiMML());
+
+		// 和音パートへの出力
+		track.setMML("MML@a1a1a1,,r1r1r1r1c1,a1a1a1a1;");
+		assertEquals("MML@l1at60aa,,l1r.r.rct120,l1at60aaat120;", track.generate().getMabiMML());
+
+		// 歌パート
+		track.setMML("MML@,,,a1");
+		assertEquals("MML@,,,a1;", track.generate().getMabiMML());
+	}
+
+	@Test
+	public void test_64bitMabi_02() throws UndefinedTickException {
+		var track = new MMLTrack();
+		track.setFix64(true);
+		MMLBuilder.setMMLVZeroTempo(false);
+
+		track.getGlobalTempoList().add(new MMLTempoEvent(130, 0));
+		track.getGlobalTempoList().add(new MMLTempoEvent(60, 384));
+		track.getGlobalTempoList().add(new MMLTempoEvent(240, 3840));
+
+		// 和音へのテンポ出力有効のパターン
+		MMLTrack.setTempoAllowChordPart(true);
+		track.setMML("MML@,c2,,a1");
+		assertEquals("MML@,t130c2,,t130a1;", track.generate().getMabiMML());
+		track.setMML("MML@,c1c1,,a1a1");
+		assertEquals("MML@,t130l1ct60ct130,,t130l1at60at130;", track.generate().getMabiMML());
+
+		// 和音へのテンポ出力無効のパターン (ズレ補正用のテンポは和音パートへの許可する)
+		MMLTrack.setTempoAllowChordPart(false);
+		assertEquals("MML@t130r1t60,l1cct130,,t130l1at60at130;", track.generate().getMabiMML());
+		track.setMML("MML@,c2,b2.,a1");
+		assertEquals("MML@t130,c2,b2.,t130a1;", track.generate().getMabiMML());
 	}
 }

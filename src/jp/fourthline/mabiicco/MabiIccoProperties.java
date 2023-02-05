@@ -20,6 +20,7 @@ import java.util.function.Consumer;
 import jp.fourthline.mabiicco.midi.SoundEnv;
 import jp.fourthline.mabiicco.ui.PianoRollView;
 import jp.fourthline.mmlTools.MMLBuilder;
+import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.core.MMLText;
 import jp.fourthline.mmlTools.core.ResourceLoader;
@@ -110,6 +111,9 @@ public final class MabiIccoProperties {
 
 	/** VZero Tempo */
 	public final Property<Boolean> mmlVZeroTempo = new BooleanProperty("function.mml_vzero_tempo", true, t -> MMLBuilder.setMMLVZeroTempo(t.booleanValue()));
+
+	/** fix64 Tempo */
+	public final Property<Boolean> mmlFix64Tempo = new BooleanProperty("function.mml_fix64_tempo", false, t -> MMLScore.setMMLFix64(t.booleanValue()));
 
 	/** システムのL&F */
 	public final Property<Boolean> useSystemLaF = new BooleanProperty("ui.use_system_laf", false);

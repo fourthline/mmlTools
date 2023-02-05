@@ -13,7 +13,7 @@ import jp.fourthline.mmlTools.core.UndefinedTickException;
 public final class MMLBuilder {
 	private static final int STRING_BUILDER_SIZE = 2048;
 
-	/** VZero Tempo */
+	/** VZero Tempo: "休符+テンポ" -> "V0音符+テンポ" に変換する. 64bit化Mabi以前向けの補正機能. */
 	private static boolean mmlVZeroTempo = true;
 	public static void setMMLVZeroTempo(boolean b) {
 		mmlVZeroTempo = b;
@@ -149,6 +149,20 @@ public final class MMLBuilder {
 		return toMMLString(withTempo, mabiTempo, null);
 	}
 
+	private LinkedList<MMLTempoEvent> makeLocalTempoList(long totalTick) {
+		//　テンポ, startOffset に伴って 使う先頭のあたまがかわる
+		LinkedList<MMLTempoEvent> localTempoList = new LinkedList<>(eventList.getGlobalTempoList());
+		while (localTempoList.size() > 1) {
+			if (localTempoList.get(1).getTickOffset() <= startOffset) {
+				localTempoList.removeFirst();
+			} else {
+				break;
+			}
+		}
+
+		return localTempoList;
+	}
+
 	/**
 	 * テンポ出力を行うかどうかを指定してMML文字列を作成する.
 	 * TODO: 長いなぁ。
@@ -161,15 +175,7 @@ public final class MMLBuilder {
 	public String toMMLString(boolean withTempo, boolean mabiTempo, List<MMLEventList> relationPart)
 			throws UndefinedTickException {
 		long totalTick = totalTickRelationPart(relationPart);
-		//　テンポ, startOffset に伴って 使う先頭のあたまがかわる
-		LinkedList<MMLTempoEvent> localTempoList = new LinkedList<>(eventList.getGlobalTempoList());
-		while (localTempoList.size() > 1) {
-			if (localTempoList.get(1).getTickOffset() <= startOffset) {
-				localTempoList.removeFirst();
-			} else {
-				break;
-			}
-		}
+		LinkedList<MMLTempoEvent> localTempoList = makeLocalTempoList(totalTick);
 		StringBuilder sb = new StringBuilder(STRING_BUILDER_SIZE);
 
 		// initial note: octave 4, tick 0, offset 0, velocity 8

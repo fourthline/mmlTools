@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2022 たんらる
+ * Copyright (C) 2013-2023 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -68,6 +68,9 @@ public final class MMLTrack implements Serializable, Cloneable {
 
 	// コーラスオプション (楽器＋歌）
 	private int songProgram = NO_CHORUS;  // コーラスを使用しない.
+
+	// 64bit mabi 合奏ズレ補正
+	private boolean fix64Tempo = false;
 
 	public MMLTrack() {
 		this(0, 0, 0);
@@ -249,6 +252,14 @@ public final class MMLTrack implements Serializable, Cloneable {
 		return this.volume;
 	}
 
+	public boolean getFix64() {
+		return fix64Tempo;
+	}
+
+	public void setFix64(boolean b) {
+		fix64Tempo = b;
+	}
+
 	public MMLEventList getMMLEventAtIndex(int index) {
 		return mmlParts.get(index);
 	}
@@ -269,6 +280,39 @@ public final class MMLTrack implements Serializable, Cloneable {
 		return max;
 	}
 
+	/**
+	 * 64bit mabinogi 環境における合奏ズレを補正する
+	 * 開始テンポと終了テンポが異なる場合に、MML最終位置に開始テンポを追加する. （和音パートへも許可）
+	 * @param mml
+	 * @return
+	 */
+	private String[] fix64Tempo(String mml[]) {
+		// 楽器パート処理.
+		int firstTempo = MMLTempoEvent.searchOnTick(globalTempoList, commonStartOffset + startDelta);
+		int tick = MMLEventList.maxEndTick(mmlParts.subList(0, 3));
+		int endTempo = MMLTempoEvent.searchOnTick(globalTempoList, tick - 1);
+		if (firstTempo != endTempo) {
+			for (int i = 0; i < 3; i++) {
+				var note = mmlParts.get(i).getLastNote();
+				if ((note != null) && (note.getEndTick() == tick)) {
+					mml[i] += "t" + firstTempo;
+					break;
+				}
+			}
+		}
+
+		// 歌パート処理.
+		int firstSongTempo = MMLTempoEvent.searchOnTick(globalTempoList, commonStartOffset + startSongDelta);
+		var songLastNote = mmlParts.get(3).getLastNote();
+		if (songLastNote != null) {
+			int endSongTempo = MMLTempoEvent.searchOnTick(globalTempoList, songLastNote.getEndTick() - 1);
+			if (firstSongTempo != endSongTempo) {
+				mml[3] += "t" + firstSongTempo;
+			}
+		}
+		return mml;
+	}
+
 	public MMLTrack generate() throws UndefinedTickException {
 		String mml1 = getOriginalMML();
 		originalMML.setMMLText(getMMLStrings(false, false));
@@ -283,11 +327,13 @@ public final class MMLTrack implements Serializable, Cloneable {
 		/*
 		 * tailFixはMusicQアップデートで不要になりました. 2017/01/07
 		 */
-		if (!optTempoAllowChordPart) {
-			mabiMML.setMMLText(getMMLStrings(false, true));
-		} else {
-			mabiMML.setMMLText(getMMLStringsMusicQ());
+		String[] mmlStrings = (!optTempoAllowChordPart) ? getMMLStrings(false, true) : getMMLStringsMusicQ();
+
+		// 64ビットクライアントにより、合奏ズレが発生している向けの補正機能. 2023/02/05
+		if (fix64Tempo) {
+			mmlStrings = fix64Tempo(mmlStrings);
 		}
+		mabiMML.setMMLText(mmlStrings);
 		generated = true;
 		return this;
 	}

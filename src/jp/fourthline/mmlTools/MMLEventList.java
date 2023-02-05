@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2022 たんらる
+ * Copyright (C) 2013-2023 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -57,10 +57,10 @@ public final class MMLEventList implements Serializable, Cloneable {
 		while (parser.hasNext()) {
 			MMLEvent event = parser.next();
 
-			if (event instanceof MMLTempoEvent) {
-				((MMLTempoEvent) event).appendToListElement(tempoList);
-			} else if (event instanceof MMLNoteEvent) {
-				noteList.add((MMLNoteEvent) event);
+			if (event instanceof MMLTempoEvent tempoEvent) {
+				tempoEvent.appendToListElement(tempoList);
+			} else if (event instanceof MMLNoteEvent noteEvent) {
+				noteList.add(noteEvent);
 			}
 		}
 	}
@@ -401,5 +401,21 @@ public final class MMLEventList implements Serializable, Cloneable {
 
 	public String getInternalMMLString() throws UndefinedTickException {
 		return MMLBuilder.create(this).toMMLString(false, false);
+	}
+
+	/**
+	 * イベントリストのリストの中で最後のTickを得る.
+	 * @param eventList
+	 * @return
+	 */
+	public static int maxEndTick(List<MMLEventList> eventList) {
+		int endTick = 0;
+		for (var e : eventList) {
+			var lastNote = e.getLastNote();
+			if ((lastNote != null) && (endTick < lastNote.getEndTick())) {
+				endTick = lastNote.getEndTick();
+			}
+		}
+		return endTick;
 	}
 }

@@ -604,25 +604,17 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 	}
 
 	@Override
-	public void updateActivePart(boolean generate) {
-		updateActivePart(generate, -1);
+	public void generateActiveTrack() {
+		// 単一のTrackだけを更新したいところであるが, 整合性を保つために全体をGenerateする. 
+		updateActivePart(true);
 	}
 
 	@Override
-	public void generateActiveTrack() {
-		// 単一のTrackだけを更新したいところであるが, 整合性を保つために全体をGenerateする. 
-		updateActivePart(true, -1);
-	}
-
-	private void updateActivePart(boolean generate, int trackIndex) {
+	public void updateActivePart(boolean generate) {
 		NanoTime time = NanoTime.start();
 		if (generate) {
 			try {
-				if (trackIndex >= 0) {
-					mmlScore.generateOne(trackIndex);
-				} else {
-					mmlScore.generateAll();
-				}
+				mmlScore.generateAll();
 			} catch (UndefinedTickException e) {
 				EventQueue.invokeLater(() -> {
 					String msg = AppResource.appText("fail.mml_modify") + "\n" + e.getMessage();

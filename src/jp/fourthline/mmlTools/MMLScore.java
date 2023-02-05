@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2022 たんらる
+ * Copyright (C) 2013-2023 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -29,6 +29,12 @@ public final class MMLScore implements Cloneable {
 	private final List<TimeSignature> timeSignatureList = new ArrayList<>();
 
 	public static final int MAX_TRACK = 24;
+
+	/** mabi64 合奏ズレ補正 */
+	private static boolean fix64Tempo = false;
+	public static void setMMLFix64(boolean b) {
+		fix64Tempo = b;
+	}
 
 	private String title = "";
 	private String author = "";
@@ -330,16 +336,12 @@ public final class MMLScore implements Cloneable {
 		return this;
 	}
 
-
-	public MMLScore generateOne(int trackIndex) throws UndefinedTickException {
-		trackList.get(trackIndex).generate();
-		return this;
-	}
-
 	public MMLScore generateAll() throws UndefinedTickException {
 		exceptionStack.clear();
+		boolean fix64Current = (trackList.size() >= 2) && fix64Tempo; // 複数トラックのときに設定する.
 		trackList.parallelStream().forEach(t -> {
 			try {
+				t.setFix64(fix64Current);
 				t.generate();
 			} catch (UndefinedTickException e) {
 				exceptionStack.push(e);
