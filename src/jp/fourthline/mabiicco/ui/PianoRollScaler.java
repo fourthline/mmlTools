@@ -128,7 +128,7 @@ public final class PianoRollScaler implements MouseWheelListener {
 		} else {
 			// 縦方向の移動
 			int delta = pianoRollView.getNoteHeight() * 2;
-			p.y += (rotation > 0) ? delta : -delta; 
+			p.y = Math.min(Math.max(0, p.y + ((rotation > 0) ? delta : -delta)), pianoRollView.getHeight() - viewport.getHeight());
 			scrollPane.getViewport().setViewPosition(p);
 			parent.repaint();
 		}
