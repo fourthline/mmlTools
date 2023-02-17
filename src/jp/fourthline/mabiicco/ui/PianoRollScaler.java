@@ -13,7 +13,6 @@ import javax.swing.JViewport;
 
 import jp.fourthline.mabiicco.IEditState;
 import jp.fourthline.mabiicco.midi.MabiDLS;
-import jp.fourthline.mmlTools.Measure;
 
 public final class PianoRollScaler implements MouseWheelListener {
 	private final IMMLManager mmlManager;
@@ -38,7 +37,7 @@ public final class PianoRollScaler implements MouseWheelListener {
 	public void expandPianoViewWide() {
 		scalePlayPosition(t -> this.expandPianoViewWide(t));
 	}
-	
+
 	public void reducePianoViewWide() {
 		scalePlayPosition(t -> this.reducePianoViewWide(t));
 	}
@@ -101,6 +100,30 @@ public final class PianoRollScaler implements MouseWheelListener {
 		}
 	}
 
+	private void scrollH(int rotation, JViewport viewport, Point p) {
+		var score = mmlManager.getMMLScore();
+		int measureWidth = pianoRollView.convertTicktoX(score.getMeasureTick());
+		// 横方向の移動
+		if (viewport.getWidth() > measureWidth) {
+			int delta = pianoRollView.convertTicktoX((viewport.getWidth() > measureWidth * 2) ? score.getMeasureTick() : score.getBeatTick());
+			p.x += (rotation > 0) ? delta : -delta;
+		} else {
+			p.x += (rotation > 0) ? 6 : -6;
+		}
+		p.x = Math.min(Math.max(0, p.x), pianoRollView.getWidth() - viewport.getWidth());
+		scrollPane.getViewport().setViewPosition(p);
+		parent.repaint();
+	}
+
+	private void scrollV(int rotation, JViewport viewport, Point p) {
+		// 縦方向の移動
+		int delta = pianoRollView.getNoteHeight() * 2;
+		p.y += (rotation > 0) ? delta : -delta;
+		p.y = Math.min(Math.max(0, p.y + ((rotation > 0) ? delta : -delta)), pianoRollView.getHeight() - viewport.getHeight());
+		scrollPane.getViewport().setViewPosition(p);
+		parent.repaint();
+	}
+
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		JViewport viewport = scrollPane.getViewport();
@@ -118,19 +141,10 @@ public final class PianoRollScaler implements MouseWheelListener {
 			}
 		} else if (!e.isAltDown() && !e.isControlDown() && e.isShiftDown()) {
 			// 横方向の移動
-			int tickOffset = Measure.nextMeasure(mmlManager.getMMLScore(), (int) pianoRollView.convertXtoTick(p.x) ,rotation > 0);
-			p.x = pianoRollView.convertTicktoX(tickOffset);
-			if (p.x < 0) {
-				p.x = 0;
-			}
-			scrollPane.getViewport().setViewPosition(p);
-			parent.repaint();
+			scrollH(rotation, viewport, p);
 		} else {
 			// 縦方向の移動
-			int delta = pianoRollView.getNoteHeight() * 2;
-			p.y = Math.min(Math.max(0, p.y + ((rotation > 0) ? delta : -delta)), pianoRollView.getHeight() - viewport.getHeight());
-			scrollPane.getViewport().setViewPosition(p);
-			parent.repaint();
+			scrollV(rotation, viewport, p);
 		}
 	}
 }
