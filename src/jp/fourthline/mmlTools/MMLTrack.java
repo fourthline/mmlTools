@@ -657,6 +657,12 @@ public final class MMLTrack implements Serializable, Cloneable {
 		};
 	}
 
+	public boolean isFantasyTrack() {
+		boolean b1 = !mmlParts.get(0).isEmpty() || !mmlParts.get(1).isEmpty() || !mmlParts.get(2).isEmpty();
+		boolean b2 = !mmlParts.get(3).isEmpty();
+		return b1 && b2;
+	}
+
 	@Override
 	public MMLTrack clone() {
 		MMLTrack o = new MMLTrack(commonStartOffset, startDelta, startSongDelta)

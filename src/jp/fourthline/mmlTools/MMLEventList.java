@@ -84,6 +84,10 @@ public final class MMLEventList implements Serializable, Cloneable {
 		}
 	}
 
+	public boolean isEmpty() {
+		return noteList.isEmpty();
+	}
+
 	public List<MMLNoteEvent> getMMLNoteEventList() {
 		return noteList;
 	}

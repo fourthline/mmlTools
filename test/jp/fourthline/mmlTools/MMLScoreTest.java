@@ -51,11 +51,13 @@ public class MMLScoreTest extends FileSelect {
 	@Before
 	public void setup() {
 		MMLTrack.setTempoAllowChordPart(false);
+		MMLScore.setMMLFix64(false);
 	}
 
 	@After
 	public void cleanup() {
 		MMLTrack.setTempoAllowChordPart(true);
+		MMLScore.setMMLFix64(false);
 	}
 
 	/**
@@ -779,6 +781,48 @@ public class MMLScoreTest extends FileSelect {
 		assertTrue(score.getTrack(0) != score.getTrack(1));
 		assertEquals("MML@t60aaat90bbbb,,;", score.getTrack(0).getMabiMML());
 		assertEquals("MML@t60aaat90bbbb,,;", score.getTrack(1).getMabiMML());
+	}
+
+	@Test
+	public void test_fix64() throws UndefinedTickException {
+		MMLScore.setMMLFix64(true);
+		var track = new MMLTrack();
+		score.addTrack(track);
+		score.generateAll();
+		assertEquals(1, score.getTrackCount());
+		assertEquals(false, track.getFix64());
+
+		// 楽器パート部のみのMML
+		track.setMML("MML@cccc,cccc,cccc,;");
+		score.generateAll();
+		assertEquals(false, track.getFix64());
+
+		// 楽器パートと歌パート部のMML
+		track.setMML("MML@cccc,cccc,cccc,cccc;");
+		score.generateAll();
+		assertEquals(true, track.getFix64());
+
+		track.setMML("MML@cccc,,,cccc;");
+		score.generateAll();
+		assertEquals(true, track.getFix64());
+
+		track.setMML("MML@,cccc,,cccc;");
+		score.generateAll();
+		assertEquals(true, track.getFix64());
+
+		track.setMML("MML@,,cccc,cccc;");
+		score.generateAll();
+		assertEquals(true, track.getFix64());
+
+		// 歌パート部のみのMML
+		track.setMML("MML@,,,cccc;");
+		score.generateAll();
+		assertEquals(false, track.getFix64());
+
+		// 複数トラック
+		score.addTrack(new MMLTrack());
+		score.generateAll();
+		assertEquals(true, track.getFix64());
 	}
 
 	public static void main(String[] args) {

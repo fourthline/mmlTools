@@ -336,9 +336,23 @@ public final class MMLScore implements Cloneable {
 		return this;
 	}
 
+	private boolean fix64Current() {
+		if (fix64Tempo) {
+			int size = trackList.size();
+			if (size > 1) {
+				return true;
+			} else if (size == 1) {
+				if (trackList.get(0).isFantasyTrack()) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	public MMLScore generateAll() throws UndefinedTickException {
 		exceptionStack.clear();
-		boolean fix64Current = (trackList.size() >= 2) && fix64Tempo; // 複数トラックのときに設定する.
+		boolean fix64Current = fix64Current();
 		trackList.parallelStream().forEach(t -> {
 			try {
 				t.setFix64(fix64Current);
