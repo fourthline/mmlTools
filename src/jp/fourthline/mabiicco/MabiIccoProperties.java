@@ -11,14 +11,17 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.InvalidPropertiesFormatException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import jp.fourthline.mabiicco.midi.SoundEnv;
 import jp.fourthline.mabiicco.ui.PianoRollView;
+import jp.fourthline.mabiicco.ui.color.ScaleColor;
 import jp.fourthline.mmlTools.MMLBuilder;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTrack;
@@ -95,6 +98,9 @@ public final class MabiIccoProperties {
 
 	/** Midi Device */
 	public final Property<String> midiInputDevice = new StringProperty("midi.input_device");
+
+	/** Scale color */
+	public final IndexProperty<ScaleColor> scaleColor = new IndexProperty<ScaleColor>("scale.color", ScaleColor.values(), ScaleColor.C_MAJOR, t -> ScaleColor.valueOf(t)); // new StringProperty("scale.color", ScaleColor.C_MAJOR.toString());
 
 	/** Midi キーボード 和音入力 */
 	public final Property<Boolean> midiChordInput = new BooleanProperty("midi.chord_input", false);
@@ -297,7 +303,46 @@ public final class MabiIccoProperties {
 		T get();
 	}
 
-	private final class StringProperty implements Property<String> {
+	public class IndexProperty<T> implements Property<T> {
+		private final String name;
+		private final List<T> values;
+		private final T defaultValue;
+		private final Function<String, T> func;
+		public IndexProperty(String name, T[] values, T defaultValue, Function<String, T> func) {
+			this.name = name;
+			this.values = Arrays.asList(values);
+			this.defaultValue = defaultValue;
+			this.func = func;
+		}
+
+		public void setIndex(Integer index) {
+			properties.setProperty(name, values.get(index).toString());
+			save();
+		}
+
+		public int getIndex() {
+			return values.indexOf(get());
+		}
+
+		@Override
+		public void set(T value) {
+			setIndex(values.indexOf(value));
+		}
+
+		@Override
+		public T get() {
+			String str = properties.getProperty(name, defaultValue.toString());
+			try {
+				T o = func.apply(str);
+				return o;
+			} catch (IllegalArgumentException e) {
+				set(defaultValue);
+				return defaultValue;
+			}
+		}
+	}
+
+	private class StringProperty implements Property<String> {
 		private final String name;
 		private final String defaultValue;
 		private final Consumer<String> optDo;

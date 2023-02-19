@@ -829,9 +829,10 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 				mmlSeqView.setPianoRollHeightScale(h);
 				int index = Arrays.asList(PianoRollView.NoteHeight.values()).indexOf(h);
 				MabiIccoProperties.getInstance().setPianoRollViewHeightScaleProperty(index);
-			} else if (o instanceof ScaleColor) {
+			} else if (o instanceof ScaleColor color) {
 				// 音階表示を変更する.
-				mmlSeqView.setScaleColor((ScaleColor)o);
+				mmlSeqView.setScaleColor(color);
+				MabiIccoProperties.getInstance().scaleColor.set(color);
 			} else if (o instanceof SoundEnv ss) {
 				// 音源環境を変更する.
 				int index = Arrays.asList(SoundEnv.values()).indexOf(ss);

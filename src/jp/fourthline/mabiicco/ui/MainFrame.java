@@ -356,8 +356,8 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		JMenu settingMenu = new JMenu(appText("menu.setting"));
 		menuBar.add(settingMenu);
 		// 表示に関わる設定
-		createGroupMenu(settingMenu, "menu.noteHeight", PianoRollView.NoteHeight.values(), () -> MabiIccoProperties.getInstance().getPianoRollViewHeightScaleProperty());
-		createGroupMenu(settingMenu, "menu.scale_color", ScaleColor.values(), null);
+		createGroupMenu(settingMenu, "menu.noteHeight", PianoRollView.NoteHeight.values(), () -> properties.getPianoRollViewHeightScaleProperty());
+		createGroupMenu(settingMenu, "menu.scale_color", ScaleColor.values(), () -> properties.scaleColor.getIndex());
 		createCheckMenu(settingMenu, "view.tempo", properties.enableViewTempo);
 		createCheckMenu(settingMenu, "view.marker", properties.enableViewMarker);
 		createCheckMenu(settingMenu, "view.range", properties.viewRange);
@@ -382,7 +382,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createCheckMenu(settingMenu, "mml.regenerate_with_open", properties.reGenerateWithOpen);
 		settingMenu.add(new JSeparator());
 		// DLSに関わる設定
-		createGroupMenu(settingMenu, "menu.sound_env", SoundEnv.values(), () -> MabiIccoProperties.getInstance().getSoundEnvIndex());
+		createGroupMenu(settingMenu, "menu.sound_env", SoundEnv.values(), () -> properties.getSoundEnvIndex());
 		createCheckMenu(settingMenu, "menu.useDefaultSoundbank", properties.useDefaultSoundBank, ActionDispatcher.USE_DEFAULT_SOUNDBANK, true);
 		createMenuItem(settingMenu, "menu.select_dls", ActionDispatcher.SELECT_DLS, true);
 
