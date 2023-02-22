@@ -29,6 +29,10 @@ public final class TimeBox extends JComboBox<StringBuffer> implements Runnable {
 	private final StringBuffer time1 = new StringBuffer("time MM:SS/MM:SS (t120)     ");
 	private final StringBuffer time2 = new StringBuffer();
 
+	public enum Type {
+		MEASURE, TIME;
+	}
+
 	public TimeBox(IMMLManager mmlManager) {
 		super();
 		this.mmlManager = mmlManager;

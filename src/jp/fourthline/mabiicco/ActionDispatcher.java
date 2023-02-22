@@ -20,7 +20,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.function.Consumer;
 import java.util.function.IntSupplier;
@@ -823,25 +822,21 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 
 	private void changeAction(Object source) {
 		if (source instanceof Supplier<?>) {
+			var appProperties = MabiIccoProperties.getInstance();
 			Object o = ((Supplier<?>) source).get();
 			if (o instanceof PianoRollView.NoteHeight h) {
 				// ノートの表示している高さを変更する.
 				mmlSeqView.setPianoRollHeightScale(h);
-				int index = Arrays.asList(PianoRollView.NoteHeight.values()).indexOf(h);
-				MabiIccoProperties.getInstance().setPianoRollViewHeightScaleProperty(index);
+				appProperties.pianoRollNoteHeight.set(h);
 			} else if (o instanceof ScaleColor color) {
 				// 音階表示を変更する.
 				mmlSeqView.setScaleColor(color);
-				MabiIccoProperties.getInstance().scaleColor.set(color);
+				appProperties.scaleColor.set(color);
 			} else if (o instanceof SoundEnv ss) {
 				// 音源環境を変更する.
-				int index = Arrays.asList(SoundEnv.values()).indexOf(ss);
-				if (index >= 0) {
-					var appProperties = MabiIccoProperties.getInstance();
-					appProperties.setSoundEnvIndex(index);
-					appProperties.useDefaultSoundBank.set(!ss.useDLS());
-					showAppRestartDialog();
-				}
+				appProperties.soundEnv.set(ss);
+				appProperties.useDefaultSoundBank.set(!ss.useDLS());
+				showAppRestartDialog();
 			} else {
 				System.err.println("changeAction invalid param " + source.getClass().toString());
 			}

@@ -20,9 +20,8 @@ import jp.fourthline.mabiicco.ActionDispatcher;
 import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.IEditStateObserver;
 import jp.fourthline.mabiicco.MabiIccoProperties;
-import jp.fourthline.mabiicco.midi.SoundEnv;
+import jp.fourthline.mabiicco.MabiIccoProperties.IndexProperty;
 import jp.fourthline.mabiicco.ui.PianoRollView.PaintMode;
-import jp.fourthline.mabiicco.ui.color.ScaleColor;
 import jp.fourthline.mabiicco.ui.editor.NoteAlign;
 
 import javax.swing.JTextField;
@@ -356,8 +355,8 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		JMenu settingMenu = new JMenu(appText("menu.setting"));
 		menuBar.add(settingMenu);
 		// 表示に関わる設定
-		createGroupMenu(settingMenu, "menu.noteHeight", PianoRollView.NoteHeight.values(), () -> properties.getPianoRollViewHeightScaleProperty());
-		createGroupMenu(settingMenu, "menu.scale_color", ScaleColor.values(), () -> properties.scaleColor.getIndex());
+		createGroupMenu(settingMenu, "menu.noteHeight", properties.pianoRollNoteHeight);
+		createGroupMenu(settingMenu, "menu.scale_color", properties.scaleColor);
 		createCheckMenu(settingMenu, "view.tempo", properties.enableViewTempo);
 		createCheckMenu(settingMenu, "view.marker", properties.enableViewMarker);
 		createCheckMenu(settingMenu, "view.range", properties.viewRange);
@@ -382,7 +381,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createCheckMenu(settingMenu, "mml.regenerate_with_open", properties.reGenerateWithOpen);
 		settingMenu.add(new JSeparator());
 		// DLSに関わる設定
-		createGroupMenu(settingMenu, "menu.sound_env", SoundEnv.values(), () -> properties.getSoundEnvIndex());
+		createGroupMenu(settingMenu, "menu.sound_env", properties.soundEnv);
 		createCheckMenu(settingMenu, "menu.useDefaultSoundbank", properties.useDefaultSoundBank, ActionDispatcher.USE_DEFAULT_SOUNDBANK, true);
 		createMenuItem(settingMenu, "menu.select_dls", ActionDispatcher.SELECT_DLS, true);
 
@@ -435,12 +434,12 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	 * @param actionCommand
 	 * @param supplier
 	 */
-	private void createGroupMenu(JMenu settingMenu, String menuName, SettingButtonGroupItem[] items, IntSupplier supplier) {
+	private void createGroupMenu(JMenu settingMenu, String menuName, IndexProperty<? extends SettingButtonGroupItem> prop) {
 		JMenu menu = new JMenu(appText(menuName));
 		settingMenu.add(menu);
 
 		ButtonGroup group = new ButtonGroup();
-		for (SettingButtonGroupItem item : items) {
+		for (SettingButtonGroupItem item : prop.getValues()) {
 			CheckBoxMenuWith<SettingButtonGroupItem> itemMenu = new CheckBoxMenuWith<>(appText(item.getButtonName()), item);
 			itemMenu.setActionCommand(ActionDispatcher.CHANGE_ACTION);
 			itemMenu.addActionListener(listener);
@@ -448,11 +447,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 			group.add(itemMenu);
 		}
 
-		int index = 0;
-		if (supplier != null) {
-			index = supplier.getAsInt();
-		}
-		Collections.list(group.getElements()).get(index).setSelected(true);
+		Collections.list(group.getElements()).get(prop.getIndex()).setSelected(true);
 	}
 
 	/**
@@ -569,8 +564,8 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		toolBar.add(newToolBarSeparator());
 		timeBox.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
 		timeBox.setFocusable(false);
-		timeBox.setSelectedIndex(MabiIccoProperties.getInstance().getTimeBoxIndex());
-		timeBox.addActionListener((t) -> MabiIccoProperties.getInstance().setTimeBoxIndex(timeBox.getSelectedIndex()));
+		timeBox.setSelectedIndex(MabiIccoProperties.getInstance().timebox.getIndex());
+		timeBox.addActionListener((t) -> MabiIccoProperties.getInstance().timebox.setIndex(timeBox.getSelectedIndex()));
 		timeBox.setPreferredSize(new Dimension(240, 20));
 		toolBar.add(timeBox);
 

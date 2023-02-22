@@ -17,10 +17,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import jp.fourthline.mabiicco.midi.SoundEnv;
 import jp.fourthline.mabiicco.ui.PianoRollView;
+import jp.fourthline.mabiicco.ui.TimeBox;
 import jp.fourthline.mabiicco.ui.color.ScaleColor;
 import jp.fourthline.mmlTools.MMLBuilder;
 import jp.fourthline.mmlTools.MMLScore;
@@ -58,13 +58,13 @@ public final class MabiIccoProperties {
 	private static final String WINDOW_HEIGHT = "window.height";
 
 	/** ピアノロール表示の高さスケール */
-	private static final String HEIGHT_SCALE = "view.pianoRoll.heightScale";
+	public final IndexProperty<PianoRollView.NoteHeight> pianoRollNoteHeight = new IndexProperty<>("view.pianoRoll.heightScale", PianoRollView.NoteHeight.values(), PianoRollView.NoteHeight.H8);
 
 	/** timeBox Index */
-	private static final String TIMEBOX = "view.timeBox";
+	public final IndexProperty<TimeBox.Type> timebox = new IndexProperty<>("view.timeBox", TimeBox.Type.values(), TimeBox.Type.MEASURE);
 
 	/** 音源設定 Index */
-	private static final String SOUND_ENV = "function.sound_env";
+	public final IndexProperty<SoundEnv> soundEnv = new IndexProperty<SoundEnv>("function.sound_env", SoundEnv.values(), SoundEnv.MABINOGI);
 
 	/** クリック再生機能の有効/無効 */
 	public final Property<Boolean> enableClickPlay = new BooleanProperty("function.enable_click_play", true);
@@ -100,7 +100,7 @@ public final class MabiIccoProperties {
 	public final Property<String> midiInputDevice = new StringProperty("midi.input_device");
 
 	/** Scale color */
-	public final IndexProperty<ScaleColor> scaleColor = new IndexProperty<ScaleColor>("scale.color", ScaleColor.values(), ScaleColor.C_MAJOR, t -> ScaleColor.valueOf(t)); // new StringProperty("scale.color", ScaleColor.C_MAJOR.toString());
+	public final IndexProperty<ScaleColor> scaleColor = new IndexProperty<ScaleColor>("scale.color", ScaleColor.values(), ScaleColor.C_MAJOR);
 
 	/** Midi キーボード 和音入力 */
 	public final Property<Boolean> midiChordInput = new BooleanProperty("midi.chord_input", false);
@@ -228,49 +228,6 @@ public final class MabiIccoProperties {
 		}
 	}
 
-	public int getPianoRollViewHeightScaleProperty() {
-		String s = properties.getProperty(HEIGHT_SCALE, "1");
-		int index = Integer.parseInt(s);
-		if ( (index < 0) || (index >= PianoRollView.NoteHeight.values().length) ) {
-			index = 1;
-		}
-
-		return index;
-	}
-
-	public void setPianoRollViewHeightScaleProperty(int index) {
-		properties.setProperty(HEIGHT_SCALE, ""+index);
-		save();
-	}
-
-	public int getTimeBoxIndex() {
-		String s = properties.getProperty(TIMEBOX, "0");
-		int index = Integer.parseInt(s);
-		if ( (index < 0) || (index > 1) ) {
-			index = 0;
-		}
-		return index;
-	}
-
-	public void setTimeBoxIndex(int index) {
-		properties.setProperty(TIMEBOX, ""+index);
-		save();
-	}
-
-	public int getSoundEnvIndex() {
-		String s = properties.getProperty(SOUND_ENV, "0");
-		int index = Integer.parseInt(s);
-		if ( (index < 0) || (index >= SoundEnv.values().length) ) {
-			index = 0;
-		}
-		return index;
-	}
-
-	public void setSoundEnvIndex(int index) {
-		properties.setProperty(SOUND_ENV, Integer.toString(index));
-		save();
-	}
-
 	private final LinkedList<File> fileHistory = new LinkedList<>();
 	private void initFileHistory() {
 		for (int i = 0; i < MAX_FILE_HISTORY; i++) {
@@ -303,20 +260,36 @@ public final class MabiIccoProperties {
 		T get();
 	}
 
-	public class IndexProperty<T> implements Property<T> {
+	/**
+	 * Enum型設定値をIndexで扱うProperty
+	 * @param <T>
+	 */
+	public class IndexProperty<T extends Enum<?>> implements Property<T> {
 		private final String name;
 		private final List<T> values;
 		private final T defaultValue;
-		private final Function<String, T> func;
-		public IndexProperty(String name, T[] values, T defaultValue, Function<String, T> func) {
+
+		/**
+		 * コンストラクタ
+		 * @param name          プロパティ名
+		 * @param values        設定値の配列. values() でよい.
+		 * @param defaultValue  デフォルト値
+		 */
+		public IndexProperty(String name, T[] values, T defaultValue) {
 			this.name = name;
 			this.values = Arrays.asList(values);
 			this.defaultValue = defaultValue;
-			this.func = func;
+		}
+
+		public List<T> getValues() {
+			return values;
 		}
 
 		public void setIndex(Integer index) {
-			properties.setProperty(name, values.get(index).toString());
+			if ( (index < 0) || (index >= values.size()) ) {
+				index = values.indexOf(defaultValue);
+			}
+			properties.setProperty(name, index.toString());
 			save();
 		}
 
@@ -331,14 +304,16 @@ public final class MabiIccoProperties {
 
 		@Override
 		public T get() {
-			String str = properties.getProperty(name, defaultValue.toString());
-			try {
-				T o = func.apply(str);
-				return o;
-			} catch (IllegalArgumentException e) {
-				set(defaultValue);
-				return defaultValue;
+			String str = properties.getProperty(name);
+			if (str != null) {
+				try {
+					int index = Integer.parseInt(str);
+					if ((index >= 0) && (index < values.size())) {
+						return values.get(index);
+					}
+				} catch (NumberFormatException e) {}
 			}
+			return defaultValue;
 		}
 	}
 

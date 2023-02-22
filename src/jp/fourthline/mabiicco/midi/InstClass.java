@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2022 たんらる
+ * Copyright (C) 2013-2023 たんらる
  */
 
 package jp.fourthline.mabiicco.midi;
@@ -42,7 +42,7 @@ public final class InstClass {
 	private static ResourceBundle instResource = null;
 	static {
 		try {
-			String instName = SoundEnv.values()[MabiIccoProperties.getInstance().getSoundEnvIndex()].getInstrumentName();
+			String instName = MabiIccoProperties.getInstance().soundEnv.get().getInstrumentName();
 			instResource = ResourceBundle.getBundle(instName, new ResourceLoader());
 		} catch (Exception e) {}
 	}

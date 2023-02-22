@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2022 たんらる
+ * Copyright (C) 2013-2023 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
@@ -64,12 +64,6 @@ public final class PianoRollView extends JPanel {
 
 	public void setNoteHeight(NoteHeight nh) {
 		noteHeight = nh;
-	}
-
-	private void setNoteHeightIndex(int index) {
-		if ( (index >= 0) && (index < NoteHeight.values().length) ) {
-			noteHeight = NoteHeight.values()[index];
-		}
 	}
 
 	public int getTotalHeight() {
@@ -153,8 +147,7 @@ public final class PianoRollView extends JPanel {
 	public PianoRollView() {
 		super();
 		setPreferredSize(new Dimension(0, getTotalHeight()));
-
-		setNoteHeightIndex( properties.getPianoRollViewHeightScaleProperty() );
+		this.noteHeight = properties.pianoRollNoteHeight.get();
 		setSequenceTick(0);
 	}
 

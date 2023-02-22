@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2022 たんらる
+ * Copyright (C) 2013-2023 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
@@ -19,7 +19,6 @@ import jp.fourthline.mabiicco.MabiIccoProperties;
 import jp.fourthline.mabiicco.midi.IPlayNote;
 import jp.fourthline.mabiicco.midi.InstClass;
 import jp.fourthline.mabiicco.midi.MabiDLS;
-import jp.fourthline.mabiicco.midi.SoundEnv;
 import jp.fourthline.mmlTools.MMLNoteEvent;
 
 public final class KeyboardView extends JPanel implements IPlayNote {
@@ -69,7 +68,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 			}
 		});
 
-		octDelta = SoundEnv.values()[MabiIccoProperties.getInstance().getSoundEnvIndex()].pianoRollOctDelta();
+		octDelta = MabiIccoProperties.getInstance().soundEnv.get().pianoRollOctDelta();
 	}
 
 	public void updateHeight() {
