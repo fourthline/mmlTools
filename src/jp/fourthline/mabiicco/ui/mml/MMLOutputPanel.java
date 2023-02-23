@@ -149,7 +149,9 @@ public final class MMLOutputPanel extends JPanel {
 		Toolkit kit = Toolkit.getDefaultToolkit();
 		Clipboard clip = kit.getSystemClipboard();
 		clip.setContents(new StringSelection(text), null);
-		JOptionPane.showMessageDialog(parent, message, AppResource.getAppTitle(), JOptionPane.PLAIN_MESSAGE);
+		if (parent != null) {
+			JOptionPane.showMessageDialog(parent, message, AppResource.getAppTitle(), JOptionPane.PLAIN_MESSAGE);
+		}
 	}
 
 

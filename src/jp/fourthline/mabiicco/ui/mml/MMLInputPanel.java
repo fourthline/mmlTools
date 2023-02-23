@@ -173,7 +173,7 @@ public final class MMLInputPanel extends JPanel {
 		dialog.setVisible(true);
 	}
 
-	private void applyMMLTrack() {
+	void applyMMLTrack() {
 		InstClass inst = (InstClass)comboBox.getSelectedItem();
 		track.setProgram(inst.getProgram());
 		track.setTrackName(textField.getText());
@@ -183,6 +183,14 @@ public final class MMLInputPanel extends JPanel {
 		} else {
 			mmlManager.addMMLTrack(track);
 		}
+	}
+
+	void setMMLTrack(MMLTrack track) {
+		this.track = track;
+	}
+
+	void setOverride(boolean b) {
+		overrideButton.setSelected(b);
 	}
 
 	public static String getClipboardString() {
