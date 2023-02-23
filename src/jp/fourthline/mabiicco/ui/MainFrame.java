@@ -14,6 +14,7 @@ import java.awt.Rectangle;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.border.EmptyBorder;
 
 import jp.fourthline.mabiicco.ActionDispatcher;
@@ -398,10 +399,10 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		return menuBar;
 	}
 
-	private static class CheckBoxMenuWith<T> extends JCheckBoxMenuItem implements Supplier<T> {
+	private static class GroupMenuItemWith<T> extends JRadioButtonMenuItem implements Supplier<T> {
 		private static final long serialVersionUID = -7786833458520626015L;
 		private final T obj;
-		private CheckBoxMenuWith(String text, T obj) {
+		private GroupMenuItemWith(String text, T obj) {
 			super(text);
 			this.obj = obj;
 		}
@@ -440,7 +441,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 
 		ButtonGroup group = new ButtonGroup();
 		for (SettingButtonGroupItem item : prop.getValues()) {
-			CheckBoxMenuWith<SettingButtonGroupItem> itemMenu = new CheckBoxMenuWith<>(appText(item.getButtonName()), item);
+			GroupMenuItemWith<SettingButtonGroupItem> itemMenu = new GroupMenuItemWith<>(appText(item.getButtonName()), item);
 			itemMenu.setActionCommand(ActionDispatcher.CHANGE_ACTION);
 			itemMenu.addActionListener(listener);
 			menu.add(itemMenu);
