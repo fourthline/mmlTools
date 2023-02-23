@@ -22,12 +22,9 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import jp.fourthline.FileSelect;
 import jp.fourthline.UseLoadingDLS;
 import jp.fourthline.mmlTools.core.MMLText;
 import jp.fourthline.mmlTools.core.NanoTime;
@@ -36,28 +33,20 @@ import jp.fourthline.mmlTools.optimizer.MMLStringOptimizer;
 import jp.fourthline.mmlTools.parser.IMMLFileParser;
 import jp.fourthline.mmlTools.parser.MMLParseException;
 
-public class MMLScoreTest extends FileSelect {
-
-	@BeforeClass
-	public static void setupClass() {
-		UseLoadingDLS.initializeDefaultDLS();
-	}
-
-	@AfterClass
-	public static void cleanupClass() {
-		MMLTrack.setTempoAllowChordPart(false);
-	}
+public class MMLScoreTest extends UseLoadingDLS {
 
 	@Before
 	public void setup() {
 		MMLTrack.setTempoAllowChordPart(false);
+		MMLBuilder.setMMLVZeroTempo(true);
 		MMLScore.setMMLFix64(false);
 	}
 
 	@After
 	public void cleanup() {
 		MMLTrack.setTempoAllowChordPart(true);
-		MMLScore.setMMLFix64(false);
+		MMLBuilder.setMMLVZeroTempo(false);
+		MMLScore.setMMLFix64(true);
 	}
 
 	/**
@@ -823,18 +812,5 @@ public class MMLScoreTest extends FileSelect {
 		score.addTrack(new MMLTrack());
 		score.generateAll();
 		assertEquals(true, track.getFix64());
-	}
-
-	public static void main(String[] args) {
-		var o = new MMLScoreTest();
-		MMLScoreTest.setupClass();
-		var report = new ByteArrayOutputStream();
-		o.reportStream = new PrintStream(report);
-		o.setup();
-		o.testLocalMMLParse();
-
-		//		System.out.println(" ==== ");
-		//		System.out.println(report.toString());
-		System.exit(0);
 	}
 }

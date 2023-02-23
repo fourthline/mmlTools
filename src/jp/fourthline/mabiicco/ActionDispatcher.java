@@ -162,6 +162,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	private final JFileChooser wavoutFileChooser;
 	private final JFileChooser txtFileChooser;
 
+	private final MabiIccoProperties appProperties = MabiIccoProperties.getInstance();
+
 	private static ActionDispatcher instance = null;
 	public static ActionDispatcher getInstance() {
 		if (instance == null) {
@@ -353,7 +355,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	private void fileOpenWithHistory(Object o) {
 		if (o instanceof IntSupplier) {
 			int index = ((IntSupplier)o).getAsInt();
-			File file = MabiIccoProperties.getInstance().getFileHistory()[index];
+			File file = appProperties.getFileHistory()[index];
 			if ( (file == null) || (!file.exists()) ) {
 				JOptionPane.showMessageDialog(mainFrame,
 						AppResource.appText("error.nofile"),
@@ -382,8 +384,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 
 			openedFile = file;
 			notifyUpdateFileState();
-			MabiIccoProperties.getInstance().setRecentFile(file.getPath());
-			MabiIccoProperties.getInstance().setFileHistory(file);
+			appProperties.setRecentFile(file.getPath());
+			appProperties.setFileHistory(file);
 			mainFrame.updateFileHistoryMenu();
 		}
 		showTime("open", time);
@@ -426,8 +428,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			mainFrame.setTitleAndFileName(file.getName());
 			fileState.setOriginalBase();
 			notifyUpdateFileState();
-			MabiIccoProperties.getInstance().setRecentFile(file.getPath());
-			MabiIccoProperties.getInstance().setFileHistory(file);
+			appProperties.setRecentFile(file.getPath());
+			appProperties.setFileHistory(file);
 			mainFrame.updateFileHistoryMenu();
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(mainFrame, AppResource.appText("fail.saveFile"), "ERROR", JOptionPane.ERROR_MESSAGE);
@@ -462,7 +464,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	}
 
 	private File fileOpenDialog() {
-		String recentPath = MabiIccoProperties.getInstance().getRecentFile();
+		String recentPath = appProperties.getRecentFile();
 		openFileChooser.setFileFilter(allFilter);
 		openFileChooser.setAcceptAllFileFilterUsed(false);
 		openFileChooser.setSelectedFile(null);
@@ -486,7 +488,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	 * @return 保存ファイル, 保存ファイルがなければnull.
 	 */
 	private File showSaveDialog(JFileChooser fileChooser, String suffix) {
-		String recentPath = MabiIccoProperties.getInstance().getRecentFile();
+		String recentPath = appProperties.getRecentFile();
 		if (openedFile != null) {
 			fileChooser.setSelectedFile(openedFile);
 		} else {
@@ -577,7 +579,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			MMLScore score = loader.parse();
 			showTime("import", time);
 			if (score != null) {
-				MabiIccoProperties.getInstance().setRecentFile(file.getPath());
+				appProperties.setRecentFile(file.getPath());
 				// 新規ファイルに何も変更していない状態でインポートする場合は既存トラックを削除する
 				boolean newImport = (openedFile == null) && (!fileState.isModified());
 				new MMLImportPanel(mainFrame, score, mmlSeqView, newImport).showDialog();
@@ -777,9 +779,9 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	}
 
 	private void inputEmptyCorrection() {
-		String value = JOptionPane.showInputDialog(mainFrame, AppResource.appText("mml.emptyCorrection"), MabiIccoProperties.getInstance().mmlEmptyCorrection.get());
+		String value = JOptionPane.showInputDialog(mainFrame, AppResource.appText("mml.emptyCorrection"), appProperties.mmlEmptyCorrection.get());
 		if (value != null) {
-			MabiIccoProperties.getInstance().mmlEmptyCorrection.set(value);
+			appProperties.mmlEmptyCorrection.set(value);
 		}
 	}
 
@@ -790,7 +792,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 
 	private void changeUI() {
 		try {
-			if (MabiIccoProperties.getInstance().useSystemLaF.get()) {
+			if (appProperties.useSystemLaF.get()) {
 				UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
 			} else {
 				UIManager.setLookAndFeel( new FlatLightLaf() );
@@ -804,7 +806,6 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	}
 
 	private void selectDLSFile() {
-		var appProperties = MabiIccoProperties.getInstance();
 		JFileChooser fileChooser = MabiIcco.createFileChooser();
 		fileChooser.setCurrentDirectory(new File("."));
 		FileFilter dlsFilter = new FileNameExtensionFilter(AppResource.appText("file.dls"), "dls");
@@ -822,7 +823,6 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 
 	private void changeAction(Object source) {
 		if (source instanceof Supplier<?>) {
-			var appProperties = MabiIccoProperties.getInstance();
 			Object o = ((Supplier<?>) source).get();
 			if (o instanceof PianoRollView.NoteHeight h) {
 				// ノートの表示している高さを変更する.

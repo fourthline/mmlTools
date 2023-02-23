@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2022 たんらる
+ * Copyright (C) 2013-2023 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import jp.fourthline.mmlTools.core.MMLTicks;
@@ -21,6 +23,18 @@ import jp.fourthline.mmlTools.core.UndefinedTickException;
  *
  */
 public class MMLEventListTest {
+
+	@Before
+	public void setup() {
+		MMLBuilder.setMMLVZeroTempo(true);
+		MMLScore.setMMLFix64(false);
+	}
+
+	@After
+	public void cleanup() {
+		MMLBuilder.setMMLVZeroTempo(false);
+		MMLScore.setMMLFix64(true);
+	}
 
 	/**
 	 * @throws UndefinedTickException 
