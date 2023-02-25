@@ -164,6 +164,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 
 	private final MabiIccoProperties appProperties = MabiIccoProperties.getInstance();
 
+	private boolean testMode = false;
+
 	private static ActionDispatcher instance = null;
 	public static ActionDispatcher getInstance() {
 		if (instance == null) {
@@ -189,6 +191,10 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		this.fileState.setFileStateObserver(this);
 		this.editState.setEditStateObserver(this);
 		return this;
+	}
+
+	public void setTestMode(boolean b) {
+		testMode = b;
 	}
 
 	public void initialize() {
@@ -802,7 +808,9 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	}
 
 	private void showAppRestartDialog() {
-		JOptionPane.showMessageDialog(mainFrame, AppResource.appText("message.appRestart"), AppResource.getAppTitle(), JOptionPane.INFORMATION_MESSAGE);
+		if (!testMode) {
+			JOptionPane.showMessageDialog(mainFrame, AppResource.appText("message.appRestart"), AppResource.getAppTitle(), JOptionPane.INFORMATION_MESSAGE);
+		}
 	}
 
 	private void selectDLSFile() {

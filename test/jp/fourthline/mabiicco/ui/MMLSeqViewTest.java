@@ -1,14 +1,16 @@
 /*
- * Copyright (C) 2015-2022 たんらる
+ * Copyright (C) 2015-2023 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
 
 
 import java.awt.Dimension;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -35,6 +37,7 @@ import jp.fourthline.mmlTools.MMLNoteEvent;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.Marker;
+import jp.fourthline.mmlTools.TimeSignature;
 
 public final class MMLSeqViewTest extends UseLoadingDLS {
 
@@ -306,6 +309,7 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 			var expect = ImageIO.read(expectStream);
 			ImageIO.write(expect, "png", bos1);
 			ImageIO.write(actual, "png", bos2);
+			ImageIO.write(actual, "png", new FileOutputStream("_tmp.png"));
 			assertArrayEquals(bos1.toByteArray(), bos2.toByteArray());
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -345,11 +349,14 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 	@Test
 	public void test_pianoRollView() throws Exception {
 		PianoRollView view = (PianoRollView) getField("pianoRollView");
+		ColumnPanel columnView = (ColumnPanel) getField("columnView");
 		obj.setMMLselectedTrack(new MMLTrack().setMML("MML@t160l1cccc,l1dddd,l1eeee,l1ffff;"));
 		obj.addMMLTrack(new MMLTrack().setMML("MML@>l1cccc,>l1dddd,>l1eeee,>l1ffff;"));
 		obj.addMMLTrack(new MMLTrack().setMML("MML@<l1cccc,<l1dddd,<l1eeee,<l1ffff;"));
 
 		obj.getMMLScore().getMarkerList().add(new Marker("Marker", 96*3));
+		obj.getMMLScore().getTimeSignatureList().add(new TimeSignature(obj.getMMLScore(), 384, 6, 8));
+		obj.getMMLScore().getTimeSignatureList().add(new TimeSignature(obj.getMMLScore(), 672, 3, 4));
 
 		// 拡大
 		assertEquals(6.0, view.getWideScale(), 0.001);
@@ -361,6 +368,8 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 		checkImage(view, "sample1");
 
 		// 縮小
+		columnView.PaintOnTarget(1152);
+		columnView.mousePressed(new MouseEvent(columnView, MouseEvent.MOUSE_PRESSED, 0, 0, 3840, 10, 0, 0, 1, false, MouseEvent.BUTTON1));
 		Stream.of(0.1, 0.25, 0.375, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 6.0) .forEach(t -> {
 			assertEquals(t.doubleValue(), view.getWideScale(), 0.001);
 			obj.getPianoRollScaler().reducePianoViewWide(0);

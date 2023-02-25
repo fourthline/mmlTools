@@ -33,6 +33,9 @@ public final class PianoRollScaler implements MouseWheelListener {
 		pv.addMouseWheelListener(this);
 	}
 
+	public double getScale() {
+		return viewScaleTable[viewScaleIndex];
+	}
 
 	public void expandPianoViewWide() {
 		scalePlayPosition(t -> this.expandPianoViewWide(t));

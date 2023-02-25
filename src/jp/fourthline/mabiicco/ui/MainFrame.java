@@ -80,6 +80,8 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 
 	private final ActionListener listener;
 
+	private final MabiIccoProperties appProperties = MabiIccoProperties.getInstance();
+
 	/** シーケンス再生中に無効化する機能のリスト */
 	private final ArrayList<JComponent> noplayFunctions = new ArrayList<>();
 
@@ -352,38 +354,37 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 				KeyStroke.getKeyStroke(KeyEvent.VK_F6, 0));
 
 		/************************* Setting Menu *************************/
-		MabiIccoProperties properties = MabiIccoProperties.getInstance();
 		JMenu settingMenu = new JMenu(appText("menu.setting"));
 		menuBar.add(settingMenu);
 		// 表示に関わる設定
-		createGroupMenu(settingMenu, "menu.noteHeight", properties.pianoRollNoteHeight);
-		createGroupMenu(settingMenu, "menu.scale_color", properties.scaleColor);
-		createCheckMenu(settingMenu, "view.tempo", properties.enableViewTempo);
-		createCheckMenu(settingMenu, "view.marker", properties.enableViewMarker);
-		createCheckMenu(settingMenu, "view.range", properties.viewRange);
-		createCheckMenu(settingMenu, "view.instAttr", properties.instAttr);
-		createCheckMenu(settingMenu, "view.showAllVelocity", properties.showAllVelocity);
-		createCheckMenu(settingMenu, "view.velocity", properties.viewVelocityLine);
-		createCheckMenu(settingMenu, "ui.use_system_laf", properties.useSystemLaF, ActionDispatcher.CHANGE_UI, false);
-		createCheckMenu(settingMenu, "ui.scale_disable", properties.uiscaleDisable);
+		createGroupMenu(settingMenu, "menu.noteHeight", appProperties.pianoRollNoteHeight);
+		createGroupMenu(settingMenu, "menu.scale_color", appProperties.scaleColor);
+		createCheckMenu(settingMenu, "view.tempo", appProperties.enableViewTempo);
+		createCheckMenu(settingMenu, "view.marker", appProperties.enableViewMarker);
+		createCheckMenu(settingMenu, "view.range", appProperties.viewRange);
+		createCheckMenu(settingMenu, "view.instAttr", appProperties.instAttr);
+		createCheckMenu(settingMenu, "view.showAllVelocity", appProperties.showAllVelocity);
+		createCheckMenu(settingMenu, "view.velocity", appProperties.viewVelocityLine);
+		createCheckMenu(settingMenu, "ui.use_system_laf", appProperties.useSystemLaF, ActionDispatcher.CHANGE_UI, false);
+		createCheckMenu(settingMenu, "ui.scale_disable", appProperties.uiscaleDisable);
 		settingMenu.add(new JSeparator());
 		// 機能に関わる設定
-		createCheckMenu(settingMenu, "edit.enable", properties.enableEdit);
-		createCheckMenu(settingMenu, "edit.active_part_switch", properties.activePartSwitch);
-		createCheckMenu(settingMenu, "clickPlayMenu", properties.enableClickPlay);
-		createCheckMenu(settingMenu, "edit.tempoDeleteWithConvert", properties.enableTempoDeleteWithConvert);
+		createCheckMenu(settingMenu, "edit.enable", appProperties.enableEdit);
+		createCheckMenu(settingMenu, "edit.active_part_switch", appProperties.activePartSwitch);
+		createCheckMenu(settingMenu, "clickPlayMenu", appProperties.enableClickPlay);
+		createCheckMenu(settingMenu, "edit.tempoDeleteWithConvert", appProperties.enableTempoDeleteWithConvert);
 		settingMenu.add(new JSeparator());
 		// MML生成に関わる設定
-		createCheckMenu(settingMenu, "mml.precise_optimize", properties.enableMMLPreciseOptimize, ActionDispatcher.MML_GENERATE);
-		createCheckMenu(settingMenu, "mml.tempo_allow_chord_part", properties.mmlTempoAllowChordPart, ActionDispatcher.MML_GENERATE);
-		createCheckMenu(settingMenu, "mml.vzero_tempo", properties.mmlVZeroTempo, ActionDispatcher.MML_GENERATE);
-		createCheckMenu(settingMenu, "mml.fix64_tempo", properties.mmlFix64Tempo, ActionDispatcher.MML_GENERATE);
+		createCheckMenu(settingMenu, "mml.precise_optimize", appProperties.enableMMLPreciseOptimize, ActionDispatcher.MML_GENERATE);
+		createCheckMenu(settingMenu, "mml.tempo_allow_chord_part", appProperties.mmlTempoAllowChordPart, ActionDispatcher.MML_GENERATE);
+		createCheckMenu(settingMenu, "mml.vzero_tempo", appProperties.mmlVZeroTempo, ActionDispatcher.MML_GENERATE);
+		createCheckMenu(settingMenu, "mml.fix64_tempo", appProperties.mmlFix64Tempo, ActionDispatcher.MML_GENERATE);
 		createMenuItem(settingMenu, "mml.emptyCorrection", ActionDispatcher.INPUT_EMPTY_CORRECTION, true);
-		createCheckMenu(settingMenu, "mml.regenerate_with_open", properties.reGenerateWithOpen);
+		createCheckMenu(settingMenu, "mml.regenerate_with_open", appProperties.reGenerateWithOpen);
 		settingMenu.add(new JSeparator());
 		// DLSに関わる設定
-		createGroupMenu(settingMenu, "menu.sound_env", properties.soundEnv);
-		createCheckMenu(settingMenu, "menu.useDefaultSoundbank", properties.useDefaultSoundBank, ActionDispatcher.USE_DEFAULT_SOUNDBANK, true);
+		createGroupMenu(settingMenu, "menu.sound_env", appProperties.soundEnv);
+		createCheckMenu(settingMenu, "menu.useDefaultSoundbank", appProperties.useDefaultSoundBank, ActionDispatcher.USE_DEFAULT_SOUNDBANK, true);
 		createMenuItem(settingMenu, "menu.select_dls", ActionDispatcher.SELECT_DLS, true);
 
 		/************************* Help Menu *************************/
@@ -392,7 +393,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 
 		createMenuItem(helpMenu, "menu.about", ActionDispatcher.ABOUT);
 		createMenuItem(helpMenu, "menu.shortcutInfo", ActionDispatcher.SHORTCUT_INFO);
-		if (!properties.useDefaultSoundBank.get()) {
+		if (!appProperties.useDefaultSoundBank.get()) {
 			createMenuItem(helpMenu, "menu.instList", ActionDispatcher.INST_LIST);
 		}
 
@@ -428,7 +429,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	}
 
 	/**
-	 * チェックボックのメニューグループを作成する
+	 * ラジオボタンのメニューグループを作成する
 	 * @param settingMenu
 	 * @param menuName
 	 * @param items
@@ -565,8 +566,8 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		toolBar.add(newToolBarSeparator());
 		timeBox.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
 		timeBox.setFocusable(false);
-		timeBox.setSelectedIndex(MabiIccoProperties.getInstance().timebox.getIndex());
-		timeBox.addActionListener((t) -> MabiIccoProperties.getInstance().timebox.setIndex(timeBox.getSelectedIndex()));
+		timeBox.setSelectedIndex(appProperties.timebox.getIndex());
+		timeBox.addActionListener((t) -> appProperties.timebox.setIndex(timeBox.getSelectedIndex()));
 		timeBox.setPreferredSize(new Dimension(240, 20));
 		toolBar.add(timeBox);
 
@@ -588,9 +589,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	}
 
 	private void loadWindowPeoperties() {
-		MabiIccoProperties properties = MabiIccoProperties.getInstance();
-
-		Rectangle rect = properties.getWindowRect();
+		Rectangle rect = appProperties.getWindowRect();
 		if (rect == null) {
 			setSize(1024, 768);
 			setLocationRelativeTo(null);
@@ -598,7 +597,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 			setBounds(rect);
 		}
 
-		if (properties.windowMaximize.get()) {
+		if (appProperties.windowMaximize.get()) {
 			this.setExtendedState(MAXIMIZED_BOTH);
 		}
 
@@ -606,13 +605,11 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 
 	private void updateWindowProperties() {
 		int extendedState = this.getExtendedState();
-		MabiIccoProperties properties = MabiIccoProperties.getInstance();
-
 		if ( extendedState == MAXIMIZED_BOTH ) {
-			properties.windowMaximize.set(true);
+			appProperties.windowMaximize.set(true);
 		} else {
-			properties.windowMaximize.set(false);
-			properties.setWindowRect(this.getBounds());
+			appProperties.windowMaximize.set(false);
+			appProperties.setWindowRect(this.getBounds());
 		}
 	}
 
@@ -733,7 +730,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	}
 
 	public void updateFileHistoryMenu() {
-		File[] fileList = MabiIccoProperties.getInstance().getFileHistory();
+		File[] fileList = appProperties.getFileHistory();
 		for (int i = 0; i < fileHistory.length; i++) {
 			if ( (i < fileList.length) && (fileList[i] != null) ) {
 				fileHistory[i].setText( (i+1) + " " + fileList[i].getName() );
