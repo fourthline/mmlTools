@@ -777,14 +777,16 @@ public class MMLScoreTest extends UseLoadingDLS {
 		MMLScore.setMMLFix64(true);
 		var track = new MMLTrack();
 		score.addTrack(track);
-		score.generateAll();
-		assertEquals(1, score.getTrackCount());
-		assertEquals(false, track.getFix64());
 
-		// 楽器パート部のみのMML
+		score.generateAll();
+		// (2023/03/12 無条件でfix64有効に変更)
+		assertEquals(1, score.getTrackCount());
+		assertEquals(true, track.getFix64());
+
+		// 楽器パート部のみのMML (2023/03/12 無条件でfix64有効に変更)
 		track.setMML("MML@cccc,cccc,cccc,;");
 		score.generateAll();
-		assertEquals(false, track.getFix64());
+		assertEquals(true, track.getFix64());
 
 		// 楽器パートと歌パート部のMML
 		track.setMML("MML@cccc,cccc,cccc,cccc;");
@@ -803,10 +805,10 @@ public class MMLScoreTest extends UseLoadingDLS {
 		score.generateAll();
 		assertEquals(true, track.getFix64());
 
-		// 歌パート部のみのMML
+		// 歌パート部のみのMML (2023/03/12 無条件でfix64有効に変更)
 		track.setMML("MML@,,,cccc;");
 		score.generateAll();
-		assertEquals(false, track.getFix64());
+		assertEquals(true, track.getFix64());
 
 		// 複数トラック
 		score.addTrack(new MMLTrack());
