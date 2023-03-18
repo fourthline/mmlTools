@@ -275,7 +275,7 @@ public final class MabiIccoProperties {
 		 * @param values        設定値の配列. values() でよい.
 		 * @param defaultValue  デフォルト値
 		 */
-		public IndexProperty(String name, T[] values, T defaultValue) {
+		private IndexProperty(String name, T[] values, T defaultValue) {
 			this.name = name;
 			this.values = Arrays.asList(values);
 			this.defaultValue = defaultValue;
