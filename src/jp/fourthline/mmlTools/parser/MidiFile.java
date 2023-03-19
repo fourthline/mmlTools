@@ -150,10 +150,7 @@ public final class MidiFile extends AbstractMMLParser {
 			if (formatType == 0) {
 				parseFormat0Track(seq.getTracks()[0]);
 			} else if (formatType == 1) {
-				int count = 1;
-				for (Track track : seq.getTracks()) {
-					parseFormat1Track(track, count++);
-				}
+				parseFormat1Track(seq.getTracks());
 			}
 			bin.close();
 		} catch (InvalidMidiDataException | IOException e) {
@@ -211,6 +208,10 @@ public final class MidiFile extends AbstractMMLParser {
 	 */
 	private void parseFormat0Track(Track track) throws MMLParseException {
 		var midiEventList = convMidiEventList(track);
+		List<List<MidiEvent>> chList = new ArrayList<>();
+		for (int i = 0; i < MIDI_CHANNEL; i++) {
+			chList.add(new ArrayList<>());
+		}
 
 		TrackInfo trackInfo = new TrackInfo(1);
 		for (MidiEvent event : midiEventList) {
@@ -219,8 +220,13 @@ public final class MidiFile extends AbstractMMLParser {
 			if (tick >= MMLEvent.MAX_TICK) continue;
 			if (msg instanceof MetaMessage) {
 				parseMetaMessage((MetaMessage)msg, tick, trackInfo);
+			} else if (msg instanceof ShortMessage shortmsg) {
+				int channel = shortmsg.getChannel();
+				chList.get(channel).add(event);
 			} else if (msg instanceof SysexMessage) {
 				System.out.println("Sysex");
+			} else {
+				throw new MMLParseException("Unknown MIDI message.");
 			}
 		}
 
@@ -229,15 +235,12 @@ public final class MidiFile extends AbstractMMLParser {
 			activeNoteMap.clear();
 			curNoteList.clear();
 			trackInfo = new TrackInfo(i+1);
-			for (MidiEvent event : midiEventList) {
+			for (MidiEvent event : chList.get(i)) {
 				MidiMessage msg = event.getMessage();
 				long tick = convTick( event.getTick() );
 				if (tick >= MMLEvent.MAX_TICK) continue;
 				if (msg instanceof ShortMessage shortmsg) {
-					int channel = shortmsg.getChannel();
-					if (i == channel) {
-						parseShortMessage(shortmsg, tick, trackInfo);
-					}
+					parseShortMessage(shortmsg, tick, trackInfo);
 				}
 			}
 
@@ -252,30 +255,32 @@ public final class MidiFile extends AbstractMMLParser {
 	 * @param count
 	 * @throws MMLParseException
 	 */
-	private void parseFormat1Track(Track track, int count) throws MMLParseException {
-		TrackInfo trackInfo = new TrackInfo(count);
-		activeNoteMap.clear();
-		curNoteList.clear();
-		System.out.println(" - track -");
-		System.out.println(track.size());
+	private void parseFormat1Track(Track track[]) throws MMLParseException {
+		for (int i = 0; i < track.length; i++) {
+			TrackInfo trackInfo = new TrackInfo(i+1);
+			activeNoteMap.clear();
+			curNoteList.clear();
+			System.out.println(" - track -");
+			System.out.println(track[i].size());
 
-		for (MidiEvent event : convMidiEventList(track)) {
-			MidiMessage msg = event.getMessage();
-			long tick = convTick( event.getTick() );
-			if (tick >= MMLEvent.MAX_TICK) continue;
-			if (msg instanceof MetaMessage) {
-				parseMetaMessage((MetaMessage)msg, tick, trackInfo);
-			} else if (msg instanceof ShortMessage) {
-				parseShortMessage((ShortMessage)msg, tick, trackInfo);
-			} else if (msg instanceof SysexMessage) {
-				System.out.println("Sysex");
-			} else {
-				throw new MMLParseException("Unknown MIDI message.");
+			for (MidiEvent event : convMidiEventList(track[i])) {
+				MidiMessage msg = event.getMessage();
+				long tick = convTick( event.getTick() );
+				if (tick >= MMLEvent.MAX_TICK) continue;
+				if (msg instanceof MetaMessage) {
+					parseMetaMessage((MetaMessage)msg, tick, trackInfo);
+				} else if (msg instanceof ShortMessage) {
+					parseShortMessage((ShortMessage)msg, tick, trackInfo);
+				} else if (msg instanceof SysexMessage) {
+					System.out.println("Sysex");
+				} else {
+					throw new MMLParseException("Unknown MIDI message.");
+				}
 			}
-		}
 
-		// MMLEventListのリストを使ってトラックを生成.
-		createMMLTrack(createMMLEventList(), trackInfo);
+			// MMLEventListのリストを使ってトラックを生成.
+			createMMLTrack(createMMLEventList(), trackInfo);
+		}
 	}
 
 	/**
