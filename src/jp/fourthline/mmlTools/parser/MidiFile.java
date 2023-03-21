@@ -146,13 +146,15 @@ public final class MidiFile extends AbstractMMLParser {
 			System.out.println(seq.getDivisionType());
 			System.out.println(seq.getMicrosecondLength());
 			System.out.println(seq.getTickLength());
+			bin.close();
 
 			if (formatType == 0) {
 				parseFormat0Track(seq.getTracks()[0]);
 			} else if (formatType == 1) {
 				parseFormat1Track(seq.getTracks());
+			} else {
+				throw new MMLParseException("not support format <" + formatType + ">");
 			}
-			bin.close();
 		} catch (InvalidMidiDataException | IOException e) {
 			e.printStackTrace();
 		}

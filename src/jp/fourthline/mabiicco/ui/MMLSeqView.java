@@ -47,6 +47,7 @@ import java.awt.Frame;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.LinkedList;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.IntConsumer;
@@ -68,8 +69,6 @@ import java.util.function.IntConsumer;
  */
 public final class MMLSeqView extends AbstractMMLManager implements ChangeListener, ActionListener, MainView {
 	private static final int INITIAL_TRACK_COUNT = 1;
-
-	private int trackCounter;
 
 	private final JScrollPane scrollPane;
 	private final PianoRollView pianoRollView;
@@ -189,7 +188,6 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 	public void initializeMMLTrack() {
 		mmlScore = new MMLScore();
 		tabbedPane.removeAll();
-		trackCounter = 0;
 		for (int i = 0; i < INITIAL_TRACK_COUNT; i++) {
 			addMMLTrack(null);
 		}
@@ -199,11 +197,14 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 	}
 
 	private String getNewTrackName() {
-		if (trackCounter >= MMLScore.MAX_TRACK * 4) {
-			trackCounter = 0;
+		LinkedList<String> list = new LinkedList<>();
+		for (int i = 0; i <= MMLScore.MAX_TRACK; i++) {
+			list.add("Track" + (i+1));
 		}
-		trackCounter++;
-		return "Track" + trackCounter;
+		for (var track : mmlScore.getTrackList()) {
+			list.remove(track.getTrackName());
+		}
+		return list.getFirst();
 	}
 
 	/**
@@ -364,11 +365,9 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 	 */
 	public MMLTrack getSelectedTrack() {
 		int index = tabbedPane.getSelectedIndex();
-
 		if (index < 0) {
 			index = 0;
 		}
-
 		return mmlScore.getTrack(index);
 	}
 

@@ -187,7 +187,13 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 		assertEquals(2, obj.getMMLScore().getTrackCount());
 		assertEquals("Track2", obj.getSelectedTrack().getTrackName());
 
+		// 増えす.
+		obj.addMMLTrack(null);
+		assertEquals(3, obj.getMMLScore().getTrackCount());
+		assertEquals("Track3", obj.getSelectedTrack().getTrackName());
+
 		// 最小
+		obj.removeMMLTrack();
 		obj.removeMMLTrack();
 		assertEquals(1, obj.getMMLScore().getTrackCount());
 		assertEquals("Track1", obj.getSelectedTrack().getTrackName());
@@ -195,7 +201,7 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 		// へらない.
 		obj.removeMMLTrack();
 		assertEquals(1, obj.getMMLScore().getTrackCount());
-		assertEquals("Track26", obj.getSelectedTrack().getTrackName());
+		assertEquals("Track1", obj.getSelectedTrack().getTrackName());
 	}
 
 	@Test
