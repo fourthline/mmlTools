@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2022 たんらる
+ * Copyright (C) 2013-2023 たんらる
  */
 
 package jp.fourthline.mmlTools.parser;
@@ -75,7 +75,7 @@ public final class MMLEventParser implements Iterator<MMLEvent> {
 					}
 					continue;
 				} catch (NumberFormatException e) {
-					e.printStackTrace();
+					System.err.println(e.getMessage());
 				}
 			}
 			if ( (firstC == 't') || (firstC == 'T') ) {

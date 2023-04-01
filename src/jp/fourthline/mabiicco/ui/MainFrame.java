@@ -309,6 +309,8 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createMenuItem(editMenu, "mml.generate", ActionDispatcher.MML_GENERATE, true);
 		createMenuItem(editMenu, "edit.keyboard.input", ActionDispatcher.KEYBOARD_INPUT, true,
 				KeyStroke.getKeyStroke(KeyEvent.VK_K, InputEvent.CTRL_DOWN_MASK));
+		createMenuItem(editMenu, "mml.text_edit", ActionDispatcher.MML_TEXT_EDIT, true,
+				KeyStroke.getKeyStroke(KeyEvent.VK_J, InputEvent.CTRL_DOWN_MASK));
 
 		/************************* Track Menu *************************/
 		JMenu trackMenu = new JMenu(appText("menu.track"));
@@ -383,6 +385,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createCheckMenu(settingMenu, "mml.regenerate_with_open", appProperties.reGenerateWithOpen);
 		settingMenu.add(new JSeparator());
 		// DLSに関わる設定
+		createGroupMenu(settingMenu, "menu.overlap_mode", appProperties.overlapMode);
 		createGroupMenu(settingMenu, "menu.sound_env", appProperties.soundEnv);
 		createCheckMenu(settingMenu, "menu.useDefaultSoundbank", appProperties.useDefaultSoundBank, ActionDispatcher.USE_DEFAULT_SOUNDBANK, true);
 		createMenuItem(settingMenu, "menu.select_dls", ActionDispatcher.SELECT_DLS, true);

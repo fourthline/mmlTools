@@ -148,6 +148,7 @@ public final class PianoRollView extends JPanel {
 		super();
 		setPreferredSize(new Dimension(0, getTotalHeight()));
 		this.noteHeight = properties.pianoRollNoteHeight.get();
+		this.scaleColor = properties.scaleColor.get();
 		setSequenceTick(0);
 	}
 

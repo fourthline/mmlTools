@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2022 たんらる
+ * Copyright (C) 2014-2023 たんらる
  */
 
 package jp.fourthline.mmlTools.parser;
@@ -69,7 +69,7 @@ public final class MMLFile extends AbstractMMLParser {
 		String s = text;
 		s = CRLF_PATTERN.matcher(s).replaceAll("\n");
 		s = CR_PATTERN.matcher(s).replaceAll("\n");
-		s = END_LINE_PATTERN.matcher(s).replaceAll("\n");
+		s = END_LINE_PATTERN.matcher(s + '\n').replaceAll("\n");
 		s = COMMENT_PATTERN.matcher(s).replaceAll("");
 		s = SPACE_PATTERN.matcher(s).replaceAll("");
 		return s;

@@ -36,6 +36,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.formdev.flatlaf.FlatLightLaf;
 
+import jp.fourthline.mabiicco.midi.MMLMidiTrack;
 import jp.fourthline.mabiicco.midi.MabiDLS;
 import jp.fourthline.mabiicco.midi.SoundEnv;
 import jp.fourthline.mabiicco.ui.About;
@@ -143,6 +144,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String CONVERT_TUPLET = "convert_tuplet";
 	@Action public static final String OTHER_MML_EXPORT = "other_mml_export";
 	@Action public static final String CHANGE_ACTION = "change_action";
+	@Action public static final String MML_TEXT_EDIT = "mml_text_edit";
 
 	private final HashMap<String, Consumer<Object>> actionMap = new HashMap<>();
 
@@ -290,6 +292,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(CONVERT_TUPLET, t -> editState.convertTuplet());
 		actionMap.put(OTHER_MML_EXPORT, t -> this.otherMmlExportAction());
 		actionMap.put(CHANGE_ACTION, t -> this.changeAction(t));
+		actionMap.put(MML_TEXT_EDIT, t -> mmlSeqView.mmlTextEditor());
 	}
 
 	@Override
@@ -845,6 +848,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 				appProperties.soundEnv.set(ss);
 				appProperties.useDefaultSoundBank.set(!ss.useDLS());
 				showAppRestartDialog();
+			} else if (o instanceof MMLMidiTrack.OverlapMode mode) {
+				appProperties.overlapMode.set(mode);
 			} else {
 				System.err.println("changeAction invalid param " + source.getClass().toString());
 			}

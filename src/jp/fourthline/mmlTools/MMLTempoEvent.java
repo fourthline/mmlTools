@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2022 たんらる
+ * Copyright (C) 2013-2023 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -23,7 +23,7 @@ public final class MMLTempoEvent extends MMLEvent implements Cloneable {
 
 	public MMLTempoEvent(int tempo, int tickOffset, boolean isFirst) throws IllegalArgumentException {
 		super(tickOffset);
-		if (tempo <= 0) {
+		if ((tempo <= 0) || (tempo > 1000)) {
 			throw new IllegalArgumentException("tempo "+tempo);
 		}
 		this.tempo = tempo;

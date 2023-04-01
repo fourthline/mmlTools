@@ -27,6 +27,7 @@ import jp.fourthline.mabiicco.ui.color.ScaleColor;
 import jp.fourthline.mabiicco.ui.editor.KeyboardEditor;
 import jp.fourthline.mabiicco.ui.editor.MMLEditor;
 import jp.fourthline.mabiicco.ui.editor.MMLScoreUndoEdit;
+import jp.fourthline.mabiicco.ui.editor.MMLTextEditor;
 import jp.fourthline.mabiicco.ui.mml.MMLInputPanel;
 import jp.fourthline.mabiicco.ui.mml.MMLOutputPanel;
 import jp.fourthline.mabiicco.ui.mml.MMLPartChangePanel;
@@ -100,9 +101,7 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 		pianoRollView = new PianoRollView();
 		keyboardView = new KeyboardView(this, pianoRollView);
 
-		scrollPane = new JScrollPane(pianoRollView);
-		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		scrollPane = new JScrollPane(pianoRollView, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		scrollPane.getVerticalScrollBar().setUnitIncrement(pianoRollView.getNoteHeight());
 
 		panel.add(scrollPane, BorderLayout.CENTER);
@@ -824,5 +823,9 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 	@Override
 	public long getSequencePosition() {
 		return pianoRollView.getSequencePlayPosition();
+	}
+
+	public void mmlTextEditor() {
+		new MMLTextEditor(parentFrame, this, pianoRollView).showDialog();
 	}
 }

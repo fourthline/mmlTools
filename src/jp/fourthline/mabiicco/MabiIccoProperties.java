@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.function.Consumer;
 
+import jp.fourthline.mabiicco.midi.MMLMidiTrack;
 import jp.fourthline.mabiicco.midi.SoundEnv;
 import jp.fourthline.mabiicco.ui.PianoRollView;
 import jp.fourthline.mabiicco.ui.TimeBox;
@@ -126,6 +127,9 @@ public final class MabiIccoProperties {
 
 	/** UIスケールを100%に固定する */
 	public final Property<Boolean> uiscaleDisable = new BooleanProperty("ui.scale_disable", false);
+
+	/** Overlap mode */
+	public final IndexProperty<MMLMidiTrack.OverlapMode> overlapMode = new IndexProperty<>("function.overlap_mode", MMLMidiTrack.OverlapMode.values(), MMLMidiTrack.OverlapMode.INST);
 
 	/** 内蔵音源を使用する */
 	public final Property<Boolean> useDefaultSoundBank = new BooleanProperty("function.use_default_soundbank", false);

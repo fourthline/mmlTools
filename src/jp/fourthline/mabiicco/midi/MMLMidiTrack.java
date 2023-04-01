@@ -1,12 +1,16 @@
 /*
- * Copyright (C) 2014-2022 たんらる
+ * Copyright (C) 2014-2023 たんらる
  */
 
 package jp.fourthline.mabiicco.midi;
 
+import static jp.fourthline.mabiicco.AppResource.appText;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.fourthline.mabiicco.MabiIccoProperties;
+import jp.fourthline.mabiicco.ui.SettingButtonGroupItem;
 import jp.fourthline.mmlTools.MMLNoteEvent;
 
 /**
@@ -18,6 +22,7 @@ public final class MMLMidiTrack {
 	private final InstClass inst;
 	private final ArrayList<MMLNoteEvent> noteEventList;
 	private int attackDelayCorrect = 0;
+	private final OverlapMode overlapMode = MabiIccoProperties.getInstance().overlapMode.get();
 
 	public MMLMidiTrack(InstClass inst) {
 		this.inst = inst;
@@ -70,8 +75,41 @@ public final class MMLMidiTrack {
 		}
 	}
 
+	public enum OverlapMode implements SettingButtonGroupItem {
+		NONE {
+			@Override
+			public boolean f(boolean b) {
+				return false;
+			}
+		},
+		INST {
+			@Override
+			public boolean f(boolean b) {
+				return b;
+			}
+		},
+		ALL {
+			@Override
+			public boolean f(boolean b) {
+				return true;
+			}
+		};
+
+		private final String name;
+		private OverlapMode() {
+			this.name = appText("menu.overlap_mode." + super.name().toLowerCase());
+		}
+
+		@Override
+		public String getButtonName() {
+			return this.name;
+		}
+
+		public abstract boolean f(boolean b);
+	}
+
 	private MMLNoteEvent overlapNote(int targetIndex, MMLNoteEvent addEvent) {
-		if (inst.isOverlap(addEvent.getNote())) {
+		if (overlapMode.f(inst.isOverlap(addEvent.getNote()))) {
 			return addEvent;
 		}
 

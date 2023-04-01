@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2022 たんらる
+ * Copyright (C) 2013-2023 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
@@ -134,11 +134,7 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 			// パートタイトル
 			partButton[i] = new JToggleButton( MMLPART_NAME[i] );
 			partButton[i].setFocusable(false);
-			GridBagConstraints gbc_label = new GridBagConstraints();
-			gbc_label.insets = new Insets(0, 0, 5, 5);
-			gbc_label.gridx = 1;
-			gbc_label.gridy = gridy;
-			mmlTextPanel.add(partButton[i], gbc_label);
+			mmlTextPanel.add(partButton[i], createGridBag(1, gridy, false));
 			bGroup.add(partButton[i]);
 
 			// パートのテキストフィールド
@@ -148,17 +144,22 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 			mmlText[i].setFont(new Font("Monospaced", Font.PLAIN, 12));
 			mmlText[i].setColumns(10);
 			mmlText[i].addMouseListener(new ButtonCombAdapter(partButton[i]));
-
-			GridBagConstraints gbc_mmlText = new GridBagConstraints();
-			gbc_mmlText.insets = new Insets(0, 0, 5, 5);
-			gbc_mmlText.fill = GridBagConstraints.HORIZONTAL;
-			gbc_mmlText.gridx = 3;
-			gbc_mmlText.gridy = gridy;
-			mmlTextPanel.add(mmlText[i], gbc_mmlText);
+			mmlTextPanel.add(mmlText[i], createGridBag(3, gridy, true));
 		}
 
 		// 一番上のパートが初期の選択パート.
 		partButton[0].setSelected(true);
+	}
+
+	private GridBagConstraints createGridBag(int x, int y, boolean fill) {
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.insets = new Insets(0, 0, 5, 5);
+		gbc.gridx = x;
+		gbc.gridy = y;
+		if (fill) {
+			gbc.fill = GridBagConstraints.HORIZONTAL;
+		}
+		return gbc;
 	}
 
 	/**
