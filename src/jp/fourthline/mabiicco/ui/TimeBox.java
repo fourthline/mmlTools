@@ -38,8 +38,8 @@ public final class TimeBox extends JComboBox<StringBuffer> implements Runnable {
 		this.mmlManager = mmlManager;
 		addItem(time1);
 		addItem(time2);
-		new Thread(this).start();
 		sequencer = MabiDLS.getInstance().getSequencer();
+		new Thread(this).start();
 	}
 
 	/**
