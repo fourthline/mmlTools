@@ -9,16 +9,22 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.AbstractAction;
+import javax.swing.InputMap;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.AncestorEvent;
@@ -98,13 +104,24 @@ public final class MMLTextEditor implements DocumentListener, CaretListener {
 		textPane.setText(text);
 
 		this.parentFrame = parentFrame;
-		this.dialog = new JDialog(parentFrame, AppResource.appText("mml.text_edit"), false);
+		this.dialog = new JDialog(parentFrame, AppResource.appText("mml.text_edit"), true);
 		dialog.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosed(WindowEvent e) { 
 				cancelAction();
 			}
 		});
+		InputMap imap = dialog.getRootPane().getInputMap(
+				JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "close-it");
+		dialog.getRootPane().getActionMap().put("close-it", new AbstractAction() {
+			private static final long serialVersionUID = 4749203868495137137L;
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				cancelAction();
+				dialog.setVisible(false);
+			}});
 
 		this.scrollPane = new JScrollPane(textPane, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		this.scrollPane.setPreferredSize(new Dimension(400, 240));
@@ -181,7 +198,6 @@ public final class MMLTextEditor implements DocumentListener, CaretListener {
 		var tempoList = mmlManager.getMMLScore().getTempoEventList();
 		tempoList.clear();
 		tempoList.addAll(originalTempoList);
-		mmlManager.updateActivePart(false);
 		if (parentFrame != null) {
 			parentFrame.repaint();
 		}

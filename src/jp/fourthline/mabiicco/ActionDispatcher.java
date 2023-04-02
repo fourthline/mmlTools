@@ -297,10 +297,13 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		String command = e.getActionCommand();
+		doAction(e.getSource(), e.getActionCommand());
+	}
+
+	public void doAction(Object source, String command) {
 		Consumer<Object> func = actionMap.get(command);
 		if (func != null) {
-			func.accept( e.getSource() );
+			func.accept(source);
 		} else {
 			System.err.println("not found Action: " + command);
 		}

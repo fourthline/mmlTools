@@ -21,6 +21,7 @@ import java.awt.Insets;
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
 
+import jp.fourthline.mabiicco.ActionDispatcher;
 import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.midi.InstClass;
 import jp.fourthline.mabiicco.midi.InstType;
@@ -176,6 +177,14 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 			if (button.isEnabled()) {
 				button.setSelected(true);
 				Arrays.asList(button.getActionListeners()).forEach(t -> t.actionPerformed(null));
+			}
+		}
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			int clickCount = e.getClickCount();
+			if (clickCount == 2) {
+				ActionDispatcher.getInstance().doAction(this, ActionDispatcher.MML_TEXT_EDIT);
 			}
 		}
 	}
