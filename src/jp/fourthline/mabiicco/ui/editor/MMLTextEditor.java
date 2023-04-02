@@ -7,6 +7,7 @@ package jp.fourthline.mabiicco.ui.editor;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -15,6 +16,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.InputMap;
@@ -33,9 +36,9 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
@@ -62,9 +65,19 @@ public final class MMLTextEditor implements DocumentListener, CaretListener {
 	private final JTextPane textPane = new JTextPane();
 
 	private final DefaultStyledDocument doc = new DefaultStyledDocument(new StyleContext());
-	private final MutableAttributeSet s0 = new SimpleAttributeSet();
-	private final MutableAttributeSet s1 = new SimpleAttributeSet();
-	private final MutableAttributeSet s2 = new SimpleAttributeSet();
+	private static final AttributeSet emptyStyle = createAttribute(Color.DARK_GRAY);
+	private static final AttributeSet normalStyle = createAttribute(Color.BLACK);
+	private static final AttributeSet tokenStyle = createAttribute(Color.BLUE);
+	private static final AttributeSet commentStyle = createAttribute(Color.decode("#006400"));
+
+	private static AttributeSet createAttribute(Color foreground) {
+		var attr = new SimpleAttributeSet();
+		StyleConstants.setForeground(attr, foreground);
+		return attr;
+	}
+
+	// コメント文解析用
+	private final List<Pattern> commentPatterns = List.of(Pattern.compile("/\\*/?([^/]|[^*]/)*\\*/"), Pattern.compile("//.*\n"));
 
 	// もとのMMLイベントリスト: キャンセル時に使う
 	private final MMLEventList originalList;
@@ -82,6 +95,7 @@ public final class MMLTextEditor implements DocumentListener, CaretListener {
 	public MMLTextEditor(Frame parentFrame, IMMLManager mmlManager, PianoRollView pianoRollView) {
 		textPane.setDocument(doc);
 		textPane.addCaretListener(this);
+		textPane.setFont(new Font("Monospaced", Font.PLAIN, 12));
 		textPane.addAncestorListener(new AncestorListener() {
 			@Override
 			public void ancestorRemoved(AncestorEvent event) {}
@@ -94,7 +108,7 @@ public final class MMLTextEditor implements DocumentListener, CaretListener {
 				event.getComponent().requestFocusInWindow();
 			}
 		});
-		doc.setParagraphAttributes(0, 0, s0, false);
+		doc.setParagraphAttributes(0, 0, emptyStyle, false);
 		this.mmlManager = mmlManager;
 		originalList = mmlManager.getActiveMMLPart();
 		originalTempoList = new ArrayList<>(originalList.getGlobalTempoList());
@@ -102,6 +116,7 @@ public final class MMLTextEditor implements DocumentListener, CaretListener {
 		int index = mmlManager.getActiveMMLPartIndex();
 		String text = new MMLText().setMMLText(mmlManager.getActiveTrack().getOriginalMML()).getText(index);
 		textPane.setText(text);
+		applyStyle();
 
 		this.parentFrame = parentFrame;
 		this.dialog = new JDialog(parentFrame, AppResource.appText("mml.text_edit"), true);
@@ -139,32 +154,34 @@ public final class MMLTextEditor implements DocumentListener, CaretListener {
 		buttonPanel.add(cancelButton);
 		panel.add(buttonPanel, BorderLayout.SOUTH);
 
-		initStyle();
-		applyStyle();
-
 		doc.addDocumentListener(this);
 
 		this.pianoRollView = pianoRollView;
 		initialPosition = (pianoRollView != null) ? pianoRollView.getSequencePosition() : 0;
 	}
 
-	private void initStyle() {
-		StyleConstants.setForeground(s0, Color.DARK_GRAY);
-		StyleConstants.setForeground(s1, Color.BLACK);
-		StyleConstants.setForeground(s2, Color.BLUE);
-	}
-
 	private void applyStyle() {
 		try {
 			String text = doc.getText(0, doc.getLength());
-			doc.setCharacterAttributes(0, text.length(), s0, true);
+			doc.setCharacterAttributes(0, text.length(), emptyStyle, true);
 			MMLTokenizer tokenizer = new MMLTokenizer(text);
 			while (tokenizer.hasNext()) {
 				String s = tokenizer.next();
 				int i[] = tokenizer.getIndex();
-				var style = MMLTokenizer.isNote(s.charAt(0)) ? s1 : s2;
+				var style = MMLTokenizer.isNote(s.charAt(0)) ? normalStyle : tokenStyle;
 				doc.setCharacterAttributes(i[0], 1, style, true);
 			}
+
+			// コメントのスタイル設定
+			commentPatterns.forEach(ptn -> {
+				Matcher m = ptn.matcher(text + '\n');
+				for (int i = 0; m.find(i); i = m.end()) {
+					int start = m.start();
+					int end = m.end();
+					doc.setCharacterAttributes(start, end-start, commentStyle, true);
+				}
+			});
+
 			setMML(text);
 			if (parentFrame != null) {
 				parentFrame.repaint();
