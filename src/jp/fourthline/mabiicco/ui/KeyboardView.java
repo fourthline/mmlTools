@@ -19,6 +19,7 @@ import jp.fourthline.mabiicco.MabiIccoProperties;
 import jp.fourthline.mabiicco.midi.IPlayNote;
 import jp.fourthline.mabiicco.midi.InstClass;
 import jp.fourthline.mabiicco.midi.MabiDLS;
+import jp.fourthline.mabiicco.midi.MMLMidiTrack.OverlapMode;
 import jp.fourthline.mmlTools.MMLNoteEvent;
 
 public final class KeyboardView extends JPanel implements IPlayNote {
@@ -199,11 +200,12 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 			int totalHeight = pianoRollView.getTotalHeight();
 			int height = pianoRollView.getNoteHeight();
 			int x = width - 1;
+			OverlapMode overlapMode = MabiIccoProperties.getInstance().overlapMode.get();
 			for (int i = 0; i < totalHeight; i += height) {
 				int note = pianoRollView.convertY2Note(i);
 				if (!relativeInst.isValid(note)) {
 					g.setColor(Color.RED);
-				} else if (relativeInst.isOverlap(note)) {
+				} else if (overlapMode.f(relativeInst.isOverlap(note))) {
 					g.setColor(Color.BLUE);
 				} else {
 					g.setColor(Color.GREEN);

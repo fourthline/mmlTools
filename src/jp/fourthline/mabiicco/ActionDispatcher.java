@@ -853,6 +853,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 				showAppRestartDialog();
 			} else if (o instanceof MMLMidiTrack.OverlapMode mode) {
 				appProperties.overlapMode.set(mode);
+				mmlSeqView.repaint();
 			} else {
 				System.err.println("changeAction invalid param " + source.getClass().toString());
 			}
