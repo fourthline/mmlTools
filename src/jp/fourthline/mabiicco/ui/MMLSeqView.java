@@ -829,7 +829,10 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 		try {
 			new MMLTextEditor(parentFrame, this, pianoRollView).showDialog();
 		} catch (UndefinedTickException e) {
-			e.printStackTrace();
+			EventQueue.invokeLater(() -> {
+				String msg = AppResource.appText("fail.mml_modify") + "\n" + e.getMessage();
+				JOptionPane.showMessageDialog(parentFrame, msg, AppResource.getAppTitle(), JOptionPane.WARNING_MESSAGE);
+			});
 		}
 	}
 }

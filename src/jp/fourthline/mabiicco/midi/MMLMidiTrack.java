@@ -78,19 +78,19 @@ public final class MMLMidiTrack {
 	public enum OverlapMode implements SettingButtonGroupItem {
 		NONE {
 			@Override
-			public boolean f(boolean b) {
+			public boolean isOverlap(InstClass inst, int note) {
 				return false;
 			}
 		},
 		INST {
 			@Override
-			public boolean f(boolean b) {
-				return b;
+			public boolean isOverlap(InstClass inst, int note) {
+				return inst.isOverlap(note);
 			}
 		},
 		ALL {
 			@Override
-			public boolean f(boolean b) {
+			public boolean isOverlap(InstClass inst, int note) {
 				return true;
 			}
 		};
@@ -105,11 +105,11 @@ public final class MMLMidiTrack {
 			return this.name;
 		}
 
-		public abstract boolean f(boolean b);
+		public abstract boolean isOverlap(InstClass inst, int note);
 	}
 
 	private MMLNoteEvent overlapNote(int targetIndex, MMLNoteEvent addEvent) {
-		if (overlapMode.f(inst.isOverlap(addEvent.getNote()))) {
+		if (overlapMode.isOverlap(inst, addEvent.getNote())) {
 			return addEvent;
 		}
 

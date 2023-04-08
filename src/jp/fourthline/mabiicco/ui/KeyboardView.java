@@ -205,7 +205,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 				int note = pianoRollView.convertY2Note(i);
 				if (!relativeInst.isValid(note)) {
 					g.setColor(Color.RED);
-				} else if (overlapMode.f(relativeInst.isOverlap(note))) {
+				} else if (overlapMode.isOverlap(relativeInst, note)) {
 					g.setColor(Color.BLUE);
 				} else {
 					g.setColor(Color.GREEN);
