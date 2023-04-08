@@ -18,8 +18,9 @@ import java.util.List;
 import java.util.Properties;
 import java.util.function.Consumer;
 
-import jp.fourthline.mabiicco.midi.MMLMidiTrack;
+import jp.fourthline.mabiicco.midi.MMLMidiTrack.OverlapMode;
 import jp.fourthline.mabiicco.midi.SoundEnv;
+import jp.fourthline.mabiicco.ui.PianoRollScaler.MouseScrollWidth;
 import jp.fourthline.mabiicco.ui.PianoRollView;
 import jp.fourthline.mabiicco.ui.TimeBox;
 import jp.fourthline.mabiicco.ui.color.ScaleColor;
@@ -129,13 +130,16 @@ public final class MabiIccoProperties {
 	public final Property<Boolean> uiscaleDisable = new BooleanProperty("ui.scale_disable", false);
 
 	/** Overlap mode */
-	public final IndexProperty<MMLMidiTrack.OverlapMode> overlapMode = new IndexProperty<>("function.overlap_mode", MMLMidiTrack.OverlapMode.values(), MMLMidiTrack.OverlapMode.INST);
+	public final IndexProperty<OverlapMode> overlapMode = new IndexProperty<>("function.overlap_mode", OverlapMode.values(), OverlapMode.INST);
 
 	/** 内蔵音源を使用する */
 	public final Property<Boolean> useDefaultSoundBank = new BooleanProperty("function.use_default_soundbank", false);
 
 	/** テンポ削除時にもTick変換のダイアログ表示をする */
 	public final Property<Boolean> enableTempoDeleteWithConvert = new BooleanProperty("function.tempoDeleteWithConvert", false);
+
+	/** マウスホイールによる横スクロール量 */
+	public final IndexProperty<MouseScrollWidth> mouseScrollWidth = new IndexProperty<>("function.mouse_scroll_width", MouseScrollWidth.values(), MouseScrollWidth.AUTO);
 
 	/** ファイルOpen時にMML再生成する (旧データとの比較をしない) */
 	public final Property<Boolean> reGenerateWithOpen = new BooleanProperty("function.reGenerateWithOpen", true);

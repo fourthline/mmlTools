@@ -42,6 +42,7 @@ import jp.fourthline.mabiicco.midi.SoundEnv;
 import jp.fourthline.mabiicco.ui.About;
 import jp.fourthline.mabiicco.ui.MMLSeqView;
 import jp.fourthline.mabiicco.ui.MainFrame;
+import jp.fourthline.mabiicco.ui.PianoRollScaler.MouseScrollWidth;
 import jp.fourthline.mabiicco.ui.PianoRollView;
 import jp.fourthline.mabiicco.ui.WavoutPanel;
 import jp.fourthline.mabiicco.ui.color.ScaleColor;
@@ -854,6 +855,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			} else if (o instanceof MMLMidiTrack.OverlapMode mode) {
 				appProperties.overlapMode.set(mode);
 				mmlSeqView.repaint();
+			} else if (o instanceof MouseScrollWidth scrollWidth) {
+				appProperties.mouseScrollWidth.set(scrollWidth);
 			} else {
 				System.err.println("changeAction invalid param " + source.getClass().toString());
 			}

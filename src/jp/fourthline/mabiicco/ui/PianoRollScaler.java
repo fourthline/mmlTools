@@ -3,6 +3,8 @@
  */
 package jp.fourthline.mabiicco.ui;
 
+import static jp.fourthline.mabiicco.AppResource.appText;
+
 import java.awt.Point;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
@@ -12,7 +14,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 
 import jp.fourthline.mabiicco.IEditState;
+import jp.fourthline.mabiicco.MabiIccoProperties;
 import jp.fourthline.mabiicco.midi.MabiDLS;
+import jp.fourthline.mmlTools.MMLScore;
 
 public final class PianoRollScaler implements MouseWheelListener {
 	private final IMMLManager mmlManager;
@@ -103,16 +107,60 @@ public final class PianoRollScaler implements MouseWheelListener {
 		}
 	}
 
-	private void scrollH(int rotation, JViewport viewport, Point p) {
-		var score = mmlManager.getMMLScore();
-		int measureWidth = pianoRollView.convertTicktoX(score.getMeasureTick());
-		// 横方向の移動
-		if (viewport.getWidth() > measureWidth) {
-			int delta = pianoRollView.convertTicktoX((viewport.getWidth() > measureWidth * 2) ? score.getMeasureTick() : score.getBeatTick());
-			p.x += (rotation > 0) ? delta : -delta;
-		} else {
-			p.x += (rotation > 0) ? 6 : -6;
+	/**
+	 * マウスホイール横スクロール量
+	 */
+	public enum MouseScrollWidth implements SettingButtonGroupItem {
+		AUTO {
+			@Override
+			public int getDelta(MMLScore score, JViewport viewport, PianoRollView pianoRollView) {
+				int measureWidth = pianoRollView.convertTicktoX(score.getMeasureTick());
+				int viewportWidth = viewport.getWidth();
+				if (viewportWidth > measureWidth) {
+					return pianoRollView.convertTicktoX((viewportWidth > measureWidth * 2) ? score.getMeasureTick() : score.getBeatTick());
+				}
+				return FIXW;
+			}
+		},
+		MEASURE {
+			@Override
+			public int getDelta(MMLScore score, JViewport viewport, PianoRollView pianoRollView) {
+				return pianoRollView.convertTicktoX(score.getMeasureTick());
+			}
+			
+		},
+		BEAT {
+			@Override
+			public int getDelta(MMLScore score, JViewport viewport, PianoRollView pianoRollView) {
+				return pianoRollView.convertTicktoX(score.getBeatTick());
+			}
+		},
+		FIX6 {
+			@Override
+			public int getDelta(MMLScore score, JViewport viewport, PianoRollView pianoRollView) {
+				return FIXW;
+			}
+		};
+
+		private final static int FIXW = 6;
+		private final String name;
+		private MouseScrollWidth() {
+			this.name = appText("ui.mouse_scroll_width." + super.name().toLowerCase());
 		}
+
+		@Override
+		public String getButtonName() {
+			return this.name;
+		}
+
+		public abstract int getDelta(MMLScore score, JViewport viewport, PianoRollView pianoRollView);
+	}
+
+	private void scrollH(int rotation, JViewport viewport, Point p) {
+		// 横方向の移動
+		var score = mmlManager.getMMLScore();
+		int delta = MabiIccoProperties.getInstance().mouseScrollWidth.get().getDelta(score, viewport, pianoRollView);
+		p.x += (rotation > 0) ? delta : -delta;
 		p.x = Math.min(Math.max(0, p.x), pianoRollView.getWidth() - viewport.getWidth());
 		scrollPane.getViewport().setViewPosition(p);
 		parent.repaint();
