@@ -51,6 +51,7 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 	@AfterClass
 	public static void cleanup() {
 		MabiIccoProperties.getInstance().enableViewMarker.set(viewMarker);
+		MabiDLS.getInstance().allNoteOff();
 	}
 
 	private MMLSeqView obj;
