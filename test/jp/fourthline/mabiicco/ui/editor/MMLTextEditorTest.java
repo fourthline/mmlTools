@@ -14,6 +14,7 @@ import jp.fourthline.mabiicco.ui.MMLSeqView;
 import jp.fourthline.mmlTools.MMLBuilder;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTrack;
+import jp.fourthline.mmlTools.core.UndefinedTickException;
 
 public class MMLTextEditorTest extends UseLoadingDLS {
 
@@ -31,7 +32,7 @@ public class MMLTextEditorTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void test_edit() {
+	public void test_edit() throws UndefinedTickException {
 		obj.addMMLTrack(new MMLTrack().setMML("MML@rt150cdc;"));
 		obj.addMMLTrack(new MMLTrack());
 		obj.updateActivePart(true);
@@ -49,7 +50,7 @@ public class MMLTextEditorTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void test_cancel() {
+	public void test_cancel() throws UndefinedTickException {
 		obj.addMMLTrack(new MMLTrack().setMML("MML@rt150cdc;"));
 		obj.addMMLTrack(new MMLTrack());
 		obj.updateActivePart(true);

@@ -46,11 +46,12 @@ import javax.swing.text.StyleContext;
 import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.ui.IMMLManager;
 import jp.fourthline.mabiicco.ui.PianoRollView;
+import jp.fourthline.mmlTools.MMLBuilder;
 import jp.fourthline.mmlTools.MMLEventList;
 import jp.fourthline.mmlTools.MMLTempoEvent;
-import jp.fourthline.mmlTools.core.MMLText;
 import jp.fourthline.mmlTools.core.MMLTokenizer;
 import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.optimizer.MMLStringOptimizer;
 import jp.fourthline.mmlTools.parser.MMLFile;
 
 
@@ -92,7 +93,7 @@ public final class MMLTextEditor implements DocumentListener, CaretListener {
 	private final long initialPosition;
 	private final PianoRollView pianoRollView;
 
-	public MMLTextEditor(Frame parentFrame, IMMLManager mmlManager, PianoRollView pianoRollView) {
+	public MMLTextEditor(Frame parentFrame, IMMLManager mmlManager, PianoRollView pianoRollView) throws UndefinedTickException {
 		textPane.setDocument(doc);
 		textPane.addCaretListener(this);
 		textPane.setFont(new Font("Monospaced", Font.PLAIN, 12));
@@ -114,7 +115,10 @@ public final class MMLTextEditor implements DocumentListener, CaretListener {
 		originalTempoList = new ArrayList<>(originalList.getGlobalTempoList());
 
 		int index = mmlManager.getActiveMMLPartIndex();
-		String text = new MMLText().setMMLText(mmlManager.getActiveTrack().getOriginalMML()).getText(index);
+		int startOffset = mmlManager.getActiveTrack().getStartOffset(index);
+		var mmlBuilder = MMLBuilder.create(mmlManager.getActiveMMLPart(), startOffset);
+		// テンポありの汎用出力.
+		String text = new MMLStringOptimizer(mmlBuilder.toMMLString(true, false)).optimizeGen2();
 		textPane.setText(text);
 		applyStyle();
 
@@ -260,9 +264,7 @@ public final class MMLTextEditor implements DocumentListener, CaretListener {
 		try {
 			// 休符も含めたTick長を求める
 			String text = textPane.getText(0, dot);
-			text = MMLFile.toMMLText(text);
-			text = text.replaceAll("R", "c");
-			text = text.replaceAll("r", "c");
+			text = MMLFile.toMMLText(text).replaceAll("R", "c").replaceAll("r", "c");
 			var eventList = new MMLEventList(text);
 			if (pianoRollView != null) {
 				pianoRollView.setSequenceTick(eventList.getTickLength());
