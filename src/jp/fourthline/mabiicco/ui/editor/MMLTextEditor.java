@@ -118,7 +118,7 @@ public final class MMLTextEditor implements DocumentListener, CaretListener {
 		int startOffset = mmlManager.getActiveTrack().getStartOffset(index);
 		var mmlBuilder = MMLBuilder.create(mmlManager.getActiveMMLPart(), startOffset);
 		// テンポありの汎用出力.
-		String text = new MMLStringOptimizer(mmlBuilder.toMMLString(true, false)).optimizeGen2();
+		String text = new MMLStringOptimizer(mmlBuilder.toMMLString(true, false)).optimizeForTextEditor();
 		textPane.setText(text);
 		applyStyle();
 
@@ -260,19 +260,38 @@ public final class MMLTextEditor implements DocumentListener, CaretListener {
 
 	@Override
 	public void caretUpdate(CaretEvent e) {
-		int dot = e.getDot();
 		try {
 			// 休符も含めたTick長を求める
-			String text = textPane.getText(0, dot);
-			text = MMLFile.toMMLText(text).replaceAll("R", "c").replaceAll("r", "c");
-			var eventList = new MMLEventList(text);
+			String text = doc.getText(0, doc.getLength());
+			long tick = tickMMLPosition(text, e.getDot());
 			if (pianoRollView != null) {
-				pianoRollView.setSequenceTick(eventList.getTickLength());
+				pianoRollView.setSequenceTick(tick);
 				mmlManager.updatePianoRollView();
 			}
 			if (parentFrame != null) {
 				parentFrame.repaint();
 			}
 		} catch (BadLocationException e1) {}
+	}
+
+	/**
+	 * MML文字列の位置に対するTickを取得する
+	 * @param mml
+	 * @param pos
+	 * @return
+	 */
+	long tickMMLPosition(String mml, int pos) {
+		StringBuilder sb = new StringBuilder();
+		MMLTokenizer tokenizer = new MMLTokenizer(MMLFile.toMMLText(mml).toLowerCase().replaceAll("r", "c"));
+		while (tokenizer.hasNext()) {
+			String next = tokenizer.next();
+			int end = tokenizer.getEnd();
+			if (end <= pos) {
+				sb.append(next);
+			} else {
+				break;
+			}
+		}
+		return new MMLEventList(sb.toString()).getTickLength();
 	}
 }

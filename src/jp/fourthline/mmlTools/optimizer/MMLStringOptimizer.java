@@ -73,6 +73,16 @@ public final class MMLStringOptimizer {
 	}
 
 	/**
+	 * テキストエディタ用
+	 */
+	public String optimizeForTextEditor() {
+		Optimizer[] optimizerList = {
+				new OxLxFixedOptimizer()
+		};
+		return optimize(optimizerList);
+	}
+
+	/**
 	 * MML最適化 Normal
 	 */
 	private String optimize() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2022 たんらる
+ * Copyright (C) 2013-2023 たんらる
  */
 
 package jp.fourthline.mmlTools.core;
@@ -42,6 +42,14 @@ public final class MMLTokenizer implements Iterator<String> {
 	public void remove() {
 		startIndex = 0;
 		endIndex = 0;
+	}
+
+	public int getStart() {
+		return startIndex;
+	}
+
+	public int getEnd() {
+		return endIndex;
 	}
 
 	/**

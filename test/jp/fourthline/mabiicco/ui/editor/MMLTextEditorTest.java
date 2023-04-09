@@ -66,4 +66,24 @@ public class MMLTextEditorTest extends UseLoadingDLS {
 		assertEquals(obj.getMMLScore().getTrack(0).getGlobalTempoList(), obj.getMMLScore().getTrack(1).getGlobalTempoList());
 		assertEquals(obj.getMMLScore().getTrack(0).getGlobalTempoList(), obj.getMMLScore().getTrack(2).getGlobalTempoList());
 	}
+
+	@Test
+	public void test_mmlPos() throws UndefinedTickException {
+		var editor = new MMLTextEditor(null, obj, null);
+		String mml = "rr16r32.>cc16.c32.";
+		assertEquals(0, editor.tickMMLPosition(mml, -1));
+		assertEquals(0, editor.tickMMLPosition(mml, 0));
+		assertEquals(96, editor.tickMMLPosition(mml, 1));
+		assertEquals(96, editor.tickMMLPosition(mml, 3));
+		assertEquals(96+24, editor.tickMMLPosition(mml, 4));
+		assertEquals(96+24, editor.tickMMLPosition(mml, 7));
+		assertEquals(96+24+18, editor.tickMMLPosition(mml, 8));
+		assertEquals(96+24+18, editor.tickMMLPosition(mml, 9));
+		assertEquals(96+24+18+96, editor.tickMMLPosition(mml, 10));
+		assertEquals(96+24+18+96, editor.tickMMLPosition(mml, 13));
+		assertEquals(96+24+18+96+36, editor.tickMMLPosition(mml, 14));
+		assertEquals(96+24+18+96+36, editor.tickMMLPosition(mml, 17));
+		assertEquals(96+24+18+96+36+18, editor.tickMMLPosition(mml, 18));
+		assertEquals(96+24+18+96+36+18, editor.tickMMLPosition(mml, 1000));
+	}
 }
