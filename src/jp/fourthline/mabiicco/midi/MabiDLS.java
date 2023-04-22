@@ -357,7 +357,10 @@ public final class MabiDLS {
 			return;
 		}
 		updateMidiControl(score);
-		setMute(trackIndex, false);
+
+		// Mute設定は変更せず, 一時的にチャンネルのミュートを解除する
+		this.channel[channel].setMute(false); // TODO: ミュート & エレキギター/チェロ/ヴァイオリンなどのチャネルだと、残音が残ってしまう.
+
 		setTrackPanpot(trackIndex, 64);
 		setTrackVolume(trackIndex, MMLTrack.INITIAL_VOLUME);
 		MMLNoteEvent[] playNoteEvents = this.playNoteList.get(channel);
