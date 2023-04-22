@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2022 たんらる
+ * Copyright (C) 2015-2023 たんらる
  */
 
 package jp.fourthline.mabiicco.midi;
@@ -9,6 +9,8 @@ import static org.junit.Assert.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
+import java.util.function.Supplier;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MetaMessage;
@@ -42,20 +44,20 @@ public class MabiDLSTest extends UseLoadingDLS {
 	private void checkPanpot(int trackIndex, int midiChannel) {
 		System.out.println("checkPanpot "+trackIndex+" @ "+midiChannel);
 		assertEquals(64, dls.getSynthesizer().getChannels()[midiChannel].getController(10));
-		assertEquals(64, dls.getSynthesizer().getChannels()[midiChannel+24].getController(10));
-		dls.setChannelPanpot(trackIndex, 0);
+		assertEquals(64, dls.getSynthesizer().getChannels()[midiChannel+3].getController(10));
+		dls.setTrackPanpot(trackIndex, 0);
 		assertEquals(0, dls.getSynthesizer().getChannels()[midiChannel].getController(10));
-		assertEquals(0, dls.getSynthesizer().getChannels()[midiChannel+24].getController(10));
-		dls.setChannelPanpot(trackIndex, 64);
+		assertEquals(0, dls.getSynthesizer().getChannels()[midiChannel+3].getController(10));
+		dls.setTrackPanpot(trackIndex, 64);
 		assertEquals(64, dls.getSynthesizer().getChannels()[midiChannel].getController(10));
-		assertEquals(64, dls.getSynthesizer().getChannels()[midiChannel+24].getController(10));
+		assertEquals(64, dls.getSynthesizer().getChannels()[midiChannel+3].getController(10));
 	}
 
 	@Test
 	public final void test() {
 		for (int i = 0; i < 24; i++) {
 			checkMute(i, i);
-			checkPanpot(i, i);
+			checkPanpot(i, i*MabiDLS.MAX_CHANNEL_PLAY_NOTE);
 		}
 	}
 
@@ -71,7 +73,7 @@ public class MabiDLSTest extends UseLoadingDLS {
 		MMLScore score = new MMLScore();
 		score.addTrack(new MMLTrack().setMML("MML@aat180aa,brb,crc,drd;").setProgram(5));
 		score.getTrack(0).setSongProgram(100);
-		Sequence seq = dls.createSequence(score, 1, true, false, true);
+		Sequence seq = dls.createSequenceForPlay(score);
 		assertEquals(3, seq.getTracks().length);
 		assertEquals(MMLTicks.getTick("1"), seq.getTickLength());
 
@@ -115,14 +117,26 @@ public class MabiDLSTest extends UseLoadingDLS {
 	public void test_createSequence2() throws InvalidMidiDataException, UndefinedTickException {
 		MMLScore score = new MMLScore();
 		score.addTrack(new MMLTrack().setMML("MML@aart180a;"));
-		Sequence seq = dls.createSequence(score, 1, true, false, true);
+		Sequence seq = dls.createSequenceForPlay(score);
 		assertEquals(2, seq.getTracks().length);
 		assertEquals(MMLTicks.getTick("1"), seq.getTickLength());
 
 		score.getTrack(0).getMMLEventAtIndex(0).getMMLNoteEventList().remove(2);
-		seq = dls.createSequence(score, 1, false, false, true);
+		seq = dls.createSequenceForMidi(score);
 		assertEquals(2, seq.getTracks().length);
 		assertEquals(MMLTicks.getTick("2"), seq.getTickLength());
+	}
+
+	@Test
+	public void test_createSequenceGen2() throws InvalidMidiDataException, UndefinedTickException {
+		MMLScore score = new MMLScore();
+		score.addTrack(new MMLTrack().setMML("MML@aart180a,cccc,dddd;"));
+		score.addTrack(new MMLTrack().setMML("MML@aart180a,cccc,dddd;"));
+		Sequence seq = dls.createSequenceOnSepChannel(score);
+		assertEquals(7, seq.getTracks().length);
+		var m = seq.getTracks()[6].get(0).getMessage();
+		assertEquals(true, m instanceof ExtendMessage);
+		assertEquals(6, ((ExtendMessage)m).getChannel());
 	}
 
 	@Test
@@ -130,37 +144,56 @@ public class MabiDLSTest extends UseLoadingDLS {
 		MMLScore score = new MMLScore();
 		score.addTrack(new MMLTrack().setMML("MML@aa,,,dd;"));
 		score.getTrack(0).setSongProgram(121);
-		Sequence seq = dls.createSequence(score, 1, true, false, true);
 
-		// 遅延補正なし
-		assertEquals(3, seq.getTracks().length);
-		assertEquals(192, seq.getTracks()[1].ticks());
-		assertEquals(1, seq.getTracks()[1].get(1).getTick());
-		assertEquals(96, seq.getTracks()[1].get(2).getTick());
-		assertEquals(97, seq.getTracks()[1].get(3).getTick());
-		assertEquals(192, seq.getTracks()[1].get(4).getTick());
-		assertEquals(192, seq.getTracks()[2].ticks());
-		assertEquals(1, seq.getTracks()[2].get(1).getTick());
-		assertEquals(96, seq.getTracks()[2].get(2).getTick());
-		assertEquals(97, seq.getTracks()[2].get(3).getTick());
-		assertEquals(192, seq.getTracks()[2].get(4).getTick());
+		Supplier<Sequence> f1 = () -> {
+			try {
+				return dls.createSequenceForPlay(score);
+			} catch (InvalidMidiDataException e) {
+				return null;
+			}
+		};
+		Supplier<Sequence> f2 = () -> {
+			try {
+				return dls.createSequenceOnSepChannel(score);
+			} catch (InvalidMidiDataException e) {
+				return null;
+			}
+		};
 
-		// 遅延補正あり
-		score.getTrack(0).setAttackDelayCorrect(-6);
-		score.getTrack(0).setAttackSongDelayCorrect(-12);
-		seq = dls.createSequence(score, 1, true, false, true);
+		for (var func : List.of(f1, f2)) {
+			score.getTrack(0).setAttackDelayCorrect(0);
+			score.getTrack(0).setAttackSongDelayCorrect(0);
+			Sequence seq = func.get();
+			// 遅延補正なし
+			assertEquals(3, seq.getTracks().length);
+			assertEquals(192, seq.getTracks()[1].ticks());
+			assertEquals(1, seq.getTracks()[1].get(1).getTick());
+			assertEquals(96, seq.getTracks()[1].get(2).getTick());
+			assertEquals(97, seq.getTracks()[1].get(3).getTick());
+			assertEquals(192, seq.getTracks()[1].get(4).getTick());
+			assertEquals(192, seq.getTracks()[2].ticks());
+			assertEquals(1, seq.getTracks()[2].get(1).getTick());
+			assertEquals(96, seq.getTracks()[2].get(2).getTick());
+			assertEquals(97, seq.getTracks()[2].get(3).getTick());
+			assertEquals(192, seq.getTracks()[2].get(4).getTick());
 
-		assertEquals(3, seq.getTracks().length);
-		assertEquals(192-6, seq.getTracks()[1].ticks());
-		assertEquals(1, seq.getTracks()[1].get(1).getTick());
-		assertEquals(96-6, seq.getTracks()[1].get(2).getTick());
-		assertEquals(97-6, seq.getTracks()[1].get(3).getTick());
-		assertEquals(192-6, seq.getTracks()[1].get(4).getTick());
-		assertEquals(192-12, seq.getTracks()[2].ticks());
-		assertEquals(1, seq.getTracks()[2].get(1).getTick());
-		assertEquals(96-12, seq.getTracks()[2].get(2).getTick());
-		assertEquals(97-12, seq.getTracks()[2].get(3).getTick());
-		assertEquals(192-12, seq.getTracks()[2].get(4).getTick());
+			// 遅延補正あり
+			score.getTrack(0).setAttackDelayCorrect(-6);
+			score.getTrack(0).setAttackSongDelayCorrect(-12);
+			seq = func.get();
+
+			assertEquals(3, seq.getTracks().length);
+			assertEquals(192-6, seq.getTracks()[1].ticks());
+			assertEquals(1, seq.getTracks()[1].get(1).getTick());
+			assertEquals(96-6, seq.getTracks()[1].get(2).getTick());
+			assertEquals(97-6, seq.getTracks()[1].get(3).getTick());
+			assertEquals(192-6, seq.getTracks()[1].get(4).getTick());
+			assertEquals(192-12, seq.getTracks()[2].ticks());
+			assertEquals(1, seq.getTracks()[2].get(1).getTick());
+			assertEquals(96-12, seq.getTracks()[2].get(2).getTick());
+			assertEquals(97-12, seq.getTracks()[2].get(3).getTick());
+			assertEquals(192-12, seq.getTracks()[2].get(4).getTick());
+		}
 	}
 
 	@Test

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2022 たんらる
+ * Copyright (C) 2013-2023 たんらる
  */
 
 package jp.fourthline.mabiicco.midi;
@@ -39,10 +39,10 @@ public final class MabiDLS {
 	private Sequencer sequencer;
 	private MidiChannel[] channel;
 	private final ArrayList<MMLNoteEvent[]> playNoteList = new ArrayList<>();
-	private static final int MAX_CHANNEL_PLAY_NOTE = 4;
-	private static final int MAX_MIDI_PART = MMLScore.MAX_TRACK * 2;
-	private static final int MIDI_CHORUS_OFFSET = MMLScore.MAX_TRACK;
-	public static final int KEYBOARD_PLAY_CHANNEL = MAX_MIDI_PART;
+	public static final int MAX_CHANNEL_PLAY_NOTE = 4;
+	private static final int CHORUS_INDEX = 3;
+	private static final int NUM_CHANNEL_ON_TRACK = 4;
+	private static final int MAX_MIDI_PART = MMLScore.MAX_TRACK * NUM_CHANNEL_ON_TRACK;
 	private final ArrayList<InstClass> insts = new ArrayList<>();
 	private final Map<File, List<InstClass>> instsMap = new TreeMap<>();
 	private static final int DLS_BANK = (0x79 << 7);
@@ -56,7 +56,7 @@ public final class MabiDLS {
 	};
 
 	private final ArrayList<Runnable> notifier = new ArrayList<>();
-	private final boolean[] muteState = new boolean[ MAX_MIDI_PART+1 ];
+	private final boolean[] muteState = new boolean[ MMLScore.MAX_TRACK ];
 	private WavoutDataLine wavout;
 	private boolean allLoaded = false;
 
@@ -75,7 +75,7 @@ public final class MabiDLS {
 	public void initializeMIDI() throws MidiUnavailableException, InvalidMidiDataException, IOException, LineUnavailableException {
 		this.synthesizer = MidiSystem.getSynthesizer();
 		HashMap<String, Object> info = new HashMap<>();
-		info.put("midi channels", MAX_MIDI_PART+1);
+		info.put("midi channels", MAX_MIDI_PART);
 		info.put("large mode", "true");
 		info.put("load default soundbank", "false");
 		info.put("max polyphony", "96");
@@ -143,7 +143,7 @@ public final class MabiDLS {
 		try {
 			MabiDLS.getInstance().loadRequiredInstruments(mmlScore);
 			Sequencer sequencer = MabiDLS.getInstance().getSequencer();
-			Sequence sequence = createSequence(mmlScore);
+			Sequence sequence = createSequenceOnSepChannel(mmlScore);
 			sequencer.setSequence(sequence);
 			this.startTick = startTick;
 			this.startTempo = mmlScore.getTempoOnTick(startTick);
@@ -324,18 +324,31 @@ public final class MabiDLS {
 	}
 
 	/**
+	 * トラックIndexとパートIndexからチャンネル番号を得る.
+	 * @param trackIndex
+	 * @param partIndex
+	 * @return
+	 */
+	private int getChannel(int trackIndex, int partIndex) {
+		return trackIndex * NUM_CHANNEL_ON_TRACK + partIndex;
+	}
+
+	/**
 	 * 単音再生
 	 */
-	public void playNote(int note, int program, int channel, int velocity) {
+	public void playNote(MMLScore score, int note, int velocity, int trackIndex, int partIndex) {
+		int channel = getChannel(trackIndex, partIndex);
 		MMLNoteEvent playNote = this.playNoteList.get(channel)[0];
 		if ( (playNote == null) || (playNote.getNote() != note) ) {
 			playNote = new MMLNoteEvent(note, 0, 0, velocity);
 		}
-		playNotes(new MMLNoteEvent[] { playNote }, program, channel);
+		playNotes(score, new MMLNoteEvent[] { playNote }, trackIndex, partIndex);
 	}
 
 	/** 和音再生 */
-	public void playNotes(MMLNoteEvent[] noteList, int program, int channel) {
+	public void playNotes(MMLScore score, MMLNoteEvent[] noteList, int trackIndex, int partIndex) {
+		int channel = getChannel(trackIndex, partIndex);
+
 		/* シーケンサによる再生中は鳴らさない */
 		if (sequencer.isRunning()) {
 			return;
@@ -343,12 +356,13 @@ public final class MabiDLS {
 		if (channel >= this.channel.length) {
 			return;
 		}
-		changeProgram(program, channel);
-		this.channel[channel].setMute(false); // TODO: ミュート & エレキギター/チェロ/ヴァイオリンなどのチャネルだと、残音が残ってしまう.
-		setChannelPanpot(channel, 64);
-		setChannelVolume(channel, MMLTrack.INITIAL_VOLUME);
-		MidiChannel midiChannel = this.channel[channel];
+		updateMidiControl(score);
+		setMute(trackIndex, false);
+		setTrackPanpot(trackIndex, 64);
+		setTrackVolume(trackIndex, MMLTrack.INITIAL_VOLUME);
 		MMLNoteEvent[] playNoteEvents = this.playNoteList.get(channel);
+		MidiChannel midiChannel = this.channel[channel];
+		int program = midiChannel.getProgram();
 
 		for (int i = 0; i < playNoteEvents.length; i++) {
 			MMLNoteEvent note = null;
@@ -373,75 +387,97 @@ public final class MabiDLS {
 		}
 	}
 
-	private void changeProgram(int program, int ch) {
-		if ((program & InstClass.DRUM) != 0) {
-			channel[ch].programChange(DRUM_BANK, (program - InstClass.DRUM));
-		} else {
-			channel[ch].programChange(DLS_BANK, program);
+	/**
+	 * 歌パートのプログラム番号を選択する
+	 * @param program
+	 * @param songProgram
+	 * @return
+	 */
+	public int selectSongProgram(int program, int songProgram) {
+		int ret = program;
+		if ((getInstByProgram(program).getType() != InstType.VOICE) && (songProgram >= 0)) {
+			ret = songProgram;
 		}
+		return ret;
 	}
 
-	public int getChannelProgram(int ch) {
-		if ( (0 >= ch) && (ch < channel.length) ) {
-			return channel[ch].getProgram();
+	private void changeProgram(int trackIndex, int program, int songProgram) {
+		int bank = DLS_BANK;
+
+		if ((program & InstClass.DRUM) != 0) {
+			bank = DRUM_BANK;
+			program -= InstClass.DRUM;
 		}
-		return -1;
+		int chorusChannel = getChannel(trackIndex, CHORUS_INDEX);
+		for (int i = getChannel(trackIndex, 0); i < chorusChannel; i++) {
+			channel[i].programChange(bank, program);
+		}
+
+		channel[chorusChannel].programChange(DLS_BANK, selectSongProgram(program, songProgram));
 	}
 
 	/**
-	 * 指定したチャンネルのパンポットを設定します.
-	 * @param ch
+	 * 指定したトラックのパンポットを設定します.
+	 * @param trackIndex
 	 * @param panpot
 	 */
-	public void setChannelPanpot(int ch, int panpot) {
-		if (ch < channel.length) {
-			channel[ch].controlChange(10, panpot);
+	public void setTrackPanpot(int trackIndex, int panpot) {
+		if ( (trackIndex < 0) || (trackIndex >= MMLScore.MAX_TRACK) ) {
+			throw new IllegalArgumentException("trackIndex: " + trackIndex);
 		}
-		if (ch < MIDI_CHORUS_OFFSET) {
-			channel[ch+MIDI_CHORUS_OFFSET].controlChange(10, panpot);
+
+		for (int i = getChannel(trackIndex, 0); i < getChannel(trackIndex+1, 0); i++) {
+			channel[i].controlChange(10, panpot);
 		}
 	}
 
 	/**
-	 * 指定したチャンネルのメイン・ボリュームを設定します.
-	 * @param ch
+	 * 指定したトラックのメイン・ボリュームを設定します.
+	 * @param trackIndex
 	 * @param volume
 	 */
-	public void setChannelVolume(int ch, int volume) {
-		if (ch < channel.length) {
-			channel[ch].controlChange(7, volume);
+	public void setTrackVolume(int trackIndex, int volume) {
+		if ( (trackIndex < 0) || (trackIndex >= MMLScore.MAX_TRACK) ) {
+			throw new IllegalArgumentException("trackIndex: " + trackIndex);
 		}
-		if (ch < MIDI_CHORUS_OFFSET) {
-			channel[ch+MIDI_CHORUS_OFFSET].controlChange(7, volume);
+
+		for (int i = getChannel(trackIndex, 0); i < getChannel(trackIndex+1, 0); i++) {
+			channel[i].controlChange(7, volume);
 		}
 	}
 
-	public void toggleMute(int ch) {
-		muteState[ch] = !muteState[ch];
-		if (ch < MIDI_CHORUS_OFFSET) {
-			muteState[ch+MIDI_CHORUS_OFFSET] = muteState[ch];
+	public void toggleMute(int trackIndex) {
+		if ( (trackIndex < 0) || (trackIndex >= MMLScore.MAX_TRACK) ) {
+			throw new IllegalArgumentException("trackIndex: " + trackIndex);
 		}
+
+		muteState[trackIndex] = !muteState[trackIndex];
 		midiSetMuteState();
 	}
 
-	public void setMute(int ch, boolean mute) {
-		muteState[ch] = mute;
-		if (ch < MIDI_CHORUS_OFFSET) {
-			muteState[ch+MIDI_CHORUS_OFFSET] = muteState[ch];
+	public void setMute(int trackIndex, boolean mute) {
+		if ( (trackIndex < 0) || (trackIndex >= MMLScore.MAX_TRACK) ) {
+			throw new IllegalArgumentException("trackIndex: " + trackIndex);
 		}
+
+		muteState[trackIndex] = mute;
 		midiSetMuteState();
 	}
 
-	public boolean getMute(int ch) {
-		return muteState[ch];
+	public boolean getMute(int trackIndex) {
+		if ( (trackIndex < 0) || (trackIndex >= MMLScore.MAX_TRACK) ) {
+			throw new IllegalArgumentException("trackIndex: " + trackIndex);
+		}
+		return muteState[trackIndex];
 	}
 
-	public void solo(int ch) {
+	public void solo(int trackIndex) {
+		if ( (trackIndex < 0) || (trackIndex >= MMLScore.MAX_TRACK) ) {
+			throw new IllegalArgumentException("trackIndex: " + trackIndex);
+		}
+
 		for (int i = 0; i < muteState.length; i++) {
-			muteState[i] = (i != ch);
-		}
-		if (ch < MIDI_CHORUS_OFFSET) {
-			muteState[ch+MIDI_CHORUS_OFFSET] = muteState[ch];
+			muteState[i] = (i != trackIndex);
 		}
 		midiSetMuteState();
 	}
@@ -455,30 +491,38 @@ public final class MabiDLS {
 
 	/** MIDIにMuteStateを反映する. */
 	private void midiSetMuteState() {
-		for (int i = 0; i < channel.length; i++) {
-			channel[i].setMute(muteState[i]);
+		for (int i = 0; i < muteState.length; i++) {
+			for (int chIndex = getChannel(i, 0); chIndex < getChannel(i+1, 0); chIndex++) {
+				channel[chIndex].setMute(muteState[i]);
+			}
 		}
 	}
 
 	public void updateMidiControl(MMLScore score) {
 		int trackCount = 0;
 		for (MMLTrack mmlTrack : score.getTrackList()) {
-			this.setChannelPanpot(trackCount, mmlTrack.getPanpot());
-			this.setChannelPanpot(trackCount+MIDI_CHORUS_OFFSET, mmlTrack.getPanpot());
-			this.setChannelVolume(trackCount, mmlTrack.getVolume());
-			this.setChannelVolume(trackCount+MIDI_CHORUS_OFFSET, mmlTrack.getVolume());
-			this.changeProgram(mmlTrack.getProgram(), trackCount);
-			this.changeProgram(mmlTrack.getSongProgram(), trackCount+MIDI_CHORUS_OFFSET);
+			this.setTrackPanpot(trackCount, mmlTrack.getPanpot());
+			this.setTrackVolume(trackCount, mmlTrack.getVolume());
+			this.changeProgram(trackCount, mmlTrack.getProgram(), mmlTrack.getSongProgram());
 			trackCount++;
 		}
 	}
 
 	/**
 	 * MIDIシーケンスを作成します。
+	 * チャンネル構成変更後したので使用できない。
 	 * @throws InvalidMidiDataException 
 	 */
-	public Sequence createSequence(MMLScore score) throws InvalidMidiDataException {
+	public Sequence createSequenceForPlay(MMLScore score) throws InvalidMidiDataException {
 		return createSequence(score, 1, true, false, true);
+	}
+
+	/**
+	 * MIDIシーケンスを作成します。
+	 * @throws InvalidMidiDataException 
+	 */
+	public Sequence createSequenceForMidi(MMLScore score) throws InvalidMidiDataException {
+		return createSequence(score, 0, false, true, false);
 	}
 
 	/**
@@ -490,7 +534,7 @@ public final class MabiDLS {
 	 * @return
 	 * @throws InvalidMidiDataException
 	 */
-	public Sequence createSequence(MMLScore score, int startOffset, boolean attackDelayCorrect, boolean withMeta, boolean withMute) throws InvalidMidiDataException {
+	private Sequence createSequence(MMLScore score, int startOffset, boolean attackDelayCorrect, boolean withMeta, boolean withMute) throws InvalidMidiDataException {
 		Sequence sequence = new Sequence(Sequence.PPQ, MMLTickTable.TPQN);
 		int totalTick = score.getTotalTickLength();
 		Track track = sequence.createTrack();
@@ -518,12 +562,60 @@ public final class MabiDLS {
 		for (MMLTrack mmlTrack : score.getTrackList()) {
 			convertMidiTrack(sequence.createTrack(), mmlTrack, trackCount, mmlTrack.getProgram(), startOffset, attackDelayCorrect, withMeta, withMute);
 			if (mmlTrack.getSongProgram() >= 0) {
-				convertMidiTrack(sequence.createTrack(), mmlTrack, trackCount+MIDI_CHORUS_OFFSET, mmlTrack.getSongProgram(), startOffset, attackDelayCorrect, withMeta, withMute);
+				convertMidiTrack(sequence.createTrack(), mmlTrack, trackCount+MMLScore.MAX_TRACK, mmlTrack.getSongProgram(), startOffset, attackDelayCorrect, withMeta, withMute);
 			}
 			trackCount++;
 			if (trackCount >= this.channel.length) {
 				break;
 			}
+		}
+
+		return sequence;
+	}
+
+	/**
+	 * 全パートを単独チャンネルで鳴らすシーケンスを作成する
+	 * @param score
+	 * @return
+	 * @throws InvalidMidiDataException
+	 */
+	public Sequence createSequenceOnSepChannel(MMLScore score) throws InvalidMidiDataException {
+		Sequence sequence = new Sequence(Sequence.PPQ, MMLTickTable.TPQN);
+		int totalTick = score.getTotalTickLength();
+		Track track = sequence.createTrack();
+
+		// グローバルテンポ
+		List<MMLTempoEvent> globalTempoList = score.getTempoEventList();
+		for (MMLTempoEvent tempoEvent : globalTempoList) {
+			byte[] tempo = tempoEvent.getMetaData();
+			int tickOffset = tempoEvent.getTickOffset();
+			if (tickOffset >= totalTick) {
+				break;
+			}
+			track.add(new MidiEvent(new MetaMessage(MMLTempoEvent.META, tempo, tempo.length), tickOffset));
+		}
+
+		int trackIndex = 0;
+		for (MMLTrack mmlTrack : score.getTrackList()) {
+			for (int i = 0; i < NUM_CHANNEL_ON_TRACK; i++) {
+				int program = mmlTrack.getProgram();
+				if ((i == CHORUS_INDEX) && (mmlTrack.getSongProgram() >= 0)) {
+					program = mmlTrack.getSongProgram();
+				}
+				boolean[] enablePart = InstClass.getEnablePartByProgram(program);
+				if (enablePart[i]) {
+					var eventList = mmlTrack.getMMLEventAtIndex(i).getMMLNoteEventList();
+					if (eventList.size() > 0) {
+						int channel = getChannel(trackIndex, i);
+						var instClass = getInstByProgram(program);
+						MMLMidiTrack midiTrack = new MMLMidiTrack(instClass);
+						midiTrack.setAttackDelayCorrect(mmlTrack.getAttackDelayCorrect(i));
+						midiTrack.add(eventList);
+						convertMidiPart(sequence.createTrack(), midiTrack.getNoteEventList(), channel, instClass, 1, true);
+					}
+				}
+			}
+			trackIndex++;
 		}
 
 		return sequence;
@@ -543,13 +635,6 @@ public final class MabiDLS {
 			track.add(new MidiEvent(nameMessage, 0));
 		}
 
-		// Program Change
-		ShortMessage pcMessage = new ExtendMessage(ShortMessage.PROGRAM_CHANGE, 
-				channel,
-				targetProgram & 0xff,
-				0);
-		track.add(new MidiEvent(pcMessage, 0));
-
 		boolean[] enablePart = InstClass.getEnablePartByProgram(targetProgram);
 		InstClass instClass = getInstByProgram(targetProgram);
 		MMLMidiTrack midiTrack = new MMLMidiTrack(instClass);
@@ -565,8 +650,16 @@ public final class MabiDLS {
 		convertMidiPart(track, midiTrack.getNoteEventList(), channel, instClass, startOffset, withMute);
 	}
 
-	private void convertMidiPart(Track track, List<MMLNoteEvent> eventList, int channel, InstClass inst, int startOffset, boolean withMute) {
+	private void convertMidiPart(Track track, List<MMLNoteEvent> eventList, int channel, InstClass inst, int startOffset, boolean withMute) throws InvalidMidiDataException {
 		int velocity = MMLNoteEvent.INIT_VOL;
+		int targetProgram = inst.getProgram();
+
+		// Program Change
+		ShortMessage pcMessage = new ExtendMessage(ShortMessage.PROGRAM_CHANGE, 
+				channel,
+				targetProgram & 0xff,
+				0);
+		track.add(new MidiEvent(pcMessage, 0));
 
 		// Noteイベントの変換
 		for ( MMLNoteEvent noteEvent : eventList ) {

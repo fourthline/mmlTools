@@ -130,7 +130,9 @@ public final class MabiIccoProperties {
 	public final Property<Boolean> uiscaleDisable = new BooleanProperty("ui.scale_disable", false);
 
 	/** Overlap mode */
-	public final IndexProperty<OverlapMode> overlapMode = new IndexProperty<>("function.overlap_mode", OverlapMode.values(), OverlapMode.INST);
+	/* 2023/04/19 のアップデートにより、重複音が問題なくできるようになったので固定値へ変更 */
+//	public final IndexProperty<OverlapMode> overlapMode = new IndexProperty<>("function.overlap_mode", OverlapMode.values(), OverlapMode.INST);
+	public final Property<OverlapMode> overlapMode = new FixedProperty<>(OverlapMode.ALL);
 
 	/** 内蔵音源を使用する */
 	public final Property<Boolean> useDefaultSoundBank = new BooleanProperty("function.use_default_soundbank", false);
@@ -266,6 +268,23 @@ public final class MabiIccoProperties {
 	public interface Property<T> {
 		void set(T value);
 		T get();
+	}
+
+	public static class FixedProperty<T> implements Property<T> {
+		private final T value;
+		private FixedProperty(T v) {
+			value = v;
+		}
+
+		@Override
+		public void set(T value) {
+			throw new AssertionError();
+		}
+
+		@Override
+		public T get() {
+			return value;
+		}
 	}
 
 	/**

@@ -795,8 +795,8 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 		MMLTrack track = getSelectedTrack();
 		if (view != null) {
 			int part = view.getSelectedMMLPartIndex();
-			if ( (part == 3) && (track.getSongProgram() >= 0) ) {
-				return track.getSongProgram();
+			if (part == 3) {
+				return MabiDLS.getInstance().selectSongProgram(track.getProgram(), track.getSongProgram());
 			}
 
 			return track.getProgram();

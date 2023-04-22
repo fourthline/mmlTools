@@ -44,7 +44,6 @@ public final class MMLMidiTrackTest extends UseLoadingDLS {
 		var track = new MMLTrack().setMML("MML@c1c2,v12rc,v13r1c;");
 		var midiTrack = new MMLMidiTrack(dls.getInstByProgram(0));
 
-
 		for (var eventList : track.getMMLEventList()) {
 			midiTrack.add(eventList.getMMLNoteEventList());
 		}
@@ -52,7 +51,8 @@ public final class MMLMidiTrackTest extends UseLoadingDLS {
 		ArrayList<MMLNoteEvent> list = new ArrayList<>();
 		list.add(new MMLNoteEvent(48, 384, 0));
 		list.add(new MMLNoteEvent(48, 96, 96, 12));
-		list.add(new MMLNoteEvent(48, 96, 384, 8));
+		list.add(new MMLNoteEvent(48, 192, 384, 8));
+		list.add(new MMLNoteEvent(48, 96, 384, 13));
 
 		assertEquals(list, midiTrack.getNoteEventList());
 	}

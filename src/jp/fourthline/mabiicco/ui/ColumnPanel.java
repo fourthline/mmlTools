@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2022 たんらる
+ * Copyright (C) 2013-2023 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
@@ -310,13 +310,15 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 			int trackIndex = 0;
 			List<MMLNoteEvent[]> noteListArray = score.getNoteListOnTickOffset(tick);
 			for (MMLNoteEvent[] noteList : noteListArray) {
-				int program = score.getTrack(trackIndex).getProgram();
-				if (x < 0) {
-					dls.playNotes(null, program, trackIndex);
-				} else {
-					dls.playNotes(noteList, program, trackIndex);
+				int partIndex = 0;
+				for (MMLNoteEvent noteEvent : noteList) {
+					if (x < 0) {
+						dls.playNotes(score, null, trackIndex, partIndex);
+					} else {
+						dls.playNotes(score, new MMLNoteEvent[] { noteEvent }, trackIndex, partIndex);
+					}
+					partIndex++;
 				}
-
 				trackIndex++;
 			}
 		}

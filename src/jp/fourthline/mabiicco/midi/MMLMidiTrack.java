@@ -37,6 +37,10 @@ public final class MMLMidiTrack {
 		this.attackDelayCorrect = attackDelayCorrect;
 	}
 
+	public void clear() {
+		noteEventList.clear();
+	}
+
 	public void add(List<MMLNoteEvent> list) {
 		for (MMLNoteEvent noteEvent : list) {
 			addItem(noteEvent.clone());

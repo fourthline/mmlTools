@@ -26,6 +26,8 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 	private static final long serialVersionUID = -3850112420986284800L;
 
 	private int[] playNote = null;
+	private int playTrackIndex = 0;
+	private int playPartIndex = 0;
 	private final int width = 60;
 	private final int DEFAULT_VELOCITY = 11;
 	private final IMMLManager mmlManager;
@@ -230,7 +232,6 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 			offNote();
 			return;
 		}
-		playNote = note;
 		MMLNoteEvent[] noteEvent = new MMLNoteEvent[note.length];
 		for (int i = 0; i < note.length; i++) {
 			noteEvent[i] = new MMLNoteEvent(note[i], 0, 0, velocity);
@@ -238,9 +239,16 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 
 		MabiDLS dls = MabiDLS.getInstance();
 		if (!dls.getSequencer().isRunning()) {
-			int program = mmlManager.getActivePartProgram();
+			int trackIndex = mmlManager.getActiveTrackIndex();
+			int partIndex = mmlManager.getActiveMMLPartIndex();
+			if ((playTrackIndex != trackIndex) || (playPartIndex != partIndex)) {
+				offNote();
+			}
 			dls.loadRequiredInstruments(mmlManager.getMMLScore());
-			dls.playNotes(noteEvent, program, MabiDLS.KEYBOARD_PLAY_CHANNEL);
+			dls.playNotes(mmlManager.getMMLScore(), noteEvent, trackIndex, partIndex);
+			playNote = note;
+			playTrackIndex = trackIndex;
+			playPartIndex = partIndex;
 		}
 
 		repaint();
@@ -249,9 +257,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 	@Override
 	public void offNote() {
 		playNote = null;
-		int program = mmlManager.getActivePartProgram();
-		MabiDLS.getInstance().playNote(Integer.MIN_VALUE, program, MabiDLS.KEYBOARD_PLAY_CHANNEL, 0);
-
+		MabiDLS.getInstance().playNote(mmlManager.getMMLScore(), Integer.MIN_VALUE, 0, playTrackIndex, playPartIndex);
 		repaint();
 	}
 

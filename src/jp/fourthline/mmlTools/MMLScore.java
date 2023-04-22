@@ -307,11 +307,7 @@ public final class MMLScore implements Cloneable {
 			int partIndex = 0;
 			MMLNoteEvent[] noteList = new MMLNoteEvent[4];
 			for (MMLEventList eventList : track.getMMLEventList()) {
-				if (partIndex == 3) {
-					continue;
-				}
-				noteList[partIndex] = eventList.searchOnTickOffset(tick);
-				partIndex++;
+				noteList[partIndex++] = eventList.searchOnTickOffset(tick);
 			}
 			noteListArray.add(noteList);
 		}

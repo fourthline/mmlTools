@@ -551,7 +551,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		File file = showSaveDialog(exportFileChooser, "mid");
 		if (file != null) {
 			try {
-				MidiSystem.write(MabiDLS.getInstance().createSequence(mmlSeqView.getMMLScore(), 0, false, true, false), 1, file);
+				MidiSystem.write(MabiDLS.getInstance().createSequenceForMidi(mmlSeqView.getMMLScore()), 1, file);
 			} catch (IOException | InvalidMidiDataException e) {
 				JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
 			}
