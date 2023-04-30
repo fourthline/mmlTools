@@ -738,6 +738,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		for (int i = 0; i < fileHistory.length; i++) {
 			if ( (i < fileList.length) && (fileList[i] != null) ) {
 				fileHistory[i].setText( (i+1) + " " + fileList[i].getName() );
+				fileHistory[i].setToolTipText(fileList[i].getAbsolutePath());
 				fileHistory[i].set(i);
 				fileHistory[i].setVisible(true);
 			} else {

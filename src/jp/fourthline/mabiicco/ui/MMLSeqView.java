@@ -826,6 +826,9 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 	}
 
 	public void mmlTextEditor() {
+		if (MabiDLS.getInstance().getSequencer().isRunning()) {
+			return;
+		}
 		try {
 			new MMLTextEditor(parentFrame, this, pianoRollView).showDialog();
 		} catch (UndefinedTickException e) {
