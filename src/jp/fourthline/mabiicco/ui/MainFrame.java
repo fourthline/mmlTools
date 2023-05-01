@@ -609,7 +609,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 
 	private void updateWindowProperties() {
 		int extendedState = this.getExtendedState();
-		if ( extendedState == MAXIMIZED_BOTH ) {
+		if ( (extendedState & MAXIMIZED_BOTH) == MAXIMIZED_BOTH ) {
 			appProperties.windowMaximize.set(true);
 		} else {
 			appProperties.windowMaximize.set(false);
