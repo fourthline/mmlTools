@@ -220,6 +220,9 @@ public final class MMLScore implements Cloneable {
 
 		// マーカー
 		MMLEvent.insertTick(markerList, tickPosition, tick);
+
+		// 拍子 (小節単位にする必要があるので、変更はされない）
+		MMLEvent.insertTick(timeSignatureList, tickPosition, tick);
 	}
 
 	public void removeTicks(int tickPosition, boolean isMeasure) {
@@ -239,6 +242,9 @@ public final class MMLScore implements Cloneable {
 
 		// マーカー
 		MMLEvent.removeTick(markerList, tickPosition, tick);
+
+		// 拍子 (小節単位にする必要があるので、変更はされない）
+		MMLEvent.removeTick(timeSignatureList, tickPosition, tick);
 	}
 
 	/**

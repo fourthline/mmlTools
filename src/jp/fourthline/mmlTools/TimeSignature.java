@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 たんらる
+ * Copyright (C) 2022-2023 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -44,6 +44,19 @@ public final class TimeSignature extends MMLEvent {
 		this(score, tickOffset, Integer.parseInt(numTime), Integer.parseInt(baseTime));
 	}
 
+	@Override
+	public void setTickOffset(int tickOffset) {
+		// 小節単位に固定するため、個別の設定は不可
+	}
+
+	/**
+	 * 表示用TickOffsetの設定（内部用）
+	 * @param tickOffset
+	 */
+	private void setViewTickOffset(int tickOffset) {
+		super.setTickOffset(tickOffset);
+	}
+
 	/**
 	 * TimeSignatureリストのOffset情報を再計算する
 	 * @param score
@@ -53,7 +66,7 @@ public final class TimeSignature extends MMLEvent {
 		list.sort(Comparator.comparingInt(t -> t.getMeasureOffset()));
 		for (TimeSignature ts : list) {
 			int tick = measureToCalcTick(score, ts.getMeasureOffset());
-			ts.setTickOffset(tick);
+			ts.setViewTickOffset(tick);
 		}
 	}
 
