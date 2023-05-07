@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2022 たんらる
+ * Copyright (C) 2017-2023 たんらる
  */
 
 package jp.fourthline.mabiicco.midi;
@@ -78,6 +78,10 @@ public final class WavoutDataLine implements SourceDataLine, IWavoutState {
 			this.endNotify = null;
 		}
 		this.rec = false;
+	}
+
+	public boolean isRec() {
+		return this.rec;
 	}
 
 	@Override

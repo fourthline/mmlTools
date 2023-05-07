@@ -96,8 +96,8 @@ public final class MabiDLS {
 				byte[] metaData = meta.getData();
 				sequencer.setTempoInMPQ(ByteBuffer.wrap(metaData).getInt());
 			} else if (type == 0x2f) {
-				// トラック終端
-				if (loop) {
+				// トラック終端, wav出力の場合はループしない.
+				if (loop && !wavout.isRec()) {
 					sequenceStart();
 				} else {
 					notifier.forEach(t -> t.run());
