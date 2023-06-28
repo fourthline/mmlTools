@@ -4,6 +4,7 @@
 
 package jp.fourthline.mabiicco.ui;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.sound.midi.Sequencer;
@@ -32,6 +33,8 @@ public final class TimeBox extends JComboBox<StringBuffer> implements Runnable {
 	public enum Type {
 		MEASURE, TIME;
 	}
+
+	private final List<Type> types = Arrays.asList(Type.values());
 
 	public TimeBox(IMMLManager mmlManager) {
 		super();
@@ -84,5 +87,14 @@ public final class TimeBox extends JComboBox<StringBuffer> implements Runnable {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public void setType(Type type) {
+		int index = types.indexOf(type);
+		setSelectedIndex(index);
+	}
+
+	public Type getType() {
+		return types.get(getSelectedIndex());
 	}
 }

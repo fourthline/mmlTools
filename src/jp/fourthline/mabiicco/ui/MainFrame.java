@@ -21,7 +21,7 @@ import jp.fourthline.mabiicco.ActionDispatcher;
 import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.IEditStateObserver;
 import jp.fourthline.mabiicco.MabiIccoProperties;
-import jp.fourthline.mabiicco.MabiIccoProperties.IndexProperty;
+import jp.fourthline.mabiicco.MabiIccoProperties.EnumProperty;
 import jp.fourthline.mabiicco.ui.PianoRollView.PaintMode;
 import jp.fourthline.mabiicco.ui.editor.NoteAlign;
 
@@ -36,7 +36,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -436,11 +435,9 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	 * ラジオボタンのメニューグループを作成する
 	 * @param settingMenu
 	 * @param menuName
-	 * @param items
-	 * @param actionCommand
-	 * @param supplier
+	 * @param prop
 	 */
-	private void createGroupMenu(JMenu settingMenu, String menuName, IndexProperty<? extends SettingButtonGroupItem> prop) {
+	private void createGroupMenu(JMenu settingMenu, String menuName, EnumProperty<? extends SettingButtonGroupItem> prop) {
 		JMenu menu = new JMenu(appText(menuName));
 		settingMenu.add(menu);
 
@@ -449,11 +446,10 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 			GroupMenuItemWith<SettingButtonGroupItem> itemMenu = new GroupMenuItemWith<>(appText(item.getButtonName()), item);
 			itemMenu.setActionCommand(ActionDispatcher.CHANGE_ACTION);
 			itemMenu.addActionListener(listener);
+			itemMenu.setSelected(item.equals(prop.get()));
 			menu.add(itemMenu);
 			group.add(itemMenu);
 		}
-
-		Collections.list(group.getElements()).get(prop.getIndex()).setSelected(true);
 	}
 
 	/**
@@ -570,8 +566,8 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		toolBar.add(newToolBarSeparator());
 		timeBox.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
 		timeBox.setFocusable(false);
-		timeBox.setSelectedIndex(appProperties.timebox.getIndex());
-		timeBox.addActionListener((t) -> appProperties.timebox.setIndex(timeBox.getSelectedIndex()));
+		timeBox.setType(appProperties.timebox.get());
+		timeBox.addActionListener((t) -> appProperties.timebox.set(timeBox.getType()));
 		timeBox.setPreferredSize(new Dimension(240, 20));
 		toolBar.add(timeBox);
 

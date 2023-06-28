@@ -11,7 +11,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.InvalidPropertiesFormatException;
 import java.util.LinkedList;
 import java.util.List;
@@ -60,13 +59,13 @@ public final class MabiIccoProperties {
 	private static final String WINDOW_HEIGHT = "window.height";
 
 	/** ピアノロール表示の高さスケール */
-	public final IndexProperty<PianoRollView.NoteHeight> pianoRollNoteHeight = new IndexProperty<>("view.pianoRoll.heightScale", PianoRollView.NoteHeight.values(), PianoRollView.NoteHeight.H8);
+	public final EnumProperty<PianoRollView.NoteHeight> pianoRollNoteHeight = new EnumProperty<>("view.pianoRoll.heightScale", PianoRollView.NoteHeight.values(), PianoRollView.NoteHeight.H8);
 
 	/** timeBox Index */
-	public final IndexProperty<TimeBox.Type> timebox = new IndexProperty<>("view.timeBox", TimeBox.Type.values(), TimeBox.Type.MEASURE);
+	public final EnumProperty<TimeBox.Type> timebox = new EnumProperty<>("view.timeBox", TimeBox.Type.values(), TimeBox.Type.MEASURE);
 
 	/** 音源設定 Index */
-	public final IndexProperty<SoundEnv> soundEnv = new IndexProperty<SoundEnv>("function.sound_env", SoundEnv.values(), SoundEnv.MABINOGI);
+	public final EnumProperty<SoundEnv> soundEnv = new EnumProperty<SoundEnv>("function.sound_env", SoundEnv.values(), SoundEnv.MABINOGI);
 
 	/** クリック再生機能の有効/無効 */
 	public final Property<Boolean> enableClickPlay = new BooleanProperty("function.enable_click_play", true);
@@ -102,7 +101,7 @@ public final class MabiIccoProperties {
 	public final Property<String> midiInputDevice = new StringProperty("midi.input_device");
 
 	/** Scale color */
-	public final IndexProperty<ScaleColor> scaleColor = new IndexProperty<ScaleColor>("scale.color", ScaleColor.values(), ScaleColor.C_MAJOR);
+	public final EnumProperty<ScaleColor> scaleColor = new EnumProperty<ScaleColor>("scale.color", ScaleColor.values(), ScaleColor.C_MAJOR);
 
 	/** Midi キーボード 和音入力 */
 	public final Property<Boolean> midiChordInput = new BooleanProperty("midi.chord_input", false);
@@ -131,7 +130,7 @@ public final class MabiIccoProperties {
 
 	/** Overlap mode */
 	/* 2023/04/19 のアップデートにより、重複音が問題なくできるようになったので固定値へ変更 */
-//	public final IndexProperty<OverlapMode> overlapMode = new IndexProperty<>("function.overlap_mode", OverlapMode.values(), OverlapMode.INST);
+	//	public final IndexProperty<OverlapMode> overlapMode = new IndexProperty<>("function.overlap_mode", OverlapMode.values(), OverlapMode.INST);
 	public final Property<OverlapMode> overlapMode = new FixedProperty<>(OverlapMode.ALL);
 
 	/** 内蔵音源を使用する */
@@ -141,7 +140,7 @@ public final class MabiIccoProperties {
 	public final Property<Boolean> enableTempoDeleteWithConvert = new BooleanProperty("function.tempoDeleteWithConvert", false);
 
 	/** マウスホイールによる横スクロール量 */
-	public final IndexProperty<MouseScrollWidth> mouseScrollWidth = new IndexProperty<>("function.mouse_scroll_width", MouseScrollWidth.values(), MouseScrollWidth.AUTO);
+	public final EnumProperty<MouseScrollWidth> mouseScrollWidth = new EnumProperty<>("function.mouse_scroll_width", MouseScrollWidth.values(), MouseScrollWidth.AUTO);
 
 	/** ファイルOpen時にMML再生成する (旧データとの比較をしない) */
 	public final Property<Boolean> reGenerateWithOpen = new BooleanProperty("function.reGenerateWithOpen", true);
@@ -287,141 +286,124 @@ public final class MabiIccoProperties {
 		}
 	}
 
-	/**
-	 * Enum型設定値をIndexで扱うProperty
-	 * @param <T>
-	 */
-	public class IndexProperty<T extends Enum<?>> implements Property<T> {
-		private final String name;
-		private final List<T> values;
-		private final T defaultValue;
+	private abstract class AbstractProperty<T> implements Property<T> {
+		protected final String name;
+		protected final T defaultValue;
+		protected final Consumer<T> optDo;
 
-		/**
-		 * コンストラクタ
-		 * @param name          プロパティ名
-		 * @param values        設定値の配列. values() でよい.
-		 * @param defaultValue  デフォルト値
-		 */
-		private IndexProperty(String name, T[] values, T defaultValue) {
+		private AbstractProperty(String name, T defaultValue, Consumer<T> optDo) {
 			this.name = name;
-			this.values = Arrays.asList(values);
 			this.defaultValue = defaultValue;
-		}
-
-		public List<T> getValues() {
-			return values;
-		}
-
-		public void setIndex(Integer index) {
-			if ( (index < 0) || (index >= values.size()) ) {
-				index = values.indexOf(defaultValue);
+			this.optDo = optDo;
+			if (optDo != null) {
+				optDo.accept(defaultValue);
 			}
-			properties.setProperty(name, index.toString());
-			save();
-		}
-
-		public int getIndex() {
-			return values.indexOf(get());
 		}
 
 		@Override
-		public void set(T value) {
-			setIndex(values.indexOf(value));
+		public void set(T str) {
+			properties.setProperty(name, stringValue(str));
+			save();
+			if (optDo != null) {
+				optDo.accept(str);
+			}
 		}
 
 		@Override
 		public T get() {
-			String str = properties.getProperty(name);
-			if (str != null) {
-				try {
-					int index = Integer.parseInt(str);
-					if ((index >= 0) && (index < values.size())) {
-						return values.get(index);
-					}
-				} catch (NumberFormatException e) {}
+			String str = properties.getProperty(name, stringValue(defaultValue));
+			T value = parseValue(str);
+			if (value == null) {
+				value = defaultValue;
 			}
-			return defaultValue;
-		}
-	}
-
-	private class StringProperty implements Property<String> {
-		private final String name;
-		private final String defaultValue;
-		private final Consumer<String> optDo;
-
-		private StringProperty(String name) {
-			this(name, "");
-		}
-
-		private StringProperty(String name, String defaultValue) {
-			this(name, defaultValue, null);
-		}
-
-		private StringProperty(String name, String defaultValue, Consumer<String> optDo) {
-			this.name = name;
-			this.defaultValue = defaultValue;
-			this.optDo = optDo;
-			if (optDo != null) {
-				optDo.accept(defaultValue);
-			}
-		}
-
-		@Override
-		public void set(String str) {
-			properties.setProperty(name, str);
-			save();
-			if (optDo != null) {
-				optDo.accept(str);
-			}
-		}
-
-		@Override
-		public String get() {
-			String str = properties.getProperty(name, defaultValue);
-			if (optDo != null) {
-				// 設定ファイルからの反映に必要
-				optDo.accept(str);
-			}
-			return str;
-		}
-	}
-
-	private final class BooleanProperty implements Property<Boolean> {
-		private final String name;
-		private final String defaultValue;
-		private final Consumer<Boolean> optDo;
-
-		private BooleanProperty(String name, boolean defaultValue) {
-			this(name, defaultValue, null);
-		}
-
-		private BooleanProperty(String name, boolean defaultValue, Consumer<Boolean> optDo) {
-			this.name = name;
-			this.defaultValue = Boolean.toString(defaultValue);
-			this.optDo = optDo;
-			if (optDo != null) {
-				optDo.accept(defaultValue);
-			}
-		}
-
-		@Override
-		public void set(Boolean b) {
-			properties.setProperty(name, Boolean.toString(b));
-			save();
-			if (optDo != null) {
-				optDo.accept(b);
-			}
-		}
-
-		@Override
-		public Boolean get() {
-			String str = properties.getProperty(name, defaultValue);
-			Boolean value = Boolean.parseBoolean(str);
 			if (optDo != null) {
 				// 設定ファイルからの反映に必要
 				optDo.accept(value);
 			}
 			return value;
+		}
+
+		abstract protected T parseValue(String str);
+		abstract protected String stringValue(T v);
+	}
+
+	private final class StringProperty extends AbstractProperty<String> {
+		private StringProperty(String name) {
+			super(name, "", null);
+		}
+
+		private StringProperty(String name, String defaultValue) {
+			super(name, defaultValue, null);
+		}
+
+		private StringProperty(String name, String defaultValue, Consumer<String> optDo) {
+			super(name, defaultValue, optDo);
+		}
+
+		@Override
+		protected String parseValue(String str) {
+			return str;
+		}
+
+		@Override
+		protected String stringValue(String v) {
+			return v;
+		}
+	}
+
+	private final class BooleanProperty extends AbstractProperty<Boolean> {
+		private BooleanProperty(String name, boolean defaultValue) {
+			super(name, defaultValue, null);
+		}
+
+		private BooleanProperty(String name, boolean defaultValue, Consumer<Boolean> optDo) {
+			super(name, defaultValue, optDo);
+		}
+
+		@Override
+		protected Boolean parseValue(String str) {
+			return Boolean.parseBoolean(str);
+		}
+
+		@Override
+		protected String stringValue(Boolean v) {
+			return Boolean.toString(v);
+		}
+	}
+
+	public final class EnumProperty<T extends Enum<T>> extends AbstractProperty<T> {
+		private final T[] values;
+
+		private EnumProperty(String name, T[] values, T defaultValue) {
+			super(name, defaultValue, null);
+			this.values = values;
+		}
+
+		@Override
+		protected T parseValue(String str) {
+			for (T t : values) {
+				if (stringValue(t).equals(str)) {
+					return t;
+				}
+			}
+			try {
+				int index = Integer.parseInt(str);
+				if ((index >= 0) && (index < values.length)) {
+					var t = values[index];
+					set(t);
+					return t;
+				}
+			} catch (NumberFormatException e2) {}
+			return defaultValue;
+		}
+
+		@Override
+		protected String stringValue(T v) {
+			return v.name();
+		}
+
+		public T[] getValues() {
+			return values;
 		}
 	}
 }

@@ -13,7 +13,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import jp.fourthline.mabiicco.ui.PianoRollView;
+import jp.fourthline.mabiicco.ui.PianoRollView.NoteHeight;
 
 public class MabiIccoPropertiesTest {
 
@@ -85,17 +85,11 @@ public class MabiIccoPropertiesTest {
 		assertEquals("MABINOGI", obj.soundEnv.get().name());
 
 		// set
-		obj.pianoRollNoteHeight.set(PianoRollView.NoteHeight.H14);
-		assertEquals("H14", obj.pianoRollNoteHeight.get().name());
-
-		// setIndex
-		obj.pianoRollNoteHeight.setIndex(-1);
+		obj.pianoRollNoteHeight.set(NoteHeight.H8);
 		assertEquals("H8", obj.pianoRollNoteHeight.get().name());
-		obj.pianoRollNoteHeight.setIndex(0);
+		obj.pianoRollNoteHeight.set(NoteHeight.H6);
 		assertEquals("H6", obj.pianoRollNoteHeight.get().name());
-		obj.pianoRollNoteHeight.setIndex(4);
+		obj.pianoRollNoteHeight.set(NoteHeight.H14);
 		assertEquals("H14", obj.pianoRollNoteHeight.get().name());
-		obj.pianoRollNoteHeight.setIndex(5);
-		assertEquals("H8", obj.pianoRollNoteHeight.get().name());
 	}
 }
