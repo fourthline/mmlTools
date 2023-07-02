@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
@@ -42,12 +43,15 @@ public final class TrackPropertyPanel extends JPanel {
 	// 歌部のオプション
 	private final MMLOutputOptions songOption;
 
+	// Nコマンド無効化オプション
+	private final JCheckBox disableNoptCheckBox = new JCheckBox(AppResource.appText("track_property.disable_nopt"));
+
 	private final IMMLManager mmlManager;
 
 	private final MMLTrack track;
 	private final MMLTrack sandTrack;
 
-	private final Dimension prefSize = new Dimension(350, 300);
+	private final Dimension prefSize = new Dimension(350, 360);
 
 	/**
 	 * Create the dialog.
@@ -109,6 +113,15 @@ public final class TrackPropertyPanel extends JPanel {
 		// MML出力オプション（歌部）
 		add(songOption.createMMLOptionPanel(AppResource.appText("track_property.mmlOptions2"), 5, 210));
 
+		// N最適化無効オプション
+		JPanel disableNoptPanel = new JPanel();
+		disableNoptPanel.setBorder(new TitledBorder(new LineBorder(Color.GRAY, 1, true), AppResource.appText("track_property.opt_option"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		disableNoptPanel.setBounds(5, 300, 340, 60);
+		disableNoptPanel.setLayout(null);
+		disableNoptCheckBox.setBounds(20, 20, 240, 20);
+		disableNoptPanel.add(disableNoptCheckBox);
+		add(disableNoptPanel);
+
 		// 初期値設定
 		int commonStartOffset = track.getCommonStartOffset();
 		trackNameField.setText(track.getTrackName());
@@ -116,6 +129,7 @@ public final class TrackPropertyPanel extends JPanel {
 		volumeSpinner.setValue(track.getVolume());
 		instOption.setValue(track.getStartDelta() + commonStartOffset, track.getAttackDelayCorrect());
 		songOption.setValue(track.getStartSongDelta() + commonStartOffset, track.getAttackSongDelayCorrect());
+		disableNoptCheckBox.setSelected(track.getDisableNopt());
 	}
 
 	private JLabel newJLabel(String text, int x, int y, int width, int height) {
@@ -144,6 +158,7 @@ public final class TrackPropertyPanel extends JPanel {
 		}
 		track.setAttackDelayCorrect( instOption.getAttackDelayCorrect() );
 		track.setAttackSongDelayCorrect( songOption.getAttackDelayCorrect() );
+		track.setDisableNopt( disableNoptCheckBox.isSelected() );
 		mmlManager.updateActivePart(true);
 	}
 

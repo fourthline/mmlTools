@@ -61,7 +61,7 @@ public final class AAMMLExport {
 	}
 
 	public static String toAAText(String mml[]) {
-		var optimizer = new OxLxFixedOptimizer();
+		var optimizer = new OxLxFixedOptimizer(true);
 		int part = Math.min(mml.length, 10);
 		for (int i = 0; i < part; i++) {
 			if ( (i > 0) && (mml[i].length() > 0) ) {

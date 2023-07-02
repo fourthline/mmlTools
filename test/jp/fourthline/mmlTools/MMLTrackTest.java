@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import jp.fourthline.mmlTools.core.MMLTools;
 import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.optimizer.MMLStringOptimizer;
 
 /**
  * @author fourthline
@@ -25,12 +26,14 @@ public class MMLTrackTest {
 	public void setup() {
 		MMLTrack.setTempoAllowChordPart(false);
 		MMLBuilder.setMMLVZeroTempo(true);
+		MMLStringOptimizer.setEnablePreciseOptimize(true);
 	}
 
 	@After
 	public void cleanup() {
 		MMLTrack.setTempoAllowChordPart(true);
 		MMLBuilder.setMMLVZeroTempo(true);
+		MMLStringOptimizer.setEnablePreciseOptimize(true);
 	}
 
 	/**
@@ -613,5 +616,41 @@ public class MMLTrackTest {
 		assertEquals("MML@t130r1t60,l1cct130,,t130l1at60at130;", track.generate().getMabiMML());
 		track.setMML("MML@,c2,b2.,a1");
 		assertEquals("MML@t130,c2,b2.,t130a1;", track.generate().getMabiMML());
+	}
+
+	@Test
+	public void test_disableNopt() throws UndefinedTickException {
+		String mml1 = "MML@o7ccco0d+o7cccc,,;";
+		String mml2 = "MML@o7cccn3cccc,,;";
+		var track = new MMLTrack().setMML("MML@o7ccco0d+o7cccc");
+
+		// 旧Algo, N有効
+		MMLStringOptimizer.setEnablePreciseOptimize(false);
+		track.setDisableNopt(false);
+		track.generate();
+		assertEquals(mml2, track.getMabiMML());
+
+		// 旧Algo, N無効
+		track.setDisableNopt(true);
+		track.generate();
+		assertEquals(mml1, track.getMabiMML());
+
+		// MusicQ
+		MMLTrack.setTempoAllowChordPart(true);
+		track.generate();
+		assertEquals(mml1, track.getMabiMML());
+
+		// 新Algo, N無効
+		MMLStringOptimizer.setEnablePreciseOptimize(true);
+		track.generate();
+		assertEquals(mml1, track.getMabiMML());
+
+		// 内部データ向けはNコマンド有効
+		assertEquals(mml2, track.getOriginalMML());
+
+		// 新Algo, N有効
+		track.setDisableNopt(false);
+		track.generate();
+		assertEquals(mml2, track.getMabiMML());
 	}
 }

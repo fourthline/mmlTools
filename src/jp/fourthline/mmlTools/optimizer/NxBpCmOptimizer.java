@@ -16,8 +16,11 @@ public final class NxBpCmOptimizer extends NxOptimizer {
 	 */
 	private final Map<Integer, String> map = new HashMap<>();
 
-	public NxBpCmOptimizer() {
+	private final boolean disableNopt;
+
+	public NxBpCmOptimizer(boolean disableNopt) {
 		super();
+		this.disableNopt = disableNopt;
 	}
 
 	/**
@@ -40,9 +43,10 @@ public final class NxBpCmOptimizer extends NxOptimizer {
 		}
 	}
 
-	public NxBpCmOptimizer(int octave, String initStr) {
+	public NxBpCmOptimizer(int octave, String initStr, boolean disableNopt) {
 		super();
 		this.octave = octave;
+		this.disableNopt = disableNopt;
 		builderList.clear();
 		builderList.add(new NxBuilder(octave, initStr));
 		parser.setOctave(octave);
@@ -60,7 +64,7 @@ public final class NxBpCmOptimizer extends NxOptimizer {
 				// c -> >b+ パターン
 				addToken(t, octave-1, "b+" + noteLength);
 			}
-			if (t.prevOct != octave) {
+			if ((!disableNopt) && (t.prevOct != octave)) {
 				// nパターン
 				if (noteLength.length() == 0) {
 					int noteNumber = getCurrentNoteNumber();

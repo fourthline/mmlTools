@@ -46,6 +46,7 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 	private static final String START_SONG_DELTA = "startSongDelta=";
 	private static final String DELAY = "attackDelayCorrect=";
 	private static final String SONG_DELAY = "attackSongDelayCorrect=";
+	private static final String DISABLE_NOPT = "disableNopt=";
 
 	private final MMLScore score;
 	private MMLTrack lastTrack = null;
@@ -75,6 +76,7 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 				.pattern(VISIBLE,       t -> getLastTrack().setVisible(Boolean.parseBoolean(t)) )
 				.pattern(DELAY,         t -> getLastTrack().setAttackDelayCorrect(Integer.parseInt(t)))
 				.pattern(SONG_DELAY,    t -> getLastTrack().setAttackSongDelayCorrect(Integer.parseInt(t)))
+				.pattern(DISABLE_NOPT,  t -> getLastTrack().setDisableNopt(Boolean.parseBoolean(t)))
 				.pattern(TITLE,         t -> score.setTitle(t) )
 				.pattern(AUTHOR,        t -> score.setAuthor(t) )
 				.pattern(TIME,          t -> score.setBaseTime(t) )
@@ -270,6 +272,9 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 			}
 			if (track.getAttackSongDelayCorrect() != 0) {
 				stream.println(SONG_DELAY+track.getAttackSongDelayCorrect());
+			}
+			if (track.getDisableNopt()) {
+				stream.println(DISABLE_NOPT+track.getDisableNopt());
 			}
 		}
 

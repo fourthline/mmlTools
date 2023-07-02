@@ -60,6 +60,9 @@ public final class MMLTrack implements Serializable, Cloneable {
 	private int attackDelayCorrect = 0;     // 楽器部のアタック遅延補正
 	private int attackSongDelayCorrect = 0; // 歌部のアタック遅延補正
 
+	// Nコマンド無効化オプション
+	private boolean disableNopt = false;
+
 	// for MML input
 	private final MMLText originalMML = new MMLText();
 
@@ -364,7 +367,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 		}
 		for (int i = 0; i < count; i++) {
 			if (mabiTempo) {
-				mml[i] = mabiMMLOptimizeFunc.apply(new MMLStringOptimizer(mml[i]));
+				mml[i] = mabiMMLOptimizeFunc.apply(new MMLStringOptimizer(mml[i]).setDisableNopt(disableNopt));
 			} else {
 				// 内部データ向けは旧アルゴリズムを使用する.
 				mml[i] = new MMLStringOptimizer(mml[i]).toString();
@@ -436,7 +439,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 		boolean allowed = tempoAllowChordPartFunction.apply(program);
 		String[] mml = getGenericMMLStrings(allowed);
 		for (int i = 0; i < mml.length; i++) {
-			mml[i] = mabiMMLOptimizeFunc.apply(new MMLStringOptimizer(mml[i]));
+			mml[i] = mabiMMLOptimizeFunc.apply(new MMLStringOptimizer(mml[i]).setDisableNopt(disableNopt));
 		}
 		if ((mmlParts.get(3).getTickLength() == 0)) {
 			mml[3] = "";
@@ -661,6 +664,14 @@ public final class MMLTrack implements Serializable, Cloneable {
 		boolean b1 = !mmlParts.get(0).isEmpty() || !mmlParts.get(1).isEmpty() || !mmlParts.get(2).isEmpty();
 		boolean b2 = !mmlParts.get(3).isEmpty();
 		return b1 && b2;
+	}
+
+	public void setDisableNopt(boolean b) {
+		disableNopt = b;
+	}
+
+	public boolean getDisableNopt() {
+		return disableNopt;
 	}
 
 	@Override

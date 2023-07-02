@@ -41,6 +41,11 @@ public final class OxLxFixedOptimizer extends OxLxOptimizer {
 		}
 	}
 
+	private final boolean disableNopt;
+	public OxLxFixedOptimizer(boolean disableNopt) {
+		this.disableNopt = disableNopt;
+	}
+
 	/**
 	 * 置換パターン
 	 */
@@ -71,7 +76,7 @@ public final class OxLxFixedOptimizer extends OxLxOptimizer {
 		}
 	}
 
-	public static final class OptimizerMap2 extends OptimizerMap {
+	public final class OptimizerMap2 extends OptimizerMap {
 		private static final long serialVersionUID = -1916149376927832458L;
 
 		private static int compString(StringBuilder s1, StringBuilder s2) {
@@ -109,9 +114,9 @@ public final class OxLxFixedOptimizer extends OxLxOptimizer {
 			return octave;
 		}
 
-		private static int calcSubNxBpCmOptLength(String mml, int commonLen, int octave) {
+		private static int calcSubNxBpCmOptLength(String mml, int commonLen, int octave, boolean disableNopt) {
 			String initStr = mml.substring(0, commonLen);
-			NxBpCmOptimizer optimizer = new NxBpCmOptimizer(octave, initStr);
+			NxBpCmOptimizer optimizer = new NxBpCmOptimizer(octave, initStr, disableNopt);
 			new MMLTokenizer(mml.substring(commonLen)).forEachRemaining(optimizer::nextToken);
 			return optimizer.getMinString().length();
 		}
@@ -124,8 +129,8 @@ public final class OxLxFixedOptimizer extends OxLxOptimizer {
 			} else {
 				int commonLen = compString(builder, now);
 				int octave = calcOctave(builder.substring(0, commonLen));
-				int i1 = calcSubNxBpCmOptLength(builder.toString(), commonLen, octave);
-				int i2 = calcSubNxBpCmOptLength(now.toString(), commonLen, octave);
+				int i1 = calcSubNxBpCmOptLength(builder.toString(), commonLen, octave, disableNopt);
+				int i2 = calcSubNxBpCmOptLength(now.toString(), commonLen, octave, disableNopt);
 				if (i1 < i2) {
 					this.put(key, builder);
 				}

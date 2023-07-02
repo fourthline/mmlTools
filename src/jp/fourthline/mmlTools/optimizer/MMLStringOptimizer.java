@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2022 たんらる
+ * Copyright (C) 2015-2023 たんらる
  */
 
 package jp.fourthline.mmlTools.optimizer;
@@ -36,6 +36,8 @@ public final class MMLStringOptimizer {
 
 	private final String originalMML;
 
+	private boolean disableNopt = false;
+
 	/**
 	 * @param mml   MMLEventListで出力したMML文字列.
 	 */
@@ -66,8 +68,8 @@ public final class MMLStringOptimizer {
 	 */
 	public String optimizeGen2() {
 		Optimizer[] optimizerList = {
-				new OxLxFixedOptimizer(),
-				new NxBpCmOptimizer()
+				new OxLxFixedOptimizer(disableNopt),
+				new NxBpCmOptimizer(disableNopt)
 		};
 		return optimize(optimizerList);
 	}
@@ -77,7 +79,7 @@ public final class MMLStringOptimizer {
 	 */
 	public String optimizeForTextEditor() {
 		Optimizer[] optimizerList = {
-				new OxLxFixedOptimizer()
+				new OxLxFixedOptimizer(true)
 		};
 		return optimize(optimizerList);
 	}
@@ -86,12 +88,16 @@ public final class MMLStringOptimizer {
 	 * MML最適化 Normal
 	 */
 	private String optimize() {
-		Optimizer[] optimizerList = {
+		Optimizer[] optimizerList1 = {
 				new OxLxOptimizer(),
 				new BpCmOptimizer(),
 				new NxOptimizer()
 		};
-		return optimize(optimizerList);
+		Optimizer[] optimizerList2 =  {
+				new OxLxOptimizer(),
+				new BpCmOptimizer()
+		};
+		return optimize(!disableNopt ? optimizerList1 : optimizerList2);
 	}
 
 	private String optimize(Optimizer[] optimizerList) {
@@ -102,6 +108,11 @@ public final class MMLStringOptimizer {
 		}
 
 		return mml;
+	}
+
+	public MMLStringOptimizer setDisableNopt(boolean disableNopt) {
+		this.disableNopt = disableNopt;
+		return this;
 	}
 
 	public interface Optimizer {
