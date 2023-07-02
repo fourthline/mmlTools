@@ -105,9 +105,9 @@ public final class TrackPropertyPanel extends JPanel {
 		add(newJLabel(AppResource.appText("track_property.volume"), 20, 83, 100, 14));
 
 		// MML出力オプション（楽器部）
-		add(instOption.createMMLOptionPanel(AppResource.appText("track_propert.mmlOptions1"), 5, 120));
+		add(instOption.createMMLOptionPanel(AppResource.appText("track_property.mmlOptions1"), 5, 120));
 		// MML出力オプション（歌部）
-		add(songOption.createMMLOptionPanel(AppResource.appText("track_propert.mmlOptions2"), 5, 210));
+		add(songOption.createMMLOptionPanel(AppResource.appText("track_property.mmlOptions2"), 5, 210));
 
 		// 初期値設定
 		int commonStartOffset = track.getCommonStartOffset();
@@ -198,7 +198,7 @@ public final class TrackPropertyPanel extends JPanel {
 			String deltaTitle = AppResource.appText("track_property.startDelta");
 			String delayCorrectTitle = AppResource.appText("track_property.attackDelayCorrect");
 			JPanel mmlOptionsPanel = new JPanel();
-			mmlOptionsPanel.setBorder(new TitledBorder(new LineBorder(new Color(128, 128, 128), 1, true), title, TitledBorder.LEADING, TitledBorder.TOP, null, null));
+			mmlOptionsPanel.setBorder(new TitledBorder(new LineBorder(Color.GRAY, 1, true), title, TitledBorder.LEADING, TitledBorder.TOP, null, null));
 			mmlOptionsPanel.setBounds(x, y, 340, 80);
 			mmlOptionsPanel.setLayout(null);
 			add(mmlOptionsPanel);
