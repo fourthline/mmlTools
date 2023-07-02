@@ -13,6 +13,7 @@ panpot=64
 visible=true
 attackDelayCorrect=-6
 attackSongDelayCorrect=-12
+disableNopt=true
 mml-track=MML@t220<b1&b,,;
 name=Track2
 program=0

@@ -250,6 +250,7 @@ public class MMLScoreTest extends UseLoadingDLS {
 		track1.setTrackName("Track1");
 		track1.setAttackDelayCorrect(-6);
 		track1.setAttackSongDelayCorrect(-12);
+		track1.setDisableNopt(true);
 		score.addTrack(track1);
 
 		MMLTrack track2 = new MMLTrack(1152, 0, 0).setMML("MML@<b1&b,,;");

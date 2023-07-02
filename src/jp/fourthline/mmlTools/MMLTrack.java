@@ -686,6 +686,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 		o.setTrackName(trackName);
 		o.setAttackDelayCorrect(attackDelayCorrect);
 		o.setAttackSongDelayCorrect(attackSongDelayCorrect);
+		o.setDisableNopt(disableNopt);
 		if (generated) {
 			try {
 				o.generate();
