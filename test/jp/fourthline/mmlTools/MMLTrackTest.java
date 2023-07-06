@@ -386,6 +386,7 @@ public class MMLTrackTest {
 		t1.setPanpot(1);
 		t1.setProgram(2);
 		t1.setProgram(-2);
+		t1.setDisableNopt(true);
 
 		MMLTrack t2 = t1.clone();
 
@@ -406,6 +407,7 @@ public class MMLTrackTest {
 
 		assertEquals("MML@o8d+o4aa,b8c6,rc,r2d;", t3.getMabiMML());
 		assertEquals("MML@o8d+o4aat130,b8c6,rc,r2dt130;", t3.getOriginalMML());
+		assertEquals(true, t3.getDisableNopt());
 	}
 
 	@Test
