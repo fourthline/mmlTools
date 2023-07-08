@@ -18,8 +18,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
-import com.formdev.flatlaf.FlatLightLaf;
-
 import sun.swing.FilePane;
 import jp.fourthline.mabiicco.midi.InstType;
 import jp.fourthline.mabiicco.midi.MabiDLS;
@@ -165,13 +163,7 @@ public final class MabiIcco {
 				System.setProperty("sun.java2d.uiScale.enabled", "false");
 			}
 
-			// initial flatLAF
-			FlatLightLaf.setup();
-			if (properties.useSystemLaF.get()) {
-				UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
-			} else {
-				UIManager.setLookAndFeel( new FlatLightLaf() );
-			}
+			properties.laf.get().update();
 
 			// font
 			String fontName = AppResource.appText("ui.font");

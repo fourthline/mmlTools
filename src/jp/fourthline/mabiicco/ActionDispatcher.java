@@ -857,6 +857,13 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 				mmlSeqView.repaint();
 			} else if (o instanceof MouseScrollWidth scrollWidth) {
 				appProperties.mouseScrollWidth.set(scrollWidth);
+			} else if (o instanceof Laf laf) {
+				laf = laf.update();
+				if (laf != null) {
+					appProperties.laf.set(laf);
+					SwingUtilities.updateComponentTreeUI(mainFrame);
+					mainFrame.repaint();
+				}
 			} else {
 				System.err.println("changeAction invalid param " + source.getClass().toString());
 			}

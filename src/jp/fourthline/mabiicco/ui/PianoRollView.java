@@ -23,6 +23,7 @@ import jp.fourthline.mabiicco.MabiIccoProperties;
 import jp.fourthline.mabiicco.midi.InstClass;
 import jp.fourthline.mabiicco.midi.MabiDLS;
 import jp.fourthline.mabiicco.ui.color.ColorManager;
+import jp.fourthline.mabiicco.ui.color.ColorSet;
 import jp.fourthline.mabiicco.ui.color.ScaleColor;
 import jp.fourthline.mmlTools.MMLEventList;
 import jp.fourthline.mmlTools.MMLNoteEvent;
@@ -104,13 +105,13 @@ public final class PianoRollView extends JPanel {
 		this.scaleColor = scaleColor;
 	}
 
-	private static final Color noSoundColor = new Color(0.9f, 0.8f, 0.8f);
-	private static final Color outRangeColor = new Color(230, 204, 204);
+	private static final ColorSet noSoundColor = ColorSet.create(new Color(0.9f, 0.8f, 0.8f), Color.RED);
+	private static final ColorSet outRangeColor = ColorSet.create(new Color(230, 204, 204), Color.RED);
 
-	private static final Color barBorder = new Color(0.5f, 0.5f, 0.5f);
-	private static final Color darkBarBorder = new Color(0.3f, 0.2f, 0.3f);
+	private static final ColorSet barBorder = ColorSet.create(new Color(0.5f, 0.5f, 0.5f));
+	private static final ColorSet darkBarBorder = ColorSet.create(new Color(0.3f, 0.2f, 0.3f));
 
-	private static final Color shadowColor = Color.GRAY;
+	private static final ColorSet shadowColor = ColorSet.create(Color.GRAY);
 
 	private static final Color START_OFFSET_COLOR = new Color(0.9f, 0.8f, 0.8f);
 
@@ -389,22 +390,22 @@ public final class PianoRollView extends JPanel {
 			if (!properties.enableEdit.get()) {
 				// 編集モード時は境界表示しない
 			} else if (properties.viewRange.get() && !relativeInst.checkPitchRange(line)) {
-				fillColor = outRangeColor;
+				fillColor = outRangeColor.get();
 			} else if ( (properties.instAttr.get()) && (!relativeInst.isValid(line)) ) {
-				fillColor = noSoundColor;
+				fillColor = noSoundColor.get();
 			}
 			g.setColor(fillColor);
 			g.fillRect(0, y, width, noteHeight.h);
 			g.setColor(START_OFFSET_COLOR);
 			g.fillRect(0, y, startOffsetX, noteHeight.h);
 			if (i == 0) {
-				g.setColor(darkBarBorder);
+				g.setColor(darkBarBorder.get());
 			} else {
 				g.setColor(ScaleColor.BORDER_COLOR);
 			}
 			g.drawLine(0, y, width, y);
 		}
-		g.setColor(darkBarBorder);
+		g.setColor(darkBarBorder.get());
 		g.drawLine(0, 12*noteHeight.h+startY, width, 12*noteHeight.h+startY);
 	}
 
@@ -424,7 +425,7 @@ public final class PianoRollView extends JPanel {
 	void paintSequenceLine(Graphics2D g, int height) {
 		long position = getSequencePlayPosition();
 
-		Color color = Color.RED;
+		Color color = Color.white;
 		int x = convertTicktoX(position);
 
 		g.setColor(color);
@@ -445,7 +446,7 @@ public final class PianoRollView extends JPanel {
 		int y = getTotalHeight();
 		Stroke oldStroke = g.getStroke();
 		g.setStroke(dashStroke);
-		g.setColor(barBorder);
+		g.setColor(barBorder.get());
 
 		int step = w;
 		while (step >= 32) {
@@ -475,9 +476,9 @@ public final class PianoRollView extends JPanel {
 		while (totalTick <= endViewTick) {
 			if (totalTick >= startViewTick-beatTick) {
 				if (beatCount%numTime == 0) {
-					g.setColor(darkBarBorder);
+					g.setColor(darkBarBorder.get());
 				} else {
-					g.setColor(barBorder);
+					g.setColor(barBorder.get());
 				}
 				int x = convertTicktoX(totalTick);
 				g.drawLine(x, 0, x, y);
@@ -521,7 +522,7 @@ public final class PianoRollView extends JPanel {
 
 		if (drawOption) {
 			// shadow
-			drawRect(g, shadowColor, shadowColor, x+2, y+2, width, height);
+			drawRect(g, shadowColor.get(), shadowColor.get(), x+2, y+2, width, height);
 		}
 		drawRect(g, rectColor, fillColor, x, y, width, height);
 
@@ -530,7 +531,7 @@ public final class PianoRollView extends JPanel {
 			int velocity = noteEvent.getVelocity();
 			if ( showAllVelocity || (prevNote == null) || (prevNote.getVelocity() != velocity) ) {
 				String s = "V" + velocity;
-				g.setColor(Color.DARK_GRAY);
+				g.setColor(Color.white);
 				g.drawString(s, x, y);
 			}
 		}

@@ -16,12 +16,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import jp.fourthline.mabiicco.midi.MMLMidiTrack.OverlapMode;
 import jp.fourthline.mabiicco.midi.SoundEnv;
 import jp.fourthline.mabiicco.ui.PianoRollScaler.MouseScrollWidth;
 import jp.fourthline.mabiicco.ui.PianoRollView;
 import jp.fourthline.mabiicco.ui.TimeBox;
+import jp.fourthline.mabiicco.ui.color.ColorSet;
 import jp.fourthline.mabiicco.ui.color.ScaleColor;
 import jp.fourthline.mmlTools.MMLBuilder;
 import jp.fourthline.mmlTools.MMLScore;
@@ -124,6 +126,9 @@ public final class MabiIccoProperties {
 
 	/** システムのL&F */
 	public final Property<Boolean> useSystemLaF = new BooleanProperty("ui.use_system_laf", false);
+
+	/** LAF */
+	public final EnumProperty<Laf> laf = new EnumProperty<>("ui.laf", Laf.values(), Laf.LIGHT, t -> ColorSet.update(t.isLight()));
 
 	/** UIスケールを100%に固定する */
 	public final Property<Boolean> uiscaleDisable = new BooleanProperty("ui.scale_disable", false);
@@ -264,9 +269,8 @@ public final class MabiIccoProperties {
 		save();
 	}
 
-	public interface Property<T> {
+	public interface Property<T> extends Supplier<T> {
 		void set(T value);
-		T get();
 	}
 
 	public static class FixedProperty<T> implements Property<T> {
@@ -375,7 +379,11 @@ public final class MabiIccoProperties {
 		private final T[] values;
 
 		private EnumProperty(String name, T[] values, T defaultValue) {
-			super(name, defaultValue, null);
+			this(name, values, defaultValue, null);
+		}
+
+		private EnumProperty(String name, T[] values, T defaultValue, Consumer<T> optDo) {
+			super(name, defaultValue, optDo);
 			this.values = values;
 		}
 
