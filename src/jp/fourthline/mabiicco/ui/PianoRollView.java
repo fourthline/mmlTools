@@ -115,6 +115,7 @@ public final class PianoRollView extends JPanel {
 
 	private static final Color START_OFFSET_COLOR = new Color(0.9f, 0.8f, 0.8f);
 	private static final ColorSet seqBarColor = ColorSet.create(Color.RED);
+	private static final ColorSet vStrColor = ColorSet.create(Color.DARK_GRAY);
 
 	private static final int DRAW_START_MARGIN = 192;
 
@@ -529,7 +530,7 @@ public final class PianoRollView extends JPanel {
 			int velocity = noteEvent.getVelocity();
 			if ( showAllVelocity || (prevNote == null) || (prevNote.getVelocity() != velocity) ) {
 				String s = "V" + velocity;
-				g.setColor(Color.white);
+				g.setColor(vStrColor.get());
 				g.drawString(s, x, y);
 			}
 		}

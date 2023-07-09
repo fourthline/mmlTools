@@ -17,8 +17,7 @@ public final class ColorSet implements Supplier<Color> {
 	private static final ArrayList<ColorSet> list = new ArrayList<>();
 
 	public static ColorSet create(Color lightColor, Color darkColor) {
-		var o = new ColorSet(lightColor, darkColor);
-		o.changeCurrentColor(MabiIccoProperties.getInstance().laf.get().isLight());
+		var o = new ColorSet(lightColor, darkColor, MabiIccoProperties.getInstance().laf.get().isLight());
 		list.add(o);
 		return o;
 	}
@@ -39,10 +38,10 @@ public final class ColorSet implements Supplier<Color> {
 	private final Color darkColor;
 	private Color currentColor;
 
-	private ColorSet(Color lightColor, Color darkColor) {
+	private ColorSet(Color lightColor, Color darkColor, boolean lightMode) {
 		this.lightColor = lightColor;
 		this.darkColor = darkColor;
-		currentColor = lightColor;
+		changeCurrentColor(lightMode);
 	}
 
 	@Override
