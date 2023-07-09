@@ -114,6 +114,7 @@ public final class PianoRollView extends JPanel {
 	private static final ColorSet shadowColor = ColorSet.create(Color.GRAY);
 
 	private static final Color START_OFFSET_COLOR = new Color(0.9f, 0.8f, 0.8f);
+	private static final ColorSet seqBarColor = ColorSet.create(Color.RED);
 
 	private static final int DRAW_START_MARGIN = 192;
 
@@ -424,11 +425,8 @@ public final class PianoRollView extends JPanel {
 
 	void paintSequenceLine(Graphics2D g, int height) {
 		long position = getSequencePlayPosition();
-
-		Color color = Color.white;
 		int x = convertTicktoX(position);
-
-		g.setColor(color);
+		g.setColor(seqBarColor.get());
 		g.drawLine(x, 0, x, height);
 	}
 
