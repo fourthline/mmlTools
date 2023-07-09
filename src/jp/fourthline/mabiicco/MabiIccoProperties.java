@@ -124,9 +124,6 @@ public final class MabiIccoProperties {
 	/** fix64 Tempo */
 	public final Property<Boolean> mmlFix64Tempo = new BooleanProperty("function.mml_fix64_tempo", false, t -> MMLScore.setMMLFix64(t.booleanValue()));
 
-	/** システムのL&F */
-	public final Property<Boolean> useSystemLaF = new BooleanProperty("ui.use_system_laf", false);
-
 	/** LAF */
 	public final EnumProperty<Laf> laf = new EnumProperty<>("ui.laf", Laf.values(), Laf.LIGHT, t -> ColorSet.update(t.isLight()));
 

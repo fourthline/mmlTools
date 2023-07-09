@@ -30,11 +30,8 @@ import javax.sound.midi.MidiSystem;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
-import com.formdev.flatlaf.FlatLightLaf;
 
 import jp.fourthline.mabiicco.midi.MMLMidiTrack;
 import jp.fourthline.mabiicco.midi.MabiDLS;
@@ -130,7 +127,6 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String KEYBOARD_INPUT = "keyboard_input";
 	@Action public static final String INPUT_EMPTY_CORRECTION = "input_empty_correction";
 	@Action public static final String REMOVE_RESTS_BETWEEN_NOTES = "remote_rests_between_notes";
-	@Action public static final String CHANGE_UI = "change_ui";
 	@Action public static final String USE_DEFAULT_SOUNDBANK = "use_default_soundbank";
 	@Action public static final String SET_TEMP_MUTE = "set_temp_mute";
 	@Action public static final String UNSET_TEMP_MUTE = "unset_temp_mute";
@@ -278,7 +274,6 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(KEYBOARD_INPUT, t -> mmlSeqView.showKeyboardInput());
 		actionMap.put(INPUT_EMPTY_CORRECTION, t -> this.inputEmptyCorrection());
 		actionMap.put(REMOVE_RESTS_BETWEEN_NOTES, t -> editState.removeRestsBetweenNotes());
-		actionMap.put(CHANGE_UI, t -> this.changeUI());
 		actionMap.put(USE_DEFAULT_SOUNDBANK, t -> this.showAppRestartDialog());
 		actionMap.put(SET_TEMP_MUTE, t -> editState.setTempMute(true));
 		actionMap.put(UNSET_TEMP_MUTE, t -> editState.setTempMute(false));
@@ -801,17 +796,6 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	private void duplicateMMLTrack() {
 		MMLTrack track = mmlSeqView.getSelectedTrack().clone();
 		mmlSeqView.addMMLTrack(track);
-	}
-
-	private void changeUI() {
-		try {
-			if (appProperties.useSystemLaF.get()) {
-				UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
-			} else {
-				UIManager.setLookAndFeel( new FlatLightLaf() );
-			}
-			SwingUtilities.updateComponentTreeUI(mainFrame);
-		} catch (Exception e) {}
 	}
 
 	private void showAppRestartDialog() {
