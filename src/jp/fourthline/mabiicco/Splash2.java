@@ -59,11 +59,13 @@ public final class Splash2 extends JDialog implements ISplash {
 			add(version);
 			version.setText("Version: "+AppResource.getVersionText());
 			version.setBounds(200, 290, 120, 14);
+			version.setForeground(Color.BLACK);
 			add(textArea);
 			textArea.setEditable(false);
 			textArea.setBounds(20, 313, WIDTH-40, 80);
 			textArea.setBorder(new Splash.RoundBorder(20, 10));
 			textArea.setOpaque(false);
+			textArea.setForeground(Color.BLACK);
 			setOpaque(false);
 		}
 

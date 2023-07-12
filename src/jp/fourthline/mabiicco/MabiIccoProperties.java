@@ -33,7 +33,7 @@ import jp.fourthline.mmlTools.core.ResourceLoader;
 import jp.fourthline.mmlTools.optimizer.MMLStringOptimizer;
 
 public final class MabiIccoProperties {
-	private final Properties properties = new Properties();
+	private final PreloadedProperties properties = new PreloadedProperties();
 
 	private static final MabiIccoProperties instance = new MabiIccoProperties();
 	private final static String CONFIG_FILE = ".mabiicco.config";
@@ -151,35 +151,8 @@ public final class MabiIccoProperties {
 		return instance;
 	}
 
-	private final boolean test_mode;
-
 	private MabiIccoProperties() {
-		test_mode = System.getProperty("mabiicco.test_mode") != null;
-		if (!test_mode) {
-			try {
-				FileInputStream in = new FileInputStream(ResourceLoader.getAppConfigPath(CONFIG_FILE));
-				properties.load(in);
-				in.close();
-				initFileHistory();
-			} catch (InvalidPropertiesFormatException e) {
-			} catch (FileNotFoundException e) {
-			} catch (IOException e) {
-			}
-		}
-	}
-
-	private void save() {
-		if (!test_mode) {
-			try {
-				FileOutputStream out = new FileOutputStream(ResourceLoader.getAppConfigPath(CONFIG_FILE));
-				properties.store(out, "");
-				out.close();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+		initFileHistory();
 	}
 
 	public String getRecentFile() {
@@ -188,7 +161,7 @@ public final class MabiIccoProperties {
 
 	public void setRecentFile(String path) {
 		properties.setProperty(RECENT_FILE, path);
-		save();
+		properties.save();
 	}
 
 	public List<File> getDlsFile() {
@@ -235,7 +208,7 @@ public final class MabiIccoProperties {
 			properties.setProperty(WINDOW_Y, Integer.toString((int)rect.getY()));
 			properties.setProperty(WINDOW_WIDTH, Integer.toString((int)rect.getWidth()));
 			properties.setProperty(WINDOW_HEIGHT, Integer.toString((int)rect.getHeight()));
-			save();
+			properties.save();
 		}
 	}
 
@@ -263,7 +236,7 @@ public final class MabiIccoProperties {
 		for (int i = 0; i < fileHistory.size(); i++) {
 			properties.setProperty(FILE_HISTORY+i, fileHistory.get(i).getAbsolutePath());
 		}
-		save();
+		properties.save();
 	}
 
 	public interface Property<T> extends Supplier<T> {
@@ -290,21 +263,21 @@ public final class MabiIccoProperties {
 	private abstract class AbstractProperty<T> implements Property<T> {
 		protected final String name;
 		protected final T defaultValue;
-		protected final Consumer<T> optDo;
+		protected Consumer<T> optDo;
 
 		private AbstractProperty(String name, T defaultValue, Consumer<T> optDo) {
 			this.name = name;
 			this.defaultValue = defaultValue;
 			this.optDo = optDo;
 			if (optDo != null) {
-				optDo.accept(defaultValue);
+				optDo.accept(get());
 			}
 		}
 
 		@Override
 		public void set(T str) {
 			properties.setProperty(name, stringValue(str));
-			save();
+			properties.save();
 			if (optDo != null) {
 				optDo.accept(str);
 			}
@@ -316,10 +289,6 @@ public final class MabiIccoProperties {
 			T value = parseValue(str);
 			if (value == null) {
 				value = defaultValue;
-			}
-			if (optDo != null) {
-				// 設定ファイルからの反映に必要
-				optDo.accept(value);
 			}
 			return value;
 		}
@@ -380,8 +349,12 @@ public final class MabiIccoProperties {
 		}
 
 		private EnumProperty(String name, T[] values, T defaultValue, Consumer<T> optDo) {
-			super(name, defaultValue, optDo);
+			super(name, defaultValue, null); // values代入前なので optDo処理は行わせない.
 			this.values = values;
+			this.optDo = optDo;
+			if (optDo != null) {
+				optDo.accept(get());
+			}
 		}
 
 		@Override
@@ -409,6 +382,41 @@ public final class MabiIccoProperties {
 
 		public T[] getValues() {
 			return values;
+		}
+	}
+
+	private static final class PreloadedProperties extends Properties {
+		private static final long serialVersionUID = 7450043736414817020L;
+		private final boolean test_mode;
+		private final String path;
+		private PreloadedProperties() {
+			test_mode = System.getProperty("mabiicco.test_mode") != null;
+			path = ResourceLoader.getAppConfigPath(CONFIG_FILE);
+			if (!test_mode) {
+				try {
+					FileInputStream in = new FileInputStream(path);
+					super.load(in);
+					in.close();
+				} catch (InvalidPropertiesFormatException e) {
+				} catch (FileNotFoundException e) {
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		private void save() {
+			if (!test_mode) {
+				try {
+					FileOutputStream out = new FileOutputStream(path);
+					store(out, "");
+					out.close();
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 }
