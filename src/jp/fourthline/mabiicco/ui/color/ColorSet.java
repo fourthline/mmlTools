@@ -7,8 +7,6 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.function.Supplier;
 
-import jp.fourthline.mabiicco.MabiIccoProperties;
-
 /**
  * ライトカラーとダークカラーのセット
  */
@@ -17,7 +15,7 @@ public final class ColorSet implements Supplier<Color> {
 	private static final ArrayList<ColorSet> list = new ArrayList<>();
 
 	public static ColorSet create(Color lightColor, Color darkColor) {
-		var o = new ColorSet(lightColor, darkColor, MabiIccoProperties.getInstance().laf.get().isLight());
+		var o = new ColorSet(lightColor, darkColor, ColorSet.lightMode);
 		list.add(o);
 		return o;
 	}
@@ -26,7 +24,9 @@ public final class ColorSet implements Supplier<Color> {
 		return create(color, color);
 	}
 
+	private static boolean lightMode = true;
 	public static void update(boolean lightMode) {
+		ColorSet.lightMode = lightMode;
 		list.forEach(t -> t.changeCurrentColor(lightMode));
 	}
 

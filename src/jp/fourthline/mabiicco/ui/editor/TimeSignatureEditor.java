@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 たんらる
+ * Copyright (C) 2022-2023 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.editor;
@@ -29,14 +29,10 @@ import jp.fourthline.mmlTools.core.UndefinedTickException;
 public final class TimeSignatureEditor extends AbstractMarkerEditor<TimeSignature> {
 
 	private final Frame parentFrame;
-	private final JComboBox<String> timeCount = new JComboBox<>(TimeSignature.TIME_COUNT_LIST);
-	private final JComboBox<String> timeBase = new JComboBox<>(TimeSignature.TIME_BASE_LIST);
-	private final JLabel sepLabel = new JLabel("/");
 
 	public TimeSignatureEditor(Frame parentFrame, IMMLManager mmlManager, IEditAlign editAlign, IViewTargetMarker viewTargetMarker) {
 		super("timeSign", mmlManager, editAlign, viewTargetMarker);
 		this.parentFrame = parentFrame;
-		timeBase.setMaximumRowCount(2);   // JComboBoxの性能劣化対策
 	}
 
 	@Override
@@ -45,6 +41,11 @@ public final class TimeSignatureEditor extends AbstractMarkerEditor<TimeSignatur
 	}
 
 	private TimeSignature showTimeSignatureInputDialog(String title) {
+		JComboBox<String> timeCount = new JComboBox<>(TimeSignature.TIME_COUNT_LIST);
+		JComboBox<String> timeBase = new JComboBox<>(TimeSignature.TIME_BASE_LIST);
+		timeBase.setMaximumRowCount(2);   // JComboBoxの性能劣化対策
+		JLabel sepLabel = new JLabel("/");
+
 		JPanel panel = new JPanel();
 		panel.add(timeCount);
 		panel.add(sepLabel);

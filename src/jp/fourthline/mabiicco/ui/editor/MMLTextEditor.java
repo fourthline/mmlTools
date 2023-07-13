@@ -46,6 +46,7 @@ import javax.swing.text.StyleContext;
 import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.ui.IMMLManager;
 import jp.fourthline.mabiicco.ui.PianoRollView;
+import jp.fourthline.mabiicco.ui.color.ColorSet;
 import jp.fourthline.mmlTools.MMLBuilder;
 import jp.fourthline.mmlTools.MMLEventList;
 import jp.fourthline.mmlTools.MMLTempoEvent;
@@ -66,10 +67,15 @@ public final class MMLTextEditor implements DocumentListener, CaretListener {
 	private final JTextPane textPane = new JTextPane();
 
 	private final DefaultStyledDocument doc = new DefaultStyledDocument(new StyleContext());
-	private static final AttributeSet emptyStyle = createAttribute(Color.DARK_GRAY);
-	private static final AttributeSet normalStyle = createAttribute(Color.BLACK);
-	private static final AttributeSet tokenStyle = createAttribute(Color.BLUE);
-	private static final AttributeSet commentStyle = createAttribute(Color.decode("#006400"));
+	private static final ColorSet emptyStyleColor = ColorSet.create(Color.DARK_GRAY, Color.GRAY);
+	private static final ColorSet normalStyleColor = ColorSet.create(Color.BLACK, Color.LIGHT_GRAY);
+	private static final ColorSet tokenStyleColor = ColorSet.create(Color.BLUE, Color.CYAN);
+	private static final ColorSet commentStyleColor = ColorSet.create(Color.decode("#006400"), Color.decode("#66AA66"));
+
+	private final AttributeSet emptyStyle = createAttribute(emptyStyleColor.get());
+	private final AttributeSet normalStyle = createAttribute(normalStyleColor.get());
+	private final AttributeSet tokenStyle = createAttribute(tokenStyleColor.get());
+	private final AttributeSet commentStyle = createAttribute(commentStyleColor.get());
 
 	private static AttributeSet createAttribute(Color foreground) {
 		var attr = new SimpleAttributeSet();

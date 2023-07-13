@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2022 たんらる
+ * Copyright (C) 2017-2023 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.editor;
@@ -36,6 +36,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerModel;
 
+import jp.fourthline.mabiicco.ActionDispatcher;
 import jp.fourthline.mabiicco.MabiIccoProperties;
 import jp.fourthline.mabiicco.midi.IPlayNote;
 import jp.fourthline.mabiicco.midi.InstClass;
@@ -111,6 +112,9 @@ public final class KeyboardEditor {
 		this.pianoRollView = pianoRollView;
 		this.parentFrame = parentFrame;
 		dialog = new JDialog(parentFrame, appText("edit.keyboard.input"), true);
+
+		// laf更新反映のため.
+		ActionDispatcher.getInstance().addUpdateUIComponent(dialog);
 
 		initializePanel();
 	}

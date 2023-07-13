@@ -4,6 +4,7 @@
 
 package jp.fourthline.mabiicco;
 
+import java.awt.Component;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,7 +21,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
@@ -161,6 +164,9 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	private final JFileChooser wavoutFileChooser;
 	private final JFileChooser txtFileChooser;
 
+	// laf変更時に更新が必要なもののリスト
+	private final List<Component> updateUIComponents = new ArrayList<>();
+
 	private final MabiIccoProperties appProperties = MabiIccoProperties.getInstance();
 
 	private boolean testMode = false;
@@ -173,15 +179,29 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		return instance;
 	}
 
+	/**
+	 * laf更新時に更新が必要なコンポーネントを追加する.
+	 * @param c
+	 */
+	public void addUpdateUIComponent(Component c) {
+		updateUIComponents.add(c);
+	}
+
 	private ActionDispatcher() {
 		openFileChooser = MabiIcco.createFileChooser();
 		saveFileChooser = MabiIcco.createFileChooser();
 		exportFileChooser = MabiIcco.createFileChooser();
 		wavoutFileChooser = MabiIcco.createFileChooser();
 		txtFileChooser = MabiIcco.createFileChooser();
+
+		List.of(openFileChooser, saveFileChooser, exportFileChooser, wavoutFileChooser, txtFileChooser).forEach(t -> updateUIComponents.add((Component)t));
 	}
 
 	public ActionDispatcher setMainFrame(MainFrame mainFrame) {
+		if (this.mainFrame != null) {
+			updateUIComponents.remove(this.mainFrame);
+		}
+		updateUIComponents.add(mainFrame);
 		this.mainFrame = mainFrame;
 		this.mmlSeqView = mainFrame.getMMLSeqView();
 		this.fileState = this.mmlSeqView.getFileState();
@@ -845,7 +865,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 				laf = laf.update();
 				if (laf != null) {
 					appProperties.laf.set(laf);
-					SwingUtilities.updateComponentTreeUI(mainFrame);
+					updateUIComponents.forEach(t -> SwingUtilities.updateComponentTreeUI(t));
 					mainFrame.repaint();
 				}
 			} else {

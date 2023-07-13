@@ -19,6 +19,7 @@ import jp.fourthline.mabiicco.MabiIccoProperties;
 import jp.fourthline.mabiicco.midi.IPlayNote;
 import jp.fourthline.mabiicco.midi.InstClass;
 import jp.fourthline.mabiicco.midi.MabiDLS;
+import jp.fourthline.mabiicco.ui.color.ColorSet;
 import jp.fourthline.mabiicco.midi.MMLMidiTrack.OverlapMode;
 import jp.fourthline.mmlTools.MMLNoteEvent;
 
@@ -41,6 +42,10 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 
 	private final Color borderColor = new Color(0.3f, 0.3f, 0.3f);
 	private final Color octaveBorderColor = new Color(0.3f, 0.3f, 0.6f);
+
+	private final ColorSet whiteKeyColor = ColorSet.create(Color.WHITE, Color.LIGHT_GRAY);
+	private final ColorSet blackKeyColor = ColorSet.create(Color.BLACK);
+	private final ColorSet backgroundColor = ColorSet.create(Color.LIGHT_GRAY, Color.DARK_GRAY);
 
 	/**
 	 * Create the panel.
@@ -87,7 +92,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 		int height = pianoRollView.getTotalHeight();
 
 		Graphics2D g2 = (Graphics2D)g.create();
-		g2.setColor(Color.WHITE);
+		g2.setColor(whiteKeyColor.get());
 		g2.fillRect(0, 0, width, height);
 
 		for (int i = 0; i <= PianoRollView.OCTNUM; i++) {
@@ -99,7 +104,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 
 		// 残りの領域があれば塗りつぶす
 		if (height < getHeight()) {
-			g2.setColor(Color.LIGHT_GRAY);
+			g2.setColor(backgroundColor.get());
 			g2.fillRect(0, height+1, width, getHeight() - height);
 		}
 
@@ -170,7 +175,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 			y += startY;
 			if (y + height > yLimit) break;
 
-			g.setColor(Color.BLACK);
+			g.setColor(blackKeyColor.get());
 			g.fillRect(0, y, 20, height);
 
 			g.setColor(borderColor);

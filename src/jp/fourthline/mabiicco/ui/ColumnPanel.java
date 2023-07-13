@@ -28,6 +28,7 @@ import javax.swing.event.PopupMenuListener;
 import jp.fourthline.mabiicco.MabiIccoProperties;
 import jp.fourthline.mabiicco.midi.MabiDLS;
 import jp.fourthline.mabiicco.ui.color.ColorManager;
+import jp.fourthline.mabiicco.ui.color.ColorSet;
 import jp.fourthline.mabiicco.ui.editor.IEditAlign;
 import jp.fourthline.mabiicco.ui.editor.IMarkerEditor;
 import jp.fourthline.mabiicco.ui.editor.MMLTempoEditor;
@@ -47,13 +48,14 @@ import jp.fourthline.mmlTools.core.UndefinedTickException;
 public final class ColumnPanel extends JPanel implements MouseListener, MouseMotionListener, IViewTargetMarker {
 	private static final long serialVersionUID = -6609938350741425221L;
 
-	private static final Color BEAT_BORDER_COLOR = new Color(0.4f, 0.4f, 0.4f);
+	private static final ColorSet BEAT_BORDER_COLOR = ColorSet.create(new Color(0.4f, 0.4f, 0.4f), new Color(128, 128, 128));
 	private static final Color TEMPO_MAKER_FILL_COLOR = new Color(0.4f, 0.8f, 0.8f);
 	private static final Color MAKER_FILL_COLOR = new Color(0.2f, 0.8f, 0.2f);
 	private static final Color TIME_SIGNATURE_FILL_COLOR = new Color(255, 165, 0);
 	private static final Color TARGET_MAKER_FILL_COLOR = new Color(0.9f, 0.7f, 0.0f, 0.6f);
-	private static final Color START_COMMON_OFFSET_COLOR = new Color(255, 167, 227);
-	private static final Color START_OFFSET_COLOR = new Color(255, 202, 227);
+	private static final ColorSet START_COMMON_OFFSET_COLOR = ColorSet.create(new Color(255, 167, 227), Color.decode("#993366"));
+	private static final ColorSet START_OFFSET_COLOR = ColorSet.create(new Color(255, 202, 227), Color.decode("#996666"));
+	private static final ColorSet TEXT_COLOR = ColorSet.create(Color.DARK_GRAY, Color.LIGHT_GRAY);
 	private static final int DRAW_HEIGHT = 32;
 	private static final int DRAW_OFFSET_HEIGHT = 6;
 
@@ -152,10 +154,10 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 		int x1 = pianoRollView.convertTicktoX(mmlManager.getActiveTrack().getCommonStartOffset());
 		int x2 = pianoRollView.convertTicktoX(mmlManager.getActiveMMLPartStartOffset());
 
-		g.setColor(START_COMMON_OFFSET_COLOR);
+		g.setColor(START_COMMON_OFFSET_COLOR.get());
 		g.fillRect(0, DRAW_HEIGHT, x1, DRAW_OFFSET_HEIGHT);
 
-		g.setColor(START_OFFSET_COLOR);
+		g.setColor(START_OFFSET_COLOR.get());
 		g.fillRect(0, DRAW_HEIGHT+DRAW_OFFSET_HEIGHT, x2, DRAW_OFFSET_HEIGHT);
 	}
 
@@ -170,7 +172,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 		int md = 0;
 		int y2 = getHeight();
 		long length = pianoRollView.convertXtoTick( getWidth() );
-		g.setColor(BEAT_BORDER_COLOR);
+		g.setColor(BEAT_BORDER_COLOR.get());
 
 		int nextMeasureOffset = 0;
 		TimeSignature timeSignature = timeSignatureIterator.hasNext() ? timeSignatureIterator.next() : null;
@@ -231,13 +233,13 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 			}
 
 			// label
-			g.setColor(Color.DARK_GRAY);
+			g.setColor(TEXT_COLOR.get());
 			g.drawString(s, x+6, DRAW_HEIGHT-2+dy);
 
 			// icon
 			g.setColor(color);
 			g.fillPolygon(xPoints, yPoints, xPoints.length);
-			g.setColor(BEAT_BORDER_COLOR);
+			g.setColor(BEAT_BORDER_COLOR.get());
 			g.drawPolygon(xPoints, yPoints, xPoints.length);
 		} catch (UndefinedTickException e) {
 			e.printStackTrace();
@@ -256,7 +258,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 		// icon
 		g.setColor(TARGET_MAKER_FILL_COLOR);
 		g.fillPolygon(xPoints, yPoints, xPoints.length);
-		g.setColor(BEAT_BORDER_COLOR);
+		g.setColor(BEAT_BORDER_COLOR.get());
 		g.drawPolygon(xPoints, yPoints, xPoints.length);
 	}
 

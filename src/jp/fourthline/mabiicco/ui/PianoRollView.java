@@ -105,15 +105,15 @@ public final class PianoRollView extends JPanel {
 		this.scaleColor = scaleColor;
 	}
 
-	private static final ColorSet noSoundColor = ColorSet.create(new Color(0.9f, 0.8f, 0.8f), Color.RED);
-	private static final ColorSet outRangeColor = ColorSet.create(new Color(230, 204, 204), Color.RED);
+	private static final ColorSet noSoundColor = ColorSet.create(new Color(0.9f, 0.8f, 0.8f), new Color(180, 150, 150));
+	private static final ColorSet outRangeColor = ColorSet.create(new Color(230, 204, 204), new Color(180, 150, 150));
 
 	private static final ColorSet barBorder = ColorSet.create(new Color(0.5f, 0.5f, 0.5f));
 	private static final ColorSet darkBarBorder = ColorSet.create(new Color(0.3f, 0.2f, 0.3f));
 
-	private static final ColorSet shadowColor = ColorSet.create(Color.GRAY);
+	private static final ColorSet shadowColor = ColorSet.create(Color.GRAY, Color.DARK_GRAY);
 
-	private static final Color START_OFFSET_COLOR = new Color(0.9f, 0.8f, 0.8f);
+	private static final ColorSet START_OFFSET_COLOR = ColorSet.create(new Color(0.9f, 0.8f, 0.8f), new Color(180, 150, 150));
 	private static final ColorSet seqBarColor = ColorSet.create(Color.RED);
 	private static final ColorSet vStrColor = ColorSet.create(Color.DARK_GRAY);
 
@@ -398,7 +398,7 @@ public final class PianoRollView extends JPanel {
 			}
 			g.setColor(fillColor);
 			g.fillRect(0, y, width, noteHeight.h);
-			g.setColor(START_OFFSET_COLOR);
+			g.setColor(START_OFFSET_COLOR.get());
 			g.fillRect(0, y, startOffsetX, noteHeight.h);
 			if (i == 0) {
 				g.setColor(darkBarBorder.get());
