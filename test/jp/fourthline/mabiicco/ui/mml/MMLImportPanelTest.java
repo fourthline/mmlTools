@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 たんらる
+ * Copyright (C) 2022-2023 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.mml;
@@ -9,11 +9,12 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import jp.fourthline.UseLoadingDLS;
 import jp.fourthline.mabiicco.ui.IMMLManager;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTrack;
 
-public final class MMLImportPanelTest {
+public final class MMLImportPanelTest extends UseLoadingDLS {
 	private IMMLManager mmlManager = new MMLManagerStub();
 
 	@Before

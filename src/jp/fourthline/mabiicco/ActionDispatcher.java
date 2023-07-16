@@ -60,6 +60,7 @@ import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.core.NanoTime;
 import jp.fourthline.mmlTools.parser.IMMLFileParser;
 import jp.fourthline.mmlTools.parser.MMLParseException;
+import sun.swing.FilePane;
 
 public final class ActionDispatcher implements ActionListener, IFileStateObserver, IEditStateObserver {
 	private MainFrame mainFrame;
@@ -187,12 +188,34 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		updateUIComponents.add(c);
 	}
 
+	/**
+	 * Detail表示をデフォルトにするファイルChooser
+	 */
+	private static final class CuFileChooser extends JFileChooser {
+		private static final long serialVersionUID = 3081886805862237099L;
+		private CuFileChooser() {
+			super();
+			viewDetails();
+		}
+		private void viewDetails() {
+			var detailsAction = getActionMap().get(FilePane.ACTION_VIEW_DETAILS);
+			if (detailsAction != null) {
+				detailsAction.actionPerformed(null);
+			}
+		}
+		@Override
+		public void updateUI() {
+			super.updateUI();
+			viewDetails();
+		}
+	}
+
 	private ActionDispatcher() {
-		openFileChooser = MabiIcco.createFileChooser();
-		saveFileChooser = MabiIcco.createFileChooser();
-		exportFileChooser = MabiIcco.createFileChooser();
-		wavoutFileChooser = MabiIcco.createFileChooser();
-		txtFileChooser = MabiIcco.createFileChooser();
+		openFileChooser = new CuFileChooser();
+		saveFileChooser = new CuFileChooser();
+		exportFileChooser = new CuFileChooser();
+		wavoutFileChooser = new CuFileChooser();
+		txtFileChooser = new CuFileChooser();
 
 		List.of(openFileChooser, saveFileChooser, exportFileChooser, wavoutFileChooser, txtFileChooser).forEach(t -> updateUIComponents.add((Component)t));
 	}
@@ -825,7 +848,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	}
 
 	private void selectDLSFile() {
-		JFileChooser fileChooser = MabiIcco.createFileChooser();
+		JFileChooser fileChooser = new CuFileChooser();
 		fileChooser.setCurrentDirectory(new File("."));
 		FileFilter dlsFilter = new FileNameExtensionFilter(AppResource.appText("file.dls"), "dls");
 		fileChooser.addChoosableFileFilter(dlsFilter);

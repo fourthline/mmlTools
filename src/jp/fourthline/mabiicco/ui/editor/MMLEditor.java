@@ -105,6 +105,9 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		createTupletMenu = newPopupMenu(AppResource.appText("edit.convert_tuplet"), ActionDispatcher.CONVERT_TUPLET);
 		newPopupMenu(AppResource.appText("menu.delete"), ActionDispatcher.DELETE, AppResource.appText("menu.delete.icon"));
 		newPopupMenu(AppResource.appText("note.properties"), ActionDispatcher.NOTE_PROPERTY);
+
+		// laf変更反映対応
+		ActionDispatcher.getInstance().addUpdateUIComponent(popupMenu);
 	}
 
 	public void setEditAlign(int alignTick) {

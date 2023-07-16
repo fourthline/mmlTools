@@ -12,16 +12,19 @@ import com.formdev.flatlaf.FlatLightLaf;
 import jp.fourthline.mabiicco.ui.SettingButtonGroupItem;
 
 public enum Laf implements SettingButtonGroupItem {
-	SYSTEM(UIManager.getSystemLookAndFeelClassName(), true),
-	LIGHT(FlatLightLaf.class.getCanonicalName(), true),
-	DARK(FlatDarkLaf.class.getCanonicalName(), false);
+	SYSTEM(UIManager.getSystemLookAndFeelClassName(), "ui.system", true),
+	LIGHT(FlatLightLaf.class.getCanonicalName(), "ui.light", true),
+	DARK(FlatDarkLaf.class.getCanonicalName(), "ui.dark", false);
 
 	private final String lafName;
+	private final String text;
 	private final boolean lightMode;
 
-	private Laf(String lafName, boolean lightMode) {
+	private Laf(String lafName, String text, boolean lightMode) {
 		this.lafName = lafName;
+		this.text = AppResource.appText(text);
 		this.lightMode = lightMode;
+		System.out.println(lafName);
 	}
 
 	public Laf update() {
@@ -37,7 +40,7 @@ public enum Laf implements SettingButtonGroupItem {
 
 	@Override
 	public String getButtonName() {
-		return lafName;
+		return text;
 	}
 
 	public boolean isLight() {

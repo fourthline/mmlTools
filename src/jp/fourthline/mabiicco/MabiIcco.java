@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2022 たんらる
+ * Copyright (C) 2014-2023 たんらる
  */
 
 package jp.fourthline.mabiicco;
@@ -13,12 +13,9 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.sound.midi.InvalidMidiDataException;
-import javax.swing.Action;
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
-import sun.swing.FilePane;
 import jp.fourthline.mabiicco.midi.InstType;
 import jp.fourthline.mabiicco.midi.MabiDLS;
 import jp.fourthline.mabiicco.ui.MainFrame;
@@ -137,23 +134,21 @@ public final class MabiIcco {
 		return dls.getAvailableInstByInstType(InstType.MAIN_INST_LIST).length > 0;
 	}
 
-	private static void setUIFont(javax.swing.plaf.FontUIResource resource) {
-		for (Object key : Collections.list(UIManager.getDefaults().keys())) {
-			Object value = UIManager.get(key);
-			if (value instanceof javax.swing.plaf.FontUIResource) {
-				UIManager.put(key, resource);
+	/**
+	 * フォント設定の行う.
+	 * laf変更時は設定維持されているので更新不要.
+	 */
+	private static void setUIFont() {
+		String fontName = AppResource.appText("ui.font");
+		if (!fontName.equals("ui.font")) {
+			var resource = new javax.swing.plaf.FontUIResource(fontName, Font.PLAIN, 11);
+			for (Object key : Collections.list(UIManager.getDefaults().keys())) {
+				Object value = UIManager.get(key);
+				if (value instanceof javax.swing.plaf.FontUIResource) {
+					UIManager.put(key, resource);
+				}
 			}
 		}
-	}
-
-	public static JFileChooser createFileChooser() {
-		JFileChooser chooser = new JFileChooser();
-		Action detailsAction = chooser.getActionMap().get(FilePane.ACTION_VIEW_DETAILS);
-		if (detailsAction != null) {
-			detailsAction.actionPerformed(null);
-		}
-
-		return chooser;
 	}
 
 	public static void main(String[] args) {
@@ -166,10 +161,7 @@ public final class MabiIcco {
 			properties.laf.get().update();
 
 			// font
-			String fontName = AppResource.appText("ui.font");
-			if (!fontName.equals("ui.font")) {
-				setUIFont(new javax.swing.plaf.FontUIResource(fontName, Font.PLAIN, 11));
-			}
+			setUIFont();
 
 			new MabiIcco(args).start();
 		} catch (Throwable e) {

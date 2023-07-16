@@ -25,6 +25,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
+import jp.fourthline.mabiicco.ActionDispatcher;
 import jp.fourthline.mabiicco.MabiIccoProperties;
 import jp.fourthline.mabiicco.midi.MabiDLS;
 import jp.fourthline.mabiicco.ui.color.ColorManager;
@@ -101,6 +102,9 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 				pianoRollView.repaint();
 			}
 		});
+
+		// laf変更反映対応
+		ActionDispatcher.getInstance().addUpdateUIComponent(popupMenu);
 	}
 
 	@Override
