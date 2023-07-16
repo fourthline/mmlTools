@@ -88,16 +88,14 @@ public final class MMLStringOptimizer {
 	 * MML最適化 Normal
 	 */
 	private String optimize() {
-		Optimizer[] optimizerList1 = {
+		return optimize(!disableNopt ? new Optimizer[] {
 				new OxLxOptimizer(),
 				new BpCmOptimizer(),
 				new NxOptimizer()
-		};
-		Optimizer[] optimizerList2 =  {
+		} : new Optimizer[] {
 				new OxLxOptimizer(),
 				new BpCmOptimizer()
-		};
-		return optimize(!disableNopt ? optimizerList1 : optimizerList2);
+		});
 	}
 
 	private String optimize(Optimizer[] optimizerList) {
