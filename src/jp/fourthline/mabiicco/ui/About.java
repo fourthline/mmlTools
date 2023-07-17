@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2022 たんらる
+ * Copyright (C) 2014-2023 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
@@ -28,6 +28,7 @@ import javax.swing.tree.TreeCellRenderer;
 
 import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.midi.InstClass;
+import jp.fourthline.mabiicco.midi.InstType.DrumsType;
 import jp.fourthline.mabiicco.midi.InstType.NormalType;
 import jp.fourthline.mabiicco.midi.InstType.PercussionType;
 import jp.fourthline.mabiicco.midi.InstType.SongType;
@@ -146,6 +147,7 @@ public final class About {
 		private static final Icon N_ICON = new CircleIcon(10, Color.BLUE, null);
 		private static final Icon P_ICON = new CircleIcon(10, Color.ORANGE, null);
 		private static final Icon S_ICON = new CircleIcon(10, Color.GREEN, null);
+		private static final Icon D_ICON = new CircleIcon(10, Color.MAGENTA, null);
 		private static final Icon B_ICON = new CircleIcon(8, null, Color.GRAY);
 		private static final Icon DLS_ICON = AppResource.getImageIcon("/img/dls_icon.png");
 
@@ -162,6 +164,8 @@ public final class About {
 				} else if (obj instanceof InstClass inst) {
 					if (inst.getType() instanceof SongType) {
 						setIcon(S_ICON);
+					} if (inst.getType() instanceof DrumsType) {
+						setIcon(D_ICON);
 					} else if (inst.getType() instanceof NormalType) {
 						setIcon(N_ICON);
 					} else if (inst.getType() instanceof PercussionType) {

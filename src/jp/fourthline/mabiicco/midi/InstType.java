@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2022 たんらる
+ * Copyright (C) 2014-2023 たんらる
  */
 
 package jp.fourthline.mabiicco.midi;
@@ -41,7 +41,7 @@ public interface InstType {
 	InstType NORMAL = new NormalType();
 
 	/** 打楽器楽器 [ melody ], 移調できない. */
-	InstType DRUMS = new PercussionType(false);
+	InstType PERCUSSION = new PercussionType(false);
 
 	/** 打楽器楽器 [ melody ], 移調できる. (シロフォン) */
 	InstType KPUR = new PercussionType(true);
@@ -52,10 +52,13 @@ public interface InstType {
 	/** コーラス [ song ]. */
 	InstType CHORUS = new SongType();
 
+	/** ドラム [ melody, chord1, chord2 ], 移調できない. */
+	InstType DRUMS = new DrumsType();
+
 	/**
 	 * 単独で使用可能なメインの楽器のリスト.
 	 */
-	List<InstType> MAIN_INST_LIST = Arrays.asList(NORMAL, DRUMS, KPUR, VOICE);
+	List<InstType> MAIN_INST_LIST = Arrays.asList(NORMAL, PERCUSSION, KPUR, VOICE, DRUMS);
 
 	/**
 	 * 単独で使用不能なサブの楽器のリスト.
@@ -66,10 +69,11 @@ public interface InstType {
 		switch (s) {
 		case "0": return NONE;
 		case "N": return NORMAL;
-		case "D": return DRUMS;
+		case "P": return PERCUSSION;
 		case "V": return VOICE;
 		case "C": return CHORUS;
 		case "K": return KPUR;
+		case "D": return DRUMS;
 		default : throw new AssertionError();
 		}
 	}
@@ -148,6 +152,13 @@ public interface InstType {
 	public class SongType extends NormalType {
 		private SongType() {
 			super(false);
+		}
+	}
+
+	public class DrumsType extends NormalType {
+		@Override
+		public boolean allowTranspose() {
+			return false;
 		}
 	}
 

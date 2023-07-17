@@ -24,7 +24,6 @@ public enum Laf implements SettingButtonGroupItem {
 		this.lafName = lafName;
 		this.text = AppResource.appText(text);
 		this.lightMode = lightMode;
-		System.out.println(lafName);
 	}
 
 	public Laf update() {

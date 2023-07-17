@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 たんらる
+ * Copyright (C) 2015-2023 たんらる
  */
 
 package jp.fourthline.mabiicco.midi;
@@ -8,10 +8,10 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-/**
- * 
- */
-public final class InstTypeTest {
+import jp.fourthline.UseLoadingDLS;
+
+
+public final class InstTypeTest extends UseLoadingDLS {
 
 	private void checktInstType(InstType type, boolean allowTranspose, boolean[] expectPart, int[] expectVelocity) {
 		assertEquals(allowTranspose, type.allowTranspose());
@@ -37,9 +37,36 @@ public final class InstTypeTest {
 
 		checktInstType(InstType.NONE,   true,  nonePart,  noneVelocity);
 		checktInstType(InstType.NORMAL, true,  threePart, normalVelocity);
-		checktInstType(InstType.DRUMS,  false, onePart,   drumVelocity);
+		checktInstType(InstType.PERCUSSION,  false, onePart,   drumVelocity);
 		checktInstType(InstType.KPUR,   true,  onePart,   drumVelocity);
 		checktInstType(InstType.VOICE,  true,  songPart,  normalVelocity);
 		checktInstType(InstType.CHORUS, true,  songPart,  normalVelocity);
+		checktInstType(InstType.DRUMS, false,  threePart,  normalVelocity);
+	}
+
+	@Test
+	public void testStrInst() {
+		assertEquals(InstType.PERCUSSION, InstType.getInstType("P"));
+		assertEquals(InstType.DRUMS, InstType.getInstType("D"));
+		assertEquals(InstType.NORMAL, InstType.getInstType("N"));
+		assertEquals(InstType.NONE, InstType.getInstType("0"));
+		assertEquals(InstType.VOICE, InstType.getInstType("V"));
+		assertEquals(InstType.CHORUS, InstType.getInstType("C"));
+		assertEquals(InstType.KPUR, InstType.getInstType("K"));
+	}
+
+	@Test(expected =  AssertionError.class)
+	public void testStrInstEx() {
+		assertEquals(InstType.NONE, InstType.getInstType("A"));
+	}
+
+	@Test
+	public void testInstType() {
+		assertEquals(InstType.DRUMS, MabiDLS.getInstance().getInstByProgram(27).getType());
+		assertEquals(InstType.NORMAL, MabiDLS.getInstance().getInstByProgram(2).getType());
+		assertEquals(InstType.VOICE, MabiDLS.getInstance().getInstByProgram(120).getType());
+		assertEquals(InstType.PERCUSSION, MabiDLS.getInstance().getInstByProgram(66).getType());
+		assertEquals(InstType.CHORUS, MabiDLS.getInstance().getInstByProgram(110).getType());
+		assertEquals(InstType.KPUR, MabiDLS.getInstance().getInstByProgram(77).getType());
 	}
 }
