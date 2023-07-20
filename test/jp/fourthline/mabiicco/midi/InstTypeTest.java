@@ -6,6 +6,8 @@ package jp.fourthline.mabiicco.midi;
 
 import static org.junit.Assert.*;
 
+import java.util.List;
+
 import org.junit.Test;
 
 import jp.fourthline.UseLoadingDLS;
@@ -13,8 +15,9 @@ import jp.fourthline.UseLoadingDLS;
 
 public final class InstTypeTest extends UseLoadingDLS {
 
-	private void checktInstType(InstType type, boolean allowTranspose, boolean[] expectPart, int[] expectVelocity) {
+	private void checktInstType(InstType type, boolean allowTranspose, boolean allowTempoChord, boolean[] expectPart, int[] expectVelocity) {
 		assertEquals(allowTranspose, type.allowTranspose());
+		assertEquals(allowTempoChord, type.allowTempoChordPart());
 		assertEquals(expectPart.length, type.getEnablePart().length);
 		for (int i = 0; i < expectPart.length; i++) {
 			assertEquals(expectPart[i], type.getEnablePart()[i]);
@@ -35,13 +38,13 @@ public final class InstTypeTest extends UseLoadingDLS {
 		int[] normalVelocity = new int[] { 0, 0, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120, 120 };
 		int[] drumVelocity = new int[] { 0, 0, 11, 22, 33, 44, 55, 66, 77, 88, 99, 110, 121, 121, 121, 121, 121, 121 };
 
-		checktInstType(InstType.NONE,   true,  nonePart,  noneVelocity);
-		checktInstType(InstType.NORMAL, true,  threePart, normalVelocity);
-		checktInstType(InstType.PERCUSSION,  false, onePart,   drumVelocity);
-		checktInstType(InstType.KPUR,   true,  onePart,   drumVelocity);
-		checktInstType(InstType.VOICE,  true,  songPart,  normalVelocity);
-		checktInstType(InstType.CHORUS, true,  songPart,  normalVelocity);
-		checktInstType(InstType.DRUMS, false,  threePart,  normalVelocity);
+		checktInstType(InstType.NONE,   false, false, nonePart,  noneVelocity);
+		checktInstType(InstType.NORMAL, true, true, threePart, normalVelocity);
+		checktInstType(InstType.PERCUSSION,  false, false, onePart,   drumVelocity);
+		checktInstType(InstType.KPUR,   true, false, onePart,   drumVelocity);
+		checktInstType(InstType.VOICE,  true, false, songPart,  normalVelocity);
+		checktInstType(InstType.CHORUS, true, false, songPart,  normalVelocity);
+		checktInstType(InstType.DRUMS, false, true, threePart,  normalVelocity);
 	}
 
 	@Test
@@ -62,11 +65,23 @@ public final class InstTypeTest extends UseLoadingDLS {
 
 	@Test
 	public void testInstType() {
-		assertEquals(InstType.DRUMS, MabiDLS.getInstance().getInstByProgram(27).getType());
-		assertEquals(InstType.NORMAL, MabiDLS.getInstance().getInstByProgram(2).getType());
-		assertEquals(InstType.VOICE, MabiDLS.getInstance().getInstByProgram(120).getType());
-		assertEquals(InstType.PERCUSSION, MabiDLS.getInstance().getInstByProgram(66).getType());
-		assertEquals(InstType.CHORUS, MabiDLS.getInstance().getInstByProgram(110).getType());
-		assertEquals(InstType.KPUR, MabiDLS.getInstance().getInstByProgram(77).getType());
+		var dls = MabiDLS.getInstance();
+		assertEquals(InstType.DRUMS, dls.getInstByProgram(27).getType());
+		assertEquals(InstType.NORMAL, dls.getInstByProgram(2).getType());
+		assertEquals(InstType.VOICE, dls.getInstByProgram(120).getType());
+		assertEquals(InstType.PERCUSSION, dls.getInstByProgram(66).getType());
+		assertEquals(InstType.CHORUS, dls.getInstByProgram(110).getType());
+		assertEquals(InstType.KPUR, dls.getInstByProgram(77).getType());
+	}
+
+	@Test
+	public void testInstAll() {
+		var dls = MabiDLS.getInstance();
+		var mainList = dls.getAvailableInstByInstType(InstType.MAIN_INST_LIST);
+		var subList = dls.getAvailableInstByInstType(InstType.SUB_INST_LIST);
+		var allList = dls.getAllInst();
+		assertEquals(allList.size(), mainList.length + subList.length);
+		List.of(mainList).forEach(t -> assertTrue(allList.contains(t)));
+		List.of(subList).forEach(t -> assertTrue(allList.contains(t)));
 	}
 }

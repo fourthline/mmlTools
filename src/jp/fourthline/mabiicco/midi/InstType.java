@@ -80,56 +80,53 @@ public interface InstType {
 
 	int VOICE_PLAYBACK_CHANNEL = 10;
 
-	class NoneType implements InstType {
-		private final boolean[] enablePart = new boolean[] { false, false, false, false };
-
-		@Override
-		public boolean[] getEnablePart() {
-			return this.enablePart;
-		}
-
-		@Override
-		public boolean allowTranspose() {
-			return true;
+	public static class NoneType extends NormalType {
+		private NoneType() {
+			super(NormalType.NONE_PART, false, false);
 		}
 
 		@Override
 		public int convertVelocityMML2Midi(int mml_velocity) {
 			return 0;
 		}
-
-		@Override
-		public boolean allowTempoChordPart() {
-			return false;
-		}
 	}
 
 	/**
-	 * 移調可能な通常音量の音源. [ melody, chord1, chord2 ] or [ song ]
+	 * 移調可能な通常音量の音源. [ melody, chord1, chord2 ], 移調可能.
 	 */
-	public class NormalType implements InstType {
+	public static class NormalType implements InstType {
+		private static final boolean[] NONE_PART = new boolean[] { false, false, false, false };
+		private static final boolean[] ONE_PART = new boolean[] { true, false, false, false };
+		private static final boolean[] THREE_PART = new boolean[] { true, true, true, false };
+		private static final boolean[] SONG_PART = new boolean[] { false, false, false, true };
+
 		private final boolean[] enablePart;
+		private final boolean allowTranspose;
+		private final boolean allowTempoChordPart;
 
 		private NormalType() {
-			this(true);
+			this(NormalType.THREE_PART, true, true);
 		}
 
-		private NormalType(boolean isNormal) {
-			if (isNormal) {
-				this.enablePart = new boolean[] { true, true, true, false };
-			} else {
-				this.enablePart = new boolean[] { false, false, false, true };
-			}
+		private NormalType(boolean[] enablePart, boolean allowTranspose, boolean allowTempoChordPart) {
+			this.enablePart = enablePart;
+			this.allowTranspose = allowTranspose;
+			this.allowTempoChordPart = allowTempoChordPart;
 		}
 
 		@Override
-		public boolean[] getEnablePart() {
+		public final boolean[] getEnablePart() {
 			return this.enablePart;
 		}
 
 		@Override
-		public boolean allowTranspose() {
-			return true;
+		public final boolean allowTranspose() {
+			return this.allowTranspose;
+		}
+
+		@Override
+		public final boolean allowTempoChordPart() {
+			return allowTempoChordPart;
 		}
 
 		@Override
@@ -142,45 +139,32 @@ public interface InstType {
 			}
 			return (mml_velocity * 8);
 		}
-
-		@Override
-		public boolean allowTempoChordPart() {
-			return true;
-		}
 	}
 
-	public class SongType extends NormalType {
+	/**
+	 * 歌. [ song ], 移調可能.
+	 */
+	public static class SongType extends NormalType {
 		private SongType() {
-			super(false);
+			super(NormalType.SONG_PART, true, false);
 		}
 	}
 
-	public class DrumsType extends NormalType {
-		@Override
-		public boolean allowTranspose() {
-			return false;
+	/**
+	 * ドラム. [ melody, chord1, chord2 ], 移調不可.
+	 */
+	public static class DrumsType extends NormalType {
+		private DrumsType() {
+			super(NormalType.THREE_PART, false, true);
 		}
 	}
 
 	/**
 	 * 打楽器楽器 [ melody ], 移調可否を指定する.
 	 */
-	public class PercussionType implements InstType {
-		private final boolean[] enablePart = new boolean[] { true, false, false, false };
-		private final boolean allowTranspose;
-
+	public static class PercussionType extends NormalType {
 		private PercussionType(boolean allowTranspose) {
-			this.allowTranspose = allowTranspose;
-		}
-
-		@Override
-		public boolean[] getEnablePart() {
-			return this.enablePart;
-		}
-
-		@Override
-		public boolean allowTranspose() {
-			return this.allowTranspose;
+			super(NormalType.ONE_PART, allowTranspose, false);
 		}
 
 		@Override
@@ -192,11 +176,6 @@ public interface InstType {
 				mml_velocity = 0;
 			}
 			return (mml_velocity * 11);
-		}
-
-		@Override
-		public boolean allowTempoChordPart() {
-			return false;
 		}
 	}
 }
