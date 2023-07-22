@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 たんらる
+ * Copyright (C) 2022-2023 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
@@ -14,6 +14,10 @@ public final class CircleIcon implements Icon {
 	private final int width;
 	private final Color fillColor;
 	private final Color drawColor;
+
+	public CircleIcon(int width, Color color) {
+		this(width, color, color);
+	}
 
 	public CircleIcon(int width, Color fillColor, Color drawColor) {
 		this.width = width;
