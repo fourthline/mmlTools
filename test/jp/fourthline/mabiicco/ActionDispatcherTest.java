@@ -39,6 +39,7 @@ public final class ActionDispatcherTest extends UseLoadingDLS {
 		scaleColor = properties.scaleColor.get();
 		soundEnv = properties.soundEnv.get();
 		useDefaultSound = properties.useDefaultSoundBank.get();
+		properties.laf.set(Laf.LIGHT);
 	}
 
 	@After
@@ -47,6 +48,7 @@ public final class ActionDispatcherTest extends UseLoadingDLS {
 		properties.scaleColor.set(scaleColor);
 		properties.soundEnv.set(soundEnv);
 		properties.useDefaultSoundBank.set(useDefaultSound);
+		properties.laf.set(Laf.LIGHT);
 	}
 
 	private Object getField(String fieldName) throws Exception {
