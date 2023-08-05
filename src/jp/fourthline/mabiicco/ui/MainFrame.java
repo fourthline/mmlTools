@@ -192,7 +192,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	}
 
 	private JMenuItem createMenuItem(JMenu menu, String name, String actionCommand, boolean noplayFunction, KeyStroke keyStroke) {
-		JMenuItem menuItem = new JMenuItem(appText(name));
+		JMenuItem menuItem = new NoPlayOptionMenu(appText(name));
 		String iconName = appText(name+".icon");
 		if (!iconName.equals(name+".icon")) {
 			Icon icon = AppResource.getImageIcon(iconName);
@@ -290,7 +290,8 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createMenuItem(editMenu, "menu.removeBeat", ActionDispatcher.REMOVE_BEAT, true);
 		createMenuItem(editMenu, "edit.transpose", ActionDispatcher.TRANSPOSE, true);
 		createMenuItem(editMenu, "edit.tracks.velocity", ActionDispatcher.TRACKS_EDIT, true);
-		removeRestsBetweenNotesMenu = createMenuItem(editMenu, "edit.remove_rests_between_notes", ActionDispatcher.REMOVE_RESTS_BETWEEN_NOTES);
+		removeRestsBetweenNotesMenu = createMenuItem(editMenu, "edit.remove_rests_between_notes", ActionDispatcher.REMOVE_RESTS_BETWEEN_NOTES, true,
+				KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, InputEvent.SHIFT_DOWN_MASK));
 		octUpMenu = createMenuItem(editMenu, "edit.oct_up", ActionDispatcher.OCTAVE_UP, true,
 				KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.SHIFT_DOWN_MASK));
 		octDownMenu = createMenuItem(editMenu, "edit.oct_down", ActionDispatcher.OCTAVE_DOWN, true,
@@ -639,7 +640,11 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	 */
 	public void disableNoplayItems() {
 		for (JComponent component : noplayFunctions) {
-			component.setEnabled(false);
+			if (component instanceof NoPlayOptionMenu o) {
+				o.setNoplay(false);
+			} else {
+				component.setEnabled(false);
+			}
 		}
 	}
 
@@ -648,7 +653,11 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	 */
 	public void enableNoplayItems() {
 		for (JComponent component : noplayFunctions) {
-			component.setEnabled(true);
+			if (component instanceof NoPlayOptionMenu o) {
+				o.setNoplay(true);
+			} else {
+				component.setEnabled(true);
+			}
 		}
 		EventQueue.invokeLater(() -> {
 			mmlSeqView.resetViewPosition();
@@ -760,7 +769,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		shortcutMap.values().forEach(t -> {
 			t.forEach(k -> {
 				if (k.equals(keyStroke)) {
-					new AssertionError();
+					throw new AssertionError("addShortcutMap ERROR: " + text + " / " + k);
 				}
 			});
 		});
@@ -846,6 +855,27 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			this.function.run();
+		}
+	}
+
+	/**
+	 * 再生時に無効化することのできるメニューアイテム
+	 */
+	static final class NoPlayOptionMenu extends JMenuItem {
+		private static final long serialVersionUID = 1689852181335644694L;
+		private boolean noplay = true;
+		private boolean enable = true;
+		NoPlayOptionMenu(String name) {
+			super(name);
+		}
+		void setNoplay(boolean noplay) {
+			this.noplay = noplay;
+			super.setEnabled(enable && noplay);
+		}
+		@Override
+		public void setEnabled(boolean b) {
+			enable = b;
+			super.setEnabled(enable && noplay);
 		}
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 たんらる
+ * Copyright (C) 2015-2023 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
@@ -38,5 +38,29 @@ public final class MainFrameTest extends UseLoadingDLS {
 		checkNotNullField(mainFrame, "copyMenu");
 		checkNotNullField(mainFrame, "pasteMenu");
 		checkNotNullField(mainFrame, "deleteMenu");
+	}
+
+	@Test
+	public void test_NoplayMenu() {
+		var menu = new MainFrame.NoPlayOptionMenu("");
+		assertEquals(true, menu.isEnabled());
+
+		menu.setNoplay(false);
+		assertEquals(false, menu.isEnabled());
+		menu.setNoplay(true);
+		assertEquals(true, menu.isEnabled());
+
+		menu.setEnabled(false);
+		assertEquals(false, menu.isEnabled());
+		menu.setNoplay(false);
+		assertEquals(false, menu.isEnabled());
+		menu.setNoplay(true);
+		assertEquals(false, menu.isEnabled());
+		menu.setEnabled(true);
+		assertEquals(true, menu.isEnabled());
+
+		menu.setNoplay(false);
+		menu.setEnabled(true);
+		assertEquals(false, menu.isEnabled());
 	}
 }
