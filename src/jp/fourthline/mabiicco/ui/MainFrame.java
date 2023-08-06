@@ -82,25 +82,25 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	private final MabiIccoProperties appProperties = MabiIccoProperties.getInstance();
 
 	/** シーケンス再生中に無効化する機能のリスト */
-	private final ArrayList<JComponent> noplayFunctions = new ArrayList<>();
+	private final ArrayList<PlayStateComponent<?>> noplayFunctions = new ArrayList<>();
 
 	/** ショートカットキー情報 */
 	private final Map<String, List<KeyStroke>> shortcutMap = new LinkedHashMap<>();
 
 	/** 状態が変化するメニューたち */
-	private JMenuItem reloadMenuItem = null;
-	private JMenuItem undoMenu = null;
-	private JMenuItem redoMenu = null;
-	private JMenuItem saveMenuItem = null;
-	private JMenuItem cutMenu = null;
-	private JMenuItem copyMenu = null;
-	private JMenuItem pasteMenu = null;
-	private JMenuItem deleteMenu = null;
-	private JMenuItem removeRestsBetweenNotesMenu = null;
-	private JMenuItem octUpMenu = null;
-	private JMenuItem octDownMenu = null;
-	private JMenuItem velocityUpMenu = null;
-	private JMenuItem velocityDownMenu = null;
+	private PlayStateComponent<JMenuItem> reloadMenuItem = null;
+	private PlayStateComponent<JMenuItem> undoMenu = null;
+	private PlayStateComponent<JMenuItem> redoMenu = null;
+	private PlayStateComponent<JMenuItem> saveMenuItem = null;
+	private PlayStateComponent<JMenuItem> cutMenu = null;
+	private PlayStateComponent<JMenuItem> copyMenu = null;
+	private PlayStateComponent<JMenuItem> pasteMenu = null;
+	private PlayStateComponent<JMenuItem> deleteMenu = null;
+	private PlayStateComponent<JMenuItem> removeRestsBetweenNotesMenu = null;
+	private PlayStateComponent<JMenuItem> octUpMenu = null;
+	private PlayStateComponent<JMenuItem> octDownMenu = null;
+	private PlayStateComponent<JMenuItem> velocityUpMenu = null;
+	private PlayStateComponent<JMenuItem> velocityDownMenu = null;
 
 	private JButton loopButton = null;
 
@@ -179,20 +179,20 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		this.listener.actionPerformed(event);
 	}
 
-	private JMenuItem createMenuItem(JMenu menu, String name, String actionCommand) {
+	private PlayStateComponent<JMenuItem> createMenuItem(JMenu menu, String name, String actionCommand) {
 		return createMenuItem(menu, name, actionCommand, false, null);
 	}
 
-	private JMenuItem createMenuItem(JMenu menu, String name, String actionCommand, boolean noplayFunction) {
+	private PlayStateComponent<JMenuItem> createMenuItem(JMenu menu, String name, String actionCommand, boolean noplayFunction) {
 		return createMenuItem(menu, name, actionCommand, noplayFunction, null);
 	}
 
-	private JMenuItem createMenuItem(JMenu menu, String name, String actionCommand, KeyStroke keyStroke) {
+	private PlayStateComponent<JMenuItem> createMenuItem(JMenu menu, String name, String actionCommand, KeyStroke keyStroke) {
 		return createMenuItem(menu, name, actionCommand, false, keyStroke);
 	}
 
-	private JMenuItem createMenuItem(JMenu menu, String name, String actionCommand, boolean noplayFunction, KeyStroke keyStroke) {
-		JMenuItem menuItem = new NoPlayOptionMenu(appText(name));
+	private PlayStateComponent<JMenuItem> createMenuItem(JMenu menu, String name, String actionCommand, boolean noplayFunction, KeyStroke keyStroke) {
+		JMenuItem menuItem = new JMenuItem(appText(name));
 		String iconName = appText(name+".icon");
 		if (!iconName.equals(name+".icon")) {
 			Icon icon = AppResource.getImageIcon(iconName);
@@ -203,12 +203,13 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		return createMenuItem(menu, menuItem, actionCommand, noplayFunction, keyStroke);
 	}
 
-	private JMenuItem createMenuItem(JMenu menu, JMenuItem menuItem, String actionCommand, boolean noplayFunction, KeyStroke keyStroke) {
+	private PlayStateComponent<JMenuItem> createMenuItem(JMenu menu, JMenuItem menuItem, String actionCommand, boolean noplayFunction, KeyStroke keyStroke) {
+		PlayStateComponent<JMenuItem> c = new PlayStateComponent<>(menuItem);
 		menuItem.addActionListener(listener);
 		menuItem.setActionCommand(actionCommand);
 
 		if (noplayFunction) {
-			noplayFunctions.add(menuItem);
+			noplayFunctions.add(c);
 		}
 		if (keyStroke != null) {
 			menuItem.setAccelerator(keyStroke);
@@ -216,7 +217,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		}
 
 		menu.add(menuItem);
-		return menuItem;
+		return c;
 	}
 
 	private JMenuBar createMenuBar() {
@@ -488,12 +489,13 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 			}
 		});
 		if (noplayFunction) {
-			noplayFunctions.add(clickPlayMenu);
+			noplayFunctions.add(new PlayStateComponent<>(clickPlayMenu));
 		}
 	}
 
-	private JButton createToolButton(JComponent target, String title, String command, boolean noplayFunction) {
+	private PlayStateComponent<JButton> createToolButton(JComponent target, String title, String command, boolean noplayFunction) {
 		JButton button = new JButton("");
+		var c = new PlayStateComponent<>(button);
 		Icon icon = null;
 		String iconName = appText(title+".icon");
 		if (!iconName.equals(title+".icon")) {
@@ -510,11 +512,11 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		button.setActionCommand(command);
 
 		if (noplayFunction) {
-			noplayFunctions.add(button);
+			noplayFunctions.add(c);
 		}
 
 		target.add(button);
-		return button;
+		return c;
 	}
 
 	private JToolBar createToolBar() {
@@ -531,7 +533,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createToolButton(toolBar, "menu.next", ActionDispatcher.NEXT_TIME, false);
 		createToolButton(toolBar, "menu.pause", ActionDispatcher.PAUSE, false);
 		createToolButton(toolBar, "menu.stop", ActionDispatcher.STOP, false);
-		loopButton = createToolButton(toolBar, "menu.loop", ActionDispatcher.TOGGLE_LOOP, false);
+		loopButton = createToolButton(toolBar, "menu.loop", ActionDispatcher.TOGGLE_LOOP, false).get();
 
 		toolBar.add(newToolBarSeparator());
 
@@ -639,12 +641,8 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	 * 再生中に各機能を無効化する。
 	 */
 	public void disableNoplayItems() {
-		for (JComponent component : noplayFunctions) {
-			if (component instanceof NoPlayOptionMenu o) {
-				o.setNoplay(false);
-			} else {
-				component.setEnabled(false);
-			}
+		for (PlayStateComponent<?> component : noplayFunctions) {
+			component.setNoplay(false);
 		}
 	}
 
@@ -652,12 +650,8 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	 * 再生中に無効化されている機能を有効にする。
 	 */
 	public void enableNoplayItems() {
-		for (JComponent component : noplayFunctions) {
-			if (component instanceof NoPlayOptionMenu o) {
-				o.setNoplay(true);
-			} else {
-				component.setEnabled(true);
-			}
+		for (PlayStateComponent<?> component : noplayFunctions) {
+			component.setNoplay(true);
 		}
 		EventQueue.invokeLater(() -> {
 			mmlSeqView.resetViewPosition();
@@ -859,23 +853,25 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	}
 
 	/**
-	 * 再生時に無効化することのできるメニューアイテム
+	 * 再生時に無効化することのできるコンポーネント
 	 */
-	static final class NoPlayOptionMenu extends JMenuItem {
-		private static final long serialVersionUID = 1689852181335644694L;
+	static final class PlayStateComponent<T extends JComponent> {
 		private boolean noplay = true;
 		private boolean enable = true;
-		NoPlayOptionMenu(String name) {
-			super(name);
+		private final T component;
+		PlayStateComponent(T component) {
+			this.component = component;
 		}
 		void setNoplay(boolean noplay) {
 			this.noplay = noplay;
-			super.setEnabled(enable && noplay);
+			component.setEnabled(this.enable && this.noplay);
 		}
-		@Override
-		public void setEnabled(boolean b) {
-			enable = b;
-			super.setEnabled(enable && noplay);
+		void setEnabled(boolean enable) {
+			this.enable = enable;
+			component.setEnabled(this.enable && this.noplay);
+		}
+		T get() {
+			return component;
 		}
 	}
 }

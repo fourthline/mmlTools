@@ -10,26 +10,38 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
 
+import javax.swing.JMenuItem;
+
+import org.junit.Before;
 import org.junit.Test;
 
 import jp.fourthline.UseLoadingDLS;
+import jp.fourthline.mabiicco.ui.MainFrame.PlayStateComponent;
 
 
 public final class MainFrameTest extends UseLoadingDLS {
+	private MainFrame mainFrame;
 
-	private void checkNotNullField(Object obj, String fieldName) throws Exception {
+	@Before
+	public void setup() {
+		mainFrame = new MainFrame(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {}
+		}, null);
+	}
+
+	private Object getField(Object obj, String fieldName) throws Exception {
 		Field f = MainFrame.class.getDeclaredField(fieldName);
 		f.setAccessible(true);
-		assertNotNull(f.get(obj));
+		return f.get(obj);
+	}
+
+	private void checkNotNullField(Object obj, String fieldName) throws Exception {
+		assertNotNull(getField(obj, fieldName));
 	}
 
 	@Test
 	public final void test() throws Exception {
-		MainFrame mainFrame = new MainFrame(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {}
-		}, null);
-
 		checkNotNullField(mainFrame, "reloadMenuItem");
 		checkNotNullField(mainFrame, "undoMenu");
 		checkNotNullField(mainFrame, "redoMenu");
@@ -41,26 +53,52 @@ public final class MainFrameTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void test_NoplayMenu() {
-		var menu = new MainFrame.NoPlayOptionMenu("");
+	public void test_PlayStateComponent() {
+		var menu = new JMenuItem("");
+		var stat = new MainFrame.PlayStateComponent<>(menu);
 		assertEquals(true, menu.isEnabled());
 
-		menu.setNoplay(false);
+		stat.setNoplay(false);
 		assertEquals(false, menu.isEnabled());
-		menu.setNoplay(true);
+		stat.setNoplay(true);
 		assertEquals(true, menu.isEnabled());
 
-		menu.setEnabled(false);
+		stat.setEnabled(false);
 		assertEquals(false, menu.isEnabled());
-		menu.setNoplay(false);
+		stat.setNoplay(false);
 		assertEquals(false, menu.isEnabled());
-		menu.setNoplay(true);
+		stat.setNoplay(true);
 		assertEquals(false, menu.isEnabled());
-		menu.setEnabled(true);
+		stat.setEnabled(true);
 		assertEquals(true, menu.isEnabled());
 
-		menu.setNoplay(false);
-		menu.setEnabled(true);
+		stat.setNoplay(false);
+		stat.setEnabled(true);
 		assertEquals(false, menu.isEnabled());
+	}
+
+	@Test
+	public void test_PlayStateMenu() throws Exception {
+		@SuppressWarnings("unchecked")
+		MainFrame.PlayStateComponent<JMenuItem> c = (PlayStateComponent<JMenuItem>) getField(mainFrame, "removeRestsBetweenNotesMenu");
+
+		mainFrame.setRemoveRestsBetweenNotesEnable(true);
+		assertEquals(true, c.get().isEnabled());
+
+		mainFrame.disableNoplayItems();
+		assertEquals(false, c.get().isEnabled());
+
+		mainFrame.enableNoplayItems();
+		assertEquals(true, c.get().isEnabled());
+
+		mainFrame.disableNoplayItems();
+		assertEquals(false, c.get().isEnabled());
+		mainFrame.setRemoveRestsBetweenNotesEnable(false);
+		mainFrame.enableNoplayItems();
+		assertEquals(false, c.get().isEnabled());
+		mainFrame.setRemoveRestsBetweenNotesEnable(true);
+		assertEquals(true, c.get().isEnabled());
+		mainFrame.setRemoveRestsBetweenNotesEnable(false);
+		assertEquals(false, c.get().isEnabled());
 	}
 }
