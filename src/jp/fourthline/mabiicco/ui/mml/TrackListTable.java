@@ -25,6 +25,7 @@ public final class TrackListTable extends JTable {
 		private static final long serialVersionUID = -5732476297298041942L;
 		private final String[] columnNames = new String[] {
 				"",
+				"#",
 				AppResource.appText("mml.output.trackName"),
 				AppResource.appText("mml.output.instrument"),
 				AppResource.appText("mml.output.rank")
@@ -37,9 +38,11 @@ public final class TrackListTable extends JTable {
 		private InCheckTableModel(List<MMLTrack> trackList, boolean checkBox) {
 			this.checkBox = checkBox;
 			checkValue = new boolean[trackList.size()];
+			int trackIndex = 0;
 			for (MMLTrack track : trackList) {
 				InstClass inst = MabiDLS.getInstance().getInstByProgram(track.getProgram());
 				dataList.add(new String[] {
+						Integer.toString(++trackIndex),
 						track.getTrackName(),
 						inst.toString(),
 						track.mmlRankFormat()
@@ -75,7 +78,7 @@ public final class TrackListTable extends JTable {
 
 		@Override
 		public int getColumnCount() {
-			int count = 4;
+			int count = columnNames.length;
 			if (!checkBox) {
 				count--;
 			}
@@ -154,10 +157,14 @@ public final class TrackListTable extends JTable {
 		setModel( checkTableModel );
 		if (checkBox) {
 			getColumnModel().getColumn(0).setPreferredWidth(0);
-			getColumnModel().getColumn(3).setPreferredWidth(180);
+			getColumnModel().getColumn(1).setPreferredWidth(20);
+			getColumnModel().getColumn(1).setMaxWidth(20);
+			getColumnModel().getColumn(4).setPreferredWidth(180);
 			setRowSelectionAllowed(false);
 		} else {
-			getColumnModel().getColumn(2).setPreferredWidth(180);
+			getColumnModel().getColumn(0).setPreferredWidth(20);
+			getColumnModel().getColumn(0).setMaxWidth(20);
+			getColumnModel().getColumn(3).setPreferredWidth(180);
 			setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			setRowSelectionInterval(0, 0);
 		}
@@ -210,7 +217,8 @@ public final class TrackListTable extends JTable {
 
 	public String getTableListInfo() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(AppResource.appText("mml.output.trackName")).append('\t')
+		sb.append("#\t")
+		.append(AppResource.appText("mml.output.trackName")).append('\t')
 		.append(AppResource.appText("mml.output.instrument")).append('\t')
 		.append(AppResource.appText("mml.output.rank")).append('\n');
 		for (var data : checkTableModel.dataList) {

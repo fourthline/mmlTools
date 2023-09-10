@@ -47,7 +47,7 @@ public final class MMLExportPanel extends JPanel {
 	private final MMLScore score;
 	private final Supplier<File> fileSupplier;
 
-	private final Dimension prefSize = new Dimension(440, 360);
+	private final Dimension prefSize = new Dimension(460, 360);
 	private final JLabel outputTextCountLabel = new JLabel();
 	private String outputText;
 	private JButton fileExportButton;

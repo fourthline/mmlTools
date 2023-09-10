@@ -44,7 +44,7 @@ public final class MultiTracksVelocityChangeEditor extends JPanel {
 	private final IMMLManager mmlManager;
 	private final Frame parentFrame;
 
-	private final Dimension prefSize = new Dimension(440, 300);
+	private final Dimension prefSize = new Dimension(460, 300);
 
 	public MultiTracksVelocityChangeEditor(Frame parentFrame, IMMLManager mmlManager) {
 		this.dialog = new JDialog(parentFrame, AppResource.appText("edit.tracks.velocity"), true);

@@ -41,7 +41,7 @@ public final class MultiTracksViewEditor extends JPanel {
 
 	private boolean[] oldValue;
 
-	private final Dimension prefSize = new Dimension(440, 300);
+	private final Dimension prefSize = new Dimension(460, 300);
 
 	public MultiTracksViewEditor(Frame parentFrame, IMMLManager mmlManager) {
 		this.dialog = new JDialog(parentFrame, AppResource.appText("edit.tracks.view"), true);

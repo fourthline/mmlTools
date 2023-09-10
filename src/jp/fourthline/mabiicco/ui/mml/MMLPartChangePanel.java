@@ -60,7 +60,7 @@ public final class MMLPartChangePanel extends JPanel {
 	private JComboBox<String> partSelectComboBox;
 	private final JLabel selectedRange = new JLabel();
 
-	private final Dimension prefSize = new Dimension(440, 450);
+	private final Dimension prefSize = new Dimension(460, 450);
 
 	public MMLPartChangePanel() {
 		this.dialog = null;

@@ -41,7 +41,7 @@ public final class MMLImportPanel extends JPanel {
 
 	private final JLabel lblNewLabel = new JLabel(AppResource.appText("mml.input.import.possibleImport")+": XX/XX");
 
-	private final Dimension prefSize = new Dimension(440, 300);
+	private final Dimension prefSize = new Dimension(460, 300);
 
 	/**
 	 * インポートパネルを生成する

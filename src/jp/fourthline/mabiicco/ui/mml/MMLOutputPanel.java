@@ -46,7 +46,7 @@ public final class MMLOutputPanel extends JPanel {
 	final List<String> outputTextList = new ArrayList<>();
 	private final String trackName;
 
-	private final Dimension prefSize = new Dimension(480, 340);
+	private final Dimension prefSize = new Dimension(500, 340);
 
 	public MMLOutputPanel(Frame parentFrame) {
 		this.dialog = null;
