@@ -8,7 +8,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 
 public final class MeasureTest {
 
@@ -38,7 +38,7 @@ public final class MeasureTest {
 	}
 
 	@Test
-	public void test_barText02() throws UndefinedTickException {
+	public void test_barText02() throws MMLException {
 		var ts1 = new TimeSignature(score, 384, 3, 4);
 		var ts2 = new TimeSignature(score, 384*3, 6, 8);
 
@@ -66,7 +66,7 @@ public final class MeasureTest {
 	}
 
 	@Test
-	public void test_measuredTick() throws UndefinedTickException {
+	public void test_measuredTick() throws MMLException {
 		var ts1 = new TimeSignature(score, 384, 3, 4);
 		var ts2 = new TimeSignature(score, 384*3, 6, 8);
 		score.getTimeSignatureList().add(ts1);

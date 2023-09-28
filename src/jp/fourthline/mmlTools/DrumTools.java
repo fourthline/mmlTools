@@ -8,7 +8,7 @@ import jp.fourthline.mmlTools.core.MMLTicks;
 import jp.fourthline.mmlTools.core.MMLTokenizer;
 import jp.fourthline.mmlTools.core.MMLTools;
 import jp.fourthline.mmlTools.core.MelodyParser;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 
 /**
  * ドラムの和音分割
@@ -23,7 +23,7 @@ public class DrumTools extends MMLTools {
 		super(mml);
 	}
 
-	public double getOverSec() throws UndefinedTickException {
+	public double getOverSec() throws MMLException {
 		return (getMabinogiTime() - getPlayTime());
 	}
 
@@ -47,9 +47,9 @@ public class DrumTools extends MMLTools {
 	/**
 	 * ドラムの和音分割で、和音２を曲の長さ分以上になるように休符を挿入する（打楽器分割用）
 	 * ほしいもの：　編集後のChord2とOversec
-	 * @throws UndefinedTickException
+	 * @throws MMLException
 	 */
-	private void drumChord2InsertPlaylength(boolean minText) throws UndefinedTickException {
+	private void drumChord2InsertPlaylength(boolean minText) throws MMLException {
 		// total length - chord2 timing value
 		double total_length = getPlayTime(); // 分割前の演奏時間を計算しておく
 		double pre_chord2_length = chord2Parser.getPlayLengthByTempoList();
@@ -105,7 +105,7 @@ public class DrumTools extends MMLTools {
 					result += "r" + tickCandidate[i];
 				}
 			} // for
-		} catch (UndefinedTickException e) {
+		} catch (MMLException e) {
 			return "<Internal_ERROR>";
 		}
 
@@ -113,7 +113,7 @@ public class DrumTools extends MMLTools {
 	}
 
 
-	public String makeForMabiMML(ComposeRank cutRank) throws UndefinedTickException {
+	public String makeForMabiMML(ComposeRank cutRank) throws MMLException {
 		return makeForMabiMML(cutRank, true);
 	}
 
@@ -123,9 +123,9 @@ public class DrumTools extends MMLTools {
 	 * @param cutRank 分割するランク
 	 * @param minText 終端モード　falseの場合、時間最適。trueの場合、文字数最小。
 	 * @return 分割後のMML
-	 * @throws UndefinedTickException
+	 * @throws MMLException
 	 */
-	public String makeForMabiMML(ComposeRank cutRank, boolean minText) throws UndefinedTickException {
+	public String makeForMabiMML(ComposeRank cutRank, boolean minText) throws MMLException {
 		cutMMLDrum(cutRank);
 
 		parseMMLforMabinogi();
@@ -161,9 +161,9 @@ public class DrumTools extends MMLTools {
 	 * ボリュームを　2/3　にする。
 	 * 高速に処理するため、独自実装。
 	 * 分割前に実行すること。
-	 * @throws UndefinedTickException
+	 * @throws MMLException
 	 */
-	public String disDrumVolume() throws UndefinedTickException {
+	public String disDrumVolume() throws MMLException {
 		MMLTokenizer mt = new MMLTokenizer(mml_melody);
 		StringBuffer sb = new StringBuffer(mml_melody.length());
 
@@ -243,7 +243,7 @@ class MMLCutter {
 				if ( !lastL.equals("4") ) {  // not if 4 then, next part start L token
 					strL = "l" + lastL;
 				}
-			} catch (UndefinedTickException e) {}
+			} catch (MMLException e) {}
 		}
 
 		mml_src = mml_src.substring(cut);

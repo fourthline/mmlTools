@@ -10,13 +10,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 import jp.fourthline.mmlTools.core.NanoTime;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 
 public class TimeSignatureTest {
 	private MMLScore score = new MMLScore();
 
 	@Before
-	public void setup() throws UndefinedTickException {
+	public void setup() throws MMLException {
 		score.addTimeSignature(new TimeSignature(score, 0, 3, 4));
 		score.addTimeSignature(new TimeSignature(score, 384, 4, 4));
 		score.addTimeSignature(new TimeSignature(score, 3840, 6, 8));

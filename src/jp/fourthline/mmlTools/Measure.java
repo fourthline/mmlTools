@@ -5,7 +5,7 @@
 package jp.fourthline.mmlTools;
 
 import jp.fourthline.mmlTools.core.MMLTicks;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 
 
 /**
@@ -105,7 +105,7 @@ public final class Measure {
 		return Integer.toString(numTime);
 	}
 
-	public String timeBase() throws UndefinedTickException {
+	public String timeBase() throws MMLException {
 		return new MMLTicks("", beatTick).toMMLText();
 	}
 

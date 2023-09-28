@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jp.fourthline.mmlTools.core.IllegalTickOffsetException;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 
 
 /**
@@ -44,7 +44,7 @@ public abstract class MMLEvent implements Serializable {
 
 	public abstract String toString();
 
-	public abstract String toMMLString() throws UndefinedTickException;
+	public abstract String toMMLString() throws MMLException;
 
 
 	/**

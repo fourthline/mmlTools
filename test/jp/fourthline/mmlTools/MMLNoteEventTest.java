@@ -16,7 +16,7 @@ import org.junit.Test;
 import jp.fourthline.FileSelect;
 import jp.fourthline.mmlTools.core.MMLTicks;
 import jp.fourthline.mmlTools.core.TuningBase;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 
 
 /**
@@ -61,7 +61,7 @@ public class MMLNoteEventTest extends FileSelect {
 	}
 
 	@Test
-	public void testTuningNote_64() throws UndefinedTickException {
+	public void testTuningNote_64() throws MMLException {
 		MMLEventList eventList = new MMLEventList("c1&c64");
 		String expected = "c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64";
 		MMLNoteEvent noteEvent = eventList.getMMLNoteEventList().get(0);
@@ -74,7 +74,7 @@ public class MMLNoteEventTest extends FileSelect {
 	}
 
 	@Test
-	public void testTuningNote_32() throws UndefinedTickException {
+	public void testTuningNote_32() throws MMLException {
 		MMLEventList eventList = new MMLEventList("c1&c64");
 		String expected = "c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c32&c64";
 		MMLNoteEvent noteEvent = eventList.getMMLNoteEventList().get(0);
@@ -87,7 +87,7 @@ public class MMLNoteEventTest extends FileSelect {
 	}
 
 	@Test
-	public void testTuningNote_16() throws UndefinedTickException {
+	public void testTuningNote_16() throws MMLException {
 		MMLEventList eventList = new MMLEventList("c1&c64");
 		String expected = "c16&c16&c16&c16&c16&c16&c16&c16&c16&c16&c16&c16&c16&c16&c16&c16&c64";
 		MMLNoteEvent noteEvent = eventList.getMMLNoteEventList().get(0);
@@ -142,7 +142,7 @@ public class MMLNoteEventTest extends FileSelect {
 	}
 
 	@Test
-	public void testNoteTexts() throws UndefinedTickException, IOException {
+	public void testNoteTexts() throws MMLException, IOException {
 		StringBuilder sb = new StringBuilder();
 		for (int i = MMLTicks.minimumTick(); i <= 768; i++) {
 			MMLNoteEvent event = new MMLNoteEvent(48, i, 0);
@@ -156,7 +156,7 @@ public class MMLNoteEventTest extends FileSelect {
 	}
 
 	@Test
-	public void testRestTexts() throws UndefinedTickException, IOException {
+	public void testRestTexts() throws MMLException, IOException {
 		StringBuilder sb = new StringBuilder();
 		MMLNoteEvent prev = new MMLNoteEvent(48, 48, 0);
 		for (int i = MMLTicks.minimumTick(); i <= 768; i++) {

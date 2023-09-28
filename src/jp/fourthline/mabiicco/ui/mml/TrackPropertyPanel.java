@@ -25,10 +25,12 @@ import javax.swing.JSpinner;
 import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.ui.IMMLManager;
 import jp.fourthline.mabiicco.ui.editor.NumberSpinner;
+import jp.fourthline.mmlTools.MMLExceptionList;
 import jp.fourthline.mmlTools.MMLTempoConverter;
 import jp.fourthline.mmlTools.MMLTrack;
+import jp.fourthline.mmlTools.MMLVerifyException;
 import jp.fourthline.mmlTools.core.MMLTicks;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 
 
 public final class TrackPropertyPanel extends JPanel {
@@ -271,7 +273,7 @@ public final class TrackPropertyPanel extends JPanel {
 			try {
 				sandTrack.generate();
 				o.setForeground(Color.BLACK);
-			} catch (UndefinedTickException e) {
+			} catch (MMLExceptionList | MMLVerifyException e) {
 				o.setForeground(Color.RED);
 			}
 		}
@@ -300,7 +302,7 @@ public final class TrackPropertyPanel extends JPanel {
 						s = "-" + s;
 					}
 					s = "=" + s;
-				} catch (UndefinedTickException e) {
+				} catch (MMLException e) {
 					s = "=N/A";
 				}
 			}
@@ -309,7 +311,7 @@ public final class TrackPropertyPanel extends JPanel {
 			try {
 				sandTrack.generate();
 				o.setForeground(Color.BLACK);
-			} catch (UndefinedTickException e) {
+			} catch (MMLExceptionList | MMLVerifyException e) {
 				o.setForeground(Color.RED);
 			}
 		}

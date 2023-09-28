@@ -11,10 +11,11 @@ import jp.fourthline.mabiicco.ui.AbstractMMLManager;
 import jp.fourthline.mabiicco.ui.IMMLManager;
 import jp.fourthline.mabiicco.ui.PianoRollView;
 import jp.fourthline.mmlTools.MMLEventList;
+import jp.fourthline.mmlTools.MMLExceptionList;
 import jp.fourthline.mmlTools.MMLNoteEvent;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTrack;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.MMLVerifyException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -70,7 +71,7 @@ public class KeyboardEditorTest extends UseLoadingDLS {
 		public void updateActivePart(boolean generate) {
 			try {
 				score.generateAll();
-			} catch (UndefinedTickException e) {
+			} catch (MMLExceptionList | MMLVerifyException e) {
 				e.printStackTrace();
 			}
 		}

@@ -23,7 +23,7 @@ import jp.fourthline.UseLoadingDLS;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.core.MMLTicks;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 
 /**
  * 
@@ -69,7 +69,7 @@ public class MabiDLSTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void test_createSequence() throws InvalidMidiDataException, UndefinedTickException {
+	public void test_createSequence() throws InvalidMidiDataException, MMLException {
 		MMLScore score = new MMLScore();
 		score.addTrack(new MMLTrack().setMML("MML@aat180aa,brb,crc,drd;").setProgram(5));
 		score.getTrack(0).setSongProgram(100);
@@ -114,7 +114,7 @@ public class MabiDLSTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void test_createSequence2() throws InvalidMidiDataException, UndefinedTickException {
+	public void test_createSequence2() throws InvalidMidiDataException, MMLException {
 		MMLScore score = new MMLScore();
 		score.addTrack(new MMLTrack().setMML("MML@aart180a;"));
 		Sequence seq = dls.createSequenceForPlay(score);
@@ -128,7 +128,7 @@ public class MabiDLSTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void test_createSequenceGen2() throws InvalidMidiDataException, UndefinedTickException {
+	public void test_createSequenceGen2() throws InvalidMidiDataException, MMLException {
 		MMLScore score = new MMLScore();
 		score.addTrack(new MMLTrack().setMML("MML@aart180a,cccc,dddd;"));
 		score.addTrack(new MMLTrack().setMML("MML@aart180a,cccc,dddd;"));
@@ -140,7 +140,7 @@ public class MabiDLSTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void test_createSequence_attackDelayCorrect() throws InvalidMidiDataException, UndefinedTickException {
+	public void test_createSequence_attackDelayCorrect() throws InvalidMidiDataException, MMLException {
 		MMLScore score = new MMLScore();
 		score.addTrack(new MMLTrack().setMML("MML@aa,,,dd;"));
 		score.getTrack(0).setSongProgram(121);

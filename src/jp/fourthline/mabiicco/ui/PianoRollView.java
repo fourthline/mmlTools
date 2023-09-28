@@ -32,7 +32,7 @@ import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.Measure;
 import jp.fourthline.mmlTools.TimeSignature;
 import jp.fourthline.mmlTools.core.MMLTicks;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 
 
 /**
@@ -194,7 +194,7 @@ public final class PianoRollView extends JPanel {
 			tickLength += t1*12;
 			tickLength -= tickLength % t1;
 			tickLength += mmlManager.getActiveMMLPartStartOffset();
-		} catch (UndefinedTickException e) {
+		} catch (MMLException e) {
 			e.printStackTrace();
 		}
 		int width = convertTicktoX(tickLength);
@@ -628,7 +628,7 @@ public final class PianoRollView extends JPanel {
 			String lenText = "N/A";
 			try {
 				lenText = paintNoteInfo.toMMLString();
-			} catch (UndefinedTickException e) {}
+			} catch (MMLException e) {}
 			lenText =  paintNoteInfo.getTick() + ": " + lenText;
 			int x1 = convertTicktoX(paintNoteInfo.getTickOffset());
 			int x2 = convertTicktoX(paintNoteInfo.getEndTick());

@@ -38,9 +38,9 @@ import jp.fourthline.mabiicco.midi.MabiDLS;
 import jp.fourthline.mabiicco.ui.IMMLManager;
 import jp.fourthline.mabiicco.ui.PianoRollView;
 import jp.fourthline.mmlTools.MMLEventList;
+import jp.fourthline.mmlTools.MMLExceptionList;
 import jp.fourthline.mmlTools.MMLNoteEvent;
 import jp.fourthline.mmlTools.MMLTrack;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
 
 
 public final class MMLEditor implements MouseInputListener, IEditState, IEditContext, IEditAlign {
@@ -626,7 +626,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 			StringSelection selection = new StringSelection(MMLEVENT_PREFIX + eventList.getInternalMMLString());
 			clipboard.setContents(selection, selection);
-		} catch (UndefinedTickException e) {}
+		} catch (MMLExceptionList e) {}
 	}
 
 	@Override 

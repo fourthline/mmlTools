@@ -14,7 +14,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import jp.fourthline.mmlTools.core.MMLTools;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 import jp.fourthline.mmlTools.optimizer.MMLStringOptimizer;
 
 /**
@@ -37,10 +37,11 @@ public class MMLTrackTest {
 	}
 
 	/**
-	 * @throws UndefinedTickException
+	 * @throws MMLExceptionList
+	 * @throws MMLVerifyException
 	 */
 	@Test
-	public void testGetMMLStrings() throws UndefinedTickException {
+	public void testGetMMLStrings() throws MMLExceptionList, MMLVerifyException {
 		MMLTrack track = new MMLTrack().setMML("MML@aaa,bbb,ccc,ddd;");
 		String[] expect = {
 				"a8t150v0a8v8aa", // melodyパートのみテンポ指定.
@@ -55,7 +56,7 @@ public class MMLTrackTest {
 	}
 
 	@Test
-	public void testGetMMLStringsMusicQ() throws UndefinedTickException {
+	public void testGetMMLStringsMusicQ() throws MMLExceptionList, MMLVerifyException {
 		MMLTrack.setTempoAllowChordPart(true);
 		MMLTrack track = new MMLTrack().setMML("MML@aaa,bbb,ccc,ddd;");
 		String[] expect = {
@@ -83,7 +84,7 @@ public class MMLTrackTest {
 
 			assertEquals(expectPlayTime, track.getPlayTime(), 0.001);
 			assertEquals(expectMabinogiTime, track.getMabinogiTime(), 0.001);
-		} catch (UndefinedTickException e) {
+		} catch (MMLException e) {
 			e.printStackTrace();
 		}
 	}
@@ -170,11 +171,12 @@ public class MMLTrackTest {
 
 	/**
 	 * テンポを跨ぐ場合の分割Tick-Undefined（最小Tick近似） = Exception
-	 * @throws UndefinedTickException
+	 * @throws MMLExceptionList
+	 * @throws MMLVerifyException
 	 */
 	@Ignore // 2017/01/07: MusicQアップデートでtailFix不要.
 	@Test
-	public void testGeneric00() throws UndefinedTickException {
+	public void testGeneric00() throws MMLExceptionList, MMLVerifyException {
 		String mml =       "MML@ggt150gg,rr8r16.a24aa;";
 		String expectMML = "MML@ggt150ggr64,rr8r16.a32&a64aa,;";
 
@@ -199,10 +201,11 @@ public class MMLTrackTest {
 	/**
 	 * tempo tail
 	 * v0c補正と重なっている音は鳴らない場合があります. (mabi)
-	 * @throws UndefinedTickException
+	 * @throws MMLExceptionList
+	 * @throws MMLVerifyException
 	 */
 	@Test
-	public void testTempo_tail0() throws UndefinedTickException {
+	public void testTempo_tail0() throws MMLExceptionList, MMLVerifyException {
 		String mml =        "MML@,c2t130&c1.t200r1t180";
 		String expectMML1 = "MML@r2t130l1r.t200rt180,l1c&c,;";
 		String expectMML2 = "MML@v0d2t130,l1c&c,;";
@@ -251,10 +254,11 @@ public class MMLTrackTest {
 
 	/**
 	 * 不要な終端テンポ（時間計算）.
-	 * @throws UndefinedTickException
+	 * @throws MMLExceptionList
+	 * @throws MMLVerifyException
 	 */
 	@Test
-	public void test_generateTailTempo0() throws UndefinedTickException {
+	public void test_generateTailTempo0() throws MMLExceptionList, MMLVerifyException {
 		String input  = "MML@t120ddddddddrrrrt60,cccccccc";
 		String expect = "MML@t120dddddddd,cccccccc,;";
 		MMLTrack track = new MMLTrack().setMML(input);
@@ -312,7 +316,7 @@ public class MMLTrackTest {
 	}
 
 	@Test
-	public void test_musicq_tempo_00() throws UndefinedTickException {
+	public void test_musicq_tempo_00() throws MMLExceptionList, MMLVerifyException {
 		MMLTrack.setTempoAllowChordPart(true);
 
 		String mml = "MML@a&a&a,rrt120,c";
@@ -322,7 +326,7 @@ public class MMLTrackTest {
 	}
 
 	@Test
-	public void test_musicq_tempo_01() throws UndefinedTickException {
+	public void test_musicq_tempo_01() throws MMLExceptionList, MMLVerifyException {
 		MMLTrack.setTempoAllowChordPart(true);
 
 		String mml = "MML@a&a&a,rrt120,rc";
@@ -332,7 +336,7 @@ public class MMLTrackTest {
 	}
 
 	@Test
-	public void test_musicq_tempo_02() throws UndefinedTickException {
+	public void test_musicq_tempo_02() throws MMLExceptionList, MMLVerifyException {
 		MMLTrack.setTempoAllowChordPart(true);
 
 		String mml = "MML@a&a&a,rrt120,rrc";
@@ -342,7 +346,7 @@ public class MMLTrackTest {
 	}
 
 	@Test
-	public void test_musicq_tempo_03() throws UndefinedTickException {
+	public void test_musicq_tempo_03() throws MMLExceptionList, MMLVerifyException {
 		MMLTrack.setTempoAllowChordPart(true);
 
 		String mml = "MML@a&a&a,rrt120,rc&c";
@@ -352,7 +356,7 @@ public class MMLTrackTest {
 	}
 
 	@Test
-	public void test_musicq_tempo_04() throws UndefinedTickException {
+	public void test_musicq_tempo_04() throws MMLExceptionList, MMLVerifyException {
 		MMLTrack.setTempoAllowChordPart(true);
 
 		String mml = "MML@a2,l1c&c&c&c,l1<a&a;";
@@ -367,10 +371,11 @@ public class MMLTrackTest {
 
 	/**
 	 * 和音にテンポ出力する場合に他のパートと音符が重ならないようにする
-	 * @throws UndefinedTickException
+	 * @throws MMLExceptionList
+	 * @throws MMLVerifyException 
 	 */
 	@Test
-	public void test_musicq_tempo_05() throws UndefinedTickException {
+	public void test_musicq_tempo_05() throws MMLExceptionList, MMLVerifyException {
 		MMLTrack.setTempoAllowChordPart(true);
 
 		String mml = "MML@c1&c1,rrt230,;";
@@ -381,7 +386,7 @@ public class MMLTrackTest {
 	}
 
 	@Test
-	public void test_clone() throws UndefinedTickException {
+	public void test_clone() throws MMLExceptionList, MMLVerifyException {
 		MMLTrack t1 = new MMLTrack().setMML("MML@aaat130,b8c6,rc,rrd;");
 		t1.setPanpot(1);
 		t1.setProgram(2);
@@ -482,7 +487,7 @@ public class MMLTrackTest {
 	}
 
 	@Test
-	public void test_startOffset_mml() throws UndefinedTickException {
+	public void test_startOffset_mml() throws MMLExceptionList, MMLVerifyException {
 		var track = new MMLTrack(384, 0, -96).setMML("MML@a,b,c,d;");
 		track.getGlobalTempoList().add(new MMLTempoEvent(180, 0));
 		track.getGlobalTempoList().add(new MMLTempoEvent(140, 96));
@@ -494,7 +499,7 @@ public class MMLTrackTest {
 	}
 
 	@Test
-	public void test_startOffset_mml2() throws UndefinedTickException {
+	public void test_startOffset_mml2() throws MMLExceptionList, MMLVerifyException {
 		MMLTrack.setTempoAllowChordPart(true);
 		var track = new MMLTrack(384, 0, -96).setMML("MML@a,b,c,d;");
 		track.getGlobalTempoList().add(new MMLTempoEvent(180, 0));
@@ -508,10 +513,11 @@ public class MMLTrackTest {
 
 	/**
 	 * アタック遅延補正のテスト
-	 * @throws UndefinedTickException
+	 * @throws MMLExceptionList
+	 * @throws MMLVerifyException
 	 */
 	@Test
-	public void test_attackDelayCorrect_1() throws UndefinedTickException {
+	public void test_attackDelayCorrect_1() throws MMLExceptionList, MMLVerifyException {
 		var track = new MMLTrack(0, 0, 0).setMML("MML@aa,bb,cc,dd;");
 		track.setAttackDelayCorrect(-6);
 		track.setAttackSongDelayCorrect(-12);
@@ -528,10 +534,11 @@ public class MMLTrackTest {
 
 	/**
 	 * アタック遅延補正のテスト
-	 * @throws UndefinedTickException
+	 * @throws MMLExceptionList
+	 * @throws MMLVerifyException
 	 */
 	@Test
-	public void test_attackDelayCorrect_2() throws UndefinedTickException {
+	public void test_attackDelayCorrect_2() throws MMLExceptionList, MMLVerifyException {
 		var track = new MMLTrack(0, 384, 0).setMML("MML@a1,,,b1;");
 		track.getGlobalTempoList().add(new MMLTempoEvent(60, 0));
 		track.getGlobalTempoList().add(new MMLTempoEvent(240, 384));
@@ -560,10 +567,11 @@ public class MMLTrackTest {
 
 	/**
 	 * 64bit-mabi 合奏ズレ補正
-	 * @throws UndefinedTickException 
+	 * @throws MMLExceptionList
+	 * @throws MMLVerifyException
 	 */
 	@Test
-	public void test_64bitMabi_01() throws UndefinedTickException {
+	public void test_64bitMabi_01() throws MMLExceptionList, MMLVerifyException {
 		var track = new MMLTrack();
 		track.setFix64(true);
 		track.setMML("MML@a1a1a1");
@@ -597,7 +605,7 @@ public class MMLTrackTest {
 	}
 
 	@Test
-	public void test_64bitMabi_02() throws UndefinedTickException {
+	public void test_64bitMabi_02() throws MMLExceptionList, MMLVerifyException {
 		var track = new MMLTrack();
 		track.setFix64(true);
 		MMLBuilder.setMMLVZeroTempo(false);
@@ -621,7 +629,7 @@ public class MMLTrackTest {
 	}
 
 	@Test
-	public void test_disableNopt() throws UndefinedTickException {
+	public void test_disableNopt() throws MMLExceptionList, MMLVerifyException {
 		String mml1 = "MML@o7ccco0d+o7cccc,,;";
 		String mml2 = "MML@o7cccn3cccc,,;";
 		var track = new MMLTrack().setMML("MML@o7ccco0d+o7cccc");

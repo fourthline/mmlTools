@@ -9,7 +9,7 @@ import java.util.Objects;
 import jp.fourthline.mmlTools.core.IllegalTickOffsetException;
 import jp.fourthline.mmlTools.core.MMLTicks;
 import jp.fourthline.mmlTools.core.TuningBase;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 
 public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 	private static final long serialVersionUID = 4372538748155995529L;
@@ -115,7 +115,7 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 	private static final String[] noteNameTable = {
 			"c", "c+", "d", "d+", "e", "f", "f+", "g", "g+", "a", "a+", "b"
 	};
-	private String getNoteName() throws UndefinedTickException {
+	private String getNoteName() throws MMLException {
 		if (note == -1) {
 			return "c-";
 		}
@@ -123,13 +123,13 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 	}
 
 	@Override
-	public String toMMLString() throws UndefinedTickException {
+	public String toMMLString() throws MMLException {
 		return toMMLString(0);
 	}
 
-	private String toMMLString(int prevEndTickOffset) throws UndefinedTickException {
+	private String toMMLString(int prevEndTickOffset) throws MMLException {
 		if ( (note < -1) || (note >= 108) ) {
-			throw new UndefinedTickException("note = "+note);
+			throw MMLException.createIllegalNote(note);
 		}
 		String noteName = getNoteName();
 		int actTick = tick;
@@ -144,9 +144,9 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 		}
 	}
 
-	public String toMMLString(MMLNoteEvent prevNoteEvent) throws UndefinedTickException {
+	public String toMMLString(MMLNoteEvent prevNoteEvent) throws MMLException {
 		if ( (note < -1) || (note >= 108) ) {
-			throw new UndefinedTickException("note = "+note);
+			throw MMLException.createIllegalNote(note);
 		}
 		StringBuilder sb = new StringBuilder();
 
@@ -171,7 +171,7 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 	 * @param prevNoteEvent
 	 * @return
 	 */
-	private String createMMLSpaceString(MMLNoteEvent prevNoteEvent) throws UndefinedTickException {
+	private String createMMLSpaceString(MMLNoteEvent prevNoteEvent) throws MMLException {
 		int noteSpaceTick = getTickOffset() - prevNoteEvent.getEndTick();
 		if ( noteSpaceTick > 0 ) {
 			MMLTicks mmlTick = new MMLTicks("r", noteSpaceTick, false);

@@ -8,7 +8,7 @@ package jp.fourthline.mmlTools;
 import java.util.Map;
 
 import jp.fourthline.mmlTools.core.MMLTools;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 
 
 /**
@@ -39,7 +39,7 @@ public class MMLTimeTools extends MMLTools {
 			88, 83, 88, 59, 59
 	};
 
-	public MMLTimeTools(String mml, boolean drumMode) throws UndefinedTickException {
+	public MMLTimeTools(String mml, boolean drumMode) throws MMLException {
 		super(mml);
 
 		parseMMLforMabinogi();
@@ -79,19 +79,19 @@ public class MMLTimeTools extends MMLTools {
 	}
 
 
-	public Map<Integer, Integer> getPlayList() throws UndefinedTickException {
+	public Map<Integer, Integer> getPlayList() throws MMLException {
 		return playParser.getTempoList();
 	}
 
-	public Map<Integer, Integer> getMelodyList() throws UndefinedTickException {
+	public Map<Integer, Integer> getMelodyList() throws MMLException {
 		return melodyParser.getTempoList();
 	}
 
-	public Map<Integer, Integer> getChord1List() throws UndefinedTickException {
+	public Map<Integer, Integer> getChord1List() throws MMLException {
 		return chord1Parser.getTempoList();
 	}
 
-	public Map<Integer, Integer> getChord2List() throws UndefinedTickException {
+	public Map<Integer, Integer> getChord2List() throws MMLException {
 		return chord2Parser.getTempoList();
 	}
 }

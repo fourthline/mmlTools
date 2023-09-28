@@ -15,14 +15,14 @@ import org.junit.Test;
 import jp.fourthline.UseLoadingDLS;
 import jp.fourthline.mmlTools.MMLNoteEvent;
 import jp.fourthline.mmlTools.MMLTrack;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 
 public final class MMLMidiTrackTest extends UseLoadingDLS {
 
 	private final MabiDLS dls = MabiDLS.getInstance();
 
 	@Test
-	public void test_overlap() throws InvalidMidiDataException, UndefinedTickException {
+	public void test_overlap() throws InvalidMidiDataException, MMLException {
 		var track = new MMLTrack().setMML("MML@c1c2,v12rc,v13r1c;");
 		var midiTrack = new MMLMidiTrack(dls.getInstByProgram(21));
 
@@ -40,7 +40,7 @@ public final class MMLMidiTrackTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void test_noOverlap() throws InvalidMidiDataException, UndefinedTickException {
+	public void test_noOverlap() throws InvalidMidiDataException, MMLException {
 		var track = new MMLTrack().setMML("MML@c1c2,v12rc,v13r1c;");
 		var midiTrack = new MMLMidiTrack(dls.getInstByProgram(0));
 

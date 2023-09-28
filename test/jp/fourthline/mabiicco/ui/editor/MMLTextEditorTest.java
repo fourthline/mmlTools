@@ -12,9 +12,9 @@ import org.junit.Test;
 import jp.fourthline.UseLoadingDLS;
 import jp.fourthline.mabiicco.ui.MMLSeqView;
 import jp.fourthline.mmlTools.MMLBuilder;
+import jp.fourthline.mmlTools.MMLExceptionList;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTrack;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
 
 public class MMLTextEditorTest extends UseLoadingDLS {
 
@@ -32,7 +32,7 @@ public class MMLTextEditorTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void test_edit() throws UndefinedTickException {
+	public void test_edit() throws MMLExceptionList {
 		obj.addMMLTrack(new MMLTrack().setMML("MML@rt150cdc;"));
 		obj.addMMLTrack(new MMLTrack());
 		obj.updateActivePart(true);
@@ -50,7 +50,7 @@ public class MMLTextEditorTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void test_cancel() throws UndefinedTickException {
+	public void test_cancel() throws MMLExceptionList {
 		obj.addMMLTrack(new MMLTrack().setMML("MML@rt150cdc;"));
 		obj.addMMLTrack(new MMLTrack());
 		obj.updateActivePart(true);
@@ -68,7 +68,7 @@ public class MMLTextEditorTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void test_mmlPos() throws UndefinedTickException {
+	public void test_mmlPos() throws MMLExceptionList {
 		var editor = new MMLTextEditor(null, obj, null);
 		String mml = "rr16r32.>cc16.c32.";
 		assertEquals(0, editor.tickMMLPosition(mml, -1));

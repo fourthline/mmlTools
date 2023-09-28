@@ -19,7 +19,7 @@ public enum TuningBase {
 		this.base = base;
 		try {
 			this.tick = MMLTicks.getTick(base);
-		} catch (UndefinedTickException e) {
+		} catch (MMLException e) {
 			this.tick = 0;
 		}
 	}

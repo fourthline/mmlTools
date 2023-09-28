@@ -5,7 +5,7 @@
 package jp.fourthline.mmlTools;
 
 import jp.fourthline.mmlTools.core.MMLTokenizer;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 
 
 /**
@@ -24,14 +24,14 @@ public class XylophoneMML {
 	/**
 	 * @return 変換後のMML
 	 */
-	public String conv(String mml) throws UndefinedTickException {
+	public String conv(String mml) throws MMLException {
 		return this.conv(mml, false);
 	}
 
 	/**
 	 * @return 変換後のMML
 	 */
-	public String conv(String mml, boolean backMode) throws UndefinedTickException {
+	public String conv(String mml, boolean backMode) throws MMLException {
 		MMLTokenizer mt = new MMLTokenizer(mml);
 		this.backMode = backMode;
 

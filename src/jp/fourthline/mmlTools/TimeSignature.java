@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 import jp.fourthline.mmlTools.core.MMLTicks;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 
 
 public final class TimeSignature extends MMLEvent {
@@ -33,14 +33,14 @@ public final class TimeSignature extends MMLEvent {
 	private int baseTick;
 	private int measureOffset;      // 小節で設定する
 
-	public TimeSignature(MMLScore score, int tickOffset, int numTime, int baseTime) throws UndefinedTickException {
+	public TimeSignature(MMLScore score, int tickOffset, int numTime, int baseTime) throws MMLException {
 		super(tickOffset);
 		this.numTime = numTime;
 		this.baseTick = MMLTicks.getTick(Integer.toString(baseTime));
 		this.measureOffset = tickToMeasure(score, tickOffset);
 	}
 
-	public TimeSignature(MMLScore score, int tickOffset, String numTime, String baseTime) throws UndefinedTickException {
+	public TimeSignature(MMLScore score, int tickOffset, String numTime, String baseTime) throws MMLException {
 		this(score, tickOffset, Integer.parseInt(numTime), Integer.parseInt(baseTime));
 	}
 
@@ -193,7 +193,7 @@ public final class TimeSignature extends MMLEvent {
 		try {
 			String baseTime = new MMLTicks("", baseTick).toMMLText();
 			return String.format("%d=%d/%s", getTickOffset(), numTime, baseTime);
-		} catch (UndefinedTickException e) {
+		} catch (MMLException e) {
 			e.printStackTrace();
 		}
 		return "";
@@ -204,7 +204,7 @@ public final class TimeSignature extends MMLEvent {
 		try {
 			String baseTime = new MMLTicks("", baseTick).toMMLText();
 			return String.format("%d/%s", numTime, baseTime);
-		} catch (UndefinedTickException e) {
+		} catch (MMLException e) {
 			e.printStackTrace();
 		}
 		return "";

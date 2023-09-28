@@ -23,16 +23,18 @@ import javax.sound.midi.*;
 import jp.fourthline.mabiicco.midi.InstClass;
 import jp.fourthline.mmlTools.MMLEvent;
 import jp.fourthline.mmlTools.MMLEventList;
+import jp.fourthline.mmlTools.MMLExceptionList;
 import jp.fourthline.mmlTools.MMLNoteEvent;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTempoEvent;
 import jp.fourthline.mmlTools.MMLTrack;
+import jp.fourthline.mmlTools.MMLVerifyException;
 import jp.fourthline.mmlTools.Marker;
 import jp.fourthline.mmlTools.TimeSignature;
 import jp.fourthline.mmlTools.core.MMLTickTable;
 import jp.fourthline.mmlTools.core.MMLTicks;
 import jp.fourthline.mmlTools.core.ResourceLoader;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 import jp.fourthline.mmlTools.optimizer.MMLStringOptimizer;
 
 
@@ -162,7 +164,7 @@ public final class MidiFile extends AbstractMMLParser {
 		score.getTempoEventList().addAll(tempoList);
 		try {
 			return score.generateAll();
-		} catch (UndefinedTickException e) {
+		} catch (MMLExceptionList | MMLVerifyException e) {
 			return score;
 		}
 	}
@@ -313,7 +315,7 @@ public final class MidiFile extends AbstractMMLParser {
 					break;
 				}
 			}
-		} catch (UndefinedTickException e) {
+		} catch (MMLExceptionList e) {
 			e.printStackTrace();
 		}
 	}
@@ -403,7 +405,7 @@ public final class MidiFile extends AbstractMMLParser {
 					} else {
 						try {
 							score.addTimeSignature(new TimeSignature(score, (int) tick, timeCount, base));
-						} catch (UndefinedTickException e) {
+						} catch (MMLException e) {
 							e.printStackTrace();
 						}
 					}
@@ -507,7 +509,7 @@ public final class MidiFile extends AbstractMMLParser {
 		try {
 			MMLScore score = new MidiFile().parse(new FileInputStream("sample2.mid"));
 			score.generateAll();
-		} catch (FileNotFoundException | MMLParseException | UndefinedTickException e) {
+		} catch (FileNotFoundException | MMLParseException | MMLExceptionList | MMLVerifyException e) {
 			e.printStackTrace();
 		}
 	}

@@ -398,6 +398,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 
 		createMenuItem(helpMenu, "menu.about", ActionDispatcher.ABOUT);
 		createMenuItem(helpMenu, "menu.shortcutInfo", ActionDispatcher.SHORTCUT_INFO);
+		createMenuItem(helpMenu, "menu.mmlErrList", ActionDispatcher.MML_ERR_LIST);
 		if (!appProperties.useDefaultSoundBank.get()) {
 			createMenuItem(helpMenu, "menu.instList", ActionDispatcher.INST_LIST);
 		}

@@ -17,7 +17,7 @@ import jp.fourthline.mabiicco.ui.IMMLManager;
 import jp.fourthline.mabiicco.ui.IViewTargetMarker;
 import jp.fourthline.mmlTools.Measure;
 import jp.fourthline.mmlTools.TimeSignature;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 
 /**
  * TimeSignature Editor
@@ -55,7 +55,7 @@ public final class TimeSignatureEditor extends AbstractMarkerEditor<TimeSignatur
 		timeCount.setSelectedItem(measure.timeCount());
 		try {
 			timeBase.setSelectedItem(measure.timeBase());
-		} catch (UndefinedTickException e) {
+		} catch (MMLException e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -66,7 +66,7 @@ public final class TimeSignatureEditor extends AbstractMarkerEditor<TimeSignatur
 				String s1 = timeCount.getItemAt(timeCount.getSelectedIndex());
 				String s2 = timeBase.getItemAt(timeBase.getSelectedIndex());
 				return new TimeSignature(mmlManager.getMMLScore(), targetTick, s1, s2);
-			} catch (UndefinedTickException e) {
+			} catch (MMLException e) {
 				e.printStackTrace();
 			}
 		}

@@ -31,7 +31,7 @@ import jp.fourthline.mmlTools.MMLBuilder;
 import jp.fourthline.mmlTools.MMLEventList;
 import jp.fourthline.mmlTools.MMLNoteEvent;
 import jp.fourthline.mmlTools.MMLTrack;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 
 public final class MMLEditorTest extends UseLoadingDLS {
 
@@ -481,10 +481,10 @@ public final class MMLEditorTest extends UseLoadingDLS {
 
 	/**
 	 * すべて選択する. 選択されたことはDeleteして消えたことで判定.
-	 * @throws UndefinedTickException
+	 * @throws MMLException
 	 */
 	@Test
-	public void test_selectAll() throws UndefinedTickException {
+	public void test_selectAll() throws MMLException {
 		mmlManager.setMMLselectedTrack(new MMLTrack().setMML("MML@ccc,ddd,eee"));
 		editor.selectAll();
 		editor.selectedDelete();

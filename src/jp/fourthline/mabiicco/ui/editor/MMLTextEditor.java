@@ -49,9 +49,9 @@ import jp.fourthline.mabiicco.ui.PianoRollView;
 import jp.fourthline.mabiicco.ui.color.ColorSet;
 import jp.fourthline.mmlTools.MMLBuilder;
 import jp.fourthline.mmlTools.MMLEventList;
+import jp.fourthline.mmlTools.MMLExceptionList;
 import jp.fourthline.mmlTools.MMLTempoEvent;
 import jp.fourthline.mmlTools.core.MMLTokenizer;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
 import jp.fourthline.mmlTools.optimizer.MMLStringOptimizer;
 import jp.fourthline.mmlTools.parser.MMLFile;
 
@@ -99,7 +99,7 @@ public final class MMLTextEditor implements DocumentListener, CaretListener {
 	private final long initialPosition;
 	private final PianoRollView pianoRollView;
 
-	public MMLTextEditor(Frame parentFrame, IMMLManager mmlManager, PianoRollView pianoRollView) throws UndefinedTickException {
+	public MMLTextEditor(Frame parentFrame, IMMLManager mmlManager, PianoRollView pianoRollView) throws MMLExceptionList {
 		textPane.setDocument(doc);
 		textPane.addCaretListener(this);
 		textPane.setFont(new Font("Monospaced", Font.PLAIN, 12));
@@ -207,7 +207,7 @@ public final class MMLTextEditor implements DocumentListener, CaretListener {
 		var eventList = new MMLEventList(text, null, startOffset); // グローバルテンポリストから切り離す
 		try {
 			eventList.getInternalMMLString();
-		} catch (UndefinedTickException e) {
+		} catch (MMLExceptionList e) {
 			allow = false;
 		}
 		mmlManager.getActiveTrack().getMMLEventList().set(index, eventList);

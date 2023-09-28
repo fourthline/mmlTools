@@ -35,9 +35,9 @@ public class MMLTools {
 	/**　
 	 * MMLの演奏時間を取得する.
 	 * @return 時間（秒）
-	 * @throws UndefinedTickException 変換に失敗した
+	 * @throws MMLException 変換に失敗した
 	 */
-	public double getPlayTime() throws UndefinedTickException  {
+	public double getPlayTime() throws MMLException  {
 		if (play_length < 0.0) {
 			play_length = playParser.getPlayLengthByTempoList();
 		}
@@ -49,9 +49,9 @@ public class MMLTools {
 	 * マビノギでの演奏スキル時間を取得する.
 	 * <p>演奏時間  － 0.6秒 ＜ スキル時間 であれば、切れずに演奏される</p>
 	 * @return 時間（秒）
-	 * @throws UndefinedTickException 変換に失敗した
+	 * @throws MMLException 変換に失敗した
 	 */
-	public double getMabinogiTime() throws UndefinedTickException {
+	public double getMabinogiTime() throws MMLException {
 		if (mabinogi_length < 0.0) {
 			double max = 0.0;
 			double[] timeList = {
@@ -72,9 +72,9 @@ public class MMLTools {
 
 	/**
 	 * マビノギ演奏でのMML解析
-	 * @throws UndefinedTickException 変換に失敗した
+	 * @throws MMLException 変換に失敗した
 	 */
-	public void parseMMLforMabinogi() throws UndefinedTickException {
+	public void parseMMLforMabinogi() throws MMLException {
 		melodyParser = new MelodyParser(mml_melody);
 		chord1Parser = new MelodyParser(mml_chord1, "4", melodyParser.getTempo());
 		chord2Parser = new MelodyParser(mml_chord2, "4", chord1Parser.getTempo());
@@ -84,9 +84,9 @@ public class MMLTools {
 	/**
 	 * 演奏時間の解析
 	 * @param drumMode 打楽器モードの場合 trueを指定する.
-	 * @throws UndefinedTickException 変換に失敗した
+	 * @throws MMLException 変換に失敗した
 	 */
-	public void parsePlayMode(boolean drumMode) throws UndefinedTickException {
+	public void parsePlayMode(boolean drumMode) throws MMLException {
 		if (drumMode) {
 			String s = mml_melody
 					+ "T"+melodyParser.getTempo() + mml_chord1
@@ -192,7 +192,7 @@ public class MMLTools {
 		return s;
 	}
 
-	public boolean checkPitch(int min, int max) throws UndefinedTickException {
+	public boolean checkPitch(int min, int max) throws MMLException {
 		parseMMLforMabinogi();
 		parsePlayMode(false);
 

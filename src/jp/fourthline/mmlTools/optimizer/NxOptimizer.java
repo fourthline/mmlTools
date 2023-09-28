@@ -12,7 +12,7 @@ import java.util.OptionalInt;
 import jp.fourthline.mmlTools.core.MMLTokenizer;
 import jp.fourthline.mmlTools.core.MelodyParser;
 import jp.fourthline.mmlTools.core.ParserWarn3ML;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 
 
 /**
@@ -165,7 +165,7 @@ public class NxOptimizer implements MMLStringOptimizer.Optimizer {
 	public void nextToken(String token) {
 		try {
 			parser.noteGT(token);
-		} catch (UndefinedTickException | ParserWarn3ML e) {}
+		} catch (MMLException | ParserWarn3ML e) {}
 
 		doToken(token);
 		printMap();

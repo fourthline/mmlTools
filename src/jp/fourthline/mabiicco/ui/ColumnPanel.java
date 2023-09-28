@@ -43,7 +43,7 @@ import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTempoEvent;
 import jp.fourthline.mmlTools.Marker;
 import jp.fourthline.mmlTools.TimeSignature;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 
 
 public final class ColumnPanel extends JPanel implements MouseListener, MouseMotionListener, IViewTargetMarker {
@@ -59,6 +59,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 	private static final ColorSet TEXT_COLOR = ColorSet.create(Color.DARK_GRAY, Color.LIGHT_GRAY);
 	private static final int DRAW_HEIGHT = 32;
 	private static final int DRAW_OFFSET_HEIGHT = 6;
+	private static final int DRAW_HEIGHT_ERR_BAR = 10;
 
 	private final PianoRollView pianoRollView;
 	private final IMMLManager mmlManager;
@@ -123,6 +124,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 		Graphics2D g2 = (Graphics2D)g.create();
 
 		paintStartOffset(g2);
+		paintErr(g2);
 		paintRuler(g2);
 		paintMarker(g2);
 		paintTempoEvents(g2);
@@ -165,6 +167,18 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 		g.fillRect(0, DRAW_HEIGHT+DRAW_OFFSET_HEIGHT, x2, DRAW_OFFSET_HEIGHT);
 	}
 
+	/**
+	 * エラー箇所の表示
+	 */
+	private void paintErr(Graphics2D g) {
+		var errList = mmlManager.getMMLScore().getMMLErr();
+		g.setColor(Color.RED);
+		for (var item : errList) {
+			int x = pianoRollView.convertTicktoX(item.getNote().getTickOffset());
+			int width = Math.max(pianoRollView.convertTicktoX(item.getNote().getTick()), 2);
+			g.fillRect(x, 1, width, DRAW_HEIGHT_ERR_BAR);
+		}
+	}
 	/**
 	 * ルーラを表示します。
 	 */
@@ -245,7 +259,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 			g.fillPolygon(xPoints, yPoints, xPoints.length);
 			g.setColor(BEAT_BORDER_COLOR.get());
 			g.drawPolygon(xPoints, yPoints, xPoints.length);
-		} catch (UndefinedTickException e) {
+		} catch (MMLException e) {
 			e.printStackTrace();
 		}
 	}

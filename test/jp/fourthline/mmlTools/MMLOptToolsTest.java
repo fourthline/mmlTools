@@ -10,7 +10,7 @@ import static org.junit.Assert.*;
 import org.junit.*;
 
 import jp.fourthline.mmlTools.core.MelodyParser;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 
 
 public class MMLOptToolsTest {
@@ -42,7 +42,7 @@ public class MMLOptToolsTest {
 			System.out.printf("*** %d, %d\n", result1, result2);
 			int[] result = { result1, result2 };
 			return result;
-		} catch (UndefinedTickException e) {}
+		} catch (MMLException e) {}
 
 		return null;
 	}
@@ -59,7 +59,7 @@ public class MMLOptToolsTest {
 
 				int[] result = mmlTimeTest(orig+orig_tick[i], s);
 				assertEquals(result[0], result[1]);
-			} catch (UndefinedTickException e) {
+			} catch (MMLException e) {
 				e.printStackTrace();
 			}
 		}
@@ -73,7 +73,7 @@ public class MMLOptToolsTest {
 			String s = tools.replaceNoise(input);
 			System.out.println("----"+s);
 			return s;
-		} catch (UndefinedTickException e) {
+		} catch (MMLException e) {
 			e.printStackTrace();
 		}
 

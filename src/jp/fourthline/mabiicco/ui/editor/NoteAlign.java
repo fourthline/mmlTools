@@ -9,7 +9,7 @@ import java.util.List;
 
 import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mmlTools.core.MMLTicks;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 
 
 
@@ -42,7 +42,7 @@ public enum NoteAlign {
 		viewText = AppResource.appText("editor.note_" + s);
 		try {
 			alignTick = MMLTicks.getTick(s);
-		} catch (UndefinedTickException e) {
+		} catch (MMLException e) {
 			e.printStackTrace();
 			System.exit(1);
 		}

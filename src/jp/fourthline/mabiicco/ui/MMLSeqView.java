@@ -33,13 +33,14 @@ import jp.fourthline.mabiicco.ui.mml.MMLOutputPanel;
 import jp.fourthline.mabiicco.ui.mml.MMLPartChangePanel;
 import jp.fourthline.mabiicco.ui.mml.TrackPropertyPanel;
 import jp.fourthline.mmlTools.MMLEventList;
+import jp.fourthline.mmlTools.MMLExceptionList;
 import jp.fourthline.mmlTools.MMLNoteEvent;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTrack;
+import jp.fourthline.mmlTools.MMLVerifyException;
 import jp.fourthline.mmlTools.Measure;
 import jp.fourthline.mmlTools.core.MMLTicks;
 import jp.fourthline.mmlTools.core.NanoTime;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -613,15 +614,13 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 		if (generate) {
 			try {
 				mmlScore.generateAll();
-			} catch (UndefinedTickException e) {
-				EventQueue.invokeLater(() -> {
-					String msg = AppResource.appText("fail.mml_modify") + "\n" + e.getMessage();
-					JOptionPane.showMessageDialog(parentFrame, msg, AppResource.getAppTitle(), JOptionPane.WARNING_MESSAGE);
-				});
+			} catch (MMLExceptionList | MMLVerifyException e) {
+				showErrMessage(mmlScore, e);
 				System.err.println("REVERT: " + e.getMessage());
 				undoEdit.revertState();
 				editor.reset();
 			}
+			panel.repaint();
 		}
 
 		updateAllMMLPart();
@@ -831,11 +830,20 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 		}
 		try {
 			new MMLTextEditor(parentFrame, this, pianoRollView).showDialog();
-		} catch (UndefinedTickException e) {
-			EventQueue.invokeLater(() -> {
-				String msg = AppResource.appText("fail.mml_modify") + "\n" + e.getMessage();
-				JOptionPane.showMessageDialog(parentFrame, msg, AppResource.getAppTitle(), JOptionPane.WARNING_MESSAGE);
-			});
+		} catch (MMLExceptionList e) {
+			showErrMessage(mmlScore, e);
 		}
+	}
+
+	private void showErrMessage(MMLScore score, Exception e) {
+		var errView = new MMLErrView(score);
+		EventQueue.invokeLater(() -> {
+			String msg = AppResource.appText("fail.mml_modify") + "\n" + e.getLocalizedMessage();
+			String options[] = { "OK", "detail" };
+			int r = JOptionPane.showOptionDialog(parentFrame, msg, AppResource.getAppTitle(), JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+			if (r == 1) {
+				errView.showMMLErrList(parentFrame);
+			}
+		});
 	}
 }

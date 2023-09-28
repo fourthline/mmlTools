@@ -14,7 +14,7 @@ import java.util.function.IntFunction;
 
 import jp.fourthline.mmlTools.core.MMLText;
 import jp.fourthline.mmlTools.core.MMLTicks;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 import jp.fourthline.mmlTools.optimizer.MMLStringOptimizer;
 
 public final class MMLTrack implements Serializable, Cloneable {
@@ -316,7 +316,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 		return mml;
 	}
 
-	public MMLTrack generate() throws UndefinedTickException {
+	public MMLTrack generate() throws MMLExceptionList, MMLVerifyException {
 		String mml1 = getOriginalMML();
 		originalMML.setMMLText(getMMLStrings(false, false));
 		var t = new MMLTrack(commonStartOffset, startDelta, startSongDelta).setMML(getOriginalMML());
@@ -325,7 +325,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 			System.err.println("Verify error.");
 			System.err.println(mml1);
 			System.err.println(getOriginalMML());
-			throw new UndefinedTickException("Verify error.");
+			throw new MMLVerifyException(this);
 		}
 		/*
 		 * tailFixはMusicQアップデートで不要になりました. 2017/01/07
@@ -341,25 +341,37 @@ public final class MMLTrack implements Serializable, Cloneable {
 		return this;
 	}
 
-	private String[] getMMLStrings(boolean tailFix, boolean mabiTempo) throws UndefinedTickException {
+	private String[] getMMLStrings(boolean tailFix, boolean mabiTempo) throws MMLExceptionList {
 		int count = mmlParts.size();
 		String[] mml = new String[count];
+		var errList = new ArrayList<MMLExceptionList.Entry>();
 
 		for (int i = 0; i < count; i++) {
 			int startOffset = mabiTempo ? getStartOffsetforMabiMML(i) : getStartOffset(i);
 			// メロディパートのMML更新（テンポ, tickLengthにあわせる.
 			MMLEventList eventList = mmlParts.get(i);
 			boolean isPrimaryTempoPart = (i == 0) || (i == 3);
-			if ( isPrimaryTempoPart ) {
-				// part0 の場合, 1,2のパート情報を渡す
-				List<MMLEventList> relationPart = (i == 0) ? mmlParts.subList(1, 3) : null;
-				mml[i] = MMLBuilder.create(eventList, startOffset).toMMLString(true, mabiTempo, relationPart);
-			} else {
-				mml[i] = MMLBuilder.create(eventList, startOffset).toMMLString();
+			try {
+				if ( isPrimaryTempoPart ) {
+					// part0 の場合, 1,2のパート情報を渡す
+					List<MMLEventList> relationPart = (i == 0) ? mmlParts.subList(1, 3) : null;
+					mml[i] = MMLBuilder.create(eventList, startOffset).toMMLString(true, mabiTempo, relationPart);
+				} else {
+					mml[i] = MMLBuilder.create(eventList, startOffset).toMMLString();
+				}
+			} catch (MMLExceptionList e) {
+				errList.addAll(e.getErr());
 			}
 		}
+		if (!errList.isEmpty()) {
+			throw new MMLExceptionList(errList);
+		}
 		if (tailFix) { // 終端補正
-			mml[0] = tailFix(mml[0], mml[1], mml[2]);
+			try {
+				mml[0] = tailFix(mml[0], mml[1], mml[2]);
+			} catch (MMLException e) {
+				e.printStackTrace();
+			}
 		}
 		// for mabi MML, メロディ～和音2 までがカラの時にはメロディパートもカラにする.
 		if ( mabiTempo && mmlParts.get(0).getMMLNoteEventList().isEmpty() && mml[1].equals("") && mml[2].equals("") ) {
@@ -405,13 +417,14 @@ public final class MMLTrack implements Serializable, Cloneable {
 	 * TODO: 別クラスでもいいかも？
 	 * @param allowTempoChord   テンポを和音パートに出力許可するか
 	 * @return
-	 * @throws UndefinedTickException
+	 * @throws MMLExceptionList 
 	 */
-	public String[] getGenericMMLStrings(boolean allowTempoChord) throws UndefinedTickException {
+	public String[] getGenericMMLStrings(boolean allowTempoChord) throws MMLExceptionList {
 		int count = mmlParts.size();
 		String[] mml = new String[count];
 		LinkedList<MMLTempoEvent> localTempoList = new LinkedList<>(globalTempoList);
 		List<List<MMLEventList>> relationParts = makeRelationPart();
+		var errList = new ArrayList<MMLExceptionList.Entry>();
 
 		for (int i = 0; i < count; i++) {
 			// メロディパートのMML更新（テンポ, tickLengthにあわせる.
@@ -420,9 +433,16 @@ public final class MMLTrack implements Serializable, Cloneable {
 				localTempoList = new LinkedList<>(globalTempoList);
 			}
 			List<MMLEventList> relationPart = ((i < 3) && (allowTempoChord)) ? relationParts.get(i) : null;
-			mml[i] = MMLBuilder.create(eventList, getStartOffsetforMabiMML(i), MMLBuilder.INIT_OCT).toMMLStringMusicQ(localTempoList, relationPart);
-
+			try {
+				mml[i] = MMLBuilder.create(eventList, getStartOffsetforMabiMML(i), MMLBuilder.INIT_OCT).toMMLStringMusicQ(localTempoList, relationPart);
+			} catch (MMLExceptionList e) {
+				errList.addAll(e.getErr());
+			}
 		}
+		if (!errList.isEmpty()) {
+			throw new MMLExceptionList(errList);
+		}
+
 		// for mabi MML, メロディ～和音2 までがカラの時にはメロディパートもカラにする.
 		if ( mmlParts.get(0).getMMLNoteEventList().isEmpty() && mml[1].equals("") && mml[2].equals("") ) {
 			mml[0] = "";
@@ -433,9 +453,9 @@ public final class MMLTrack implements Serializable, Cloneable {
 	/**
 	 * MusicQ以降用のMabinogi用MML生成.
 	 * @return
-	 * @throws UndefinedTickException
+	 * @throws MMLExceptionList 
 	 */
-	private String[] getMMLStringsMusicQ() throws UndefinedTickException {
+	private String[] getMMLStringsMusicQ() throws MMLExceptionList {
 		boolean allowed = tempoAllowChordPartFunction.apply(program);
 		String[] mml = getGenericMMLStrings(allowed);
 		for (int i = 0; i < mml.length; i++) {
@@ -453,7 +473,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 		mabiMMLOptimizeFunc = (f != null) ? (f) : (t -> t.preciseOptimize());
 	}
 
-	private String tailFix(String melody, String chord1, String chord2) throws UndefinedTickException {
+	private String tailFix(String melody, String chord1, String chord2) throws MMLException {
 		String s = melody;
 		MMLTrack partTrack = new MMLTrack().setMML(melody, chord1, chord2, "");
 		long totalTick = partTrack.getMaxTickLength();
@@ -690,7 +710,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 		if (generated) {
 			try {
 				o.generate();
-			} catch (UndefinedTickException e) {
+			} catch (MMLExceptionList | MMLVerifyException e) {
 				e.printStackTrace();
 			}
 		}

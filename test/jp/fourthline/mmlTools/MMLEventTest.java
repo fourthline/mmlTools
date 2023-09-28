@@ -9,15 +9,16 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import jp.fourthline.mmlTools.core.MMLTicks;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 
 public class MMLEventTest {
 	/**
 	 * insertTick
-	 * @throws UndefinedTickException 
+	 * @throws MMLExceptionList 
+	 * @throws MMLException 
 	 */
 	@Test
-	public void testInsertTick0() throws UndefinedTickException {
+	public void testInsertTick0() throws MMLExceptionList, MMLException {
 		MMLEventList eventList1 = new MMLEventList("aabb");
 		MMLEventList eventList2 = new MMLEventList("aar1bb");
 
@@ -28,10 +29,11 @@ public class MMLEventTest {
 
 	/**
 	 * removeTick
-	 * @throws UndefinedTickException 
+	 * @throws MMLExceptionList 
+	 * @throws MMLException 
 	 */
 	@Test
-	public void testRemoveTick0() throws UndefinedTickException {
+	public void testRemoveTick0() throws MMLExceptionList, MMLException {
 		MMLEventList eventList1 = new MMLEventList("aac1bb");
 		MMLEventList eventList2 = new MMLEventList("aar8r9b");
 
@@ -42,10 +44,11 @@ public class MMLEventTest {
 
 	/**
 	 * removeTick
-	 * @throws UndefinedTickException 
+	 * @throws MMLExceptionList 
+	 * @throws MMLException 
 	 */
 	@Test
-	public void testRemoveTick1() throws UndefinedTickException {
+	public void testRemoveTick1() throws MMLExceptionList, MMLException {
 		MMLEventList eventList1 = new MMLEventList("aac1bb");
 		MMLEventList eventList2 = new MMLEventList("aabb");
 

@@ -11,11 +11,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
+import java.util.Vector;
 
 import jp.fourthline.mabiicco.midi.MabiDLS;
 import jp.fourthline.mmlTools.core.MMLTicks;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 import jp.fourthline.mmlTools.parser.MMSFile;
 
 
@@ -41,7 +41,8 @@ public final class MMLScore implements Cloneable {
 	private int numTime = 4;
 	private int baseTime = 4;
 
-	private final Stack<UndefinedTickException> exceptionStack = new Stack<>();
+	private final Vector<MMLVerifyException> verifyErrStack = new Vector<>();
+	private final Vector<MMLExceptionList.Entry> mmlErrStack = new Vector<>();
 
 	public static final int MAX_USER_VIEW_MEASURE = 200;
 	private int userViewMeasure;
@@ -191,7 +192,7 @@ public final class MMLScore implements Cloneable {
 	public int getBeatTick() {
 		try {
 			return MMLTicks.getTick(String.valueOf(baseTime));
-		} catch (UndefinedTickException e) {
+		} catch (MMLException e) {
 			throw new AssertionError();
 		}
 	}
@@ -340,22 +341,28 @@ public final class MMLScore implements Cloneable {
 			if ( force || Arrays.equals(this.getObjectState(), score.getObjectState()) ) {
 				return score;
 			}
-		} catch (UndefinedTickException e) {}
+		} catch (MMLExceptionList | MMLVerifyException e) {}
 		return this;
 	}
 
-	public MMLScore generateAll() throws UndefinedTickException {
-		exceptionStack.clear();
+	public MMLScore generateAll() throws MMLExceptionList, MMLVerifyException {
+		verifyErrStack.clear();
+		mmlErrStack.clear();
 		trackList.parallelStream().forEach(t -> {
 			try {
 				t.setFix64(fix64Tempo);
 				t.generate();
-			} catch (UndefinedTickException e) {
-				exceptionStack.push(e);
+			} catch (MMLVerifyException e) {
+				verifyErrStack.add(e);
+			} catch (MMLExceptionList e) {
+				mmlErrStack.addAll(e.getErr());
 			}
 		});
-		if (!exceptionStack.isEmpty()) {
-			throw exceptionStack.pop();
+		if (!verifyErrStack.isEmpty()) {
+			throw verifyErrStack.firstElement();
+		}
+		if (!mmlErrStack.isEmpty()) {
+			throw new MMLExceptionList(mmlErrStack);
 		}
 		return this;
 	}
@@ -443,6 +450,14 @@ public final class MMLScore implements Cloneable {
 	public void removeTimeSignature(TimeSignature ts) {
 		timeSignatureList.remove(ts);
 		TimeSignature.recalcTimeSignatureList(this);
+	}
+
+	public List<MMLVerifyException> getVerifyErr() {
+		return verifyErrStack;
+	}
+
+	public List<MMLExceptionList.Entry> getMMLErr() {
+		return mmlErrStack;
 	}
 
 	@Override

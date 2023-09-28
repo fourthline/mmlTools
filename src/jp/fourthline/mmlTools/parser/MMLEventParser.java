@@ -13,7 +13,7 @@ import jp.fourthline.mmlTools.core.MMLTokenizer;
 import jp.fourthline.mmlTools.core.MelodyParser;
 import jp.fourthline.mmlTools.core.ParserWarn3ML;
 import jp.fourthline.mmlTools.core.TuningBase;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 
 public final class MMLEventParser implements Iterator<MMLEvent> {
 	private final MMLTokenizer tokenizer;
@@ -111,7 +111,7 @@ public final class MMLEventParser implements Iterator<MMLEvent> {
 						return nextItem;
 					}
 				} 
-			} catch (UndefinedTickException | ParserWarn3ML e) {
+			} catch (MMLException | ParserWarn3ML e) {
 				System.err.println(e.getMessage());
 			}
 

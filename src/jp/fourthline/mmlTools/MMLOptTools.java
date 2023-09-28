@@ -7,7 +7,7 @@ package jp.fourthline.mmlTools;
 import jp.fourthline.mmlTools.core.MMLTokenizer;
 import jp.fourthline.mmlTools.core.MelodyParser;
 import jp.fourthline.mmlTools.core.ParserWarn3ML;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 
 
 
@@ -73,7 +73,7 @@ public class MMLOptTools {
 	 * @param mml （例：c4,f8,e-32）
 	 * @return 合成後の token
 	 */
-	public String replaceNoise(String mml) throws UndefinedTickException {
+	public String replaceNoise(String mml) throws MMLException {
 		MMLTokenizer mt = new MMLTokenizer(mml);
 		MelodyParser parser = new MelodyParser(null);
 		int beforeNoteNumber = -1;
@@ -140,7 +140,7 @@ public class MMLOptTools {
 	 * @param width Length文字 ("64", "8")
 	 * @return 合成後の token
 	 */
-	public String replaceTail64(String note, String width) throws UndefinedTickException {		
+	public String replaceTail64(String note, String width) throws MMLException {		
 		int patternIndex = -1;
 		for (int i = 0; i < orig_tick.length; i++) {
 			if ( width.equals(orig_tick[i]) ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 たんらる
+ * Copyright (C) 2022-2023 たんらる
  */
 
 package jp.fourthline.mmlTools.parser;
@@ -9,11 +9,12 @@ import java.io.InputStream;
 import java.util.LinkedHashMap;
 
 import jp.fourthline.mmlTools.MMLEventList;
+import jp.fourthline.mmlTools.MMLExceptionList;
 import jp.fourthline.mmlTools.MMLNoteEvent;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTrack;
+import jp.fourthline.mmlTools.MMLVerifyException;
 import jp.fourthline.mmlTools.core.MMLTokenizer;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
 
 
 public final class TxtFile extends AbstractMMLParser {
@@ -62,15 +63,13 @@ public final class TxtFile extends AbstractMMLParser {
 			}
 
 			return convertOctave(score);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (UndefinedTickException e) {
+		} catch (IOException | MMLExceptionList | MMLVerifyException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
-	private MMLScore convertOctave(MMLScore score) throws UndefinedTickException {
+	private MMLScore convertOctave(MMLScore score) throws MMLExceptionList, MMLVerifyException {
 		if (!parseProperties.getOrDefault(PARSE_CONVERT_OCT, true)) {
 			System.out.println("skip convert oct");
 			return score;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 たんらる
+ * Copyright (C) 2022-2023 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -11,8 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
-
-import jp.fourthline.mmlTools.core.UndefinedTickException;
 
 public class MMLTempoConverterTest {
 
@@ -159,7 +157,7 @@ public class MMLTempoConverterTest {
 	}
 
 	@Test
-	public void test_convert01() throws UndefinedTickException {
+	public void test_convert01() throws MMLExceptionList, MMLVerifyException {
 		var score = new MMLScore();
 		score.addTrack(new MMLTrack().setMML("MML@t140ccct90ddd"));
 		score.getMarkerList().add(new Marker("test", 96));
@@ -173,7 +171,7 @@ public class MMLTempoConverterTest {
 	}
 
 	@Test
-	public void test_convert02() throws UndefinedTickException {
+	public void test_convert02() throws MMLExceptionList, MMLVerifyException {
 		var t1 = new MMLTempoEvent(120, 768);
 		var score = new MMLScore();
 		score.addTrack(new MMLTrack().setMML("MML@fefefefe,,;"));
@@ -185,7 +183,7 @@ public class MMLTempoConverterTest {
 	}
 
 	@Test
-	public void test_convert03() throws UndefinedTickException {
+	public void test_convert03() throws MMLExceptionList, MMLVerifyException {
 		var t1 = new MMLTempoEvent(120, 768);
 		var score = new MMLScore();
 		score.addTrack(new MMLTrack().setMML("MML@fefefefe,,;"));

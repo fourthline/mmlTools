@@ -40,6 +40,7 @@ import jp.fourthline.mabiicco.midi.MMLMidiTrack;
 import jp.fourthline.mabiicco.midi.MabiDLS;
 import jp.fourthline.mabiicco.midi.SoundEnv;
 import jp.fourthline.mabiicco.ui.About;
+import jp.fourthline.mabiicco.ui.MMLErrView;
 import jp.fourthline.mabiicco.ui.MMLSeqView;
 import jp.fourthline.mabiicco.ui.MainFrame;
 import jp.fourthline.mabiicco.ui.PianoRollScaler.MouseScrollWidth;
@@ -146,6 +147,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String OTHER_MML_EXPORT = "other_mml_export";
 	@Action public static final String CHANGE_ACTION = "change_action";
 	@Action public static final String MML_TEXT_EDIT = "mml_text_edit";
+	@Action public static final String MML_ERR_LIST = "mml_err_list";
 
 	private final HashMap<String, Consumer<Object>> actionMap = new HashMap<>();
 
@@ -332,6 +334,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(OTHER_MML_EXPORT, t -> this.otherMmlExportAction());
 		actionMap.put(CHANGE_ACTION, t -> this.changeAction(t));
 		actionMap.put(MML_TEXT_EDIT, t -> mmlSeqView.mmlTextEditor());
+		actionMap.put(MML_ERR_LIST, t -> new MMLErrView(mmlSeqView.getMMLScore()).showMMLErrList(mainFrame));
 	}
 
 	@Override

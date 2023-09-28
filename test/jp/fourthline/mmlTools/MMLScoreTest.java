@@ -28,7 +28,7 @@ import org.junit.Test;
 import jp.fourthline.UseLoadingDLS;
 import jp.fourthline.mmlTools.core.MMLText;
 import jp.fourthline.mmlTools.core.NanoTime;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 import jp.fourthline.mmlTools.optimizer.MMLStringOptimizer;
 import jp.fourthline.mmlTools.parser.IMMLFileParser;
 import jp.fourthline.mmlTools.parser.MMLParseException;
@@ -102,7 +102,7 @@ public class MMLScoreTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void testMMLFileFormat0() throws UndefinedTickException {
+	public void testMMLFileFormat0() throws MMLExceptionList, MMLVerifyException {
 		MMLTrack track = new MMLTrack().setMML("MML@aaa,bbb,ccc,dd1;");
 		track.setTrackName("track1");
 		score.addTrack(track);
@@ -114,7 +114,7 @@ public class MMLScoreTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void testMMLFileFormat1() throws UndefinedTickException {
+	public void testMMLFileFormat1() throws MMLExceptionList, MMLVerifyException {
 		MMLTrack track1 = new MMLTrack().setMML("MML@at150aa1,bbb,ccc,dd1;");
 		track1.setTrackName("track1");
 		score.addTrack(track1);
@@ -133,7 +133,7 @@ public class MMLScoreTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void testMMLFileFormat1_ex() throws UndefinedTickException {
+	public void testMMLFileFormat1_ex() throws MMLExceptionList, MMLVerifyException {
 		/* MMLScore.parse() */
 		try {
 			MMLScore score1 = new MMLScoreSerializer(new MMLScore()).parse(fileSelect("format1.mmi")).generateAll();
@@ -147,7 +147,7 @@ public class MMLScoreTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void testMMLFileFormat_r0() throws UndefinedTickException {
+	public void testMMLFileFormat_r0() throws MMLExceptionList, MMLVerifyException {
 		MMLTrack.setTempoAllowChordPart(true);
 
 		MMLTrack track = new MMLTrack().setMML("MML@r1t180c8;");
@@ -160,7 +160,7 @@ public class MMLScoreTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void testMMLFileFormat_r0_q() throws UndefinedTickException {
+	public void testMMLFileFormat_r0_q() throws MMLExceptionList, MMLVerifyException {
 		MMLTrack track = new MMLTrack().setMML("MML@r1t180c8;");
 		track.setTrackName("track1");
 		score.addTrack(track);
@@ -171,7 +171,7 @@ public class MMLScoreTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void testMMLFileFormat_r1() throws UndefinedTickException {
+	public void testMMLFileFormat_r1() throws MMLExceptionList, MMLVerifyException {
 		MMLTrack track1 = new MMLTrack().setMML("MML@r1>f+1t120&f+1;");
 		track1.setTrackName("track1");
 		score.addTrack(track1);
@@ -194,7 +194,7 @@ public class MMLScoreTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void testMMLFileFormat_r1_q() throws UndefinedTickException {
+	public void testMMLFileFormat_r1_q() throws MMLExceptionList, MMLVerifyException {
 		MMLTrack.setTempoAllowChordPart(true);
 
 		MMLTrack track1 = new MMLTrack().setMML("MML@r1>f+1t120&f+1;");
@@ -219,7 +219,7 @@ public class MMLScoreTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void testMMLFileFormat2() throws UndefinedTickException {
+	public void testMMLFileFormat2() throws MMLExceptionList, MMLVerifyException {
 		MMLTrack.setTempoAllowChordPart(true);
 
 		MMLTrack track1 = new MMLTrack(768, -576, -672).setMML("MML@c1,,,e1;");
@@ -242,7 +242,7 @@ public class MMLScoreTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void testMMLFileFormat3() throws UndefinedTickException {
+	public void testMMLFileFormat3() throws MMLExceptionList, MMLVerifyException {
 		MMLTrack.setTempoAllowChordPart(true);
 
 		MMLTrack track1 = new MMLTrack(1152, 0, 0).setMML("MML@c1&c,,,<d;");
@@ -337,7 +337,7 @@ public class MMLScoreTest extends UseLoadingDLS {
 						assertEquals(re1, re2);
 
 						printReport(mabiMMLoptGen1, mabiMMLoptGen2);
-					} catch (UndefinedTickException e) {
+					} catch (MMLExceptionList | MMLVerifyException e) {
 						fail(e.getMessage());
 					}
 				});
@@ -347,7 +347,7 @@ public class MMLScoreTest extends UseLoadingDLS {
 					score.generateAll();
 					long t2 = System.currentTimeMillis();
 					System.out.println("MMLScore generateAll: "+(t2-t1)+"ms");
-				} catch (UndefinedTickException e) {
+				} catch (MMLExceptionList | MMLVerifyException e) {
 					fail(e.getMessage());
 				}
 
@@ -355,7 +355,7 @@ public class MMLScoreTest extends UseLoadingDLS {
 					try {
 						score.generateAll();
 						new MMLScoreSerializer(score).writeToOutputStream(new FileOutputStream(file));
-					} catch (UndefinedTickException e) {
+					} catch (MMLExceptionList | MMLVerifyException e) {
 						fail(e.getMessage());
 					}
 				}
@@ -425,7 +425,7 @@ public class MMLScoreTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void test_transpose1() throws UndefinedTickException {
+	public void test_transpose1() throws MMLExceptionList, MMLVerifyException {
 		String mml    = "MML@cdcdccdd,,;";
 		String expect = "MML@c+d+c+d+c+c+d+d+,,;"; // 移調された場合.
 
@@ -445,7 +445,7 @@ public class MMLScoreTest extends UseLoadingDLS {
 		assertEquals(expect, score.getTrack(2).getMabiMML());
 	}
 
-	private void checkTranspose(String mml, String expect, int transpose) throws UndefinedTickException {
+	private void checkTranspose(String mml, String expect, int transpose) throws MMLExceptionList, MMLVerifyException {
 		score.addTrack(new MMLTrack().setMML(mml));
 
 		score.transpose(transpose);
@@ -455,41 +455,41 @@ public class MMLScoreTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void test_transpose2() throws UndefinedTickException {
+	public void test_transpose2() throws MMLExceptionList, MMLVerifyException {
 		String mml    = "MML@o0c,,;";
 		String expect = "MML@o0c-,,;";
 		checkTranspose(mml, expect, -1);
 	}
 
-	@Test(expected=UndefinedTickException.class)
-	public void test_transpose3() throws UndefinedTickException {
+	@Test(expected=MMLExceptionList.class)
+	public void test_transpose3() throws MMLExceptionList, MMLVerifyException {
 		String mml    = "MML@o0c,,;";
 		String expect = "MML@n-2,,;";
 		checkTranspose(mml, expect, -2);
 	}
 
 	@Test
-	public void test_transpose4() throws UndefinedTickException {
+	public void test_transpose4() throws MMLExceptionList, MMLVerifyException {
 		String mml    = "MML@o8b-,,;";
 		String expect = "MML@o8b,,;";
 		checkTranspose(mml, expect, +1);
 	}
 
-	@Test(expected=UndefinedTickException.class)
-	public void test_transpose5() throws UndefinedTickException {
+	@Test(expected=MMLExceptionList.class)
+	public void test_transpose5() throws MMLExceptionList, MMLVerifyException {
 		String mml    = "MML@n0o8b-,,;";
 		String expect = "MML@n0o9c,,;";
 		checkTranspose(mml, expect, +2);
 	}
 
-	private void checkGenerateAll(String mml, String expect) throws UndefinedTickException {
+	private void checkGenerateAll(String mml, String expect) throws MMLExceptionList, MMLVerifyException {
 		score.addTrack(new MMLTrack().setMML(mml));
 		score.generateAll();
 		assertEquals(expect, score.getTrack(0).getMabiMML());
 	}
 
 	@Test
-	public void test_v0ct_temp1() throws UndefinedTickException {
+	public void test_v0ct_temp1() throws MMLExceptionList, MMLVerifyException {
 		MMLTrack.setTempoAllowChordPart(true);
 
 		/* 他のパートに d がある場合のテンポ補正 */
@@ -500,7 +500,7 @@ public class MMLScoreTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void test_v0ct_temp2() throws UndefinedTickException {
+	public void test_v0ct_temp2() throws MMLExceptionList, MMLVerifyException {
 		/* 他のパートに c がある場合のテンポ補正 */
 		checkGenerateAll(
 				"MML@l2drt130rv8g,l2rc,;",
@@ -509,7 +509,7 @@ public class MMLScoreTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void test_v0ct_temp3() throws UndefinedTickException {
+	public void test_v0ct_temp3() throws MMLExceptionList, MMLVerifyException {
 		/* 他のパートに c, d がある場合のテンポ補正 */
 		checkGenerateAll(
 				"MML@l2drt130rv8g,l2rc,l2rd;",
@@ -518,7 +518,7 @@ public class MMLScoreTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void test_v0ct_temp4() throws UndefinedTickException {
+	public void test_v0ct_temp4() throws MMLExceptionList, MMLVerifyException {
 		/* 他のパートに c, d がある場合のテンポ補正 */
 		checkGenerateAll(
 				"MML@l2drt130rv8g,l2rd,l2rc;",
@@ -527,7 +527,7 @@ public class MMLScoreTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void test_v0ct_temp5() throws UndefinedTickException {
+	public void test_v0ct_temp5() throws MMLExceptionList, MMLVerifyException {
 		/* 他のパートに b, c がある場合のテンポ補正 */
 		checkGenerateAll(
 				"MML@l2drt130rv8g,l2rb,l2rc;",
@@ -536,7 +536,7 @@ public class MMLScoreTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void test_v0ct_temp6() throws UndefinedTickException {
+	public void test_v0ct_temp6() throws MMLExceptionList, MMLVerifyException {
 		/* 他のパートに g, a がある場合のテンポ補正 */
 		checkGenerateAll(
 				"MML@l2drt130rv8g,l2rg,l2ra;",
@@ -545,7 +545,7 @@ public class MMLScoreTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void test_v0ct_temp7() throws UndefinedTickException {
+	public void test_v0ct_temp7() throws MMLExceptionList, MMLVerifyException {
 		/* 長い休符の場合最後のみ */
 		checkGenerateAll(
 				"MML@l1r.r.rrt130,,l1r.r.rrc;",
@@ -554,7 +554,7 @@ public class MMLScoreTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void test_v0ct_temp8() throws UndefinedTickException {
+	public void test_v0ct_temp8() throws MMLExceptionList, MMLVerifyException {
 		/* とちゅうで切る場合 */
 		checkGenerateAll(
 				"MML@l1r.r.rt240,v12ccccdd2deeec2fffggggaaaabbbb>c1,d1d1.d1.;",
@@ -563,7 +563,7 @@ public class MMLScoreTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void test_v0ct_temp9() throws UndefinedTickException {
+	public void test_v0ct_temp9() throws MMLExceptionList, MMLVerifyException {
 		MMLTrack.setTempoAllowChordPart(true);
 
 		/* 他のパートに c, d がある場合のテンポ補正, 和音1にテンポ */
@@ -574,7 +574,7 @@ public class MMLScoreTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void test_v0ct_temp10() throws UndefinedTickException {
+	public void test_v0ct_temp10() throws MMLExceptionList, MMLVerifyException {
 		MMLTrack.setTempoAllowChordPart(true);
 
 		/* 和音2にテンポをつくる */
@@ -585,7 +585,7 @@ public class MMLScoreTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void test_tempo_q01() throws UndefinedTickException {
+	public void test_tempo_q01() throws MMLExceptionList, MMLVerifyException {
 		MMLTrack.setTempoAllowChordPart(true);
 
 		/* メロディ以外 */
@@ -705,10 +705,10 @@ public class MMLScoreTest extends UseLoadingDLS {
 
 	/**
 	 * t120テスト
-	 * @throws UndefinedTickException 
+	 * @throws MMLException 
 	 */
 	@Test
-	public void test_setStartOffsetAll_4() throws UndefinedTickException {
+	public void test_setStartOffsetAll_4() throws MMLExceptionList, MMLVerifyException {
 		score.addTrack(new MMLTrack(0, 0, 96).setMML("MML@d,,,c"));
 		score.getTrack(0).setSongProgram(110);
 		score.getTempoEventList().add(new MMLTempoEvent(140, 0));
@@ -719,10 +719,10 @@ public class MMLScoreTest extends UseLoadingDLS {
 
 	/**
 	 * addTrack test
-	 * @throws UndefinedTickException 
+	 * @throws MMLException 
 	 */
 	@Test
-	public void test_setStartOffsetAll_5() throws UndefinedTickException {
+	public void test_setStartOffsetAll_5() throws MMLExceptionList, MMLVerifyException {
 		score.addTrack(new MMLTrack(0, 0, 96).setMML("MML@d,,,c"));
 		score.getTrack(0).setSongProgram(110);
 		score.getTempoEventList().add(new MMLTempoEvent(140, 0));
@@ -742,10 +742,10 @@ public class MMLScoreTest extends UseLoadingDLS {
 
 	/**
 	 * import MML test (delay)
-	 * @throws UndefinedTickException 
+	 * @throws MMLException 
 	 */
 	@Test
-	public void test_setMabiMML_0() throws UndefinedTickException {
+	public void test_setMabiMML_0() throws MMLExceptionList, MMLVerifyException {
 		score.addTrack(new MMLTrack(0, 0, 96).setMML("MML@d,,,c"));
 		score.getTempoEventList().add(new MMLTempoEvent(140, 0));
 		score.getTrack(0).setSongProgram(110);
@@ -762,7 +762,7 @@ public class MMLScoreTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void test_trackClone() throws UndefinedTickException {
+	public void test_trackClone() throws MMLExceptionList, MMLVerifyException {
 		score.addTrack(new MMLTrack().setMML("MML@T60aaaT90bbbb;"));
 		score.addTrack(score.getTrack(0).clone());
 		score.generateAll();
@@ -774,7 +774,7 @@ public class MMLScoreTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void test_fix64() throws UndefinedTickException {
+	public void test_fix64() throws MMLExceptionList, MMLVerifyException {
 		MMLScore.setMMLFix64(true);
 		var track = new MMLTrack();
 		score.addTrack(track);

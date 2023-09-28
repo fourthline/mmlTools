@@ -16,7 +16,7 @@ public final class MMLTicks {
 
 	private static final MMLTickTable tickTable = MMLTickTable.createTickTable();
 
-	public static int getTick(String gt) throws UndefinedTickException {
+	public static int getTick(String gt) throws MMLException {
 		String str = gt;
 		while (!tickTable.getTable().containsKey(str)) {
 			int len = str.length();
@@ -27,7 +27,7 @@ public final class MMLTicks {
 			if (!Character.isDigit(ch)) {
 				str = str.substring(0, len - 1);
 			} else {
-				throw new UndefinedTickException(gt);
+				throw MMLException.createUndefinedTickException(gt);
 			}
 		}
 
@@ -93,7 +93,7 @@ public final class MMLTicks {
 		return sb.toString();
 	}
 
-	private String makeMMLText(StringBuilder sb, int remTick) throws UndefinedTickException {
+	private String makeMMLText(StringBuilder sb, int remTick) throws MMLException {
 		// 1~64の分割
 		if (remTick > 0) {
 			for (int base = 1; base <= 64; base *= 2) {
@@ -109,7 +109,7 @@ public final class MMLTicks {
 				}
 			}
 			if (remTick > 0) {
-				throw new UndefinedTickException(remTick + "/" + tick);
+				throw MMLException.createUndefinedTickException(remTick, tick);
 			}
 		}
 
@@ -127,9 +127,9 @@ public final class MMLTicks {
 	 * noteNameとtickをMMLの文字列に変換します.
 	 * needTieがtrueのときは、'&amp;' による連結を行います.
 	 * @return MML文字列
-	 * @throws UndefinedTickException 変換に失敗した
+	 * @throws MMLException 変換に失敗した
 	 */
-	public String toMMLText() throws UndefinedTickException {
+	public String toMMLText() throws MMLException {
 		int remTick = tick;
 		StringBuilder sb = new StringBuilder();
 
@@ -148,9 +148,9 @@ public final class MMLTicks {
 	 * Base長を使って変換します.　（調律用）
 	 * @param base 使用する調律指定
 	 * @return MML文字列
-	 * @throws UndefinedTickException 変換に失敗した
+	 * @throws MMLException 変換に失敗した
 	 */
-	public String toMMLTextByBase(TuningBase base) throws UndefinedTickException {
+	public String toMMLTextByBase(TuningBase base) throws MMLException {
 		int remTick = tick;
 		StringBuilder sb = new StringBuilder();
 		int min = minimumTick();

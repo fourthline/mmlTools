@@ -21,9 +21,10 @@ import jp.fourthline.mabiicco.MabiIccoProperties;
 import jp.fourthline.mabiicco.ui.IMMLManager;
 import jp.fourthline.mabiicco.ui.IViewTargetMarker;
 import jp.fourthline.mabiicco.ui.UIUtils;
+import jp.fourthline.mmlTools.MMLExceptionList;
 import jp.fourthline.mmlTools.MMLTempoConverter;
 import jp.fourthline.mmlTools.MMLTempoEvent;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.MMLVerifyException;
 
 /**
  * MMLTempo Editor
@@ -133,7 +134,7 @@ public final class MMLTempoEditor extends AbstractMarkerEditor<MMLTempoEvent> {
 			var converter = MMLTempoConverter.convert(preScore, list);
 			try {
 				preScore.generateAll();
-			} catch (UndefinedTickException e) {
+			} catch (MMLExceptionList | MMLVerifyException e) {
 				JOptionPane.showMessageDialog(parentFrame, e.getMessage(), AppResource.getAppTitle(), JOptionPane.WARNING_MESSAGE);
 				return false;
 			}

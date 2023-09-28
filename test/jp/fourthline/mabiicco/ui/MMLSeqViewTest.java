@@ -38,7 +38,7 @@ import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.Marker;
 import jp.fourthline.mmlTools.TimeSignature;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 
 public final class MMLSeqViewTest extends UseLoadingDLS {
 
@@ -289,7 +289,7 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void test_addRemoveTicks() throws UndefinedTickException {
+	public void test_addRemoveTicks() throws MMLException {
 		var score = obj.getMMLScore();
 		obj.setMMLselectedTrack(new MMLTrack().setMML("MML@cccc,dddd,eeee,ffff;"));
 		obj.addMMLTrack(new MMLTrack().setMML("MML@gggg,aaaa,bbbb,>cccc;"));

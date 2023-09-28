@@ -17,6 +17,7 @@ import jp.fourthline.mabiicco.midi.InstType;
 import jp.fourthline.mabiicco.midi.MabiDLS;
 import jp.fourthline.mabiicco.ui.MainFrame;
 import jp.fourthline.mmlTools.MMLTrack;
+import jp.fourthline.mmlTools.core.MMLException;
 import jp.fourthline.mmlTools.parser.MidiFile;
 
 
@@ -139,6 +140,9 @@ public final class MabiIcco {
 			}
 
 			properties.laf.get().update();
+
+			// MMLエラーのローカライズ設定.
+			MMLException.setLocalizeFunc(t -> AppResource.appText(t));
 
 			new MabiIcco(args).start();
 		} catch (Throwable e) {

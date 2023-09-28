@@ -15,8 +15,9 @@ import org.junit.Test;
 
 import jp.fourthline.mmlTools.MMLBuilder;
 import jp.fourthline.mmlTools.MMLEventList;
+import jp.fourthline.mmlTools.MMLExceptionList;
 import jp.fourthline.mmlTools.core.MMLTicks;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 
 /**
  * MML最適化のテスト.
@@ -26,7 +27,7 @@ public class MMLStringOptimizerTest {
 	private static final int TIMEOUT = 100;
 
 	@Before
-	public void setup() throws UndefinedTickException {
+	public void setup() throws MMLException {
 		checkMMLStringOptimize("c4", "c");
 		MMLStringOptimizer.setDebug(true);
 		MMLTicks.getTick("64");
@@ -63,7 +64,7 @@ public class MMLStringOptimizerTest {
 			MMLEventList eventList1 = new MMLEventList(input);
 			MMLEventList eventList2 = new MMLEventList(mml);
 			assertEquals(eventList1.getMMLNoteEventList().toString(), eventList2.getMMLNoteEventList().toString());
-		} catch (UndefinedTickException e) {
+		} catch (MMLExceptionList e) {
 			fail(e.getMessage());
 		}
 	}
@@ -332,7 +333,7 @@ public class MMLStringOptimizerTest {
 	}
 
 	@Test
-	public void test_gen2_n23() throws UndefinedTickException {
+	public void test_gen2_n23() throws MMLException {
 		/* Gen2チェックパターン1 */
 		String input  = "l2f+.r4f+.f+4<f1b>b<f+4>c+4f+f1f+1f+1f+.r4f+.f+4f8>f+4f+<c-bff4r4c-1c+<f+c-1n49d+c-1n49f+";
 		String expect = "l2f+.r4f+.f+4<f1b>b<f+4>c+4f+f1f+1f+1f+.r4f+.f+4f8>f+4f+<c-bff4r4c-1c+<f+c-1n49d+c-1n49f+";
@@ -342,7 +343,7 @@ public class MMLStringOptimizerTest {
 	}
 
 	@Test
-	public void test_gen2_n24() throws UndefinedTickException {
+	public void test_gen2_n24() throws MMLException {
 		/* Gen2チェックパターン2 */
 		String input  = "l64ffffffr1v12l4<<a+fg";
 		String expect = "l64ffffffr1v12l4<<a+fg";
@@ -351,7 +352,7 @@ public class MMLStringOptimizerTest {
 	}
 
 	@Test
-	public void test_gen2_ln25() throws UndefinedTickException {
+	public void test_gen2_ln25() throws MMLException {
 		/* Gen2チェックパターン3 */
 		String input =  "l2fffl8n22f&f2.n22f1d+1f1&f2.ff";
 		String expect=  "l2fffl8n22f&f2.n22f1d+1f1&f2.ff";

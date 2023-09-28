@@ -4,11 +4,12 @@
 
 package jp.fourthline.mmlTools;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import jp.fourthline.mmlTools.core.MMLTicks;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 
 public final class MMLBuilder {
 	private static final int STRING_BUILDER_SIZE = 2048;
@@ -22,6 +23,8 @@ public final class MMLBuilder {
 	private final MMLEventList eventList;
 	private final int startOffset;
 	private final int initOct;
+
+	private final List<MMLExceptionList.Entry> errList = new ArrayList<>();
 
 	public static final int INIT_OCT = 4;
 
@@ -49,9 +52,9 @@ public final class MMLBuilder {
 	 * @param noteEvent        判定するtickのノートイベント
 	 * @param currentOctave    現在のオクターブ
 	 * @return                 テンポ補正に使う文字
-	 * @throws UndefinedTickException
+	 * @throws MMLException
 	 */
-	private char makeTempoChar(List<MMLEventList> relationPart, MMLNoteEvent noteEvent, int currentOctave) throws UndefinedTickException {
+	private char makeTempoChar(List<MMLEventList> relationPart, MMLNoteEvent noteEvent, int currentOctave) throws MMLException {
 		boolean[] f = { true, true, true, true, true, true, true };
 		// relationのパートのオフセット位置の情報をつかって、使用するabcdefg のどれを使うかを決める。
 		if (relationPart != null) {
@@ -79,8 +82,7 @@ public final class MMLBuilder {
 		return 'c';
 	}
 
-	private MMLNoteEvent insertTempoMML(StringBuilder sb, MMLNoteEvent prevNoteEvent, MMLTempoEvent tempoEvent, boolean mabiTempo, List<MMLEventList> relationPart)
-			throws UndefinedTickException {
+	private MMLNoteEvent insertTempoMML(StringBuilder sb, MMLNoteEvent prevNoteEvent, MMLTempoEvent tempoEvent, boolean mabiTempo, List<MMLEventList> relationPart) {
 		if (prevNoteEvent.getEndTick() < tempoEvent.getTickOffset()) {
 			int tickLength = tempoEvent.getTickOffset() - prevNoteEvent.getEndTick();
 			int tickOffset = prevNoteEvent.getEndTick();
@@ -88,14 +90,22 @@ public final class MMLBuilder {
 			int currentOctave = prevNoteEvent.getOctave();
 			MMLTicks ticks = new MMLTicks("r", tickLength, false);
 			prevNoteEvent = new MMLNoteEvent(prevNoteEvent.getNote(), tickLength, tickOffset, prevNoteEvent.getVelocity());
-			sb.append(ticks.toMMLText());
+			try {
+				sb.append(ticks.toMMLText());
+			} catch (MMLException e) {
+				errList.add(new MMLExceptionList.Entry(prevNoteEvent, e));
+			}
 			if (mabiTempo && mmlVZeroTempo) {
 				// 最後の1つのrだけを補正文字に置換する.
 				int lastIndex = sb.lastIndexOf("r");
 				sb.replace(lastIndex, lastIndex+1, "c");
 				var noteEvent = new MMLEventList(sb.toString()).getLastNote();
-				char inChar = makeTempoChar(relationPart, noteEvent, currentOctave);
-				sb.replace(lastIndex, lastIndex+1, (prevNoteEvent.getVelocity() != 0) ? "v0"+inChar : ""+inChar);
+				try {
+					char inChar = makeTempoChar(relationPart, noteEvent, currentOctave);
+					sb.replace(lastIndex, lastIndex+1, (prevNoteEvent.getVelocity() != 0) ? "v0"+inChar : ""+inChar);
+				} catch (MMLException e) {
+					errList.add(new MMLExceptionList.Entry(noteEvent, e));
+				}
 				prevNoteEvent = new MMLNoteEvent(note, tickLength, tickOffset, 0);
 			}
 		}
@@ -106,7 +116,7 @@ public final class MMLBuilder {
 
 	private void insertNoteWithTempo(StringBuilder sb, LinkedList<MMLTempoEvent> localTempoList,
 			MMLNoteEvent prevNoteEvent, MMLNoteEvent noteEvent,
-			boolean withTempo, boolean mabiTempo) throws UndefinedTickException {
+			boolean withTempo, boolean mabiTempo) throws MMLExceptionList {
 		MMLNoteEvent divNoteEvent = noteEvent.clone();
 
 		// endTickOffsetがTempoを跨いでいたら、'&'でつなげる. (withTempoのみ)
@@ -116,7 +126,11 @@ public final class MMLBuilder {
 			int tick = localTempoList.getFirst().getTickOffset() - divNoteEvent.getTickOffset();
 
 			MMLNoteEvent partNoteEvent = new MMLNoteEvent(divNoteEvent.getNote(), tick, divNoteEvent.getTickOffset(), divNoteEvent.getVelocity());
-			sb.append( partNoteEvent.toMMLString(prevNoteEvent) );
+			try {
+				sb.append( partNoteEvent.toMMLString(prevNoteEvent) );
+			} catch (MMLException e) {
+				errList.add(new MMLExceptionList.Entry(prevNoteEvent, e));
+			}
 
 			if (withTempo) {
 				sb.append( localTempoList.getFirst().toMMLString() );
@@ -134,18 +148,22 @@ public final class MMLBuilder {
 		}
 
 		if (divNoteEvent.getTick() > 0) {
-			sb.append( divNoteEvent.toMMLString(prevNoteEvent) );
+			try {
+				sb.append( divNoteEvent.toMMLString(prevNoteEvent) );
+			} catch (MMLException e) {
+				errList.add(new MMLExceptionList.Entry(divNoteEvent, e));
+			}
 		}
 		if (noteEvent.getVelocity() != divNoteEvent.getVelocity()) {
 			sb.append("v").append(noteEvent.getVelocity());
 		}
 	}
 
-	public String toMMLString() throws UndefinedTickException {
+	public String toMMLString() throws MMLExceptionList {
 		return toMMLString(false, true);
 	}
 
-	public String toMMLString(boolean withTempo, boolean mabiTempo) throws UndefinedTickException {
+	public String toMMLString(boolean withTempo, boolean mabiTempo) throws MMLExceptionList {
 		return toMMLString(withTempo, mabiTempo, null);
 	}
 
@@ -170,10 +188,10 @@ public final class MMLBuilder {
 	 * @param mabiTempo    MML for mabi
 	 * @param relationPart テンポ補正時に参照する関連するパートの情報
 	 * @return
-	 * @throws UndefinedTickException
+	 * @throws MMLExceptionList
 	 */
-	public String toMMLString(boolean withTempo, boolean mabiTempo, List<MMLEventList> relationPart)
-			throws UndefinedTickException {
+	public String toMMLString(boolean withTempo, boolean mabiTempo, List<MMLEventList> relationPart) throws MMLExceptionList
+			 {
 		long totalTick = totalTickRelationPart(relationPart);
 		LinkedList<MMLTempoEvent> localTempoList = makeLocalTempoList(totalTick);
 		StringBuilder sb = new StringBuilder(STRING_BUILDER_SIZE);
@@ -207,12 +225,15 @@ public final class MMLBuilder {
 			}
 			localTempoList.removeFirst();
 		}
+		if (!errList.isEmpty()) {
+			throw new MMLExceptionList(errList);
+		}
 
 		return sb.toString();
 	}
 
 	private int insertNoteWithTempoMusicQ(StringBuilder sb, List<MMLTempoEvent> localTempoList, int tempoIndex,
-			MMLNoteEvent prevNoteEvent, MMLNoteEvent noteEvent, List<MMLEventList> relationPart) throws UndefinedTickException {
+			MMLNoteEvent prevNoteEvent, MMLNoteEvent noteEvent, List<MMLEventList> relationPart) {
 		MMLNoteEvent divNoteEvent = noteEvent.clone();
 		int index = tempoIndex;
 
@@ -233,7 +254,11 @@ public final class MMLBuilder {
 
 			int tick = localTempoList.get(index).getTickOffset() - divNoteEvent.getTickOffset();
 			MMLNoteEvent partNoteEvent = new MMLNoteEvent(divNoteEvent.getNote(), tick, divNoteEvent.getTickOffset(), divNoteEvent.getVelocity());
-			sb.append( partNoteEvent.toMMLString(prevNoteEvent) );
+			try {
+				sb.append( partNoteEvent.toMMLString(prevNoteEvent) );
+			} catch (MMLException e) {
+				errList.add(new MMLExceptionList.Entry(partNoteEvent, e));
+			}
 			sb.append( localTempoList.get(index).toMMLString() );
 			localTempoList.remove(index);
 
@@ -244,7 +269,11 @@ public final class MMLBuilder {
 		}
 
 		if (divNoteEvent.getTick() > 0) {
-			sb.append( divNoteEvent.toMMLString(prevNoteEvent) );
+			try {
+				sb.append( divNoteEvent.toMMLString(prevNoteEvent) );
+			} catch (MMLException e) {
+				errList.add(new MMLExceptionList.Entry(divNoteEvent, e));
+			}
 		}
 		if (noteEvent.getVelocity() != divNoteEvent.getVelocity()) {
 			sb.append("v").append(noteEvent.getVelocity());
@@ -314,10 +343,9 @@ public final class MMLBuilder {
 	 * @param localTempoList テンポリスト
 	 * @param relationPart   テンポ補正時に参照する関連するパートの情報
 	 * @return
-	 * @throws UndefinedTickException
+	 * @throws MMLExceptionList 
 	 */
-	public String toMMLStringMusicQ(List<MMLTempoEvent> localTempoList, List<MMLEventList> relationPart)
-			throws UndefinedTickException {
+	public String toMMLStringMusicQ(List<MMLTempoEvent> localTempoList, List<MMLEventList> relationPart) throws MMLExceptionList {
 		long totalTick = totalTickRelationPart(relationPart);
 		StringBuilder sb = new StringBuilder(STRING_BUILDER_SIZE);
 		int tempoIndex = 0;
@@ -356,6 +384,9 @@ public final class MMLBuilder {
 			} else {
 				tempoIndex++;
 			}
+		}
+		if (!errList.isEmpty()) {
+			throw new MMLExceptionList(errList);
 		}
 
 		return sb.toString();

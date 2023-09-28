@@ -15,19 +15,19 @@ import org.junit.Test;
 public final class MMLTicksTest {
 
 	@Test
-	public void test_getTick4() throws UndefinedTickException {
+	public void test_getTick4() throws MMLException {
 		int tick = MMLTicks.getTick("4");
 		assertEquals(96, tick);
 	}
 
 	@Test
-	public void test_getTick16() throws UndefinedTickException {
+	public void test_getTick16() throws MMLException {
 		int tick = MMLTicks.getTick("16");
 		assertEquals(24, tick);
 	}
 
 	@Test
-	public void test_getTick16dot() throws UndefinedTickException {
+	public void test_getTick16dot() throws MMLException {
 		int tick1 = MMLTicks.getTick("16...");
 		int tick2 = MMLTicks.getTick("16.");
 		assertEquals(tick1, tick2);
@@ -37,7 +37,7 @@ public final class MMLTicksTest {
 	 * 不要文字の無視.
 	 */
 	@Test
-	public void test_getTick9dotAN() throws UndefinedTickException {
+	public void test_getTick9dotAN() throws MMLException {
 		int tick1 = MMLTicks.getTick("9.@@@@");
 		int tick2 = MMLTicks.getTick("9.");
 		assertEquals(tick1, tick2);
@@ -46,8 +46,8 @@ public final class MMLTicksTest {
 	/**
 	 * 変換できない.
 	 */
-	@Test(expected = UndefinedTickException.class)
-	public void test_getTick65() throws UndefinedTickException {
+	@Test(expected = MMLException.class)
+	public void test_getTick65() throws MMLException {
 		MMLTicks.getTick("65");
 	}
 
@@ -55,7 +55,7 @@ public final class MMLTicksTest {
 	 * 調律符生成.
 	 */
 	@Test
-	public void test_toMMLTextByBase() throws UndefinedTickException {
+	public void test_toMMLTextByBase() throws MMLException {
 		MMLTicks note = new MMLTicks("c", 96+6);
 		String expect64 = "c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64&c64";
 		String expect32 = "c32&c32&c32&c32&c32&c32&c32&c32&c64";
@@ -75,7 +75,7 @@ public final class MMLTicksTest {
 	 * &の連結なし調律.
 	 */
 	@Test
-	public void test_toMMLTextByBaseR() throws UndefinedTickException {
+	public void test_toMMLTextByBaseR() throws MMLException {
 		MMLTicks note = new MMLTicks("r", 96, false);
 		String expect16 = "r16r16r16r16";
 		assertEquals(expect16, note.toMMLTextByBase(TuningBase.L16));
@@ -85,7 +85,7 @@ public final class MMLTicksTest {
 	 * 数Tickオーバーの調律符1
 	 */
 	@Test
-	public void test_toMMLTextByBaseE1() throws UndefinedTickException {
+	public void test_toMMLTextByBaseE1() throws MMLException {
 		MMLTicks note = new MMLTicks("r", 96+5, false);
 		String expect16 = "r16r16r16r13";
 		assertEquals(expect16, note.toMMLTextByBase(TuningBase.L16));
@@ -95,7 +95,7 @@ public final class MMLTicksTest {
 	 * 数Tickオーバーの調律符2
 	 */
 	@Test
-	public void test_toMMLTextByBaseE2() throws UndefinedTickException {
+	public void test_toMMLTextByBaseE2() throws MMLException {
 		MMLTicks note = new MMLTicks("r", 48+1, false);
 		String expect16 = "r32r32r32r29";
 		assertEquals(expect16, note.toMMLTextByBase(TuningBase.L32));

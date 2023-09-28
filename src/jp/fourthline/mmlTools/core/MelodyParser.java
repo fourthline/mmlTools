@@ -53,14 +53,14 @@ public final class MelodyParser {
 		tempoList.put(0, tempo); // initial tempo
 	}
 
-	public int getTempo() throws UndefinedTickException {
+	public int getTempo() throws MMLException {
 		if (mml_length < 0)
 			cals_length();
 
 		return tempo;
 	}
 
-	public String getMmlL() throws UndefinedTickException {
+	public String getMmlL() throws MMLException {
 		if (mml_length < 0)
 			cals_length();
 
@@ -75,7 +75,7 @@ public final class MelodyParser {
 	}
 
 
-	public int getLength() throws UndefinedTickException {
+	public int getLength() throws MMLException {
 		if (mml_length < 0)
 			cals_length();
 
@@ -114,7 +114,7 @@ public final class MelodyParser {
 
 	}
 
-	public void mergeParser(MelodyParser srcParser) throws UndefinedTickException {
+	public void mergeParser(MelodyParser srcParser) throws MMLException {
 		int len1 = this.getLength();
 		int len2 = srcParser.getLength();
 
@@ -131,14 +131,14 @@ public final class MelodyParser {
 		tempoList.putAll(srcParser.tempoList);
 	}
 
-	public Map<Integer, Integer> getTempoList() throws UndefinedTickException {
+	public Map<Integer, Integer> getTempoList() throws MMLException {
 		if (tempoList.size() < 2)
 			cals_length();
 
 		return tempoList;
 	}
 
-	public double getPlayLengthByTempoList() throws UndefinedTickException {
+	public double getPlayLengthByTempoList() throws MMLException {
 		double length_total = 0.0;
 
 		if (tempoList.size() < 2)
@@ -161,7 +161,7 @@ public final class MelodyParser {
 	}
 
 
-	private int mmlGT(String gt) throws UndefinedTickException {
+	private int mmlGT(String gt) throws MMLException {
 		return MMLTicks.getTick(gt);
 	}
 
@@ -256,7 +256,7 @@ public final class MelodyParser {
 		}
 	}
 
-	public int noteGT(String note) throws UndefinedTickException, ParserWarn3ML {
+	public int noteGT(String note) throws MMLException, ParserWarn3ML {
 		if (!MMLTokenizer.isNote(note.charAt(0))) {
 			mmlOperation(note);
 			return 0;
@@ -268,7 +268,7 @@ public final class MelodyParser {
 			try {
 				noteNumber = Integer.parseInt(note.substring(1));
 			} catch (NumberFormatException e) {
-				throw new UndefinedTickException(note);
+				throw MMLException.createIllegalNote(note);
 			}
 			noteMinMax( noteNumber );
 			gt = "";
@@ -319,7 +319,7 @@ public final class MelodyParser {
 	/**
 	 * cals mml length
 	 */
-	private int cals_length() throws UndefinedTickException {
+	private int cals_length() throws MMLException {
 		MMLTokenizer mt = new MMLTokenizer(mml_src);
 		reset();
 

@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import jp.fourthline.mmlTools.core.MMLTicks;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
 import jp.fourthline.mmlTools.parser.MMLEventParser;
 
 
@@ -403,7 +402,7 @@ public final class MMLEventList implements Serializable, Cloneable {
 		return null;
 	}
 
-	public String getInternalMMLString() throws UndefinedTickException {
+	public String getInternalMMLString() throws MMLExceptionList {
 		return MMLBuilder.create(this).toMMLString(false, false);
 	}
 

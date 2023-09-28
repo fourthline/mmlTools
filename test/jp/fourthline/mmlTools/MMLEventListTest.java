@@ -16,7 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import jp.fourthline.mmlTools.core.MMLTicks;
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 
 /**
  * @author fourthline
@@ -37,10 +37,10 @@ public class MMLEventListTest {
 	}
 
 	/**
-	 * @throws UndefinedTickException 
+	 * @throws MMLException 
 	 */
 	@Test
-	public void testGetMMLNoteEventList() throws UndefinedTickException {
+	public void testGetMMLNoteEventList() throws MMLException {
 		int t4 = MMLTicks.getTick("4");
 		MMLEventList eventList = new MMLEventList("aaa");
 		List<MMLNoteEvent> expectList = 
@@ -58,10 +58,10 @@ public class MMLEventListTest {
 
 	/**
 	 * Test method for {@link jp.fourthline.mmlTools.MMLEventList#addMMLNoteEvent(jp.fourthline.mmlTools.MMLNoteEvent)}.
-	 * @throws UndefinedTickException 
+	 * @throws MMLException 
 	 */
 	@Test
-	public void testAddMMLNoteEvent_0() throws UndefinedTickException {
+	public void testAddMMLNoteEvent_0() throws MMLException {
 		int t4 = MMLTicks.getTick("4");
 		MMLEventList eventList = new MMLEventList("aaa");
 		MMLEventList expectList = new MMLEventList("ab-a");
@@ -78,10 +78,10 @@ public class MMLEventListTest {
 
 	/**
 	 * Test method for {@link jp.fourthline.mmlTools.MMLEventList#addMMLNoteEvent(jp.fourthline.mmlTools.MMLNoteEvent)}.
-	 * @throws UndefinedTickException 
+	 * @throws MMLException 
 	 */
 	@Test
-	public void testAddMMLNoteEvent_1() throws UndefinedTickException {
+	public void testAddMMLNoteEvent_1() throws MMLException {
 		int t4 = MMLTicks.getTick("4");
 		int t16 = MMLTicks.getTick("16");
 		MMLEventList eventList = new MMLEventList("aaa");
@@ -100,10 +100,10 @@ public class MMLEventListTest {
 
 	/**
 	 * Test method for {@link jp.fourthline.mmlTools.MMLEventList#addMMLNoteEvent(jp.fourthline.mmlTools.MMLNoteEvent)}.
-	 * @throws UndefinedTickException 
+	 * @throws MMLException 
 	 */
 	@Test
-	public void testAddMMLNoteEvent_2() throws UndefinedTickException {
+	public void testAddMMLNoteEvent_2() throws MMLException {
 		int t4 = MMLTicks.getTick("4");
 		int t16 = MMLTicks.getTick("16");
 		MMLEventList eventList = new MMLEventList("aaa");
@@ -122,10 +122,10 @@ public class MMLEventListTest {
 
 	/**
 	 * Test method for {@link jp.fourthline.mmlTools.MMLEventList#addMMLNoteEvent(jp.fourthline.mmlTools.MMLNoteEvent)}.
-	 * @throws UndefinedTickException 
+	 * @throws MMLException 
 	 */
 	@Test
-	public void testAddMMLNoteEvent_3() throws UndefinedTickException {
+	public void testAddMMLNoteEvent_3() throws MMLException {
 		int t4 = MMLTicks.getTick("4");
 		int t8 = MMLTicks.getTick("8");
 		int t16 = MMLTicks.getTick("16");
@@ -144,10 +144,10 @@ public class MMLEventListTest {
 
 	/**
 	 * Test method for {@link jp.fourthline.mmlTools.MMLEventList#addMMLNoteEvent(jp.fourthline.mmlTools.MMLNoteEvent)}.
-	 * @throws UndefinedTickException 
+	 * @throws MMLException 
 	 */
 	@Test
-	public void testAddMMLNoteEvent_4() throws UndefinedTickException {
+	public void testAddMMLNoteEvent_4() throws MMLException {
 		int t4 = MMLTicks.getTick("4");
 		int t16 = MMLTicks.getTick("16");
 		MMLEventList eventList = new MMLEventList("aaa");
@@ -165,10 +165,10 @@ public class MMLEventListTest {
 
 	/**
 	 * Test method for {@link jp.fourthline.mmlTools.MMLEventList#addMMLNoteEvent(jp.fourthline.mmlTools.MMLNoteEvent)}.
-	 * @throws UndefinedTickException 
+	 * @throws MMLException 
 	 */
 	@Test
-	public void testAddMMLNoteEvent_5() throws UndefinedTickException {
+	public void testAddMMLNoteEvent_5() throws MMLException {
 		int t4 = MMLTicks.getTick("4");
 		MMLEventList eventList = new MMLEventList("rra");
 		MMLEventList expectList = new MMLEventList("rb-a");
@@ -184,10 +184,10 @@ public class MMLEventListTest {
 	}
 
 	/**
-	 * @throws UndefinedTickException 
+	 * @throws MMLException 
 	 */
 	@Test
-	public void testSearchOnTickOffset() throws UndefinedTickException {
+	public void testSearchOnTickOffset() throws MMLException {
 		int t4 = MMLTicks.getTick("4");
 		int t16 = MMLTicks.getTick("16");
 		MMLEventList eventList = new MMLEventList("ab-a");
@@ -210,10 +210,10 @@ public class MMLEventListTest {
 	}
 
 	/**
-	 * @throws UndefinedTickException 
+	 * @throws MMLException 
 	 */
 	@Test
-	public void testSearchPrevNoteOnTickOffset() throws UndefinedTickException {
+	public void testSearchPrevNoteOnTickOffset() throws MMLException {
 		int t4 = MMLTicks.getTick("4");
 		MMLEventList eventList = new MMLEventList("ab-a");
 
@@ -235,7 +235,7 @@ public class MMLEventListTest {
 	}
 
 	@Test
-	public void testToMMLString_0() throws UndefinedTickException {
+	public void testToMMLString_0() throws MMLExceptionList {
 		MMLEventList eventList = new MMLEventList("ara");
 
 		String mml = MMLBuilder.create(eventList).toMMLString();
@@ -246,10 +246,10 @@ public class MMLEventListTest {
 
 	/**
 	 * オクターブ変化を付けたMMLの双方向変換のテスト.
-	 * @throws UndefinedTickException
+	 * @throws MMLExceptionList
 	 */
 	@Test
-	public void testToMMLString_1() throws UndefinedTickException {
+	public void testToMMLString_1() throws MMLExceptionList {
 		MMLEventList eventList = new MMLEventList("cdef-gab>cdef+gab+<c1");
 
 		String mml = MMLBuilder.create(eventList).toMMLString();
@@ -260,10 +260,10 @@ public class MMLEventListTest {
 
 	/**
 	 * tieによる連結が必要な音価さん.
-	 * @throws UndefinedTickException
+	 * @throws MMLExceptionList
 	 */
 	@Test
-	public void testToMMLString_2() throws UndefinedTickException {
+	public void testToMMLString_2() throws MMLExceptionList {
 		MMLEventList eventList = new MMLEventList("c4&c16g2&g8d1.&d1.&d1.&d24");
 
 		String mml = MMLBuilder.create(eventList).toMMLString();
@@ -274,10 +274,10 @@ public class MMLEventListTest {
 
 	/**
 	 * tempo, velocity を含むMML.
-	 * @throws UndefinedTickException
+	 * @throws MMLExceptionList
 	 */
 	@Test
-	public void testToMMLString_3() throws UndefinedTickException {
+	public void testToMMLString_3() throws MMLExceptionList {
 		MMLEventList eventList = new MMLEventList("T150v10c8.g16e4v8g-<at120<b-");
 
 		String mml = MMLBuilder.create(eventList).toMMLString(true, true);
@@ -288,10 +288,10 @@ public class MMLEventListTest {
 
 	/**
 	 * tempo, velocity を含むMML. (テンポを跨ぐNoteがある)
-	 * @throws UndefinedTickException
+	 * @throws MMLExceptionList 
 	 */
 	@Test
-	public void testToMMLString_4() throws UndefinedTickException {
+	public void testToMMLString_4() throws MMLExceptionList {
 		MMLEventList eventList = new MMLEventList("c2d4");
 		List<MMLTempoEvent> globalTempoList = new ArrayList<MMLTempoEvent>();
 		String expectMML = "c8t150v0c8t130c4v8d4";
@@ -307,10 +307,10 @@ public class MMLEventListTest {
 
 	/**
 	 * tempo, velocity を含むMML. (テンポ指定が最終ノートより後方にある)
-	 * @throws UndefinedTickException
+	 * @throws MMLExceptionList 
 	 */
 	@Test
-	public void testToMMLString_5() throws UndefinedTickException {
+	public void testToMMLString_5() throws MMLExceptionList {
 		MMLEventList eventList = new MMLEventList("c4d4");
 		String expectMML = "c4d4r1.r1.t150";
 		List<MMLTempoEvent> globalTempoList = new ArrayList<MMLTempoEvent>();
@@ -325,10 +325,10 @@ public class MMLEventListTest {
 
 	/**
 	 * tempo, velocity を含むMML. (rTn式)
-	 * @throws UndefinedTickException
+	 * @throws MMLExceptionList
 	 */
 	@Test
-	public void testToMMLString_7() throws UndefinedTickException {
+	public void testToMMLString_7() throws MMLExceptionList {
 		MMLEventList eventList = new MMLEventList("c1r1t150c1");
 		String expectMML = "c1v0c1t150v8c1";
 
@@ -340,10 +340,10 @@ public class MMLEventListTest {
 
 	/**
 	 * tempo, velocity を含むMML. (r後のv)
-	 * @throws UndefinedTickException
+	 * @throws MMLExceptionList
 	 */
 	@Test
-	public void testToMMLString_8() throws UndefinedTickException {
+	public void testToMMLString_8() throws MMLExceptionList {
 		MMLEventList eventList = new MMLEventList("v12rc");
 		String expectMML = "r4v12c4";
 
@@ -355,10 +355,10 @@ public class MMLEventListTest {
 
 	/**
 	 * 調律符の判定テスト.
-	 * @throws UndefinedTickException
+	 * @throws MMLExceptionList
 	 */
 	@Test
-	public void testTuningNote() throws UndefinedTickException {
+	public void testTuningNote() throws MMLExceptionList {
 		MMLEventList eventList = new MMLEventList("c64&c64&c64&c64");
 		String expectMML = "c64&c64&c64&c64";
 
@@ -394,10 +394,10 @@ public class MMLEventListTest {
 
 	/**
 	 * テンポ＋休符のテスト.
-	 * @throws UndefinedTickException
+	 * @throws MMLExceptionList
 	 */
 	@Test
-	public void testTempoAndR() throws UndefinedTickException {
+	public void testTempoAndR() throws MMLExceptionList {
 		MMLEventList eventList = new MMLEventList("v12t110rt60rt90c");
 		String expectMML = "t110v0c4t60c4t90v12c4";
 
@@ -535,10 +535,10 @@ public class MMLEventListTest {
 
 	/**
 	 * swap
-	 * @throws UndefinedTickException
+	 * @throws MMLExceptionList
 	 */
 	@Test
-	public void testSwap0() throws UndefinedTickException {
+	public void testSwap0() throws MMLExceptionList {
 		MMLEventList eventList1 = new MMLEventList("rcrc");
 		MMLEventList eventList2 = new MMLEventList("r.c2");
 
@@ -556,10 +556,10 @@ public class MMLEventListTest {
 
 	/**
 	 * move
-	 * @throws UndefinedTickException
+	 * @throws MMLExceptionList
 	 */
 	@Test
-	public void testMove0() throws UndefinedTickException {
+	public void testMove0() throws MMLExceptionList {
 		MMLEventList eventList1 = new MMLEventList("rcrc");
 		MMLEventList eventList2 = new MMLEventList("r.c2");
 
@@ -576,10 +576,10 @@ public class MMLEventListTest {
 
 	/**
 	 * copy
-	 * @throws UndefinedTickException
+	 * @throws MMLExceptionList
 	 */
 	@Test
-	public void testCopy0() throws UndefinedTickException {
+	public void testCopy0() throws MMLExceptionList {
 		MMLEventList eventList1 = new MMLEventList("rcrc");
 		MMLEventList eventList2 = new MMLEventList("r.c2");
 
@@ -595,7 +595,7 @@ public class MMLEventListTest {
 	}
 
 	@Test
-	public void testIndexOfMMLString_1() throws UndefinedTickException {
+	public void testIndexOfMMLString_1() throws MMLException {
 		int t4 = MMLTicks.getTick("4");
 		MMLEventList eventList = new MMLEventList("rrcd&drrf.");
 
@@ -616,7 +616,7 @@ public class MMLEventListTest {
 	}
 
 	@Test
-	public void testIndexOfMMLString_2() throws UndefinedTickException {
+	public void testIndexOfMMLString_2() throws MMLException {
 		int t4 = MMLTicks.getTick("4");
 		MMLEventList eventList = new MMLEventList("rrv10c8t250l16d");
 
@@ -627,19 +627,19 @@ public class MMLEventListTest {
 	}
 
 	@Test
-	public void testIndexOfMMLString_3() throws UndefinedTickException {
+	public void testIndexOfMMLString_3() throws MMLException {
 		MMLEventList eventList = new MMLEventList("l64c&c&c&c&c&c&c&c");
 		assertArrayEquals( new int[]{3, 18}, eventList.indexOfMMLString(0) );
 	}
 
 	@Test
-	public void testV0_4() throws UndefinedTickException {
+	public void testV0_4() throws MMLExceptionList {
 		MMLEventList eventList = new MMLEventList("v0cdcd");
 		assertEquals("v0c4d4c4d4", MMLBuilder.create(eventList).toMMLString());
 	}
 
 	@Test
-	public void testSetUnsetVelocity_0() throws UndefinedTickException {
+	public void testSetUnsetVelocity_0() throws MMLExceptionList {
 		MMLEventList eventList = new MMLEventList("v12cdefv7g");
 		MMLEventList eventList2 = new MMLEventList("v12cdv10efv7g");
 		MMLEventList eventList3 = new MMLEventList("v12cdefv7g");
@@ -674,14 +674,14 @@ public class MMLEventListTest {
 	}
 
 	@Test
-	public void test_plus() throws UndefinedTickException {
+	public void test_plus() throws MMLException {
 		MMLEventList eventList1 = new MMLEventList("c+");
 		MMLEventList eventList2 = new MMLEventList("c#");
 		assertEquals(eventList1.toString(), eventList2.toString());
 	}
 
 	@Test
-	public void test_illegalMML() throws UndefinedTickException {
+	public void test_illegalMML() throws MMLExceptionList {
 		MMLEventList eventList1 = new MMLEventList("l8bNwMub+4.ebb+htt16b16c.cc+c2.");
 		System.out.println(eventList1.getTickLength());
 		MMLEventList eventList2 = new MMLEventList("l8bb+4.ebb+b16c.cc+c2.");
@@ -690,7 +690,7 @@ public class MMLEventListTest {
 	}
 
 	@Test
-	public void testParse_m1() throws UndefinedTickException {
+	public void testParse_m1() throws MMLExceptionList {
 		MMLEventList eventList1 = new MMLEventList("o0c-");
 		assertEquals("<<<<c-4", MMLBuilder.create(eventList1).toMMLString());
 	}
@@ -744,8 +744,8 @@ public class MMLEventListTest {
 			eventList.deleteMinRest();
 			try {
 				s = eventList.getInternalMMLString();
-			} catch (UndefinedTickException e) {
-				assertEquals("Undefined tick table: "+i+"/"+i, e.getMessage());
+			} catch (MMLExceptionList e) {
+				assertEquals("Undefined tick table: "+i, e.getMessage());
 			}
 		}
 		assertEquals("r64e64", s);

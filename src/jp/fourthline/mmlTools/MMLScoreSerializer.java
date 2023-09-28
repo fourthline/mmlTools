@@ -4,7 +4,7 @@
 
 package jp.fourthline.mmlTools;
 
-import jp.fourthline.mmlTools.core.UndefinedTickException;
+import jp.fourthline.mmlTools.core.MMLException;
 import jp.fourthline.mmlTools.parser.AbstractMMLParser;
 import jp.fourthline.mmlTools.parser.MMLParseException;
 import jp.fourthline.mmlTools.parser.SectionContents;
@@ -199,7 +199,7 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 				int baseTime = Integer.parseInt(sig[1]);
 				try {
 					score.addTimeSignature(new TimeSignature(score, Integer.parseInt(tickString), numTime, baseTime));
-				} catch (NumberFormatException | UndefinedTickException e) {
+				} catch (NumberFormatException | MMLException e) {
 					e.printStackTrace();
 				}
 			}
