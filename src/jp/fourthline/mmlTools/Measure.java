@@ -19,8 +19,24 @@ public final class Measure {
 	private final int beatTick;
 	private final int measuredTick;
 
+	/**
+	 * tickからその小節の先頭tickを算出する
+	 * @param score
+	 * @param tick
+	 * @return
+	 */
 	public static int measuredTick(MMLScore score, int tick) {
 		return new Measure(score, tick).measuredTick();
+	}
+
+	/**
+	 * tickから小節番号を算出する
+	 * @param score
+	 * @param tick
+	 * @return
+	 */
+	public static int tickToMeasure(MMLScore score, int tick) {
+		return new Measure(score, tick).getMeasure();
 	}
 
 	public static int nextMeasure(MMLScore score, int tick, boolean next) {

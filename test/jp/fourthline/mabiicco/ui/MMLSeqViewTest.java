@@ -38,6 +38,7 @@ import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.Marker;
 import jp.fourthline.mmlTools.TimeSignature;
+import jp.fourthline.mmlTools.core.UndefinedTickException;
 
 public final class MMLSeqViewTest extends UseLoadingDLS {
 
@@ -288,18 +289,23 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 	}
 
 	@Test
-	public void test_addRemoveTicks() {
+	public void test_addRemoveTicks() throws UndefinedTickException {
+		var score = obj.getMMLScore();
 		obj.setMMLselectedTrack(new MMLTrack().setMML("MML@cccc,dddd,eeee,ffff;"));
 		obj.addMMLTrack(new MMLTrack().setMML("MML@gggg,aaaa,bbbb,>cccc;"));
+		score.addTimeSignature(new TimeSignature(score, score.getMeasureTick(), 3, 4));
 		assertEquals(96*4, obj.getMMLScore().getTotalTickLength());
+		assertEquals("[384=3/4]", score.getTimeSignatureList().toString());
 
 		// 2拍目に1拍追加する.
 		obj.getMMLScore().setTimeCountOnly(2);
+		assertEquals("[192=3/4]", score.getTimeSignatureList().toString());
 		obj.nextStepTimeTo(true);
 		obj.addTicks(false);
 		assertEquals("MML@ccrcc,ddrdd,eeree,ffrff;", obj.getMMLScore().getTrack(0).getOriginalMML());
 		assertEquals("MML@ggrgg,aaraa,bbrbb,>ccrcc;", obj.getMMLScore().getTrack(1).getOriginalMML());
 		assertEquals(96*5, obj.getMMLScore().getTotalTickLength());
+		assertEquals("[192=3/4]", score.getTimeSignatureList().toString());
 
 		// 先頭の1拍を削除する.
 		obj.nextStepTimeTo(false);
@@ -307,6 +313,17 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 		assertEquals("MML@crcc,drdd,eree,frff;", obj.getMMLScore().getTrack(0).getOriginalMML());
 		assertEquals("MML@grgg,araa,brbb,>crcc;", obj.getMMLScore().getTrack(1).getOriginalMML());
 		assertEquals(96*4, obj.getMMLScore().getTotalTickLength());
+		assertEquals("[192=3/4]", score.getTimeSignatureList().toString());
+
+		// 先頭に1小節追加する.
+		obj.addTicks(true);
+		assertEquals("[384=3/4]", score.getTimeSignatureList().toString());
+
+		// 3小節目を削除する.
+		obj.nextStepTimeTo(true);
+		obj.nextStepTimeTo(true);
+		obj.removeTicks(true);
+		assertEquals("[384=3/4]", score.getTimeSignatureList().toString());
 	}
 
 	private void assertImage(InputStream expectStream, RenderedImage actual) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 ÇΩÇÒÇÁÇÈ
+ * Copyright (C) 2022-2023 „Åü„Çì„Çâ„Çã
  */
 
 package jp.fourthline.mmlTools;
@@ -49,5 +49,68 @@ public class TimeSignatureTest {
 		}
 
 		System.out.println(totalTime1 + ", " + totalTime2);
+	}
+
+	@Test
+	public void testAddMeasure() {
+		var list = score.getTimeSignatureList();
+		assertEquals(0, list.get(0).getMeasureOffset());
+		assertEquals(1, list.get(1).getMeasureOffset());
+		assertEquals(10, list.get(2).getMeasureOffset());
+		assertEquals("[0=3/4, 288=4/4, 3744=6/8]", list.toString());
+
+		TimeSignature.addMeasure(score, 0);
+		assertEquals(0, list.get(0).getMeasureOffset());
+		assertEquals(2, list.get(1).getMeasureOffset());
+		assertEquals(11, list.get(2).getMeasureOffset());
+		assertEquals("[0=3/4, 576=4/4, 4032=6/8]", list.toString());
+
+		TimeSignature.addMeasure(score, 2);
+		assertEquals(0, list.get(0).getMeasureOffset());
+		assertEquals(2, list.get(1).getMeasureOffset());
+		assertEquals(12, list.get(2).getMeasureOffset());
+		assertEquals("[0=3/4, 576=4/4, 4416=6/8]", list.toString());
+
+		TimeSignature.addMeasure(score, 12);
+		assertEquals(0, list.get(0).getMeasureOffset());
+		assertEquals(2, list.get(1).getMeasureOffset());
+		assertEquals(12, list.get(2).getMeasureOffset());
+		assertEquals("[0=3/4, 576=4/4, 4416=6/8]", list.toString());
+	}
+
+	@Test
+	public void testRemoveMeasure() {
+		var list = score.getTimeSignatureList();
+		assertEquals(0, list.get(0).getMeasureOffset());
+		assertEquals(1, list.get(1).getMeasureOffset());
+		assertEquals(10, list.get(2).getMeasureOffset());
+		assertEquals("[0=3/4, 288=4/4, 3744=6/8]", list.toString());
+
+		TimeSignature.removeMeasure(score, 10);
+		assertEquals(0, list.get(0).getMeasureOffset());
+		assertEquals(1, list.get(1).getMeasureOffset());
+		assertEquals(10, list.get(2).getMeasureOffset());
+		assertEquals("[0=3/4, 288=4/4, 3744=6/8]", list.toString());
+
+		TimeSignature.removeMeasure(score, 9);
+		assertEquals(0, list.get(0).getMeasureOffset());
+		assertEquals(1, list.get(1).getMeasureOffset());
+		assertEquals(9, list.get(2).getMeasureOffset());
+		assertEquals("[0=3/4, 288=4/4, 3360=6/8]", list.toString());
+
+		TimeSignature.removeMeasure(score, 0);
+		assertEquals(0, list.get(0).getMeasureOffset());
+		assertEquals(8, list.get(1).getMeasureOffset());
+		assertEquals("[0=4/4, 3072=6/8]", list.toString());
+
+		TimeSignature.removeMeasure(score, 0);
+		TimeSignature.removeMeasure(score, 0);
+		TimeSignature.removeMeasure(score, 0);
+		TimeSignature.removeMeasure(score, 0);
+		TimeSignature.removeMeasure(score, 0);
+		TimeSignature.removeMeasure(score, 0);
+		TimeSignature.removeMeasure(score, 0);
+		TimeSignature.removeMeasure(score, 0);
+		assertEquals("[0=6/8]", list.toString());
 	}
 }

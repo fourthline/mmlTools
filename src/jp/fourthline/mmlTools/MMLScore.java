@@ -172,6 +172,7 @@ public final class MMLScore implements Cloneable {
 
 	public void setBaseOnly(int base) {
 		baseTime = base;
+		TimeSignature.recalcTimeSignatureList(this);
 	}
 
 	public int getTimeCountOnly() {
@@ -180,6 +181,7 @@ public final class MMLScore implements Cloneable {
 
 	public void setTimeCountOnly(int value) {
 		numTime = value;
+		TimeSignature.recalcTimeSignatureList(this);
 	}
 
 	public int getMeasureTick() {
@@ -221,8 +223,10 @@ public final class MMLScore implements Cloneable {
 		// マーカー
 		MMLEvent.insertTick(markerList, tickPosition, tick);
 
-		// 拍子 (小節単位にする必要があるので、変更はされない）
-		MMLEvent.insertTick(timeSignatureList, tickPosition, tick);
+		// 拍子
+		if (isMeasure) {
+			TimeSignature.addMeasure(this, Measure.tickToMeasure(this, tickPosition));
+		}
 	}
 
 	public void removeTicks(int tickPosition, boolean isMeasure) {
@@ -243,8 +247,10 @@ public final class MMLScore implements Cloneable {
 		// マーカー
 		MMLEvent.removeTick(markerList, tickPosition, tick);
 
-		// 拍子 (小節単位にする必要があるので、変更はされない）
-		MMLEvent.removeTick(timeSignatureList, tickPosition, tick);
+		// 拍子
+		if (isMeasure) {
+			TimeSignature.removeMeasure(this, Measure.tickToMeasure(this, tickPosition));
+		}
 	}
 
 	/**

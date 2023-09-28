@@ -139,6 +139,43 @@ public final class TimeSignature extends MMLEvent {
 		return md;
 	}
 
+	/**
+	 * 1小節追加における拍子記号処理
+	 * @param score
+	 * @param measurePosition
+	 */
+	public static void addMeasure(MMLScore score, int measurePosition) {
+		var eventList = score.getTimeSignatureList();
+		for (int i = 0; i < eventList.size(); i++) {
+			var event = eventList.get(i);
+			if (event.getMeasureOffset() > measurePosition) {
+				event.measureOffset++;
+			}
+		}
+
+		recalcTimeSignatureList(score);
+	}
+
+	/**
+	 * 1小節削除における拍子記号処理
+	 * @param score
+	 * @param measurePosition
+	 */
+	public static void removeMeasure(MMLScore score, int measurePosition) {
+		var eventList = score.getTimeSignatureList();
+		for (int i = 0; i < eventList.size(); i++) {
+			var event = eventList.get(i);
+			if (event.getMeasureOffset() > measurePosition) {
+				event.measureOffset--;
+				if ((i > 0) && (eventList.get(i-1).getMeasureOffset() == event.measureOffset)) {
+					eventList.remove(--i);
+				}
+			}
+		}		
+
+		recalcTimeSignatureList(score);
+	}
+
 	public int getNumTime() {
 		return numTime;
 	}
