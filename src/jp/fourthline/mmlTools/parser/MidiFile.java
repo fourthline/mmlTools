@@ -446,6 +446,12 @@ public final class MidiFile extends AbstractMMLParser {
 				int velocity = data2 / 8;
 				if (!activeNoteMap.containsKey(note)) {
 					MMLNoteEvent noteEvent = new MMLNoteEvent(note, 0, (int)tick, velocity);
+					try {
+						noteEvent.toMMLString();
+					} catch (MMLException e) {
+						// ノートが範囲外すぎるなどして, MML変換できない場合は無視.
+						break;
+					}
 					activeNoteMap.put(note, noteEvent);
 					curNoteList.add(noteEvent);
 				}
