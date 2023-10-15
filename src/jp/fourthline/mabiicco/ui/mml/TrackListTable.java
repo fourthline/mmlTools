@@ -54,9 +54,11 @@ public final class TrackListTable extends JTable {
 		private InCheckTableModel(MMLTrack track, List<MMLText> textList) {
 			this.checkBox = false;
 			this.checkValue = null;
+			int trackIndex = 0;
 			for (MMLText mml : textList) {
 				InstClass inst = MabiDLS.getInstance().getInstByProgram(track.getProgram());
 				dataList.add(new String[] {
+						Integer.toString(++trackIndex),
 						track.getTrackName(),
 						inst.toString(),
 						mml.mmlRankFormat()
