@@ -110,7 +110,10 @@ public final class MMLScore implements Cloneable {
 	 * @return
 	 */
 	public MMLTrack getTrack(int index) {
-		return trackList.get(index);
+		if ((index >= 0) && (index < trackList.size())) {
+			return trackList.get(index);
+		}
+		return null;
 	}
 
 	/**

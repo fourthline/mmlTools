@@ -181,6 +181,11 @@ public final class PianoRollView extends JPanel {
 		selectingRect = rect;
 	}
 
+	public int getNewWidth() {
+		updateViewWidthTrackLength();
+		return Math.max(getWidth(), getPreferredSize().width);
+	}
+
 	/**
 	 * 現在のトラックの内容に合わせた幅に設定します.
 	 */
@@ -495,20 +500,6 @@ public final class PianoRollView extends JPanel {
 		}
 	}
 
-	private void drawRect(Graphics2D g, Color rectColor, Color fillColor, int x, int y, int width, int height) {
-		g.setColor(fillColor);
-		if (width != 0) {
-			g.fillRect(x+1, y+1, width, height-1);
-		} else {
-			g.drawLine(x+1, y+1, x+1, y+height-1);
-		}
-		g.setColor(rectColor);
-		g.drawLine(x+1, y+1, x+1, y+height-1);
-		g.drawLine(x+width+1, y+height-1, x+width+1, y+1);
-		g.drawLine(x+2, y, x+width, y);
-		g.drawLine(x+width, y+height, x+2, y+height);
-	}
-
 	private void drawNote(Graphics2D g, MMLNoteEvent noteEvent, Color rectColor, Color fillColor, boolean drawOption, MMLNoteEvent prevNote) {
 		int note = noteEvent.getNote();
 		int tick = noteEvent.getTick();
@@ -521,9 +512,9 @@ public final class PianoRollView extends JPanel {
 
 		if (drawOption) {
 			// shadow
-			drawRect(g, shadowColor.get(), shadowColor.get(), x+2, y+2, width, height);
+			UIUtils.drawRect(g, shadowColor.get(), shadowColor.get(), x+2, y+2, width, height);
 		}
-		drawRect(g, rectColor, fillColor, x, y, width, height);
+		UIUtils.drawRect(g, rectColor, fillColor, x, y, width, height);
 
 		if (drawOption) {
 			// velocityの描画.

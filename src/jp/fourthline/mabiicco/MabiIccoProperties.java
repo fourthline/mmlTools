@@ -25,6 +25,7 @@ import jp.fourthline.mabiicco.ui.PianoRollView;
 import jp.fourthline.mabiicco.ui.TimeBox;
 import jp.fourthline.mabiicco.ui.color.ColorSet;
 import jp.fourthline.mabiicco.ui.color.ScaleColor;
+import jp.fourthline.mabiicco.ui.editor.VelocityEditor.VelocityWidth;
 import jp.fourthline.mmlTools.MMLBuilder;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTrack;
@@ -146,6 +147,12 @@ public final class MabiIccoProperties {
 
 	/** ファイルOpen時にMML再生成する (旧データとの比較をしない) */
 	public final Property<Boolean> reGenerateWithOpen = new BooleanProperty("function.reGenerateWithOpen", true);
+
+	/** Velocity Editor */
+	public final Property<Boolean> velocityEditor = new BooleanProperty("function.velocityEditor", false);
+
+	/** Velocity bar width */
+	public final EnumProperty<VelocityWidth> velocityWidth = new EnumProperty<VelocityWidth>("function.velocityEditor.velocity_width", VelocityWidth.values(), VelocityWidth.W4);
 
 	public static MabiIccoProperties getInstance() {
 		return instance;

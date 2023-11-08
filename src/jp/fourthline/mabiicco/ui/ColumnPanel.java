@@ -295,7 +295,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 			int width = pianoRollView.convertTicktoX( noteEvent.getTick() );
 			int velocity = noteEvent.getVelocity();
 			if (velocity < 0)  velocity = 0;
-			if (velocity > 15) velocity = 15;
+			if (velocity > MMLNoteEvent.MAX_VOL) velocity = MMLNoteEvent.MAX_VOL;
 			int y = DRAW_HEIGHT - velocity - 2;
 			g.drawLine(x, y, x+width-1, y);
 		}

@@ -26,10 +26,11 @@ import jp.fourthline.mmlTools.MMLNoteEvent;
 public final class KeyboardView extends JPanel implements IPlayNote {
 	private static final long serialVersionUID = -3850112420986284800L;
 
+	public static final int HEADER_WIDTH = 60;
+
 	private int[] playNote = null;
 	private int playTrackIndex = 0;
 	private int playPartIndex = 0;
-	private final int width = 60;
 	private final int DEFAULT_VELOCITY = 11;
 	private final IMMLManager mmlManager;
 
@@ -80,7 +81,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 	}
 
 	public void updateHeight() {
-		setPreferredSize(new Dimension(width, pianoRollView.getTotalHeight()));
+		setPreferredSize(new Dimension(HEADER_WIDTH, pianoRollView.getTotalHeight()));
 	}
 
 	/**
@@ -93,7 +94,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 
 		Graphics2D g2 = (Graphics2D)g.create();
 		g2.setColor(whiteKeyColor.get());
-		g2.fillRect(0, 0, width, height);
+		g2.fillRect(0, 0, HEADER_WIDTH, height);
 
 		for (int i = 0; i <= PianoRollView.OCTNUM; i++) {
 			paintOctPianoLine(g2, i, (char)('0'+PianoRollView.OCTNUM-i-1 + octDelta));
@@ -105,7 +106,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 		// 残りの領域があれば塗りつぶす
 		if (height < getHeight()) {
 			g2.setColor(backgroundColor.get());
-			g2.fillRect(0, height+1, width, getHeight() - height);
+			g2.fillRect(0, height+1, HEADER_WIDTH, getHeight() - height);
 		}
 
 		g2.dispose();
@@ -184,7 +185,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 
 		// グリッド
 		g.setColor(octaveBorderColor);
-		g.drawLine(40, startY, width, startY);
+		g.drawLine(40, startY, HEADER_WIDTH, startY);
 
 		// オクターブ
 		int y = startY + octHeight;
@@ -192,7 +193,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 			char[] o_char = { 'o', posText };
 			g.setFont(new Font("Arial", Font.PLAIN, 12));
 			g.drawChars(o_char, 0, o_char.length, 42, y);
-			g.drawLine(40, y, width, y);
+			g.drawLine(40, y, HEADER_WIDTH, y);
 		}
 	}
 
@@ -206,7 +207,7 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 		} else if (MabiIccoProperties.getInstance().instAttr.get()) {
 			int totalHeight = pianoRollView.getTotalHeight();
 			int height = pianoRollView.getNoteHeight();
-			int x = width - 1;
+			int x = HEADER_WIDTH - 1;
 			OverlapMode overlapMode = MabiIccoProperties.getInstance().overlapMode.get();
 			for (int i = 0; i < totalHeight; i += height) {
 				int note = pianoRollView.convertY2Note(i);

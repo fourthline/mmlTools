@@ -28,6 +28,7 @@ import jp.fourthline.mabiicco.ui.editor.KeyboardEditor;
 import jp.fourthline.mabiicco.ui.editor.MMLEditor;
 import jp.fourthline.mabiicco.ui.editor.MMLScoreUndoEdit;
 import jp.fourthline.mabiicco.ui.editor.MMLTextEditor;
+import jp.fourthline.mabiicco.ui.editor.VelocityEditor;
 import jp.fourthline.mabiicco.ui.mml.MMLInputPanel;
 import jp.fourthline.mabiicco.ui.mml.MMLOutputPanel;
 import jp.fourthline.mabiicco.ui.mml.MMLPartChangePanel;
@@ -60,11 +61,15 @@ import java.util.function.IntConsumer;
  * <pre>
  * MMLSeqView
  *  |
- *  +- {@link PianoRollView} (JScrollPane 内）
- *  |
- *  +- {@link KeyboardView} (JScrollPane の行ヘッダ）
- *  |
- *  +- {@link ColumnPanel} (JScrollPane の列ヘッダ）
+ *  +- mainPanel
+ *  |  |
+ *  |  +- {@link PianoRollView} (JScrollPane 内）
+ *  |  |
+ *  |  +- {@link KeyboardView} (JScrollPane の行ヘッダ）
+ *  |  |
+ *  |  +- {@link ColumnPanel} (JScrollPane の列ヘッダ）
+ *  |  |
+ *  |  +- {@link VelocityEditor} (JScrollPane 内）
  *  |
  *  +- {@link MMLTrackView} ({@link TrackTabbedPane} extends JTabbedPane 内)
  * </pre>
@@ -78,11 +83,14 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 	private final KeyboardView keyboardView;
 	private final JTabbedPane tabbedPane;
 	private final ColumnPanel columnView;
+	private final JScrollPane velocityScrollPane;
+	private final JPanel mainPanel;
 
 	private final MMLScoreUndoEdit undoEdit = new MMLScoreUndoEdit(this);
 
 	private final MMLEditor editor;
 	private final KeyboardEditor keyboardEditor;
+	private final VelocityEditor velocityEditor;
 
 	private final JPanel panel;
 	private final ScheduledThreadPoolExecutor scheduledExecutor = new ScheduledThreadPoolExecutor(4);
@@ -99,13 +107,26 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 		panel.setLayout(new BorderLayout(0, 0));
 
 		// Scroll View (KeyboardView, PianoRollView) - CENTER
+		mainPanel = new JPanel(new BorderLayout());
 		pianoRollView = new PianoRollView();
 		keyboardView = new KeyboardView(this, pianoRollView);
-
 		scrollPane = new JScrollPane(pianoRollView, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		scrollPane.getVerticalScrollBar().setUnitIncrement(pianoRollView.getNoteHeight());
+		mainPanel.add(scrollPane, BorderLayout.CENTER);
 
-		panel.add(scrollPane, BorderLayout.CENTER);
+		// create mml editor
+		editor = new MMLEditor(parentFrame, keyboardView, pianoRollView, this);
+		columnView = new ColumnPanel(parentFrame, pianoRollView, this, editor);
+
+		// Scroll View (VelocityEditor)
+		velocityEditor = new VelocityEditor(this, pianoRollView, editor);
+		velocityScrollPane = new JScrollPane(velocityEditor,  ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		mainPanel.add(velocityScrollPane, BorderLayout.SOUTH);
+		velocityScrollPane.setRowHeaderView(new VelocityEditor.VelocityEditorHeader(velocityEditor));
+		UIUtils.scrollChain(scrollPane, velocityScrollPane);
+		setVelocityViewEnable(MabiIccoProperties.getInstance().enableEdit.get());
+
+		panel.add(mainPanel, BorderLayout.CENTER);
 		pianoRollView.setViewportAndParent(scrollPane.getViewport(), this);
 
 		// MMLTrackView (tab) - SOUTH
@@ -114,12 +135,11 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 		tabbedPane.setPreferredSize(new Dimension(0, 200));
 		panel.add(tabbedPane, BorderLayout.SOUTH);
 
-		// create mml editor
-		editor = new MMLEditor(parentFrame, keyboardView, pianoRollView, this);
-		columnView = new ColumnPanel(parentFrame, pianoRollView, this, editor);
-
 		// PianoRollScaler
 		pianoRollScaler = new PianoRollScaler(this, pianoRollView, scrollPane, this, editor);
+		pianoRollScaler.addScrollPane(scrollPane);
+		pianoRollScaler.addScrollPane(velocityScrollPane);
+		pianoRollScaler.addChangeScaleListener(velocityEditor);
 
 		// create keyboard editor
 		keyboardEditor = new KeyboardEditor(parentFrame, this, keyboardView, editor, pianoRollView);
@@ -167,6 +187,7 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 			resetTrackView();
 			tabbedPane.setPreferredSize(new Dimension(0, currentEditMode ? 200 : 60));
 		}
+		setVelocityViewEnable(editMode);
 
 		panel.repaint();
 	}
@@ -283,7 +304,7 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 			addMMLTrack(null);
 		} else {
 			// ピアノロール更新
-			pianoRollView.repaint();
+			mainPanel.repaint();
 			// エディタ更新
 			updateSelectedTrackAndMMLPart();
 		}
@@ -318,7 +339,6 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 	public void setMMLScore(MMLScore score) {
 		mmlScore = score;
 
-		pianoRollView.repaint();
 		tabbedPane.removeAll();
 
 		int trackCount = 0;
@@ -338,6 +358,8 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 		updateTrackTabIcon();
 		updateActivePart(false);
 		updateProgramSelect();
+
+		mainPanel.repaint();
 	}
 
 	/**
@@ -475,9 +497,7 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 			pianoRollView.setRelativeInst(inst);
 			keyboardView.setRelativeInst(inst);
 
-			pianoRollView.repaint();
-			columnView.repaint();
-			keyboardView.repaint();
+			mainPanel.repaint();
 		}
 	}
 
@@ -785,7 +805,7 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 		}
 		point.setLocation(positionX, positionY);
 		viewport.setViewPosition(point);
-		scrollPane.repaint();
+		mainPanel.repaint();
 	}
 
 	@Override
@@ -832,6 +852,15 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 			new MMLTextEditor(parentFrame, this, pianoRollView).showDialog();
 		} catch (MMLExceptionList e) {
 			showErrMessage(mmlScore, e);
+		}
+	}
+
+	private void setVelocityViewEnable(boolean editMode) {
+		boolean b = MabiIccoProperties.getInstance().velocityEditor.get() && editMode;
+		if (b != velocityScrollPane.isVisible()) {
+			velocityScrollPane.setVisible(b);
+			mainPanel.revalidate();
+			mainPanel.repaint();
 		}
 	}
 

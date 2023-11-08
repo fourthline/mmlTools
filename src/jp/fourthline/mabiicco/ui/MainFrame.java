@@ -14,14 +14,12 @@ import java.awt.Rectangle;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JRadioButtonMenuItem;
 import javax.swing.border.EmptyBorder;
 
 import jp.fourthline.mabiicco.ActionDispatcher;
 import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.IEditStateObserver;
 import jp.fourthline.mabiicco.MabiIccoProperties;
-import jp.fourthline.mabiicco.MabiIccoProperties.EnumProperty;
 import jp.fourthline.mabiicco.ui.PianoRollView.PaintMode;
 import jp.fourthline.mabiicco.ui.editor.NoteAlign;
 
@@ -41,10 +39,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntSupplier;
-import java.util.function.Supplier;
 
 import javax.swing.AbstractAction;
-import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
@@ -137,7 +133,6 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 
 		timeBox = new TimeBox(mmlSeqView);
 		JToolBar toolBar = createToolBar();
-		toolBar.setFloatable(false);
 		northPanel.add(toolBar);
 
 		JPanel southPanel = new JPanel();
@@ -360,15 +355,15 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		JMenu settingMenu = new JMenu(appText("menu.setting"));
 		menuBar.add(settingMenu);
 		// 表示に関わる設定
-		createGroupMenu(settingMenu, "menu.noteHeight", appProperties.pianoRollNoteHeight);
-		createGroupMenu(settingMenu, "menu.scale_color", appProperties.scaleColor);
+		UIUtils.createGroupMenu(settingMenu, "menu.noteHeight", appProperties.pianoRollNoteHeight);
+		UIUtils.createGroupMenu(settingMenu, "menu.scale_color", appProperties.scaleColor);
 		createCheckMenu(settingMenu, "view.tempo", appProperties.enableViewTempo);
 		createCheckMenu(settingMenu, "view.marker", appProperties.enableViewMarker);
 		createCheckMenu(settingMenu, "view.range", appProperties.viewRange);
 		createCheckMenu(settingMenu, "view.instAttr", appProperties.instAttr);
 		createCheckMenu(settingMenu, "view.showAllVelocity", appProperties.showAllVelocity);
 		createCheckMenu(settingMenu, "view.velocity", appProperties.viewVelocityLine);
-		createGroupMenu(settingMenu, "ui.laf", appProperties.laf);
+		UIUtils.createGroupMenu(settingMenu, "ui.laf", appProperties.laf);
 		createCheckMenu(settingMenu, "ui.scale_disable", appProperties.uiscaleDisable);
 		settingMenu.add(new JSeparator());
 		// 機能に関わる設定
@@ -376,7 +371,8 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createCheckMenu(settingMenu, "edit.active_part_switch", appProperties.activePartSwitch);
 		createCheckMenu(settingMenu, "clickPlayMenu", appProperties.enableClickPlay);
 		createCheckMenu(settingMenu, "edit.tempoDeleteWithConvert", appProperties.enableTempoDeleteWithConvert);
-		createGroupMenu(settingMenu, "ui.mouse_scroll_width", appProperties.mouseScrollWidth);
+		UIUtils.createGroupMenu(settingMenu, "ui.mouse_scroll_width", appProperties.mouseScrollWidth);
+		createCheckMenu(settingMenu, "velocity_editor", appProperties.velocityEditor);
 		settingMenu.add(new JSeparator());
 		// MML生成に関わる設定
 		createCheckMenu(settingMenu, "mml.precise_optimize", appProperties.enableMMLPreciseOptimize, ActionDispatcher.MML_GENERATE);
@@ -388,7 +384,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		settingMenu.add(new JSeparator());
 		// DLSに関わる設定
 //		createGroupMenu(settingMenu, "menu.overlap_mode", appProperties.overlapMode);  // 2023/04/19 のアップデートにより、重複音が問題なくできるようになったので固定値へ変更
-		createGroupMenu(settingMenu, "menu.sound_env", appProperties.soundEnv);
+		UIUtils.createGroupMenu(settingMenu, "menu.sound_env", appProperties.soundEnv);
 		createCheckMenu(settingMenu, "menu.useDefaultSoundbank", appProperties.useDefaultSoundBank, ActionDispatcher.USE_DEFAULT_SOUNDBANK, true);
 		createMenuItem(settingMenu, "menu.select_dls", ActionDispatcher.SELECT_DLS, true);
 
@@ -404,19 +400,6 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		}
 
 		return menuBar;
-	}
-
-	private static class GroupMenuItemWith<T> extends JRadioButtonMenuItem implements Supplier<T> {
-		private static final long serialVersionUID = -7786833458520626015L;
-		private final T obj;
-		private GroupMenuItemWith(String text, T obj) {
-			super(text);
-			this.obj = obj;
-		}
-		@Override
-		public T get() {
-			return obj;
-		}
 	}
 
 	private static class MenuWithIndex extends JMenuItem implements IntSupplier {
@@ -435,27 +418,6 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	}
 
 	/**
-	 * ラジオボタンのメニューグループを作成する
-	 * @param settingMenu
-	 * @param menuName
-	 * @param prop
-	 */
-	private void createGroupMenu(JMenu settingMenu, String menuName, EnumProperty<? extends SettingButtonGroupItem> prop) {
-		JMenu menu = new JMenu(appText(menuName));
-		settingMenu.add(menu);
-
-		ButtonGroup group = new ButtonGroup();
-		for (SettingButtonGroupItem item : prop.getValues()) {
-			GroupMenuItemWith<SettingButtonGroupItem> itemMenu = new GroupMenuItemWith<>(appText(item.getButtonName()), item);
-			itemMenu.setActionCommand(ActionDispatcher.CHANGE_ACTION);
-			itemMenu.addActionListener(listener);
-			itemMenu.setSelected(item.equals(prop.get()));
-			menu.add(itemMenu);
-			group.add(itemMenu);
-		}
-	}
-
-	/**
 	 * 有効/無効の設定ボタンを作成します.
 	 * @param settingMenu
 	 */
@@ -468,20 +430,24 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	}
 
 	private void createCheckMenu(JMenu settingMenu, String itemName, MabiIccoProperties.Property<Boolean> property, String actionCommand, boolean noplayFunction) {
-		JCheckBoxMenuItem clickPlayMenu = new JCheckBoxMenuItem(appText(itemName));
+		createCheckMenu(settingMenu, itemName, property, actionCommand, noplayFunction, null);
+	}
+
+	private void createCheckMenu(JMenu settingMenu, String itemName, MabiIccoProperties.Property<Boolean> property, String actionCommand, boolean noplayFunction, KeyStroke keyStroke) {
+		JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(appText(itemName));
 		String detail = itemName+".detail";
 		String toolTipText = appText(detail); 
 		if (toolTipText != detail) {
-			clickPlayMenu.setToolTipText(toolTipText);
+			menuItem.setToolTipText(toolTipText);
 		}
-		settingMenu.add(clickPlayMenu);
+		settingMenu.add(menuItem);
 
-		clickPlayMenu.setSelected( property.get() );
-		clickPlayMenu.setActionCommand(actionCommand);
-		clickPlayMenu.addActionListener((e) -> {
+		menuItem.setSelected( property.get() );
+		menuItem.setActionCommand(actionCommand);
+		menuItem.addActionListener((e) -> {
 			boolean b = property.get();
 			property.set(!b);
-			clickPlayMenu.setSelected(!b);
+			menuItem.setSelected(!b);
 			if (mmlSeqView != null) {
 				mmlSeqView.repaint();
 			}
@@ -490,7 +456,11 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 			}
 		});
 		if (noplayFunction) {
-			noplayFunctions.add(new PlayStateComponent<>(clickPlayMenu));
+			noplayFunctions.add(new PlayStateComponent<>(menuItem));
+		}
+		if (keyStroke != null) {
+			menuItem.setAccelerator(keyStroke);
+			addShortcutMap(menuItem.getText(), keyStroke);
 		}
 	}
 
@@ -521,7 +491,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	}
 
 	private JToolBar createToolBar() {
-		JToolBar toolBar = new JToolBar();
+		JToolBar toolBar = UIUtils.createToolBar();
 
 		createToolButton(toolBar, "menu.newFile", ActionDispatcher.NEW_FILE, true);
 		createToolButton(toolBar, "menu.openFile", ActionDispatcher.FILE_OPEN, true);

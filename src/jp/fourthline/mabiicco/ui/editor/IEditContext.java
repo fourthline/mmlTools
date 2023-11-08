@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2022 たんらる
+ * Copyright (C) 2014-2023 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.editor;
@@ -7,11 +7,14 @@ package jp.fourthline.mabiicco.ui.editor;
 import java.awt.Cursor;
 import java.awt.Point;
 
+import jp.fourthline.mmlTools.MMLNoteEvent;
+
 /**
  * EditModeから使用するContext.
  */
 interface IEditContext {
 	boolean hasSelectedNote();
+	boolean isSelectedNote(MMLNoteEvent event);
 	boolean onExistNote(Point point);
 	boolean selectTrackOnExistNote(Point point);
 	boolean isEditLengthPosition(Point point);

@@ -51,6 +51,7 @@ import jp.fourthline.mabiicco.ui.editor.MMLTranspose;
 import jp.fourthline.mabiicco.ui.editor.MultiTracksVelocityChangeEditor;
 import jp.fourthline.mabiicco.ui.editor.MultiTracksViewEditor;
 import jp.fourthline.mabiicco.ui.editor.UserViewWidthDialog;
+import jp.fourthline.mabiicco.ui.editor.VelocityEditor.VelocityWidth;
 import jp.fourthline.mabiicco.ui.mml.MMLExportPanel;
 import jp.fourthline.mabiicco.ui.mml.MMLImportPanel;
 import jp.fourthline.mabiicco.ui.mml.MMLScorePropertyPanel;
@@ -894,8 +895,11 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 					updateUIComponents.forEach(t -> SwingUtilities.updateComponentTreeUI(t));
 					mainFrame.repaint();
 				}
+			} else if (o instanceof VelocityWidth vw) {
+				appProperties.velocityWidth.set(vw);
+				mainFrame.repaint();
 			} else {
-				System.err.println("changeAction invalid param " + source.getClass().toString());
+				System.err.println("changeAction invalid param " + o.getClass().toString());
 			}
 		}
 	}

@@ -8,6 +8,8 @@ import static jp.fourthline.mabiicco.AppResource.appText;
 import java.awt.Point;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.IntConsumer;
 
 import javax.swing.JScrollPane;
@@ -28,13 +30,25 @@ public final class PianoRollScaler implements MouseWheelListener {
 	private int viewScaleIndex = 0;
 	private final double[] viewScaleTable = { 6, 5, 4, 3, 2, 1.5, 1, 0.75, 0.5, 0.375, 0.25, 0.1 };
 
+	private final List<JScrollPane> scrollPaneList = new ArrayList<>();
+	private final List<ChangeScaleListener> repositionNotify = new ArrayList<>();
+
+	public interface ChangeScaleListener {
+		void changeScale(int x);
+	}
+
 	public PianoRollScaler(IMMLManager mmlManager, PianoRollView pv, JScrollPane sp, MainView parent, IEditState editState) {
 		this.mmlManager = mmlManager;
 		this.pianoRollView = pv;
 		this.scrollPane = sp;
 		this.parent = parent;
 		this.editState = editState;
-		pv.addMouseWheelListener(this);
+	}
+
+	public void addScrollPane(JScrollPane scrollPane) {
+		scrollPaneList.add(scrollPane);
+		scrollPane.addMouseWheelListener(this);
+		scrollPane.setWheelScrollingEnabled(false);
 	}
 
 	public double getScale() {
@@ -92,7 +106,6 @@ public final class PianoRollScaler implements MouseWheelListener {
 		repositionChangeScaleView(scale1, pianoRollView.getWideScale(), xOffset);
 	}
 
-	// TODO: 応急措置, 拡大時に表示位置を保持できていない.
 	private void repositionChangeScaleView(double scale1, double scale2, int xOffset) {
 		JViewport viewport = scrollPane.getViewport();
 		Point p = viewport.getViewPosition();
@@ -100,11 +113,20 @@ public final class PianoRollScaler implements MouseWheelListener {
 		// 拡大/縮小したときの表示位置を調整します.
 		p.x = (int)((p.x + xOffset) * scale1 / scale2) - xOffset;
 		parent.repaint();
-		viewport.updateUI();
+		scrollPaneList.forEach(t -> t.getViewport().updateUI());  // ちらつき防止
 		viewport.setViewPosition(p);
+
+		// 拡大/縮小したときの位置を通知する
+		repositionNotify.forEach(c -> c.changeScale(p.x + xOffset));
+
+		// 表示位置が正しい値になっていない場合がある問題の対策.
 		if ( (viewport.getViewPosition().x != p.x) || (viewport.getViewPosition().y != p.y)) {
 			viewport.setViewPosition(p);
 		}
+	}
+
+	public void addChangeScaleListener(ChangeScaleListener c) {
+		repositionNotify.add(c);
 	}
 
 	/**
@@ -127,7 +149,7 @@ public final class PianoRollScaler implements MouseWheelListener {
 			public int getDelta(MMLScore score, JViewport viewport, PianoRollView pianoRollView) {
 				return pianoRollView.convertTicktoX(score.getMeasureTick());
 			}
-			
+
 		},
 		BEAT {
 			@Override
@@ -156,46 +178,60 @@ public final class PianoRollScaler implements MouseWheelListener {
 		public abstract int getDelta(MMLScore score, JViewport viewport, PianoRollView pianoRollView);
 	}
 
-	private void scrollH(int rotation, JViewport viewport, Point p) {
+	private void scrollH(int rotation) {
+		JViewport viewport = scrollPane.getViewport();
+		Point p = viewport.getViewPosition();
+
 		// 横方向の移動
 		var score = mmlManager.getMMLScore();
 		int delta = MabiIccoProperties.getInstance().mouseScrollWidth.get().getDelta(score, viewport, pianoRollView);
 		p.x += (rotation > 0) ? delta : -delta;
 		p.x = Math.min(Math.max(0, p.x), pianoRollView.getWidth() - viewport.getWidth());
-		scrollPane.getViewport().setViewPosition(p);
+		viewport.setViewPosition(p);
+
+		// 表示位置が正しい値になっていない場合がある問題の対策.
+		if ( (viewport.getViewPosition().x != p.x) || (viewport.getViewPosition().y != p.y)) {
+			viewport.setViewPosition(p);
+		}
 		parent.repaint();
 	}
 
-	private void scrollV(int rotation, JViewport viewport, Point p) {
+	private void scrollV(int rotation) {
+		JViewport viewport = scrollPane.getViewport();
+		Point p = viewport.getViewPosition();
+
 		// 縦方向の移動
 		int delta = pianoRollView.getNoteHeight() * 2;
 		p.y += (rotation > 0) ? delta : -delta;
 		p.y = Math.min(Math.max(0, p.y + ((rotation > 0) ? delta : -delta)), pianoRollView.getHeight() - viewport.getHeight());
-		scrollPane.getViewport().setViewPosition(p);
+		viewport.setViewPosition(p);
 		parent.repaint();
 	}
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-		JViewport viewport = scrollPane.getViewport();
-		Point p = viewport.getViewPosition();
 		int rotation = e.getWheelRotation();
-		if (e.isAltDown() && !e.isControlDown() && !e.isShiftDown()) {
-			// 編集アクションの実行
-			editState.notesModifyVelocity(e.getPoint(), rotation < 0);
-		} else if (!e.isAltDown() && e.isControlDown() && !e.isShiftDown()) {
-			// 幅の拡大縮小
-			if (rotation < 0) {
-				expandPianoViewWide( e.getX() - p.x );
+
+		if (e.getSource() instanceof JScrollPane sc) {
+			int x = e.getX() - sc.getViewport().getBounds().x;
+
+			if (e.isAltDown() && !e.isControlDown() && !e.isShiftDown()) {
+				// 編集アクションの実行
+				editState.notesModifyVelocity(e.getPoint(), rotation < 0);
+			} else if (!e.isAltDown() && e.isControlDown() && !e.isShiftDown()) {
+				// 幅の拡大縮小
+				if (rotation < 0) {
+					expandPianoViewWide( x );
+				} else {
+					reducePianoViewWide( x );
+				}
+			} else if (!e.isAltDown() && !e.isControlDown() && e.isShiftDown()) {
+				// 横方向の移動
+				scrollH(rotation);
 			} else {
-				reducePianoViewWide( e.getX() - p.x );
+				// 縦方向の移動
+				scrollV(rotation);
 			}
-		} else if (!e.isAltDown() && !e.isControlDown() && e.isShiftDown()) {
-			// 横方向の移動
-			scrollH(rotation, viewport, p);
-		} else {
-			// 縦方向の移動
-			scrollV(rotation, viewport, p);
 		}
 	}
 }

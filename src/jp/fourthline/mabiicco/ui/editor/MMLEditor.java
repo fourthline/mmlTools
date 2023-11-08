@@ -87,7 +87,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 				},
 				t -> {
 					// 選択したノートの音量を変更する.
-					for(MMLNoteEvent n : selectedNote) {
+					for (MMLNoteEvent n : selectedNote) {
 						n.setVelocity(t);
 					}
 					mmlManager.generateActiveTrack();
@@ -529,6 +529,11 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	@Override
 	public boolean hasSelectedNote() {
 		return !(selectedNote.isEmpty());
+	}
+
+	@Override
+	public boolean isSelectedNote(MMLNoteEvent event) {
+		return selectedNote.contains(event);
 	}
 
 	/** 連続した複数のノートが選択されているかどうかを判定する */

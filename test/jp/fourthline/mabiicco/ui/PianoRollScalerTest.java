@@ -10,6 +10,7 @@ import java.awt.Point;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseWheelEvent;
 import java.lang.reflect.Field;
+import java.util.function.Supplier;
 
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
@@ -53,10 +54,24 @@ public final class PianoRollScalerTest extends UseLoadingDLS {
 		frame.setVisible(false);
 	}
 
-	private Point mouseWheelMoved(MouseWheelEvent e) throws InterruptedException {
-		pianoRollScaler.mouseWheelMoved(e);
+	private Point mouseWheelMoved(Supplier<MouseWheelEvent> e) throws InterruptedException {
+		pianoRollScaler.mouseWheelMoved(e.get());
 		Thread.sleep(10);
-		return viewport.getViewPosition();
+		return scrollPane.getViewport().getViewPosition();
+	}
+
+	private Supplier<MouseWheelEvent> createMouseWheelEvent(int x, int y, int modifiers, int rotation) {
+		Supplier<MouseWheelEvent> r = () -> {
+			var bounds = viewport.getBounds();
+			var point = viewport.getViewPosition();
+			var event = new MouseWheelEvent(scrollPane, 0, 0, modifiers,
+					x + bounds.x - point.x,
+					y + bounds.y - point.y,
+					0, false, 0, 0,
+					rotation);
+			return event;
+		};
+		return r;
 	}
 
 	@Test
@@ -67,8 +82,8 @@ public final class PianoRollScalerTest extends UseLoadingDLS {
 		assertEquals(0, p.x);
 		assertEquals(436, p.y);
 
-		var e1 = new MouseWheelEvent(viewport, 0, 0, 0, 0, 0, 0, false, 0, 0, -1);
-		var e2 = new MouseWheelEvent(viewport, 0, 0, 0, 0, 0, 0, false, 0, 0, 1);
+		var e1 = createMouseWheelEvent(0, 0, 0, -1);
+		var e2 = createMouseWheelEvent(0, 0, 0, 1);
 
 		// 縦スクロール
 		for (int i= 404; i >= 0; i -= 32) {
@@ -97,8 +112,8 @@ public final class PianoRollScalerTest extends UseLoadingDLS {
 		assertEquals(0, p.x);
 		assertEquals(436, p.y);
 
-		var e1 = new MouseWheelEvent(viewport, 0, 0, InputEvent.SHIFT_DOWN_MASK, 0, 0, 0, false, 0, 0, -1);
-		var e2 = new MouseWheelEvent(viewport, 0, 0, InputEvent.SHIFT_DOWN_MASK, 0, 0, 0, false, 0, 0, 1);
+		var e1 = createMouseWheelEvent(0, 0, InputEvent.SHIFT_DOWN_MASK, -1);
+		var e2 = createMouseWheelEvent(0, 0, InputEvent.SHIFT_DOWN_MASK, 1);
 
 		obj.getMMLScore().setUserViewMeasure(20);
 		obj.repaint();
@@ -213,8 +228,8 @@ public final class PianoRollScalerTest extends UseLoadingDLS {
 	@Test
 	public void test_expand() throws Exception {
 		Point p = viewport.getViewPosition();
-		var e1 = new MouseWheelEvent(viewport, 0, 0, InputEvent.CTRL_DOWN_MASK, 400, 30, 0, false, 0, 0, -1);
-		var e2 = new MouseWheelEvent(viewport, 0, 0, InputEvent.CTRL_DOWN_MASK, 200, 30, 0, false, 0, 0, 1);
+		var e1 = createMouseWheelEvent(400, 30, InputEvent.CTRL_DOWN_MASK, -1);
+		var e2 = createMouseWheelEvent(200, 30, InputEvent.CTRL_DOWN_MASK, 1);
 
 		assertEquals(6.0, pianoRollScaler.getScale(), 0.1);
 		assertEquals(0, p.x);
