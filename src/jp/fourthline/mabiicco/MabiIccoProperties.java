@@ -390,6 +390,10 @@ public final class MabiIccoProperties {
 		public T[] getValues() {
 			return values;
 		}
+
+		public T getDefault() {
+			return defaultValue;
+		}
 	}
 
 	private static final class PreloadedProperties extends Properties {

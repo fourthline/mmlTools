@@ -113,8 +113,13 @@ public final class UIUtils {
 		settingMenu.add(menu);
 
 		ButtonGroup group = new ButtonGroup();
+		var defaultValue = prop.getDefault();
 		for (SettingButtonGroupItem item : prop.getValues()) {
-			GroupMenuItemWith<SettingButtonGroupItem> itemMenu = new GroupMenuItemWith<>(appText(item.getButtonName()), item);
+			String name = appText(item.getButtonName());
+			if (item == defaultValue) {
+				name += " (default)";
+			}
+			GroupMenuItemWith<SettingButtonGroupItem> itemMenu = new GroupMenuItemWith<>(name, item);
 			itemMenu.setActionCommand(ActionDispatcher.CHANGE_ACTION);
 			itemMenu.addActionListener(listener);
 			itemMenu.setSelected(item.equals(prop.get()));
