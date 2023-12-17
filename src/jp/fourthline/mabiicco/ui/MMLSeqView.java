@@ -32,6 +32,7 @@ import jp.fourthline.mabiicco.ui.editor.VelocityEditor;
 import jp.fourthline.mabiicco.ui.mml.MMLInputPanel;
 import jp.fourthline.mabiicco.ui.mml.MMLOutputPanel;
 import jp.fourthline.mabiicco.ui.mml.MMLPartChangePanel;
+import jp.fourthline.mabiicco.ui.mml.MMLXImportPanel;
 import jp.fourthline.mabiicco.ui.mml.TrackPropertyPanel;
 import jp.fourthline.mmlTools.MMLEventList;
 import jp.fourthline.mmlTools.MMLExceptionList;
@@ -463,6 +464,17 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 		mmlInputDialog.showDialog();
 	}
 
+	public void mml_xImportAction() {
+		new MMLXImportPanel(parentFrame, getNewTrackName(), this).showDialog();
+	}
+
+	public void mml_xExportAction() {
+		var track = getSelectedTrack();
+		if (!track.mmlRank().canCompose()) {
+			MMLOutputPanel.createSelectedTrackMMLSplitPanel(parentFrame, track, mmlScore).showDialog();
+		}
+	}
+
 	public void outputClipBoardAction() {
 		MMLOutputPanel outputPanel = new MMLOutputPanel(parentFrame, mmlScore.getTrackList(), mmlScore);
 		outputPanel.showDialog();
@@ -509,7 +521,7 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 	@Override
 	public int getActiveMMLPartIndex() {
 		MMLTrackView view = (MMLTrackView) tabbedPane.getSelectedComponent();
-		return view.getSelectedMMLPartIndex();
+		return (view != null) ? view.getSelectedMMLPartIndex() : 0;
 	}
 
 	@Override

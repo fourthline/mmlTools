@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2022 たんらる
+ * Copyright (C) 2014-2023 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.mml;
@@ -7,26 +7,21 @@ package jp.fourthline.mabiicco.ui.mml;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JButton;
-import javax.swing.KeyStroke;
 import javax.swing.JScrollPane;
 
 import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.ui.IMMLManager;
 import jp.fourthline.mabiicco.ui.MMLTrackView;
+import jp.fourthline.mabiicco.ui.UIUtils;
 import jp.fourthline.mabiicco.ui.editor.MMLEditor;
 import jp.fourthline.mmlTools.MMLEventList;
 import jp.fourthline.mmlTools.MMLTrack;
@@ -188,16 +183,7 @@ public final class MMLPartChangePanel extends JPanel {
 		executePanel.add(radioCopy);
 		executeGroup.add(radioCopy);
 
-		InputMap imap = dialog.getRootPane().getInputMap(
-				JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-		imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "close-it");
-		dialog.getRootPane().getActionMap().put("close-it", new AbstractAction() {
-			private static final long serialVersionUID = -4495368209645211523L;
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				dialog.setVisible(false);
-			}});
+		UIUtils.dialogCloseAction(dialog);
 
 		updateView();
 	}

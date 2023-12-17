@@ -149,6 +149,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String CHANGE_ACTION = "change_action";
 	@Action public static final String MML_TEXT_EDIT = "mml_text_edit";
 	@Action public static final String MML_ERR_LIST = "mml_err_list";
+	@Action public static final String MML_X_IMPORT = "mml_x_import";
+	@Action public static final String MML_X_EXPORT = "mml_x_export";
 
 	private final HashMap<String, Consumer<Object>> actionMap = new HashMap<>();
 
@@ -336,6 +338,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(CHANGE_ACTION, t -> this.changeAction(t));
 		actionMap.put(MML_TEXT_EDIT, t -> mmlSeqView.mmlTextEditor());
 		actionMap.put(MML_ERR_LIST, t -> new MMLErrView(mmlSeqView.getMMLScore()).showMMLErrList(mainFrame));
+		actionMap.put(MML_X_IMPORT, t -> mmlSeqView.mml_xImportAction());
+		actionMap.put(MML_X_EXPORT, t -> mmlSeqView.mml_xExportAction());
 	}
 
 	@Override
@@ -752,6 +756,9 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		mainFrame.setSelectedEdit(editState.hasSelectedNote());
 		mainFrame.setPasteEnable(editState.canPaste());
 		mainFrame.setRemoveRestsBetweenNotesEnable(editState.hasSelectedMultipleConsecutiveNotes());
+
+		// 楽譜集分割-UI更新
+		mainFrame.setXExport(!mmlSeqView.getActiveTrack().mmlRank().canCompose());
 	}
 
 	private void toggleLoop() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2022 たんらる
+ * Copyright (C) 2014-2023 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.mml;
@@ -8,22 +8,17 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.util.List;
 
-import javax.swing.AbstractAction;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JLabel;
-import javax.swing.KeyStroke;
 
 import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.ui.IMMLManager;
+import jp.fourthline.mabiicco.ui.UIUtils;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTrack;
 
@@ -103,16 +98,7 @@ public final class MMLImportPanel extends JPanel {
 
 		table.setDefaultEditor(Object.class, null);
 
-		InputMap imap = dialog.getRootPane().getInputMap(
-				JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-		imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "close-it");
-		dialog.getRootPane().getActionMap().put("close-it", new AbstractAction() {
-			private static final long serialVersionUID = -4495368209645211523L;
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				dialog.setVisible(false);
-			}});
+		UIUtils.dialogCloseAction(dialog);
 
 		add(buttonPanel, BorderLayout.SOUTH);
 		add(p, BorderLayout.CENTER);

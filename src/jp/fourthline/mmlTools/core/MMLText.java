@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2022 たんらる
+ * Copyright (C) 2014-2023 たんらる
  */
 
 package jp.fourthline.mmlTools.core;
@@ -197,5 +197,12 @@ public final class MMLText {
 
 	public void setExcludeSongPart(boolean b) {
 		this.excludeSongPart = b;
+	}
+
+	public MMLText join(MMLText t) {
+		for (int i = 0; i < text.length; i++) {
+			text[i] = text[i].concat(t.text[i]);
+		}
+		return this;
 	}
 }

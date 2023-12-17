@@ -8,23 +8,34 @@ import static jp.fourthline.mabiicco.AppResource.appText;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.LayoutManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.function.Supplier;
 
+import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
+import javax.swing.InputMap;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JMenu;
+import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.JViewport;
+import javax.swing.KeyStroke;
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import jp.fourthline.mabiicco.ActionDispatcher;
+import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.MabiIccoProperties.EnumProperty;
 
 public final class UIUtils {
@@ -169,5 +180,32 @@ public final class UIUtils {
 			super.updateUI();
 			setFloatable(false);
 		}
+	}
+
+	public static void dialogCloseAction(JDialog dialog) {
+		dialogCloseAction(dialog, () -> {});
+	}
+
+	public static void dialogCloseAction(JDialog dialog, Runnable f) {
+		InputMap imap = dialog.getRootPane().getInputMap(
+				JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "close-it");
+		dialog.getRootPane().getActionMap().put("close-it", new AbstractAction() {
+			private static final long serialVersionUID = 9185214975506783931L;
+			@Override
+			public void actionPerformed(ActionEvent arg) {
+				f.run();
+				dialog.setVisible(false);
+			}});
+	}
+
+	public static JPanel createTitledPanel(String title) {
+		return createTitledPanel(title, null);
+	}
+
+	public static JPanel createTitledPanel(String title, LayoutManager layout) {
+		var panel = new JPanel(layout);
+		panel.setBorder(new TitledBorder(new LineBorder(Color.GRAY, 1, true), AppResource.appText(title), TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		return panel;
 	}
 }

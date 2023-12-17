@@ -10,8 +10,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
@@ -19,15 +17,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.AbstractAction;
-import javax.swing.InputMap;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
-import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.AncestorEvent;
@@ -46,6 +40,7 @@ import javax.swing.text.StyleContext;
 import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.ui.IMMLManager;
 import jp.fourthline.mabiicco.ui.PianoRollView;
+import jp.fourthline.mabiicco.ui.UIUtils;
 import jp.fourthline.mabiicco.ui.color.ColorSet;
 import jp.fourthline.mmlTools.MMLBuilder;
 import jp.fourthline.mmlTools.MMLEventList;
@@ -136,17 +131,7 @@ public final class MMLTextEditor implements DocumentListener, CaretListener {
 				cancelAction();
 			}
 		});
-		InputMap imap = dialog.getRootPane().getInputMap(
-				JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-		imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "close-it");
-		dialog.getRootPane().getActionMap().put("close-it", new AbstractAction() {
-			private static final long serialVersionUID = 4749203868495137137L;
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				cancelAction();
-				dialog.setVisible(false);
-			}});
+		UIUtils.dialogCloseAction(dialog, this::cancelAction);
 
 		this.scrollPane = new JScrollPane(textPane, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		this.scrollPane.setPreferredSize(new Dimension(400, 240));

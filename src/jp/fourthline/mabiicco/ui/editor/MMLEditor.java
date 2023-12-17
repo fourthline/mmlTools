@@ -140,6 +140,9 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	 */
 	public void reset() {
 		selectNote(null);
+		if (editObserver != null) {
+			editObserver.notifyUpdateEditState();
+		}
 	}
 
 	private void selectNote(MMLNoteEvent noteEvent) {

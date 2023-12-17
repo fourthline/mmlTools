@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 たんらる
+ * Copyright (C) 2022-2023 たんらる
  */
 
 package jp.fourthline.mabiicco;
@@ -14,6 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 
 import jp.fourthline.mabiicco.MabiIcco.ISplash;
 
@@ -46,7 +47,7 @@ public final class Splash2 extends JDialog implements ISplash {
 		private static final int HEIGHT = 433; 
 		private final ImageIcon img;
 		private final JProgressBar progress = new JProgressBar();
-		private final JLabel version = new JLabel();
+		private final JLabel version = new JLabel("", SwingConstants.RIGHT);
 		private final JTextArea textArea = new JTextArea();
 		private SplashPanel() {
 			super();
@@ -58,7 +59,7 @@ public final class Splash2 extends JDialog implements ISplash {
 			progress.setBounds(14, 406, 290, 12);
 			add(version);
 			version.setText("Version: "+AppResource.getVersionText());
-			version.setBounds(200, 290, 120, 14);
+			version.setBounds(100, 290, 180, 14);
 			version.setForeground(Color.BLACK);
 			add(textArea);
 			textArea.setEditable(false);

@@ -34,6 +34,12 @@ public interface InstType {
 	 */
 	int convertVelocityMML2Midi(int mml_velocity);
 
+	/**
+	 * 歌パートを除外するオプションを許可するか.
+	 * @return
+	 */
+	boolean allowExcludeSongPart();
+
 	/** 使用不可な楽器 */
 	InstType NONE = new NoneType();
 
@@ -82,7 +88,7 @@ public interface InstType {
 
 	public static class NoneType extends NormalType {
 		private NoneType() {
-			super(NormalType.NONE_PART, false, false);
+			super(NormalType.NONE_PART, false, false, false);
 		}
 
 		@Override
@@ -103,15 +109,17 @@ public interface InstType {
 		private final boolean[] enablePart;
 		private final boolean allowTranspose;
 		private final boolean allowTempoChordPart;
+		private final boolean allowExcludeSongPart;
 
 		private NormalType() {
-			this(NormalType.THREE_PART, true, true);
+			this(NormalType.THREE_PART, true, true, true);
 		}
 
-		private NormalType(boolean[] enablePart, boolean allowTranspose, boolean allowTempoChordPart) {
+		private NormalType(boolean[] enablePart, boolean allowTranspose, boolean allowTempoChordPart, boolean allowExcludeSongPart) {
 			this.enablePart = enablePart;
 			this.allowTranspose = allowTranspose;
 			this.allowTempoChordPart = allowTempoChordPart;
+			this.allowExcludeSongPart = allowExcludeSongPart;
 		}
 
 		@Override
@@ -139,6 +147,11 @@ public interface InstType {
 			}
 			return (mml_velocity * 8);
 		}
+
+		@Override
+		public boolean allowExcludeSongPart() {
+			return allowExcludeSongPart;
+		}
 	}
 
 	/**
@@ -146,7 +159,7 @@ public interface InstType {
 	 */
 	public static class SongType extends NormalType {
 		private SongType() {
-			super(NormalType.SONG_PART, true, false);
+			super(NormalType.SONG_PART, true, false, false);
 		}
 	}
 
@@ -155,7 +168,7 @@ public interface InstType {
 	 */
 	public static class DrumsType extends NormalType {
 		private DrumsType() {
-			super(NormalType.THREE_PART, false, true);
+			super(NormalType.THREE_PART, false, true, true);
 		}
 	}
 
@@ -164,7 +177,7 @@ public interface InstType {
 	 */
 	public static class PercussionType extends NormalType {
 		private PercussionType(boolean allowTranspose) {
-			super(NormalType.ONE_PART, allowTranspose, false);
+			super(NormalType.ONE_PART, allowTranspose, false, true);
 		}
 
 		@Override

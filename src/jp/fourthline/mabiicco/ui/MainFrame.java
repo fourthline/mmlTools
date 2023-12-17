@@ -97,6 +97,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	private PlayStateComponent<JMenuItem> octDownMenu = null;
 	private PlayStateComponent<JMenuItem> velocityUpMenu = null;
 	private PlayStateComponent<JMenuItem> velocityDownMenu = null;
+	private PlayStateComponent<JMenuItem> xExportMenu = null;
 
 	private JButton loopButton = null;
 
@@ -152,6 +153,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		setSelectedEdit(false);
 		setPasteEnable(false);
 		setRemoveRestsBetweenNotesEnable(false);
+		setXExport(false);
 
 		// 閉じるボタンへのアクション設定
 		setDefaultCloseOperation( DO_NOTHING_ON_CLOSE );
@@ -331,6 +333,11 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 				KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
 		createMenuItem(trackMenu, "menu.mml_export", ActionDispatcher.MML_EXPORT,
 				KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+
+		trackMenu.add(new JSeparator());
+
+		createMenuItem(trackMenu, "menu.mml_x_import", ActionDispatcher.MML_X_IMPORT, true);
+		xExportMenu = createMenuItem(trackMenu, "menu.mml_x_export", ActionDispatcher.MML_X_EXPORT, true);
 
 		/************************* Play Menu *************************/
 		JMenu playMenu = new JMenu(appText("menu.operate"));
@@ -697,6 +704,10 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 
 	public void setRemoveRestsBetweenNotesEnable(boolean b) {
 		removeRestsBetweenNotesMenu.setEnabled(b);
+	}
+
+	public void setXExport(boolean b) {
+		xExportMenu.setEnabled(b);
 	}
 
 	public void updateLoop(boolean b) {

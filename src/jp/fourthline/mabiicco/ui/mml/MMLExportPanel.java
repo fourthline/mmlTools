@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 たんらる
+ * Copyright (C) 2022-2023 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.mml;
@@ -10,8 +10,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -19,10 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -30,9 +25,9 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
-import javax.swing.KeyStroke;
 
 import jp.fourthline.mabiicco.AppResource;
+import jp.fourthline.mabiicco.ui.UIUtils;
 import jp.fourthline.mmlTools.AAMMLExport;
 import jp.fourthline.mmlTools.MMLEventList;
 import jp.fourthline.mmlTools.MMLScore;
@@ -111,16 +106,7 @@ public final class MMLExportPanel extends JPanel {
 		table.setDefaultEditor(Object.class, null);
 		table.addPropertyChangeListener(t -> updateText());
 
-		InputMap imap = dialog.getRootPane().getInputMap(
-				JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-		imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "close-it");
-		dialog.getRootPane().getActionMap().put("close-it", new AbstractAction() {
-			private static final long serialVersionUID = -4495368209645211523L;
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				dialog.setVisible(false);
-			}});
+		UIUtils.dialogCloseAction(dialog);
 
 		// format panel (north)
 		JPanel formatPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));

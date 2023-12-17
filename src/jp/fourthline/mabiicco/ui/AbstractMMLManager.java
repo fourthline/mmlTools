@@ -22,6 +22,7 @@ public abstract class AbstractMMLManager implements IMMLManager {
 
 	@Override
 	public int getActiveMMLPartStartOffset() {
-		return getActiveTrack().getStartOffset(getActiveMMLPartIndex());
+		var track = getActiveTrack();
+		return (track != null) ? track.getStartOffset(getActiveMMLPartIndex()) : 0;
 	}
 }
