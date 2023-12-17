@@ -18,8 +18,8 @@ import jp.fourthline.mabiicco.ui.color.ColorSet;
 
 public final class LevelMonitor extends JComponent implements ISoundDataLine {
 	private static final long serialVersionUID = -3910689963056146451L;
-	private static final int PIR = 1200;
-	private static final int R_PIR = 10;
+	private static final int PIR = 600;
+	private static final int R_PIR = 20;
 	private int counter = 0;
 	private int reduceCounter = 0;
 
@@ -30,8 +30,11 @@ public final class LevelMonitor extends JComponent implements ISoundDataLine {
 	private final DataChannel left = new DataChannel();
 	private final DataChannel right = new DataChannel();
 
-	private static final class DataChannel {
+	private final boolean dlsChain;
+
+	public static final class DataChannel {
 		private int max;
+		private int currentMax;
 
 		private int value;
 		private int holtValue;
@@ -43,6 +46,7 @@ public final class LevelMonitor extends JComponent implements ISoundDataLine {
 		public void commit(boolean isRun) {
 			double value = ( (Math.log10((double) max / 32768.0) * 10) + 40); // -40dB..0dB
 			setValue(value, isRun);
+			this.currentMax = max;
 			max = Integer.MIN_VALUE;
 		}
 
@@ -60,12 +64,16 @@ public final class LevelMonitor extends JComponent implements ISoundDataLine {
 			this.holtValue = Math.max(0, Math.max(value, this.holtValue));
 		}
 
-		private int getValue() {
+		int getValue() {
 			return value;
 		}
 
-		private int getHoltValue() {
+		int getHoltValue() {
 			return holtValue;
+		}
+
+		int getMax() {
+			return currentMax;
 		}
 
 		public void paint(Graphics g, int x, int y, int barH) {
@@ -74,7 +82,7 @@ public final class LevelMonitor extends JComponent implements ISoundDataLine {
 
 			g.setColor(barColor.get());
 			if (a1 > 0) {
-				for (int i = 0; i < a1; i+=3) {
+				for (int i = 0; i <= a1; i+=3) {
 					g.fillRect(i, y, 2, barH);
 				}
 			}
@@ -86,23 +94,30 @@ public final class LevelMonitor extends JComponent implements ISoundDataLine {
 	}
 
 	public LevelMonitor() {
+		this(true);
+	}
+
+	public LevelMonitor(boolean dlsChain) {
 		setPreferredSize(new Dimension(46, 20));
-		MabiDLS.getInstance().setSoundDataLine(this);
+		this.dlsChain = dlsChain;
+		if (dlsChain) {
+			MabiDLS.getInstance().setSoundDataLine(this);
+		}
 	}
 
 	@Override
 	public void write(byte data[]) {
-		boolean isRun = MabiDLS.getInstance().getSequencer().isRunning();
+		boolean isRun = dlsChain ? MabiDLS.getInstance().getSequencer().isRunning() : true;
 		var b = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer();
 		int c = b.capacity() / 2;
 		for (int i = 0; i < c; i++) {
 			left.update(b.get());
 			right.update(b.get());
-			if (++counter > PIR) {
+			if (++counter >= PIR) {
 				counter = 0;
 				left.commit(isRun);
 				right.commit(isRun);
-				if (++reduceCounter > R_PIR) {
+				if (++reduceCounter >= R_PIR) {
 					reduceCounter = 0;
 					left.reduce(isRun);
 					right.reduce(isRun);
@@ -110,6 +125,14 @@ public final class LevelMonitor extends JComponent implements ISoundDataLine {
 				repaint();
 			}
 		}
+	}
+
+	DataChannel getLeft() {
+		return left;
+	}
+
+	DataChannel getRight() {
+		return right;
 	}
 
 	@Override

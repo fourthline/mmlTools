@@ -8,15 +8,9 @@ package jp.fourthline.mabiicco.ui;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.stream.Stream;
 
-import javax.imageio.ImageIO;
 import javax.swing.JTabbedPane;
 import javax.swing.JViewport;
 
@@ -324,21 +318,6 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 		obj.nextStepTimeTo(true);
 		obj.removeTicks(true);
 		assertEquals("[384=3/4]", score.getTimeSignatureList().toString());
-	}
-
-	private void assertImage(InputStream expectStream, RenderedImage actual) {
-		ByteArrayOutputStream bos1 = new ByteArrayOutputStream();
-		ByteArrayOutputStream bos2 = new ByteArrayOutputStream();
-		try {
-			var expect = ImageIO.read(expectStream);
-			ImageIO.write(expect, "png", bos1);
-			ImageIO.write(actual, "png", bos2);
-			ImageIO.write(actual, "png", new FileOutputStream("_tmp.png"));
-			assertArrayEquals(bos1.toByteArray(), bos2.toByteArray());
-		} catch (IOException e) {
-			e.printStackTrace();
-			new AssertionError();
-		}
 	}
 
 	private void checkImage(PianoRollView view, String filename) throws Exception {

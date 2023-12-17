@@ -4,9 +4,16 @@
 
 package jp.fourthline;
 
-import java.io.File;
-import java.io.IOException;
+import static org.junit.Assert.assertArrayEquals;
 
+import java.awt.image.RenderedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import javax.imageio.ImageIO;
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.sampled.LineUnavailableException;
@@ -56,4 +63,18 @@ public abstract class UseLoadingDLS extends FileSelect {
 		return track;
 	}
 
+	protected void assertImage(InputStream expectStream, RenderedImage actual) {
+		ByteArrayOutputStream bos1 = new ByteArrayOutputStream();
+		ByteArrayOutputStream bos2 = new ByteArrayOutputStream();
+		try {
+			var expect = ImageIO.read(expectStream);
+			ImageIO.write(expect, "png", bos1);
+			ImageIO.write(actual, "png", bos2);
+			ImageIO.write(actual, "png", new FileOutputStream("_tmp.png"));
+			assertArrayEquals(bos1.toByteArray(), bos2.toByteArray());
+		} catch (IOException e) {
+			e.printStackTrace();
+			new AssertionError();
+		}
+	}
 }
