@@ -43,7 +43,9 @@ public final class InstClass {
 	static {
 		try {
 			String instName = MabiIccoProperties.getInstance().soundEnv.get().getInstrumentName();
-			instResource = ResourceBundle.getBundle(instName, new ResourceLoader());
+			if (instName != null) {
+				instResource = ResourceBundle.getBundle(instName, new ResourceLoader());
+			}
 		} catch (Exception e) {}
 	}
 
@@ -380,9 +382,9 @@ public final class InstClass {
 		}
 	}
 
-	public static List<InstClass> defaultSoundBank() throws MidiUnavailableException {
+	public static List<InstClass> defaultSoundBank(boolean nameConvert) throws MidiUnavailableException {
 		Soundbank sb = MidiSystem.getSynthesizer().getDefaultSoundbank();
-		return loadSoundBank(sb, true);
+		return loadSoundBank(sb, nameConvert);
 	}
 
 	public static List<InstClass> loadDLS(File dlsFile) throws InvalidMidiDataException, IOException {

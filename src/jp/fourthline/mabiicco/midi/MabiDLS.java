@@ -22,6 +22,7 @@ import javax.sound.sampled.LineUnavailableException;
 import com.sun.media.sound.SoftSynthesizer;
 
 import jp.fourthline.mabiicco.AppErrorHandler;
+import jp.fourthline.mabiicco.MabiIccoProperties;
 import jp.fourthline.mmlTools.MMLEventList;
 import jp.fourthline.mmlTools.MMLNoteEvent;
 import jp.fourthline.mmlTools.MMLScore;
@@ -192,7 +193,8 @@ public final class MabiDLS {
 
 	public void loadingDefaultSound() {
 		try {
-			List<InstClass> loadList = InstClass.defaultSoundBank();
+			boolean nameConvert = MabiIccoProperties.getInstance().soundEnv.get().nameConvertForDefaultSoundBank();
+			List<InstClass> loadList = InstClass.defaultSoundBank(nameConvert);
 			for (InstClass inst : loadList) {
 				if (!insts.contains(inst)) {
 					insts.add(inst);
@@ -736,6 +738,10 @@ public final class MabiDLS {
 			}
 		}
 		return midiDeviceList;
+	}
+
+	public void setSoundDataLine(ISoundDataLine soundDataLine) {
+		wavout.setSoundDataLine(soundDataLine);
 	}
 
 	public static void main(String[] args) {

@@ -34,6 +34,7 @@ public final class WavoutDataLine implements SourceDataLine, IWavoutState {
 	private File tempFile = null;
 	private OutputStream tempOutputStream = null;
 	private Runnable endNotify;
+	private ISoundDataLine soundDataLine = null;
 
 	public WavoutDataLine() throws LineUnavailableException {
 		this.parent = AudioSystem.getSourceDataLine(format);
@@ -41,7 +42,7 @@ public final class WavoutDataLine implements SourceDataLine, IWavoutState {
 
 	private long time;
 	private long curLen;
-	
+
 	@Override
 	public long getTime() { return time; }
 
@@ -244,6 +245,14 @@ public final class WavoutDataLine implements SourceDataLine, IWavoutState {
 			}
 			this.time += time.ms();
 		}
+
+		if (soundDataLine != null) {
+			soundDataLine.write(b);
+		}
 		return parent.write(b, off, len);
+	}
+
+	public void setSoundDataLine(ISoundDataLine soundDataLine) {
+		this.soundDataLine = soundDataLine;
 	}
 }

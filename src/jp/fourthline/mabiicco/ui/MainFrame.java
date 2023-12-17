@@ -552,6 +552,10 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		timeBox.setPreferredSize(new Dimension(240, 20));
 		toolBar.add(timeBox);
 
+		toolBar.add(newToolBarSeparator());
+		var soundMonitor = new LevelMonitor();
+		toolBar.add(soundMonitor);
+
 		return toolBar;
 	}
 
