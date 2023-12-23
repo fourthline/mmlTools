@@ -391,7 +391,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 							JOptionPane.WARNING_MESSAGE);
 				} catch (MMLParseException e) {
 					JOptionPane.showMessageDialog(parent,
-							AppResource.appText("error.invalid_file"),
+							AppResource.appText(e.getMessage()),
 							AppResource.appText("error.read"),
 							JOptionPane.WARNING_MESSAGE);
 				} catch (Throwable e) {

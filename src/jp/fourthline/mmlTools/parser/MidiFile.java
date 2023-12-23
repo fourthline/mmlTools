@@ -5,12 +5,14 @@
 package jp.fourthline.mmlTools.parser;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -126,6 +128,95 @@ public final class MidiFile extends AbstractMMLParser {
 		} catch (MissingResourceException e) {}
 	}
 
+	/**
+	 * 事前にトラック情報を解析する
+	 * @param file
+	 * @return
+	 */
+	public MidiFile preparse(File file) {
+		try {
+			MidiFileFormat format = MidiSystem.getMidiFileFormat(file);
+			int formatType = format.getType();
+			System.out.println("type: " + formatType);
+			var tracks = MidiSystem.getSequence(file).getTracks();
+			if (formatType == 0) {
+				trackSelectMap = preparseChannel(tracks[0]);
+			} else if (formatType == 1) {
+				trackSelectMap = new LinkedHashMap<>();
+				for (int i = 0; i < tracks.length; i++) {
+					var trackSelect = preparseTrack(tracks[i], i);
+					if (trackSelect != null) {
+						trackSelectMap.put(i, trackSelect);
+					}
+				}
+			} else {
+				System.out.println("not support format <" + formatType + ">"); // 例外にはしない.
+			}
+
+			System.out.println(trackSelectMap);
+		} catch (IOException | InvalidMidiDataException e) {
+			e.printStackTrace();
+		}
+		return this;
+	}
+
+	/**
+	 * type0向け
+	 * @param track
+	 * @return
+	 */
+	private Map<Integer, TrackSelect> preparseChannel(Track track) {
+		int size = track.size();
+		boolean[] channel = new boolean[16];
+		Arrays.fill(channel, false);
+		for (int i = 0; i < size; i++) {
+			var event = track.get(i).getMessage();
+			if ( (event instanceof ShortMessage sm) && (sm.getCommand() == ShortMessage.NOTE_ON) ) {
+				channel[sm.getChannel()] = true;
+			}
+		}
+
+		Map<Integer, TrackSelect> map = new LinkedHashMap<>();
+		for (int i = 0; i < channel.length; i++) {
+			if (channel[i]) {
+				map.put(i, new TrackSelect(new TrackInfo(i).name)); // format0 はChからトラック名をつくる. @link parseFormat0Track
+			}
+		}
+		return map;
+	}
+
+	/**
+	 * type1向け
+	 * @param track
+	 * @return
+	 */
+	private TrackSelect preparseTrack(Track track, int index) {
+		String name = new TrackInfo(index).name;    // format1 track[] のindexからトラック名をつくる. @link parseFormat1Track
+		int size = track.size();
+		boolean nameParsed = false;
+		boolean noteParsed = false;
+		for (int i = 0; i < size; i++) {
+			var event = track.get(i).getMessage();
+			if (event instanceof MetaMessage m) {
+				if (m.getType() == 3) {
+					if (m.getData().length > 0) {
+						name = new String(m.getData());
+						nameParsed = true;
+					}
+				}
+			} else if ( (event instanceof ShortMessage sm) && (sm.getCommand() == ShortMessage.NOTE_ON) ){
+				if (!noteParsed) {
+					noteParsed = true;
+				}
+			}
+			if (nameParsed && noteParsed) {
+				break;
+			}
+		}
+
+		return noteParsed ? new TrackSelect(name) : null;
+	}
+
 	@Override
 	public String getName() {
 		return "MIDI";
@@ -178,7 +269,7 @@ public final class MidiFile extends AbstractMMLParser {
 		private int panpot = 64;
 		private int program = 0;
 		private TrackInfo(int count) {
-			name = "Track"+count;
+			name = "Track"+(count+1);
 		}
 		private MMLTrack createMMLTrack() {
 			MMLTrack track = new MMLTrack();
@@ -217,7 +308,7 @@ public final class MidiFile extends AbstractMMLParser {
 			chList.add(new ArrayList<>());
 		}
 
-		TrackInfo trackInfo = new TrackInfo(1);
+		TrackInfo trackInfo = new TrackInfo(0);
 		for (MidiEvent event : midiEventList) {
 			MidiMessage msg = event.getMessage();
 			long tick = convTick( event.getTick() );
@@ -236,9 +327,17 @@ public final class MidiFile extends AbstractMMLParser {
 
 		// チャンネルごとの情報を読み取る
 		for (int i = 0; i < MIDI_CHANNEL; i++) {
+			// 読み込む対象のトラックかどうかを判定する.
+			if (trackSelectMap != null) {
+				var select = trackSelectMap.get(i);
+				if ( (select != null) && (!select.isEnabled()) ) {
+					continue;
+				}
+			}
+
 			activeNoteMap.clear();
 			curNoteList.clear();
-			trackInfo = new TrackInfo(i+1);
+			trackInfo = new TrackInfo(i);
 			for (MidiEvent event : chList.get(i)) {
 				MidiMessage msg = event.getMessage();
 				long tick = convTick( event.getTick() );
@@ -261,11 +360,20 @@ public final class MidiFile extends AbstractMMLParser {
 	 */
 	private void parseFormat1Track(Track track[]) throws MMLParseException {
 		for (int i = 0; i < track.length; i++) {
-			TrackInfo trackInfo = new TrackInfo(i+1);
-			activeNoteMap.clear();
-			curNoteList.clear();
 			System.out.println(" - track -");
 			System.out.println(track[i].size());
+
+			// 読み込む対象のトラックかどうかを判定する.
+			if (trackSelectMap != null) {
+				var select = trackSelectMap.get(i);
+				if ( (select != null) && (!select.isEnabled()) ) {
+					continue;
+				}
+			}
+
+			TrackInfo trackInfo = new TrackInfo(i);
+			activeNoteMap.clear();
+			curNoteList.clear();
 
 			for (MidiEvent event : convMidiEventList(track[i])) {
 				MidiMessage msg = event.getMessage();
@@ -291,8 +399,9 @@ public final class MidiFile extends AbstractMMLParser {
 	 * 整列済みノートイベントからMMLTrackをつくる
 	 * @param eventList
 	 * @param trackInfo
+	 * @throws MMLParseException 
 	 */
-	private void createMMLTrack(ArrayList<MMLEventList> eventList, TrackInfo trackInfo) {
+	private void createMMLTrack(ArrayList<MMLEventList> eventList, TrackInfo trackInfo) throws MMLParseException {
 		System.out.printf(" ###### track tick: %d %d => %d\n",
 				activeNoteMap.size(),
 				curNoteList.size(),
@@ -310,7 +419,9 @@ public final class MidiFile extends AbstractMMLParser {
 				}
 				MMLTrack track = trackInfo.createMMLTrack();
 				track.setMML(mml[0], mml[1], mml[2], "");
-				score.addTrack(track);
+				if (score.addTrack(track) < 0) {
+					throw new MMLParseException("track over: " + track.getTrackName());
+				}
 				if (!parseMultiTrack) {
 					break;
 				}
@@ -354,7 +465,6 @@ public final class MidiFile extends AbstractMMLParser {
 	 * @param trackInfo
 	 */
 	private void parseMetaMessage(MetaMessage msg, long tick, TrackInfo trackInfo) {
-		System.out.print(tick+" > ");
 		int type = msg.getType();
 		byte[] data = msg.getData();
 		switch (type) {
@@ -363,7 +473,6 @@ public final class MidiFile extends AbstractMMLParser {
 			buf.put((byte)0);
 			buf.put(data);
 			int tempo = 60000000/buf.getInt(0);
-			System.out.println("Tempo: "+tempo);
 			if (parseTempo) {
 				new MMLTempoEvent(tempo, (int)tick).appendToListElement(tempoList);
 			}
@@ -438,7 +547,6 @@ public final class MidiFile extends AbstractMMLParser {
 			if (data1 == 10) { // panpot
 				trackInfo.panpot = data2;
 			}
-			System.out.printf("control change: [%d] [%d]\n", data1, data2);
 			break;
 		case ShortMessage.NOTE_ON:
 			if (data2 > 0) {

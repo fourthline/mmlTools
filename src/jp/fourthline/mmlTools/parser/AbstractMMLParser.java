@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 たんらる
+ * Copyright (C) 2022-2023 たんらる
  */
 
 package jp.fourthline.mmlTools.parser;
@@ -11,6 +11,7 @@ import java.util.Map;
 public abstract class AbstractMMLParser implements IMMLFileParser {
 	protected Map<String, Boolean> parseProperties = null;
 	protected Map<String, Collection<String>> parseAttributes = null;
+	protected Map<Integer, TrackSelect> trackSelectMap = null;
 
 	@Override
 	public Map<String, Boolean> getParseProperties() {
@@ -28,5 +29,9 @@ public abstract class AbstractMMLParser implements IMMLFileParser {
 	@Override
 	public String getName() {
 		return "";
+	}
+
+	public Map<Integer, TrackSelect> getTrackSelectMap() {
+		return trackSelectMap;
 	}
 }

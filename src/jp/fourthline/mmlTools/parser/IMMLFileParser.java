@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2022 たんらる
+ * Copyright (C) 2013-2023 たんらる
  */
 
 package jp.fourthline.mmlTools.parser;
@@ -21,6 +21,7 @@ public interface IMMLFileParser {
 	Map<String, Collection<String>> getParseAttributes();
 	void setParseAttribute(String key, String value);
 	String getName();
+	Map<Integer, TrackSelect> getTrackSelectMap();
 
 	static IMMLFileParser getParser(File file) {
 		IMMLFileParser fileParser;
@@ -30,12 +31,37 @@ public interface IMMLFileParser {
 		} else if (suffix.endsWith(".mml")) {
 			fileParser = new MMLFile();
 		} else if (suffix.endsWith(".mid")) {
-			fileParser = new MidiFile();
+			fileParser = new MidiFile().preparse(file);
 		} else if (suffix.endsWith(".txt")) {
 			fileParser = new TxtFile();
 		} else {
 			fileParser = new MMLScoreSerializer(new MMLScore());
 		}
 		return fileParser;
+	}
+
+	public static final class TrackSelect {
+		private boolean enable;
+		private final String name;
+		public TrackSelect(String name) {
+			enable = true;
+			this.name = name.isBlank() ? "-" : "<"+name+">";
+		}
+
+		public void setEnable(boolean b) {
+			enable = b;
+		}
+
+		public boolean isEnabled() {
+			return enable;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public String toString() {
+			return name;
+		}
 	}
 }

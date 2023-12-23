@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 たんらる
+ * Copyright (C) 2013-2023 たんらる
  */
 
 package jp.fourthline.mmlTools.parser;
@@ -54,7 +54,7 @@ public final class MMSFile extends AbstractMMLParser {
 	public MMLScore parse(InputStream istream) throws MMLParseException {
 		List<SectionContents> contentsList = SectionContents.makeSectionContentsByInputStream(istream, "Shift_JIS");
 		if (contentsList.isEmpty()) {
-			throw(new MMLParseException());
+			throw(new MMLParseException("empty"));
 		}
 
 		for (SectionContents section : contentsList) {

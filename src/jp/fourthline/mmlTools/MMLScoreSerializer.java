@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 たんらる
+ * Copyright (C) 2022-2023 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -92,7 +92,7 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 
 		List<SectionContents> contentsList = SectionContents.makeSectionContentsByInputStream(istream, "UTF-8");
 		if (contentsList.isEmpty()) {
-			throw(new MMLParseException());
+			throw(new MMLParseException("empty"));
 		}
 		for (SectionContents section : contentsList) {
 			if (section.getName().equals(SCORE_SECTION)) {
