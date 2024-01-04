@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 たんらる
+ * Copyright (C) 2022-2024 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
@@ -21,7 +21,7 @@ import jp.fourthline.mmlTools.MMLTempoEvent;
  */
 public final class TimeBox extends JComboBox<StringBuffer> implements Runnable {
 	private static final long serialVersionUID = 6907274508888816165L;
-	private static final int UPDATE_TIME = 100;
+	private static final int UPDATE_TIME = 200;
 	private static final int RUNNING_UPDATE_TIME = 25;
 
 	private final IMMLManager mmlManager;
@@ -42,7 +42,7 @@ public final class TimeBox extends JComboBox<StringBuffer> implements Runnable {
 		addItem(time1);
 		addItem(time2);
 		sequencer = MabiDLS.getInstance().getSequencer();
-		new Thread(this).start();
+		new Thread(this, "TimeBox Thread").start();
 	}
 
 	/**

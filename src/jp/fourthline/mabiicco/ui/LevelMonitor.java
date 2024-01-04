@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 たんらる
+ * Copyright (C) 2023-2024 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
@@ -31,6 +31,7 @@ public final class LevelMonitor extends JComponent implements ISoundDataLine {
 	private final DataChannel right = new DataChannel();
 
 	private final boolean dlsChain;
+	private String paintCode = ""; // アイドル時用負荷低減用.
 
 	public static final class DataChannel {
 		private int max;
@@ -44,17 +45,17 @@ public final class LevelMonitor extends JComponent implements ISoundDataLine {
 		}
 
 		public void commit(boolean isRun) {
-			double value = ( (Math.log10((double) max / 32768.0) * 10) + 40); // -40dB..0dB
-			setValue(value, isRun);
+			if (isRun) {
+				double value = ( (Math.log10((double) max / 32768.0) * 10) + 40); // -40dB..0dB
+				setValue(value);
+			} else {
+				setValue(0);
+			}
 			this.currentMax = max;
-			max = Integer.MIN_VALUE;
+			max = 0;
 		}
 
-		private void setValue(double value, boolean isRun) {
-			if (!isRun) {
-				value = 0;
-			}
-
+		private void setValue(double value) {
 			this.value = Math.max(0, (int)(value));
 			this.holtValue = Math.max(this.value, this.holtValue);
 		}
@@ -76,7 +77,7 @@ public final class LevelMonitor extends JComponent implements ISoundDataLine {
 			return currentMax;
 		}
 
-		public void paint(Graphics g, int x, int y, int barH) {
+		public String paint(Graphics g, int x, int y, int barH) {
 			int a1 = getValue();
 			int a2 = getHoltValue();
 
@@ -90,6 +91,7 @@ public final class LevelMonitor extends JComponent implements ISoundDataLine {
 			if (a2 > 0) {
 				g.fillRect(a2+x, y, 2, barH);
 			}
+			return String.valueOf(a1) + String.valueOf(a2);
 		}
 	}
 
@@ -111,8 +113,10 @@ public final class LevelMonitor extends JComponent implements ISoundDataLine {
 		var b = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer();
 		int c = b.capacity() / 2;
 		for (int i = 0; i < c; i++) {
-			left.update(b.get());
-			right.update(b.get());
+			if (isRun) {
+				left.update(b.get());
+				right.update(b.get());
+			}
 			if (++counter >= PIR) {
 				counter = 0;
 				left.commit(isRun);
@@ -122,7 +126,11 @@ public final class LevelMonitor extends JComponent implements ISoundDataLine {
 					left.reduce(isRun);
 					right.reduce(isRun);
 				}
-				repaint();
+				String code = "" + left.getValue() + left.getHoltValue() + right.getValue() + right.getHoltValue();
+				if (!code.equals(paintCode)) {
+					// アイドル時の負荷低減, 描画済みのデータを同じであれば再描画しない.
+					repaint();
+				}
 			}
 		}
 	}
@@ -149,8 +157,9 @@ public final class LevelMonitor extends JComponent implements ISoundDataLine {
 		int RightY = y + leftY - 1;
 		int x = 2;
 
-		left.paint(g, x, leftY, barH);
-		right.paint(g, x, RightY, barH);
+		String code = left.paint(g, x, leftY, barH);
+		code += right.paint(g, x, RightY, barH);
+		paintCode = code;
 
 		g.dispose();
 	}
