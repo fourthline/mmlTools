@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 たんらる
+ * Copyright (C) 2023-2024 たんらる
  */
 package jp.fourthline.mabiicco.ui.mml;
 
@@ -38,12 +38,12 @@ public class TrackListTableTest extends UseLoadingDLS {
 		track.setTrackName("track1");
 		score.addTrack(track);
 		var o = new TrackListTable(score.getTrackList());
-		assertEquals("1", o.getValueAt(0, 0));
+		assertEquals("1", o.getValueAt(0, 0).toString());
 		assertEquals("track1", o.getValueAt(0, 1));
 		assertEquals("0: リュート", o.getValueAt(0, 2));
 		assertEquals("*Rank F ( 3, 3, 5 )", o.getValueAt(0, 3));
 
-		assertEquals(String.class, o.getColumnClass(0));
+		assertEquals(Integer.class, o.getColumnClass(0));
 		assertEquals(String.class, o.getColumnClass(1));
 		assertEquals(String.class, o.getColumnClass(2));
 		assertEquals(String.class, o.getColumnClass(3));
@@ -62,13 +62,13 @@ public class TrackListTableTest extends UseLoadingDLS {
 		score.addTrack(track);
 		var o = new TrackListTable(score.getTrackList(), true);
 		assertEquals(false, o.getValueAt(0, 0));
-		assertEquals("1", o.getValueAt(0, 1));
+		assertEquals("1", o.getValueAt(0, 1).toString());
 		assertEquals("track1", o.getValueAt(0, 2));
 		assertEquals("0: リュート", o.getValueAt(0, 3));
 		assertEquals("*Rank F ( 3, 3, 5 )", o.getValueAt(0, 4));
 
 		assertEquals(Boolean.class, o.getColumnClass(0));
-		assertEquals(String.class, o.getColumnClass(1));
+		assertEquals(Integer.class, o.getColumnClass(1));
 		assertEquals(String.class, o.getColumnClass(2));
 		assertEquals(String.class, o.getColumnClass(3));
 		assertEquals(String.class, o.getColumnClass(4));
@@ -87,7 +87,7 @@ public class TrackListTableTest extends UseLoadingDLS {
 		track.setTrackName("track1");
 
 		var o = new TrackListTable(track, list);
-		assertEquals("1", o.getValueAt(0, 0));
+		assertEquals("1", o.getValueAt(0, 0).toString());
 		assertEquals("track1", o.getValueAt(0, 1));
 		assertEquals("0: リュート", o.getValueAt(0, 2));
 		assertEquals("Rank 練習 ( 3, 0, 0 )", o.getValueAt(0, 3));

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2022 たんらる
+ * Copyright (C) 2014-2024 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.mml;
@@ -32,7 +32,7 @@ public final class TrackListTable extends JTable {
 		};
 		private final boolean checkBox;
 		private final boolean[] checkValue;
-		private final ArrayList<String[]> dataList = new ArrayList<>();
+		private final ArrayList<Object[]> dataList = new ArrayList<>();
 		private final ArrayList<ComposeRank> rankList = new ArrayList<>();
 
 		private InCheckTableModel(List<MMLTrack> trackList, boolean checkBox) {
@@ -41,8 +41,8 @@ public final class TrackListTable extends JTable {
 			int trackIndex = 0;
 			for (MMLTrack track : trackList) {
 				InstClass inst = MabiDLS.getInstance().getInstByProgram(track.getProgram());
-				dataList.add(new String[] {
-						Integer.toString(++trackIndex),
+				dataList.add(new Object[] {
+						Integer.valueOf(++trackIndex),
 						track.getTrackName(),
 						inst.toString(),
 						track.mmlRankFormat()
@@ -68,14 +68,8 @@ public final class TrackListTable extends JTable {
 		}
 
 		@Override
-		public Class<?> getColumnClass(int col) {
-			if (!checkBox) {
-				col++;
-			}
-			if (col == 0) {
-				return Boolean.class;
-			}
-			return String.class;
+		public Class<?> getColumnClass(int col){
+			return getValueAt(0, col).getClass();
 		}
 
 		@Override
