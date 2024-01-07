@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2023 たんらる
+ * Copyright (C) 2021-2024 たんらる
  */
 package jp.fourthline.mabiicco.ui;
 
@@ -106,6 +106,23 @@ public final class PianoRollScaler implements MouseWheelListener {
 		repositionChangeScaleView(scale1, pianoRollView.getWideScale(), xOffset);
 	}
 
+	/**
+	 *  表示位置が正しい値になっていない場合がある問題の対策.
+	 *    大本からの全体を invokeLaterで実行しても効かない.
+	 * @param viewport
+	 * @param p
+	 */
+	private void viewportSetPositionWorkaround(JViewport viewport, Point p) {
+		int count = 0;
+		while ( (viewport.getViewPosition().x != p.x) || (viewport.getViewPosition().y != p.y)) {
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {}
+			viewport.setViewPosition(p);
+			if (++count > 100) break;
+		}
+	}
+
 	private void repositionChangeScaleView(double scale1, double scale2, int xOffset) {
 		JViewport viewport = scrollPane.getViewport();
 		Point p = viewport.getViewPosition();
@@ -120,9 +137,7 @@ public final class PianoRollScaler implements MouseWheelListener {
 		repositionNotify.forEach(c -> c.changeScale(p.x + xOffset));
 
 		// 表示位置が正しい値になっていない場合がある問題の対策.
-		if ( (viewport.getViewPosition().x != p.x) || (viewport.getViewPosition().y != p.y)) {
-			viewport.setViewPosition(p);
-		}
+		viewportSetPositionWorkaround(viewport, p);
 	}
 
 	public void addChangeScaleListener(ChangeScaleListener c) {
@@ -190,9 +205,8 @@ public final class PianoRollScaler implements MouseWheelListener {
 		viewport.setViewPosition(p);
 
 		// 表示位置が正しい値になっていない場合がある問題の対策.
-		if ( (viewport.getViewPosition().x != p.x) || (viewport.getViewPosition().y != p.y)) {
-			viewport.setViewPosition(p);
-		}
+		viewportSetPositionWorkaround(viewport, p);
+
 		parent.repaint();
 	}
 
