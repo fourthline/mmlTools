@@ -31,7 +31,7 @@ public final class LevelMonitor extends JComponent implements ISoundDataLine {
 	private final DataChannel right = new DataChannel();
 
 	private final boolean dlsChain;
-	private String paintCode = ""; // アイドル時用負荷低減用.
+	private int paintCode = -1; // アイドル時用負荷低減用.
 
 	public static final class DataChannel {
 		private int max;
@@ -77,7 +77,17 @@ public final class LevelMonitor extends JComponent implements ISoundDataLine {
 			return currentMax;
 		}
 
-		public String paint(Graphics g, int x, int y, int barH) {
+		private int getCode() {
+			return encode(value, holtValue);
+		}
+
+		private int encode(int a, int b) {
+			int v = (a & 0xff ) << 8;
+			v |= (b & 0xff);
+			return v;
+		}
+
+		public int paint(Graphics g, int x, int y, int barH) {
 			int a1 = getValue();
 			int a2 = getHoltValue();
 
@@ -91,7 +101,7 @@ public final class LevelMonitor extends JComponent implements ISoundDataLine {
 			if (a2 > 0) {
 				g.fillRect(a2+x, y, 2, barH);
 			}
-			return String.valueOf(a1) + String.valueOf(a2);
+			return encode(a1, a2);
 		}
 	}
 
@@ -126,8 +136,8 @@ public final class LevelMonitor extends JComponent implements ISoundDataLine {
 					left.reduce(isRun);
 					right.reduce(isRun);
 				}
-				String code = "" + left.getValue() + left.getHoltValue() + right.getValue() + right.getHoltValue();
-				if (!code.equals(paintCode)) {
+				int code = (left.getCode() << 16) + (right.getCode());
+				if (code != paintCode) {
 					// アイドル時の負荷低減, 描画済みのデータを同じであれば再描画しない.
 					repaint();
 				}
@@ -157,7 +167,7 @@ public final class LevelMonitor extends JComponent implements ISoundDataLine {
 		int RightY = y + leftY - 1;
 		int x = 2;
 
-		String code = left.paint(g, x, leftY, barH);
+		int code = left.paint(g, x, leftY, barH) << 16;
 		code += right.paint(g, x, RightY, barH);
 		paintCode = code;
 
