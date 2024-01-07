@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 たんらる
+ * Copyright (C) 2022-2024 たんらる
  */
 
 package jp.fourthline.mabiicco;
@@ -63,6 +63,7 @@ public final class Splash2 extends JDialog implements ISplash {
 			version.setForeground(Color.BLACK);
 			add(textArea);
 			textArea.setEditable(false);
+			textArea.setFocusable(false);
 			textArea.setBounds(20, 313, WIDTH-40, 80);
 			textArea.setBorder(new Splash.RoundBorder(20, 10));
 			textArea.setOpaque(false);
