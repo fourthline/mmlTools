@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 たんらる
+ * Copyright (C) 2022-2024 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
@@ -9,6 +9,7 @@ import static jp.fourthline.mabiicco.AppResource.appText;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.LayoutManager;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.function.Supplier;
@@ -207,5 +208,23 @@ public final class UIUtils {
 		var panel = new JPanel(layout);
 		panel.setBorder(new TitledBorder(new LineBorder(Color.GRAY, 1, true), AppResource.appText(title), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		return panel;
+	}
+
+	/**
+	 *  表示位置が正しい値になっていない場合がある問題の対策.
+	 *    大本からの全体を invokeLaterで実行しても効かない.
+	 * @param viewport
+	 * @param p
+	 */
+	public static void viewportSetPositionWorkaround(JViewport viewport, Point p) {
+		viewport.setViewPosition(p);
+		int count = 0;
+		while ( (viewport.getViewPosition().x != p.x) || (viewport.getViewPosition().y != p.y)) {
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {}
+			viewport.setViewPosition(p);
+			if (++count > 100) break;
+		}
 	}
 }

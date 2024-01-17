@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2023 たんらる
+ * Copyright (C) 2013-2024 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
@@ -817,6 +817,7 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 		}
 		point.setLocation(positionX, positionY);
 		viewport.setViewPosition(point);
+		UIUtils.viewportSetPositionWorkaround(viewport, point);
 		mainPanel.repaint();
 	}
 
