@@ -20,16 +20,15 @@ import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.midi.MabiDLS;
 
 public final class PolyphonyMonitor implements Runnable {
+	private static final int BAR_W = 3;
+	private static final int MAX_V = 256;
+	private static final int M_HEIGHT = 80;
 
 	private int value = 0;
 	private int max = 0;
 	private final JDialog dialog;
 	private final JTextField textField = new JTextField(9);
 	private final JPanel mainPanel;
-
-	private static final int BAR_H = 3;
-	private static final int MAX_V = 256;
-	private static final int M_WIDTH = 80;
 
 	private static PolyphonyMonitor instance = null;
 	public static PolyphonyMonitor getInstance() {
@@ -75,33 +74,37 @@ public final class PolyphonyMonitor implements Runnable {
 		var p = new JPanel() {
 			private static final long serialVersionUID = -7206453832110132604L;
 
+			private int x(int v) {
+				return v* BAR_W + 16;
+			}
+
 			@Override
 			public void paintComponent(Graphics g) {
 				super.paintComponent(g);
 
 				g.setColor(getForeground());
 				for (int i = 0; i <= MAX_V; i += 32) {
-					int y = y(i) - 1;
-					g.drawLine(16, y, M_WIDTH, y);
-					g.drawString(Integer.toString(i), 4, y-2);
+					int x = x(i) - 1;
+					g.drawLine(x, 16, x, M_HEIGHT);
+					g.drawString(Integer.toString(i), x-2, 12);
 				}
 
 				g.setColor(new Color(0, 128, 0));
 				for (int i = 1; i <= value; i++) {
-					int y = y(i);
-					g.fillRect(24, y, M_WIDTH-24, BAR_H / 2);
+					int x = x(i);
+					g.fillRect(x, 24, BAR_W / 2, M_HEIGHT-24);
 				}
 
 				g.setColor(Color.RED);
 				if (max > 0) {
-					int y = y(max);
-					g.fillRect(24, y, M_WIDTH-24, 1);
-					g.drawString(Integer.toString(max), 24, y-2);
+					int x = x(max);
+					g.fillRect(x, 24, 1, M_HEIGHT-24);
+					g.drawString(Integer.toString(max), x+4, 32);
 				}
 			}
 		};
 
-		p.setPreferredSize(new Dimension(M_WIDTH, MAX_V * BAR_H + 24));
+		p.setPreferredSize(new Dimension(MAX_V * BAR_W + 64, M_HEIGHT));
 		return p;
 	}
 
@@ -142,10 +145,6 @@ public final class PolyphonyMonitor implements Runnable {
 	private void reset() {
 		max = 0;
 		mainPanel.repaint();
-	}
-
-	private int y(int v) {
-		return (MAX_V - v) * BAR_H + 16;
 	}
 
 	@Override
