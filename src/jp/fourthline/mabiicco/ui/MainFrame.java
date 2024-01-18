@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2023 たんらる
+ * Copyright (C) 2013-2024 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
@@ -405,6 +405,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		if (!appProperties.useDefaultSoundBank.get()) {
 			createMenuItem(helpMenu, "menu.instList", ActionDispatcher.INST_LIST);
 		}
+		createMenuItem(helpMenu, "menu.polyphonyMonitor", ActionDispatcher.POLYPHONY_MONITOR);
 
 		return menuBar;
 	}
@@ -553,8 +554,14 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		toolBar.add(timeBox);
 
 		toolBar.add(newToolBarSeparator());
+
+		// レベルモニター
 		var soundMonitor = new LevelMonitor();
 		toolBar.add(soundMonitor);
+
+		// 発音数モニター
+		var ployMonitor = PolyphonyMonitor.getInstance().getTextField();
+		toolBar.add(ployMonitor);
 
 		return toolBar;
 	}

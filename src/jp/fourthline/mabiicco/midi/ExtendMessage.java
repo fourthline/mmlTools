@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 たんらる
+ * Copyright (C) 2021-2024 たんらる
  */
 
 package jp.fourthline.mabiicco.midi;
@@ -7,6 +7,9 @@ package jp.fourthline.mabiicco.midi;
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.ShortMessage;
+
+import jp.fourthline.mabiicco.ui.PolyphonyMonitor;
+
 import javax.sound.midi.Receiver;
 
 
@@ -109,6 +112,8 @@ public final class ExtendMessage extends ShortMessage {
 					allStop(ch);
 				}
 			}
+
+			PolyphonyMonitor.getInstance().update();
 		}
 
 		@Override

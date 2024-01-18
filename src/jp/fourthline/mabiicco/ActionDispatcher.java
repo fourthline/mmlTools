@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2023 たんらる
+ * Copyright (C) 2014-2024 たんらる
  */
 
 package jp.fourthline.mabiicco;
@@ -45,6 +45,7 @@ import jp.fourthline.mabiicco.ui.MMLSeqView;
 import jp.fourthline.mabiicco.ui.MainFrame;
 import jp.fourthline.mabiicco.ui.PianoRollScaler.MouseScrollWidth;
 import jp.fourthline.mabiicco.ui.PianoRollView;
+import jp.fourthline.mabiicco.ui.PolyphonyMonitor;
 import jp.fourthline.mabiicco.ui.WavoutPanel;
 import jp.fourthline.mabiicco.ui.color.ScaleColor;
 import jp.fourthline.mabiicco.ui.editor.MMLTranspose;
@@ -151,6 +152,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String MML_ERR_LIST = "mml_err_list";
 	@Action public static final String MML_X_IMPORT = "mml_x_import";
 	@Action public static final String MML_X_EXPORT = "mml_x_export";
+	@Action public static final String POLYPHONY_MONITOR = "polyphony_monitor";
 
 	private final HashMap<String, Consumer<Object>> actionMap = new HashMap<>();
 
@@ -340,6 +342,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(MML_ERR_LIST, t -> new MMLErrView(mmlSeqView.getMMLScore()).showMMLErrList(mainFrame));
 		actionMap.put(MML_X_IMPORT, t -> mmlSeqView.mml_xImportAction());
 		actionMap.put(MML_X_EXPORT, t -> mmlSeqView.mml_xExportAction());
+		actionMap.put(POLYPHONY_MONITOR, t -> PolyphonyMonitor.getInstance().show(mainFrame));
 	}
 
 	@Override
