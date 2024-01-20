@@ -211,11 +211,13 @@ public final class MabiIccoProperties {
 
 	public void setWindowRect(Rectangle rect) {
 		if (!windowMaximize.get()) {
-			properties.setProperty(WINDOW_X, Integer.toString((int)rect.getX()));
-			properties.setProperty(WINDOW_Y, Integer.toString((int)rect.getY()));
-			properties.setProperty(WINDOW_WIDTH, Integer.toString((int)rect.getWidth()));
-			properties.setProperty(WINDOW_HEIGHT, Integer.toString((int)rect.getHeight()));
-			properties.save();
+			if ( (rect.getX() >= 0.0) && (rect.getY() >= 0.0) ) {
+				properties.setProperty(WINDOW_X, Integer.toString((int)rect.getX()));
+				properties.setProperty(WINDOW_Y, Integer.toString((int)rect.getY()));
+				properties.setProperty(WINDOW_WIDTH, Integer.toString((int)rect.getWidth()));
+				properties.setProperty(WINDOW_HEIGHT, Integer.toString((int)rect.getHeight()));
+				properties.save();
+			}
 		}
 	}
 
