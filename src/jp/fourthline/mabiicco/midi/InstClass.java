@@ -405,7 +405,7 @@ public final class InstClass {
 			int bank = inst.getPatch().getBank();
 			int program = inst.getPatch().getProgram();
 			int lProgram = logicalProgramNum(inst);
-			System.out.printf("%d,%d(%d)=%s \"%s\"\n", bank, program, lProgram ,originalName, name);
+//			System.out.printf("%d,%d(%d)=%s \"%s\"\n", bank, program, lProgram ,originalName, name);
 			if (bank != 0) continue;
 			if ( (name != null) || (debug) ) {
 				name = ""+lProgram+": "+name;
@@ -414,7 +414,7 @@ public final class InstClass {
 						program,
 						inst);
 				instArray.add(instc);
-				instc.dlsInfoWriteToOutputStream(System.out);
+//				instc.dlsInfoWriteToOutputStream(System.out);
 			}
 		}
 		return instArray;
