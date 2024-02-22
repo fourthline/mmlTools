@@ -123,7 +123,7 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 		velocityEditor = new VelocityEditor(this, pianoRollView, editor);
 		velocityScrollPane = new JScrollPane(velocityEditor,  ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		mainPanel.add(velocityScrollPane, BorderLayout.SOUTH);
-		velocityScrollPane.setRowHeaderView(new VelocityEditor.VelocityEditorHeader(velocityEditor));
+		velocityScrollPane.setRowHeaderView(new VelocityEditor.VelocityEditorHeader(velocityEditor, velocityEditor));
 		UIUtils.scrollChain(scrollPane, velocityScrollPane);
 		setVelocityViewEnable(MabiIccoProperties.getInstance().enableEdit.get());
 

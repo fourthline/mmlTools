@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 たんらる
+ * Copyright (C) 2023-2024 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.editor;
@@ -8,6 +8,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
@@ -16,9 +17,10 @@ import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.function.Supplier;
 
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -46,7 +48,7 @@ import jp.fourthline.mmlTools.MMLNoteEvent;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.Measure;
 
-public final class VelocityEditor extends JPanel implements MouseInputListener, ActionListener, ChangeScaleListener {
+public final class VelocityEditor extends JPanel implements MouseInputListener, ActionListener, ChangeScaleListener, Supplier<VelocityEditor.RangeMode> {
 	private static final long serialVersionUID = -4676324927393791707L;
 
 	public static int HEIGHT = 120;
@@ -56,6 +58,8 @@ public final class VelocityEditor extends JPanel implements MouseInputListener, 
 
 	private boolean isEdit = false;
 	private EditMode mode = EditMode.PENCIL_MODE;
+
+	private RangeMode rangeMode = RangeMode.SELECTED_PART;
 
 	/**
 	 * Velocity表示幅
@@ -73,6 +77,62 @@ public final class VelocityEditor extends JPanel implements MouseInputListener, 
 		@Override
 		public String toString() {
 			return getButtonName();
+		}
+	}
+
+	public enum RangeMode implements SettingButtonGroupItem {
+		SELECTED_PART("paintMode.active_part", false, false),
+		SELECTED_TRACK("paintMode.active_track", true, false),
+		ALL_TRACK("paintMode.all_track", true, true)
+		;
+		private final String buttonName;
+		private final boolean curTrack;
+		private final boolean all;
+		private RangeMode(String name, boolean curTrack, boolean all) {
+			this.buttonName = name;
+			this.curTrack = curTrack;
+			this.all = all;
+		}
+
+		private interface PartAction {
+			void action(int trackIndex, int partIndex);
+		}
+
+		public void action(VelocityEditor velocityEditor, PartAction func) {
+			var mmlManager = velocityEditor.mmlManager;
+			int trackIndex = mmlManager.getActiveTrackIndex();
+			int partIndex = mmlManager.getActiveMMLPartIndex();
+
+			int trackCount = mmlManager.getMMLScore().getTrackCount();
+			int partCount = mmlManager.getMMLScore().getTrack(trackIndex).getMMLEventList().size();
+
+			// Other Track
+			if (all) {
+				for (int i = 0; i < trackCount; i++) {
+					if (trackIndex != i) {
+						for (int p = 0; p < partCount; p++) {
+							func.action(i, p);
+						}
+					}
+				}
+			}
+
+			// Active Track & Active Part以外
+			if (curTrack) {
+				for (int i = 0; i < partCount; i++) {
+					if (partIndex != i) {
+						func.action(trackIndex, i);
+					}
+				}
+			}
+
+			// Active Part
+			func.action(trackIndex, partIndex);
+		}
+
+		@Override
+		public String getButtonName() {
+			return buttonName;
 		}
 	}
 
@@ -216,17 +276,24 @@ public final class VelocityEditor extends JPanel implements MouseInputListener, 
 		g.setStroke(oldStroke);
 	}
 
+	private MMLEventList getPart(int trackIndex, int partIndex) {
+		return mmlManager.getMMLScore().getTrack(trackIndex).getMMLEventAtIndex(partIndex);
+	}
+
 	private void paintVelocityNote(Graphics2D g) {
-		MMLEventList activePart = mmlManager.getActiveMMLPart();
-		if (activePart == null) {
+		rangeMode.action(this, (a, b) -> paintVelocityNote(g, a, b));
+	}
+
+	private void paintVelocityNote(Graphics2D g, int trackIndex, int partIndex) {
+		MMLEventList eventList = getPart(trackIndex, partIndex);
+		if (eventList == null) {
 			return;
 		}
 
-		int trackIndex = mmlManager.getActiveTrackIndex();
 		Color rectColor = ColorManager.defaultColor().getActiveRectColor(trackIndex);
 		Color fillColor = ColorManager.defaultColor().getActiveFillColor(trackIndex);
 
-		for (MMLNoteEvent noteEvent : activePart.getMMLNoteEventList()) {
+		for (MMLNoteEvent noteEvent : eventList.getMMLNoteEventList()) {
 			int x = tickToX(noteEvent.getTickOffset());
 			int velocity = noteEvent.getVelocity();
 			if (velocity < 0)  velocity = 0;
@@ -379,7 +446,11 @@ public final class VelocityEditor extends JPanel implements MouseInputListener, 
 			}
 
 			private void updateNoteVelocity(VelocityEditor velocityEditor, Point endPoint, int x) {
-				var activePart = velocityEditor.mmlManager.getActiveMMLPart();
+				velocityEditor.rangeMode.action(velocityEditor, (a, b) -> updateNoteVelocity(velocityEditor, endPoint, x, a, b));
+			}
+
+			private void updateNoteVelocity(VelocityEditor velocityEditor, Point endPoint, int x, int trackIndex, int partIndex) {
+				var activePart = velocityEditor.getPart(trackIndex, partIndex);
 				for (var noteEvent : activePart.getMMLNoteEventList()) {
 					int noteX = velocityEditor.tickToX(noteEvent.getTickOffset());
 					if ( (noteX <= x) && (noteX + velocityEditor.velocityWidth() > x) ) {
@@ -425,7 +496,11 @@ public final class VelocityEditor extends JPanel implements MouseInputListener, 
 			 * @param g
 			 */
 			private void paintActiveLine(VelocityEditor velocityEditor, Graphics2D g) {
-				var activePart = velocityEditor.mmlManager.getActiveMMLPart();
+				velocityEditor.rangeMode.action(velocityEditor, (a, b) -> paintActiveLine(velocityEditor, g, a, b));
+			}
+
+			private void paintActiveLine(VelocityEditor velocityEditor, Graphics2D g, int trackIndex, int partIndex) {
+				var activePart = velocityEditor.getPart(trackIndex, partIndex);
 				for (var noteEvent : activePart.getMMLNoteEventList()) {
 					int noteX = velocityEditor.tickToX(noteEvent.getTickOffset());
 					if ( (noteX <= currentPoint.x) && (noteX + velocityEditor.velocityWidth() > currentPoint.x) ) {
@@ -435,7 +510,6 @@ public final class VelocityEditor extends JPanel implements MouseInputListener, 
 							int[] xPoints = { noteX+1, noteX+halfWidth, noteX+width };
 							int[] yPoints = { 2, 10, 2 };
 
-							int trackIndex = velocityEditor.mmlManager.getActiveTrackIndex();
 							Color rectColor = ColorManager.defaultColor().getActiveRectColor(trackIndex);
 							g.setColor(rectColor);
 							g.fillPolygon(xPoints, yPoints, xPoints.length);
@@ -479,12 +553,16 @@ public final class VelocityEditor extends JPanel implements MouseInputListener, 
 			}
 
 			private void updateEditNote(VelocityEditor velocityEditor) {
-				MMLEventList activePart = velocityEditor.mmlManager.getActiveMMLPart();
+				editNoteMap.clear();
+				velocityEditor.rangeMode.action(velocityEditor, (a, b) -> updateEditNote(velocityEditor, a, b));
+			}
+
+			private void updateEditNote(VelocityEditor velocityEditor, int trackIndex, int partIndex) {
+				MMLEventList activePart = velocityEditor.getPart(trackIndex, partIndex);
 				if (activePart == null) {
 					return;
 				}
 
-				editNoteMap.clear();
 				for (MMLNoteEvent noteEvent : activePart.getMMLNoteEventList()) {
 					int tickOffset = noteEvent.getTickOffset();
 					int x = velocityEditor.tickToX(tickOffset) + velocityEditor.velocityWidth() / 2 - 1;   // 真ん中で基準をとる
@@ -498,6 +576,7 @@ public final class VelocityEditor extends JPanel implements MouseInputListener, 
 						}
 						if (!velocityEditor.editContext.hasSelectedNote() || velocityEditor.editContext.isSelectedNote(noteEvent)) {
 							editNoteMap.put(tickOffset, velocity);
+							System.out.println(editNoteMap);
 						}
 					}
 				}
@@ -527,22 +606,26 @@ public final class VelocityEditor extends JPanel implements MouseInputListener, 
 		private static final ColorSet editFillColor = ColorSet.create(new Color(0, 0, 0, 64), new Color(128, 128, 128, 64));
 		private final String text;
 
-		protected Map<Integer, Integer> editNoteMap = new HashMap<>();;
+		protected Map<Integer, Integer> editNoteMap = new TreeMap<>();
 		abstract void start(VelocityEditor velocityEditor, int x, int y);
 		abstract void update(VelocityEditor velocityEditor, int x, int y);
 		boolean move(VelocityEditor velocityEditor, int x, int y) { return false; }
 		abstract Point getCurrentPoint();
 
 		final void applyEnd(VelocityEditor velocityEditor) {
-			var activePart = velocityEditor.mmlManager.getActiveMMLPart();
+			velocityEditor.rangeMode.action(velocityEditor, (a, b) -> applyEnd(velocityEditor, a, b));
+			editNoteMap.clear();
+			velocityEditor.mmlManager.updateActivePart(true);
+		}
+
+		final void applyEnd(VelocityEditor velocityEditor, int trackIndex, int partIndex) {
+			var activePart = velocityEditor.getPart(trackIndex, partIndex);
 			for (var noteEvent : activePart.getMMLNoteEventList()) {
 				var o = editNoteMap.get(noteEvent.getTickOffset());
 				if (o != null) {
 					noteEvent.setVelocity(o);
 				}
 			}
-			editNoteMap.clear();
-			velocityEditor.mmlManager.updateActivePart(true);
 		}
 
 		abstract void paintEditMode(VelocityEditor velocityEditor, Graphics2D g);
@@ -622,13 +705,14 @@ public final class VelocityEditor extends JPanel implements MouseInputListener, 
 			}
 		}
 
-		public VelocityEditorHeader(ActionListener actionListener) {
+		public VelocityEditorHeader(ActionListener actionListener, Supplier<RangeMode> rangeMode) {
 			setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 			ButtonGroup group = new ButtonGroup();
 			var b1 = new ModeButton("P", EditMode.PENCIL_MODE, actionListener, group, true);
 			var b2 = new ModeButton("L", EditMode.LINE_MODE, actionListener, group);
 
+			// サブボタン
 			var bt = new JButton(new RightIcon(10));
 			bt.addActionListener(event -> {
 				var menu = new JPopupMenu();
@@ -637,12 +721,27 @@ public final class VelocityEditor extends JPanel implements MouseInputListener, 
 			});
 			bt.setFocusable(false);
 
+			// Rangeボタン
+			var br = new JButton("R");
+			br.setToolTipText(AppResource.appText("velocity_editor.range_button"));
+			br.addActionListener(event -> {
+				var menu = new JPopupMenu();
+				UIUtils.createGroupMenu(menu, RangeMode.values(), actionListener, rangeMode.get());
+				menu.show(this, br.getBounds().x+br.getBounds().width, br.getBounds().y);
+			});
+			br.setFocusable(false);
+
 			JToolBar toolbar = UIUtils.createToolBar(JToolBar.VERTICAL);
 			toolbar.add(bt);
+			toolbar.add(br);
+			toolbar.addSeparator();
 			toolbar.add(b1);
 			toolbar.add(b2);
-			toolbar.setAlignmentX(Component.LEFT_ALIGNMENT);
-			add(toolbar);
+
+			JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+			panel.setOpaque(false);
+			panel.add(toolbar);
+			add(panel);
 		}
 
 		@Override
@@ -672,8 +771,24 @@ public final class VelocityEditor extends JPanel implements MouseInputListener, 
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() instanceof VelocityEditorHeader.ModeButton button) {
+		var src = e.getSource();
+		if (src instanceof VelocityEditorHeader.ModeButton button) {
 			mode = button.getMode();
+		} else if (src instanceof Supplier button) {
+			var obj = button.get();
+			if (obj instanceof RangeMode rm) {
+				rangeMode = rm;
+				repaint();
+			}
 		}
+	}
+
+	@Override
+	public RangeMode get() {
+		return rangeMode;
+	}
+
+	void setRangeMode(RangeMode mode) {
+		rangeMode = mode;
 	}
 }

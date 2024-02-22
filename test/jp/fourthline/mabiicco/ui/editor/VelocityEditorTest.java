@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 たんらる
+ * Copyright (C) 2023-2024 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.editor;
@@ -9,6 +9,7 @@ import static org.junit.Assert.*;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.function.BiConsumer;
 
 import org.junit.After;
@@ -21,8 +22,12 @@ import jp.fourthline.mabiicco.MabiIccoProperties;
 import jp.fourthline.mabiicco.ui.MMLSeqView;
 import jp.fourthline.mabiicco.ui.MainFrame;
 import jp.fourthline.mabiicco.ui.PianoRollView.NoteHeight;
+import jp.fourthline.mabiicco.ui.editor.VelocityEditor.EditMode;
+import jp.fourthline.mabiicco.ui.editor.VelocityEditor.RangeMode;
 import jp.fourthline.mabiicco.ui.editor.VelocityEditor.VelocityWidth;
 import jp.fourthline.mmlTools.MMLNoteEvent;
+import jp.fourthline.mmlTools.MMLTrack;
+import jp.fourthline.mmlTools.core.MMLText;
 
 public final class VelocityEditorTest extends UseLoadingDLS {
 
@@ -57,12 +62,20 @@ public final class VelocityEditorTest extends UseLoadingDLS {
 		editor = (MMLEditor) getField("editor");
 		velocityEditor = (VelocityEditor) getField("velocityEditor");
 
+		// 別のトラック
+		obj.addMMLTrack(new MMLTrack().setMML("MML@,rv0<c;"));
+		obj.addMMLTrack(new MMLTrack());
+
 		var mmlpart = obj.getActiveMMLPart();
 		mmlpart.addMMLNoteEvent(new MMLNoteEvent(50, 48, 96, 7));
 		mmlpart.addMMLNoteEvent(new MMLNoteEvent(51, 48, 96+48, 8));
 		mmlpart.addMMLNoteEvent(new MMLNoteEvent(52, 48, 96+96, 9));
 		mmlpart.addMMLNoteEvent(new MMLNoteEvent(53, 48, 96+96+48, 10));
 		mmlpart.addMMLNoteEvent(new MMLNoteEvent(54, 48, 96+96+96, 11));
+
+		// 別のパート
+		obj.getActiveTrack().getMMLEventAtIndex(2).addMMLNoteEvent(new MMLNoteEvent(48, 48, 96, 1));
+
 
 		frame.setVisible(true);
 	}
@@ -104,7 +117,7 @@ public final class VelocityEditorTest extends UseLoadingDLS {
 			System.out.println(velocityEditor.getEditMode().getEditNoteMap().toString());
 		}
 		try {
-			Thread.sleep(100);
+			Thread.sleep(20);
 		} catch (InterruptedException e) {}
 	}
 
@@ -158,129 +171,207 @@ public final class VelocityEditorTest extends UseLoadingDLS {
 		assertEquals(expectMML3, obj.getActiveTrack().getMabiMML());
 	}
 
-	@Test
-	public void test_pencilMode() throws InterruptedException {
+	private List<MMLNoteEvent> pData1 = List.of(new MMLNoteEvent(54, 48, 0, 11));
+	private List<MMLNoteEvent> pData2 = List.of(new MMLNoteEvent(54, 48, 0, 11), new MMLNoteEvent(50, 48, 48, 11));
+	private String[] pencelModeExpects = {
+			"{}",
+			"{0=12}",
+			"{0=12, 96=12}",
+			"{0=12, 96=8}",
+			"{0=12, 96=2}",
+			"{0=12, 96=2, 144=2, 192=2, 240=2}",
+			"{0=12, 96=2, 144=2, 192=2, 240=2, 288=2}",
+			"{0=12, 96=2, 144=2, 192=2, 240=2, 288=2}",
+			"{0=12, 96=2, 144=2, 192=2, 240=2, 288=2}",
+			"{}",
+			"{}",
+			"{0=12, 96=9, 144=9, 192=7, 240=6, 288=4}",
+			"{}",
+			"{0=2}",
+			"{0=3, 96=6, 144=8, 192=9, 240=10, 288=11}",
+			"{0=2, 96=6, 144=6, 192=8, 240=9, 288=11}",
+			"{}"
+	};
+	private String[] pencelModeSelectedExpects = {
+			"{}",
+			"{}",
+			"{96=12}",
+			"{96=8}",
+			"{96=2}",
+			"{96=2, 144=2, 192=2, 240=2}",
+			"{96=2, 144=2, 192=2, 240=2, 288=2}",
+			"{96=2, 144=2, 192=2, 240=2, 288=2}",
+			"{96=2, 144=2, 192=2, 240=2, 288=2}",
+			"{}",
+			"{}",
+			"{96=9, 144=9, 192=7, 240=6, 288=4}",
+			"{}",
+			"{}",
+			"{96=6, 144=8, 192=9, 240=10, 288=11}",
+			"{96=6, 144=6, 192=8, 240=9, 288=11}",
+			"{}"
+	};
+	private String[] lineModeExpects = {
+			"{}",
+			"{}",
+			"{0=12, 48=12}",
+			"{0=12, 48=10}",
+			"{0=11, 48=7}",
+			"{0=12, 48=10, 96=8, 144=6, 192=4}",
+			"{0=12, 48=11, 96=9, 144=8, 192=7, 240=5, 288=4}",
+			"{0=13, 48=14, 96=15, 144=15, 192=15, 240=15, 288=15}",
+			"{0=11, 48=3, 96=0, 144=0, 192=0, 240=0, 288=0}",
+			"{}",
+			"{}",
+			"{0=12, 48=11, 96=9, 144=8, 192=7, 240=5, 288=4}",
+			"{}",
+			"{}",
+			"{0=3, 48=4, 96=6, 144=7, 192=8, 240=10, 288=11}",
+			"{}",
+			"{}"
+	};
+	private String[] lineModeSelectedExpects = {
+			"{}",
+			"{}",
+			"{}",
+			"{}",
+			"{}",
+			"{96=8, 144=6, 192=4}",
+			"{96=9, 144=8, 192=7, 240=5, 288=4}",
+			"{96=15, 144=15, 192=15, 240=15, 288=15}",
+			"{96=0, 144=0, 192=0, 240=0, 288=0}",
+			"{}",
+			"{}",
+			"{96=9, 144=8, 192=7, 240=5, 288=4}",
+			"{}",
+			"{}",
+			"{96=6, 144=7, 192=8, 240=10, 288=11}",
+			"{}",
+			"{}"
+	};
+
+	private void testMode(EditMode editMode, RangeMode rangeMode, boolean select, List<MMLNoteEvent> addNotes, String[] expects, DataSet dataSet) throws InterruptedException {
 		assertEquals(false, velocityEditor.isEdit());
+		velocityEditor.setMode(editMode);
+		velocityEditor.setRangeMode(rangeMode);
+
+		if (select) {
+			editor.selectAll();
+		}
 
 		var mmlpart = obj.getActiveMMLPart();
-		mmlpart.addMMLNoteEvent(new MMLNoteEvent(54, 48, 0, 11));
+		addNotes.forEach(t -> mmlpart.addMMLNoteEvent(t.clone()));
 		frame.repaint();
 
-		String[] expects = {
-				"{}",
-				"{0=12}",
-				"{0=12, 96=12}",
-				"{0=12, 96=8}",
-				"{0=12, 96=2}",
-				"{0=12, 96=2, 144=2, 192=2, 240=2}",
-				"{0=12, 96=2, 144=2, 192=2, 240=2, 288=2}",
-				"{0=12, 96=2, 144=2, 192=2, 240=2, 288=2}",
-				"{0=12, 96=2, 144=2, 192=2, 240=2, 288=2}",
-				"{}",
-				"{}",
-				"{288=4, 240=6, 192=7, 144=9, 96=9, 0=12}",
-				"{}",
-				"{0=2}",
-				"{0=3, 96=6, 144=8, 192=9, 240=10, 288=11}",
-				"{0=2, 96=6, 144=6, 192=8, 240=9, 288=11}",
-				"{}"
-		};
-		testC(expects, "MML@v12l8f+rv2dd+eff+,,;", "MML@v12l8f+rv9dd+v7ev6fv4f+,,;", "MML@v2l8f+rv6dd+v8ev9fv11f+,,;");
+		testC(expects, dataSet.e1(rangeMode), dataSet.e2(rangeMode), dataSet.e3(rangeMode));
+		assertEquals(dataSet.o(rangeMode), obj.getMMLScore().getTrack(1).getMabiMML());
+	}
+
+	private static record DataSet(String m1, String m2, String m3, String c0, String c1, String c2, String c3, String o0, String o3) {
+		private String e1(RangeMode mode) {
+			String s = (mode == RangeMode.SELECTED_PART) ? c0 : c1;
+			return new MMLText().setMMLText( new String[] { m1, "", s } ).getMML();
+		}
+		private String e2(RangeMode mode) {
+			String s = (mode == RangeMode.SELECTED_PART) ? c0 : c2;
+			return new MMLText().setMMLText( new String[] { m2, "", s } ).getMML();
+		}
+		private String e3(RangeMode mode) {
+			String s = (mode == RangeMode.SELECTED_PART) ? c0 : c3;
+			return new MMLText().setMMLText( new String[] { m3, "", s } ).getMML();
+		}
+		private String o(RangeMode mode) {
+			String s = (mode != RangeMode.ALL_TRACK) ? o0 : o3;
+			return new MMLText().setMMLText( new String[] { "<>", s, "" } ).getMML();
+		}
+	}
+
+	private static String PENCIL_M1 = "v12l8f+rv2dd+eff+";
+	private static String PENCIL_M2 = "v12l8f+rv9dd+v7ev6fv4f+";
+	private static String PENCIL_M3 = "v2l8f+rv6dd+v8ev9fv11f+";
+	private static String PENCIL_C0 = "rv1c8";
+	private static String PENCIL_C1 = "rv2c8";
+	private static String PENCIL_C2 = "rv9c8";
+	private static String PENCIL_C3 = "rv6c8";
+	private static String PENCIL_O0 = "rv0<c";
+	private static String PENCIL_O3 = "rv6<c";
+	private static DataSet PENCIL_DATA = new DataSet(PENCIL_M1, PENCIL_M2, PENCIL_M3, PENCIL_C0, PENCIL_C1, PENCIL_C2, PENCIL_C3, PENCIL_O0, PENCIL_O3);
+
+	@Test
+	public void test_pencilMode_1() throws InterruptedException {
+		testMode(EditMode.PENCIL_MODE, RangeMode.SELECTED_PART, false, pData1, pencelModeExpects, PENCIL_DATA);
 	}
 
 	@Test
-	public void test_pancilMode_selected() throws InterruptedException {
-		assertEquals(false, velocityEditor.isEdit());
-
-		editor.selectAll();
-		var mmlpart = obj.getActiveMMLPart();
-		mmlpart.addMMLNoteEvent(new MMLNoteEvent(54, 48, 0, 11));
-		frame.repaint();
-
-		String[] expects = {
-				"{}",
-				"{}",
-				"{96=12}",
-				"{96=8}",
-				"{96=2}",
-				"{96=2, 144=2, 192=2, 240=2}",
-				"{96=2, 144=2, 192=2, 240=2, 288=2}",
-				"{96=2, 144=2, 192=2, 240=2, 288=2}",
-				"{96=2, 144=2, 192=2, 240=2, 288=2}",
-				"{}",
-				"{}",
-				"{288=4, 240=6, 192=7, 144=9, 96=9}",
-				"{}",
-				"{}",
-				"{96=6, 144=8, 192=9, 240=10, 288=11}",
-				"{96=6, 144=6, 192=8, 240=9, 288=11}",
-				"{}"
-		};
-		testC(expects, "MML@v11l8f+rv2dd+eff+,,;", "MML@v15l8f+rv9dd+v7ev6fv4f+,,;", "MML@v15l8f+rv6dd+v8ev9fv11f+,,;");
+	public void test_pencilMode_2() throws InterruptedException {
+		testMode(EditMode.PENCIL_MODE, RangeMode.SELECTED_TRACK, false, pData1, pencelModeExpects, PENCIL_DATA);
 	}
 
 	@Test
-	public void test_lineMode() throws InterruptedException {
-		assertEquals(false, velocityEditor.isEdit());
-		velocityEditor.setMode(VelocityEditor.EditMode.LINE_MODE);
+	public void test_pencilMode_3() throws InterruptedException {
+		testMode(EditMode.PENCIL_MODE, RangeMode.ALL_TRACK, false, pData1, pencelModeExpects, PENCIL_DATA);
+	}
 
-		var mmlpart = obj.getActiveMMLPart();
-		mmlpart.addMMLNoteEvent(new MMLNoteEvent(54, 48, 0, 11));
-		mmlpart.addMMLNoteEvent(new MMLNoteEvent(50, 48, 48, 11));
-		frame.repaint();
+	private static String PENCIL_S_M1 = "v11l8f+rv2dd+eff+";
+	private static String PENCIL_S_M2 = "v15l8f+rv9dd+v7ev6fv4f+";
+	private static String PENCIL_S_M3 = "v15l8f+rv6dd+v8ev9fv11f+";
+	private static DataSet PENCIL_S_DATA = new DataSet(PENCIL_S_M1, PENCIL_S_M2, PENCIL_S_M3, PENCIL_C0, PENCIL_C1, PENCIL_C2, PENCIL_C3, PENCIL_O0, PENCIL_O3);
 
-		String[] expects = {
-				"{}",
-				"{}",
-				"{0=12, 48=12}",
-				"{0=12, 48=10}",
-				"{0=11, 48=7}",
-				"{0=12, 48=10, 96=8, 144=6, 192=4}",
-				"{0=12, 48=11, 96=9, 144=8, 192=7, 240=5, 288=4}",
-				"{0=13, 48=14, 96=15, 144=15, 192=15, 240=15, 288=15}",
-				"{0=11, 48=3, 96=0, 144=0, 192=0, 240=0, 288=0}",
-				"{}",
-				"{}",
-				"{0=12, 48=11, 96=9, 144=8, 192=7, 240=5, 288=4}",
-				"{}",
-				"{}",
-				"{0=3, 48=4, 96=6, 144=7, 192=8, 240=10, 288=11}",
-				"{}",
-				"{}"
-		};
-		testC(expects, "MML@v12l8f+v11dv9dv8d+v7ev5fv4f+,,;", "MML@v12l8f+v11dv9dv8d+v7ev5fv4f+,,;", "MML@v15l8f+ddd+eff+,,;");
+
+	@Test
+	public void test_pencilMode_selected_1() throws InterruptedException {
+		testMode(EditMode.PENCIL_MODE, RangeMode.SELECTED_PART, true, pData1, pencelModeSelectedExpects, PENCIL_S_DATA);
 	}
 
 	@Test
-	public void test_lineMode_selected() throws InterruptedException {
-		assertEquals(false, velocityEditor.isEdit());
-		velocityEditor.setMode(VelocityEditor.EditMode.LINE_MODE);
+	public void test_pencilMode_selected_2() throws InterruptedException {
+		testMode(EditMode.PENCIL_MODE, RangeMode.SELECTED_TRACK, true, pData1, pencelModeSelectedExpects, PENCIL_S_DATA);
+	}
 
-		editor.selectAll();
-		var mmlpart = obj.getActiveMMLPart();
-		mmlpart.addMMLNoteEvent(new MMLNoteEvent(54, 48, 0, 11));
-		mmlpart.addMMLNoteEvent(new MMLNoteEvent(50, 48, 48, 11));
-		frame.repaint();
+	@Test
+	public void test_pencilMode_selected_3() throws InterruptedException {
+		testMode(EditMode.PENCIL_MODE, RangeMode.ALL_TRACK, true, pData1, pencelModeSelectedExpects, PENCIL_S_DATA);
+	}
 
-		String[] expects = {
-				"{}",
-				"{}",
-				"{}",
-				"{}",
-				"{}",
-				"{96=8, 144=6, 192=4}",
-				"{96=9, 144=8, 192=7, 240=5, 288=4}",
-				"{96=15, 144=15, 192=15, 240=15, 288=15}",
-				"{96=0, 144=0, 192=0, 240=0, 288=0}",
-				"{}",
-				"{}",
-				"{96=9, 144=8, 192=7, 240=5, 288=4}",
-				"{}",
-				"{}",
-				"{96=6, 144=7, 192=8, 240=10, 288=11}",
-				"{}",
-				"{}"
-		};
-		testC(expects, "MML@v11l8f+dv9dv8d+v7ev5fv4f+,,;", "MML@v15l8f+dv9dv8d+v7ev5fv4f+,,;", "MML@v15l8f+ddd+eff+,,;");
+	private static String LINE_M1 = "v12l8f+v11dv9dv8d+v7ev5fv4f+";
+	private static String LINE_M2 = "v12l8f+v11dv9dv8d+v7ev5fv4f+";
+	private static String LINE_M3 = "v15l8f+ddd+eff+";
+	private static String LINE_C0 = PENCIL_C0;
+	private static String LINE_CN = PENCIL_C2;
+	private static String LINE_O0 = PENCIL_O0;
+	private static String LINE_O3 = "rv9<c";
+	private static DataSet LINE_DATA = new DataSet(LINE_M1, LINE_M2, LINE_M3, LINE_C0, LINE_CN, LINE_CN, LINE_CN, LINE_O0, LINE_O3);
+
+	@Test
+	public void test_lineMode_1() throws InterruptedException {
+		testMode(EditMode.LINE_MODE, RangeMode.SELECTED_PART, false, pData2, lineModeExpects, LINE_DATA);
+	}
+
+	@Test
+	public void test_lineMode_2() throws InterruptedException {
+		testMode(EditMode.LINE_MODE, RangeMode.SELECTED_TRACK, false, pData2, lineModeExpects, LINE_DATA);
+	}
+
+	@Test
+	public void test_lineMode_3() throws InterruptedException {
+		testMode(EditMode.LINE_MODE, RangeMode.ALL_TRACK, false, pData2, lineModeExpects, LINE_DATA);
+	}
+
+	private static String LINE_S_M1 = "v11l8f+dv9dv8d+v7ev5fv4f+";
+	private static String LINE_S_M2 = "v15l8f+dv9dv8d+v7ev5fv4f+";
+	private static String LINE_S_M3 = "v15l8f+ddd+eff+";
+	private static DataSet LINE_S_DATA = new DataSet(LINE_S_M1, LINE_S_M2, LINE_S_M3, LINE_C0, LINE_CN, LINE_CN, LINE_CN, LINE_O0, LINE_O3);
+
+	@Test
+	public void test_lineMode_selected_1() throws InterruptedException {
+		testMode(EditMode.LINE_MODE, RangeMode.SELECTED_PART, true, pData2, lineModeSelectedExpects, LINE_S_DATA);
+	}
+	@Test
+	public void test_lineMode_selected_2() throws InterruptedException {
+		testMode(EditMode.LINE_MODE, RangeMode.SELECTED_TRACK, true, pData2, lineModeSelectedExpects, LINE_S_DATA);
+	}
+	@Test
+	public void test_lineMode_selected_3() throws InterruptedException {
+		testMode(EditMode.LINE_MODE, RangeMode.ALL_TRACK, true, pData2, lineModeSelectedExpects, LINE_S_DATA);
 	}
 }

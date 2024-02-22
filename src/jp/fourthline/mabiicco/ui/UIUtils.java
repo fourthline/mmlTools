@@ -11,6 +11,7 @@ import java.awt.Graphics2D;
 import java.awt.LayoutManager;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.function.Supplier;
 
@@ -135,6 +136,18 @@ public final class UIUtils {
 			itemMenu.setActionCommand(ActionDispatcher.CHANGE_ACTION);
 			itemMenu.addActionListener(listener);
 			itemMenu.setSelected(item.equals(prop.get()));
+			menu.add(itemMenu);
+			group.add(itemMenu);
+		}
+	}
+
+	public static void createGroupMenu(JComponent menu, SettingButtonGroupItem[] items, ActionListener listener, SettingButtonGroupItem initialItem) {
+		ButtonGroup group = new ButtonGroup();
+		for (SettingButtonGroupItem item : items) {
+			String name = appText(item.getButtonName());
+			GroupMenuItemWith<SettingButtonGroupItem> itemMenu = new GroupMenuItemWith<>(name, item);
+			itemMenu.addActionListener(listener);
+			itemMenu.setSelected(item.equals(initialItem));
 			menu.add(itemMenu);
 			group.add(itemMenu);
 		}

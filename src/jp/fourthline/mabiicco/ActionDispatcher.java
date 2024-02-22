@@ -761,7 +761,10 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		mainFrame.setRemoveRestsBetweenNotesEnable(editState.hasSelectedMultipleConsecutiveNotes());
 
 		// 楽譜集分割-UI更新
-		mainFrame.setXExport(!mmlSeqView.getActiveTrack().mmlRank().canCompose());
+		var track = mmlSeqView.getActiveTrack();
+		if (track != null) {
+			mainFrame.setXExport(!track.mmlRank().canCompose());
+		}
 	}
 
 	private void toggleLoop() {

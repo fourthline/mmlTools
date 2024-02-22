@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2023 たんらる
+ * Copyright (C) 2013-2024 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
@@ -230,6 +230,7 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 		view.mmlManager = mmlManager;
 		view.updateTrack();
 		view.updateMuteButton();
+		view.setSelectMMLPartOfIndex(0);
 		view.updatePartButtonStatus();
 		return view;
 	}
