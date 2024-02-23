@@ -762,9 +762,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 
 		// 楽譜集分割-UI更新
 		var track = mmlSeqView.getActiveTrack();
-		if (track != null) {
-			mainFrame.setXExport(!track.mmlRank().canCompose());
-		}
+		mainFrame.setXExport((track != null) && (!track.mmlRank().canCompose()));
 	}
 
 	private void toggleLoop() {
