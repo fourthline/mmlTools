@@ -296,6 +296,7 @@ public final class VelocityEditorTest extends UseLoadingDLS {
 	private static String PENCIL_O0 = "rv0<c";
 	private static String PENCIL_O3 = "rv6<c";
 	private static DataSet PENCIL_DATA = new DataSet(PENCIL_M1, PENCIL_M2, PENCIL_M3, PENCIL_C0, PENCIL_C1, PENCIL_C2, PENCIL_C3, PENCIL_O0, PENCIL_O3);
+	private static DataSet PENCIL_DATA2 = new DataSet(PENCIL_M1, PENCIL_M2, PENCIL_M3, PENCIL_C0, PENCIL_C0, PENCIL_C0, PENCIL_C0, PENCIL_O0, PENCIL_O0);
 
 	@Test
 	public void test_pencilMode_1() throws InterruptedException {
@@ -310,6 +311,24 @@ public final class VelocityEditorTest extends UseLoadingDLS {
 	@Test
 	public void test_pencilMode_3() throws InterruptedException {
 		testMode(EditMode.PENCIL_MODE, RangeMode.ALL_TRACK, false, pData1, pencelModeExpects, PENCIL_DATA);
+	}
+
+	@Test
+	public void test_pencilModeTrackVisible_1() throws InterruptedException {
+		obj.getMMLScore().getTrackList().forEach(t -> t.setVisible(false));
+		testMode(EditMode.PENCIL_MODE, RangeMode.SELECTED_PART, false, pData1, pencelModeExpects, PENCIL_DATA2);
+	}
+
+	@Test
+	public void test_pencilModeTrackVisible_2() throws InterruptedException {
+		obj.getMMLScore().getTrackList().forEach(t -> t.setVisible(false));
+		testMode(EditMode.PENCIL_MODE, RangeMode.SELECTED_TRACK, false, pData1, pencelModeExpects, PENCIL_DATA2);
+	}
+
+	@Test
+	public void test_pencilModeTrackVisible_3() throws InterruptedException {
+		obj.getMMLScore().getTrackList().forEach(t -> t.setVisible(false));
+		testMode(EditMode.PENCIL_MODE, RangeMode.ALL_TRACK, false, pData1, pencelModeExpects, PENCIL_DATA2);
 	}
 
 	private static String PENCIL_S_M1 = "v11l8f+rv2dd+eff+";
