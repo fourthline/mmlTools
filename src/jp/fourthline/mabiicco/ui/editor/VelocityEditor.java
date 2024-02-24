@@ -110,8 +110,10 @@ public final class VelocityEditor extends JPanel implements MouseInputListener, 
 			if (all) {
 				for (int i = 0; i < trackCount; i++) {
 					if (trackIndex != i) {
-						for (int p = 0; p < partCount; p++) {
-							func.action(i, p);
+						if (mmlManager.getMMLScore().getTrack(i).isVisible()) {
+							for (int p = 0; p < partCount; p++) {
+								func.action(i, p);
+							}
 						}
 					}
 				}
@@ -119,9 +121,11 @@ public final class VelocityEditor extends JPanel implements MouseInputListener, 
 
 			// Active Track & Active Part以外
 			if (curTrack) {
-				for (int i = 0; i < partCount; i++) {
-					if (partIndex != i) {
-						func.action(trackIndex, i);
+				if (mmlManager.getMMLScore().getTrack(trackIndex).isVisible()) {
+					for (int i = 0; i < partCount; i++) {
+						if (partIndex != i) {
+							func.action(trackIndex, i);
+						}
 					}
 				}
 			}
