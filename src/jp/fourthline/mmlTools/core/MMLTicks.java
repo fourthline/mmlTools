@@ -1,11 +1,11 @@
 /*
- * Copyright (C) 2013-2022 たんらる
+ * Copyright (C) 2013-2024 たんらる
  */
 
 package jp.fourthline.mmlTools.core;
 
-
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -32,6 +32,11 @@ public final class MMLTicks {
 		}
 
 		return tickTable.getTable().get(str);
+	}
+
+	public static Optional<List<List<String>>> getAlt(int tick) {
+		var t = tickTable.getInvTable().get(tick);
+		return t == null ? Optional.empty() : Optional.of(t.alt);
 	}
 
 	private static Integer minimum = null;
@@ -99,7 +104,7 @@ public final class MMLTicks {
 			for (int base = 1; base <= 64; base *= 2) {
 				int baseTick = getTick(""+base);
 				if (tickTable.getInvTable().containsKey(remTick)) {
-					sb.append( mmlNotePart(tickTable.getInvTable().get(remTick)) );
+					sb.append( mmlNotePart(tickTable.getInvTable().get(remTick).primary) );
 					remTick = 0;
 					break;
 				}

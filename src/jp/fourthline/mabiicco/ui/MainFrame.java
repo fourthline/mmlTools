@@ -382,7 +382,8 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createCheckMenu(settingMenu, "velocity_editor", appProperties.velocityEditor);
 		settingMenu.add(new JSeparator());
 		// MML生成に関わる設定
-		createCheckMenu(settingMenu, "mml.precise_optimize", appProperties.enableMMLPreciseOptimize, ActionDispatcher.MML_GENERATE);
+//		createCheckMenu(settingMenu, "mml.precise_optimize", appProperties.enableMMLPreciseOptimize, ActionDispatcher.MML_GENERATE);
+		UIUtils.createGroupMenu(settingMenu, "mml.optimize_level", appProperties.mmlOptimizeLevel);
 		createCheckMenu(settingMenu, "mml.tempo_allow_chord_part", appProperties.mmlTempoAllowChordPart, ActionDispatcher.MML_GENERATE);
 		createCheckMenu(settingMenu, "mml.vzero_tempo", appProperties.mmlVZeroTempo, ActionDispatcher.MML_GENERATE);
 		createCheckMenu(settingMenu, "mml.fix64_tempo", appProperties.mmlFix64Tempo, ActionDispatcher.MML_GENERATE);

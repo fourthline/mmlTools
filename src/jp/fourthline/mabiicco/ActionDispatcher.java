@@ -909,6 +909,9 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			} else if (o instanceof VelocityWidth vw) {
 				appProperties.velocityWidth.set(vw);
 				mainFrame.repaint();
+			} else if (o instanceof MMLOptimizeLevel level) {
+				appProperties.mmlOptimizeLevel.set(level);
+				this.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, MML_GENERATE));
 			} else {
 				System.err.println("changeAction invalid param " + o.getClass().toString());
 			}

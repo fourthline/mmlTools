@@ -31,7 +31,6 @@ import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.core.MMLText;
 import jp.fourthline.mmlTools.core.ResourceLoader;
-import jp.fourthline.mmlTools.optimizer.MMLStringOptimizer;
 
 public final class MabiIccoProperties {
 	private final PreloadedProperties properties = new PreloadedProperties();
@@ -98,7 +97,10 @@ public final class MabiIccoProperties {
 	public final Property<Boolean> activePartSwitch = new BooleanProperty("function.active_part_switch", false);
 
 	/** 精密なMML最適化 */
-	public final Property<Boolean> enableMMLPreciseOptimize = new BooleanProperty("function.mml_precise_optimize", true, (t) -> MMLStringOptimizer.setEnablePreciseOptimize(t.booleanValue()));
+//	public final Property<Boolean> enableMMLPreciseOptimize = new BooleanProperty("function.mml_precise_optimize", true, (t) -> MMLStringOptimizer.setEnablePreciseOptimize(t.booleanValue()));
+
+	/** MML最適化レベル */
+	public final EnumProperty<MMLOptimizeLevel> mmlOptimizeLevel = new EnumProperty<>("function.mml_optimize_level", MMLOptimizeLevel.values(), MMLOptimizeLevel.LV2, t -> t.change());
 
 	/** Midi Device */
 	public final Property<String> midiInputDevice = new StringProperty("midi.input_device");

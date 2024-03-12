@@ -223,7 +223,7 @@ public class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 		fixPattern(map);
 	}
 
-	protected void fixPattern(Map<String, StringBuilder> map) {}
+	protected void fixPattern(OptimizerMap map) {}
 
 	public static String getOctaveString(int prevOct, int nextOct) {
 		int delta = prevOct - nextOct;

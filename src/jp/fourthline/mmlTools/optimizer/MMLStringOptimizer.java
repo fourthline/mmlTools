@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2023 たんらる
+ * Copyright (C) 2015-2024 たんらる
  */
 
 package jp.fourthline.mmlTools.optimizer;
@@ -17,10 +17,13 @@ public final class MMLStringOptimizer {
 	 */
 	private static boolean debug = false;
 
+	public static final int GEN1 = 1;
+	public static final int GEN2 = 2;
+	public static final int GEN3 = 3;
 	/**
 	 * Gen2最適化を使うオプション
 	 */
-	private static boolean enablePreciseOptimize = true;
+	private static int optLevel = 1;
 
 	public static void setDebug(boolean b) {
 		debug = b;
@@ -30,8 +33,8 @@ public final class MMLStringOptimizer {
 		return debug;
 	}
 
-	public static void setEnablePreciseOptimize(boolean enable) {
-		enablePreciseOptimize = enable;
+	public static void setOptimizeLevel(int level) {
+		optLevel = level;
 	}
 
 	private final String originalMML;
@@ -55,8 +58,11 @@ public final class MMLStringOptimizer {
 	 * 設定によってGen2/Normalを切り替える, Gen2の場合は出力結果を再Parseして検査する.
 	 */
 	public String preciseOptimize() {
-		if (enablePreciseOptimize) {
+		if (optLevel == GEN2) {
 			String mml1 = optimizeGen2();
+			return (new MMLEventList(mml1).equals(new MMLEventList(originalMML))) ? mml1 : optimize();
+		} else if (optLevel == GEN3) {
+			String mml1 = optimizeGen3();
 			return (new MMLEventList(mml1).equals(new MMLEventList(originalMML))) ? mml1 : optimize();
 		} else {
 			return optimize();
@@ -70,6 +76,18 @@ public final class MMLStringOptimizer {
 		Optimizer[] optimizerList = {
 				new OxLxFixedOptimizer(disableNopt),
 				new NxBpCmOptimizer(disableNopt)
+		};
+		return optimize(optimizerList);
+	}
+
+	/**
+	 * MML最適化 Gen3
+	 */
+	public String optimizeGen3() {
+		Optimizer[] optimizerList = {
+				new OxLxFixedAltOptimizer(disableNopt),
+				new NxBpCmOptimizer(disableNopt),
+				new OxLxFixedAltOptimizer.PatternOptimizer()
 		};
 		return optimize(optimizerList);
 	}

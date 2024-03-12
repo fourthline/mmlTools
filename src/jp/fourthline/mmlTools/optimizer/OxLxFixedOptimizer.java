@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 たんらる
+ * Copyright (C) 2022-2024 たんらる
  */
 
 package jp.fourthline.mmlTools.optimizer;
@@ -13,17 +13,17 @@ import jp.fourthline.mmlTools.core.MMLTokenizer;
 /**
  * OxLx機能拡張
  */
-public final class OxLxFixedOptimizer extends OxLxOptimizer {
+public class OxLxFixedOptimizer extends OxLxOptimizer {
 	/**
 	 * 置換パターン用レコード
 	 */
-	private static final class FixPattern {
+	protected static final class FixPattern {
 		private final String lStr;
 		private final String match;
 		private final int matchLen;
 		private final String replace;
 
-		private FixPattern(String lStr, String match, String replace) {
+		protected FixPattern(String lStr, String match, String replace) {
 			this.lStr = lStr;
 			this.match = match;
 			this.matchLen = match.length();
@@ -31,7 +31,7 @@ public final class OxLxFixedOptimizer extends OxLxOptimizer {
 		}
 
 		public void patternApply(String key, StringBuilder sb) {
-			if (key.equals(lStr)) {
+			if (key.equals(lStr) || lStr.equals("*")) {
 				if (sb.toString().endsWith(match)) {
 					int len = sb.length();
 					int index = len - matchLen;
@@ -54,7 +54,7 @@ public final class OxLxFixedOptimizer extends OxLxOptimizer {
 			new FixPattern("64", "r32.", "rrr"));
 
 	@Override
-	protected void fixPattern(Map<String, StringBuilder> map) {
+	protected void fixPattern(OptimizerMap map) {
 		map.forEach((key, builder) -> pattern.forEach(t -> t.patternApply(key, builder)));
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 たんらる
+ * Copyright (C) 2022-2024 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -10,9 +10,23 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import jp.fourthline.mmlTools.optimizer.MMLStringOptimizer;
+
 public class MMLTempoConverterTest {
+
+	@BeforeClass
+	public static void setup() {
+		MMLStringOptimizer.setOptimizeLevel(MMLStringOptimizer.GEN2);
+	}
+
+	@AfterClass
+	public static void cleanup() {
+		MMLStringOptimizer.setOptimizeLevel(MMLStringOptimizer.GEN2);
+	}
 
 	@Test
 	public void test_staticFunc() {

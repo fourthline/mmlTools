@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2022 たんらる
+ * Copyright (C) 2015-2024 たんらる
  */
 
 package jp.fourthline.mmlTools.core;
@@ -21,7 +21,7 @@ public final class MMLTickTable {
 	/**
 	 * For tick -> MML text
 	 */
-	private final IntMap<List<String>> tickInvTable;
+	private final IntMap<MMLPatern> tickInvTable;
 
 	public static MMLTickTable createTickTable() {
 		InputStream preTable = null;
@@ -39,7 +39,7 @@ public final class MMLTickTable {
 		System.out.println("MMLTickTable " + time.ms() + "ms");
 	}
 
-	public IntMap<List<String>> getInvTable() {
+	IntMap<MMLPatern> getInvTable() {
 		return this.tickInvTable;
 	}
 
@@ -63,23 +63,42 @@ public final class MMLTickTable {
 		}
 	}
 
-	private int patternLength(List<String> pattern) {
-		int len = 0;
-		List<String> spll = Arrays.asList("1", "2", "4", "8", "16");
-		for (String s : pattern) {
-			if (spll.stream().anyMatch(s::equals)) {
-				len += s.length();
-			} else if (spll.stream().map(t -> t+".").anyMatch(s::equals)) {
-				len += s.length()*2;
+
+	static class MMLPatern {
+		List<String> primary = null;
+		List<List<String>> alt = new ArrayList<>();
+
+		private MMLPatern(List<String> list) {
+			this.primary = list;
+		}
+
+		private int patternLength(List<String> pattern) {
+			int len = 0;
+			List<String> spll = Arrays.asList("1", "2", "4", "8", "16");
+			for (String s : pattern) {
+				if (spll.stream().anyMatch(s::equals)) {
+					len += s.length();
+				} else if (spll.stream().map(t -> t+".").anyMatch(s::equals)) {
+					len += s.length()*2;
+				} else {
+					len += s.length()*3;
+				}
+			}
+			return len + pattern.size()*10;
+		}
+
+		private void put(List<String> list) {
+			if (patternLength(list) <= patternLength(primary)) {
+				if (list.size() == 2) alt.add(primary);
+				primary = list;
 			} else {
-				len += s.length()*3;
+				if (list.size() == 2) alt.add(list);
 			}
 		}
-		return len + pattern.size()*10;
 	}
 
-	private IntMap<List<String>> generateInvTable() {
-		var table = new HashMap<Integer, List<String>>(1024);
+	private IntMap<MMLPatern> generateInvTable() {
+		var table = new HashMap<Integer, MMLPatern>(1024);
 		String[] keys = tickTable.keySet().toArray(new String[0]);
 		int mTick = tickTable.get("1") * 2 - 1;
 		for (int i = 1; i <= COMBN; i++) {
@@ -87,9 +106,11 @@ public final class MMLTickTable {
 			for (List<String> list : pattern) {
 				int tick = list.stream().mapToInt(tickTable::get).sum();
 				if (tick <= mTick) {
-					List<String> currentList = table.get(tick);
-					if ( (currentList == null) || (patternLength(list) <= patternLength(currentList)) ) {
-						table.put(tick, list);
+					var currentList = table.get(tick);
+					if (currentList == null) {
+						table.put(tick, new MMLPatern(list));
+					} else {
+						currentList.put(list);
 					}
 				}
 			}
@@ -98,6 +119,10 @@ public final class MMLTickTable {
 	}
 
 	void writeToOutputStreamInvTable(OutputStream outputStream) {
+		writeToOutputStreamInvTable(outputStream, false);
+	}
+
+	void writeToOutputStreamInvTable(OutputStream outputStream, boolean alt) {
 		PrintStream stream = new PrintStream(outputStream, false, StandardCharsets.UTF_8);
 		stream.println("# Generated Text --- ");
 		stream.println("# registered key: " + tickInvTable.validCount());
@@ -106,9 +131,11 @@ public final class MMLTickTable {
 		for (int i = 1; i <= max; i++) {
 			if (tickInvTable.containsKey(i)) {
 				stream.print(i+"=");
-				tickInvTable.get(i).forEach( s -> {
-					stream.print("[" + s + "]");
-				});
+				tickInvTable.get(i).primary.forEach( s -> stream.print("[" + s + "]"));
+				if (alt) {
+					stream.print("\t");
+					tickInvTable.get(i).alt.forEach( s -> stream.print("[" + s + "]"));
+				}
 				stream.println();
 			} else {
 				stream.println("# "+i+"=<< not supported >>");
@@ -116,8 +143,8 @@ public final class MMLTickTable {
 		}
 	}
 
-	private IntMap<List<String>> readFromInputStreamInvTable(InputStream inputStream) {
-		var table = new HashMap<Integer, List<String>>(1024);
+	private IntMap<MMLPatern> readFromInputStreamInvTable(InputStream inputStream) {
+		var table = new HashMap<Integer, MMLPatern>(1024);
 		InputStreamReader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
 		new BufferedReader(reader).lines().forEach(s -> {
 			if (!s.startsWith("#")) {
@@ -131,7 +158,7 @@ public final class MMLTickTable {
 					valueList.add(item);
 					itemList = itemList.substring(itemIndex+1);
 				}
-				table.put(Integer.parseInt(key), valueList);
+				table.put(Integer.parseInt(key), new MMLPatern(valueList));
 			}
 		});
 		return new IntMap<>(table);
@@ -174,7 +201,7 @@ public final class MMLTickTable {
 	}
 
 	private void printTickList() {
-		writeToOutputStreamInvTable(System.out);
+		writeToOutputStreamInvTable(System.out, true);
 	}
 
 	public static void main(String[] args) {

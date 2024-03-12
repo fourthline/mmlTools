@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2023 たんらる
+ * Copyright (C) 2013-2024 たんらる
  */
 
 package jp.fourthline.mmlTools.core;
@@ -85,6 +85,13 @@ public final class MMLTokenizer implements Iterator<String> {
 		String noteLength = token.substring(noteName.length());
 
 		return new String[] { noteName, noteLength };
+	}
+
+	public static boolean isLenOnly(String str) {
+		if (str.endsWith(".")) {
+			str = str.substring(0, str.length() - 1);
+		}
+		return str.matches("[0-9]+");
 	}
 
 	public int searchToken(int startIndex) {

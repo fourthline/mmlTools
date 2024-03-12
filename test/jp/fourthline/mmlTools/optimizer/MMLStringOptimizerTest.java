@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2022 たんらる
+ * Copyright (C) 2013-2024 たんらる
  */
 
 package jp.fourthline.mmlTools.optimizer;
@@ -358,5 +358,260 @@ public class MMLStringOptimizerTest {
 		String expect=  "l2fffl8n22f&f2.n22f1d+1f1&f2.ff";
 		checkMMLStringOptimize(input, expect);
 		checkMMLStringOptimize(input, expect, t -> t.optimizeGen2());
+	}
+
+	@Test(timeout=TIMEOUT)
+	public void test_F4() {
+		String input  =  "l24cr12cr12cr12c";
+		String expect =  "l24cr12cr12cr12c";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen2());
+	}
+
+	public void test_F4_g3() {
+		String input  =  "l24cr12cr12cr12c";
+		String expect =  "l24crrcrrcrrc";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen3());
+	}
+
+	public void test_F5() {
+		String input  =  "l64cr32cr32cr32c";
+		String expect =  "l64cr32cr32cr32c";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen2());
+	}
+
+	public void test_F5_g3() {
+		String input  =  "l64cr32cr32cr32c";
+		String expect =  "l64crrcrrcrrc";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen3());
+	}
+
+	@Test
+	public void test_F6() {
+		String input  =  "l12ccccg4&g6";
+		String expect =  "l12ccccg4&g6";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen2());
+	}
+
+	@Test
+	public void test_F6_g3() {
+		String input  =  "l12ccccg4&g6";
+		String expect =  "l12ccccg&g3";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen3());
+	}
+
+	@Test
+	public void test_F7() {
+		String input  =  "l24cccr8rrccc";
+		String expect =  "l24cccr8r12ccc";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen2());
+	}
+
+	@Test
+	public void test_F7_g3() {
+		String input  =  "l24cccr8rrccc";
+		String expect =  "l24cccrr6ccc";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen3());
+	}
+
+	@Test
+	public void test_altPattern_1() {
+		String input  = "l8ddddc4.&c7dddd";
+		String expect = "l8ddddc4.&c7dddd";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen2());
+	}
+
+	@Test
+	public void test_altPattern_1r() {
+		String input  = "l8ddddr4.r7dddd";
+		String expect = "l8ddddr4.r7dddd";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen2());
+	}
+
+	@Test
+	public void test_altPattern_2() {
+		String input  = "l7ddddc4.&c7dddd";
+		String expect = "l7ddddc4.&cdddd";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen2());
+	}
+
+	@Test
+	public void test_altPattern_2r() {
+		String input  = "l7ddddr4.r7dddd";
+		String expect = "l7ddddr4.rdddd";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen2());
+	}
+
+	@Test
+	public void test_altPattern_3() {
+		String input  = "l64ddddc4.&c7dddd";
+		String expect = "l64ddddc&c2dddd";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen3());
+	}
+
+	@Test
+	public void test_altPattern_3r() {
+		String input  = "l64ddddr4.r7dddd";
+		String expect = "l64ddddrr2dddd";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen3());
+	}
+
+	@Test
+	public void test_altPattern_4() {
+		String input  = "l27ddddc4&c18dddd";
+		String expect = "l27ddddc.&c4dddd";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen3());
+	}
+
+	@Test
+	public void test_altPattern_4r() {
+		String input  = "l27ddddr4r18dddd";
+		String expect = "l27ddddr.r4dddd";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen3());
+	}
+
+	@Test
+	public void test_altPattern_4l() {
+		String input  = "l27ddddc4&c18l4dddd";
+		String expect = "l27ddddc.l4&cdddd";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen3());
+	}
+
+	@Test
+	public void test_altPattern_4lr() {
+		String input  = "l27ddddr4r18l4dddd";
+		String expect = "l27ddddr.l4rdddd";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen3());
+	}
+
+	@Test
+	public void test_altPattern_5() {
+		String input  = "l18ddddc4&c18dddd";
+		String expect = "l18ddddc4&cdddd";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen2());
+	}
+
+	@Test
+	public void test_altPattern_5r() {
+		String input  = "l18ddddr4r18dddd";
+		String expect = "l18ddddr4rdddd";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen2());
+	}
+
+	@Test
+	public void test_altPattern_6() {
+		String input  = "l6ddddc4&c18dddd";
+		String expect = "l6ddddc.&c18dddd";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen3());
+	}
+
+	@Test
+	public void test_altPattern_6r() {
+		String input  = "l6ddddr4r18dddd";
+		String expect = "l6ddddr.r18dddd";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen3());
+	}
+
+	@Test
+	public void test_altPattern_7() {
+		String input  = "l6.ddddc4&c18dddd";
+		String expect = "ddddc&c18dddd";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen2());
+	}
+
+	@Test
+	public void test_altPattern_7r() {
+		String input  = "l6.ddddr4r18dddd";
+		String expect = "ddddrr18dddd";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen2());
+	}
+
+	@Test
+	public void test_F8() {
+		String input  = "l2.rg2gg8g4f+";
+		String expect = "l2.rg2gg8g4f+";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen2());
+	}
+
+	@Test
+	public void test_F8g3() {
+		String input  = "l2.rg2gg8g4f+";
+		String expect = "l2.rg2gg8g4f+";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen3());
+	}
+
+	@Test
+	public void test_44d1() {
+		String input  = "l64dddc2&c8";
+		String expect = "l64dddc2&c8";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen3());
+	}
+
+	@Test
+	public void test_44d2() {
+		String input  = "l64dddl4.dddc2&c8";
+		String expect = "l64dddl4.dddc&c4";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen3());
+	}
+
+	@Test
+	public void test_44d3() {
+		String input  = "l64dddl4dddc2&c8";
+		String expect = "l64dddl4dddc.&c";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen3());
+	}
+
+	@Test
+	public void test_44d4() {
+		String input  = "l64dddc2&c8l4ffff";
+		String expect = "l64dddl4c.&cffff";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen3());
+	}
+
+	@Test
+	public void test_44d5() {
+		String input  = "l64dddc2&c8l4.ffff";
+		String expect = "l64dddl4.c4&cffff";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen3());
+	}
+
+	@Test
+	public void test_R1() {
+		String input  = "c64c64c64r1.r2c1c1c1c1";
+		String expect = "l64cccl1rrcccc";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen2());
+	}
+
+	@Test
+	public void test_R1d1() {
+		String input  = "c64c64c64r1.r2c1.c1.c1.c1.";
+		String expect = "l64cccl1rrl1.cccc";    // "l64cccl1.rr2cccc"
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen2());
+	}
+
+	@Test
+	public void test_R1d2() {
+		String input  = "c64c64c64r1.r2c2c2c2c2";
+		String expect = "l64cccl1rrl2cccc";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen2());
+	}
+
+	@Test
+	public void test_R2() {
+		String input  = "c64c64c64d1.&d2c1c1c1c1";
+		String expect = "l64cccl1d&dcccc";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen2());
+	}
+
+	@Test
+	public void test_R3() {
+		String input  = "l24cccr8r12ccc";
+		String expect = "l24cccrr6ccc";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen3());
+	}
+	@Test
+	public void test_R4() {
+		String input  = "r3r9r16ccc";
+		String expect = "rr5r17ccc";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen3());
 	}
 }

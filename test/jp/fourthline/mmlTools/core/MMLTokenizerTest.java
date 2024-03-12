@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 たんらる
+ * Copyright (C) 2016-2024 たんらる
  */
 
 package jp.fourthline.mmlTools.core;
@@ -22,5 +22,17 @@ public class MMLTokenizerTest {
 		}
 
 		assertArrayEquals(expect, result.toArray());
+	}
+
+	@Test
+	public void test_isLenOnly() {
+		assertTrue(MMLTokenizer.isLenOnly("4"));
+		assertTrue(MMLTokenizer.isLenOnly("4."));
+		assertTrue(MMLTokenizer.isLenOnly("16"));
+		assertTrue(MMLTokenizer.isLenOnly("16."));
+		assertFalse(MMLTokenizer.isLenOnly("4l16"));
+		assertFalse(MMLTokenizer.isLenOnly("4t160"));
+		assertFalse(MMLTokenizer.isLenOnly(""));
+		assertFalse(MMLTokenizer.isLenOnly("4l1"));
 	}
 }

@@ -26,14 +26,14 @@ public class MMLTrackTest {
 	public void setup() {
 		MMLTrack.setTempoAllowChordPart(false);
 		MMLBuilder.setMMLVZeroTempo(true);
-		MMLStringOptimizer.setEnablePreciseOptimize(true);
+		MMLStringOptimizer.setOptimizeLevel(MMLStringOptimizer.GEN2);
 	}
 
 	@After
 	public void cleanup() {
 		MMLTrack.setTempoAllowChordPart(true);
 		MMLBuilder.setMMLVZeroTempo(true);
-		MMLStringOptimizer.setEnablePreciseOptimize(true);
+		MMLStringOptimizer.setOptimizeLevel(MMLStringOptimizer.GEN2);
 	}
 
 	/**
@@ -635,7 +635,7 @@ public class MMLTrackTest {
 		var track = new MMLTrack().setMML("MML@o7ccco0d+o7cccc");
 
 		// 旧Algo, N有効
-		MMLStringOptimizer.setEnablePreciseOptimize(false);
+		MMLStringOptimizer.setOptimizeLevel(MMLStringOptimizer.GEN1);
 		track.setDisableNopt(false);
 		track.generate();
 		assertEquals(mml2, track.getMabiMML());
@@ -651,7 +651,7 @@ public class MMLTrackTest {
 		assertEquals(mml1, track.getMabiMML());
 
 		// 新Algo, N無効
-		MMLStringOptimizer.setEnablePreciseOptimize(true);
+		MMLStringOptimizer.setOptimizeLevel(MMLStringOptimizer.GEN2);
 		track.generate();
 		assertEquals(mml1, track.getMabiMML());
 
