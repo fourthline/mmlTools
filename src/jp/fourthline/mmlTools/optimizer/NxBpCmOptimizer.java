@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 たんらる
+ * Copyright (C) 2022-2024 たんらる
  */
 
 package jp.fourthline.mmlTools.optimizer;
@@ -54,7 +54,7 @@ public final class NxBpCmOptimizer extends NxOptimizer {
 
 	@Override
 	protected void notePattern(String token, String noteName, String noteLength) {
-		builderList.forEach(t -> {
+		builderList.stream().forEach(t -> {
 			// 通常パターン
 			addToken(t, octave, token);
 			if (noteName.equals("b")) {

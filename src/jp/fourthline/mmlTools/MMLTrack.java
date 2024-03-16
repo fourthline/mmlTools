@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2023 たんらる
+ * Copyright (C) 2013-2024 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -45,6 +45,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 	private static final int PART_COUNT = 4;
 	private final List<MMLEventList> mmlParts = new ArrayList<>();
 	private List<MMLTempoEvent> globalTempoList = new ArrayList<>();
+	private final MMLStringOptimizer optimizer[] = new MMLStringOptimizer[PART_COUNT];
 	private boolean generated = false;
 
 	private int program = 0;
@@ -89,6 +90,9 @@ public final class MMLTrack implements Serializable, Cloneable {
 		this.commonStartOffset = commonStartOffset;
 		this.startDelta = startDelta;
 		this.startSongDelta = startSongDelta;
+		for (int i = 0; i < optimizer.length; i++) {
+			optimizer[i] = new MMLStringOptimizer();
+		}
 		mmlParse(false);
 		generated = true;
 	}
@@ -379,10 +383,10 @@ public final class MMLTrack implements Serializable, Cloneable {
 		}
 		for (int i = 0; i < count; i++) {
 			if (mabiTempo) {
-				mml[i] = mabiMMLOptimizeFunc.apply(new MMLStringOptimizer(mml[i]).setDisableNopt(disableNopt));
+				mml[i] = mabiMMLOptimizeFunc.apply(optimizer[i].set(mml[i]).setDisableNopt(disableNopt));
 			} else {
 				// 内部データ向けは旧アルゴリズムを使用する.
-				mml[i] = new MMLStringOptimizer(mml[i]).toString();
+				mml[i] = optimizer[i].set(mml[i]).toString();
 			}
 		}
 		if ((mmlParts.get(3).getTickLength() == 0)) {
@@ -459,7 +463,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 		boolean allowed = tempoAllowChordPartFunction.apply(program);
 		String[] mml = getGenericMMLStrings(allowed);
 		for (int i = 0; i < mml.length; i++) {
-			mml[i] = mabiMMLOptimizeFunc.apply(new MMLStringOptimizer(mml[i]).setDisableNopt(disableNopt));
+			mml[i] = mabiMMLOptimizeFunc.apply(optimizer[i].set(mml[i]).setDisableNopt(disableNopt));
 		}
 		if ((mmlParts.get(3).getTickLength() == 0)) {
 			mml[3] = "";

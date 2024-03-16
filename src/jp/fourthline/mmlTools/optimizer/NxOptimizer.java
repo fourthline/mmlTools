@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2022 たんらる
+ * Copyright (C) 2015-2024 たんらる
  */
 
 package jp.fourthline.mmlTools.optimizer;
@@ -85,7 +85,7 @@ public class NxOptimizer implements MMLStringOptimizer.Optimizer {
 		if ( (noteNumber < 0) || (noteNumber > 96) ) {
 			return;
 		}
-		prevMap.forEach(t -> {
+		prevMap.stream().forEach(t -> {
 			t.builder.append("n").append(noteNumber);
 			t.nCount++;
 		});
@@ -94,16 +94,16 @@ public class NxOptimizer implements MMLStringOptimizer.Optimizer {
 	}
 
 	private void addOctToken(String token) {
-		builderList.forEach(t -> t.addOctToken(t.builder.length(), token));
+		builderList.stream().forEach(t -> t.addOctToken(t.builder.length(), token));
 	}
 
 	private void clearOctToken() {
-		builderList.forEach(t -> t.offset = OptionalInt.empty());
+		builderList.stream().forEach(t -> t.offset = OptionalInt.empty());
 	}
 
 	private List<NxBuilder> listClone() {
 		List<NxBuilder> cloneList = new ArrayList<>();
-		builderList.forEach(t -> cloneList.add(t.clone()));
+		builderList.stream().forEach(t -> cloneList.add(t.clone()));
 		return cloneList;
 	}
 
@@ -142,7 +142,7 @@ public class NxOptimizer implements MMLStringOptimizer.Optimizer {
 	}
 
 	private void addNoteToken(String token) {
-		builderList.forEach(t -> {
+		builderList.stream().forEach(t -> {
 			t.builder.append( OxLxOptimizer.getOctaveString(t.prevOct, octave) );
 			t.builder.append(token);
 			t.prevOct = octave;
@@ -151,12 +151,12 @@ public class NxOptimizer implements MMLStringOptimizer.Optimizer {
 	}
 
 	private void addToken(String token) {
-		builderList.forEach(t -> t.builder.append(token));
+		builderList.stream().forEach(t -> t.builder.append(token));
 	}
 
 	private void printMap() {
 		if (MMLStringOptimizer.getDebug()) {
-			builderList.forEach(t -> System.out.println(t.toString()));
+			builderList.stream().forEach(t -> System.out.println(t.toString()));
 			System.out.println(" -- ");
 		}
 	}

@@ -55,7 +55,7 @@ public class OxLxFixedOptimizer extends OxLxOptimizer {
 
 	@Override
 	protected void fixPattern(OptimizerMap map) {
-		map.forEach((key, builder) -> pattern.forEach(t -> t.patternApply(key, builder)));
+		map.forEach((key, builder) -> pattern.stream().forEach(t -> t.patternApply(key, builder)));
 	}
 
 	/**
@@ -114,11 +114,23 @@ public class OxLxFixedOptimizer extends OxLxOptimizer {
 			return octave;
 		}
 
-		private static int calcSubNxBpCmOptLength(String mml, int commonLen, int octave, boolean disableNopt) {
+
+		private final Map<String, Integer> cache = new CacheMap<>(32);
+		private int calcSubNxBpCmOptLength(String mml, int commonLen, int octave, boolean disableNopt) {
 			String initStr = mml.substring(0, commonLen);
+
+			String key = mml + ":" + commonLen + ":" + octave + ":" + disableNopt;
+			var s = cache.get(key);
+			if (s != null) {
+				return s;
+			}
+
 			NxBpCmOptimizer optimizer = new NxBpCmOptimizer(octave, initStr, disableNopt);
 			new MMLTokenizer(mml.substring(commonLen)).forEachRemaining(optimizer::nextToken);
-			return optimizer.getMinString().length();
+
+			var r = optimizer.getMinString().length();
+			cache.put(key, r);
+			return r;
 		}
 
 		@Override

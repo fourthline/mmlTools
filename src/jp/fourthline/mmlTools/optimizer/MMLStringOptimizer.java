@@ -4,6 +4,8 @@
 
 package jp.fourthline.mmlTools.optimizer;
 
+import java.util.Map;
+
 import jp.fourthline.mmlTools.MMLEventList;
 import jp.fourthline.mmlTools.core.MMLTokenizer;
 
@@ -25,6 +27,11 @@ public final class MMLStringOptimizer {
 	 */
 	private static int optLevel = 1;
 
+	/**
+	 * キャッシュ
+	 */
+	private final Map<String, String> mmlCache = new CacheMap<>(16);
+
 	public static void setDebug(boolean b) {
 		debug = b;
 	}
@@ -37,20 +44,23 @@ public final class MMLStringOptimizer {
 		optLevel = level;
 	}
 
-	private final String originalMML;
+	private String originalMML;
 
 	private boolean disableNopt = false;
 
 	/**
 	 * @param mml   MMLEventListで出力したMML文字列.
 	 */
-	public MMLStringOptimizer(String mml) {
-		originalMML = mml;
+	public MMLStringOptimizer() {}
+
+	public MMLStringOptimizer set(String mml) {
+		this.originalMML = mml;
+		return this;
 	}
 
 	@Override
 	public String toString() {
-		return optimize();
+		return optimize(false);
 	}
 
 	/**
@@ -58,15 +68,24 @@ public final class MMLStringOptimizer {
 	 * 設定によってGen2/Normalを切り替える, Gen2の場合は出力結果を再Parseして検査する.
 	 */
 	public String preciseOptimize() {
+		String key = optLevel + ":" + disableNopt + ":" + originalMML;
+		String str = mmlCache.get(key);
+		if (str != null) {
+			return str;
+		}
+
 		if (optLevel == GEN2) {
 			String mml1 = optimizeGen2();
-			return (new MMLEventList(mml1).equals(new MMLEventList(originalMML))) ? mml1 : optimize();
+			str = (new MMLEventList(mml1).equals(new MMLEventList(originalMML))) ? mml1 : optimize(disableNopt);
 		} else if (optLevel == GEN3) {
 			String mml1 = optimizeGen3();
-			return (new MMLEventList(mml1).equals(new MMLEventList(originalMML))) ? mml1 : optimize();
+			str = (new MMLEventList(mml1).equals(new MMLEventList(originalMML))) ? mml1 : optimize(disableNopt);
 		} else {
-			return optimize();
+			str = optimize(disableNopt);
 		}
+
+		mmlCache.put(key, str);
+		return str;
 	}
 
 	/**
@@ -105,8 +124,8 @@ public final class MMLStringOptimizer {
 	/**
 	 * MML最適化 Normal
 	 */
-	private String optimize() {
-		return optimize(!disableNopt ? new Optimizer[] {
+	private String optimize(boolean opt) {
+		return optimize(!opt ? new Optimizer[] {
 				new OxLxOptimizer(),
 				new BpCmOptimizer(),
 				new NxOptimizer()
@@ -136,11 +155,15 @@ public final class MMLStringOptimizer {
 		String getMinString();
 	}
 
+	Map<String, String> getCache() {
+		return mmlCache;
+	}
+
 	public static void main(String[] args) {
 		MMLStringOptimizer.setDebug(true);
 		// String mml = "c8c2c1c8c2c1c8c2c1c8c2c1";
 		String mml = "c1<a+>rc<a+>c1";
 		// System.out.println( new MMLStringOptimizer(mml).toString() );
-		System.out.println(new MMLStringOptimizer(mml).optimizeGen2());
+		System.out.println(new MMLStringOptimizer().set(mml).optimizeGen2());
 	}
 }

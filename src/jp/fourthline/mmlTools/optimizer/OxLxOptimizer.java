@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2022 たんらる
+ * Copyright (C) 2015-2024 たんらる
  */
 
 package jp.fourthline.mmlTools.optimizer;
@@ -68,11 +68,11 @@ public class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 	 * すべてに文字列を無条件追加
 	 */
 	private void addString(String s) {
-		map.values().forEach(t -> t.append(s));
+		map.values().stream().forEach(t -> t.append(s));
 	}
 
 	private void addString(String s, int insertBack) {
-		map.values().forEach(t -> {
+		map.values().stream().forEach(t -> {
 			int len = t.length();
 			t.insert(len-insertBack, s);
 		});
@@ -194,7 +194,7 @@ public class OxLxOptimizer implements MMLStringOptimizer.Optimizer {
 				deleteKey.add(key);
 			}
 		});
-		deleteKey.forEach(t -> map.remove(t));
+		deleteKey.stream().forEach(t -> map.remove(t));
 	}
 
 	private String section = "4";
