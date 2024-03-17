@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2023 たんらる
+ * Copyright (C) 2013-2024 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
@@ -528,6 +528,21 @@ public final class PianoRollView extends JPanel {
 	}
 
 	/**
+	 * ノートイベントが現在の表示範囲内であるかどうかを判定する.
+	 * @param noteEvent
+	 * @return  0: 表示範囲内, -1: 表示範囲より前, +1: 表示範囲より後
+	 */
+	public int isValidDrawNote(MMLNoteEvent noteEvent) {
+		if ( (noteEvent.getEndTick() < startViewTick) && (noteEvent.getTickOffset() < startViewTick - DRAW_START_MARGIN) ) {
+			return -1;
+		}
+		if (noteEvent.getTickOffset() > endViewTick) {
+			return 1;
+		}
+		return 0;
+	}
+
+	/**
 	 * MMLEventリストのロールを表示します。
 	 * @param g
 	 * @param mmlPart
@@ -538,11 +553,11 @@ public final class PianoRollView extends JPanel {
 
 		// 現在のView範囲のみを描画する.
 		for (MMLNoteEvent noteEvent : mmlPart) {
-			if ( (noteEvent.getEndTick() < startViewTick) && (noteEvent.getTickOffset() < startViewTick - DRAW_START_MARGIN) ) {
+			int t = isValidDrawNote(noteEvent);
+			if (t < 0) {
 				prevNote = noteEvent;
 				continue;
-			}
-			if (noteEvent.getTickOffset() > endViewTick) {
+			} else if (t > 0) {
 				break;
 			}
 

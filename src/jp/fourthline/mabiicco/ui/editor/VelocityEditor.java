@@ -298,6 +298,13 @@ public final class VelocityEditor extends JPanel implements MouseInputListener, 
 		Color fillColor = ColorManager.defaultColor().getActiveFillColor(trackIndex);
 
 		for (MMLNoteEvent noteEvent : eventList.getMMLNoteEventList()) {
+			int t = pianoRollView.isValidDrawNote(noteEvent);
+			if (t < 0) {
+				continue;
+			} else if (t > 0) {
+				break;
+			}
+
 			int x = tickToX(noteEvent.getTickOffset());
 			int velocity = noteEvent.getVelocity();
 			if (velocity < 0)  velocity = 0;

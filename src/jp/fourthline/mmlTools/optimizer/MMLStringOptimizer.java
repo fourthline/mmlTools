@@ -30,7 +30,7 @@ public final class MMLStringOptimizer {
 	/**
 	 * キャッシュ
 	 */
-	private final Map<String, String> mmlCache = new CacheMap<>(16);
+	private final Map<String, String> mmlCache = new CacheMap<>(4);
 
 	public static void setDebug(boolean b) {
 		debug = b;
@@ -157,6 +157,10 @@ public final class MMLStringOptimizer {
 
 	Map<String, String> getCache() {
 		return mmlCache;
+	}
+
+	public void setCache(MMLStringOptimizer o) {
+		mmlCache.putAll(o.mmlCache);
 	}
 
 	public static void main(String[] args) {
