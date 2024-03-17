@@ -768,7 +768,7 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 		scheduledExecutor.scheduleWithFixedDelay(() -> {
 			if (MabiDLS.getInstance().getSequencer().isRunning()) {
 				EventQueue.invokeLater(() -> {
-					updatePianoRollView();
+					updatePianoRollView(true);
 				});
 			}
 		}, 500, 25, TimeUnit.MILLISECONDS);
@@ -776,14 +776,22 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 
 	@Override
 	public void updatePianoRollView() {
+		updatePianoRollView(false);
+	}
+
+	private void updatePianoRollView(boolean updateSequenceBar) {
 		JViewport viewport = scrollPane.getViewport();
 		Point point = viewport.getViewPosition();
 		int note = pianoRollView.convertY2Note(point.y)-1;
-		updatePianoRollView(note);
+		updatePianoRollView(note, updateSequenceBar);
 	}
 
 	@Override
 	public void updatePianoRollView(int note) {
+		updatePianoRollView(note, false);
+	}
+
+	private void updatePianoRollView(int note, boolean updateSequenceBar) {
 		pianoRollView.updateRunningSequencePosition();
 		int curPositionTick = (int) pianoRollView.getSequencePlayPosition();
 		int curPositionX = pianoRollView.convertTicktoX(curPositionTick);
@@ -818,7 +826,13 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 		point.setLocation(positionX, positionY);
 		viewport.setViewPosition(point);
 		UIUtils.viewportSetPositionWorkaround(viewport, point);
-		mainPanel.repaint();
+
+		if (updateSequenceBar) {
+			// シーケンスバー更新のときは必要なコンポーネントだけをrepaintする
+			scrollPane.repaint();
+		} else {
+			mainPanel.repaint();
+		}
 	}
 
 	@Override
