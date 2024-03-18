@@ -69,7 +69,7 @@ public final class MMLStringOptimizer {
 		return cachedOptimize(optLevel, disableNopt);
 	}
 
-	public String cachedOptimize(int gen, boolean disableNopt) {
+	private String cachedOptimize(int gen, boolean disableNopt) {
 		String key = gen + ":" + disableNopt + ":" + originalMML;
 		String str = mmlCache.get(key);
 		if (str != null) {
