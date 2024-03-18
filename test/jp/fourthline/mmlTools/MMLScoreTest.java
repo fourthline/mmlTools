@@ -373,7 +373,7 @@ public class MMLScoreTest extends UseLoadingDLS {
 		}
 	}
 
-	private final MMLOptimizerPerfoｒmanceCounter optNormal = new MMLOptimizerPerfoｒmanceCounter("Normal", t -> t.toString());
+	private final MMLOptimizerPerfoｒmanceCounter optNormal = new MMLOptimizerPerfoｒmanceCounter("Normal", t -> t.optimize(true));
 	private final MMLOptimizerPerfoｒmanceCounter optGen2   = new MMLOptimizerPerfoｒmanceCounter("Gen2  ", t -> t.optimizeGen2());
 	private final MMLOptimizerPerfoｒmanceCounter optGen3   = new MMLOptimizerPerfoｒmanceCounter("Gen3  ", t -> t.optimizeGen3());
 	/**

@@ -126,7 +126,7 @@ public final class MMLStringOptimizer {
 	/**
 	 * MML最適化 Normal
 	 */
-	private String optimize(boolean opt) {
+	public String optimize(boolean opt) {
 		return optimize(!opt ? new Optimizer[] {
 				new OxLxOptimizer(),
 				new BpCmOptimizer(),
