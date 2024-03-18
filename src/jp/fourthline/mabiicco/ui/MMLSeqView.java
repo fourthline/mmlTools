@@ -581,21 +581,25 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 
 	public void undo() {
 		if (undoEdit.canUndo()) {
+			var time = NanoTime.start();
 			undoEdit.undo();
 			mmlScore = mmlScore.toGeneratedScore(false);
 			resetTrackView();
 			updateSelectedTrackAndMMLPart();
 			updateActivePart(false);
+			ActionDispatcher.getInstance().showTime("undo", time);
 		}
 	}
 
 	public void redo() {
 		if (undoEdit.canRedo()) {
+			var time = NanoTime.start();
 			undoEdit.redo();
 			mmlScore = mmlScore.toGeneratedScore(false);
 			resetTrackView();
 			updateSelectedTrackAndMMLPart();
 			updateActivePart(false);
+			ActionDispatcher.getInstance().showTime("redo", time);
 		}
 	}
 

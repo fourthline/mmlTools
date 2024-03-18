@@ -40,7 +40,7 @@ public class MMLStringOptimizerTest {
 
 	@Test(timeout=TIMEOUT)
 	public void test0() {
-		MMLStringOptimizer optimizer = new MMLStringOptimizer().set("");
+		MMLStringOptimizer optimizer = new MMLStringOptimizer("");
 		assertEquals("", optimizer.toString());
 	}
 
@@ -50,7 +50,7 @@ public class MMLStringOptimizerTest {
 
 	private void checkMMLStringOptimize(String input, String expect, Function<MMLStringOptimizer, String> f) {
 		try {
-			MMLStringOptimizer optimizer = new MMLStringOptimizer().set(MMLBuilder.create(new MMLEventList(input)).toMMLString(true, true));
+			MMLStringOptimizer optimizer = new MMLStringOptimizer(MMLBuilder.create(new MMLEventList(input)).toMMLString(true, true));
 			String mml = f.apply(optimizer);
 
 			System.out.println(input);
@@ -620,9 +620,9 @@ public class MMLStringOptimizerTest {
 	public void test_cache() {
 		String expect1 =  "l64cr32cr32cr32c";
 		String expect2 =  "l64crrcrrcrrc";
+		MMLStringOptimizer.getCache().clear();
 
-		var optimizer = new MMLStringOptimizer();
-		optimizer.set("l64cr32cr32cr32c");
+		var optimizer = new MMLStringOptimizer("l64cr32cr32cr32c");
 		MMLStringOptimizer.setOptimizeLevel(MMLStringOptimizer.GEN2);
 		assertEquals(expect1, optimizer.preciseOptimize());
 		MMLStringOptimizer.setOptimizeLevel(MMLStringOptimizer.GEN3);
@@ -632,6 +632,8 @@ public class MMLStringOptimizerTest {
 		MMLStringOptimizer.setOptimizeLevel(MMLStringOptimizer.GEN1);
 		assertEquals(expect1, optimizer.preciseOptimize());
 
-		assertEquals(3, optimizer.getCache().keySet().size());
+		assertEquals(3, MMLStringOptimizer.getCache().keySet().size());
+
+		MMLStringOptimizer.setOptimizeLevel(MMLStringOptimizer.GEN2);
 	}
 }

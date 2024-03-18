@@ -4,6 +4,7 @@
 
 package jp.fourthline.mmlTools.optimizer;
 
+import java.util.Collections;
 import java.util.Map;
 
 import jp.fourthline.mmlTools.MMLEventList;
@@ -29,8 +30,9 @@ public final class MMLStringOptimizer {
 
 	/**
 	 * キャッシュ
+	 *   undo, redoでも使えるようにstaticとする.
 	 */
-	private final Map<String, String> mmlCache = new CacheMap<>(4);
+	private static final Map<String, String> mmlCache = Collections.synchronizedMap(new CacheMap<>(256));
 
 	public static void setDebug(boolean b) {
 		debug = b;
@@ -44,40 +46,40 @@ public final class MMLStringOptimizer {
 		optLevel = level;
 	}
 
-	private String originalMML;
+	private final String originalMML;
 
 	private boolean disableNopt = false;
 
 	/**
 	 * @param mml   MMLEventListで出力したMML文字列.
 	 */
-	public MMLStringOptimizer() {}
-
-	public MMLStringOptimizer set(String mml) {
+	public MMLStringOptimizer(String mml) {
 		this.originalMML = mml;
-		return this;
 	}
 
 	@Override
 	public String toString() {
-		return optimize(false);
+		return cachedOptimize(GEN1, false);
 	}
 
 	/**
-	 * 精密なMML最適化を行う
 	 * 設定によってGen2/Normalを切り替える, Gen2の場合は出力結果を再Parseして検査する.
 	 */
 	public String preciseOptimize() {
-		String key = optLevel + ":" + disableNopt + ":" + originalMML;
+		return cachedOptimize(optLevel, disableNopt);
+	}
+
+	public String cachedOptimize(int gen, boolean disableNopt) {
+		String key = gen + ":" + disableNopt + ":" + originalMML;
 		String str = mmlCache.get(key);
 		if (str != null) {
 			return str;
 		}
 
-		if (optLevel == GEN2) {
+		if (gen == GEN2) {
 			String mml1 = optimizeGen2();
 			str = (new MMLEventList(mml1).equals(new MMLEventList(originalMML))) ? mml1 : optimize(disableNopt);
-		} else if (optLevel == GEN3) {
+		} else if (gen == GEN3) {
 			String mml1 = optimizeGen3();
 			str = (new MMLEventList(mml1).equals(new MMLEventList(originalMML))) ? mml1 : optimize(disableNopt);
 		} else {
@@ -155,12 +157,8 @@ public final class MMLStringOptimizer {
 		String getMinString();
 	}
 
-	Map<String, String> getCache() {
+	static Map<String, String> getCache() {
 		return mmlCache;
-	}
-
-	public void setCache(MMLStringOptimizer o) {
-		mmlCache.putAll(o.mmlCache);
 	}
 
 	public static void main(String[] args) {
@@ -168,6 +166,6 @@ public final class MMLStringOptimizer {
 		// String mml = "c8c2c1c8c2c1c8c2c1c8c2c1";
 		String mml = "c1<a+>rc<a+>c1";
 		// System.out.println( new MMLStringOptimizer(mml).toString() );
-		System.out.println(new MMLStringOptimizer().set(mml).optimizeGen2());
+		System.out.println(new MMLStringOptimizer(mml).optimizeGen2());
 	}
 }

@@ -119,7 +119,7 @@ public final class MMLTextEditor implements DocumentListener, CaretListener {
 		int startOffset = mmlManager.getActiveTrack().getStartOffset(index);
 		var mmlBuilder = MMLBuilder.create(mmlManager.getActiveMMLPart(), startOffset);
 		// テンポありの汎用出力.
-		String text = new MMLStringOptimizer().set(mmlBuilder.toMMLString(true, false)).optimizeForTextEditor();
+		String text = new MMLStringOptimizer(mmlBuilder.toMMLString(true, false)).optimizeForTextEditor();
 		textPane.setText(text);
 		applyStyle();
 

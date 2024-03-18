@@ -11,6 +11,7 @@ public class CacheMap<K, V> extends LinkedHashMap<K, V> {
 	private static final long serialVersionUID = 8400828433060223318L;
 
 	private final int max;
+
 	public CacheMap(int max) {
 		super(16, 0.75f, true);
 		this.max = max;
