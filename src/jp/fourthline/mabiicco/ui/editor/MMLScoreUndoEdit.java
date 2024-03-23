@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 たんらる
+ * Copyright (C) 2014-2024 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.editor;
@@ -38,8 +38,6 @@ public final class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFil
 	private final IMMLManager mmlManager;
 	private int originalIndex = 0; /** オリジナル位置. undo/redo範囲外になった場合は 負値. 0~size-1 */
 
-	private String backupString = null;
-
 	public MMLScoreUndoEdit(IMMLManager mmlManager) {
 		this.mmlManager = mmlManager;
 	}
@@ -72,7 +70,6 @@ public final class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFil
 			fileStateObserver.notifyUpdateFileState();
 
 		System.out.println("saveState() "+undoState.size());
-		makeBackup();
 	}
 
 	@Override
@@ -136,12 +133,14 @@ public final class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFil
 		this.fileStateObserver = observer;
 	}
 
-	private void makeBackup() {
+	private String makeBackup() {
+		String str = null;
 		try {
-			backupString = compress(makeBackupString());
+			str = compress(makeBackupString());
 		} catch (IOException e) {
-			backupString = null;
+			str = null;
 		}
+		return str;
 	}
 
 	private void writeStack(PrintStream out, Stack<byte[]> data) throws IOException {
@@ -242,6 +241,6 @@ public final class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFil
 	}
 
 	public String getBackupString() {
-		return backupString;
+		return makeBackup();
 	}
 }
