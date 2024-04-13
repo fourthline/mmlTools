@@ -4,7 +4,9 @@
 
 package jp.fourthline.mmlTools.optimizer;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import jp.fourthline.mmlTools.MMLEventList;
@@ -33,6 +35,21 @@ public final class MMLStringOptimizer {
 	 *   undo, redoでも使えるようにstaticとする.
 	 */
 	private static final Map<String, String> mmlCache = Collections.synchronizedMap(new CacheMap<>(256));
+
+	private static final List<Map<?, ?>> cacheList = new ArrayList<>();
+
+	public static void addCacheList(Map<?, ?> map) {
+		cacheList.add(map);
+	}
+
+	public static void clearAllCache() {
+		cacheList.forEach(t -> t.clear());
+	}
+
+	static {
+		addCacheList(mmlCache);
+	}
+
 
 	public static void setDebug(boolean b) {
 		debug = b;

@@ -5,6 +5,7 @@
 package jp.fourthline.mmlTools.optimizer;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,6 @@ public final class OxLxFixedAltOptimizer extends OxLxFixedOptimizer {
 	}
 
 	private final OptimizerMap altPatternMap = new OptimizerMap();
-	private final Map<String, List<AltPattern>> altCache = new CacheMap<>(32);
 
 	/**
 	 * 置換パターン
@@ -106,7 +106,7 @@ public final class OxLxFixedAltOptimizer extends OxLxFixedOptimizer {
 		final String amp = !note1[0].equals("r") ? "&" : "";
 
 		try {
-			var s1 = AltPattern.getAltList(altCache, note1[1], note2[1], key);
+			var s1 = AltPattern.getAltList(note1[1], note2[1], key);
 			if (s1 != null) {
 				var str = builder.substring(0, startIndex);
 				var m = s1.stream().filter(t -> t.getLStr().isEmpty()).map(t -> note1[0] + (t.getNeedDot() ? "."+amp : amp ) + note2[0] + t.getAltPattern()).min(Comparator.naturalOrder());
@@ -145,6 +145,12 @@ public final class OxLxFixedAltOptimizer extends OxLxFixedOptimizer {
 	}
 
 	private static class AltPattern {
+		private static final Map<String, List<AltPattern>> altCache = Collections.synchronizedMap(new CacheMap<>(128));
+
+		static {
+			MMLStringOptimizer.addCacheList(altCache);
+		}
+
 		private final String altPattern;
 		private final boolean needDot;
 		private final Optional<String> lStr;
@@ -166,7 +172,7 @@ public final class OxLxFixedAltOptimizer extends OxLxFixedOptimizer {
 			return lStr;
 		}
 
-		public static List<AltPattern> getAltList(Map<String, List<AltPattern>> altCache, String note1, String note2, String lStr) throws MMLException {
+		public static List<AltPattern> getAltList(String note1, String note2, String lStr) throws MMLException {
 			if (!MMLTokenizer.isLenOnly(note1) || !MMLTokenizer.isLenOnly(note2)) {
 				return null;
 			}

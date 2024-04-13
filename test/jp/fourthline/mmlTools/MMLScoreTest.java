@@ -626,6 +626,7 @@ public class MMLScoreTest extends UseLoadingDLS {
 	public static class MMLOptimizerPerfoｒmanceCounter implements Function<MMLStringOptimizer, String> {
 		private long output = 0;
 		private long time = 0;
+		private long cachedTime = 0;
 		private final String name;
 		private final Function<MMLStringOptimizer, String> f;
 
@@ -635,15 +636,26 @@ public class MMLScoreTest extends UseLoadingDLS {
 		}
 
 		public void printReport() {
-			System.out.println(name+": output = " + output + ", time = " + time/1000 + " [ms], speed = " + output/(time/1000) + " [k/s]");
+			System.out.println(name+": output = " + output + ", time = " + (time/1000) + "(" + (cachedTime/1000) + ") [ms], speed = " + output/(time/1000) + "(" + output/(cachedTime/1000) + ") [k/s]");
 		}
 
 		@Override
 		public String apply(MMLStringOptimizer t) {
+			MMLStringOptimizer.clearAllCache();
+
 			NanoTime time = NanoTime.start();
 			String ret = f.apply(t);
 			this.time += time.us();
 			output += ret.length();
+
+			// 同じ処理をしたときのキャッシュ効果を測定する.
+			NanoTime ctime = NanoTime.start();
+			String ret2 = f.apply(t);
+			if (!ret.equals(ret2)) {
+				throw new AssertionError();
+			}
+			this.cachedTime += ctime.us();
+
 			return ret;
 		}
 	}

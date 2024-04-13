@@ -5,6 +5,7 @@
 package jp.fourthline.mmlTools.optimizer;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -115,18 +116,22 @@ public class OxLxFixedOptimizer extends OxLxOptimizer {
 		}
 
 
-		private final Map<String, Integer> cache = new CacheMap<>(32);
-		private int calcSubNxBpCmOptLength(String mml, int commonLen, int octave, boolean disableNopt) {
-			String initStr = mml.substring(0, commonLen);
+		private static final Map<String, Integer> cache = Collections.synchronizedMap(new CacheMap<>(1024 << 3));
+		static {
+			MMLStringOptimizer.addCacheList(cache);
+		}
 
-			String key = mml + ":" + commonLen + ":" + octave + ":" + disableNopt;
+		private static int calcSubNxBpCmOptLength(String commonStr, String mml, int octave, boolean disableNopt) {
+			int commonLen = commonStr.length();
+
+			String key = commonLen + ":" + mml + ":" + + octave + ":" + (disableNopt ? "1" : "0");
 			var s = cache.get(key);
 			if (s != null) {
 				return s;
 			}
 
-			NxBpCmOptimizer optimizer = new NxBpCmOptimizer(octave, initStr, disableNopt);
-			new MMLTokenizer(mml.substring(commonLen)).forEachRemaining(optimizer::nextToken);
+			NxBpCmOptimizer optimizer = new NxBpCmOptimizer(octave, commonStr, disableNopt);
+			new MMLTokenizer(mml).forEachRemaining(optimizer::nextToken);
 
 			var r = optimizer.getMinString().length();
 			cache.put(key, r);
@@ -141,8 +146,9 @@ public class OxLxFixedOptimizer extends OxLxOptimizer {
 			} else {
 				int commonLen = compString(builder, now);
 				int octave = calcOctave(builder.substring(0, commonLen));
-				int i1 = calcSubNxBpCmOptLength(builder.toString(), commonLen, octave, disableNopt);
-				int i2 = calcSubNxBpCmOptLength(now.toString(), commonLen, octave, disableNopt);
+				String commonStr = builder.substring(0, commonLen);
+				int i1 = calcSubNxBpCmOptLength(commonStr, builder.substring(commonLen), octave, disableNopt);
+				int i2 = calcSubNxBpCmOptLength(commonStr, now.substring(commonLen), octave, disableNopt);
 				if (i1 < i2) {
 					this.put(key, builder);
 				}
