@@ -116,7 +116,7 @@ public final class PolyphonyMonitor implements Runnable {
 		this.value = v;
 		max = Math.max(max, v);
 		var s = "Poly: " + Integer.toString(v) + "    ";
-		if (!textField.getText().equals(s)) {
+		if (!s.equals(textField.getText())) {
 			textField.setText(s);
 			mainPanel.repaint();
 		}
@@ -150,10 +150,10 @@ public final class PolyphonyMonitor implements Runnable {
 	@Override
 	public void run() {
 		while (true) {
-			update();
 			try {
+				update();
 				Thread.sleep(100);
-			} catch (InterruptedException e) {}
+			} catch (Exception e) {}
 		}
 	}
 }
