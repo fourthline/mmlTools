@@ -4,7 +4,10 @@
 
 package jp.fourthline.mmlTools.core;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 
 /**
@@ -80,11 +83,19 @@ public final class MMLTokenizer implements Iterator<String> {
 		return noteName;
 	}
 
+	private static final Map<String, String[]> tokenCache = Collections.synchronizedMap(new HashMap<>());
 	public static String[] noteNames(String token) {
+		var t = tokenCache.get(token);
+		if (t != null) {
+			return t;
+		}
+
 		String noteName = noteName(token);
 		String noteLength = token.substring(noteName.length());
 
-		return new String[] { noteName, noteLength };
+		var newV = new String[] { noteName, noteLength };
+		tokenCache.put(token, newV);
+		return newV;
 	}
 
 	public static boolean isLenOnly(String str) {
