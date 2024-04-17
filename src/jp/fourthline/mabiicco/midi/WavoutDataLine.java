@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2023 たんらる
+ * Copyright (C) 2017-2024 たんらる
  */
 
 package jp.fourthline.mabiicco.midi;
@@ -10,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
@@ -36,8 +37,36 @@ public final class WavoutDataLine implements SourceDataLine, IWavoutState {
 	private Runnable endNotify;
 	private ISoundDataLine soundDataLine = null;
 
+	private final AtomicInteger lineStallCounter = new AtomicInteger(0);
+
+	private void reconnect() {
+		parent.flush();
+		System.out.println(System.currentTimeMillis() + " flush");
+	}
+
+	private final Runnable dataLineObserver = () -> {
+		try {
+			// 初期停止.
+			Thread.sleep(6000);
+			System.out.println("start DataLineAutoFlush.");
+
+			while (true) {
+				Thread.sleep(100);
+				if (lineStallCounter.incrementAndGet() > 3) {
+					reconnect();
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	};
+
 	public WavoutDataLine() throws LineUnavailableException {
 		this.parent = AudioSystem.getSourceDataLine(format);
+
+		if ("true".equals(System.getProperties().get("mabiicco.dlaf"))) {
+			new Thread(dataLineObserver, "DataLine Observer").start();
+		}
 	}
 
 	private long time;
@@ -127,7 +156,7 @@ public final class WavoutDataLine implements SourceDataLine, IWavoutState {
 
 	@Override
 	public int available() {
-		return available();
+		return parent.available();
 	}
 
 	@Override
@@ -249,7 +278,9 @@ public final class WavoutDataLine implements SourceDataLine, IWavoutState {
 		if (soundDataLine != null) {
 			soundDataLine.write(b);
 		}
-		return parent.write(b, off, len);
+		var ret = parent.write(b, off, len);
+		lineStallCounter.set(0);
+		return ret;
 	}
 
 	public void setSoundDataLine(ISoundDataLine soundDataLine) {
