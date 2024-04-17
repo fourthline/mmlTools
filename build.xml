@@ -59,6 +59,11 @@
 				<include name="**/*.png" />
 			</fileset>
 		</copy>
+		<copy todir="${dest}/resources">
+			<fileset dir="properties">
+				<include name="**/*.properties" />
+			</fileset>
+		</copy>
 	</target>
 
 	<!-- compile-test task -->

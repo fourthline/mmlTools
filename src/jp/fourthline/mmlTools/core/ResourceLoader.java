@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 たんらる
+ * Copyright (C) 2014-2024 たんらる
  */
 
 package jp.fourthline.mmlTools.core;
@@ -24,10 +24,20 @@ public final class ResourceLoader extends Control {
 			throws IllegalAccessException, InstantiationException, IOException {
 		String bundleName = toBundleName(baseName, locale);
 		String resourceName = toResourceName(bundleName, "properties");
-		InputStream stream = new FileInputStream(getAppPath("properties/"+resourceName));
+		InputStream stream = getResourceFile(resourceName);
 		ResourceBundle resource = new PropertyResourceBundle(new InputStreamReader(stream, StandardCharsets.UTF_8));
 		stream.close();
 		return resource;
+	}
+
+	public static InputStream getResourceFile(String path) throws IOException {
+		String app_path = System.getProperty("app.path");
+		if (app_path != null) {
+			var url = ResourceLoader.class.getResource("/resources/"+path);
+			return url.openStream();
+		}
+
+		return new FileInputStream("properties/"+path);
 	}
 
 	public static String getAppPath(String path) {
