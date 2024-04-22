@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2023 たんらる
+ * Copyright (C) 2013-2024 たんらる
  */
 
 package jp.fourthline.mabiicco.midi;
@@ -88,7 +88,7 @@ public final class MabiDLS {
 		int midiChannels = this.synthesizer.getChannels().length;
 		System.out.printf("Latency: %d\nMaxPolyphony: %d\nChannels: %d\n", latency, maxPolyphony, midiChannels);
 
-		this.sequencer = MidiSystem.getSequencer();
+		this.sequencer = MidiSystem.getSequencer(false);
 		this.sequencer.open();
 		this.sequencer.addMetaEventListener(meta -> {
 			int type = meta.getType();
@@ -108,7 +108,7 @@ public final class MabiDLS {
 
 		// シーケンサとシンセサイザの初期化
 		initializeSynthesizer();
-		Transmitter transmitter = this.sequencer.getTransmitters().get(0);
+		Transmitter transmitter = this.sequencer.getTransmitter();
 		transmitter.setReceiver(new ExtendMessage.ExtendReceiver(this.synthesizer.getReceiver(), MAX_MIDI_PART));
 	}
 
