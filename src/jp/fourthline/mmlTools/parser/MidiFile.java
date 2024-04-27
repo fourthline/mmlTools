@@ -599,15 +599,14 @@ public final class MidiFile extends AbstractMMLParser {
 			System.out.printf("program change: [%d] [%d] (%d)\n", data1, data2, channel);
 			if (channel == 9) {
 				trackInfo.setProgram(InstClass.DRUM);
-			}
-			if (!canConvertInst) {
-				if (channel != 9) {
+			} else {
+				if (!canConvertInst) {
 					trackInfo.setProgram(data1);
+				} else if (parseConvertInst && midInstTable.containsKey(data1)) {
+					data1 = midInstTable.get(data1);
+					trackInfo.setProgram(data1);
+					System.out.println("   -> " + data1);
 				}
-			} else if (parseConvertInst && midInstTable.containsKey(data1)) {
-				data1 = midInstTable.get(data1);
-				trackInfo.setProgram(data1);
-				System.out.println("   -> " + data1);
 			}
 			break;
 		default:
