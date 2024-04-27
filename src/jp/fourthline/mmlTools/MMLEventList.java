@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2023 たんらる
+ * Copyright (C) 2013-2024 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -380,6 +380,16 @@ public final class MMLEventList implements Serializable, Cloneable {
 					note1.setTick(note1.getTick() + delta);
 				}
 			}
+		}
+	}
+
+	/**
+	 * 移調する.
+	 * @param transpose
+	 */
+	public void transpose(int transpose) {
+		for (MMLNoteEvent note : noteList) {
+			note.setNote( note.getNote() + transpose );
 		}
 	}
 

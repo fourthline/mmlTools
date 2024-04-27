@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2023 たんらる
+ * Copyright (C) 2013-2024 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -13,7 +13,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
-import jp.fourthline.mabiicco.midi.MabiDLS;
 import jp.fourthline.mmlTools.core.MMLTicks;
 import jp.fourthline.mmlTools.core.MMLException;
 import jp.fourthline.mmlTools.parser.MMSFile;
@@ -368,24 +367,6 @@ public final class MMLScore implements Cloneable {
 			throw new MMLExceptionList(mmlErrStack);
 		}
 		return this;
-	}
-
-	/**
-	 * 移調する.
-	 * @param transpose
-	 */
-	public void transpose(int transpose) {
-		MabiDLS dls = MabiDLS.getInstance();
-		for (MMLTrack track : trackList) {
-			// 移調ができる楽器の種類かを確認. 通常の打楽器は不可, シロフォンは可能.
-			if (dls.getInstByProgram(track.getProgram()).getType().allowTranspose()) {
-				for (MMLEventList eventList : track.getMMLEventList()) {
-					for (MMLNoteEvent note : eventList.getMMLNoteEventList()) {
-						note.setNote( note.getNote() + transpose );
-					}
-				}
-			}
-		}
 	}
 
 	/**

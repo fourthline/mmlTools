@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 たんらる
+ * Copyright (C) 2022-2024 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.mml;
@@ -9,7 +9,7 @@ import jp.fourthline.mmlTools.MMLEventList;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTrack;
 
-class MMLManagerStub extends AbstractMMLManager {
+public class MMLManagerStub extends AbstractMMLManager {
 	@Override
 	public void setMMLScore(MMLScore score) {}
 

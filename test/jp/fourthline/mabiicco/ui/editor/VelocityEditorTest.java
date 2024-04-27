@@ -23,7 +23,6 @@ import jp.fourthline.mabiicco.ui.MMLSeqView;
 import jp.fourthline.mabiicco.ui.MainFrame;
 import jp.fourthline.mabiicco.ui.PianoRollView.NoteHeight;
 import jp.fourthline.mabiicco.ui.editor.VelocityEditor.EditMode;
-import jp.fourthline.mabiicco.ui.editor.VelocityEditor.RangeMode;
 import jp.fourthline.mabiicco.ui.editor.VelocityEditor.VelocityWidth;
 import jp.fourthline.mmlTools.MMLNoteEvent;
 import jp.fourthline.mmlTools.MMLTrack;

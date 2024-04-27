@@ -48,7 +48,7 @@ import jp.fourthline.mmlTools.MMLNoteEvent;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.Measure;
 
-public final class VelocityEditor extends JPanel implements MouseInputListener, ActionListener, ChangeScaleListener, Supplier<VelocityEditor.RangeMode> {
+public final class VelocityEditor extends JPanel implements MouseInputListener, ActionListener, ChangeScaleListener, Supplier<RangeMode> {
 	private static final long serialVersionUID = -4676324927393791707L;
 
 	public static int HEIGHT = 120;
@@ -77,66 +77,6 @@ public final class VelocityEditor extends JPanel implements MouseInputListener, 
 		@Override
 		public String toString() {
 			return getButtonName();
-		}
-	}
-
-	public enum RangeMode implements SettingButtonGroupItem {
-		SELECTED_PART("paintMode.active_part", false, false),
-		SELECTED_TRACK("paintMode.active_track", true, false),
-		ALL_TRACK("paintMode.all_track", true, true)
-		;
-		private final String buttonName;
-		private final boolean curTrack;
-		private final boolean all;
-		private RangeMode(String name, boolean curTrack, boolean all) {
-			this.buttonName = name;
-			this.curTrack = curTrack;
-			this.all = all;
-		}
-
-		private interface PartAction {
-			void action(int trackIndex, int partIndex);
-		}
-
-		public void action(VelocityEditor velocityEditor, PartAction func) {
-			var mmlManager = velocityEditor.mmlManager;
-			int trackIndex = mmlManager.getActiveTrackIndex();
-			int partIndex = mmlManager.getActiveMMLPartIndex();
-
-			int trackCount = mmlManager.getMMLScore().getTrackCount();
-			int partCount = mmlManager.getMMLScore().getTrack(trackIndex).getMMLEventList().size();
-
-			// Other Track
-			if (all) {
-				for (int i = 0; i < trackCount; i++) {
-					if (trackIndex != i) {
-						if (mmlManager.getMMLScore().getTrack(i).isVisible()) {
-							for (int p = 0; p < partCount; p++) {
-								func.action(i, p);
-							}
-						}
-					}
-				}
-			}
-
-			// Active Track & Active Part以外
-			if (curTrack) {
-				if (mmlManager.getMMLScore().getTrack(trackIndex).isVisible()) {
-					for (int i = 0; i < partCount; i++) {
-						if (partIndex != i) {
-							func.action(trackIndex, i);
-						}
-					}
-				}
-			}
-
-			// Active Part
-			func.action(trackIndex, partIndex);
-		}
-
-		@Override
-		public String getButtonName() {
-			return buttonName;
 		}
 	}
 
@@ -285,7 +225,7 @@ public final class VelocityEditor extends JPanel implements MouseInputListener, 
 	}
 
 	private void paintVelocityNote(Graphics2D g) {
-		rangeMode.action(this, (a, b) -> paintVelocityNote(g, a, b));
+		rangeMode.action(mmlManager, (a, b) -> paintVelocityNote(g, a, b));
 	}
 
 	private void paintVelocityNote(Graphics2D g, int trackIndex, int partIndex) {
@@ -457,7 +397,7 @@ public final class VelocityEditor extends JPanel implements MouseInputListener, 
 			}
 
 			private void updateNoteVelocity(VelocityEditor velocityEditor, Point endPoint, int x) {
-				velocityEditor.rangeMode.action(velocityEditor, (a, b) -> updateNoteVelocity(velocityEditor, endPoint, x, a, b));
+				velocityEditor.rangeMode.action(velocityEditor.mmlManager, (a, b) -> updateNoteVelocity(velocityEditor, endPoint, x, a, b));
 			}
 
 			private void updateNoteVelocity(VelocityEditor velocityEditor, Point endPoint, int x, int trackIndex, int partIndex) {
@@ -507,7 +447,7 @@ public final class VelocityEditor extends JPanel implements MouseInputListener, 
 			 * @param g
 			 */
 			private void paintActiveLine(VelocityEditor velocityEditor, Graphics2D g) {
-				velocityEditor.rangeMode.action(velocityEditor, (a, b) -> paintActiveLine(velocityEditor, g, a, b));
+				velocityEditor.rangeMode.action(velocityEditor.mmlManager, (a, b) -> paintActiveLine(velocityEditor, g, a, b));
 			}
 
 			private void paintActiveLine(VelocityEditor velocityEditor, Graphics2D g, int trackIndex, int partIndex) {
@@ -565,7 +505,7 @@ public final class VelocityEditor extends JPanel implements MouseInputListener, 
 
 			private void updateEditNote(VelocityEditor velocityEditor) {
 				editNoteMap.clear();
-				velocityEditor.rangeMode.action(velocityEditor, (a, b) -> updateEditNote(velocityEditor, a, b));
+				velocityEditor.rangeMode.action(velocityEditor.mmlManager, (a, b) -> updateEditNote(velocityEditor, a, b));
 			}
 
 			private void updateEditNote(VelocityEditor velocityEditor, int trackIndex, int partIndex) {
@@ -624,7 +564,7 @@ public final class VelocityEditor extends JPanel implements MouseInputListener, 
 		abstract Point getCurrentPoint();
 
 		final void applyEnd(VelocityEditor velocityEditor) {
-			velocityEditor.rangeMode.action(velocityEditor, (a, b) -> applyEnd(velocityEditor, a, b));
+			velocityEditor.rangeMode.action(velocityEditor.mmlManager, (a, b) -> applyEnd(velocityEditor, a, b));
 			editNoteMap.clear();
 			velocityEditor.mmlManager.updateActivePart(true);
 		}

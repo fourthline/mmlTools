@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2022 たんらる
+ * Copyright (C) 2014-2024 たんらる
  */
 
 package jp.fourthline.mabiicco;
@@ -67,8 +67,24 @@ public final class AppResource {
 	}
 
 	public static String appText(String key) {
+		return appText(key, true);
+	}
+
+	private static String appText(String key, boolean v) {
 		try {
-			return bundle.getString(key);
+			StringBuilder sb = new StringBuilder(bundle.getString(key));
+
+			while (v) {
+				int start = sb.indexOf("%%");
+				int end = sb.indexOf("%%", start + 1);
+				if ((start >= 0) && (start + 2 < end)) {
+					String str = appText(sb.substring(start+2, end), false);
+					sb.replace(start, end+2, str);
+				} else {
+					v = false;
+				}
+			}
+			return sb.toString();
 		} catch (java.util.MissingResourceException e) {
 			return key;
 		}

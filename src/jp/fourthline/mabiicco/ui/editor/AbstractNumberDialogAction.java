@@ -1,12 +1,11 @@
 /*
- * Copyright (C) 2022 たんらる
+ * Copyright (C) 2022-2024 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.editor;
 
 import java.awt.BorderLayout;
 import java.awt.Frame;
-import java.util.function.IntConsumer;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -16,12 +15,11 @@ import javax.swing.JSpinner;
 import jp.fourthline.mabiicco.ui.UIUtils;
 
 
-public abstract class AbstractNumberDialogAction {
-	private final Frame parentFrame;
+public abstract sealed class AbstractNumberDialogAction permits MMLTranspose, UserViewWidthDialog {
+	protected final Frame parentFrame;
 	private final String title;
-	private final JPanel cPanel;
+	protected final JPanel cPanel;
 	private final JSpinner spinner;
-	private final IntConsumer function;
 
 	/**
 	 * 単一の数値入力Spinnerのダイアログ表示をして, 処理を実行する.
@@ -32,12 +30,10 @@ public abstract class AbstractNumberDialogAction {
 	 * @param min          数値の最小値
 	 * @param max          数値の最大値
 	 * @param step         数値の変動ステップ
-	 * @param function     OKボタンを押されたときの処理
 	 */
-	protected AbstractNumberDialogAction(Frame parentFrame, String title, String message, int initial, int min, int max, int step, IntConsumer function) {
+	protected AbstractNumberDialogAction(Frame parentFrame, String title, String message, int initial, int min, int max, int step) {
 		this.parentFrame = parentFrame;
 		this.title = title;
-		this.function = function;
 
 		JPanel panel = new JPanel();
 		panel.add(new JLabel(message));
@@ -53,7 +49,13 @@ public abstract class AbstractNumberDialogAction {
 		int status = JOptionPane.showConfirmDialog(parentFrame, cPanel, title, JOptionPane.OK_CANCEL_OPTION);
 		if (status == JOptionPane.OK_OPTION) {
 			int v = ((Integer) spinner.getValue()).intValue();
-			function.accept(v);
+			apply(v);
 		}
 	}
+
+	/**
+	 * OKボタンを押されたときの処理
+	 * @param v
+	 */
+	public abstract void apply(int v);
 }
