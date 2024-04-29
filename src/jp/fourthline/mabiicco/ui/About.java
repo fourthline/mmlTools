@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2023 たんらる
+ * Copyright (C) 2014-2024 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
@@ -20,7 +20,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeCellRenderer;
 
@@ -86,20 +85,9 @@ public final class About {
 			list.add(v);
 		});
 
-		JTable table = new JTable(new DefaultTableModel(list, column) {
-			private static final long serialVersionUID = 1L;
-			@Override
-			public boolean isCellEditable(int row, int column) {
-				return false;
-			}
-		});
+		JTable table = UIUtils.createTable(list, column);
 		table.getColumnModel().getColumn(0).setMinWidth(200);
 		table.getColumnModel().getColumn(0).setMaxWidth(200);
-		table.getTableHeader().setResizingAllowed(false);
-		table.getTableHeader().setReorderingAllowed(false);
-		table.getTableHeader().setRequestFocusEnabled(false);
-		table.setFocusable(false);
-		table.setRowSelectionAllowed(false);
 
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.setPreferredSize(new Dimension(600, 400));

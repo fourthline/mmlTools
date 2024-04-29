@@ -155,6 +155,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String MML_X_EXPORT = "mml_x_export";
 	@Action public static final String POLYPHONY_MONITOR = "polyphony_monitor";
 	@Action public static final String MIDI_MABI_DRUM_CONVERT = "midi_mabi_drum_convert";
+	@Action public static final String MIDI_MABI_DRUM_CONVERT_SHOW_MAP = "midi_mabi_drum_convert_show_map";
 
 	private final HashMap<String, Consumer<Object>> actionMap = new HashMap<>();
 
@@ -345,7 +346,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(MML_X_IMPORT, t -> mmlSeqView.mml_xImportAction());
 		actionMap.put(MML_X_EXPORT, t -> mmlSeqView.mml_xExportAction());
 		actionMap.put(POLYPHONY_MONITOR, t -> PolyphonyMonitor.getInstance().show(mainFrame));
-		actionMap.put(MIDI_MABI_DRUM_CONVERT, t -> DrumConverter.midDrum2MabiDrum(mmlSeqView, mmlSeqView.getActiveTrack()));
+		actionMap.put(MIDI_MABI_DRUM_CONVERT, t -> DrumConverter.midDrum2MabiDrum(mmlSeqView));
+		actionMap.put(MIDI_MABI_DRUM_CONVERT_SHOW_MAP, t -> DrumConverter.showConvertMap(mainFrame));
 	}
 
 	@Override
@@ -762,6 +764,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		mainFrame.setSelectedEdit(editState.hasSelectedNote());
 		mainFrame.setPasteEnable(editState.canPaste());
 		mainFrame.setRemoveRestsBetweenNotesEnable(editState.hasSelectedMultipleConsecutiveNotes());
+		mainFrame.setDrumConvert(DrumConverter.isDrumTrack(mmlSeqView.getActiveTrack()));
 
 		// 楽譜集分割-UI更新
 		var track = mmlSeqView.getActiveTrack();

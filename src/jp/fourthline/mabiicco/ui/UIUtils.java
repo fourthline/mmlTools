@@ -13,6 +13,7 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.Vector;
 import java.util.function.Supplier;
 
 import javax.swing.AbstractAction;
@@ -25,6 +26,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.JViewport;
@@ -35,6 +37,7 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.table.DefaultTableModel;
 
 import jp.fourthline.mabiicco.ActionDispatcher;
 import jp.fourthline.mabiicco.AppResource;
@@ -239,5 +242,23 @@ public final class UIUtils {
 			viewport.setViewPosition(p);
 			if (++count > 100) break;
 		}
+	}
+
+	@SuppressWarnings("rawtypes")
+	public static JTable createTable(Vector<? extends Vector> list, Vector<?> column) {
+		JTable table = new JTable(new DefaultTableModel(list, column) {
+			private static final long serialVersionUID = 746461323527083725L;
+
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
+		});
+		table.getTableHeader().setResizingAllowed(false);
+		table.getTableHeader().setReorderingAllowed(false);
+		table.getTableHeader().setRequestFocusEnabled(false);
+		table.setFocusable(false);
+		table.setRowSelectionAllowed(false);
+		return table;
 	}
 }

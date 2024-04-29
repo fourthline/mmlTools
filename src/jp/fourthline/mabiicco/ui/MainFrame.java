@@ -98,6 +98,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	private PlayStateComponent<JMenuItem> velocityUpMenu = null;
 	private PlayStateComponent<JMenuItem> velocityDownMenu = null;
 	private PlayStateComponent<JMenuItem> xExportMenu = null;
+	private PlayStateComponent<JMenuItem> drumConvertMenu = null;
 
 	private JButton loopButton = null;
 
@@ -298,7 +299,9 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 				KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.ALT_DOWN_MASK));
 		velocityDownMenu = createMenuItem(editMenu, "edit.velocity_down", ActionDispatcher.VELOCITY_DOWN, true,
 				KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.ALT_DOWN_MASK));
-		createMenuItem(editMenu, "edit.drum_convert", ActionDispatcher.MIDI_MABI_DRUM_CONVERT, true);
+		if (MabiIccoProperties.getInstance().soundEnv.get().useDLS()) {
+			drumConvertMenu = createMenuItem(editMenu, "edit.drum_convert", ActionDispatcher.MIDI_MABI_DRUM_CONVERT, true);
+		}
 
 		editMenu.add(new JSeparator());
 
@@ -408,6 +411,9 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 			createMenuItem(helpMenu, "menu.instList", ActionDispatcher.INST_LIST);
 		}
 		createMenuItem(helpMenu, "menu.polyphonyMonitor", ActionDispatcher.POLYPHONY_MONITOR);
+		if (drumConvertMenu != null) {
+			createMenuItem(helpMenu, "menu.drum_converting_map", ActionDispatcher.MIDI_MABI_DRUM_CONVERT_SHOW_MAP);
+		}
 
 		return menuBar;
 	}
@@ -721,6 +727,12 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 
 	public void setXExport(boolean b) {
 		xExportMenu.setEnabled(b);
+	}
+
+	public void setDrumConvert(boolean b) {
+		if (drumConvertMenu != null) {
+			drumConvertMenu.setEnabled(b);
+		}
 	}
 
 	public void updateLoop(boolean b) {
