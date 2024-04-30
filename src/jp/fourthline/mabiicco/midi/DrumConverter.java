@@ -27,10 +27,11 @@ public final class DrumConverter {
 
 	private static final Map<Integer, Entry> drumMap = new HashMap<>();
 
-	private static final int X = MMLEventParser.firstNoteNumber("O3D");
+	private static final String X_NOTE = "O3D";
+	private static final int X = MMLEventParser.firstNoteNumber(X_NOTE);
 	private static final String X_NAME = "Snare ghost";
 
-	private record Entry(String midStr, String mabiStr, int mabiDrum) {}
+	private record Entry(String midStr, String mabiStr, String mabiDrumNote, int mabiDrum) {}
 
 	static {
 		ResourceBundle instPatch = ResourceBundle.getBundle("midDrum_mabiDrum", new ResourceLoader());
@@ -38,8 +39,9 @@ public final class DrumConverter {
 			String lineStr = instPatch.getString(key);
 			String s[] = lineStr.split("\t");
 			int midDrum = Integer.parseInt(key);
-			int mabiDrum = MMLEventParser.firstNoteNumber("O" + s[2] + s[3].replace("b", "-"));
-			drumMap.put(midDrum, new Entry(s[0], s[4], mabiDrum));
+			String mabiDrumNote = "O" + s[2] + s[3].replace("b", "-");
+			int mabiDrum = MMLEventParser.firstNoteNumber(mabiDrumNote);
+			drumMap.put(midDrum, new Entry(s[0], s[4], mabiDrumNote, mabiDrum));
 		});
 	}
 
@@ -82,11 +84,11 @@ public final class DrumConverter {
 			var v = new Vector<Object>();
 			v.add(key);
 			v.add(item.midStr);
-			v.add(item.mabiDrum);
+			v.add(item.mabiDrumNote);
 			v.add(inst.isValid(item.mabiDrum) ? item.mabiStr : "-");
 			list.add(v);
 		});
-		list.add(new Vector<Object>(List.of("-", "-", X, X_NAME)));
+		list.add(new Vector<Object>(List.of("-", "-", X_NOTE, X_NAME)));
 
 		JTable table = UIUtils.createTable(list, column);
 		table.getColumnModel().getColumn(0).setMinWidth(100);
