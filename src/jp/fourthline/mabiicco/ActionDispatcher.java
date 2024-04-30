@@ -5,6 +5,7 @@
 package jp.fourthline.mabiicco;
 
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -32,6 +33,7 @@ import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiSystem;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -64,7 +66,6 @@ import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.core.NanoTime;
 import jp.fourthline.mmlTools.parser.IMMLFileParser;
 import jp.fourthline.mmlTools.parser.MMLParseException;
-import sun.swing.FilePane;
 
 public final class ActionDispatcher implements ActionListener, IFileStateObserver, IEditStateObserver {
 	private MainFrame mainFrame;
@@ -203,20 +204,60 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	 */
 	private static final class CuFileChooser extends JFileChooser {
 		private static final long serialVersionUID = 3081886805862237099L;
+
+		private final JTable detailsTable;
+
 		private CuFileChooser() {
 			super();
 			viewDetails();
+			detailsTable = findChildComponent(this, JTable.class);
 		}
+
 		private void viewDetails() {
-			var detailsAction = getActionMap().get(FilePane.ACTION_VIEW_DETAILS);
+			var detailsAction = getActionMap().get("viewTypeDetails");
 			if (detailsAction != null) {
 				detailsAction.actionPerformed(null);
 			}
 		}
+
 		@Override
 		public void updateUI() {
 			super.updateUI();
 			viewDetails();
+		}
+
+		private <T> T findChildComponent(Container container, Class<T> cls) {
+			for (var c : container.getComponents()) {
+				if (cls.isInstance(c)) {
+					return cls.cast(c);
+				} else if (c instanceof Container ct) {
+					var cc = findChildComponent(ct, cls);
+					if (cc != null) {
+						return cc;
+					}
+				}
+			}
+			return null;
+		}
+
+		@Override
+		public void setCurrentDirectory(File dir) {
+			super.setCurrentDirectory(dir);
+			fixNameColumnWidth();
+		}
+
+		/**
+		 * ディレクトリ移動で、Name列の幅が小さくなってしまう問題の対策.
+		 */
+		private void fixNameColumnWidth() {
+			if (detailsTable != null) {
+				int viewWidth = detailsTable.getParent().getSize().width;
+				int tableWidth = detailsTable.getPreferredSize().width;
+				if (tableWidth < viewWidth) {
+					var nameCol = detailsTable.getColumnModel().getColumn(0);
+					nameCol.setPreferredWidth(nameCol.getPreferredWidth() + viewWidth - tableWidth);
+				}
+			}
 		}
 	}
 
