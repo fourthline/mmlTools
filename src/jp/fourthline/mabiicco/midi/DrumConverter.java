@@ -39,7 +39,7 @@ public final class DrumConverter {
 			String lineStr = instPatch.getString(key);
 			String s[] = lineStr.split("\t");
 			int midDrum = Integer.parseInt(key);
-			String mabiDrumNote = "O" + s[2] + s[3].replace("b", "-");
+			String mabiDrumNote = "O" + s[2] + s[3].replace("b", "-").replace("#", "+");
 			int mabiDrum = MMLEventParser.firstNoteNumber(mabiDrumNote);
 			drumMap.put(midDrum, new Entry(s[0], s[4], mabiDrumNote, mabiDrum));
 		});
