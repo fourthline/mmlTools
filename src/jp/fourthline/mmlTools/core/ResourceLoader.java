@@ -31,12 +31,10 @@ public final class ResourceLoader extends Control {
 	}
 
 	public static InputStream getResourceFile(String path) throws IOException {
-		String app_path = System.getProperty("app.path");
-		if (app_path != null) {
-			var url = ResourceLoader.class.getResource("/resources/"+path);
+		var url = ResourceLoader.class.getResource("/resources/"+path);
+		if (url != null) {
 			return url.openStream();
 		}
-
 		return new FileInputStream("properties/"+path);
 	}
 
