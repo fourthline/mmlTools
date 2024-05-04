@@ -48,6 +48,7 @@
 			listfiles="yes"
 			includeantruntime="false">
 			<compilerarg line="--add-exports java.desktop/com.sun.media.sound=ALL-UNNAMED" />
+			<compilerarg line="--add-exports java.desktop/sun.swing=ALL-UNNAMED" />
 	</javac>
 	</target>
 

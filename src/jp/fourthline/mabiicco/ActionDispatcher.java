@@ -9,6 +9,8 @@ import java.awt.Container;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -66,6 +68,7 @@ import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.core.NanoTime;
 import jp.fourthline.mmlTools.parser.IMMLFileParser;
 import jp.fourthline.mmlTools.parser.MMLParseException;
+import sun.swing.FilePane;
 
 public final class ActionDispatcher implements ActionListener, IFileStateObserver, IEditStateObserver {
 	private MainFrame mainFrame;
@@ -202,15 +205,12 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	/**
 	 * Detail表示をデフォルトにするファイルChooser
 	 */
-	private static final class CuFileChooser extends JFileChooser {
+	private static final class CuFileChooser extends JFileChooser implements PropertyChangeListener {
 		private static final long serialVersionUID = 3081886805862237099L;
-
-		private final JTable detailsTable;
 
 		private CuFileChooser() {
 			super();
 			viewDetails();
-			detailsTable = findChildComponent(this, JTable.class);
 		}
 
 		private void viewDetails() {
@@ -220,10 +220,32 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			}
 		}
 
+		private void removeViewTypeAction() {
+			var filePane = findChildComponent(this, FilePane.class);
+			if (filePane != null) {
+				filePane.removePropertyChangeListener("viewType", this);
+			}
+		}
+
+		private void addViewTypeAction() {
+			var filePane = findChildComponent(this, FilePane.class);
+			if (filePane != null) {
+				filePane.addPropertyChangeListener("viewType", this);
+			}
+		}
+
 		@Override
 		public void updateUI() {
+			removeViewTypeAction();
+
 			super.updateUI();
-			viewDetails();
+			if (!getUI().getClass().getSimpleName().equals("WindowsFileChooserUI")) {
+				// WindowsFileChooserUI へ変更する場合, ここでDetail変更するとNULLで落ちてしまう. リスト表示になってしまうが許容.
+				viewDetails();
+			}
+
+			// リスト表示から詳細表示に変更した場合にも名前列の幅修正を行う.
+			addViewTypeAction();
 		}
 
 		private <T> T findChildComponent(Container container, Class<T> cls) {
@@ -250,6 +272,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		 * ディレクトリ移動で、Name列の幅が小さくなってしまう問題の対策.
 		 */
 		private void fixNameColumnWidth() {
+			var detailsTable = findChildComponent(this, JTable.class);  // UI変更した場合追従できないので都度取得する.
 			if (detailsTable != null) {
 				int viewWidth = detailsTable.getParent().getSize().width;
 				int tableWidth = detailsTable.getPreferredSize().width;
@@ -257,6 +280,14 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 					var nameCol = detailsTable.getColumnModel().getColumn(0);
 					nameCol.setPreferredWidth(nameCol.getPreferredWidth() + viewWidth - tableWidth);
 				}
+			}
+		}
+
+		@Override
+		public void propertyChange(PropertyChangeEvent evt) {
+			// リスト -> 詳細 変更時にも幅調整を行う.
+			if (evt.getNewValue().equals(1)) {
+				fixNameColumnWidth();
 			}
 		}
 	}
