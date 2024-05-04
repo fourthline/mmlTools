@@ -36,6 +36,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import jp.fourthline.mabiicco.midi.DrumConverter;
 import jp.fourthline.mabiicco.midi.MMLMidiTrack;
 import jp.fourthline.mabiicco.midi.MabiDLS;
 import jp.fourthline.mabiicco.midi.SoundEnv;
@@ -153,6 +154,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String MML_X_IMPORT = "mml_x_import";
 	@Action public static final String MML_X_EXPORT = "mml_x_export";
 	@Action public static final String POLYPHONY_MONITOR = "polyphony_monitor";
+	@Action public static final String MIDI_MABI_DRUM_CONVERT = "midi_mabi_drum_convert";
 
 	private final HashMap<String, Consumer<Object>> actionMap = new HashMap<>();
 
@@ -343,6 +345,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(MML_X_IMPORT, t -> mmlSeqView.mml_xImportAction());
 		actionMap.put(MML_X_EXPORT, t -> mmlSeqView.mml_xExportAction());
 		actionMap.put(POLYPHONY_MONITOR, t -> PolyphonyMonitor.getInstance().show(mainFrame));
+		actionMap.put(MIDI_MABI_DRUM_CONVERT, t -> DrumConverter.midDrum2MabiDrum(mmlSeqView, mmlSeqView.getActiveTrack()));
 	}
 
 	@Override

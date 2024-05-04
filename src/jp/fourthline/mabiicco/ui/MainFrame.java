@@ -298,6 +298,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 				KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.ALT_DOWN_MASK));
 		velocityDownMenu = createMenuItem(editMenu, "edit.velocity_down", ActionDispatcher.VELOCITY_DOWN, true,
 				KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.ALT_DOWN_MASK));
+		createMenuItem(editMenu, "edit.drum_convert", ActionDispatcher.MIDI_MABI_DRUM_CONVERT, true);
 
 		editMenu.add(new JSeparator());
 

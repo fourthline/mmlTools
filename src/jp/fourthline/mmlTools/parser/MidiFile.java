@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2023 たんらる
+ * Copyright (C) 2017-2024 たんらる
  */
 
 package jp.fourthline.mmlTools.parser;
@@ -22,7 +22,10 @@ import java.util.ResourceBundle;
 
 import javax.sound.midi.*;
 
+import jp.fourthline.mabiicco.MabiIccoProperties;
 import jp.fourthline.mabiicco.midi.InstClass;
+import jp.fourthline.mabiicco.midi.InstType;
+import jp.fourthline.mabiicco.midi.MabiDLS;
 import jp.fourthline.mmlTools.MMLEvent;
 import jp.fourthline.mmlTools.MMLEventList;
 import jp.fourthline.mmlTools.MMLExceptionList;
@@ -275,7 +278,14 @@ public final class MidiFile extends AbstractMMLParser {
 			MMLTrack track = new MMLTrack();
 			track.setTrackName(name);
 			track.setPanpot(panpot);
-			track.setProgram(program);
+			var trackProgram = program;
+			if ((program == InstClass.DRUM) && (MabiIccoProperties.getInstance().soundEnv.get().useDLS())) {
+				InstClass[] insts = MabiDLS.getInstance().getAvailableInstByInstType(List.of(InstType.DRUMS));
+				if (insts.length > 0) {
+					trackProgram = insts[0].getProgram();
+				}
+			}
+			track.setProgram(trackProgram);
 			return track;
 		}
 		private void setName(String name) {
@@ -530,6 +540,13 @@ public final class MidiFile extends AbstractMMLParser {
 		}
 	}
 
+	private int convertMidiNote(TrackInfo trackInfo, int data) {
+		if (trackInfo.program != InstClass.DRUM) {
+			data -= (parseConvertOctave ? 12 : 0);
+		}
+		return data;
+	}
+
 	/**
 	 * ショートメッセージ
 	 * @param msg
@@ -550,7 +567,7 @@ public final class MidiFile extends AbstractMMLParser {
 			break;
 		case ShortMessage.NOTE_ON:
 			if (data2 > 0) {
-				int note = data1 - (parseConvertOctave ? 12 : 0);
+				int note = convertMidiNote(trackInfo, data1);
 				int velocity = data2 / 8;
 				if (!activeNoteMap.containsKey(note)) {
 					MMLNoteEvent noteEvent = new MMLNoteEvent(note, 0, (int)tick, velocity);
@@ -567,7 +584,7 @@ public final class MidiFile extends AbstractMMLParser {
 			}
 			// data2 == 0 は Note Off.
 		case ShortMessage.NOTE_OFF:
-			int note = data1 - (parseConvertOctave ? 12 : 0);
+			int note = convertMidiNote(trackInfo, data1);
 			MMLNoteEvent noteEvent = activeNoteMap.get(note);
 			if (noteEvent != null) {
 				tick -= noteEvent.getTickOffset();
@@ -580,10 +597,11 @@ public final class MidiFile extends AbstractMMLParser {
 			break;
 		case ShortMessage.PROGRAM_CHANGE:
 			System.out.printf("program change: [%d] [%d] (%d)\n", data1, data2, channel);
+			if (channel == 9) {
+				trackInfo.setProgram(InstClass.DRUM);
+			}
 			if (!canConvertInst) {
-				if (channel == 9) {
-					trackInfo.setProgram(InstClass.DRUM);
-				} else {
+				if (channel != 9) {
 					trackInfo.setProgram(data1);
 				}
 			} else if (parseConvertInst && midInstTable.containsKey(data1)) {
