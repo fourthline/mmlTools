@@ -4,6 +4,7 @@
 
 package jp.fourthline.mabiicco.midi;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.util.HashMap;
@@ -12,7 +13,9 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Vector;
 
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
@@ -23,6 +26,9 @@ import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.core.ResourceLoader;
 import jp.fourthline.mmlTools.parser.MMLEventParser;
 
+/**
+ * ドラム変換 (General MIDI -> Mabi)
+ */
 public final class DrumConverter {
 
 	private static final Map<Integer, Entry> drumMap = new HashMap<>();
@@ -99,6 +105,12 @@ public final class DrumConverter {
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.setPreferredSize(new Dimension(600, 400));
 		String title = AppResource.appText("menu.drum_converting_map");
-		JOptionPane.showMessageDialog(parentFrame, scrollPane, title, JOptionPane.PLAIN_MESSAGE);
+
+		JLabel gmDesc = new JLabel(" * GM: General MIDI");
+		JPanel panel = new JPanel(new BorderLayout());
+		panel.add(scrollPane, BorderLayout.CENTER);
+		panel.add(gmDesc, BorderLayout.SOUTH);
+
+		JOptionPane.showMessageDialog(parentFrame, panel, title, JOptionPane.PLAIN_MESSAGE);
 	}
 }
