@@ -5,12 +5,9 @@
 package jp.fourthline.mabiicco;
 
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,7 +32,6 @@ import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiSystem;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -68,7 +64,6 @@ import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.core.NanoTime;
 import jp.fourthline.mmlTools.parser.IMMLFileParser;
 import jp.fourthline.mmlTools.parser.MMLParseException;
-import sun.swing.FilePane;
 
 public final class ActionDispatcher implements ActionListener, IFileStateObserver, IEditStateObserver {
 	private MainFrame mainFrame;
@@ -173,11 +168,11 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	private final FileFilter wavFilter = new FileNameExtensionFilter(AppResource.appText("file.wav"), "wav");
 	private final FileFilter txtFilter = new FileNameExtensionFilter(AppResource.appText("file.txt"), "txt");
 
-	private final JFileChooser openFileChooser;
-	private final JFileChooser saveFileChooser;
-	private final JFileChooser exportFileChooser;
-	private final JFileChooser wavoutFileChooser;
-	private final JFileChooser txtFileChooser;
+	private JFileChooser openFileChooser;
+	private JFileChooser saveFileChooser;
+	private JFileChooser exportFileChooser;
+	private JFileChooser wavoutFileChooser;
+	private JFileChooser txtFileChooser;
 
 	// laf変更時に更新が必要なもののリスト
 	private final List<Component> updateUIComponents = new ArrayList<>();
@@ -202,105 +197,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		updateUIComponents.add(c);
 	}
 
-	/**
-	 * Detail表示をデフォルトにするファイルChooser
-	 */
-	private static final class CuFileChooser extends JFileChooser implements PropertyChangeListener {
-		private static final long serialVersionUID = 3081886805862237099L;
-
-		private CuFileChooser() {
-			super();
-			viewDetails();
-		}
-
-		private void viewDetails() {
-			var detailsAction = getActionMap().get("viewTypeDetails");
-			if (detailsAction != null) {
-				detailsAction.actionPerformed(null);
-			}
-		}
-
-		private void removeViewTypeAction() {
-			var filePane = findChildComponent(this, FilePane.class);
-			if (filePane != null) {
-				filePane.removePropertyChangeListener("viewType", this);
-			}
-		}
-
-		private void addViewTypeAction() {
-			var filePane = findChildComponent(this, FilePane.class);
-			if (filePane != null) {
-				filePane.addPropertyChangeListener("viewType", this);
-			}
-		}
-
-		@Override
-		public void updateUI() {
-			removeViewTypeAction();
-
-			super.updateUI();
-			if (!getUI().getClass().getSimpleName().equals("WindowsFileChooserUI")) {
-				// WindowsFileChooserUI へ変更する場合, ここでDetail変更するとNULLで落ちてしまう. リスト表示になってしまうが許容.
-				viewDetails();
-			}
-
-			// リスト表示から詳細表示に変更した場合にも名前列の幅修正を行う.
-			addViewTypeAction();
-		}
-
-		private <T> T findChildComponent(Container container, Class<T> cls) {
-			for (var c : container.getComponents()) {
-				if (cls.isInstance(c)) {
-					return cls.cast(c);
-				} else if (c instanceof Container ct) {
-					var cc = findChildComponent(ct, cls);
-					if (cc != null) {
-						return cc;
-					}
-				}
-			}
-			return null;
-		}
-
-		@Override
-		public void setCurrentDirectory(File dir) {
-			super.setCurrentDirectory(dir);
-			fixNameColumnWidth();
-		}
-
-		/**
-		 * ディレクトリ移動で、Name列の幅が小さくなってしまう問題の対策.
-		 */
-		private void fixNameColumnWidth() {
-			var detailsTable = findChildComponent(this, JTable.class);  // UI変更した場合追従できないので都度取得する.
-			if (detailsTable != null) {
-				int viewWidth = detailsTable.getParent().getSize().width;
-				int tableWidth = detailsTable.getPreferredSize().width;
-				if (tableWidth < viewWidth) {
-					var nameCol = detailsTable.getColumnModel().getColumn(0);
-					nameCol.setPreferredWidth(nameCol.getPreferredWidth() + viewWidth - tableWidth);
-				}
-			}
-		}
-
-		@Override
-		public void propertyChange(PropertyChangeEvent evt) {
-			// リスト -> 詳細 変更時にも幅調整を行う.
-			if (evt.getNewValue().equals(1)) {
-				fixNameColumnWidth();
-			}
-		}
-	}
-
-	private ActionDispatcher() {
-		openFileChooser = new CuFileChooser();
-		saveFileChooser = new CuFileChooser();
-		exportFileChooser = new CuFileChooser();
-		wavoutFileChooser = new CuFileChooser();
-		txtFileChooser = new CuFileChooser();
-
-		List.of(openFileChooser, saveFileChooser, exportFileChooser, wavoutFileChooser, txtFileChooser).forEach(t -> updateUIComponents.add((Component)t));
-	}
+	private ActionDispatcher() {}
 
 	public ActionDispatcher setMainFrame(MainFrame mainFrame) {
 		if (this.mainFrame != null) {
@@ -328,6 +225,12 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	}
 
 	private void initializeFileChooser() {
+		openFileChooser = new FixFileChooser();
+		saveFileChooser = new FixFileChooser();
+		exportFileChooser = new FixFileChooser();
+		wavoutFileChooser = new FixFileChooser();
+		txtFileChooser = new FixFileChooser();
+
 		openFileChooser.addChoosableFileFilter(allFilter);
 		openFileChooser.addChoosableFileFilter(mmiFilter);
 		openFileChooser.addChoosableFileFilter(mmsFilter);
@@ -941,7 +844,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	}
 
 	private void selectDLSFile() {
-		JFileChooser fileChooser = new CuFileChooser();
+		JFileChooser fileChooser = new FixFileChooser();
 		fileChooser.setCurrentDirectory(new File("."));
 		FileFilter dlsFilter = new FileNameExtensionFilter(AppResource.appText("file.dls"), "dls");
 		fileChooser.addChoosableFileFilter(dlsFilter);
@@ -982,6 +885,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 				if (laf != null) {
 					appProperties.laf.set(laf);
 					updateUIComponents.forEach(t -> SwingUtilities.updateComponentTreeUI(t));
+					initializeFileChooser(); // WindowsUIでは updateUIしたあと詳細表示切り替えでNullPointerExceptionになるので、オブジェクトから再生成する.
 					mainFrame.repaint();
 				}
 			} else if (o instanceof VelocityWidth vw) {

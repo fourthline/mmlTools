@@ -30,7 +30,6 @@ import jp.fourthline.mmlTools.parser.MMLEventParser;
  * ドラム変換 (General MIDI -> Mabi)
  */
 public final class DrumConverter {
-
 	private static final Map<Integer, Entry> drumMap = new HashMap<>();
 
 	private static final String X_NOTE = "O3D";
@@ -57,6 +56,9 @@ public final class DrumConverter {
 	 * @return
 	 */
 	public static boolean isDrumTrack(MMLTrack track) {
+		if (track == null) {
+			return false;
+		}
 		var type = MabiDLS.getInstance().getInstByProgram(track.getProgram()).getType();
 		return (type == InstType.DRUMS);
 	}
