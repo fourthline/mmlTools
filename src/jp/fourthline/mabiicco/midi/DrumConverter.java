@@ -11,9 +11,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.TreeMap;
 import java.util.Vector;
 
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -30,24 +30,65 @@ import jp.fourthline.mmlTools.parser.MMLEventParser;
  * ドラム変換 (General MIDI -> Mabi)
  */
 public final class DrumConverter {
-	private static final Map<Integer, Entry> drumMap = new HashMap<>();
+	private static final Map<KeyMap, KeyMap> drumMap = new HashMap<>();
+	private static final Map<Integer, KeyMap> mabiMap = new TreeMap<>();
+	private static final Map<Integer, KeyMap> midMap = new TreeMap<>();
 
 	private static final String X_NOTE = "O3D";
-	private static final int X = MMLEventParser.firstNoteNumber(X_NOTE);
 	private static final String X_NAME = "Snare ghost";
 
-	private record Entry(String midStr, String mabiStr, String mabiDrumNote, int mabiDrum) {}
+	public record KeyMap(String key, String name) implements Comparable<KeyMap> {
+		public int getKey() {
+			if (key.startsWith("O")) {
+				return MMLEventParser.firstNoteNumber(key);
+			} else {
+				return Integer.parseInt(key);
+			}
+		}
+
+		@Override
+		public String toString() {
+			return key + ": " + name;
+		}
+
+		public String validName(InstClass inst) {
+			boolean valid = inst.isValid(getKey());
+			return key + ": " + (valid ? name : "-");
+		}
+
+		@Override
+		public int hashCode() {
+			return getKey();
+		}
+
+		@Override
+		public int compareTo(KeyMap o) {
+			return getKey() - o.getKey();
+		}
+	}
 
 	static {
 		ResourceBundle instPatch = ResourceBundle.getBundle("midDrum_mabiDrum", new ResourceLoader());
 		instPatch.keySet().stream().sorted().forEach(key -> {
 			String lineStr = instPatch.getString(key);
 			String s[] = lineStr.split("\t");
-			int midDrum = Integer.parseInt(key);
 			String mabiDrumNote = "O" + s[2] + s[3].replace("b", "-").replace("#", "+");
-			int mabiDrum = MMLEventParser.firstNoteNumber(mabiDrumNote);
-			drumMap.put(midDrum, new Entry(s[0], s[4], mabiDrumNote, mabiDrum));
+			var midEntry = new KeyMap(key, s[0]);
+			var mabiEntry = new KeyMap(mabiDrumNote, s[4]);
+			if (mabiMap.containsKey(mabiEntry.getKey())) {
+				mabiEntry = mabiMap.get(mabiEntry.getKey());
+			} else {
+				mabiMap.put(mabiEntry.getKey(), mabiEntry);
+			}
+			if (!midMap.containsKey(midEntry.getKey())) {
+				drumMap.put(midEntry, mabiEntry);
+				midMap.put(midEntry.getKey(), midEntry);
+			}
 		});
+
+		var n = new KeyMap(X_NOTE, X_NAME);
+		drumMap.put(null, n);
+		mabiMap.entrySet().forEach(t -> System.out.println(t));
 	}
 
 	/**
@@ -68,8 +109,9 @@ public final class DrumConverter {
 		if (isDrumTrack(track)) {
 			for (var eventList : track.getMMLEventList()) {
 				for (var noteEvent : eventList.getMMLNoteEventList()) {
-					var item = drumMap.get(noteEvent.getNote());
-					var note = (item == null) ? X : item.mabiDrum;
+					var key = midMap.get(noteEvent.getNote());
+					var item = drumMap.get(key);
+					var note = item.getKey();
 					noteEvent.setNote(note);
 				}
 			}
@@ -79,39 +121,26 @@ public final class DrumConverter {
 
 	public static void showConvertMap(Frame parentFrame) {
 		Vector<String> column = new Vector<>();
-		column.add("GM key");
-		column.add("GM name");
-		column.add("Mabi key");
-		column.add("Mabi name");
+		column.add("General MIDI");
+		column.add("Mabi");
 
 		final var inst = MabiDLS.getInstance().getAvailableInstByInstType(List.of(InstType.DRUMS))[0];
 
 		Vector<Vector<Object>> list = new Vector<>();
-		drumMap.keySet().stream().sorted().forEach(key -> {
-			var item = drumMap.get(key);
-			var v = new Vector<Object>();
-			v.add(key);
-			v.add(item.midStr);
-			v.add(item.mabiDrumNote);
-			v.add(inst.isValid(item.mabiDrum) ? item.mabiStr : "-");
-			list.add(v);
+		midMap.forEach((key, value) -> {
+			var mid = value;
+			var mabi = drumMap.get(value);
+			list.add(new Vector<Object>(List.of(mid, mabi.validName(inst))));
 		});
-		list.add(new Vector<Object>(List.of("-", "-", X_NOTE, X_NAME)));
 
 		JTable table = UIUtils.createTable(list, column);
-		table.getColumnModel().getColumn(0).setMinWidth(100);
-		table.getColumnModel().getColumn(0).setMaxWidth(100);
-		table.getColumnModel().getColumn(2).setMinWidth(100);
-		table.getColumnModel().getColumn(2).setMaxWidth(100);
 
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.setPreferredSize(new Dimension(600, 400));
 		String title = AppResource.appText("menu.drum_converting_map");
 
-		JLabel gmDesc = new JLabel(" * GM: General MIDI");
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.add(scrollPane, BorderLayout.CENTER);
-		panel.add(gmDesc, BorderLayout.SOUTH);
 
 		JOptionPane.showMessageDialog(parentFrame, panel, title, JOptionPane.PLAIN_MESSAGE);
 	}
