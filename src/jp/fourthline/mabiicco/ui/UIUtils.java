@@ -31,6 +31,7 @@ import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.AncestorEvent;
@@ -259,6 +260,7 @@ public final class UIUtils {
 		table.getTableHeader().setRequestFocusEnabled(false);
 		table.setFocusable(false);
 		table.setRowSelectionAllowed(false);
+		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		return table;
 	}
 }

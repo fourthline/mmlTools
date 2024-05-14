@@ -321,7 +321,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(MML_X_IMPORT, t -> mmlSeqView.mml_xImportAction());
 		actionMap.put(MML_X_EXPORT, t -> mmlSeqView.mml_xExportAction());
 		actionMap.put(POLYPHONY_MONITOR, t -> PolyphonyMonitor.getInstance().show(mainFrame));
-		actionMap.put(MIDI_MABI_DRUM_CONVERT, t -> DrumConverter.midDrum2MabiDrum(mmlSeqView));
+		actionMap.put(MIDI_MABI_DRUM_CONVERT, t -> DrumConverter.getInstance().midDrum2MabiDrum(mmlSeqView));
 		actionMap.put(MIDI_MABI_DRUM_CONVERT_SHOW_MAP, t -> DrumConverter.showConvertMap(mainFrame));
 	}
 

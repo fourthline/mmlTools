@@ -46,8 +46,8 @@ public final class MabiDLS {
 	private static final int MAX_MIDI_PART = MMLScore.MAX_TRACK * NUM_CHANNEL_ON_TRACK;
 	private final ArrayList<InstClass> insts = new ArrayList<>();
 	private final Map<File, List<InstClass>> instsMap = new TreeMap<>();
-	private static final int DLS_BANK = (0x79 << 7);
-	private static final int DRUM_BANK = (0x78 << 7);
+	public static final int DLS_BANK = (0x79 << 7);
+	public static final int DRUM_BANK = (0x78 << 7);
 
 	public static final String[] DEFALUT_DLS_PATH = {
 			"Nexon/Mabinogi/mp3/MSXspirit01.dls",
@@ -78,7 +78,7 @@ public final class MabiDLS {
 		HashMap<String, Object> info = new HashMap<>();
 		info.put("midi channels", MAX_MIDI_PART);
 		info.put("large mode", "true");
-		info.put("load default soundbank", "false");
+//		info.put("load default soundbank", "false");
 		info.put("max polyphony", "256");
 		((SoftSynthesizer)this.synthesizer).open(wavout = new WavoutDataLine(), info);
 		addTrackEndNotifier(() -> wavout.stopRec());
@@ -345,6 +345,20 @@ public final class MabiDLS {
 			playNote = new MMLNoteEvent(note, 0, 0, velocity);
 		}
 		playNotes(score, new MMLNoteEvent[] { playNote }, trackIndex, partIndex);
+	}
+
+	public void playCustom(int note, int velocity, int bank, int program) {
+		int channel = 3;
+		MidiChannel midiChannel = this.channel[channel];
+		midiChannel.setMute(false);
+		midiChannel.controlChange(10, 64);
+		midiChannel.controlChange(7, 100);
+		midiChannel.programChange(bank, program);
+		if (note >= 0) {
+			midiChannel.noteOn(note, velocity);
+		} else {
+			midiChannel.allNotesOff();
+		}
 	}
 
 	/** 和音再生 */

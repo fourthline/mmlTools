@@ -195,7 +195,7 @@ public final class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFil
 		return true;
 	}
 
-	private String compress(String s) {
+	public static String compress(String s) {
 		try {
 			ByteArrayOutputStream bstream = new ByteArrayOutputStream();
 			GZIPOutputStream out = new GZIPOutputStream( bstream );
@@ -209,7 +209,7 @@ public final class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFil
 		return null;
 	}
 
-	private String decompress(String s) {
+	public static String decompress(String s) {
 		try {
 			GZIPInputStream in = new GZIPInputStream(
 					new ByteArrayInputStream(

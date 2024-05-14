@@ -24,7 +24,7 @@ public final class DrumConverterTest extends UseLoadingDLS {
 
 		// 楽器がドラムではないのでなにもしないパターン.
 		assertFalse(DrumConverter.isDrumTrack(track));
-		DrumConverter.midDrum2MabiDrum(mmlManager);
+		DrumConverter.getInstance().midDrum2MabiDrum(mmlManager);
 		track.generate();
 
 		assertEquals(mml1, track.getOriginalMML());
@@ -32,7 +32,7 @@ public final class DrumConverterTest extends UseLoadingDLS {
 		// 楽器をドラムに変更して実行.
 		track.setProgram(27);
 		assertTrue(DrumConverter.isDrumTrack(track));
-		DrumConverter.midDrum2MabiDrum(mmlManager);
+		DrumConverter.getInstance().midDrum2MabiDrum(mmlManager);
 		track.generate();
 
 		assertEquals(mml2, track.getOriginalMML());

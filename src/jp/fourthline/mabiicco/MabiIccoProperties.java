@@ -156,6 +156,9 @@ public final class MabiIccoProperties {
 	/** Velocity bar width */
 	public final EnumProperty<VelocityWidth> velocityWidth = new EnumProperty<VelocityWidth>("function.velocityEditor.velocity_width", VelocityWidth.values(), VelocityWidth.W4);
 
+	/** DrumConverter: custom map */
+	public final Property<String> drumConvertCustomMap = new StringProperty("function.drum_convert_custom_map");
+
 	public static MabiIccoProperties getInstance() {
 		return instance;
 	}
