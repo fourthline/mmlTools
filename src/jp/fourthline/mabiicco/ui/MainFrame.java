@@ -384,6 +384,9 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createCheckMenu(settingMenu, "edit.tempoDeleteWithConvert", appProperties.enableTempoDeleteWithConvert);
 		UIUtils.createGroupMenu(settingMenu, "ui.mouse_scroll_width", appProperties.mouseScrollWidth);
 		createCheckMenu(settingMenu, "velocity_editor", appProperties.velocityEditor);
+		if (drumConvertMenu != null) {
+			createMenuItem(settingMenu, "menu.drum_converting_map", ActionDispatcher.MIDI_MABI_DRUM_CONVERT_SHOW_MAP);
+		}
 		settingMenu.add(new JSeparator());
 		// MML生成に関わる設定
 //		createCheckMenu(settingMenu, "mml.precise_optimize", appProperties.enableMMLPreciseOptimize, ActionDispatcher.MML_GENERATE);
@@ -411,9 +414,6 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 			createMenuItem(helpMenu, "menu.instList", ActionDispatcher.INST_LIST);
 		}
 		createMenuItem(helpMenu, "menu.polyphonyMonitor", ActionDispatcher.POLYPHONY_MONITOR);
-		if (drumConvertMenu != null) {
-			createMenuItem(helpMenu, "menu.drum_converting_map", ActionDispatcher.MIDI_MABI_DRUM_CONVERT_SHOW_MAP);
-		}
 
 		return menuBar;
 	}

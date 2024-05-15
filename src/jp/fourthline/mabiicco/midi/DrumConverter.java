@@ -7,6 +7,8 @@ package jp.fourthline.mabiicco.midi;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -18,6 +20,7 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.TreeMap;
 import java.util.Vector;
+import java.util.function.Supplier;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -254,6 +257,7 @@ public final class DrumConverter {
 
 		private Editor() {
 			super(new BorderLayout());
+			var icon = AppResource.getImageIcon(AppResource.appText("drum_convert.sound_icon"));
 
 			c.midMap.forEach((key, value) -> {
 				var mid = value;
@@ -261,7 +265,7 @@ public final class DrumConverter {
 				list.add(new Vector<>(List.of(mid.key, mid.getName(), mabi.keyName, mabiName(mid, mabi))));
 			});
 			var noMapItem = c.drumMap.get(null);
-			list.add(new Vector<>(List.of("-", "-", noMapItem.key, mabiName(null, noMapItem))));
+			list.add(new Vector<>(List.of("-", "-", noMapItem.keyName, mabiName(null, noMapItem))));
 
 			table = UIUtils.createTable(list, new Vector<>(List.of("GM key", "GM name", "Mabi key", "Mabi name")));
 			table.getColumnModel().getColumn(0).setMinWidth(100);
@@ -284,20 +288,39 @@ public final class DrumConverter {
 			JPanel cp1 = new JPanel(new BorderLayout());
 			cp1.add(new JLabel("MIDI: "), BorderLayout.WEST);
 			cp1.add(midLabel, BorderLayout.CENTER);
-			cp1.add(new JButton("S1"), BorderLayout.EAST);
+			var b1 = new JButton(icon);
+			b1.setFocusable(false);
+			b1.addMouseListener(new MMM(null, () -> {
+				int row = table.getSelectedRow();
+				if (row < 0) return -1;
+				var mid = getKeyMap(row);
+				return (mid != null) ? mid.key : -1;
+			}));
+			cp1.add(b1, BorderLayout.EAST);
 			JPanel cp2 = new JPanel(new BorderLayout());
 			cp2.add(new JLabel("現在: "), BorderLayout.WEST);
 			cp2.add(mabiLabel, BorderLayout.CENTER);
-			cp2.add(new JButton("S2"), BorderLayout.EAST);
+			var b2 = new JButton(icon);
+			b2.setFocusable(false);
+			b2.addMouseListener(new MMM(c.inst, () -> {
+				int row = table.getSelectedRow();
+				if (row < 0) return -1;
+				var mid = getKeyMap(row);
+				var mabi = c.defaultMap.get(mid);
+				return mabi.key;
+			}));
+			cp2.add(b2, BorderLayout.EAST);
 			JPanel cp3 = new JPanel(new BorderLayout());
 			cp3.add(new JLabel("変更: "), BorderLayout.WEST);
 			cp3.add(combo, BorderLayout.CENTER);
-			var b3 = new JButton("S3");
-			b3.addActionListener(t -> {
+			var b3 = new JButton(icon);
+			b3.setFocusable(false);
+			b3.addMouseListener(new MMM(c.inst, () -> {
 				if (combo.getSelectedItem() instanceof KeyMap mabi) {
-					playNote(MabiDLS.DLS_BANK, c.inst.getProgram(), mabi.key);
+					return mabi.key;
 				}
-			});
+				return -1;
+			}));
 			cp3.add(b3, BorderLayout.EAST);
 			JPanel cp4 = new JPanel(new BorderLayout());
 			cp4.add(cp1, BorderLayout.NORTH);
@@ -320,13 +343,32 @@ public final class DrumConverter {
 			add(comboPanel, BorderLayout.SOUTH);
 		}
 
-		private void playNote(int bank, int program, int note) {
-			System.out.println(" > " + bank + " " + program + " " + note);
-			MabiDLS.getInstance().playCustom(note, 100, bank, program);
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {}
-			MabiDLS.getInstance().playCustom(-1, 0, bank, program);
+		private static final class MMM extends MouseAdapter {
+			private final InstClass inst;
+			private final Supplier<Integer> f;
+			private MMM(InstClass inst, Supplier<Integer> f) {
+				this.inst = inst;
+				this.f = f;
+			}
+			@Override
+			public void mousePressed(MouseEvent e) {
+				playNote(f.get());
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				playNote(-1);
+			}
+
+			private void playNote(int note) {
+				boolean isMidi = (inst == null);
+				int program = 0;
+				if (!isMidi) {
+					MabiDLS.getInstance().loadRequiredInstruments(List.of(inst));
+					program = inst.getProgram();
+				}
+				MabiDLS.getInstance().playDrum(isMidi, note, 100, program);
+			}
 		}
 
 		private void updateCombo() {

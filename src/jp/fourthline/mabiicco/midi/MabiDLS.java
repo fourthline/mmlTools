@@ -78,7 +78,7 @@ public final class MabiDLS {
 		HashMap<String, Object> info = new HashMap<>();
 		info.put("midi channels", MAX_MIDI_PART);
 		info.put("large mode", "true");
-//		info.put("load default soundbank", "false");
+		//		info.put("load default soundbank", "false");
 		info.put("max polyphony", "256");
 		((SoftSynthesizer)this.synthesizer).open(wavout = new WavoutDataLine(), info);
 		addTrackEndNotifier(() -> wavout.stopRec());
@@ -262,6 +262,10 @@ public final class MabiDLS {
 			}
 		}
 
+		loadRequiredInstruments(requiredInsts);
+	}
+
+	public synchronized void loadRequiredInstruments(List<InstClass> requiredInsts) {
 		// load required Instruments
 		List<Instrument> loadedList = Arrays.asList(synthesizer.getLoadedInstruments());
 		for (InstClass inst : requiredInsts) {
@@ -301,7 +305,7 @@ public final class MabiDLS {
 			ch.controlChange(64, 0);
 		}
 
-		this.synthesizer.unloadAllInstruments(this.synthesizer.getDefaultSoundbank());
+//		this.synthesizer.unloadAllInstruments(this.synthesizer.getDefaultSoundbank());
 		all();
 	}
 
@@ -347,15 +351,21 @@ public final class MabiDLS {
 		playNotes(score, new MMLNoteEvent[] { playNote }, trackIndex, partIndex);
 	}
 
-	public void playCustom(int note, int velocity, int bank, int program) {
-		int channel = 3;
+	public void playDrum(boolean isMidi, int note, int velocity, int program) {
+		int channel = 9;
+		int bank = 0;
+		if (isMidi) {
+			program = 0;
+		} else {
+			bank = DLS_BANK;
+		}
 		MidiChannel midiChannel = this.channel[channel];
 		midiChannel.setMute(false);
 		midiChannel.controlChange(10, 64);
 		midiChannel.controlChange(7, 100);
 		midiChannel.programChange(bank, program);
 		if (note >= 0) {
-			midiChannel.noteOn(note, velocity);
+			midiChannel.noteOn(isMidi ? note : convertNoteMML2Midi(note), velocity);
 		} else {
 			midiChannel.allNotesOff();
 		}
