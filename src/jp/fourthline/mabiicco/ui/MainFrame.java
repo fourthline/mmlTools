@@ -21,6 +21,7 @@ import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.IEditStateObserver;
 import jp.fourthline.mabiicco.MabiIccoProperties;
 import jp.fourthline.mabiicco.ui.PianoRollView.PaintMode;
+import jp.fourthline.mabiicco.ui.editor.DrumConverter;
 import jp.fourthline.mabiicco.ui.editor.NoteAlign;
 import jp.fourthline.mabiicco.ui.editor.RangeMode;
 
@@ -302,7 +303,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 				KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.ALT_DOWN_MASK));
 		if (MabiIccoProperties.getInstance().soundEnv.get().useDLS()) {
 			var drumConvertGroupMenu = new JMenu(appText("edit.drum_convert"));
-			var drumConvertMenuList = UIUtils.createGroupActionMenu(drumConvertGroupMenu, RangeMode.values(), (s) -> s + " " + appText("drum_convert.menu_apply"), ActionDispatcher.MIDI_MABI_DRUM_CONVERT);
+			var drumConvertMenuList = UIUtils.createGroupActionMenu(drumConvertGroupMenu, DrumConverter.modes, (s) -> s + " " + appText("drum_convert.menu_apply"), ActionDispatcher.MIDI_MABI_DRUM_CONVERT);
 			drumConvertMenu = new ArrayList<>();
 			drumConvertMenuList.forEach(t -> drumConvertMenu.add(new PlayStateComponent<>(t)));
 			drumConvertGroupMenu.addSeparator();
@@ -735,8 +736,8 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 
 	public void setDrumConvert(boolean b, boolean all) {
 		if (drumConvertMenu != null) {
-			for (int i = 0; i < RangeMode.values().length; i++) {
-				drumConvertMenu.get(i).setEnabled((RangeMode.values()[i] == RangeMode.ALL_TRACK) ? all : b);
+			for (int i = 0; i < DrumConverter.modes.length; i++) {
+				drumConvertMenu.get(i).setEnabled((DrumConverter.modes[i] == RangeMode.ALL_TRACK) ? all : b);
 			}
 		}
 	}

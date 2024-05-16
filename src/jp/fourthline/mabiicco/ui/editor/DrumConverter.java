@@ -55,6 +55,8 @@ public final class DrumConverter {
 	private static final String X_NOTE = "O3D";
 	private static final String X_NAME = "Snare ghost";
 
+	public static final RangeMode[] modes = RangeMode.values();
+
 	private static class KeyMap implements Comparable<KeyMap> {
 		private final int key;
 		private final String keyName;
