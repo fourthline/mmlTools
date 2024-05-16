@@ -2,7 +2,7 @@
  * Copyright (C) 2024 たんらる
  */
 
-package jp.fourthline.mabiicco.midi;
+package jp.fourthline.mabiicco.ui.editor;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -20,6 +20,7 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.TreeMap;
 import java.util.Vector;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 import javax.swing.JButton;
@@ -32,9 +33,12 @@ import javax.swing.JTable;
 
 import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.MabiIccoProperties;
+import jp.fourthline.mabiicco.midi.InstClass;
+import jp.fourthline.mabiicco.midi.InstType;
+import jp.fourthline.mabiicco.midi.MabiDLS;
 import jp.fourthline.mabiicco.ui.IMMLManager;
 import jp.fourthline.mabiicco.ui.UIUtils;
-import jp.fourthline.mabiicco.ui.editor.MMLScoreUndoEdit;
+import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.core.ResourceLoader;
 import jp.fourthline.mmlTools.parser.MMLEventParser;
@@ -165,17 +169,38 @@ public final class DrumConverter {
 		return (type == InstType.DRUMS);
 	}
 
-	public void midDrum2MabiDrum(IMMLManager mmlManager) {
-		var track = mmlManager.getActiveTrack();
-		if (isDrumTrack(track)) {
-			for (var eventList : track.getMMLEventList()) {
-				for (var noteEvent : eventList.getMMLNoteEventList()) {
-					var key = midMap.get(noteEvent.getNote());
-					var item = drumMap.get(key);
-					noteEvent.setNote(item.key);
+	public static boolean containsDrumTrack(MMLScore score) {
+		boolean b = false;
+		for (var track : score.getTrackList()) {
+			if (isDrumTrack(track)) {
+				b = true;
+			}
+		}
+		return b;
+	}
+
+	public void midDrum2MabiDrum(Object source, IMMLManager mmlManager) {
+		if (source instanceof Supplier<?>) {
+			Object o = ((Supplier<?>) source).get();
+			if (o instanceof RangeMode mode) {
+				AtomicBoolean update = new AtomicBoolean(false);
+				mode.action(mmlManager, (trackIndex, partIndex) -> {
+					var track = mmlManager.getMMLScore().getTrack(trackIndex);
+					if (isDrumTrack(track)) {
+						var eventList = track.getMMLEventAtIndex(partIndex);
+
+						for (var noteEvent : eventList.getMMLNoteEventList()) {
+							var key = midMap.get(noteEvent.getNote());
+							var item = drumMap.get(key);
+							noteEvent.setNote(item.key);
+						}
+						update.set(true);
+					}
+				});
+				if (update.get()) {
+					mmlManager.updateActivePart(true);
 				}
 			}
-			mmlManager.updateActivePart(true);
 		}
 	}
 
@@ -277,12 +302,12 @@ public final class DrumConverter {
 
 			// combo
 			combo.setEnabled(false);
-			JPanel comboPanel = UIUtils.createTitledPanel("edit map", new BorderLayout());
+			JPanel comboPanel = UIUtils.createTitledPanel(AppResource.appText("drum_convert.map_change"), new BorderLayout());
 			JPanel comboButtonPanel = new JPanel();
-			JButton c1 = new JButton("Default");
-			c1.addActionListener(t -> setDefaultMap());
-			JButton c2 = new JButton("Apply");
-			c2.addActionListener(t -> changeMap());
+			JButton c1 = new JButton(AppResource.appText("edit.default"));
+			c1.addActionListener(t -> selectedDefaultMabiKey(true));
+			JButton c2 = new JButton(AppResource.appText("edit.apply"));
+			c2.addActionListener(t -> selectedMabiKey(true));
 			comboButtonPanel.add(c1);
 			comboButtonPanel.add(c2);
 			JPanel cp1 = new JPanel(new BorderLayout());
@@ -290,37 +315,21 @@ public final class DrumConverter {
 			cp1.add(midLabel, BorderLayout.CENTER);
 			var b1 = new JButton(icon);
 			b1.setFocusable(false);
-			b1.addMouseListener(new MMM(null, () -> {
-				int row = table.getSelectedRow();
-				if (row < 0) return -1;
-				var mid = getKeyMap(row);
-				return (mid != null) ? mid.key : -1;
-			}));
+			b1.addMouseListener(new MMM(null, () -> selectedMidKey()));
 			cp1.add(b1, BorderLayout.EAST);
 			JPanel cp2 = new JPanel(new BorderLayout());
-			cp2.add(new JLabel("現在: "), BorderLayout.WEST);
+			cp2.add(new JLabel(AppResource.appText("drum_convert.current")), BorderLayout.WEST);
 			cp2.add(mabiLabel, BorderLayout.CENTER);
 			var b2 = new JButton(icon);
 			b2.setFocusable(false);
-			b2.addMouseListener(new MMM(c.inst, () -> {
-				int row = table.getSelectedRow();
-				if (row < 0) return -1;
-				var mid = getKeyMap(row);
-				var mabi = c.defaultMap.get(mid);
-				return mabi.key;
-			}));
+			b2.addMouseListener(new MMM(c.inst, () -> selectedDefaultMabiKey(false)));
 			cp2.add(b2, BorderLayout.EAST);
 			JPanel cp3 = new JPanel(new BorderLayout());
-			cp3.add(new JLabel("変更: "), BorderLayout.WEST);
+			cp3.add(new JLabel(AppResource.appText("drum_convert.change")), BorderLayout.WEST);
 			cp3.add(combo, BorderLayout.CENTER);
 			var b3 = new JButton(icon);
 			b3.setFocusable(false);
-			b3.addMouseListener(new MMM(c.inst, () -> {
-				if (combo.getSelectedItem() instanceof KeyMap mabi) {
-					return mabi.key;
-				}
-				return -1;
-			}));
+			b3.addMouseListener(new MMM(c.inst, () -> selectedMabiKey(false)));
 			cp3.add(b3, BorderLayout.EAST);
 			JPanel cp4 = new JPanel(new BorderLayout());
 			cp4.add(cp1, BorderLayout.NORTH);
@@ -346,10 +355,12 @@ public final class DrumConverter {
 		private static final class MMM extends MouseAdapter {
 			private final InstClass inst;
 			private final Supplier<Integer> f;
+
 			private MMM(InstClass inst, Supplier<Integer> f) {
 				this.inst = inst;
 				this.f = f;
 			}
+
 			@Override
 			public void mousePressed(MouseEvent e) {
 				playNote(f.get());
@@ -363,11 +374,12 @@ public final class DrumConverter {
 			private void playNote(int note) {
 				boolean isMidi = (inst == null);
 				int program = 0;
+				var dls = MabiDLS.getInstance();
 				if (!isMidi) {
-					MabiDLS.getInstance().loadRequiredInstruments(List.of(inst));
+					dls.loadRequiredInstruments(List.of(inst));
 					program = inst.getProgram();
 				}
-				MabiDLS.getInstance().playDrum(isMidi, note, 100, program);
+				dls.playDrum(isMidi, note, 100, program);
 			}
 		}
 
@@ -389,21 +401,36 @@ public final class DrumConverter {
 			table.getModel().setValueAt(mabiName(mid, mabi), row, 3);
 		}
 
-		private void setDefaultMap() {
+		private int selectedMidKey() {
+			int row = table.getSelectedRow();
+			if (row < 0) return -1;
+			var mid = getKeyMap(row);
+			return (mid != null) ? mid.key : -1;
+		}
+
+		private int selectedDefaultMabiKey(boolean apply) {
 			int row = table.getSelectedRow();
 			var mid = getKeyMap(row);
 			var mabi = c.defaultMap.get(mid);
-			setKeyMap(row, mid, mabi);
-			c.saveData();
-		}
-
-		private void changeMap() {
-			if (combo.getSelectedItem() instanceof KeyMap mabi) {
-				int row = table.getSelectedRow();
-				var mid = getKeyMap(row);
+			if (apply) {
 				setKeyMap(row, mid, mabi);
 				c.saveData();
 			}
+			return mabi.key;
+		}
+
+		private int selectedMabiKey(boolean apply) {
+			int ret = -1;
+			if (combo.getSelectedItem() instanceof KeyMap mabi) {
+				int row = table.getSelectedRow();
+				var mid = getKeyMap(row);
+				if (apply) {
+					setKeyMap(row, mid, mabi);
+					c.saveData();
+				}
+				ret = mabi.key;
+			}
+			return ret;
 		}
 	}
 

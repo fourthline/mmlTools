@@ -1,6 +1,12 @@
-package jp.fourthline.mabiicco.midi;
+/*
+ * Copyright (C) 2024 たんらる
+ */
+
+package jp.fourthline.mabiicco.ui.editor;
 
 import static org.junit.Assert.*;
+
+import java.util.function.Supplier;
 
 import org.junit.Test;
 
@@ -21,10 +27,12 @@ public final class DrumConverterTest extends UseLoadingDLS {
 
 		String mml1 = track.getOriginalMML();
 		String mml2 = "MML@<dddddddddddddddddddddddddddddddddddn11<fb+an15b<fn45g>>b<g>gn23eb+f>edff+gg+aa+b>cc+dd+eff+gg+aa+b>cc+dd+eff+gg+ao3dddddddddddddddddddddddddd,,;";
+	
+		Supplier<RangeMode> source = () -> RangeMode.ALL_TRACK;
 
 		// 楽器がドラムではないのでなにもしないパターン.
 		assertFalse(DrumConverter.isDrumTrack(track));
-		DrumConverter.getInstance().midDrum2MabiDrum(mmlManager);
+		DrumConverter.getInstance().midDrum2MabiDrum(source, mmlManager);
 		track.generate();
 
 		assertEquals(mml1, track.getOriginalMML());
@@ -32,7 +40,7 @@ public final class DrumConverterTest extends UseLoadingDLS {
 		// 楽器をドラムに変更して実行.
 		track.setProgram(27);
 		assertTrue(DrumConverter.isDrumTrack(track));
-		DrumConverter.getInstance().midDrum2MabiDrum(mmlManager);
+		DrumConverter.getInstance().midDrum2MabiDrum(source, mmlManager);
 		track.generate();
 
 		assertEquals(mml2, track.getOriginalMML());

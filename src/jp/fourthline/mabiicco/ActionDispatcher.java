@@ -36,7 +36,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import jp.fourthline.mabiicco.midi.DrumConverter;
 import jp.fourthline.mabiicco.midi.MMLMidiTrack;
 import jp.fourthline.mabiicco.midi.MabiDLS;
 import jp.fourthline.mabiicco.midi.SoundEnv;
@@ -49,6 +48,7 @@ import jp.fourthline.mabiicco.ui.PianoRollView;
 import jp.fourthline.mabiicco.ui.PolyphonyMonitor;
 import jp.fourthline.mabiicco.ui.WavoutPanel;
 import jp.fourthline.mabiicco.ui.color.ScaleColor;
+import jp.fourthline.mabiicco.ui.editor.DrumConverter;
 import jp.fourthline.mabiicco.ui.editor.MMLTranspose;
 import jp.fourthline.mabiicco.ui.editor.MultiTracksVelocityChangeEditor;
 import jp.fourthline.mabiicco.ui.editor.MultiTracksViewEditor;
@@ -321,7 +321,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(MML_X_IMPORT, t -> mmlSeqView.mml_xImportAction());
 		actionMap.put(MML_X_EXPORT, t -> mmlSeqView.mml_xExportAction());
 		actionMap.put(POLYPHONY_MONITOR, t -> PolyphonyMonitor.getInstance().show(mainFrame));
-		actionMap.put(MIDI_MABI_DRUM_CONVERT, t -> DrumConverter.getInstance().midDrum2MabiDrum(mmlSeqView));
+		actionMap.put(MIDI_MABI_DRUM_CONVERT, t -> DrumConverter.getInstance().midDrum2MabiDrum(t, mmlSeqView));
 		actionMap.put(MIDI_MABI_DRUM_CONVERT_SHOW_MAP, t -> DrumConverter.showConvertMap(mainFrame));
 	}
 
@@ -739,7 +739,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		mainFrame.setSelectedEdit(editState.hasSelectedNote());
 		mainFrame.setPasteEnable(editState.canPaste());
 		mainFrame.setRemoveRestsBetweenNotesEnable(editState.hasSelectedMultipleConsecutiveNotes());
-		mainFrame.setDrumConvert(DrumConverter.isDrumTrack(mmlSeqView.getActiveTrack()));
+		mainFrame.setDrumConvert(DrumConverter.isDrumTrack(mmlSeqView.getActiveTrack()), DrumConverter.containsDrumTrack(mmlSeqView.getMMLScore()));
 
 		// 楽譜集分割-UI更新
 		var track = mmlSeqView.getActiveTrack();

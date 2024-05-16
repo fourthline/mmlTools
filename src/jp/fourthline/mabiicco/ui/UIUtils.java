@@ -13,7 +13,10 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.swing.AbstractAction;
@@ -22,6 +25,7 @@ import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
@@ -136,7 +140,7 @@ public final class UIUtils {
 			if (item == defaultValue) {
 				name += " (default)";
 			}
-			GroupMenuItemWith<SettingButtonGroupItem> itemMenu = new GroupMenuItemWith<>(name, item);
+			GroupRadioMenuItemWith<SettingButtonGroupItem> itemMenu = new GroupRadioMenuItemWith<>(name, item);
 			itemMenu.setActionCommand(ActionDispatcher.CHANGE_ACTION);
 			itemMenu.addActionListener(listener);
 			itemMenu.setSelected(item.equals(prop.get()));
@@ -149,7 +153,7 @@ public final class UIUtils {
 		ButtonGroup group = new ButtonGroup();
 		for (SettingButtonGroupItem item : items) {
 			String name = appText(item.getButtonName());
-			GroupMenuItemWith<SettingButtonGroupItem> itemMenu = new GroupMenuItemWith<>(name, item);
+			GroupRadioMenuItemWith<SettingButtonGroupItem> itemMenu = new GroupRadioMenuItemWith<>(name, item);
 			itemMenu.addActionListener(listener);
 			itemMenu.setSelected(item.equals(initialItem));
 			menu.add(itemMenu);
@@ -157,8 +161,35 @@ public final class UIUtils {
 		}
 	}
 
-	private static class GroupMenuItemWith<T> extends JRadioButtonMenuItem implements Supplier<T> {
+	public static List<JMenuItem> createGroupActionMenu(JComponent menu, SettingButtonGroupItem[] items, Function<String, String> nameConvert, String command) {
+		var list = new ArrayList<JMenuItem>();
+		var listener = ActionDispatcher.getInstance();
+		for (SettingButtonGroupItem item : items) {
+			String name = nameConvert.apply(appText(item.getButtonName()));
+			GroupMenuItemWith<SettingButtonGroupItem> itemMenu = new GroupMenuItemWith<>(name, item);
+			itemMenu.setActionCommand(command);
+			itemMenu.addActionListener(listener);
+			menu.add(itemMenu);
+			list.add(itemMenu);
+		}
+		return list;
+	}
+
+	private static class GroupRadioMenuItemWith<T> extends JRadioButtonMenuItem implements Supplier<T> {
 		private static final long serialVersionUID = -7786833458520626015L;
+		private final T obj;
+		private GroupRadioMenuItemWith(String text, T obj) {
+			super(text);
+			this.obj = obj;
+		}
+		@Override
+		public T get() {
+			return obj;
+		}
+	}
+
+	private static class GroupMenuItemWith<T> extends JMenuItem implements Supplier<T> {
+		private static final long serialVersionUID = -3983687243046433624L;
 		private final T obj;
 		private GroupMenuItemWith(String text, T obj) {
 			super(text);

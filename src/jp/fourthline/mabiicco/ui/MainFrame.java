@@ -22,6 +22,7 @@ import jp.fourthline.mabiicco.IEditStateObserver;
 import jp.fourthline.mabiicco.MabiIccoProperties;
 import jp.fourthline.mabiicco.ui.PianoRollView.PaintMode;
 import jp.fourthline.mabiicco.ui.editor.NoteAlign;
+import jp.fourthline.mabiicco.ui.editor.RangeMode;
 
 import javax.swing.JTextField;
 import javax.swing.JButton;
@@ -98,7 +99,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	private PlayStateComponent<JMenuItem> velocityUpMenu = null;
 	private PlayStateComponent<JMenuItem> velocityDownMenu = null;
 	private PlayStateComponent<JMenuItem> xExportMenu = null;
-	private PlayStateComponent<JMenuItem> drumConvertMenu = null;
+	private List<PlayStateComponent<JMenuItem>> drumConvertMenu = null;
 
 	private JButton loopButton = null;
 
@@ -300,7 +301,13 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		velocityDownMenu = createMenuItem(editMenu, "edit.velocity_down", ActionDispatcher.VELOCITY_DOWN, true,
 				KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.ALT_DOWN_MASK));
 		if (MabiIccoProperties.getInstance().soundEnv.get().useDLS()) {
-			drumConvertMenu = createMenuItem(editMenu, "edit.drum_convert", ActionDispatcher.MIDI_MABI_DRUM_CONVERT, true);
+			var drumConvertGroupMenu = new JMenu(appText("edit.drum_convert"));
+			var drumConvertMenuList = UIUtils.createGroupActionMenu(drumConvertGroupMenu, RangeMode.values(), (s) -> s + " " + appText("drum_convert.menu_apply"), ActionDispatcher.MIDI_MABI_DRUM_CONVERT);
+			drumConvertMenu = new ArrayList<>();
+			drumConvertMenuList.forEach(t -> drumConvertMenu.add(new PlayStateComponent<>(t)));
+			drumConvertGroupMenu.addSeparator();
+			createMenuItem(drumConvertGroupMenu, "menu.drum_converting_map", ActionDispatcher.MIDI_MABI_DRUM_CONVERT_SHOW_MAP, true);
+			editMenu.add(drumConvertGroupMenu);
 		}
 
 		editMenu.add(new JSeparator());
@@ -384,12 +391,9 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createCheckMenu(settingMenu, "edit.tempoDeleteWithConvert", appProperties.enableTempoDeleteWithConvert);
 		UIUtils.createGroupMenu(settingMenu, "ui.mouse_scroll_width", appProperties.mouseScrollWidth);
 		createCheckMenu(settingMenu, "velocity_editor", appProperties.velocityEditor);
-		if (drumConvertMenu != null) {
-			createMenuItem(settingMenu, "menu.drum_converting_map", ActionDispatcher.MIDI_MABI_DRUM_CONVERT_SHOW_MAP);
-		}
 		settingMenu.add(new JSeparator());
 		// MML生成に関わる設定
-//		createCheckMenu(settingMenu, "mml.precise_optimize", appProperties.enableMMLPreciseOptimize, ActionDispatcher.MML_GENERATE);
+		//		createCheckMenu(settingMenu, "mml.precise_optimize", appProperties.enableMMLPreciseOptimize, ActionDispatcher.MML_GENERATE);
 		UIUtils.createGroupMenu(settingMenu, "mml.optimize_level", appProperties.mmlOptimizeLevel);
 		createCheckMenu(settingMenu, "mml.tempo_allow_chord_part", appProperties.mmlTempoAllowChordPart, ActionDispatcher.MML_GENERATE);
 		createCheckMenu(settingMenu, "mml.vzero_tempo", appProperties.mmlVZeroTempo, ActionDispatcher.MML_GENERATE);
@@ -398,7 +402,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createCheckMenu(settingMenu, "mml.regenerate_with_open", appProperties.reGenerateWithOpen);
 		settingMenu.add(new JSeparator());
 		// DLSに関わる設定
-//		createGroupMenu(settingMenu, "menu.overlap_mode", appProperties.overlapMode);  // 2023/04/19 のアップデートにより、重複音が問題なくできるようになったので固定値へ変更
+		//		createGroupMenu(settingMenu, "menu.overlap_mode", appProperties.overlapMode);  // 2023/04/19 のアップデートにより、重複音が問題なくできるようになったので固定値へ変更
 		UIUtils.createGroupMenu(settingMenu, "menu.sound_env", appProperties.soundEnv);
 		createCheckMenu(settingMenu, "menu.useDefaultSoundbank", appProperties.useDefaultSoundBank, ActionDispatcher.USE_DEFAULT_SOUNDBANK, true);
 		createMenuItem(settingMenu, "menu.select_dls", ActionDispatcher.SELECT_DLS, true);
@@ -729,9 +733,11 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		xExportMenu.setEnabled(b);
 	}
 
-	public void setDrumConvert(boolean b) {
+	public void setDrumConvert(boolean b, boolean all) {
 		if (drumConvertMenu != null) {
-			drumConvertMenu.setEnabled(b);
+			for (int i = 0; i < RangeMode.values().length; i++) {
+				drumConvertMenu.get(i).setEnabled((RangeMode.values()[i] == RangeMode.ALL_TRACK) ? all : b);
+			}
 		}
 	}
 
