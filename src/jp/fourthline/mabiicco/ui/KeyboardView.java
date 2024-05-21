@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2023 たんらる
+ * Copyright (C) 2013-2024 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
@@ -93,6 +93,8 @@ public final class KeyboardView extends JPanel implements IPlayNote {
 		int height = pianoRollView.getTotalHeight();
 
 		Graphics2D g2 = (Graphics2D)g.create();
+		UIUtils.setRenderingHint(g2);
+
 		g2.setColor(whiteKeyColor.get());
 		g2.fillRect(0, 0, HEADER_WIDTH, height);
 

@@ -8,6 +8,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -81,25 +82,27 @@ public final class PolyphonyMonitor implements Runnable {
 			@Override
 			public void paintComponent(Graphics g) {
 				super.paintComponent(g);
+				Graphics2D g2 = (Graphics2D)g.create();
+				UIUtils.setRenderingHint(g2);
 
-				g.setColor(getForeground());
+				g2.setColor(getForeground());
 				for (int i = 0; i <= MAX_V; i += 32) {
 					int x = x(i) - 1;
-					g.drawLine(x, 16, x, M_HEIGHT);
-					g.drawString(Integer.toString(i), x-2, 12);
+					g2.drawLine(x, 16, x, M_HEIGHT);
+					g2.drawString(Integer.toString(i), x-2, 12);
 				}
 
-				g.setColor(new Color(0, 128, 0));
+				g2.setColor(new Color(0, 128, 0));
 				for (int i = 1; i <= value; i++) {
 					int x = x(i);
 					g.fillRect(x, 24, BAR_W / 2, M_HEIGHT-24);
 				}
 
-				g.setColor(Color.RED);
+				g2.setColor(Color.RED);
 				if (max > 0) {
 					int x = x(max);
-					g.fillRect(x, 24, 1, M_HEIGHT-24);
-					g.drawString(Integer.toString(max), x+4, 32);
+					g2.fillRect(x, 24, 1, M_HEIGHT-24);
+					g2.drawString(Integer.toString(max), x+4, 32);
 				}
 			}
 		};

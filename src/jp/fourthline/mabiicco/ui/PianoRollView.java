@@ -359,6 +359,7 @@ public final class PianoRollView extends JPanel {
 		int startOffsetX = convertTicktoX(mmlManager.getActiveMMLPartStartOffset());
 
 		Graphics2D g2 = (Graphics2D)g.create();
+		UIUtils.setRenderingHint(g2);
 		for (int i = 0; i <= OCTNUM; i++) {
 			paintOctPianoLine(g2, i, startOffsetX);
 		}

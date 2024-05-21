@@ -10,11 +10,14 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.LayoutManager;
 import java.awt.Point;
+import java.awt.RenderingHints;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -293,5 +296,20 @@ public final class UIUtils {
 		table.setRowSelectionAllowed(false);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		return table;
+	}
+
+	/**
+	 * テキストアンチエイリアスの既定値を有効にするため, デフォルト値を取得して設定する.
+	 * @param g
+	 */
+	public static void setRenderingHint(Graphics2D g) {
+		var o = Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints");
+		if (o instanceof Map<?,?> map) {
+			map.forEach((a, b) -> {
+				if (a instanceof RenderingHints.Key key) {
+					g.setRenderingHint(key, b);
+				}
+			});
+		}
 	}
 }

@@ -128,6 +128,7 @@ public final class VelocityEditor extends JPanel implements MouseInputListener, 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D)g.create();
+		UIUtils.setRenderingHint(g2);
 
 		paintMeasure(g2);
 		paintVelocityLine(g2);
@@ -704,6 +705,7 @@ public final class VelocityEditor extends JPanel implements MouseInputListener, 
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
 			Graphics2D g2 = (Graphics2D)g.create();
+			UIUtils.setRenderingHint(g2);
 
 			paintVelocityHeaderString(g2, 0);
 			paintVelocityHeaderString(g2, 8);

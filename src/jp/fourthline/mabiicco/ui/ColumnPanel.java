@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2023 たんらる
+ * Copyright (C) 2013-2024 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
@@ -122,6 +122,8 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D)g.create();
+
+		UIUtils.setRenderingHint(g2);
 
 		paintStartOffset(g2);
 		paintErr(g2);
