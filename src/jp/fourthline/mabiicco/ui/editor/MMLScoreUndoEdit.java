@@ -5,7 +5,6 @@
 package jp.fourthline.mabiicco.ui.editor;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -14,8 +13,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Stack;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
@@ -23,6 +20,7 @@ import javax.swing.undo.CannotUndoException;
 
 import jp.fourthline.mabiicco.IFileState;
 import jp.fourthline.mabiicco.IFileStateObserver;
+import jp.fourthline.mabiicco.Utils;
 import jp.fourthline.mabiicco.ui.IMMLManager;
 import jp.fourthline.mmlTools.MMLScore;
 
@@ -136,7 +134,7 @@ public final class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFil
 	private String makeBackup() {
 		String str = null;
 		try {
-			str = compress(makeBackupString());
+			str = Utils.compress(makeBackupString());
 		} catch (IOException e) {
 			str = null;
 		}
@@ -195,43 +193,9 @@ public final class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFil
 		return true;
 	}
 
-	public static String compress(String s) {
-		try {
-			ByteArrayOutputStream bstream = new ByteArrayOutputStream();
-			GZIPOutputStream out = new GZIPOutputStream( bstream );
-			out.write(s.getBytes());
-			out.close();
-			bstream.close();
-			return Base64.getEncoder().encodeToString(bstream.toByteArray());
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-		}
-		return null;
-	}
-
-	public static String decompress(String s) {
-		try {
-			GZIPInputStream in = new GZIPInputStream(
-					new ByteArrayInputStream(
-							Base64.getDecoder().decode(s.getBytes())));
-			ByteArrayOutputStream bstream = new ByteArrayOutputStream();
-			while (in.available() != 0) {
-				int c = in.read();
-				if (c >= 0) {
-					bstream.write(c);
-				}
-			}
-			bstream.close();
-			return bstream.toString();
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-		}
-		return null;
-	}
-
 	public boolean recover(String s) {
 		try {
-			boolean result = parseBackupString(decompress(s));
+			boolean result = parseBackupString(Utils.decompress(s));
 			makeBackup();
 			return result;
 		} catch (NumberFormatException | IOException e) {

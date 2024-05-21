@@ -33,6 +33,7 @@ import javax.swing.JTable;
 
 import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.MabiIccoProperties;
+import jp.fourthline.mabiicco.Utils;
 import jp.fourthline.mabiicco.midi.InstClass;
 import jp.fourthline.mabiicco.midi.InstType;
 import jp.fourthline.mabiicco.midi.MabiDLS;
@@ -225,13 +226,13 @@ public final class DrumConverter {
 			e.printStackTrace();
 		}
 
-		MabiIccoProperties.getInstance().drumConvertCustomMap.set(MMLScoreUndoEdit.compress(bstream.toString()));
+		MabiIccoProperties.getInstance().drumConvertCustomMap.set(Utils.compress(bstream.toString()));
 	}
 
 	private void loadData() {
 		String str = MabiIccoProperties.getInstance().drumConvertCustomMap.get();
 		if (str.length() == 0) return;
-		String data = MMLScoreUndoEdit.decompress(str);
+		String data = Utils.decompress(str);
 		if (data == null) return;
 		ByteArrayInputStream istream = new ByteArrayInputStream(data.getBytes());
 		var p = new Properties();
@@ -248,8 +249,9 @@ public final class DrumConverter {
 					}
 				}
 			});
-		} catch (IOException e) {
+		} catch (IOException | NumberFormatException e) {
 			e.printStackTrace();
+			saveData();
 		}
 	}
 
