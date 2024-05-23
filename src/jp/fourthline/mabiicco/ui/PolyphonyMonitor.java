@@ -6,7 +6,6 @@ package jp.fourthline.mabiicco.ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 
@@ -67,7 +66,7 @@ public final class PolyphonyMonitor implements Runnable {
 
 		textField.setEditable(false);
 		textField.setFocusable(false);
-		textField.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+		textField.setFont(AppResource.getMonoFont(12));
 		setValue(0);
 	}
 
@@ -95,7 +94,7 @@ public final class PolyphonyMonitor implements Runnable {
 				g2.setColor(new Color(0, 128, 0));
 				for (int i = 1; i <= value; i++) {
 					int x = x(i);
-					g.fillRect(x, 24, BAR_W / 2, M_HEIGHT-24);
+					g2.fillRect(x, 24, BAR_W / 2, M_HEIGHT-24);
 				}
 
 				g2.setColor(Color.RED);

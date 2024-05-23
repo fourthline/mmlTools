@@ -4,6 +4,7 @@
 
 package jp.fourthline.mabiicco;
 
+import java.awt.Font;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -108,6 +109,10 @@ public final class AppResource {
 
 	public static String getErrFile() {
 		return ResourceLoader.getAppPath("err.txt");
+	}
+
+	public static Font getMonoFont(int size) {
+		return new Font(Font.MONOSPACED, Font.PLAIN, size);
 	}
 
 	public static void main(String[] args) {

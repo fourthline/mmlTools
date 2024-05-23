@@ -9,7 +9,6 @@ import static jp.fourthline.mabiicco.AppResource.appText;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.Rectangle;
 
 import javax.swing.JFrame;
@@ -559,7 +558,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		toolBar.add(paintModeSelect);
 
 		toolBar.add(newToolBarSeparator());
-		timeBox.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+		timeBox.setFont(AppResource.getMonoFont(12));
 		timeBox.setFocusable(false);
 		timeBox.setType(appProperties.timebox.get());
 		timeBox.addActionListener((t) -> appProperties.timebox.set(timeBox.getType()));

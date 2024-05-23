@@ -7,7 +7,6 @@ package jp.fourthline.mabiicco.ui.editor;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Window;
 import java.awt.event.WindowAdapter;
@@ -97,7 +96,7 @@ public final class MMLTextEditor implements DocumentListener, CaretListener {
 	public MMLTextEditor(Frame parentFrame, IMMLManager mmlManager, PianoRollView pianoRollView) throws MMLExceptionList {
 		textPane.setDocument(doc);
 		textPane.addCaretListener(this);
-		textPane.setFont(new Font("Monospaced", Font.PLAIN, 12));
+		textPane.setFont(AppResource.getMonoFont(12));
 		textPane.addAncestorListener(new AncestorListener() {
 			@Override
 			public void ancestorRemoved(AncestorEvent event) {}
