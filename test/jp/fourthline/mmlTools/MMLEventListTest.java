@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2023 たんらる
+ * Copyright (C) 2013-2024 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -749,5 +749,25 @@ public class MMLEventListTest {
 			}
 		}
 		assertEquals("r64e64", s);
+	}
+
+	@Test
+	public void testTempoNotTuneBase() {
+		String mml = "l16t150f&f";
+		MMLEventList eventList = new MMLEventList(mml);
+		assertEquals(1, eventList.getMMLNoteEventList().size());
+		assertEquals(true, eventList.getMMLNoteEventList().get(0).isTuningNote());
+
+		// テンポで分割されている場合は調律符ではない.
+		mml = "l16ft150&f";
+		eventList = new MMLEventList(mml);
+		assertEquals(1, eventList.getMMLNoteEventList().size());
+		assertEquals(false, eventList.getMMLNoteEventList().get(0).isTuningNote());
+
+		// 手動パターン.
+		mml = "f64t160&f64&f32";
+		eventList = new MMLEventList(mml);
+		assertEquals(1, eventList.getMMLNoteEventList().size());
+		assertEquals(false, eventList.getMMLNoteEventList().get(0).isTuningNote());
 	}
 }

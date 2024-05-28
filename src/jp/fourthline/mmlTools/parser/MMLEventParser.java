@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2023 たんらる
+ * Copyright (C) 2013-2024 たんらる
  */
 
 package jp.fourthline.mmlTools.parser;
@@ -55,6 +55,7 @@ public final class MMLEventParser implements Iterator<MMLEvent> {
 	private final int startOffset;
 	private MMLNoteEvent prevNoteEvent = null;
 	private int volume = MMLNoteEvent.INIT_VOL;
+	private boolean onTempo = false;
 
 	/**
 	 * @return すべてMMLパースが終っているときは、nullを返す.
@@ -82,6 +83,7 @@ public final class MMLEventParser implements Iterator<MMLEvent> {
 				try {
 					int tempo = Integer.parseInt( token.substring(1) );
 					nextItem = new MMLTempoEvent(tempo, totalTick, totalTick == startOffset);
+					onTempo = true;
 				} catch (IllegalArgumentException e) {
 					continue;
 				}
@@ -94,7 +96,7 @@ public final class MMLEventParser implements Iterator<MMLEvent> {
 					/* tie でかつ、同じノートであれば、前のNoteEventにTickを加算する */
 					if ( (hasTie) && (prevNoteEvent != null) && (prevNoteEvent.getNote() == parser.getNoteNumber())) {
 						int prevTick = prevNoteEvent.getTick();
-						if ( (prevTick == tick) && (TuningBase.getInstance(tick) != null) ) {
+						if ( (prevTick == tick) && (TuningBase.getInstance(tick) != null) && (!onTempo) ) {
 							prevNoteEvent.setTuningNote(TuningBase.getInstance(tick));
 						}
 						prevNoteEvent.setTick( prevTick + tick);
@@ -105,6 +107,9 @@ public final class MMLEventParser implements Iterator<MMLEvent> {
 						prevNoteEvent.setIndexOfMMLString(tokenizer.getIndex());
 					}
 
+					if (!hasTie) {
+						onTempo = false;
+					}
 					hasTie = false;
 					totalTick += tick;
 					if (nextItem != null) {
