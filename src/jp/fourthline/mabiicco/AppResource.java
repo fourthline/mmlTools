@@ -23,6 +23,8 @@ public final class AppResource {
 	private static ArrayList<Manifest> mf;
 	private final static ResourceBundle bundle = ResourceBundle.getBundle(RESOURCE_NAME, new ResourceLoader());
 
+	public static final Font MONO_FONT = new Font(Font.MONOSPACED, Font.PLAIN, 12);
+
 	private AppResource() {}
 
 	public static ResourceBundle getResourceBundle() {
@@ -109,10 +111,6 @@ public final class AppResource {
 
 	public static String getErrFile() {
 		return ResourceLoader.getAppPath("err.txt");
-	}
-
-	public static Font getMonoFont(int size) {
-		return new Font(Font.MONOSPACED, Font.PLAIN, size);
 	}
 
 	public static void main(String[] args) {

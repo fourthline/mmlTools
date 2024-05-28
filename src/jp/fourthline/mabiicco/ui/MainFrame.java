@@ -558,7 +558,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		toolBar.add(paintModeSelect);
 
 		toolBar.add(newToolBarSeparator());
-		timeBox.setFont(AppResource.getMonoFont(12));
+		timeBox.setFont(AppResource.MONO_FONT);
 		timeBox.setFocusable(false);
 		timeBox.setType(appProperties.timebox.get());
 		timeBox.addActionListener((t) -> appProperties.timebox.set(timeBox.getType()));

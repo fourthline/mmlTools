@@ -96,7 +96,7 @@ public final class MMLTextEditor implements DocumentListener, CaretListener {
 	public MMLTextEditor(Frame parentFrame, IMMLManager mmlManager, PianoRollView pianoRollView) throws MMLExceptionList {
 		textPane.setDocument(doc);
 		textPane.addCaretListener(this);
-		textPane.setFont(AppResource.getMonoFont(12));
+		textPane.setFont(AppResource.MONO_FONT);
 		textPane.addAncestorListener(new AncestorListener() {
 			@Override
 			public void ancestorRemoved(AncestorEvent event) {}

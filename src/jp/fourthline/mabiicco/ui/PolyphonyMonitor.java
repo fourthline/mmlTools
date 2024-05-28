@@ -66,7 +66,7 @@ public final class PolyphonyMonitor implements Runnable {
 
 		textField.setEditable(false);
 		textField.setFocusable(false);
-		textField.setFont(AppResource.getMonoFont(12));
+		textField.setFont(AppResource.MONO_FONT);
 		setValue(0);
 	}
 
