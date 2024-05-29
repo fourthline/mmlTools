@@ -305,7 +305,19 @@ public final class MabiDLS {
 			ch.controlChange(64, 0);
 		}
 
-//		this.synthesizer.unloadAllInstruments(this.synthesizer.getDefaultSoundbank());
+		// デフォルトSoundBankのドラム以外をアンロードする.
+		var sb = this.synthesizer.getDefaultSoundbank();
+		var list = new ArrayList<Patch>();
+		for (var inst : sb.getInstruments()) {
+			var p = inst.getPatch();
+			if (p instanceof com.sun.media.sound.ModelPatch patch) {
+				if (!patch.isPercussion()) {
+					list.add(patch);
+				}
+			}
+		}
+		this.synthesizer.unloadInstruments(sb, list.toArray(Patch[]::new));
+
 		all();
 	}
 
