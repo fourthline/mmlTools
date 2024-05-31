@@ -302,6 +302,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 				KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.ALT_DOWN_MASK));
 		if (MabiIccoProperties.getInstance().soundEnv.get().useDLS()) {
 			var drumConvertGroupMenu = new JMenu(appText("edit.drum_convert"));
+			noplayFunctions.add(new PlayStateComponent<>(drumConvertGroupMenu));
 			var drumConvertMenuList = UIUtils.createGroupActionMenu(drumConvertGroupMenu, DrumConverter.modes, (s) -> s + " " + appText("drum_convert.menu_apply"), ActionDispatcher.MIDI_MABI_DRUM_CONVERT);
 			drumConvertMenu = new ArrayList<>();
 			drumConvertMenuList.forEach(t -> drumConvertMenu.add(new PlayStateComponent<>(t)));
