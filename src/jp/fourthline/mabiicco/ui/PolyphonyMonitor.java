@@ -117,7 +117,16 @@ public final class PolyphonyMonitor implements Runnable {
 	private void setValue(int v) {
 		this.value = v;
 		max = Math.max(max, v);
-		var s = "Poly: " + Integer.toString(v) + "    ";
+		StringBuilder sb = new StringBuilder();
+		sb.append("Poly:");
+		if (v < 10) {
+			sb.append("  ");
+		} else if (v < 100) {
+			sb.append(" ");
+		}
+		sb.append(v);
+		sb.append("    ");
+		var s = sb.toString();
 		if (!s.equals(textField.getText())) {
 			textField.setText(s);
 			mainPanel.repaint();
