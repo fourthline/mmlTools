@@ -10,6 +10,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 
 import javax.swing.JFileChooser;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
 import sun.swing.FilePane;
@@ -67,6 +68,10 @@ public final class FixFileChooser extends JFileChooser implements PropertyChange
 	 */
 	private void fixNameColumnWidth() {
 		if (detailsTable != null) {
+			if (detailsTable.getParent().getParent() instanceof JScrollPane sc) {
+				// リストが少ないときにスクロールバー表示/非表示の確定タイミングが違ってViewPortの幅が古い値になっているので, 常時表示する.
+				sc.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+			}
 			int viewWidth = detailsTable.getParent().getSize().width;
 			int tableWidth = detailsTable.getPreferredSize().width;
 			if (tableWidth < viewWidth) {
