@@ -1,19 +1,26 @@
 /*
- * Copyright (C) 2022-2023 たんらる
+ * Copyright (C) 2022-2024 たんらる
  */
 
 package jp.fourthline.mmlTools;
 
+import jp.fourthline.mabiicco.Utils;
 import jp.fourthline.mmlTools.core.MMLException;
 import jp.fourthline.mmlTools.parser.AbstractMMLParser;
 import jp.fourthline.mmlTools.parser.MMLParseException;
 import jp.fourthline.mmlTools.parser.SectionContents;
 import jp.fourthline.mmlTools.parser.TextParser;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 public final class MMLScoreSerializer extends AbstractMMLParser {
@@ -47,6 +54,7 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 	private static final String DELAY = "attackDelayCorrect=";
 	private static final String SONG_DELAY = "attackSongDelayCorrect=";
 	private static final String DISABLE_NOPT = "disableNopt=";
+	private static final String IMPORTED_DATA = "IDATA=";
 
 	private final MMLScore score;
 	private MMLTrack lastTrack = null;
@@ -80,7 +88,8 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 				.pattern(TITLE,         t -> score.setTitle(t) )
 				.pattern(AUTHOR,        t -> score.setAuthor(t) )
 				.pattern(TIME,          t -> score.setBaseTime(t) )
-				.pattern(TEMPO,         t -> putTempoObj(t) );
+				.pattern(TEMPO,         t -> putTempoObj(t) )
+				.pattern(IMPORTED_DATA, t -> getLastTrack().setImportedData(parseImportedData(t)) );
 	}
 
 	@Override
@@ -236,6 +245,83 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 		}
 	}
 
+	private static final String IMPORTED_DATA_MAGIC = "L#Vs";
+	private String writeImportedData(List<MMLEventList> list) {
+		var b = new ByteArrayOutputStream();
+		DataOutputStream bo = new DataOutputStream(b);
+		try {
+			bo.writeBytes(IMPORTED_DATA_MAGIC);
+			bo.writeByte(list.size());
+			for (var item : list) {
+				var noteEventList = item.getMMLNoteEventList();
+				bo.writeInt(noteEventList.size());
+				for (var note : noteEventList) {
+					bo.writeShort(note.getNote());
+					bo.writeInt(note.getTickOffset());
+					bo.writeInt(note.getTick());
+					bo.writeShort(note.getVelocity());
+				}
+			}
+
+			// check sum
+			int sum = 0;
+			for (byte d : b.toByteArray()) {
+				sum += d;
+			}
+			bo.writeByte(sum);
+			return Utils.compress(b.toByteArray());
+		} catch (IOException e) {}
+		return "";
+	}
+
+	private List<MMLEventList> parseImportedData(String s) {
+		var data = Utils.decompress(s);
+		if (data == null) {
+			return null;
+		}
+		try {
+			DataInputStream in = new DataInputStream(new ByteArrayInputStream(data));
+
+			if (!new String(in.readNBytes(IMPORTED_DATA_MAGIC.length())).equals(IMPORTED_DATA_MAGIC)) {
+				System.err.println("imported data: invalid magic");
+				return null;
+			}
+			int count = in.readByte();
+			List<MMLEventList> list = new ArrayList<>();
+			for (int i = 0; i < count; i++) {
+				var eventList = new MMLEventList("");
+				int noteCount = in.readInt();
+				for (int j = 0; j < noteCount; j++) {
+					int note = in.readShort();
+					int tickOffset = in.readInt();
+					int tick = in.readInt();
+					int velocity = in.readShort();
+					var event = new MMLNoteEvent(note, tick, tickOffset, velocity);
+					eventList.addMMLNoteEvent(event);
+				}
+				list.add(eventList);
+			}
+
+			// check sum
+			int sum = 0;
+			for (int i = 0; i < data.length - 1; i++) {
+				sum += data[i];
+			}
+			sum &= 0xff;
+			int a_sum = in.readByte();
+			a_sum &= 0xff;
+			if (sum != a_sum) {
+				System.err.println("imported data: sum error");
+				return null;
+			}
+
+			return list;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	public void writeToOutputStream(OutputStream outputStream) {
 		PrintStream stream = new PrintStream(outputStream, false, StandardCharsets.UTF_8);
 
@@ -259,6 +345,10 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 			}
 			//　本体
 			stream.println(MML_TRACK + track.getOriginalMML());
+			var importedData = track.getImportedData();
+			if (importedData != null) {
+				stream.println(IMPORTED_DATA + writeImportedData(importedData));
+			}
 			stream.println(TRACK_NAME + track.getTrackName());
 			stream.println(PROGRAM + track.getProgram());
 			stream.println(SONG_PROGRAM + track.getSongProgram());

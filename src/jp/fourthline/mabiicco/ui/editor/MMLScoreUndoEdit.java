@@ -195,7 +195,11 @@ public final class MMLScoreUndoEdit extends AbstractUndoableEdit implements IFil
 
 	public boolean recover(String s) {
 		try {
-			boolean result = parseBackupString(Utils.decompress(s));
+			var data = Utils.decompress(s);
+			if (data == null) {
+				return false;
+			}
+			boolean result = parseBackupString(new String(data));
 			makeBackup();
 			return result;
 		} catch (NumberFormatException | IOException e) {

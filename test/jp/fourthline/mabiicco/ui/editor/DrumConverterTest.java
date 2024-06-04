@@ -27,7 +27,7 @@ public final class DrumConverterTest extends UseLoadingDLS {
 
 		String mml1 = track.getOriginalMML();
 		String mml2 = "MML@<dddddddddddddddddddddddddddddddddddn11<fb+an15b<fn45g>>b<g>gn23eb+f>edff+gg+aa+b>cc+dd+eff+gg+aa+b>cc+dd+eff+gg+ao3dddddddddddddddddddddddddd,,;";
-	
+
 		Supplier<RangeMode> source = () -> RangeMode.ALL_TRACK;
 
 		// 楽器がドラムではないのでなにもしないパターン.
@@ -37,8 +37,12 @@ public final class DrumConverterTest extends UseLoadingDLS {
 
 		assertEquals(mml1, track.getOriginalMML());
 
-		// 楽器をドラムに変更して実行.
+		// 楽器をドラムに変更して実行, インポートしたデータでないと変換しない.
 		track.setProgram(27);
+		assertFalse(DrumConverter.isDrumTrack(track));
+
+		// 現在のデータをインポートしたデータとして設定
+		track.setImportedData(track.getMMLEventList());
 		assertTrue(DrumConverter.isDrumTrack(track));
 		DrumConverter.getInstance().midDrum2MabiDrum(source, mmlManager);
 		track.generate();

@@ -13,10 +13,14 @@ import java.util.zip.GZIPOutputStream;
 
 public final class Utils {
 	public static String compress(String s) {
+		return compress(s.getBytes());
+	}
+
+	public static String compress(byte[] b) {
 		try {
 			ByteArrayOutputStream bstream = new ByteArrayOutputStream();
 			GZIPOutputStream out = new GZIPOutputStream( bstream );
-			out.write(s.getBytes());
+			out.write(b);
 			out.close();
 			bstream.close();
 			return Base64.getEncoder().encodeToString(bstream.toByteArray());
@@ -26,7 +30,7 @@ public final class Utils {
 		return null;
 	}
 
-	public static String decompress(String s) {
+	public static byte[] decompress(String s) {
 		try {
 			GZIPInputStream in = new GZIPInputStream(
 					new ByteArrayInputStream(
@@ -39,8 +43,8 @@ public final class Utils {
 				}
 			}
 			bstream.close();
-			return bstream.toString();
-		} catch (IOException e) {
+			return bstream.toByteArray();
+		} catch (IOException | IllegalArgumentException e) {
 			System.out.println(e.getMessage());
 		}
 		return null;

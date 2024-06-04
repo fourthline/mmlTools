@@ -419,9 +419,12 @@ public final class MidiFile extends AbstractMMLParser {
 		try {
 			while (eventList.size() > 0) {
 				String[] mml = new String[3];
+				List<MMLEventList> list = new ArrayList<>();
 				for (int i = 0; i < mml.length; i++) {
 					if (!eventList.isEmpty()) {
-						mml[i] = new MMLStringOptimizer(eventList.get(0).getInternalMMLString()).toString();
+						var currentList = eventList.get(0);
+						list.add(currentList);
+						mml[i] = new MMLStringOptimizer(currentList.getInternalMMLString()).toString();
 						eventList.remove(0);
 					} else {
 						mml[i] = "";
@@ -429,6 +432,10 @@ public final class MidiFile extends AbstractMMLParser {
 				}
 				MMLTrack track = trackInfo.createMMLTrack();
 				track.setMML(mml[0], mml[1], mml[2], "");
+				if (trackInfo.program == InstClass.DRUM) {
+					// ドラム変換用に基準データをセットしておく.
+					track.setImportedData(list);
+				}
 				if (score.addTrack(track) < 0) {
 					throw new MMLParseException("track over: " + track.getTrackName());
 				}

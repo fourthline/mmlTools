@@ -75,6 +75,9 @@ public final class MMLTrack implements Serializable, Cloneable {
 	// 64bit mabi 合奏ズレ補正
 	private boolean fix64Tempo = false;
 
+	// インポートしたデータ: ドラム変換を多重実行したときに変換対象にするデータ.
+	private List<MMLEventList> importedData;
+
 	public MMLTrack() {
 		this(0, 0, 0);
 	}
@@ -134,6 +137,10 @@ public final class MMLTrack implements Serializable, Cloneable {
 
 		mmlParse(false);
 		return this;
+	}
+
+	public void setImportedData(List<MMLEventList> list) {
+		importedData = list;
 	}
 
 	private void mmlParse(boolean delayOption) {
@@ -269,6 +276,10 @@ public final class MMLTrack implements Serializable, Cloneable {
 
 	public List<MMLEventList> getMMLEventList() {
 		return mmlParts;
+	}
+
+	public List<MMLEventList> getImportedData() {
+		return importedData;
 	}
 
 	public long getMaxTickLength() {
@@ -707,6 +718,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 		o.setAttackDelayCorrect(attackDelayCorrect);
 		o.setAttackSongDelayCorrect(attackSongDelayCorrect);
 		o.setDisableNopt(disableNopt);
+		o.setImportedData(importedData);
 		if (generated) {
 			try {
 				o.generate();

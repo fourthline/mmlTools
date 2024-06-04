@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2023 たんらる
+ * Copyright (C) 2017-2024 たんらる
  */
 
 package jp.fourthline.mmlTools.parser;
@@ -10,11 +10,11 @@ import java.io.InputStream;
 
 import org.junit.Test;
 
-import jp.fourthline.FileSelect;
+import jp.fourthline.UseLoadingDLS;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLScoreTest;
 
-public final class MidiFileTest extends FileSelect {
+public final class MidiFileTest extends UseLoadingDLS {
 
 	@Test
 	public void testParse1() throws Exception {
@@ -139,5 +139,18 @@ public final class MidiFileTest extends FileSelect {
 			return;
 		}
 		assertFalse(true);
+	}
+
+	@Test
+	public void testDrum() throws Exception {
+		MidiFile.enableInstPatch();
+		IMMLFileParser parser = new MidiFile();
+		parser.setParseAttribute(MidiFile.PARSE_ALIGN, MidiFile.PARSE_ALIGN_1);
+		MMLScore score = parser.parse(fileSelect("sample_drum.mid"));
+
+		assertEquals(1, score.getTrackCount());
+
+		InputStream inputStream = fileSelect("sample_drum.mmi");
+		MMLScoreTest.checkMMLScoreWriteToOutputStream(score.generateAll(), inputStream);
 	}
 }

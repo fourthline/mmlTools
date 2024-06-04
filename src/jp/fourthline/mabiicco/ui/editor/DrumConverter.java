@@ -169,7 +169,10 @@ public final class DrumConverter {
 			return false;
 		}
 		var type = MabiDLS.getInstance().getInstByProgram(track.getProgram()).getType();
-		return (type == InstType.DRUMS);
+		if (type == InstType.DRUMS) {
+			return track.getImportedData() != null;
+		}
+		return false;
 	}
 
 	public static boolean containsDrumTrack(MMLScore score) {
@@ -182,21 +185,48 @@ public final class DrumConverter {
 		return b;
 	}
 
+	/**
+	 * ドラム変換を行う.
+	 * @param mmlManager
+	 * @param trackIndex
+	 * @param partIndex
+	 * @return  変更した場合はtrueを返す
+	 */
+	private boolean convert(IMMLManager mmlManager, int trackIndex, int partIndex) {
+		boolean update = false;
+		var track = mmlManager.getMMLScore().getTrack(trackIndex);
+		if (!isDrumTrack(track)) {
+			return false;
+		}
+
+		var importedData = track.getImportedData();
+		var eventList = track.getMMLEventAtIndex(partIndex);
+		if (partIndex < importedData.size()) {
+			var importedList = importedData.get(partIndex);
+			for (var data : importedList.getMMLNoteEventList()) {
+				int tickOffset = data.getTickOffset();
+				var noteEvent = eventList.searchOnTickOffset(tickOffset);
+				if ((noteEvent.getTickOffset() == tickOffset) && (noteEvent.getTick() == data.getTick())) {
+					// 同じTickOffsetに同じTickのノートがあれば, インポートしたデータを基準に変換する.
+					var key = midMap.get(data.getNote());
+					var item = drumMap.get(key);
+					if (noteEvent.getNote() != item.key) {
+						noteEvent.setNote(item.key);
+						update = true;
+					}
+				}
+			}
+		}
+		return update;
+	}
+
 	public void midDrum2MabiDrum(Object source, IMMLManager mmlManager) {
 		if (source instanceof Supplier<?>) {
 			Object o = ((Supplier<?>) source).get();
 			if (o instanceof RangeMode mode) {
 				AtomicBoolean update = new AtomicBoolean(false);
 				mode.action(mmlManager, (trackIndex, partIndex) -> {
-					var track = mmlManager.getMMLScore().getTrack(trackIndex);
-					if (isDrumTrack(track)) {
-						var eventList = track.getMMLEventAtIndex(partIndex);
-
-						for (var noteEvent : eventList.getMMLNoteEventList()) {
-							var key = midMap.get(noteEvent.getNote());
-							var item = drumMap.get(key);
-							noteEvent.setNote(item.key);
-						}
+					if (convert(mmlManager, trackIndex, partIndex)) {
 						update.set(true);
 					}
 				});
@@ -232,9 +262,9 @@ public final class DrumConverter {
 	private void loadData() {
 		String str = MabiIccoProperties.getInstance().drumConvertCustomMap.get();
 		if (str.length() == 0) return;
-		String data = Utils.decompress(str);
+		byte[] data = Utils.decompress(str);
 		if (data == null) return;
-		ByteArrayInputStream istream = new ByteArrayInputStream(data.getBytes());
+		ByteArrayInputStream istream = new ByteArrayInputStream(data);
 		var p = new Properties();
 		try {
 			p.load(istream);

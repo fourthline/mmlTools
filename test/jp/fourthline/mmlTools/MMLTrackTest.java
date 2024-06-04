@@ -6,7 +6,9 @@ package jp.fourthline.mmlTools;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -388,6 +390,7 @@ public class MMLTrackTest {
 	@Test
 	public void test_clone() throws MMLExceptionList, MMLVerifyException {
 		MMLTrack t1 = new MMLTrack().setMML("MML@aaat130,b8c6,rc,rrd;");
+		List<MMLEventList> importedList = new ArrayList<>();
 		t1.setPanpot(1);
 		t1.setProgram(2);
 		t1.setProgram(-2);
@@ -400,9 +403,11 @@ public class MMLTrackTest {
 		assertEquals(t1.getPanpot(), t2.getPanpot());
 		assertEquals(t1.getProgram(), t2.getProgram());
 		assertEquals(t1.getSongProgram(), t2.getSongProgram());
+		assertEquals(null, t1.getImportedData());
 
 		t1.getMMLEventList().get(0).getMMLNoteEventList().get(0).setNote(99);
 		t1.generate();
+		t1.setImportedData(importedList);
 
 		assertEquals("MML@o8d+o4aa,b8c6,rc,r2d;", t1.getMabiMML());
 		assertEquals("MML@aaat130,b8c6,rc,rrd;", t2.getMabiMML());
@@ -413,6 +418,7 @@ public class MMLTrackTest {
 		assertEquals("MML@o8d+o4aa,b8c6,rc,r2d;", t3.getMabiMML());
 		assertEquals("MML@o8d+o4aat130,b8c6,rc,r2dt130;", t3.getOriginalMML());
 		assertEquals(true, t3.getDisableNopt());
+		assertEquals(importedList, t1.getImportedData());
 	}
 
 	@Test
