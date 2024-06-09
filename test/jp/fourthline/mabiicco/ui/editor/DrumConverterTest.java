@@ -13,6 +13,7 @@ import org.junit.Test;
 import jp.fourthline.UseLoadingDLS;
 import jp.fourthline.mabiicco.ui.mml.MMLManagerStub;
 import jp.fourthline.mmlTools.MMLExceptionList;
+import jp.fourthline.mmlTools.MMLScoreSerializer;
 import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.MMLVerifyException;
 
@@ -42,7 +43,7 @@ public final class DrumConverterTest extends UseLoadingDLS {
 		assertFalse(DrumConverter.isDrumTrack(track));
 
 		// 現在のデータをインポートしたデータとして設定
-		track.setImportedData(track.getMMLEventList());
+		track.setImportedData(MMLScoreSerializer.toStringImportedData(track.getMMLEventList()));
 		assertTrue(DrumConverter.isDrumTrack(track));
 		DrumConverter.getInstance().midDrum2MabiDrum(source, mmlManager);
 		track.generate();

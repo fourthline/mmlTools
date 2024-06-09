@@ -31,6 +31,7 @@ import jp.fourthline.mmlTools.MMLEventList;
 import jp.fourthline.mmlTools.MMLExceptionList;
 import jp.fourthline.mmlTools.MMLNoteEvent;
 import jp.fourthline.mmlTools.MMLScore;
+import jp.fourthline.mmlTools.MMLScoreSerializer;
 import jp.fourthline.mmlTools.MMLTempoEvent;
 import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.MMLVerifyException;
@@ -434,7 +435,7 @@ public final class MidiFile extends AbstractMMLParser {
 				track.setMML(mml[0], mml[1], mml[2], "");
 				if (trackInfo.program == InstClass.DRUM) {
 					// ドラム変換用に基準データをセットしておく.
-					track.setImportedData(list);
+					track.setImportedData(MMLScoreSerializer.toStringImportedData(list));
 				}
 				if (score.addTrack(track) < 0) {
 					throw new MMLParseException("track over: " + track.getTrackName());

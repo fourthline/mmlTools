@@ -76,7 +76,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 	private boolean fix64Tempo = false;
 
 	// インポートしたデータ: ドラム変換を多重実行したときに変換対象にするデータ.
-	private List<MMLEventList> importedData;
+	private String importedData;
 
 	public MMLTrack() {
 		this(0, 0, 0);
@@ -139,8 +139,8 @@ public final class MMLTrack implements Serializable, Cloneable {
 		return this;
 	}
 
-	public void setImportedData(List<MMLEventList> list) {
-		importedData = list;
+	public void setImportedData(String str) {
+		importedData = str;
 	}
 
 	private void mmlParse(boolean delayOption) {
@@ -278,7 +278,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 		return mmlParts;
 	}
 
-	public List<MMLEventList> getImportedData() {
+	public String getImportedData() {
 		return importedData;
 	}
 

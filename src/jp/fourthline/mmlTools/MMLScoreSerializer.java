@@ -6,6 +6,7 @@ package jp.fourthline.mmlTools;
 
 import jp.fourthline.mabiicco.Utils;
 import jp.fourthline.mmlTools.core.MMLException;
+import jp.fourthline.mmlTools.optimizer.CacheMap;
 import jp.fourthline.mmlTools.parser.AbstractMMLParser;
 import jp.fourthline.mmlTools.parser.MMLParseException;
 import jp.fourthline.mmlTools.parser.SectionContents;
@@ -21,7 +22,9 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public final class MMLScoreSerializer extends AbstractMMLParser {
 
@@ -89,7 +92,7 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 				.pattern(AUTHOR,        t -> score.setAuthor(t) )
 				.pattern(TIME,          t -> score.setBaseTime(t) )
 				.pattern(TEMPO,         t -> putTempoObj(t) )
-				.pattern(IMPORTED_DATA, t -> getLastTrack().setImportedData(parseImportedData(t)) );
+				.pattern(IMPORTED_DATA, t -> getLastTrack().setImportedData(t) );
 	}
 
 	@Override
@@ -246,7 +249,7 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 	}
 
 	private static final String IMPORTED_DATA_MAGIC = "L#Vs";
-	private String writeImportedData(List<MMLEventList> list) {
+	public static String toStringImportedData(List<MMLEventList> list) {
 		var b = new ByteArrayOutputStream();
 		DataOutputStream bo = new DataOutputStream(b);
 		try {
@@ -269,14 +272,26 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 				sum += d;
 			}
 			bo.writeByte(sum);
-			return Utils.compress(b.toByteArray());
+			String str = Utils.compress(b.toByteArray());
+			if (!importedDataCache.containsKey(str)) {
+				importedDataCache.put(str, list);
+			}
+			return str;
 		} catch (IOException e) {}
 		return "";
 	}
 
-	private List<MMLEventList> parseImportedData(String s) {
+	private static Map<String, List<MMLEventList>> importedDataCache = Collections.synchronizedMap(new CacheMap<>(8));
+	public static List<MMLEventList> parseImportedData(String s) {
+		if (s == null) {
+			return null;
+		}
+		if (importedDataCache.containsKey(s)) {
+			return importedDataCache.get(s);
+		}
 		var data = Utils.decompress(s);
 		if (data == null) {
+			importedDataCache.put(s, null);
 			return null;
 		}
 		try {
@@ -284,6 +299,7 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 
 			if (!new String(in.readNBytes(IMPORTED_DATA_MAGIC.length())).equals(IMPORTED_DATA_MAGIC)) {
 				System.err.println("imported data: invalid magic");
+				importedDataCache.put(s, null);
 				return null;
 			}
 			int count = in.readByte();
@@ -312,13 +328,16 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 			a_sum &= 0xff;
 			if (sum != a_sum) {
 				System.err.println("imported data: sum error");
+				importedDataCache.put(s, null);
 				return null;
 			}
 
+			importedDataCache.put(s, list);
 			return list;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		importedDataCache.put(s, null);
 		return null;
 	}
 
@@ -347,7 +366,7 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 			stream.println(MML_TRACK + track.getOriginalMML());
 			var importedData = track.getImportedData();
 			if (importedData != null) {
-				stream.println(IMPORTED_DATA + writeImportedData(importedData));
+				stream.println(IMPORTED_DATA + importedData);
 			}
 			stream.println(TRACK_NAME + track.getTrackName());
 			stream.println(PROGRAM + track.getProgram());

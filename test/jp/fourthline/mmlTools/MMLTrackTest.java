@@ -407,7 +407,7 @@ public class MMLTrackTest {
 
 		t1.getMMLEventList().get(0).getMMLNoteEventList().get(0).setNote(99);
 		t1.generate();
-		t1.setImportedData(importedList);
+		t1.setImportedData(MMLScoreSerializer.toStringImportedData(importedList));
 
 		assertEquals("MML@o8d+o4aa,b8c6,rc,r2d;", t1.getMabiMML());
 		assertEquals("MML@aaat130,b8c6,rc,rrd;", t2.getMabiMML());
@@ -418,7 +418,7 @@ public class MMLTrackTest {
 		assertEquals("MML@o8d+o4aa,b8c6,rc,r2d;", t3.getMabiMML());
 		assertEquals("MML@o8d+o4aat130,b8c6,rc,r2dt130;", t3.getOriginalMML());
 		assertEquals(true, t3.getDisableNopt());
-		assertEquals(importedList, t1.getImportedData());
+		assertEquals(importedList, MMLScoreSerializer.parseImportedData(t3.getImportedData()));
 	}
 
 	@Test

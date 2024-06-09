@@ -40,6 +40,7 @@ import jp.fourthline.mabiicco.midi.MabiDLS;
 import jp.fourthline.mabiicco.ui.IMMLManager;
 import jp.fourthline.mabiicco.ui.UIUtils;
 import jp.fourthline.mmlTools.MMLScore;
+import jp.fourthline.mmlTools.MMLScoreSerializer;
 import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.core.ResourceLoader;
 import jp.fourthline.mmlTools.parser.MMLEventParser;
@@ -199,7 +200,11 @@ public final class DrumConverter {
 			return false;
 		}
 
-		var importedData = track.getImportedData();
+		var importedData = MMLScoreSerializer.parseImportedData(track.getImportedData());
+		if (importedData == null) {
+			return false;
+		}
+		
 		var eventList = track.getMMLEventAtIndex(partIndex);
 		if (partIndex < importedData.size()) {
 			var importedList = importedData.get(partIndex);
