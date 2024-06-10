@@ -154,7 +154,6 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String MML_X_EXPORT = "mml_x_export";
 	@Action public static final String POLYPHONY_MONITOR = "polyphony_monitor";
 	@Action public static final String MIDI_MABI_DRUM_CONVERT = "midi_mabi_drum_convert";
-	@Action public static final String MIDI_MABI_DRUM_CONVERT_SHOW_MAP = "midi_mabi_drum_convert_show_map";
 
 	private final HashMap<String, Consumer<Object>> actionMap = new HashMap<>();
 
@@ -180,6 +179,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	private final MabiIccoProperties appProperties = MabiIccoProperties.getInstance();
 
 	private boolean testMode = false;
+
+	private List<IEditStateObserver> editObservers = new ArrayList<>();
 
 	private static ActionDispatcher instance = null;
 	public static ActionDispatcher getInstance() {
@@ -321,8 +322,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(MML_X_IMPORT, t -> mmlSeqView.mml_xImportAction());
 		actionMap.put(MML_X_EXPORT, t -> mmlSeqView.mml_xExportAction());
 		actionMap.put(POLYPHONY_MONITOR, t -> PolyphonyMonitor.getInstance().show(mainFrame));
-		actionMap.put(MIDI_MABI_DRUM_CONVERT, t -> DrumConverter.getInstance().midDrum2MabiDrum(t, mmlSeqView));
-		actionMap.put(MIDI_MABI_DRUM_CONVERT_SHOW_MAP, t -> DrumConverter.showConvertMap(mainFrame));
+		actionMap.put(MIDI_MABI_DRUM_CONVERT, t -> DrumConverter.getInstance().showConvertMap(mainFrame, mmlSeqView));
 	}
 
 	@Override
@@ -734,16 +734,22 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		mainFrame.setCanRedo(fileState.canRedo());
 	}
 
+	public void addEditObserber(IEditStateObserver observer) {
+		editObservers.add(observer);
+	}
+
 	@Override
 	public void notifyUpdateEditState() {
 		mainFrame.setSelectedEdit(editState.hasSelectedNote());
 		mainFrame.setPasteEnable(editState.canPaste());
 		mainFrame.setRemoveRestsBetweenNotesEnable(editState.hasSelectedMultipleConsecutiveNotes());
-		mainFrame.setDrumConvert(DrumConverter.isDrumTrack(mmlSeqView.getActiveTrack()), DrumConverter.containsDrumTrack(mmlSeqView.getMMLScore()));
 
 		// 楽譜集分割-UI更新
 		var track = mmlSeqView.getActiveTrack();
 		mainFrame.setXExport((track != null) && (!track.mmlRank().canCompose()));
+
+		// 追加通知.
+		editObservers.forEach(t -> t.notifyUpdateEditState());
 	}
 
 	private void toggleLoop() {

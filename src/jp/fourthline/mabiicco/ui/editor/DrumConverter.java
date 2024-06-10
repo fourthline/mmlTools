@@ -4,14 +4,21 @@
 
 package jp.fourthline.mabiicco.ui.editor;
 
+import static jp.fourthline.mabiicco.AppResource.appText;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,19 +32,22 @@ import java.util.function.Supplier;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
+import jp.fourthline.mabiicco.ActionDispatcher;
 import jp.fourthline.mabiicco.AppResource;
+import jp.fourthline.mabiicco.IEditStateObserver;
 import jp.fourthline.mabiicco.MabiIccoProperties;
 import jp.fourthline.mabiicco.Utils;
 import jp.fourthline.mabiicco.midi.InstClass;
 import jp.fourthline.mabiicco.midi.InstType;
 import jp.fourthline.mabiicco.midi.MabiDLS;
 import jp.fourthline.mabiicco.ui.IMMLManager;
+import jp.fourthline.mabiicco.ui.SettingButtonGroupItem.SettingButtonItem;
 import jp.fourthline.mabiicco.ui.UIUtils;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLScoreSerializer;
@@ -114,6 +124,7 @@ public final class DrumConverter {
 	}
 
 	private final InstClass inst = MabiDLS.getInstance().getAvailableInstByInstType(List.of(InstType.DRUMS))[0];
+	private JDialog dialog = null;
 
 	private DrumConverter() {
 		ResourceBundle instPatch = ResourceBundle.getBundle("midDrum_mabiDrum", new ResourceLoader());
@@ -204,7 +215,7 @@ public final class DrumConverter {
 		if (importedData == null) {
 			return false;
 		}
-		
+
 		var eventList = track.getMMLEventAtIndex(partIndex);
 		if (partIndex < importedData.size()) {
 			var importedList = importedData.get(partIndex);
@@ -225,20 +236,15 @@ public final class DrumConverter {
 		return update;
 	}
 
-	public void midDrum2MabiDrum(Object source, IMMLManager mmlManager) {
-		if (source instanceof Supplier<?>) {
-			Object o = ((Supplier<?>) source).get();
-			if (o instanceof RangeMode mode) {
-				AtomicBoolean update = new AtomicBoolean(false);
-				mode.action(mmlManager, (trackIndex, partIndex) -> {
-					if (convert(mmlManager, trackIndex, partIndex)) {
-						update.set(true);
-					}
-				});
-				if (update.get()) {
-					mmlManager.updateActivePart(true);
-				}
+	public void midDrum2MabiDrum(IMMLManager mmlManager, RangeMode mode) {
+		AtomicBoolean update = new AtomicBoolean(false);
+		mode.action(mmlManager, (trackIndex, partIndex) -> {
+			if (convert(mmlManager, trackIndex, partIndex)) {
+				update.set(true);
 			}
+		});
+		if (update.get()) {
+			mmlManager.updateActivePart(true);
 		}
 	}
 
@@ -290,7 +296,7 @@ public final class DrumConverter {
 		}
 	}
 
-	private static class Editor extends JPanel {
+	public static class Editor extends JPanel implements ActionListener, IEditStateObserver {
 		private static final long serialVersionUID = -7937826516875634485L;
 		private final JComboBox<KeyMap> combo = new JComboBox<>();
 		private final JLabel midLabel = new JLabel();
@@ -308,6 +314,12 @@ public final class DrumConverter {
 		private final DrumConverter c = DrumConverter.getInstance();
 		private final JTable table;
 		private final Vector<Vector<Object>> list = new Vector<>();
+		private final JComboBox<SettingButtonItem> modeCombo;
+		private final JButton execButton = new JButton(appText("drum_convert.convert"));
+		private final JButton closeButton = new JButton(appText("drum_convert.close"));
+
+		private final JDialog dialog;
+		private final IMMLManager mmlManager;
 
 		private KeyMap getKeyMap(int row) {
 			var item = list.get(row);
@@ -319,8 +331,10 @@ public final class DrumConverter {
 			return mid;
 		}
 
-		private Editor() {
+		private Editor(JDialog dialog, IMMLManager mmlManager) {
 			super(new BorderLayout());
+			this.dialog = dialog;
+			this.mmlManager = mmlManager;
 			var icon = AppResource.getImageIcon(AppResource.appText("drum_convert.sound_icon"));
 
 			c.midMap.forEach((key, value) -> {
@@ -354,21 +368,21 @@ public final class DrumConverter {
 			cp1.add(midLabel, BorderLayout.CENTER);
 			var b1 = new JButton(icon);
 			b1.setFocusable(false);
-			b1.addMouseListener(new MMM(null, () -> selectedMidKey()));
+			b1.addMouseListener(new DMouseListener(null, () -> selectedMidKey()));
 			cp1.add(b1, BorderLayout.EAST);
 			JPanel cp2 = new JPanel(new BorderLayout());
 			cp2.add(new JLabel(AppResource.appText("drum_convert.current")), BorderLayout.WEST);
 			cp2.add(mabiLabel, BorderLayout.CENTER);
 			var b2 = new JButton(icon);
 			b2.setFocusable(false);
-			b2.addMouseListener(new MMM(c.inst, () -> selectedDefaultMabiKey(false)));
+			b2.addMouseListener(new DMouseListener(c.inst, () -> selectedDefaultMabiKey(false)));
 			cp2.add(b2, BorderLayout.EAST);
 			JPanel cp3 = new JPanel(new BorderLayout());
 			cp3.add(new JLabel(AppResource.appText("drum_convert.change")), BorderLayout.WEST);
 			cp3.add(combo, BorderLayout.CENTER);
 			var b3 = new JButton(icon);
 			b3.setFocusable(false);
-			b3.addMouseListener(new MMM(c.inst, () -> selectedMabiKey(false)));
+			b3.addMouseListener(new DMouseListener(c.inst, () -> selectedMabiKey(false)));
 			cp3.add(b3, BorderLayout.EAST);
 			JPanel cp4 = new JPanel(new BorderLayout());
 			cp4.add(cp1, BorderLayout.NORTH);
@@ -378,24 +392,45 @@ public final class DrumConverter {
 			comboPanel.add(comboButtonPanel, BorderLayout.SOUTH);
 			comboPanel.add(cp4, BorderLayout.CENTER);
 
-			// layout
+			// 変換Map
 			JScrollPane scrollPane = new JScrollPane(table);
 			scrollPane.setPreferredSize(new Dimension(600, 400));
-
+			JPanel convertMapPanel = UIUtils.createTitledPanel(appText("drum_convert.map"), new BorderLayout());
+			convertMapPanel.add(scrollPane, BorderLayout.CENTER);
 			JLabel gmDesc = new JLabel(" * GM: General MIDI");
-			JPanel panel = new JPanel(new BorderLayout());
-			panel.add(scrollPane, BorderLayout.CENTER);
-			panel.add(gmDesc, BorderLayout.SOUTH);
+			convertMapPanel.add(gmDesc, BorderLayout.SOUTH);
 
-			add(panel, BorderLayout.CENTER);
-			add(comboPanel, BorderLayout.SOUTH);
+			// 実行パネル
+			JPanel execPanel = new JPanel(new BorderLayout());
+			JPanel execPanel2 = new JPanel();
+			JPanel execPanel3 = new JPanel();
+			var modeList = new Vector<SettingButtonItem>();
+			for (var l : SettingButtonItem.create(modes)) {
+				modeList.add(l);
+			}
+			Collections.reverse(modeList);
+			modeCombo = new JComboBox<>(modeList);
+			modeCombo.addActionListener(this);
+			execButton.addActionListener(this);
+			updateExecButtonStatus();
+			closeButton.addActionListener(this);
+			dialog.getRootPane().setDefaultButton(execButton);
+			execPanel2.add(modeCombo);
+			execPanel2.add(execButton);
+			execPanel3.add(closeButton);
+			execPanel.add(execPanel2, BorderLayout.CENTER);
+			execPanel.add(execPanel3, BorderLayout.SOUTH);
+
+			add(convertMapPanel, BorderLayout.NORTH);
+			add(comboPanel, BorderLayout.CENTER);
+			add(execPanel, BorderLayout.SOUTH);
 		}
 
-		private static final class MMM extends MouseAdapter {
+		private static final class DMouseListener extends MouseAdapter {
 			private final InstClass inst;
 			private final Supplier<Integer> f;
 
-			private MMM(InstClass inst, Supplier<Integer> f) {
+			private DMouseListener(InstClass inst, Supplier<Integer> f) {
 				this.inst = inst;
 				this.f = f;
 			}
@@ -471,11 +506,70 @@ public final class DrumConverter {
 			}
 			return ret;
 		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			var source = e.getSource();
+			if (source == closeButton) {
+				dialog.setVisible(false);
+			} else if (source == execButton) {
+				apply();
+			} else if (source == modeCombo) {
+				updateExecButtonStatus();
+			}
+		}
+
+		private RangeMode getCurrentRangeMode() {
+			if (modeCombo.getSelectedItem() instanceof SettingButtonItem item) {
+				if (item.getItem() instanceof RangeMode mode) {
+					return mode;
+				}
+			}
+			return null;
+		}
+
+		private void apply() {
+			var mode = getCurrentRangeMode();
+			if (mode != null) {
+				c.midDrum2MabiDrum(mmlManager, mode);
+			}
+		}
+
+		private void updateExecButtonStatus() {
+			var mode = getCurrentRangeMode();
+			if (mode != null) {
+				AtomicBoolean enableExec = new AtomicBoolean(false);
+				mode.action(mmlManager, (trackIndex, partIndex) -> {
+					var track = mmlManager.getMMLScore().getTrack(trackIndex);
+					if (isDrumTrack(track)) {
+						enableExec.set(true);
+					}
+				});
+				execButton.setEnabled(enableExec.get());
+			}
+		}
+
+		@Override
+		public void notifyUpdateEditState() {
+			updateExecButtonStatus();
+		}
 	}
 
-	public static void showConvertMap(Frame parentFrame) {
-		var contents = new Editor();
-		String title = AppResource.appText("menu.drum_converting_map");
-		JOptionPane.showMessageDialog(parentFrame, contents, title, JOptionPane.PLAIN_MESSAGE);
+	public void showConvertMap(Frame parentFrame, IMMLManager mmlManager) {
+		if (dialog == null) {
+			dialog = new JDialog(parentFrame, appText("edit.drum_convert"));
+			var editor = new Editor(dialog, mmlManager);
+			dialog.add(editor);
+			dialog.pack();
+			dialog.addWindowListener(new WindowAdapter() {
+				@Override
+				public void windowClosing(WindowEvent e) {
+					dialog.setVisible(false);
+				}
+			});
+			dialog.setLocationRelativeTo(parentFrame);
+			ActionDispatcher.getInstance().addEditObserber(editor);
+		}
+		dialog.setVisible(true);
 	}
 }

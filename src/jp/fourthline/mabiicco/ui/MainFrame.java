@@ -20,9 +20,7 @@ import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.IEditStateObserver;
 import jp.fourthline.mabiicco.MabiIccoProperties;
 import jp.fourthline.mabiicco.ui.PianoRollView.PaintMode;
-import jp.fourthline.mabiicco.ui.editor.DrumConverter;
 import jp.fourthline.mabiicco.ui.editor.NoteAlign;
-import jp.fourthline.mabiicco.ui.editor.RangeMode;
 
 import javax.swing.JTextField;
 import javax.swing.JButton;
@@ -99,7 +97,6 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	private PlayStateComponent<JMenuItem> velocityUpMenu = null;
 	private PlayStateComponent<JMenuItem> velocityDownMenu = null;
 	private PlayStateComponent<JMenuItem> xExportMenu = null;
-	private List<PlayStateComponent<JMenuItem>> drumConvertMenu = null;
 
 	private JButton loopButton = null;
 
@@ -301,14 +298,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		velocityDownMenu = createMenuItem(editMenu, "edit.velocity_down", ActionDispatcher.VELOCITY_DOWN, true,
 				KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.ALT_DOWN_MASK));
 		if (MabiIccoProperties.getInstance().soundEnv.get().useDLS()) {
-			var drumConvertGroupMenu = new JMenu(appText("edit.drum_convert"));
-			noplayFunctions.add(new PlayStateComponent<>(drumConvertGroupMenu));
-			var drumConvertMenuList = UIUtils.createGroupActionMenu(drumConvertGroupMenu, DrumConverter.modes, (s) -> s + " " + appText("drum_convert.menu_apply"), ActionDispatcher.MIDI_MABI_DRUM_CONVERT);
-			drumConvertMenu = new ArrayList<>();
-			drumConvertMenuList.forEach(t -> drumConvertMenu.add(new PlayStateComponent<>(t)));
-			drumConvertGroupMenu.addSeparator();
-			createMenuItem(drumConvertGroupMenu, "menu.drum_converting_map", ActionDispatcher.MIDI_MABI_DRUM_CONVERT_SHOW_MAP, true);
-			editMenu.add(drumConvertGroupMenu);
+			createMenuItem(editMenu, "edit.drum_convert", ActionDispatcher.MIDI_MABI_DRUM_CONVERT, true);
 		}
 
 		editMenu.add(new JSeparator());
@@ -732,14 +722,6 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 
 	public void setXExport(boolean b) {
 		xExportMenu.setEnabled(b);
-	}
-
-	public void setDrumConvert(boolean b, boolean all) {
-		if (drumConvertMenu != null) {
-			for (int i = 0; i < DrumConverter.modes.length; i++) {
-				drumConvertMenu.get(i).setEnabled((DrumConverter.modes[i] == RangeMode.ALL_TRACK) ? all : b);
-			}
-		}
 	}
 
 	public void updateLoop(boolean b) {
