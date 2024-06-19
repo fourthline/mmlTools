@@ -55,7 +55,8 @@ public final class MMLEventParser implements Iterator<MMLEvent> {
 	private final int startOffset;
 	private MMLNoteEvent prevNoteEvent = null;
 	private int volume = MMLNoteEvent.INIT_VOL;
-	private boolean onTempo = false;
+	private int tuningFirstTick = 0;
+	private int tuningTiedCount = 0;
 
 	/**
 	 * @return すべてMMLパースが終っているときは、nullを返す.
@@ -83,7 +84,6 @@ public final class MMLEventParser implements Iterator<MMLEvent> {
 				try {
 					int tempo = Integer.parseInt( token.substring(1) );
 					nextItem = new MMLTempoEvent(tempo, totalTick, totalTick == startOffset);
-					onTempo = true;
 				} catch (IllegalArgumentException e) {
 					continue;
 				}
@@ -96,10 +96,16 @@ public final class MMLEventParser implements Iterator<MMLEvent> {
 					/* tie でかつ、同じノートであれば、前のNoteEventにTickを加算する */
 					if ( (hasTie) && (prevNoteEvent != null) && (prevNoteEvent.getNote() == parser.getNoteNumber())) {
 						int prevTick = prevNoteEvent.getTick();
-						if ( (prevTick == tick) && (TuningBase.getInstance(tick) != null) && (!onTempo) ) {
-							prevNoteEvent.setTuningNote(TuningBase.getInstance(tick));
+						if (tuningTiedCount == 0) {
+							tuningFirstTick = prevTick;
 						}
-						prevNoteEvent.setTick( prevTick + tick);
+						if ( (tuningFirstTick == tick) && (TuningBase.getInstance(tick) != null) ) {
+							if (++tuningTiedCount >= 3) {
+								// 同一4連以上場合調律符として扱う.
+								prevNoteEvent.setTuningNote(TuningBase.getInstance(tick));
+							}
+						}
+						prevNoteEvent.setTick(prevTick + tick);
 						prevNoteEvent.getIndexOfMMLString()[1] = tokenizer.getIndex()[1];
 					} else if (parser.getNoteNumber() >= -1) {
 						nextItem = prevNoteEvent;
@@ -108,7 +114,7 @@ public final class MMLEventParser implements Iterator<MMLEvent> {
 					}
 
 					if (!hasTie) {
-						onTempo = false;
+						tuningTiedCount = 0;
 					}
 					hasTie = false;
 					totalTick += tick;

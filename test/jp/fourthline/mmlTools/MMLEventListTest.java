@@ -753,10 +753,8 @@ public class MMLEventListTest {
 
 	@Test
 	public void testTempoNotTuneBase() {
-		String mml = "l16t150f&f";
-		MMLEventList eventList = new MMLEventList(mml);
-		assertEquals(1, eventList.getMMLNoteEventList().size());
-		assertEquals(true, eventList.getMMLNoteEventList().get(0).isTuningNote());
+		String mml;
+		MMLEventList eventList;
 
 		// テンポで分割されている場合は調律符ではない.
 		mml = "l16ft150&f";
@@ -769,5 +767,29 @@ public class MMLEventListTest {
 		eventList = new MMLEventList(mml);
 		assertEquals(1, eventList.getMMLNoteEventList().size());
 		assertEquals(false, eventList.getMMLNoteEventList().get(0).isTuningNote());
+
+		// 3連結 (調律符として扱わない)
+		mml = "f64t160&f64&f64";
+		eventList = new MMLEventList(mml);
+		assertEquals(1, eventList.getMMLNoteEventList().size());
+		assertEquals(false, eventList.getMMLNoteEventList().get(0).isTuningNote());
+
+		// 4連結 (調律符として扱う)
+		mml = "f64t160&f64&f64&f64";
+		eventList = new MMLEventList(mml);
+		assertEquals(1, eventList.getMMLNoteEventList().size());
+		assertEquals(true, eventList.getMMLNoteEventList().get(0).isTuningNote());
+
+		// 手動パターン3.
+		mml = "d64t150&d64&d64&d64&d64&d64&d64&d64&d64&d64";
+		eventList = new MMLEventList(mml);
+		assertEquals(1, eventList.getMMLNoteEventList().size());
+		assertEquals(true, eventList.getMMLNoteEventList().get(0).isTuningNote());		
+
+		// 手動パターン4.
+		mml = "d64&d64&d64&d64&d64&d64&d64&d64&d64t150&d64";
+		eventList = new MMLEventList(mml);
+		assertEquals(1, eventList.getMMLNoteEventList().size());
+		assertEquals(true, eventList.getMMLNoteEventList().get(0).isTuningNote());		
 	}
 }
