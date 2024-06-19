@@ -354,7 +354,7 @@ public final class DrumConverter {
 			table.getColumnModel().getColumn(2).setMinWidth(100);
 			table.getColumnModel().getColumn(2).setMaxWidth(100);
 			table.setRowSelectionAllowed(true);
-			table.getSelectionModel().addListSelectionListener(t -> updateCombo());
+			table.getSelectionModel().addListSelectionListener(t -> updateCombo(false));
 
 			// combo
 			combo.setEnabled(false);
@@ -460,22 +460,25 @@ public final class DrumConverter {
 			}
 		}
 
-		private void updateCombo() {
+		private void updateCombo(boolean labelOnly) {
 			int row = table.getSelectedRow();
 			var mid = getKeyMap(row);
 			var mabi = c.drumMap.get(mid);
 			midLabel.setText(mid == null ? "-" : mid.toString());
 			mabiLabel.setText(mabi.toString());
-			combo.removeAllItems();
-			c.mabiMap.entrySet().forEach(m -> combo.addItem(m.getValue()));
-			combo.setSelectedItem(c.drumMap.get(mid));
-			combo.setEnabled(true);
+			if (!labelOnly) {
+				combo.removeAllItems();
+				c.mabiMap.entrySet().forEach(m -> combo.addItem(m.getValue()));
+				combo.setSelectedItem(c.drumMap.get(mid));
+				combo.setEnabled(true);
+			}
 		}
 
 		private void setKeyMap(int row, KeyMap mid, KeyMap mabi) {
 			c.drumMap.put(mid, mabi);
 			table.getModel().setValueAt(mabi.keyName, row, 2);
 			table.getModel().setValueAt(mabiName(mid, mabi), row, 3);
+			updateCombo(true);
 		}
 
 		private int selectedMidKey() {
