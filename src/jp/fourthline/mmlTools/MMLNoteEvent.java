@@ -229,4 +229,16 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 				(super.equals(noteEvent)) &&
 				(Objects.equals(this.tuningBase, noteEvent.tuningBase));
 	}
+
+	public static String keyToAbsNote(int key) {
+		try {
+			var note = new MMLNoteEvent(key, 0, 0);
+			var oct = note.getOctave();
+			var name = note.getNoteName();
+			return "O" + oct + name;
+		} catch (MMLException e) {
+			e.printStackTrace();
+		}
+		return "";
+	}
 }

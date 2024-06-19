@@ -18,6 +18,7 @@ import java.awt.event.WindowEvent;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -49,6 +50,7 @@ import jp.fourthline.mabiicco.midi.MabiDLS;
 import jp.fourthline.mabiicco.ui.IMMLManager;
 import jp.fourthline.mabiicco.ui.SettingButtonGroupItem.SettingButtonItem;
 import jp.fourthline.mabiicco.ui.UIUtils;
+import jp.fourthline.mmlTools.MMLNoteEvent;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLScoreSerializer;
 import jp.fourthline.mmlTools.MMLTrack;
@@ -75,11 +77,12 @@ public final class DrumConverter {
 		private final Optional<String> name;
 
 		private KeyMap(String key, String name, InstClass inst) {
-			this.keyName = key;
 			if (key.startsWith("O")) {
 				this.key = MMLEventParser.firstNoteNumber(key);
+				this.keyName = key;
 			} else {
-				this.key= Integer.parseInt(key);
+				this.key = Integer.parseInt(key);
+				this.keyName = "#" + key + "/" + MMLNoteEvent.keyToAbsNote(this.key);
 			}
 
 			if ((inst == null) || (inst.isValid(this.key))) {
@@ -313,20 +316,18 @@ public final class DrumConverter {
 
 		private final DrumConverter c = DrumConverter.getInstance();
 		private final JTable table;
-		private final Vector<Vector<Object>> list = new Vector<>();
 		private final JComboBox<SettingButtonItem> modeCombo;
 		private final JButton execButton = new JButton(appText("drum_convert.convert"));
 		private final JButton closeButton = new JButton(appText("drum_convert.close"));
 
 		private final JDialog dialog;
 		private final IMMLManager mmlManager;
+		private final List<KeyMap> keyList = new ArrayList<>();
 
 		private KeyMap getKeyMap(int row) {
-			var item = list.get(row);
-			var key = item.get(0);
 			KeyMap mid = null;
-			if (!"-".equals(key)) {
-				mid = c.midMap.get(key);
+			if (row < keyList.size()) {
+				mid = keyList.get(row);
 			}
 			return mid;
 		}
@@ -337,10 +338,12 @@ public final class DrumConverter {
 			this.mmlManager = mmlManager;
 			var icon = AppResource.getImageIcon(AppResource.appText("drum_convert.sound_icon"));
 
+			Vector<Vector<Object>> list = new Vector<>();
 			c.midMap.forEach((key, value) -> {
 				var mid = value;
 				var mabi = c.drumMap.get(value);
-				list.add(new Vector<>(List.of(mid.key, mid.getName(), mabi.keyName, mabiName(mid, mabi))));
+				list.add(new Vector<>(List.of(mid.keyName, mid.getName(), mabi.keyName, mabiName(mid, mabi))));
+				keyList.add(mid);
 			});
 			var noMapItem = c.drumMap.get(null);
 			list.add(new Vector<>(List.of("-", "-", noMapItem.keyName, mabiName(null, noMapItem))));
