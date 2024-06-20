@@ -327,9 +327,37 @@ public final class MMLTrack implements Serializable, Cloneable {
 		return mml;
 	}
 
+	/**
+	 * テンポなしでMMLデータを作成する.
+	 * @return
+	 * @throws MMLExceptionList
+	 */
+	private String[] internalData() throws MMLExceptionList {
+		int size = mmlParts.size();
+		String[] mml = new String[size];
+		var errList = new ArrayList<MMLExceptionList.Entry>();
+		for (int i = 0; i < size; i++) {
+			try {
+				var eventList = mmlParts.get(i);
+				var str = MMLBuilder.create(eventList, getStartOffset(i)).toMMLString(false, false);
+				mml[i] = new MMLStringOptimizer(str).toString();
+			} catch (MMLExceptionList e) {
+				errList.addAll(e.getErr());
+			}
+		}
+		if (!errList.isEmpty()) {
+			throw new MMLExceptionList(errList);
+		}
+		return mml;
+	}
+
 	public MMLTrack generate() throws MMLExceptionList, MMLVerifyException {
 		String mml1 = getOriginalMML();
-		originalMML.setMMLText(getMMLStrings(false, false));
+		try {
+			originalMML.setMMLText(getMMLStrings(false, false));
+		} catch (MMLExceptionList e) {
+			originalMML.setMMLText(internalData());
+		}
 		var t = new MMLTrack(commonStartOffset, startDelta, startSongDelta).setMML(getOriginalMML());
 		t.setGlobalTempoList(globalTempoList);
 		if (!this.equals(t)) {
