@@ -155,9 +155,6 @@ public final class DrumConverter {
 		drumMap.put(null, n);
 		defaultMap.putAll(drumMap);
 
-		// カスタム設定のロード.
-		loadData();
-
 		// 不足しているMabiMapをここで作ってしまえばよいのでは.
 		var key = List.of("C", "C+", "D", "D+", "E", "F", "F+", "G", "G+", "A", "A+", "B");
 		for (int i = 2; i < 7; i++) {
@@ -172,6 +169,9 @@ public final class DrumConverter {
 				}
 			}
 		}
+
+		// カスタム設定のロード.
+		loadData();
 	}
 
 	/**
@@ -326,7 +326,7 @@ public final class DrumConverter {
 
 		private KeyMap getKeyMap(int row) {
 			KeyMap mid = null;
-			if (row < keyList.size()) {
+			if ((row >= 0) && (row < keyList.size())) {
 				mid = keyList.get(row);
 			}
 			return mid;
@@ -361,7 +361,7 @@ public final class DrumConverter {
 			JPanel comboPanel = UIUtils.createTitledPanel(AppResource.appText("drum_convert.map_change"), new BorderLayout());
 			JPanel comboButtonPanel = new JPanel();
 			JButton c1 = new JButton(AppResource.appText("edit.default"));
-			c1.addActionListener(t -> selectedDefaultMabiKey(true));
+			c1.addActionListener(t -> setDefaultMabiKey());
 			JButton c2 = new JButton(AppResource.appText("edit.apply"));
 			c2.addActionListener(t -> selectedMabiKey(true));
 			comboButtonPanel.add(c1);
@@ -378,7 +378,7 @@ public final class DrumConverter {
 			cp2.add(mabiLabel, BorderLayout.CENTER);
 			var b2 = new JButton(icon);
 			b2.setFocusable(false);
-			b2.addMouseListener(new DMouseListener(c.inst, () -> selectedDefaultMabiKey(false)));
+			b2.addMouseListener(new DMouseListener(c.inst, () -> selectedCurrentMabiKey(false)));
 			cp2.add(b2, BorderLayout.EAST);
 			JPanel cp3 = new JPanel(new BorderLayout());
 			cp3.add(new JLabel(AppResource.appText("drum_convert.change")), BorderLayout.WEST);
@@ -488,27 +488,44 @@ public final class DrumConverter {
 			return (mid != null) ? mid.key : -1;
 		}
 
-		private int selectedDefaultMabiKey(boolean apply) {
+		private int setDefaultMabiKey() {
 			int row = table.getSelectedRow();
-			var mid = getKeyMap(row);
-			var mabi = c.defaultMap.get(mid);
-			if (apply) {
+			if (row >= 0) {
+				var mid = getKeyMap(row);
+				var mabi = c.defaultMap.get(mid);
 				setKeyMap(row, mid, mabi);
 				c.saveData();
+				return mabi.key;
 			}
-			return mabi.key;
+			return -1;
+		}
+
+		private int selectedCurrentMabiKey(boolean apply) {
+			int row = table.getSelectedRow();
+			if (row >= 0) {
+				var mid = getKeyMap(row);
+				var mabi = c.drumMap.get(mid);
+				if (apply) {
+					setKeyMap(row, mid, mabi);
+					c.saveData();
+				}
+				return mabi.key;
+			}
+			return -1;
 		}
 
 		private int selectedMabiKey(boolean apply) {
 			int ret = -1;
 			if (combo.getSelectedItem() instanceof KeyMap mabi) {
 				int row = table.getSelectedRow();
-				var mid = getKeyMap(row);
-				if (apply) {
-					setKeyMap(row, mid, mabi);
-					c.saveData();
+				if (row >= 0) {
+					var mid = getKeyMap(row);
+					if (apply) {
+						setKeyMap(row, mid, mabi);
+						c.saveData();
+					}
+					ret = mabi.key;
 				}
-				ret = mabi.key;
 			}
 			return ret;
 		}
