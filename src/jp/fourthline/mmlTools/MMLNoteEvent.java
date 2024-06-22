@@ -234,7 +234,7 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 		try {
 			var note = new MMLNoteEvent(key, 0, 0);
 			var oct = note.getOctave();
-			var name = note.getNoteName();
+			var name = note.getNoteName().toUpperCase();
 			return "O" + oct + name;
 		} catch (MMLException e) {
 			e.printStackTrace();
