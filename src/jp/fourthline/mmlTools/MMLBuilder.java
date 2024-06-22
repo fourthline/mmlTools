@@ -190,8 +190,7 @@ public final class MMLBuilder {
 	 * @return
 	 * @throws MMLExceptionList
 	 */
-	public String toMMLString(boolean withTempo, boolean mabiTempo, List<MMLEventList> relationPart) throws MMLExceptionList
-			 {
+	public String toMMLString(boolean withTempo, boolean mabiTempo, List<MMLEventList> relationPart) throws MMLExceptionList {
 		long totalTick = totalTickRelationPart(relationPart);
 		LinkedList<MMLTempoEvent> localTempoList = makeLocalTempoList(totalTick);
 		StringBuilder sb = new StringBuilder(STRING_BUILDER_SIZE);
@@ -338,6 +337,20 @@ public final class MMLBuilder {
 		return totalTick;
 	}
 
+
+	private boolean tickDeltaCheck(int delta) {
+		if (delta == 0) {
+			return true;
+		}
+		if (delta < 0) delta = -delta;
+
+		int min = MMLTicks.minimumTick();
+		if (delta < min) {
+			return false;
+		}
+		return true;
+	}
+
 	/**
 	 * テンポ出力を行うかどうかを指定してMML文字列を作成する. MusicQ以降用. 関連パートにテンポを入れられる場合はいれない.
 	 * @param localTempoList テンポリスト
@@ -361,9 +374,20 @@ public final class MMLBuilder {
 		MMLNoteEvent prevNoteEvent = new MMLNoteEvent(12*initOct, 0, startOffset, MMLNoteEvent.INIT_VOL);
 		for (MMLNoteEvent noteEvent : eventList.getMMLNoteEventList()) {
 			// テンポのMML挿入判定
-			while ( (localTempoList.size() > tempoIndex) && (localTempoList.get(tempoIndex).getTickOffset() <= noteEvent.getTickOffset()) ) {
-				prevNoteEvent = insertTempoMML(sb, prevNoteEvent, localTempoList.get(tempoIndex), true, relationPart);
-				localTempoList.remove(tempoIndex);
+			while ( (localTempoList.size() > tempoIndex) ) {
+				var tempoEvent = localTempoList.get(tempoIndex);
+				int delta = noteEvent.getTickOffset() - tempoEvent.getTickOffset();
+				int prevDelta = tempoEvent.getTickOffset() - prevNoteEvent.getEndTick();
+				if ( (delta >= 0) ) {
+					if (tickDeltaCheck(delta) && tickDeltaCheck(prevDelta)) {
+						prevNoteEvent = insertTempoMML(sb, prevNoteEvent, tempoEvent, true, relationPart);
+						localTempoList.remove(tempoIndex);
+					} else {
+						tempoIndex++;
+					}
+				} else {
+					break;
+				}
 			}
 
 			tempoIndex = insertNoteWithTempoMusicQ(sb, localTempoList, tempoIndex, prevNoteEvent, noteEvent, relationPart);
