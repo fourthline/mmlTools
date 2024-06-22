@@ -388,6 +388,86 @@ public class MMLTrackTest {
 	}
 
 	@Test
+	public void test_musicq_tempo_06() throws MMLExceptionList, MMLVerifyException {
+		MMLTrack.setTempoAllowChordPart(true);
+		MMLBuilder.setMMLVZeroTempo(false);
+
+		String mml = "MML@c48,r64t230,;";
+		String expect = "MML@c48,r64t230,;";
+		MMLTrack track = new MMLTrack().setMML(mml);
+		track.generate();
+		assertEquals(expect, track.getMabiMML());
+	}
+
+	/**
+	 * 休符内テンポ（Tick不足）, 和音へテンポ出力
+	 * @throws MMLExceptionList
+	 * @throws MMLVerifyException
+	 */
+	@Test
+	public void test_musicq_tempo_07() throws MMLExceptionList, MMLVerifyException {
+		MMLTrack.setTempoAllowChordPart(true);
+		MMLBuilder.setMMLVZeroTempo(false);
+
+		String mml = "MML@r5r18<f+,rt240,;";
+		String expect = "MML@r5r18<f+,rt240,;";
+		MMLTrack track = new MMLTrack().setMML(mml);
+		track.generate();
+		assertEquals(expect, track.getMabiMML());
+	}
+
+	/**
+	 * 休符内テンポ（Tick不足）, 和音へテンポ出力
+	 * @throws MMLExceptionList
+	 * @throws MMLVerifyException
+	 */
+	@Test
+	public void test_musicq_tempo_08() throws MMLExceptionList, MMLVerifyException {
+		MMLTrack.setTempoAllowChordPart(true);
+		MMLBuilder.setMMLVZeroTempo(false);
+
+		String mml = "MML@<g+5&g+20r5r18g+,rt240,;";
+		String expect = "MML@<g+5&g+20r5r18g+,rt240,;";
+		MMLTrack track = new MMLTrack().setMML(mml);
+		track.generate();
+		assertEquals(expect, track.getMabiMML());
+	}
+
+	/**
+	 * 休符内テンポ（Tick不足）, 和音出力不可, TickLength内テンポなし (例外を期待)
+	 * @throws MMLExceptionList
+	 * @throws MMLVerifyException
+	 */
+	@Test(expected = MMLExceptionList.class)
+	public void test_musicq_tempo_09() throws MMLExceptionList, MMLVerifyException {
+		MMLTrack.setTempoAllowChordPart(true);
+		MMLBuilder.setMMLVZeroTempo(false);
+
+		String mml = "MML@r5r18c,r5r18d,r5r18e;";
+		MMLTrack track = new MMLTrack().setMML(mml);
+		track.getGlobalTempoList().add(new MMLTempoEvent(140, 96));
+		track.generate();
+	}
+
+	/**
+	 * 休符内テンポ（Tick不足）, 和音出力不可, TickLength内テンポなし
+	 * @throws MMLExceptionList
+	 * @throws MMLVerifyException
+	 */
+	@Test
+	public void test_musicq_tempo_10() throws MMLExceptionList, MMLVerifyException {
+		MMLTrack.setTempoAllowChordPart(true);
+		MMLBuilder.setMMLVZeroTempo(false);
+
+		String mml = "MML@r5r18c,r5r18d,r5r18e;";
+		String expect = "MML@r5r18c,r5r18d,r5r18e;";
+		MMLTrack track = new MMLTrack().setMML(mml);
+		track.getGlobalTempoList().add(new MMLTempoEvent(140, 96*4));
+		track.generate();
+		assertEquals(expect, track.getMabiMML());
+	}
+
+	@Test
 	public void test_clone() throws MMLExceptionList, MMLVerifyException {
 		MMLTrack t1 = new MMLTrack().setMML("MML@aaat130,b8c6,rc,rrd;");
 		List<MMLEventList> importedList = new ArrayList<>();

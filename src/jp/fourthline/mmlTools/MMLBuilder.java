@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 たんらる
+ * Copyright (C) 2022-2024 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -359,6 +359,10 @@ public final class MMLBuilder {
 	 * @throws MMLExceptionList 
 	 */
 	public String toMMLStringMusicQ(List<MMLTempoEvent> localTempoList, List<MMLEventList> relationPart) throws MMLExceptionList {
+		return toMMLStringMusicQ(localTempoList, relationPart, false);
+	}
+
+	public String toMMLStringMusicQ(List<MMLTempoEvent> localTempoList, List<MMLEventList> relationPart, boolean checkDelta) throws MMLExceptionList {
 		long totalTick = totalTickRelationPart(relationPart);
 		StringBuilder sb = new StringBuilder(STRING_BUILDER_SIZE);
 		int tempoIndex = 0;
@@ -379,7 +383,8 @@ public final class MMLBuilder {
 				int delta = noteEvent.getTickOffset() - tempoEvent.getTickOffset();
 				int prevDelta = tempoEvent.getTickOffset() - prevNoteEvent.getEndTick();
 				if ( (delta >= 0) ) {
-					if (tickDeltaCheck(delta) && tickDeltaCheck(prevDelta)) {
+					// 休符中のテンポとの距離を判定
+					if (!checkDelta || (tickDeltaCheck(delta) && tickDeltaCheck(prevDelta))) {
 						prevNoteEvent = insertTempoMML(sb, prevNoteEvent, tempoEvent, true, relationPart);
 						localTempoList.remove(tempoIndex);
 					} else {

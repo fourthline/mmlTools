@@ -472,8 +472,9 @@ public final class MMLTrack implements Serializable, Cloneable {
 				localTempoList = new LinkedList<>(globalTempoList);
 			}
 			List<MMLEventList> relationPart = ((i < 3) && (allowTempoChord)) ? relationParts.get(i) : null;
+			boolean checkDelta = (i < 2);
 			try {
-				mml[i] = MMLBuilder.create(eventList, getStartOffsetforMabiMML(i), MMLBuilder.INIT_OCT).toMMLStringMusicQ(localTempoList, relationPart);
+				mml[i] = MMLBuilder.create(eventList, getStartOffsetforMabiMML(i), MMLBuilder.INIT_OCT).toMMLStringMusicQ(localTempoList, relationPart, checkDelta);
 			} catch (MMLExceptionList e) {
 				errList.addAll(e.getErr());
 			}
