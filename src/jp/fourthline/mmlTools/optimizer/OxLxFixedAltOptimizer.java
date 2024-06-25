@@ -46,6 +46,7 @@ public final class OxLxFixedAltOptimizer extends OxLxFixedOptimizer {
 	 * 置換パターン
 	 */
 	private static final List<FixPattern> pattern = List.of(
+			new FixPattern("32", "21", "."),
 			new FixPattern("24", "r12", "rr"),
 			new FixPattern("32", "r16", "rr"),
 			new FixPattern("48", "r24", "rr"),
