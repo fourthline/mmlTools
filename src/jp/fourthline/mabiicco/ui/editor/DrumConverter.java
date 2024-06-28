@@ -584,6 +584,7 @@ public final class DrumConverter {
 			var editor = new Editor(dialog, mmlManager);
 			dialog.add(editor);
 			dialog.pack();
+			dialog.setResizable(false);
 			dialog.addWindowListener(new WindowAdapter() {
 				@Override
 				public void windowClosing(WindowEvent e) {
