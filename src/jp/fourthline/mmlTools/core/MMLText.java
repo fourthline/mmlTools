@@ -111,26 +111,35 @@ public final class MMLText {
 	}
 
 	/**
-	 * {@code MML@aaa,bbb,ccc,ddd;} 形式でMMLを取得する
-	 *   ddd: 歌パートがない場合は、dddは出力しない.
-	 * @return　{@code MML@aaa,bbb,ccc,ddd;} 形式の文字列
+	 * メロディパートのテキストを取得する.
+	 * 他の場所で text[0] を直接参照しないこと.
+	 * @return
 	 */
-	public String getMML() {
+	private String melodyPart() {
 		// メロディ or 歌 パートがどちらも空で楽譜の文字がある場合、メロディパートに1文字入れる.
 		String melody_part = text[0];
 		if (( melody_part.length() == 0) && ((this.text[1].length() != 0) || (this.text[2].length() != 0)) && !validSongPart() ) {
 			melody_part = MMLText.melody_empty_str;
 		}
-		String mml = "MML@"
-				+ melody_part + ","
-				+ this.text[1]+ ","
-				+ this.text[2];
-		if (validSongPart()) {
-			mml += "," + this.text[3];
-		}
+		return melody_part;
+	}
 
-		mml += ";";
-		return mml;
+	/**
+	 * {@code MML@aaa,bbb,ccc,ddd;} 形式でMMLを取得する
+	 *   ddd: 歌パートがない場合は、dddは出力しない.
+	 * @return　{@code MML@aaa,bbb,ccc,ddd;} 形式の文字列
+	 */
+	public String getMML() {;
+	String mml = "MML@"
+			+ melodyPart() + ","
+			+ this.text[1]+ ","
+			+ this.text[2];
+	if (validSongPart()) {
+		mml += "," + this.text[3];
+	}
+
+	mml += ";";
+	return mml;
 	}
 
 	private boolean validSongPart() {
@@ -139,9 +148,9 @@ public final class MMLText {
 
 	public ComposeRank mmlRank() {
 		if (!this.excludeSongPart) {
-			return ComposeRank.mmlRank(this.text[0], this.text[1], this.text[2], this.text[3]);
+			return ComposeRank.mmlRank(melodyPart(), this.text[1], this.text[2], this.text[3]);
 		} else {
-			return ComposeRank.mmlExcludeSongRank(this.text[0], this.text[1], this.text[2], "");
+			return ComposeRank.mmlExcludeSongRank(melodyPart(), this.text[1], this.text[2], "");
 		}
 	}
 
@@ -153,7 +162,7 @@ public final class MMLText {
 	public String mmlRankFormat() {
 		String str = "Rank "
 				+ this.mmlRank().getRank() + " "
-				+ "( " + this.text[0].length()
+				+ "( " + melodyPart().length()
 				+ ", " + this.text[1].length()
 				+ ", " + this.text[2].length();
 		if (validSongPart()) {

@@ -75,22 +75,27 @@ public final class MMLTextTest {
 		}
 		sb1.append(sb2);
 		String s = sb1.toString();
-		MMLText text = new MMLText().setMMLText("", s, s, "");
+		MMLText text = new MMLText().setMMLText("", s, "", "");
 		List<MMLText> list = text.splitMML(ComposeRank.getTopRank());
-		assertEquals(8, list.size());
+		assertEquals(5, list.size());
 		StringBuilder expect1 = new StringBuilder();
 		expect1.append("MML@").append("<>")
 		.append(',').append(s, 0, 800)
-		.append(',').append(s, 0, 500)
+		.append(',')
 		.append(';');
 		assertEquals(expect1.toString(), list.get(0).getMML());
 
 		StringBuilder expect2 = new StringBuilder();
 		expect2.append("MML@").append("<>")
 		.append(',').append(s, 800, 1600)
-		.append(',').append(s, 500, 1000)
+		.append(',')
 		.append(';');
 		assertEquals(expect2.toString(), list.get(1).getMML());
+
+		// Rank
+		assertEquals("Rank 1 ( 2, 800, 0 )", list.get(0).mmlRankFormat());
+		assertEquals("Rank 1 ( 2, 800, 0 )", list.get(1).mmlRankFormat());
+		assertEquals("Rank 1 ( 2, 800, 0 )", list.get(2).mmlRankFormat());
 	}
 
 	@Test
