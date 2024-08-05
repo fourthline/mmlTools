@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2021 たんらる
+ * Copyright (C) 2017-2024 たんらる
  */
 
 package jp.fourthline.mmlTools.core;
