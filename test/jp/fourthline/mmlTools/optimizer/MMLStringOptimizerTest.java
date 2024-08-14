@@ -617,6 +617,13 @@ public class MMLStringOptimizerTest {
 	}
 
 	@Test
+	public void test_64d() {
+		String input  = "c64c64c64c64c64c64.";
+		String expect = "l64cccccc.";
+		checkMMLStringOptimize(input, expect, t -> t.optimizeGen3());
+	}
+
+	@Test
 	public void test_32d() {
 		String input  = "c32c32c32c32c32c32.";
 		String expect = "l32cccccc.";
