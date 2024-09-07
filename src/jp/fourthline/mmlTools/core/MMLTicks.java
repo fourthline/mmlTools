@@ -12,7 +12,7 @@ import java.util.Optional;
  * 音符の時間変換値
  * @author たんらる
  */
-public final class MMLTicks {
+public class MMLTicks {
 
 	private static final MMLTickTable tickTable = MMLTickTable.createTickTable();
 
@@ -81,7 +81,7 @@ public final class MMLTicks {
 		this.needTie = needTie;
 	}
 
-	private String mmlNotePart(String phoneticString) {
+	protected String mmlNotePart(String phoneticString) {
 		return mmlNotePart(List.of(phoneticString));
 	}
 
@@ -98,7 +98,7 @@ public final class MMLTicks {
 		return sb.toString();
 	}
 
-	private String makeMMLText(StringBuilder sb, int remTick) throws MMLException {
+	protected String makeMMLText(StringBuilder sb, int remTick) throws MMLException {
 		// 1~64の分割
 		if (remTick > 0) {
 			for (int base = 1; base <= 64; base *= 2) {

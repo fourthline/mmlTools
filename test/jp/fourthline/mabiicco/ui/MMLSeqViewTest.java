@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2023 たんらる
+ * Copyright (C) 2015-2024 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
@@ -23,6 +23,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import jp.fourthline.UseLoadingDLS;
+import jp.fourthline.mabiicco.MabiIcco;
 import jp.fourthline.mabiicco.MabiIccoProperties;
 import jp.fourthline.mabiicco.midi.InstType;
 import jp.fourthline.mabiicco.midi.MabiDLS;
@@ -536,7 +537,6 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 		assertEquals(false, dls.getMute(2));
 	}
 
-
 	@Test
 	public void test_changeInst() throws Exception {
 		MMLTrack track1 = createMMLTrack(1200, 400, 400, 1200, false);
@@ -583,5 +583,32 @@ public final class MMLSeqViewTest extends UseLoadingDLS {
 		assertEquals(true, obj.getFileState().canRedo());
 		assertEquals(false, obj.getSelectedTrack().isExcludeSongPart());
 		assertEquals("Rank 1 ( 1200, 400, 400, 1200 )", view.getRankText());
+	}
+
+	@Test
+	public void test_changeInst2() throws Exception {
+		MabiIccoProperties.getInstance().percussionMotionFix.set(true);
+		var m = new MabiIcco(null);
+		MMLTrack.setPercussionMotionFixFunction(t -> m.percussionMotionFix(t));
+
+		MMLTrack track1 = createMMLTrack(1200, 400, 400, 1200, false);
+		MMLScore score = new MMLScore();
+		score.addTrack(track1);
+		obj.setMMLScore(score);
+
+		JTabbedPane tabbedPane = (JTabbedPane) getField("tabbedPane");
+		MMLTrackView view = (MMLTrackView) tabbedPane.getComponentAt(0);
+
+		assertEquals(false, obj.getFileState().canUndo());
+		assertEquals(false, obj.getFileState().canRedo());
+		assertEquals(false, obj.getSelectedTrack().isExcludeSongPart());
+		assertEquals("*Rank 1 ( 1200, 400, 400, 1200 )", view.getRankText());
+
+		// 打楽器の音源に変更する (打楽器モーション補正のためMML再生成される)
+		view.getComboBox().setSelectedIndex(27);
+		assertEquals(InstType.PERCUSSION, MabiDLS.getInstance().getInstByProgram(obj.getSelectedTrack().getProgram()).getType());
+		assertEquals("Rank 1 ( 1200, 400, 400, 1200 )", view.getRankText());
+
+		MabiIccoProperties.getInstance().percussionMotionFix.set(false);
 	}
 }

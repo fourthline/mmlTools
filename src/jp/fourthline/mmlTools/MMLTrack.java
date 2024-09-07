@@ -28,8 +28,14 @@ public final class MMLTrack implements Serializable, Cloneable {
 
 	/** program番号から和音へのテンポ出力が可能かどうかの判定を行うためのFunction */
 	private static IntFunction<Boolean> tempoAllowChordPartFunction = t -> true;
-	public static void setTempoAllowChardPartFunction(IntFunction<Boolean> f) {
+	public static void setTempoAllowChordPartFunction(IntFunction<Boolean> f) {
 		tempoAllowChordPartFunction = f;
+	}
+
+	/** program番号から打楽器モーション用の休符処理をするかどうかの判定を行うためのFunction */
+	public static IntFunction<Boolean> percussionMotionFix = t -> false;
+	public static void setPercussionMotionFixFunction(IntFunction<Boolean> f) {
+		percussionMotionFix = f;
 	}
 
 	private static final int PART_COUNT = 4;
@@ -379,6 +385,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 		var errList = new ArrayList<MMLExceptionList.Entry>();
 
 		for (int i = 0; i < count; i++) {
+			boolean pix = mabiTempo && percussionMotionFix.apply(program) && (i == 0);
 			int startOffset = mabiTempo ? getStartOffsetforMabiMML(i) : getStartOffset(i);
 			// メロディパートのMML更新（テンポ, tickLengthにあわせる.
 			MMLEventList eventList = mmlParts.get(i);
@@ -387,9 +394,9 @@ public final class MMLTrack implements Serializable, Cloneable {
 				if ( isPrimaryTempoPart ) {
 					// part0 の場合, 1,2のパート情報を渡す
 					List<MMLEventList> relationPart = (i == 0) ? mmlParts.subList(1, 3) : null;
-					mml[i] = MMLBuilder.create(eventList, startOffset).toMMLString(true, mabiTempo, relationPart);
+					mml[i] = MMLBuilder.create(eventList, startOffset, pix).toMMLString(true, mabiTempo, relationPart);
 				} else {
-					mml[i] = MMLBuilder.create(eventList, startOffset).toMMLString();
+					mml[i] = MMLBuilder.create(eventList, startOffset, pix).toMMLString();
 				}
 			} catch (MMLExceptionList e) {
 				errList.addAll(e.getErr());
@@ -459,6 +466,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 		var errList = new ArrayList<MMLExceptionList.Entry>();
 
 		for (int i = 0; i < count; i++) {
+			boolean pix = percussionMotionFix.apply(program) && (i == 0);
 			// メロディパートのMML更新（テンポ, tickLengthにあわせる.
 			MMLEventList eventList = mmlParts.get(i);
 			if (i == 3) {
@@ -467,7 +475,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 			List<MMLEventList> relationPart = ((i < 3) && (allowTempoChord)) ? relationParts.get(i) : null;
 			boolean checkDelta = (i < 2);
 			try {
-				mml[i] = MMLBuilder.create(eventList, getStartOffsetforMabiMML(i), MMLBuilder.INIT_OCT).toMMLStringMusicQ(localTempoList, relationPart, checkDelta);
+				mml[i] = MMLBuilder.create(eventList, getStartOffsetforMabiMML(i), MMLBuilder.INIT_OCT, pix).toMMLStringMusicQ(localTempoList, relationPart, checkDelta);
 			} catch (MMLExceptionList e) {
 				errList.addAll(e.getErr());
 			}

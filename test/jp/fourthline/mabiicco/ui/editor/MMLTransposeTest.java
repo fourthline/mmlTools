@@ -9,6 +9,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import jp.fourthline.UseLoadingDLS;
 import jp.fourthline.mabiicco.ui.IMMLManager;
 import jp.fourthline.mabiicco.ui.mml.MMLManagerStub;
 import jp.fourthline.mmlTools.MMLExceptionList;
@@ -16,7 +17,7 @@ import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.MMLVerifyException;
 
-public final class MMLTransposeTest {
+public final class MMLTransposeTest extends UseLoadingDLS {
 
 	private IMMLManager mmlManager = new MMLManagerStub();
 	private MMLScore score;

@@ -10,6 +10,7 @@ import java.util.List;
 
 import jp.fourthline.mmlTools.core.MMLTicks;
 import jp.fourthline.mmlTools.core.MMLException;
+import jp.fourthline.mmlTools.core.MMLRestTicks;
 
 public final class MMLBuilder {
 	private static final int STRING_BUILDER_SIZE = 2048;
@@ -28,22 +29,34 @@ public final class MMLBuilder {
 
 	public static final int INIT_OCT = 4;
 
+	private final boolean percussionMotionFix;
+	private int currentTempo = MMLTempoEvent.INITIAL_TEMPO;
+
 	public static MMLBuilder create(MMLEventList eventList) {
-		return new MMLBuilder(eventList, 0, INIT_OCT);
+		return new MMLBuilder(eventList, 0, INIT_OCT, false);
 	}
 
 	public static MMLBuilder create(MMLEventList eventList, int startOffset) {
-		return new MMLBuilder(eventList, startOffset, INIT_OCT);
+		return new MMLBuilder(eventList, startOffset, INIT_OCT, false);
+	}
+
+	public static MMLBuilder create(MMLEventList eventList, int startOffset, boolean percussionMotionFix) {
+		return new MMLBuilder(eventList, startOffset, INIT_OCT, percussionMotionFix);
 	}
 
 	public static MMLBuilder create(MMLEventList eventList, int startOffset, int initOct) {
-		return new MMLBuilder(eventList, startOffset, initOct);
+		return new MMLBuilder(eventList, startOffset, initOct, false);
 	}
 
-	private MMLBuilder(MMLEventList eventList, int startOffset, int initOct) {
+	public static MMLBuilder create(MMLEventList eventList, int startOffset, int initOct, boolean percussionMotionFix) {
+		return new MMLBuilder(eventList, startOffset, initOct, percussionMotionFix);
+	}
+
+	private MMLBuilder(MMLEventList eventList, int startOffset, int initOct, boolean percussionMotionFix) {
 		this.eventList = eventList;
 		this.startOffset = startOffset;
 		this.initOct = initOct;
+		this.percussionMotionFix = percussionMotionFix;
 	}
 
 	/**
@@ -82,36 +95,56 @@ public final class MMLBuilder {
 		return 'c';
 	}
 
-	private MMLNoteEvent insertTempoMML(StringBuilder sb, MMLNoteEvent prevNoteEvent, MMLTempoEvent tempoEvent, boolean mabiTempo, List<MMLEventList> relationPart) {
+	/**
+	 * 前のノートからの休符MMLを作成する
+	 * @param sb
+	 * @param prevNoteEvent
+	 * @param currentTempo
+	 * @param noteEvent
+	 * @throws MMLException
+	 */
+	private MMLRestTicks insertRestNoteEvent(StringBuilder sb, MMLNoteEvent prevNoteEvent, MMLEvent mmlEvent) throws MMLException {
+		int noteSpaceTick = mmlEvent.getTickOffset() - prevNoteEvent.getEndTick();
+		var noteEvent = prevNoteEvent.clone();
+		MMLRestTicks restTick = new MMLRestTicks(noteSpaceTick, noteEvent);
+		if (noteSpaceTick > 0) {
+			sb.append( percussionMotionFix ? restTick.toMMLTextWithMotionFix(currentTempo) : restTick.toMMLText() );
+			noteEvent.setTick( prevNoteEvent.getTick() + noteSpaceTick );
+		}
+		return restTick;
+	}
+
+	private MMLNoteEvent insertTempoMML(StringBuilder sb, final MMLNoteEvent prevNoteEvent, MMLTempoEvent tempoEvent, boolean mabiTempo, List<MMLEventList> relationPart) {
+		MMLNoteEvent nextPrevNoteEvent = prevNoteEvent.clone();
 		if (prevNoteEvent.getEndTick() < tempoEvent.getTickOffset()) {
-			int tickLength = tempoEvent.getTickOffset() - prevNoteEvent.getEndTick();
-			int tickOffset = prevNoteEvent.getEndTick();
-			int note = prevNoteEvent.getNote();
 			int currentOctave = prevNoteEvent.getOctave();
-			MMLTicks ticks = new MMLTicks("r", tickLength, false);
-			prevNoteEvent = new MMLNoteEvent(prevNoteEvent.getNote(), tickLength, tickOffset, prevNoteEvent.getVelocity());
+			MMLRestTicks rest = null;
 			try {
-				sb.append(ticks.toMMLText());
+				rest = insertRestNoteEvent(sb, prevNoteEvent, tempoEvent);
+				nextPrevNoteEvent = rest.getPrevNoteEvent();
 			} catch (MMLException e) {
 				errList.add(new MMLExceptionList.Entry(prevNoteEvent, e));
 			}
-			if (mabiTempo && globalVZeroTempo) {
+			if (mabiTempo && (globalVZeroTempo || percussionMotionFix)) {
 				// 最後の1つのrだけを補正文字に置換する.
-				int lastIndex = sb.lastIndexOf("r");
-				sb.replace(lastIndex, lastIndex+1, "c");
-				var noteEvent = new MMLEventList(sb.toString()).getLastNote();
-				try {
-					char inChar = makeTempoChar(relationPart, noteEvent, currentOctave);
-					sb.replace(lastIndex, lastIndex+1, (prevNoteEvent.getVelocity() != 0) ? "v0"+inChar : ""+inChar);
-				} catch (MMLException e) {
-					errList.add(new MMLExceptionList.Entry(noteEvent, e));
+				// 休符時間によって直前に休符挿入されていた場合は置換する必要なし.
+				if ( (rest != null) && (!rest.isLastReplaced()) ) {
+					int lastIndex = sb.lastIndexOf("r");
+					sb.replace(lastIndex, lastIndex+1, "c");
+					var noteEvent = new MMLEventList(sb.toString()).getLastNote();
+					try {
+						char inChar = makeTempoChar(relationPart, noteEvent, currentOctave);
+						sb.replace(lastIndex, lastIndex+1, (prevNoteEvent.getVelocity() != 0) ? "v0"+inChar : ""+inChar);
+					} catch (MMLException e) {
+						errList.add(new MMLExceptionList.Entry(noteEvent, e));
+					}
+					nextPrevNoteEvent.setVelocity(0);
 				}
-				prevNoteEvent = new MMLNoteEvent(note, tickLength, tickOffset, 0);
 			}
 		}
 		sb.append(tempoEvent.toMMLString());
 
-		return prevNoteEvent;
+		return nextPrevNoteEvent;
 	}
 
 	private void insertNoteWithTempo(StringBuilder sb, LinkedList<MMLTempoEvent> localTempoList,
@@ -127,6 +160,7 @@ public final class MMLBuilder {
 
 			MMLNoteEvent partNoteEvent = new MMLNoteEvent(divNoteEvent.getNote(), tick, divNoteEvent.getTickOffset(), divNoteEvent.getVelocity());
 			try {
+				prevNoteEvent = insertRestNoteEvent(sb, prevNoteEvent, partNoteEvent).getPrevNoteEvent();
 				sb.append( partNoteEvent.toMMLString(prevNoteEvent) );
 			} catch (MMLException e) {
 				errList.add(new MMLExceptionList.Entry(prevNoteEvent, e));
@@ -135,6 +169,7 @@ public final class MMLBuilder {
 			if (withTempo) {
 				sb.append( localTempoList.getFirst().toMMLString() );
 			}
+			currentTempo = localTempoList.getFirst().getTempo();
 			localTempoList.removeFirst();
 
 			divNoteEvent.setTick(divNoteEvent.getTick() - tick);
@@ -149,6 +184,7 @@ public final class MMLBuilder {
 
 		if (divNoteEvent.getTick() > 0) {
 			try {
+				prevNoteEvent = insertRestNoteEvent(sb, prevNoteEvent, divNoteEvent).getPrevNoteEvent();
 				sb.append( divNoteEvent.toMMLString(prevNoteEvent) );
 			} catch (MMLException e) {
 				errList.add(new MMLExceptionList.Entry(divNoteEvent, e));
@@ -172,6 +208,7 @@ public final class MMLBuilder {
 		LinkedList<MMLTempoEvent> localTempoList = new LinkedList<>(eventList.getGlobalTempoList());
 		while (localTempoList.size() > 1) {
 			if (localTempoList.get(1).getTickOffset() <= startOffset) {
+				currentTempo = localTempoList.getFirst().getTempo();
 				localTempoList.removeFirst();
 			} else {
 				break;
@@ -204,6 +241,7 @@ public final class MMLBuilder {
 					// tempo挿入 (rrrT***N の処理)
 					prevNoteEvent = insertTempoMML(sb, prevNoteEvent, localTempoList.getFirst(), mabiTempo, relationPart);
 				}
+				currentTempo = localTempoList.getFirst().getTempo();
 				localTempoList.removeFirst();
 			}
 
@@ -222,6 +260,7 @@ public final class MMLBuilder {
 				// tempo挿入 (rrrT***N の処理)
 				prevNoteEvent = insertTempoMML(sb, prevNoteEvent, tempo, mabiTempo, relationPart);
 			}
+			currentTempo = localTempoList.getFirst().getTempo();
 			localTempoList.removeFirst();
 		}
 		if (!errList.isEmpty()) {
@@ -254,6 +293,7 @@ public final class MMLBuilder {
 			int tick = localTempoList.get(index).getTickOffset() - divNoteEvent.getTickOffset();
 			MMLNoteEvent partNoteEvent = new MMLNoteEvent(divNoteEvent.getNote(), tick, divNoteEvent.getTickOffset(), divNoteEvent.getVelocity());
 			try {
+				prevNoteEvent = insertRestNoteEvent(sb, prevNoteEvent, partNoteEvent).getPrevNoteEvent();
 				sb.append( partNoteEvent.toMMLString(prevNoteEvent) );
 			} catch (MMLException e) {
 				errList.add(new MMLExceptionList.Entry(partNoteEvent, e));
@@ -269,6 +309,7 @@ public final class MMLBuilder {
 
 		if (divNoteEvent.getTick() > 0) {
 			try {
+				prevNoteEvent = insertRestNoteEvent(sb, prevNoteEvent, divNoteEvent).getPrevNoteEvent();
 				sb.append( divNoteEvent.toMMLString(prevNoteEvent) );
 			} catch (MMLException e) {
 				errList.add(new MMLExceptionList.Entry(divNoteEvent, e));
@@ -386,6 +427,7 @@ public final class MMLBuilder {
 					// 休符中のテンポとの距離を判定
 					if (!checkDelta || (tickDeltaCheck(delta) && tickDeltaCheck(prevDelta))) {
 						prevNoteEvent = insertTempoMML(sb, prevNoteEvent, tempoEvent, true, relationPart);
+						currentTempo = localTempoList.get(tempoIndex).getTempo();
 						localTempoList.remove(tempoIndex);
 					} else {
 						tempoIndex++;
@@ -409,6 +451,7 @@ public final class MMLBuilder {
 			// 関連パートに接触ノートがある場合は自パートにテンポ挿入しない
 			if (!searchRelationPartOnTick(relationPart, tempoTick)) {
 				prevNoteEvent = insertTempoMML(sb, prevNoteEvent, localTempoList.get(tempoIndex), true, relationPart);
+				currentTempo = localTempoList.get(tempoIndex).getTempo();
 				localTempoList.remove(tempoIndex);
 			} else {
 				tempoIndex++;

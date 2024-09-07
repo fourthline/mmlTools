@@ -682,11 +682,19 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 
 	@Override
 	public void updateActiveTrackProgram(int trackIndex, int program, int songProgram) {
-		mmlScore.getTrack(trackIndex).setProgram(program);
-		mmlScore.getTrack(trackIndex).setSongProgram(songProgram);
+		var track = mmlScore.getTrack(trackIndex);
+		int oldProgram = track.getProgram();
+		track.setProgram(program);
+		track.setSongProgram(songProgram);
 
 		updateSelectedTrackAndMMLPart();
-		undoEdit.saveState();
+		if (MMLTrack.percussionMotionFix.apply(oldProgram) != MMLTrack.percussionMotionFix.apply(program)) {
+			// 打楽器モーション補正の値が変わる場合はMML再生成する.
+			generateActiveTrack();
+		} else {
+			undoEdit.saveState();
+		}
+
 		updateProgramSelect();
 	}
 

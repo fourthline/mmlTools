@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2023 たんらる
+ * Copyright (C) 2014-2024 たんらる
  */
 
 package jp.fourthline.mabiicco;
@@ -56,18 +56,30 @@ public final class MabiIcco {
 		initialize();
 	}
 
+	private boolean tempoAllowChordPart(int t) {
+		var inst = dls.getInstByProgram(t);
+		if (inst != null) {
+			return inst.getType().allowTempoChordPart();
+		}
+		return true;
+	}
+
+	public boolean percussionMotionFix(int t) {
+		if (appProperties.percussionMotionFix.get()) {
+			var inst = dls.getInstByProgram(t);
+			var type = inst.getType();
+			return ( (type == InstType.KPUR) || (type == InstType.PERCUSSION) );
+		}
+		return false;
+	}
+
 	private void initialize() throws Exception {
 		// initialize
 		dls.initializeMIDI();
 		splash.updateProgress("OK\n", 20);
 
-		MMLTrack.setTempoAllowChardPartFunction(t -> {
-			var inst = dls.getInstByProgram(t);
-			if (inst != null) {
-				return inst.getType().allowTempoChordPart();
-			}
-			return true;
-		});
+		MMLTrack.setTempoAllowChordPartFunction(this::tempoAllowChordPart);
+		MMLTrack.setPercussionMotionFixFunction(this::percussionMotionFix);
 
 		if (appProperties.useDefaultSoundBank.get()) {
 			dls.loadingDefaultSound();

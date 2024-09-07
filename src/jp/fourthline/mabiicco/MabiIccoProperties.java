@@ -118,6 +118,9 @@ public final class MabiIccoProperties {
 	// 2024/08/05 廃止.
 //	public final Property<Boolean> mmlTempoAllowChordPart = new BooleanProperty("function.mml_tempo_allow_chord_part", true, t -> MMLTrack.setTempoAllowChordPart(t.booleanValue()));
 
+	/** 打楽器モーション補正 */
+	public final Property<Boolean> percussionMotionFix = new BooleanProperty("function.percussion_motion_fix", false);
+
 	/** MML空補正 */
 	public final Property<String> mmlEmptyCorrection = new StringProperty("function.mml_empty_correction", AppResource.appText("mml.emptyCorrection.default"), t -> MMLText.setMelodyEmptyStr(t));
 

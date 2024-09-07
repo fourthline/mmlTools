@@ -725,4 +725,98 @@ public class MMLTrackTest {
 		track.generate();
 		assertEquals(mml2, track.getMabiMML());
 	}
+
+	private void testPercussionMotionFix(String input, String expect) throws MMLExceptionList, MMLVerifyException {
+		MMLTrack.setPercussionMotionFixFunction(t -> true);
+		MMLTrack track = new MMLTrack().setMML(input);
+
+		track.generate();
+		assertEquals(expect, track.getMabiMML());
+
+		MMLTrack.setPercussionMotionFixFunction(t -> false);
+	}
+
+	@Test
+	public void testPercussionMotionFix_1() throws MMLExceptionList, MMLVerifyException {
+		String input  = "MML@t120l1.rrrrrrrrrrrrrrr1r3r29g64rrrrrrrrrrrrrrr1r3r29g64,,;";
+		String expect = "MML@t120l1.rrrrrrrrrrrrrrr1r3r29g64rrrrrrrrrrrrrrr1r3r29g64,,;";
+		testPercussionMotionFix(input, expect);
+	}
+
+	@Test
+	public void testPercussionMotionFix_2() throws MMLExceptionList, MMLVerifyException {
+		String input  = "MML@t120l1.rrrrrrrrrrrrrrr1r3r27g64rrrrrrrrrrrrrrr1r3r27g64,,;";
+		String expect = "MML@t120l1.rrrrrrrrrrrrrrr1r3v0c27v8g64rrrrrrrrrrrrrrr1r3v0c27v8g64,,;";
+		testPercussionMotionFix(input, expect);
+	}
+
+	@Test
+	public void testPercussionMotionFix_3() throws MMLExceptionList, MMLVerifyException {
+		String input  = "MML@t121l1.rrrrrrrrrrrrrrrr18g64rrrrrrrrrrrrrrrr18g64,,;";
+		String expect = "MML@t121l1.rrrrrrrrrrrrrrrr18g64rrrrrrrrrrrrrrrr18g64,,;";
+		testPercussionMotionFix(input, expect);
+	}
+
+	@Test
+	public void testPercussionMotionFix_4() throws MMLExceptionList, MMLVerifyException {
+		String input  = "MML@t121l1.rrrrrrrrrrrrrrrr17g64rrrrrrrrrrrrrrrr17g64,,;";
+		String expect = "MML@t121l1.rrrrrrrrrrrrrrrv0c17v8g64rrrrrrrrrrrrrrrv0c17v8g64,,;";
+		testPercussionMotionFix(input, expect);
+	}
+
+	@Test
+	public void testPercussionMotionFix_5() throws MMLExceptionList, MMLVerifyException {
+		String input  = "MML@t255l1.rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr1r29g64rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr1r29g64,,;";
+		String expect = "MML@t255l1.rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr1r29g64rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr1r29g64,,;";
+		testPercussionMotionFix(input, expect);
+	}
+
+	@Test
+	public void testPercussionMotionFix_6() throws MMLExceptionList, MMLVerifyException {
+		String input  = "MML@t255l1.rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr1r27g64rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr1r27g64,,;";
+		String expect = "MML@t255l1.rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr1v0c27v8g64rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr1v0c27v8g64,,;";
+		testPercussionMotionFix(input, expect);
+	}
+
+	@Test
+	public void testPercussionMotionFix_7() throws MMLExceptionList, MMLVerifyException {
+		String input  = "MML@t32l1.rrrr1r5.r6g64rrrr1r5.r6g64,,;";
+		String expect = "MML@t32l1.rrrr1r5.r6g64rrrr1r5.r6g64,,;";
+		testPercussionMotionFix(input, expect);
+	}
+
+	@Test
+	public void testPercussionMotionFix_8() throws MMLExceptionList, MMLVerifyException {
+		String input  = "MML@t32l1.rrrr1r3r11.g64rrrr1r3r11.g64,,;";
+		String expect = "MML@t32l1.rrrr1r3v0c11.v8g64rrrr1r3v0c11.v8g64,,;";
+		testPercussionMotionFix(input, expect);
+	}
+
+	@Test
+	public void testPercussionMotionFix_8t() throws MMLExceptionList, MMLVerifyException {
+		MMLBuilder.setMMLVZeroTempo(false);
+		String input  = "MML@r2t32l1.rrrr1r3r11.g64rrrr1r3r11.g64,,;";
+		String expect = "MML@v0c2t32l1.rrrr1r3c11.v8g64rrrr1r3v0c11.v8g64,,;";
+		testPercussionMotionFix(input, expect);
+	}
+
+	/**
+	 * 時間によって置換済の場合, テンポ前の置換は不要.
+	 */
+	@Test
+	public void testPercussionMotionFix_8t2() throws MMLExceptionList, MMLVerifyException {
+		MMLBuilder.setMMLVZeroTempo(false);
+		String input  = "MML@r2t32l1.rrrr1r3r11.g64rrrr1r3r11.t150g64,,;";
+		String expect = "MML@v0c2t32l1.rrrr1r3c11.v8g64rrrr1r3v0c11.t150v8g64,,;";
+		testPercussionMotionFix(input, expect);
+	}
+
+	@Test
+	public void testPercussionMotionFix_parts() throws MMLExceptionList, MMLVerifyException {
+		// メロディパートにのみ適用
+		MMLBuilder.setMMLVZeroTempo(false);
+		String input  = "MML@r1r1t55r1r1g8g8g8g8l1.rrrrrrrrl8dddd,r1r1t55r1r1g8g8g8g8l1.rrrrrrrrl8dddd,r1r1t55r1r1g8g8g8g8l1.rrrrrrrrl8dddd,r1r1t55r1r1g8g8g8g8l1.rrrrrrrrl8dddd;";
+		String expect = "MML@l1rv0ct55rrv8l8ggggl1.rrrrrrv0crv8l8dddd,l1.rrr1g8g8g8g8rrrrrrrrl8dddd,l1.rrr1g8g8g8g8rrrrrrrrl8dddd,l1rrt55rrl8ggggl1.rrrrrrrrl8dddd;";
+		testPercussionMotionFix(input, expect);
+	}
 }
