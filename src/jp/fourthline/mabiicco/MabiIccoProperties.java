@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2023 たんらる
+ * Copyright (C) 2013-2024 たんらる
  */
 
 package jp.fourthline.mabiicco;
@@ -28,7 +28,6 @@ import jp.fourthline.mabiicco.ui.color.ScaleColor;
 import jp.fourthline.mabiicco.ui.editor.VelocityEditor.VelocityWidth;
 import jp.fourthline.mmlTools.MMLBuilder;
 import jp.fourthline.mmlTools.MMLScore;
-import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.core.MMLText;
 import jp.fourthline.mmlTools.core.ResourceLoader;
 
@@ -116,7 +115,8 @@ public final class MabiIccoProperties {
 	private static final String FILE_HISTORY = "file.history";
 
 	/** 和音にテンポ出力を許可するかどうか */
-	public final Property<Boolean> mmlTempoAllowChordPart = new BooleanProperty("function.mml_tempo_allow_chord_part", true, t -> MMLTrack.setTempoAllowChordPart(t.booleanValue()));
+	// 2024/08/05 廃止.
+//	public final Property<Boolean> mmlTempoAllowChordPart = new BooleanProperty("function.mml_tempo_allow_chord_part", true, t -> MMLTrack.setTempoAllowChordPart(t.booleanValue()));
 
 	/** MML空補正 */
 	public final Property<String> mmlEmptyCorrection = new StringProperty("function.mml_empty_correction", AppResource.appText("mml.emptyCorrection.default"), t -> MMLText.setMelodyEmptyStr(t));

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2022 たんらる
+ * Copyright (C) 2014-2024 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.editor;
@@ -156,7 +156,7 @@ public final class MMLTempoEditor extends AbstractMarkerEditor<MMLTempoEvent> {
 	 */
 	private static class TempoInputDialog {
 		private final Frame parentFrame;
-		private final JCheckBox convertBox = new JCheckBox(AppResource.appText("edit.tempoConvert"));
+		private final JCheckBox convertBox = UIUtils.createCheckBox("edit.tempoConvert", true);
 		private final JCheckBox deleteSubseqBox = new JCheckBox(AppResource.appText("edit.delete_subseq_tempo"));
 		private final JSpinner spinner;
 
@@ -167,7 +167,6 @@ public final class MMLTempoEditor extends AbstractMarkerEditor<MMLTempoEvent> {
 			spinner.setEnabled(tempoBox);
 			UIUtils.setDefaultFocus(spinner);
 			convertBox.setSelected(false);
-			convertBox.setToolTipText(AppResource.appText("edit.tempoConvert.detail"));
 			deleteSubseqBox.setSelected(false);
 		}
 

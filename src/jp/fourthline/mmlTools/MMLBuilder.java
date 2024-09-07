@@ -15,9 +15,9 @@ public final class MMLBuilder {
 	private static final int STRING_BUILDER_SIZE = 2048;
 
 	/** VZero Tempo: "休符+テンポ" -> "V0音符+テンポ" に変換する. 64bit化Mabi以前向けの補正機能. */
-	private static boolean mmlVZeroTempo = true;
+	private static boolean globalVZeroTempo = true;
 	public static void setMMLVZeroTempo(boolean b) {
-		mmlVZeroTempo = b;
+		globalVZeroTempo = b;
 	}
 
 	private final MMLEventList eventList;
@@ -95,7 +95,7 @@ public final class MMLBuilder {
 			} catch (MMLException e) {
 				errList.add(new MMLExceptionList.Entry(prevNoteEvent, e));
 			}
-			if (mabiTempo && mmlVZeroTempo) {
+			if (mabiTempo && globalVZeroTempo) {
 				// 最後の1つのrだけを補正文字に置換する.
 				int lastIndex = sb.lastIndexOf("r");
 				sb.replace(lastIndex, lastIndex+1, "c");

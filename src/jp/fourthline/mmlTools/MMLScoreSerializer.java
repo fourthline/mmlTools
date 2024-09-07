@@ -58,6 +58,7 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 	private static final String SONG_DELAY = "attackSongDelayCorrect=";
 	private static final String DISABLE_NOPT = "disableNopt=";
 	private static final String IMPORTED_DATA = "IDATA=";
+	private static final String TEMPO_ONLY_MELODY = "tempoOnlyMelody";
 
 	private final MMLScore score;
 	private MMLTrack lastTrack = null;
@@ -92,7 +93,8 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 				.pattern(AUTHOR,        t -> score.setAuthor(t) )
 				.pattern(TIME,          t -> score.setBaseTime(t) )
 				.pattern(TEMPO,         t -> putTempoObj(t) )
-				.pattern(IMPORTED_DATA, t -> getLastTrack().setImportedData(t) );
+				.pattern(IMPORTED_DATA, t -> getLastTrack().setImportedData(t) )
+				.pattern(TEMPO_ONLY_MELODY, t -> getLastTrack().setOptTempoOnlyMelody(true) );
 	}
 
 	@Override
@@ -380,10 +382,13 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 				stream.println(DELAY + track.getAttackDelayCorrect());
 			}
 			if (track.getAttackSongDelayCorrect() != 0) {
-				stream.println(SONG_DELAY+track.getAttackSongDelayCorrect());
+				stream.println(SONG_DELAY + track.getAttackSongDelayCorrect());
 			}
 			if (track.getDisableNopt()) {
-				stream.println(DISABLE_NOPT+track.getDisableNopt());
+				stream.println(DISABLE_NOPT + track.getDisableNopt());
+			}
+			if (track.getOptTempoMelodyOnly()) {
+				stream.println(TEMPO_ONLY_MELODY);
 			}
 		}
 

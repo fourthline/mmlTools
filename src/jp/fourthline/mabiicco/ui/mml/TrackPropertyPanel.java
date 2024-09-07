@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2023 たんらる
+ * Copyright (C) 2013-2024 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.mml;
@@ -17,13 +17,12 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
-import javax.swing.border.LineBorder;
-import javax.swing.border.TitledBorder;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
 
 import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.ui.IMMLManager;
+import jp.fourthline.mabiicco.ui.UIUtils;
 import jp.fourthline.mabiicco.ui.editor.NumberSpinner;
 import jp.fourthline.mmlTools.MMLExceptionList;
 import jp.fourthline.mmlTools.MMLTempoConverter;
@@ -46,14 +45,16 @@ public final class TrackPropertyPanel extends JPanel {
 	private final MMLOutputOptions songOption;
 
 	// Nコマンド無効化オプション
-	private final JCheckBox disableNoptCheckBox = new JCheckBox(AppResource.appText("track_property.disable_nopt"));
+	private final JCheckBox disableNoptCheckBox = UIUtils.createCheckBox("track_property.disable_nopt", true);
+	// テンポをメロディに限定するオプション
+	private final JCheckBox tempoOnlyMelodyCheckBox = UIUtils.createCheckBox("track_property.tempo_only_melody", true);
 
 	private final IMMLManager mmlManager;
 
 	private final MMLTrack track;
 	private final MMLTrack sandTrack;
 
-	private final Dimension prefSize = new Dimension(350, 360);
+	private final Dimension prefSize = new Dimension(350, 370);
 
 	/**
 	 * Create the dialog.
@@ -111,17 +112,17 @@ public final class TrackPropertyPanel extends JPanel {
 		add(newJLabel(AppResource.appText("track_property.volume"), 20, 83, 100, 14));
 
 		// MML出力オプション（楽器部）
-		add(instOption.createMMLOptionPanel(AppResource.appText("track_property.mmlOptions1"), 5, 120));
+		add(instOption.createMMLOptionPanel("track_property.mmlOptions1", 5, 120));
 		// MML出力オプション（歌部）
-		add(songOption.createMMLOptionPanel(AppResource.appText("track_property.mmlOptions2"), 5, 210));
+		add(songOption.createMMLOptionPanel("track_property.mmlOptions2", 5, 210));
 
 		// N最適化無効オプション
-		JPanel disableNoptPanel = new JPanel();
-		disableNoptPanel.setBorder(new TitledBorder(new LineBorder(Color.GRAY, 1, true), AppResource.appText("track_property.opt_option"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		disableNoptPanel.setBounds(5, 300, 340, 60);
-		disableNoptPanel.setLayout(null);
+		JPanel disableNoptPanel = UIUtils.createTitledPanel("track_property.opt_option");
+		disableNoptPanel.setBounds(5, 300, 340, 70);
 		disableNoptCheckBox.setBounds(20, 20, 240, 20);
 		disableNoptPanel.add(disableNoptCheckBox);
+		tempoOnlyMelodyCheckBox.setBounds(20, 40, 240, 20);
+		disableNoptPanel.add(tempoOnlyMelodyCheckBox);
 		add(disableNoptPanel);
 
 		// 初期値設定
@@ -132,6 +133,7 @@ public final class TrackPropertyPanel extends JPanel {
 		instOption.setValue(track.getStartDelta() + commonStartOffset, track.getAttackDelayCorrect());
 		songOption.setValue(track.getStartSongDelta() + commonStartOffset, track.getAttackSongDelayCorrect());
 		disableNoptCheckBox.setSelected(track.getDisableNopt());
+		tempoOnlyMelodyCheckBox.setSelected(track.getOptTempoMelodyOnly());
 	}
 
 	private JLabel newJLabel(String text, int x, int y, int width, int height) {
@@ -161,6 +163,7 @@ public final class TrackPropertyPanel extends JPanel {
 		track.setAttackDelayCorrect( instOption.getAttackDelayCorrect() );
 		track.setAttackSongDelayCorrect( songOption.getAttackDelayCorrect() );
 		track.setDisableNopt( disableNoptCheckBox.isSelected() );
+		track.setOptTempoOnlyMelody( tempoOnlyMelodyCheckBox.isSelected() );
 		mmlManager.updateActivePart(true);
 	}
 
@@ -214,10 +217,8 @@ public final class TrackPropertyPanel extends JPanel {
 		private JPanel createMMLOptionPanel(String title, int x, int y) {
 			String deltaTitle = AppResource.appText("track_property.startDelta");
 			String delayCorrectTitle = AppResource.appText("track_property.attackDelayCorrect");
-			JPanel mmlOptionsPanel = new JPanel();
-			mmlOptionsPanel.setBorder(new TitledBorder(new LineBorder(Color.GRAY, 1, true), title, TitledBorder.LEADING, TitledBorder.TOP, null, null));
+			JPanel mmlOptionsPanel = UIUtils.createTitledPanel(title);
 			mmlOptionsPanel.setBounds(x, y, 340, 80);
-			mmlOptionsPanel.setLayout(null);
 			add(mmlOptionsPanel);
 			// startDelta
 			mmlOptionsPanel.add(newJLabel(deltaTitle, 20, 20, 170, 14));

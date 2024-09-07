@@ -25,6 +25,7 @@ import java.util.function.Supplier;
 import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
 import javax.swing.InputMap;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JMenu;
@@ -311,5 +312,13 @@ public final class UIUtils {
 				}
 			});
 		}
+	}
+
+	public static JCheckBox createCheckBox(String name, boolean tooltip) {
+		var o = new JCheckBox(appText(name));
+		if (tooltip) {
+			o.setToolTipText(appText(name + ".detail"));
+		}
+		return o;
 	}
 }

@@ -37,14 +37,12 @@ public class MMLScoreTest extends UseLoadingDLS {
 
 	@Before
 	public void setup() {
-		MMLTrack.setTempoAllowChordPart(false);
 		MMLBuilder.setMMLVZeroTempo(true);
 		MMLScore.setMMLFix64(false);
 	}
 
 	@After
 	public void cleanup() {
-		MMLTrack.setTempoAllowChordPart(true);
 		MMLBuilder.setMMLVZeroTempo(false);
 		MMLScore.setMMLFix64(true);
 	}
@@ -148,21 +146,23 @@ public class MMLScoreTest extends UseLoadingDLS {
 
 	@Test
 	public void testMMLFileFormat_r0() throws MMLExceptionList, MMLVerifyException {
-		MMLTrack.setTempoAllowChordPart(true);
+		MMLBuilder.setMMLVZeroTempo(true);
 
 		MMLTrack track = new MMLTrack().setMML("MML@r1t180c8;");
 		track.setTrackName("track1");
+		track.setOptTempoOnlyMelody(true);
 		score.addTrack(track);
 
 		String[] mml = { "MML@v0c1t180v8c8,,;" };
 
-		checkMMLFileOutput(score.generateAll(), "format_r0.mmi", mml);
+		checkMMLFileOutput(score.generateAll(), "format_r0_tom.mmi", mml);
 	}
 
 	@Test
 	public void testMMLFileFormat_r0_q() throws MMLExceptionList, MMLVerifyException {
 		MMLTrack track = new MMLTrack().setMML("MML@r1t180c8;");
 		track.setTrackName("track1");
+		track.setOptTempoOnlyMelody(false);
 		score.addTrack(track);
 
 		String[] mml = { "MML@v0c1t180v8c8,,;" };
@@ -174,14 +174,17 @@ public class MMLScoreTest extends UseLoadingDLS {
 	public void testMMLFileFormat_r1() throws MMLExceptionList, MMLVerifyException {
 		MMLTrack track1 = new MMLTrack().setMML("MML@r1>f+1t120&f+1;");
 		track1.setTrackName("track1");
+		track1.setOptTempoOnlyMelody(true);
 		score.addTrack(track1);
 
 		MMLTrack track2 = new MMLTrack().setMML("MML@r1r1a+1;");
 		track2.setTrackName("track2");
+		track2.setOptTempoOnlyMelody(true);
 		score.addTrack(track2);
 
 		MMLTrack track3 = new MMLTrack().setMML("MML@d1;");
 		track3.setTrackName("track3");
+		track3.setOptTempoOnlyMelody(true);
 		score.addTrack(track3);
 
 		String[] mml = {
@@ -190,23 +193,24 @@ public class MMLScoreTest extends UseLoadingDLS {
 				"MML@d1,,;" // 後方にあるテンポは出力しない.
 		};
 
-		checkMMLFileOutput(score.generateAll(), "format_r1.mmi", mml);
+		checkMMLFileOutput(score.generateAll(), "format_r1_tom.mmi", mml);
 	}
 
 	@Test
 	public void testMMLFileFormat_r1_q() throws MMLExceptionList, MMLVerifyException {
-		MMLTrack.setTempoAllowChordPart(true);
-
 		MMLTrack track1 = new MMLTrack().setMML("MML@r1>f+1t120&f+1;");
 		track1.setTrackName("track1");
+		track1.setOptTempoOnlyMelody(false);
 		score.addTrack(track1);
 
 		MMLTrack track2 = new MMLTrack().setMML("MML@r1r1a+1;");
 		track2.setTrackName("track2");
+		track2.setOptTempoOnlyMelody(false);
 		score.addTrack(track2);
 
 		MMLTrack track3 = new MMLTrack().setMML("MML@d1;");
 		track3.setTrackName("track3");
+		track3.setOptTempoOnlyMelody(false);
 		score.addTrack(track3);
 
 		String[] mml = {
@@ -220,8 +224,6 @@ public class MMLScoreTest extends UseLoadingDLS {
 
 	@Test
 	public void testMMLFileFormat2() throws MMLExceptionList, MMLVerifyException {
-		MMLTrack.setTempoAllowChordPart(true);
-
 		MMLTrack track1 = new MMLTrack(768, -576, -672).setMML("MML@c1,,,e1;");
 		track1.setSongProgram(110);
 		track1.setTrackName("Track1");
@@ -243,8 +245,6 @@ public class MMLScoreTest extends UseLoadingDLS {
 
 	@Test
 	public void testMMLFileFormat3() throws MMLExceptionList, MMLVerifyException {
-		MMLTrack.setTempoAllowChordPart(true);
-
 		MMLTrack track1 = new MMLTrack(1152, 0, 0).setMML("MML@c1&c,,,<d;");
 		track1.setSongProgram(110);
 		track1.setTrackName("Track1");
@@ -434,21 +434,21 @@ public class MMLScoreTest extends UseLoadingDLS {
 				.filter(t -> (t != null)).count());
 	}
 
-	private void checkGenerateAll(String mml, String expect) throws MMLExceptionList, MMLVerifyException {
-		score.addTrack(new MMLTrack().setMML(mml));
+	private void checkGenerateAll(String mml, String expect, boolean tempoOnlyMelody) throws MMLExceptionList, MMLVerifyException {
+		var track = new MMLTrack().setMML(mml);
+		track.setOptTempoOnlyMelody(tempoOnlyMelody);
+		score.addTrack(track);
 		score.generateAll();
 		assertEquals(expect, score.getTrack(0).getMabiMML());
 	}
 
 	@Test
 	public void test_v0ct_temp1() throws MMLExceptionList, MMLVerifyException {
-		MMLTrack.setTempoAllowChordPart(true);
-
 		/* 他のパートに d がある場合のテンポ補正 */
 		checkGenerateAll(
 				"MML@l2drt130rv8g,l1rd,;",
-				"MML@l2dv0ct130rv8g,l1rd,;"
-				);
+				"MML@l2dv0ct130rv8g,l1rd,;",
+				false);
 	}
 
 	@Test
@@ -456,8 +456,8 @@ public class MMLScoreTest extends UseLoadingDLS {
 		/* 他のパートに c がある場合のテンポ補正 */
 		checkGenerateAll(
 				"MML@l2drt130rv8g,l2rc,;",
-				"MML@l2dv0dt130rv8g,l2rc,;"
-				);
+				"MML@l2dv0dt130rv8g,l2rc,;",
+				true);
 	}
 
 	@Test
@@ -465,8 +465,8 @@ public class MMLScoreTest extends UseLoadingDLS {
 		/* 他のパートに c, d がある場合のテンポ補正 */
 		checkGenerateAll(
 				"MML@l2drt130rv8g,l2rc,l2rd;",
-				"MML@l2dv0et130rv8g,l2rc,l2rd;"
-				);
+				"MML@l2dv0et130rv8g,l2rc,l2rd;",
+				true);
 	}
 
 	@Test
@@ -474,8 +474,8 @@ public class MMLScoreTest extends UseLoadingDLS {
 		/* 他のパートに c, d がある場合のテンポ補正 */
 		checkGenerateAll(
 				"MML@l2drt130rv8g,l2rd,l2rc;",
-				"MML@l2dv0et130rv8g,l2rd,l2rc;"
-				);
+				"MML@l2dv0et130rv8g,l2rd,l2rc;",
+				true);
 	}
 
 	@Test
@@ -483,8 +483,8 @@ public class MMLScoreTest extends UseLoadingDLS {
 		/* 他のパートに b, c がある場合のテンポ補正 */
 		checkGenerateAll(
 				"MML@l2drt130rv8g,l2rb,l2rc;",
-				"MML@l2dv0dt130rv8g,l2rb,l2rc;"
-				);
+				"MML@l2dv0dt130rv8g,l2rb,l2rc;",
+				true);
 	}
 
 	@Test
@@ -492,8 +492,8 @@ public class MMLScoreTest extends UseLoadingDLS {
 		/* 他のパートに g, a がある場合のテンポ補正 */
 		checkGenerateAll(
 				"MML@l2drt130rv8g,l2rg,l2ra;",
-				"MML@l2dv0ct130rv8g,l2rg,l2ra;"
-				);
+				"MML@l2dv0ct130rv8g,l2rg,l2ra;",
+				true);
 	}
 
 	@Test
@@ -501,8 +501,8 @@ public class MMLScoreTest extends UseLoadingDLS {
 		/* 長い休符の場合最後のみ */
 		checkGenerateAll(
 				"MML@l1r.r.rrt130,,l1r.r.rrc;",
-				"MML@l1r.r.rv0dt130,,l1r.r.rrc;"
-				);
+				"MML@l1r.r.rv0dt130,,l1r.r.rrc;",
+				true);
 	}
 
 	@Test
@@ -510,41 +510,35 @@ public class MMLScoreTest extends UseLoadingDLS {
 		/* とちゅうで切る場合 */
 		checkGenerateAll(
 				"MML@l1r.r.rt240,v12ccccdd2deeec2fffggggaaaabbbb>c1,d1d1.d1.;",
-				"MML@l1r.r.v0et240,v12ccccdd2deeec2fffggggaaaabbbbb+1,l1dd.d.;"
-				);
+				"MML@l1r.r.v0et240,v12ccccdd2deeec2fffggggaaaabbbbb+1,l1dd.d.;",
+				true);
 	}
 
 	@Test
 	public void test_v0ct_temp9() throws MMLExceptionList, MMLVerifyException {
-		MMLTrack.setTempoAllowChordPart(true);
-
 		/* 他のパートに c, d がある場合のテンポ補正, 和音1にテンポ */
 		checkGenerateAll(
 				"MML@l2rd,l2drt130rv8g,l2rc;",
-				"MML@l2rd,l2dv0et130rv8g,l2rc;"
-				);
+				"MML@l2rd,l2dv0et130rv8g,l2rc;",
+				false);
 	}
 
 	@Test
 	public void test_v0ct_temp10() throws MMLExceptionList, MMLVerifyException {
-		MMLTrack.setTempoAllowChordPart(true);
-
 		/* 和音2にテンポをつくる */
 		checkGenerateAll(
 				"MML@l2rd,l2rc,l2drt130rv8g;",
-				"MML@l2rd,l2rc,l2dv0et130rv8g;"
-				);
+				"MML@l2rd,l2rc,l2dv0et130rv8g;",
+				false);
 	}
 
 	@Test
 	public void test_tempo_q01() throws MMLExceptionList, MMLVerifyException {
-		MMLTrack.setTempoAllowChordPart(true);
-
 		/* メロディ以外 */
 		checkGenerateAll(
 				"MML@l1>c&c&c,ggggt180gggggggg,;",
-				"MML@l1.>c&c,ggggt180gggggggg,;"
-				);
+				"MML@l1.>c&c,ggggt180gggggggg,;",
+				false);
 	}
 
 	@Test

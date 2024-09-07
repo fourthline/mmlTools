@@ -26,16 +26,6 @@ public final class MMLTrack implements Serializable, Cloneable {
 	public static final int NO_CHORUS = -1;
 	public static final int EXCLUDE_SONG = -2;
 
-	/** 和音にテンポ出力を許可するかどうかのオプション */
-	private static boolean optTempoAllowChordPart = false;
-	public static void setTempoAllowChordPart(boolean opt) {
-		MMLTrack.optTempoAllowChordPart = opt;
-	}
-
-	public static boolean getTempoAllowChordPart() {
-		return MMLTrack.optTempoAllowChordPart;
-	}
-
 	/** program番号から和音へのテンポ出力が可能かどうかの判定を行うためのFunction */
 	private static IntFunction<Boolean> tempoAllowChordPartFunction = t -> true;
 	public static void setTempoAllowChardPartFunction(IntFunction<Boolean> f) {
@@ -74,6 +64,9 @@ public final class MMLTrack implements Serializable, Cloneable {
 
 	// 64bit mabi 合奏ズレ補正
 	private boolean fix64Tempo = false;
+
+	// テンポをメロディに限定するオプション (フリースタイルジャム用)
+	private boolean optTempoOnlyMelody = false;
 
 	// インポートしたデータ: ドラム変換を多重実行したときに変換対象にするデータ.
 	private String importedData;
@@ -369,7 +362,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 		/*
 		 * tailFixはMusicQアップデートで不要になりました. 2017/01/07
 		 */
-		String[] mmlStrings = (!optTempoAllowChordPart) ? getMMLStrings(false, true) : getMMLStringsMusicQ();
+		String[] mmlStrings = (optTempoOnlyMelody) ? getMMLStrings(false, true) : getMMLStringsMusicQ();
 
 		// 64ビットクライアントにより、合奏ズレが発生している向けの補正機能. 2023/02/05
 		if (fix64Tempo) {
@@ -734,6 +727,14 @@ public final class MMLTrack implements Serializable, Cloneable {
 		return disableNopt;
 	}
 
+	public void setOptTempoOnlyMelody(boolean b) {
+		optTempoOnlyMelody = b;
+	}
+
+	public boolean getOptTempoMelodyOnly() {
+		return optTempoOnlyMelody;
+	}
+
 	@Override
 	public MMLTrack clone() {
 		MMLTrack o = new MMLTrack(commonStartOffset, startDelta, startSongDelta)
@@ -748,6 +749,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 		o.setAttackSongDelayCorrect(attackSongDelayCorrect);
 		o.setDisableNopt(disableNopt);
 		o.setImportedData(importedData);
+		o.setOptTempoOnlyMelody(optTempoOnlyMelody);
 		if (generated) {
 			try {
 				o.generate();

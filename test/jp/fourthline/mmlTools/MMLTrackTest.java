@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2023 たんらる
+ * Copyright (C) 2013-2024 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -26,14 +26,12 @@ import jp.fourthline.mmlTools.optimizer.MMLStringOptimizer;
 public class MMLTrackTest {
 	@Before
 	public void setup() {
-		MMLTrack.setTempoAllowChordPart(false);
 		MMLBuilder.setMMLVZeroTempo(true);
 		MMLStringOptimizer.setOptimizeLevel(MMLStringOptimizer.GEN2);
 	}
 
 	@After
 	public void cleanup() {
-		MMLTrack.setTempoAllowChordPart(true);
 		MMLBuilder.setMMLVZeroTempo(true);
 		MMLStringOptimizer.setOptimizeLevel(MMLStringOptimizer.GEN2);
 	}
@@ -59,7 +57,6 @@ public class MMLTrackTest {
 
 	@Test
 	public void testGetMMLStringsMusicQ() throws MMLExceptionList, MMLVerifyException {
-		MMLTrack.setTempoAllowChordPart(true);
 		MMLTrack track = new MMLTrack().setMML("MML@aaa,bbb,ccc,ddd;");
 		String[] expect = {
 				"a8t150v0a8v8aa", // melodyパートのみテンポ指定.
@@ -196,6 +193,7 @@ public class MMLTrackTest {
 		String expectMML2 = "MML@t150l1rv0dt120rdt130,l1cccccc,;";
 
 		MMLTrack track = new MMLTrack().setMML(mml);
+		track.setOptTempoOnlyMelody(true);
 		assertEquals(expectMML1, track.generate().getOriginalMML());
 		assertEquals(expectMML2, track.generate().getMabiMML());
 	}
@@ -319,8 +317,6 @@ public class MMLTrackTest {
 
 	@Test
 	public void test_musicq_tempo_00() throws MMLExceptionList, MMLVerifyException {
-		MMLTrack.setTempoAllowChordPart(true);
-
 		String mml = "MML@a&a&a,rrt120,c";
 		String expect = "MML@a2.,v0d2t120,c;";
 		MMLTrack track = new MMLTrack().setMML(mml).generate();
@@ -329,8 +325,6 @@ public class MMLTrackTest {
 
 	@Test
 	public void test_musicq_tempo_01() throws MMLExceptionList, MMLVerifyException {
-		MMLTrack.setTempoAllowChordPart(true);
-
 		String mml = "MML@a&a&a,rrt120,rc";
 		String expect = "MML@a2.,,rct120;";
 		MMLTrack track = new MMLTrack().setMML(mml).generate();
@@ -339,8 +333,6 @@ public class MMLTrackTest {
 
 	@Test
 	public void test_musicq_tempo_02() throws MMLExceptionList, MMLVerifyException {
-		MMLTrack.setTempoAllowChordPart(true);
-
 		String mml = "MML@a&a&a,rrt120,rrc";
 		String expect = "MML@a2.,,v0c2t120v8c;";
 		MMLTrack track = new MMLTrack().setMML(mml).generate();
@@ -349,8 +341,6 @@ public class MMLTrackTest {
 
 	@Test
 	public void test_musicq_tempo_03() throws MMLExceptionList, MMLVerifyException {
-		MMLTrack.setTempoAllowChordPart(true);
-
 		String mml = "MML@a&a&a,rrt120,rc&c";
 		String expect = "MML@a2.,v0d2t120,rc2;";
 		MMLTrack track = new MMLTrack().setMML(mml).generate();
@@ -359,8 +349,6 @@ public class MMLTrackTest {
 
 	@Test
 	public void test_musicq_tempo_04() throws MMLExceptionList, MMLVerifyException {
-		MMLTrack.setTempoAllowChordPart(true);
-
 		String mml = "MML@a2,l1c&c&c&c,l1<a&a;";
 		String expect = "MML@l2av0dt121l1rdt123,l1c.&c.&c,l1<a&at122;";
 		MMLTrack track = new MMLTrack().setMML(mml);
@@ -378,8 +366,6 @@ public class MMLTrackTest {
 	 */
 	@Test
 	public void test_musicq_tempo_05() throws MMLExceptionList, MMLVerifyException {
-		MMLTrack.setTempoAllowChordPart(true);
-
 		String mml = "MML@c1&c1,rrt230,;";
 		String expect = "MML@l1c&c,v0d2t230,;";
 		MMLTrack track = new MMLTrack().setMML(mml);
@@ -389,7 +375,6 @@ public class MMLTrackTest {
 
 	@Test
 	public void test_musicq_tempo_06() throws MMLExceptionList, MMLVerifyException {
-		MMLTrack.setTempoAllowChordPart(true);
 		MMLBuilder.setMMLVZeroTempo(false);
 
 		String mml = "MML@c48,r64t230,;";
@@ -406,7 +391,6 @@ public class MMLTrackTest {
 	 */
 	@Test
 	public void test_musicq_tempo_07() throws MMLExceptionList, MMLVerifyException {
-		MMLTrack.setTempoAllowChordPart(true);
 		MMLBuilder.setMMLVZeroTempo(false);
 
 		String mml = "MML@r5r18<f+,rt240,;";
@@ -423,7 +407,6 @@ public class MMLTrackTest {
 	 */
 	@Test
 	public void test_musicq_tempo_08() throws MMLExceptionList, MMLVerifyException {
-		MMLTrack.setTempoAllowChordPart(true);
 		MMLBuilder.setMMLVZeroTempo(false);
 
 		String mml = "MML@<g+5&g+20r5r18g+,rt240,;";
@@ -440,7 +423,6 @@ public class MMLTrackTest {
 	 */
 	@Test(expected = MMLExceptionList.class)
 	public void test_musicq_tempo_09() throws MMLExceptionList, MMLVerifyException {
-		MMLTrack.setTempoAllowChordPart(true);
 		MMLBuilder.setMMLVZeroTempo(false);
 
 		String mml = "MML@r5r18c,r5r18d,r5r18e;";
@@ -456,7 +438,6 @@ public class MMLTrackTest {
 	 */
 	@Test
 	public void test_musicq_tempo_10() throws MMLExceptionList, MMLVerifyException {
-		MMLTrack.setTempoAllowChordPart(true);
 		MMLBuilder.setMMLVZeroTempo(false);
 
 		String mml = "MML@r5r18c,r5r18d,r5r18e;";
@@ -586,7 +567,6 @@ public class MMLTrackTest {
 
 	@Test
 	public void test_startOffset_mml2() throws MMLExceptionList, MMLVerifyException {
-		MMLTrack.setTempoAllowChordPart(true);
 		var track = new MMLTrack(384, 0, -96).setMML("MML@a,b,c,d;");
 		track.getGlobalTempoList().add(new MMLTempoEvent(180, 0));
 		track.getGlobalTempoList().add(new MMLTempoEvent(140, 96));
@@ -612,7 +592,6 @@ public class MMLTrackTest {
 		assertEquals("MML@aa,bb,cc,dd;", track.getOriginalMML());
 		assertEquals("MML@a8&a9a,b8&b9b,c8&c9c,d8&d16.d;", track.getMabiMML());
 
-		MMLTrack.setTempoAllowChordPart(true);
 		track.generate();
 		assertEquals("MML@aa,bb,cc,dd;", track.getOriginalMML());
 		assertEquals("MML@a8&a9a,b8&b9b,c8&c9c,d8&d16.d;", track.getMabiMML());
@@ -634,18 +613,17 @@ public class MMLTrackTest {
 		track.generate();
 		assertEquals("MML@t240a1,,,t60b1t240;", track.getOriginalMML());
 		assertEquals("MML@t240a2&a.&a9,,,t60b2&b.&b16.;", track.getMabiMML());
-		MMLTrack.setTempoAllowChordPart(true);
 		track.generate();
 		assertEquals("MML@t240a1,,,t60b1t240;", track.getOriginalMML());
 		assertEquals("MML@t240a2&a.&a9,,,t60b2&b.&b16.;", track.getMabiMML());
-		MMLTrack.setTempoAllowChordPart(false);
+		track.setOptTempoOnlyMelody(true);
 
 		track.setAttackDelayCorrect(6);
 		track.setAttackSongDelayCorrect(12);
 		track.generate();
 		assertEquals("MML@t240a1,,,t60b1t240;", track.getOriginalMML());
 		assertEquals("MML@t60v0c64t240v8a1,,,v0c32t60v8b1;", track.getMabiMML());
-		MMLTrack.setTempoAllowChordPart(true);
+		track.setOptTempoOnlyMelody(false);
 		track.generate();
 		assertEquals("MML@t240a1,,,t60b1t240;", track.getOriginalMML());
 		assertEquals("MML@t60v0c64t240v8a1,,,v0c32t60v8b1;", track.getMabiMML());
@@ -701,14 +679,13 @@ public class MMLTrackTest {
 		track.getGlobalTempoList().add(new MMLTempoEvent(240, 3840));
 
 		// 和音へのテンポ出力有効のパターン
-		MMLTrack.setTempoAllowChordPart(true);
 		track.setMML("MML@,c2,,a1");
 		assertEquals("MML@,t130c2,,t130a1;", track.generate().getMabiMML());
 		track.setMML("MML@,c1c1,,a1a1");
 		assertEquals("MML@,t130l1ct60ct130,,t130l1at60at130;", track.generate().getMabiMML());
 
 		// 和音へのテンポ出力無効のパターン (ズレ補正用のテンポは和音パートへの許可する)
-		MMLTrack.setTempoAllowChordPart(false);
+		track.setOptTempoOnlyMelody(true);
 		assertEquals("MML@t130r1t60,l1cct130,,t130l1at60at130;", track.generate().getMabiMML());
 		track.setMML("MML@,c2,b2.,a1");
 		assertEquals("MML@t130,c2,b2.,t130a1;", track.generate().getMabiMML());
@@ -732,7 +709,6 @@ public class MMLTrackTest {
 		assertEquals(mml1, track.getMabiMML());
 
 		// MusicQ
-		MMLTrack.setTempoAllowChordPart(true);
 		track.generate();
 		assertEquals(mml1, track.getMabiMML());
 
