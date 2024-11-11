@@ -29,7 +29,7 @@ public class MMLFileTest extends FileSelect {
 		assertEquals(2, score.getTrackCount());
 
 		// Track1 & Track2
-		assertEquals("MML@cde,rrrfga,;", score.getTrack(0).getOriginalMML());
+		assertEquals("MML@cde,r2.fga,;", score.getTrack(0).getOriginalMML());
 		assertEquals("Track1", score.getTrack(0).getTrackName());
 		assertEquals(0, score.getTrack(0).getProgram());
 
@@ -73,6 +73,30 @@ public class MMLFileTest extends FileSelect {
 		assertEquals(66, score.getTrack(4).getProgram());
 
 		InputStream inputStream = fileSelect("sample3.mmi");
+		MMLScoreTest.checkMMLScoreWriteToOutputStream(score, inputStream);
+	}
+
+	@Test
+	public final void testParse_960() throws Exception {
+		MMLScore score = new MMLFile().parse(fileSelect("sample_960.mml"));
+		assertEquals(3, score.getTrackCount());
+
+		// Track1
+		assertEquals("MML@aaa,,;", score.getTrack(0).getOriginalMML());
+		assertEquals("Track1", score.getTrack(0).getTrackName());
+		assertEquals(0, score.getTrack(0).getProgram());
+
+		// Track2
+		assertEquals("MML@bbb,,;", score.getTrack(1).getOriginalMML());
+		assertEquals("Track2", score.getTrack(1).getTrackName());
+		assertEquals(0, score.getTrack(1).getProgram());
+
+		// Track3
+		assertEquals("MML@ccc,,;", score.getTrack(2).getOriginalMML());
+		assertEquals("Track3", score.getTrack(2).getTrackName());
+		assertEquals(0, score.getTrack(2).getProgram());
+
+		InputStream inputStream = fileSelect("sample_960.mmi");
 		MMLScoreTest.checkMMLScoreWriteToOutputStream(score, inputStream);
 	}
 

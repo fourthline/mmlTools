@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2023 たんらる
+ * Copyright (C) 2014-2024 たんらる
  */
 
 package jp.fourthline.mmlTools.parser;
@@ -23,9 +23,12 @@ import jp.fourthline.mabiicco.midi.InstType;
 import jp.fourthline.mabiicco.midi.MabiDLS;
 import jp.fourthline.mmlTools.MMLEvent;
 import jp.fourthline.mmlTools.MMLEventList;
+import jp.fourthline.mmlTools.MMLExceptionList;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTrack;
+import jp.fourthline.mmlTools.MMLVerifyException;
 import jp.fourthline.mmlTools.Marker;
+import jp.fourthline.mmlTools.core.MMLTickTable;
 
 
 /**
@@ -34,6 +37,7 @@ import jp.fourthline.mmlTools.Marker;
 public final class MMLFile extends AbstractMMLParser {
 	private final MMLScore score = new MMLScore();
 	private String encoding = "Shift_JIS";
+	private short resolution = 96;
 
 	private final TextParser parser = 
 			new TextParser()
@@ -56,7 +60,11 @@ public final class MMLFile extends AbstractMMLParser {
 			throw new MMLParseException("no track");
 		}
 		createTrack();
-		setStartPosition();
+		try {
+			setStartPosition();
+		} catch (MMLExceptionList | MMLVerifyException e) {
+			throw new MMLParseException(e.getLocalizedMessage());
+		}
 		return score;
 	}
 
@@ -92,6 +100,9 @@ public final class MMLFile extends AbstractMMLParser {
 	private void createTrack() {
 		for (Extension3mleTrack track : trackList) {
 			int program = track.getInstrument() - 1; // 3MLEのInstruments番号は1がスタート.
+			if (MabiDLS.getInstance().getInstByProgram(program) == null) {
+				program = 0;
+			}
 			String[] text = new String[] { "", "", "" };
 			for (int i = 0; i < track.getTrackCount(); i++) {
 				text[i] = mmlParts.pop();
@@ -113,8 +124,10 @@ public final class MMLFile extends AbstractMMLParser {
 
 	/**
 	 * 再生開始位置を設定します.
+	 * @throws MMLVerifyException 
+	 * @throws MMLExceptionList 
 	 */
-	private void setStartPosition() {
+	private void setStartPosition() throws MMLExceptionList, MMLVerifyException {
 		if (score.getMarkerList().size() == 0) {
 			return;
 		}
@@ -128,7 +141,10 @@ public final class MMLFile extends AbstractMMLParser {
 				for (MMLEventList eventList : mmlTrack.getMMLEventList()) {
 					MMLEvent.insertTick(eventList.getMMLNoteEventList(), 0, tickOffset);
 				}
+				mmlTrack.setStartDelta(tickOffset);
+				mmlTrack.setStartSongDelta(tickOffset);
 			}
+			mmlTrack.generate();
 		}
 	}
 
@@ -215,7 +231,10 @@ public final class MMLFile extends AbstractMMLParser {
 	}
 
 	private void parseHeader(ByteArrayInputStream istream) {
-		istream.skip(37);
+		istream.skip(24);
+		resolution = readLEShortValue(istream);
+		System.out.println("resolution: " + resolution);
+		istream.skip(11);
 		int len = readLEIntValue(istream);
 		istream.skip(len);
 	}
@@ -245,6 +264,13 @@ public final class MMLFile extends AbstractMMLParser {
 		}
 	}
 
+	private int convertTick(int tick) {
+		if (resolution == MMLTickTable.TPQN) {
+			return tick;
+		}
+		return (tick * MMLTickTable.TPQN / resolution);
+	}
+
 	private int readLEIntValue(InputStream istream) {
 		byte[] b = new byte[4];
 		try {
@@ -255,12 +281,22 @@ public final class MMLFile extends AbstractMMLParser {
 		return ByteBuffer.wrap(b).order(ByteOrder.LITTLE_ENDIAN).getInt();
 	}
 
+	private short readLEShortValue(InputStream istream) {
+		byte[] b = new byte[2];
+		try {
+			istream.read(b);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return ByteBuffer.wrap(b).order(ByteOrder.LITTLE_ENDIAN).getShort();
+	}
+
 	private void parseMarker(ByteArrayInputStream istream) {
 		List<Marker> markerList = score.getMarkerList();
 
 		// parse Marker
 		istream.skip(7);
-		int tickOffset = readLEIntValue(istream);
+		int tickOffset = convertTick( readLEIntValue(istream) );
 		istream.skip(4);
 		String name = readString(istream);
 		System.out.println("Marker " + name + "=" + tickOffset);
@@ -286,7 +322,12 @@ public final class MMLFile extends AbstractMMLParser {
 	public static void main(String[] args) {
 		try {
 			String str = "c=3902331007\nd=4wAAAJvYl0oBAAAAQlpoOTFBWSZTWReDTXYAAEH/i/7U0AQCAHgAQAAEAGwIEABAAECAAAoABKAAcivUCaZGmRiAyNqDEgnqRpkPTUZGh5S6QfOGHRg+AfSJE3ebNDxInstECT3owI1yYiuIY5IwTCLAQz1oZyAogJFOhVYmv39cWsLxsbh0MkELhClECHm5wCBjLYz8XckU4UJAXg012A==";
-
+			str = "c=1269420526\n"
+					+ "d=4wAAADQf0IYBAAAAQlpoOTFBWSZTWeWlqEkAAEL/i/7U0AQCAHgAQAAEADwIEEBAAECAAAoABKAAdBkp6IAAGgBtQZFB6IBoAANIlymxq3am6cmZmRF5lIvQDYpBCCcc\n"
+					+ "d=lAGcFJEEGKGSQKoC366GV40QB5S5BBKDD35hGIZ0TE03VMVBYo53pYu61QliAs034u5IpwoSHLS1CSA=\n";
+			str = "c=1888284627\n"
+					+ "d=4wAAAHCCN2ABAAAAQlpoOTFBWSZTWSTXaLYAAEL/j/7U0AQCAHgAQAAEADwIEABAAEAAQIAACgAEoAByI9VNNGgAAyAbUEiSjyQaPSGEAbUsroXKl92irNLbSjcSRgw0\n"
+					+ "d=TqwNzBHXtAGNYSMmYNRBKQSp7yxVJmLCafNmb3rP7+sa6ltkSJVfWpKgpI1vop3tOwFERjnfi7kinChIEmu0WwA=\n";
 			MMLFile mmlFile = new MMLFile();
 			List<Extension3mleTrack> trackList = mmlFile.parse3mleExtension(str);
 			for (Extension3mleTrack track : trackList) {
