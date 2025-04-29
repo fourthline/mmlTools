@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2024 たんらる
+ * Copyright (C) 2013-2025 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
@@ -20,9 +20,11 @@ import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.IEditStateObserver;
 import jp.fourthline.mabiicco.MabiIccoProperties;
 import jp.fourthline.mabiicco.ui.PianoRollView.PaintMode;
+import jp.fourthline.mabiicco.ui.editor.EditTool;
 import jp.fourthline.mabiicco.ui.editor.NoteAlign;
 
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.JButton;
 
 import java.awt.event.ActionListener;
@@ -101,6 +103,8 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 	private JButton loopButton = null;
 
 	private final MenuWithIndex[] fileHistory = new MenuWithIndex[ MabiIccoProperties.MAX_FILE_HISTORY ];
+
+	private List<JToggleButton> editToolButton;
 
 	/**
 	 * Create the frame.
@@ -532,6 +536,10 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 
 		toolBar.add(newToolBarSeparator());
 
+		// 編集ツール
+		editToolButton = UIUtils.createGroupJToggleButton(toolBar, EditTool.values(), EditTool.NORMAL);
+		toolBar.add(newToolBarSeparator());
+
 		// ビューの拡大/縮小ツールボタン
 		createToolButton(toolBar, "view.scale.up", ActionDispatcher.VIEW_SCALE_UP, false);
 		createToolButton(toolBar, "view.scale.down", ActionDispatcher.VIEW_SCALE_DOWN, false);
@@ -756,6 +764,17 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 			noteTypeSelect.setSelectedIndex(index);
 	}
 
+	/**
+	 * 編集ツールの変更
+	 */
+	private void changeEditTool(int index) {
+		if ( (index >= 0) && (index < editToolButton.size()) ) {
+			var item = editToolButton.get(index);
+			item.setSelected(true);
+			listener.actionPerformed(new ActionEvent(item, 0, ActionDispatcher.CHANGE_ACTION));
+		}
+	}
+
 	private void addShortcutMap(String text, KeyStroke keyStroke) {
 		shortcutMap.values().forEach(t -> {
 			t.forEach(k -> {
@@ -824,6 +843,15 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 						() -> changeNoteTypeSelect(Arrays.asList(NoteAlign.values()).indexOf(noteAlign)),
 						noteAlign.toString()));
 			}
+		}
+
+		// 編集ツール選択
+		for (var tool : EditTool.values()) {
+			var keyCode = tool.getKeyCode();
+			createKeyAction("edit_tool." + tool.toString(),
+					KeyStroke.getKeyStroke(keyCode, 0),
+					() -> changeEditTool(List.of(EditTool.values()).indexOf(tool)),
+					AppResource.appText("edit_tool") + ": " + tool.getButtonName());
 		}
 	}
 

@@ -1,12 +1,8 @@
 /*
- * Copyright (C) 2022 たんらる
+ * Copyright (C) 2022-2025 たんらる
  */
 
 package jp.fourthline.mmlTools;
-
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 import jp.fourthline.mmlTools.core.MMLTokenizer;
 import jp.fourthline.mmlTools.optimizer.AAOptimizer;
@@ -16,55 +12,11 @@ import jp.fourthline.mmlTools.optimizer.OxLxFixedOptimizer;
 /**
  * ArcheAge向けMML出力
  */
-public final class AAMMLExport {
-	public AAMMLExport() {}
+public final class AAMMLExport extends MMLConverter {
 
-	private int partCount;
-
-	public String convertMML(List<MMLEventList> mmlParts, List<MMLTempoEvent> globalTempoList) {
-		try {
-			List<String>list = getGenericMMLStrings(mmlParts, globalTempoList);
-			var array = list.toArray(String[]::new);
-			partCount = array.length;
-			String text = toAAText(array);
-			return text;
-		} catch (MMLExceptionList e) {
-			e.printStackTrace();
-		}
-		return "";
-	}
-
-	public int getPartCount() {
-		return partCount;
-	}
-
-	/**
-	 * 最適化前のMML列を取得する.
-	 * @return
-	 * @throws MMLExceptionList 
-	 */
-	private List<String> getGenericMMLStrings(List<MMLEventList> mmlParts, List<MMLTempoEvent> globalTempoList) throws MMLExceptionList {
-		int count = mmlParts.size();
-		List<String> mmlList = new ArrayList<>();
-		LinkedList<MMLTempoEvent> localTempoList = new LinkedList<>(globalTempoList);
-		var errList = new ArrayList<MMLExceptionList.Entry>();
-
-		for (int i = 0; i < count; i++) {
-			MMLEventList eventList = mmlParts.get(i);
-			try {
-				String mml = MMLBuilder.create(eventList, 0, MMLBuilder.INIT_OCT).toMMLStringMusicQ(localTempoList, null);
-				if (mml.length() > 0) {
-					mmlList.add(mml);
-				}
-			} catch (MMLExceptionList e) {
-				errList.addAll(e.getErr());
-			}
-
-		}
-		if (!errList.isEmpty()) {
-			throw new MMLExceptionList(errList);
-		}
-		return mmlList;
+	@Override
+	protected String convert(String mml[]) {
+		return toAAText(mml);
 	}
 
 	public static String toAAText(String mml[]) {

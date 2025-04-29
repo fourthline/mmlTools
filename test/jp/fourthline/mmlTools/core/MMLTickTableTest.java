@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2022 たんらる
+ * Copyright (C) 2015-2025 たんらる
  */
 
 package jp.fourthline.mmlTools.core;
@@ -13,6 +13,7 @@ import java.io.IOException;
 import org.junit.Test;
 
 import jp.fourthline.FileSelect;
+import jp.fourthline.mmlTools.core.MMLTickTable.Switch;
 
 public final class MMLTickTableTest extends FileSelect {
 
@@ -43,8 +44,20 @@ public final class MMLTickTableTest extends FileSelect {
 	}
 
 	@Test
+	public void test_invTable_mb() throws IOException {
+		MMLTickTable tickTable1 = new MMLTickTable(null);
+		MMLTickTable tickTable2 = new MMLTickTable( fileSelect("tickInvTable_mb.txt") );
+		ByteArrayOutputStream outputStream1 = new ByteArrayOutputStream();
+		ByteArrayOutputStream outputStream2 = new ByteArrayOutputStream();
+		tickTable1.tableSwitch(Switch.MB);
+		tickTable1.writeToOutputStreamInvTable(outputStream1);
+		tickTable2.writeToOutputStreamInvTable(outputStream2);
+		assertEquals(outputStream2.toString(), outputStream1.toString());
+	}
+
+	@Test
 	public void test_create() {
-		MMLTickTable tickTable = MMLTickTable.createTickTable();
+		MMLTickTable tickTable = MMLTickTable.getInstance();
 		assertNotNull(tickTable);
 		assertEquals(750, tickTable.getInvTable().validCount());
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2022 たんらる
+ * Copyright (C) 2015-2025 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.editor;
@@ -29,6 +29,7 @@ import jp.fourthline.mabiicco.ui.MMLTrackView;
 import jp.fourthline.mabiicco.ui.PianoRollView;
 import jp.fourthline.mmlTools.MMLBuilder;
 import jp.fourthline.mmlTools.MMLEventList;
+import jp.fourthline.mmlTools.MMLExceptionList;
 import jp.fourthline.mmlTools.MMLNoteEvent;
 import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.core.MMLException;
@@ -368,6 +369,69 @@ public final class MMLEditorTest extends UseLoadingDLS {
 		assertEquals(note1.toString(), noteEventList.get(0).toString());
 	}
 
+	@Test
+	public void test_lengthModifyMulti() throws Exception {
+		List<MMLNoteEvent> noteEventList = mmlManager.getActiveMMLPart().getMMLNoteEventList();
+
+		noteEventList.add(new MMLNoteEvent(60, 96, 0));
+		noteEventList.add(new MMLNoteEvent(62, 48, 384));
+		noteEventList.add(new MMLNoteEvent(64, 48, 384+96));
+		assertEquals(">c4r2.d8r8e8", mmlManager.getActiveMMLPart().getInternalMMLString());
+
+		int y1 = pianoRollView.convertNote2Y(60);
+		int y2 = pianoRollView.convertNote2Y(64);
+		int x1 = pianoRollView.convertTicktoX(96-1);
+		int x2 = pianoRollView.convertTicktoX(96+48-1);
+		int x3 = pianoRollView.convertTicktoX(96+96-1);
+		int x4 = pianoRollView.convertTicktoX(96-17);
+		int x5 = pianoRollView.convertTicktoX(516-1);
+		int x6 = pianoRollView.convertTicktoX(0);
+
+		MouseEvent mouseEvent1 = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON1_DOWN_MASK, x1, y1, 1, false);
+		MouseEvent mouseEvent2 = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON1_DOWN_MASK, x2, y1, 1, false);
+		MouseEvent mouseEvent3 = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON1_DOWN_MASK, x3, y1, 1, false);
+		MouseEvent mouseEvent4 = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON1_DOWN_MASK | InputEvent.CTRL_DOWN_MASK, x4, y1, 1, false);
+		MouseEvent mouseEvent5 = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON1_DOWN_MASK, x5, y2, 1, false);
+		MouseEvent mouseEvent6 = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON1_DOWN_MASK, x6, y1, 1, false);
+
+		editor.selectAll();
+		editor.mousePressed(mouseEvent1);
+		assertEquals(EditMode.LENGTH, getEditMode());
+		assertEquals(60, playingNote);
+		editor.mouseDragged(mouseEvent2);
+		editor.mouseReleased(mouseEvent2);
+		assertEquals(">c4.r2r8d4e4", mmlManager.getActiveMMLPart().getInternalMMLString());
+
+		// 重なる場合
+		editor.selectAll();
+		editor.mousePressed(mouseEvent2);
+		assertEquals(EditMode.LENGTH, getEditMode());
+		assertEquals(60, playingNote);
+		editor.mouseDragged(mouseEvent3);
+		editor.mouseReleased(mouseEvent3);
+		assertEquals(">c2r2d4e4.", mmlManager.getActiveMMLPart().getInternalMMLString());
+
+		// アライメント解除
+		editor.selectAll();
+		editor.mousePressed(mouseEvent3);
+		assertEquals(EditMode.LENGTH, getEditMode());
+		assertEquals(60, playingNote);
+		editor.mouseDragged(mouseEvent4);
+		editor.mouseReleased(mouseEvent4);
+		assertEquals(">c8&c16.r2.r32d64r8r9e16.", mmlManager.getActiveMMLPart().getInternalMMLString());
+
+		// 最小Tick
+		editor.selectAll();
+		assertEquals(3, mmlManager.getActiveMMLPart().getMMLNoteEventList().size());
+		editor.mousePressed(mouseEvent5);
+		assertEquals(EditMode.LENGTH, getEditMode());
+		assertEquals(64, playingNote);
+		editor.mouseDragged(mouseEvent6);
+		editor.mouseReleased(mouseEvent6);
+		assertEquals(3, mmlManager.getActiveMMLPart().getMMLNoteEventList().size());
+		assertEquals(">c64r2r4.r9d64r8r9e64", mmlManager.getActiveMMLPart().getInternalMMLString());
+	}
+
 	/**
 	 * 範囲選択.
 	 * @throws Exception
@@ -476,6 +540,23 @@ public final class MMLEditorTest extends UseLoadingDLS {
 		// delete.
 		assertEquals(">>g+4<<<e4>>>g+4r4<<g8", MMLBuilder.create(eventList).toMMLString());
 		editor.selectedDelete();
+		assertEquals(">>g+4<<<e4>>>g+4", MMLBuilder.create(eventList).toMMLString());
+	}
+
+	@Test
+	public void test_addAreaSelect2() throws Exception {
+		MMLEventList eventList = mmlManager.getActiveMMLPart();
+		eventList.addMMLNoteEvent(new MMLNoteEvent(55, 48, 384));
+		editor.selectAll();
+
+		// 範囲選択.
+		check_areaSelect(InputEvent.CTRL_DOWN_MASK, true, 4);
+		check_areaSelect(InputEvent.CTRL_DOWN_MASK, true, 4); // 増殖してないことを確認		
+		check_areaSelect(InputEvent.CTRL_DOWN_MASK, true, 4); // 再選択
+
+		// delete.
+		assertEquals(">>g+4<<<e4>>>g+4r4<<g8", MMLBuilder.create(eventList).toMMLString());
+		editor.selectedDelete();
 		assertEquals("r4<e4", MMLBuilder.create(eventList).toMMLString());
 	}
 
@@ -515,7 +596,7 @@ public final class MMLEditorTest extends UseLoadingDLS {
 				MouseEvent e = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON1_DOWN_MASK | InputEvent.CTRL_DOWN_MASK, x+1, y+1, 1, false);
 
 				editor.mousePressed(e);
-				assertEquals(EditMode.MOVE, getEditMode());
+				assertEquals(EditMode.SELECT, getEditMode());
 				editor.mouseReleased(e);
 				assertEquals(EditMode.SELECT, getEditMode());
 			}
@@ -833,5 +914,80 @@ public final class MMLEditorTest extends UseLoadingDLS {
 		assertEquals(EditMode.SELECT, getEditMode());
 		editor.mouseReleased(mouseEvent3);
 		assertEquals(EditMode.SELECT, getEditMode());
+	}
+
+	@Test
+	public void test_split() throws MMLExceptionList {
+		editor.changeEditTool(EditTool.SPLIT);
+
+		var offset = List.of(96, 384, 384+96);
+		var expect = List.of("r4>v12c1", "r4>v12c2.c4", "r4>v12c1");
+		for (int i = 0; i < offset.size(); i++) {
+			List<MMLNoteEvent> noteEventList = mmlManager.getActiveMMLPart().getMMLNoteEventList();
+			noteEventList.clear();
+			noteEventList.add(new MMLNoteEvent(60, 384, 96, 12));
+			assertEquals("r4>v12c1", mmlManager.getActiveMMLPart().getInternalMMLString());
+
+			int x = pianoRollView.convertTicktoX(offset.get(i));
+			int y = pianoRollView.convertNote2Y(60);
+			int y2 = pianoRollView.convertNote2Y(59);
+
+			MouseEvent e = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON1_DOWN_MASK, x, y, 1, false);
+			MouseEvent e2 = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON1_DOWN_MASK, x, y2, 1, false);
+			// ノートはずれは変更されない
+			editor.mousePressed(e2);
+			editor.mouseReleased(e2);
+			assertEquals("r4>v12c1", mmlManager.getActiveMMLPart().getInternalMMLString());
+
+			editor.mousePressed(e);
+			editor.mouseReleased(e);
+			assertEquals(expect.get(i), mmlManager.getActiveMMLPart().getInternalMMLString());
+		}
+
+		editor.changeEditTool(EditTool.NORMAL);
+	}
+
+	@Test
+	public void test_glue() throws MMLExceptionList {
+		editor.changeEditTool(EditTool.GLUE);
+
+		List<MMLNoteEvent> noteEventList = mmlManager.getActiveMMLPart().getMMLNoteEventList();
+
+		noteEventList.add(new MMLNoteEvent(60, 6, 96, 12));
+		noteEventList.add(new MMLNoteEvent(60, 6, 384+6, 10));
+		noteEventList.add(new MMLNoteEvent(60, 6, 384+96+12, 7));
+		noteEventList.add(new MMLNoteEvent(60, 6, 384+96+12+6, 2));
+		noteEventList.add(new MMLNoteEvent(59, 6, 384+96+12+6+6, 4));
+		noteEventList.add(new MMLNoteEvent(60, 6, 384+96+12+6+6+6, 6));
+		assertEquals("r4>v12c64r2.v10c64r4v7c64v2c64<v4b64>v6c64", mmlManager.getActiveMMLPart().getInternalMMLString());
+
+		int x = pianoRollView.convertTicktoX(96);
+		int y = pianoRollView.convertNote2Y(60);
+		int y2 = pianoRollView.convertNote2Y(59);
+
+		MouseEvent e = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON1_DOWN_MASK, x, y, 1, false);
+		MouseEvent e2 = new MouseEvent(pianoRollView, 0, 0, InputEvent.BUTTON1_DOWN_MASK, x, y2, 1, false);
+		editor.mousePressed(e);
+		editor.mouseReleased(e);
+		assertEquals("r4>v12c2.&c32r4v7c64v2c64<v4b64>v6c64", mmlManager.getActiveMMLPart().getInternalMMLString());
+
+		// ノートはずれは変更されない
+		editor.mousePressed(e2);
+		editor.mouseReleased(e2);
+		assertEquals("r4>v12c2.&c32r4v7c64v2c64<v4b64>v6c64", mmlManager.getActiveMMLPart().getInternalMMLString());
+
+		editor.mousePressed(e);
+		editor.mouseReleased(e);
+		assertEquals("r4>v12c1&c21v2c64<v4b64>v6c64", mmlManager.getActiveMMLPart().getInternalMMLString());
+
+		editor.mousePressed(e);
+		editor.mouseReleased(e);
+		assertEquals("r4>v12c1&c16<v4b64>v6c64", mmlManager.getActiveMMLPart().getInternalMMLString());
+
+		editor.mousePressed(e);
+		editor.mouseReleased(e);
+		assertEquals("r4>v12c1&c16<v4b64>v6c64", mmlManager.getActiveMMLPart().getInternalMMLString());
+
+		editor.changeEditTool(EditTool.NORMAL);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2024 たんらる
+ * Copyright (C) 2014-2025 たんらる
  */
 
 package jp.fourthline.mmlTools.parser;
@@ -188,10 +188,8 @@ public final class MMLFile extends AbstractMMLParser {
 		int dataLength = ByteBuffer.wrap(b, 0, 4).order(ByteOrder.LITTLE_ENDIAN).getInt();
 		byte[] data = new byte[dataLength];
 
-		try {
-			BZip2CompressorInputStream bz2istream = new BZip2CompressorInputStream(new ByteArrayInputStream(b, 12, b.length-12));
+		try (BZip2CompressorInputStream bz2istream = new BZip2CompressorInputStream(new ByteArrayInputStream(b, 12, b.length-12))) {
 			bz2istream.read(data);
-			bz2istream.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

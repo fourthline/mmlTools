@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2024 たんらる
+ * Copyright (C) 2017-2025 たんらる
  */
 
 package jp.fourthline.mmlTools.parser;
@@ -229,8 +229,7 @@ public final class MidiFile extends AbstractMMLParser {
 	@Override
 	public MMLScore parse(InputStream istream) throws MMLParseException {
 		updateOptions();
-		try {
-			BufferedInputStream bin = new BufferedInputStream(istream);
+		try (BufferedInputStream bin = new BufferedInputStream(istream)) {
 			MidiFileFormat format = MidiSystem.getMidiFileFormat(bin);
 			int formatType = format.getType();
 			System.out.println("type: " + formatType);
@@ -243,7 +242,6 @@ public final class MidiFile extends AbstractMMLParser {
 			System.out.println(seq.getDivisionType());
 			System.out.println(seq.getMicrosecondLength());
 			System.out.println(seq.getTickLength());
-			bin.close();
 
 			if (formatType == 0) {
 				parseFormat0Track(seq.getTracks()[0]);

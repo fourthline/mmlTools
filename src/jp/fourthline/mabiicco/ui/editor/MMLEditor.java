@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2023 たんらる
+ * Copyright (C) 2013-2025 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.editor;
@@ -67,16 +67,27 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 
 	private final Frame parentFrame;
 
+	private final EditorAction editorAction;
+
 	private static final String MMLEVENT_PREFIX = "MMLEVENT@";
+
+	@Override
+	public void changeEditTool(EditTool tool) {
+		changeState(tool.getEditMode());
+		setCursor(tool.getCursor());
+	}
 
 	public MMLEditor(Frame parentFrame, IPlayNote notePlayer, PianoRollView pianoRoll, IMMLManager mmlManager) {
 		this.notePlayer = notePlayer;
 		this.pianoRollView = pianoRoll;
 		this.mmlManager = mmlManager;
 		this.parentFrame = parentFrame;
+		this.editorAction = new EditorAction(this, mmlManager, pianoRoll, notePlayer, this::tickAlign);
 
 		pianoRoll.setSelectNote(selectedNote);
 		pianoRoll.addMouseInputListener(this);
+
+		editMode.enter(this);
 
 		velocityChangeMenu = new VelocityChangeMenu(popupMenu,
 				() -> popupTargetNote.getVelocity(),
@@ -145,29 +156,37 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		}
 	}
 
-	private void selectNote(MMLNoteEvent noteEvent) {
-		selectNote(noteEvent, false);
+	public boolean selectNote(MMLNoteEvent noteEvent) {
+		return selectNote(noteEvent, false);
 	}
 
-	private void selectNote(MMLNoteEvent noteEvent, boolean multiSelect) {
+	private boolean selectNote(MMLNoteEvent noteEvent, boolean multiSelect) {
 		if (noteEvent == null) {
 			selectedNote.clear();
-		}
-		if ( (noteEvent != null) && (!selectedNote.contains(noteEvent))) {
-			if (!multiSelect) {
+		} else if (!multiSelect) {
+			if (!selectedNote.contains(noteEvent)) {
 				selectedNote.clear();
+				selectedNote.add(noteEvent);
 			}
-			selectedNote.add(noteEvent);
+		} else {
+			if (!selectedNote.contains(noteEvent)) {
+				selectedNote.add(noteEvent);
+			} else {
+				selectedNote.remove(noteEvent);
+			}
+			return false;
 		}
+		return true;
 	}
 
 	/**
 	 * @param noteEvent1
 	 * @param noteEvent2
 	 * @param lookNote falseの場合は、tickOffset間にあるすべてのノートが選択される. trueの場合はnote情報もみて判定する.
+	 * @param selectMode  trueの場合は反転モードON。すでに選択されているノートの場合は選択解除する
 	 * @param hadNotes    追加選択しているノートのリスト
 	 */
-	private void selectMultipleNote(MMLNoteEvent noteEvent1, MMLNoteEvent noteEvent2, boolean lookNote) {
+	private void selectMultipleNote(MMLNoteEvent noteEvent1, MMLNoteEvent noteEvent2, boolean lookNote, boolean selectMode) {
 		int[] note = {
 				noteEvent1.getNote(),
 				noteEvent2.getNote()
@@ -194,7 +213,9 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 			if ( (noteEvent.getNote() >= note[0]) && (noteEvent.getNote() <= note[1]) 
 					&& (noteEvent.getEndTick() > tickOffset[0])
 					&& (noteEvent.getTickOffset() <= tickOffset[1]) ) {
-				selectedNote.add(noteEvent);
+				if (!selectMode || !detachedNote.contains(noteEvent)) {
+					selectedNote.add(noteEvent);
+				}
 			} else if (detachedNote.contains(noteEvent)) {
 				selectedNote.add(noteEvent);
 			}
@@ -231,19 +252,20 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	 * @param point  nullのときはクリアする.
 	 */
 	@Override
-	public void selectNoteByPoint(Point point, int selectModifiers) {
+	public boolean selectNoteByPoint(Point point, int selectModifiers) {
 		if (point == null) {
-			selectNote(null);
+			return selectNote(null);
 		} else {
 			MMLNoteEvent noteEvent = pointToNote(point);
 			if (noteEvent == null) {
-				return;
+				return true;
 			}
 
 			if ( (selectedNote.size() == 1) && ((selectModifiers & InputEvent.SHIFT_DOWN_MASK) != 0) ) {
-				selectMultipleNote(selectedNote.get(0), noteEvent, false);
+				selectMultipleNote(selectedNote.get(0), noteEvent, false, false);
+				return false;
 			} else {
-				selectNote(noteEvent, ((selectModifiers & InputEvent.CTRL_DOWN_MASK) != 0));
+				return selectNote(noteEvent, ((selectModifiers & InputEvent.CTRL_DOWN_MASK) != 0));
 			}
 		}
 	}
@@ -254,20 +276,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 	 */
 	@Override
 	public void newMMLNoteAndSelected(Point p) {
-		int note = pianoRollView.convertY2Note(p.y);
-		long tickOffset = pianoRollView.convertXtoTick(p.x);
-		long alignedTickOffset = tickAlign(tickOffset);
-		MMLEventList editEventList = mmlManager.getActiveMMLPart();
-		if (editEventList == null) {
-			return;
-		}
-		MMLNoteEvent prevNote = editEventList.searchPrevNoteOnTickOffset(tickOffset);
-		MMLNoteEvent noteEvent = new MMLNoteEvent(note, editAlign, (int)alignedTickOffset);
-		if (prevNote != null) {
-			noteEvent.setVelocity(prevNote.getVelocity());
-		}
-		selectNote(noteEvent);
-		notePlayer.playNote( note, noteEvent.getVelocity() );
+		editorAction.newNoteAction(p);
 	}
 
 	/**
@@ -334,6 +343,8 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		} else {
 			if (alignment) {
 				alignedTickOffsetDelta -= (tickOffsetDelta % editAlign);
+			} else {
+				System.out.print("");
 			}
 		}
 		if (detachedNote.get(0).getTickOffset() + alignedTickOffsetDelta < startOffset) {
@@ -354,6 +365,15 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 		}
 
 		notePlayer.playNote( pivNote + noteDelta, velocity );
+	}
+
+	@Override
+	public void editLengthSelectedMMLNote(Point start, Point p, boolean alignment) {
+		if (selectedNote.size() == 1) {
+			updateSelectedNoteAndTick(p, false, alignment);
+		} else {
+			editorAction.editLengthAction(start, p, alignment, selectedNote, detachedNote);
+		}
 	}
 
 	@Override
@@ -416,7 +436,7 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 
 		selectMultipleNote(
 				new MMLNoteEvent(note1, 0, tickOffset1, 0),
-				new MMLNoteEvent(note2, 0, tickOffset2, 0), true);
+				new MMLNoteEvent(note2, 0, tickOffset2, 0), true, true);
 	}
 
 	@Override
@@ -938,5 +958,15 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 			noteEvent.modifyVelocity(inc);
 			mmlManager.updateActivePart(true);
 		}
+	}
+
+	@Override
+	public void glueAction(Point p) {
+		editorAction.glueAction(p);
+	}
+
+	@Override
+	public void splitAction(Point p) {
+		editorAction.splitAction(p);
 	}
 }

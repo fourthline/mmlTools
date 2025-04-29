@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2022 たんらる
+ * Copyright (C) 2014-2025 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.editor;
@@ -7,6 +7,7 @@ package jp.fourthline.mabiicco.ui.editor;
 import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
+import java.util.function.BiConsumer;
 
 import javax.swing.SwingUtilities;
 
@@ -35,11 +36,14 @@ enum EditMode {
 				EditMode next = INSERT;
 				if (context.onExistNote(startPoint)) {
 					// ノート上であれば、ノートを選択状態にする. 複数選択判定も.
-					context.selectNoteByPoint(startPoint, e.getModifiersEx());
-					if (context.isEditLengthPosition(startPoint)) {
-						next = LENGTH;
+					if (context.selectNoteByPoint(startPoint, e.getModifiersEx())) {
+						if (context.isEditLengthPosition(startPoint)) {
+							next = LENGTH;
+						} else {
+							next = MOVE;
+						}
 					} else {
-						next = MOVE;
+						next = SELECT;
 					}
 				} else if (partSwitch && context.selectTrackOnExistNote(startPoint)) {
 					// アクティブパートを変更したときには単一選択のみ.
@@ -55,7 +59,7 @@ enum EditMode {
 			boolean ctrlOption = e.isControlDown();
 			int cursorType = Cursor.DEFAULT_CURSOR;
 			Point p = e.getPoint();
-			if (context.onExistNote(p)) {
+			if (context.onExistNote(p) && !shiftOption && !ctrlOption) {
 				if (context.isEditLengthPosition(p)) {
 					cursorType = Cursor.E_RESIZE_CURSOR;
 				} else {
@@ -131,15 +135,16 @@ enum EditMode {
 		@Override
 		public void enter(IEditContext context) {
 			// 単音選択
-			context.selectNoteByPoint(null, 0);
-			context.selectNoteByPoint(startPoint, 0);
+//			context.selectNoteByPoint(null, 0);
+//			context.selectNoteByPoint(startPoint, 0);
 			// 編集前の選択ノートリストをdetachする.
 			context.detachSelectedMMLNote();
 		}
 		@Override
 		public void executeEvent(IEditContext context, MouseEvent e) {
 			// 選択中のNote長を更新.（Noteは更新しない）
-			context.updateSelectedNoteAndTick(e.getPoint(), false, !e.isControlDown());
+//			context.updateSelectedNoteAndTick(e.getPoint(), false, !e.isControlDown());
+			context.editLengthSelectedMMLNote(startPoint, e.getPoint(), !e.isControlDown());
 		}
 		@Override
 		public void exit(IEditContext context) {
@@ -152,6 +157,7 @@ enum EditMode {
 		@Override
 		public void enter(IEditContext context) {
 			firstEvent = null;
+			context.detachSelectedMMLNote();
 		}
 		@Override
 		public void executeEvent(IEditContext context, MouseEvent e) {
@@ -160,8 +166,8 @@ enum EditMode {
 				firstEvent = e;
 				if (!ctrlOption) {
 					context.selectNoteByPoint(null, 0);
+					context.detachSelectedMMLNote();
 				}
-				context.detachSelectedMMLNote();
 			}
 			// 範囲選択.
 			context.areaSelectingAction(startPoint, e.getPoint());
@@ -171,9 +177,34 @@ enum EditMode {
 			// 範囲選択反映.
 			context.applyAreaSelect();
 		}
+	},
+	SPLIT {
+		private SimpleTool splitTool = new SimpleTool((context, e) -> context.splitAction(e.getPoint()));
+		@Override
+		public void pressEvent(IEditContext context, MouseEvent e) {
+			splitTool.pressEvent(context, e);
+		}
+
+		@Override
+		public void releaseEvent(IEditContext context, MouseEvent e) {
+			splitTool.releaseEvent(context, e);
+		}
+	},
+	GLUE {
+		private SimpleTool glueTool = new SimpleTool((context, e) -> context.glueAction(e.getPoint()));
+		public void pressEvent(IEditContext context, MouseEvent e) {
+			glueTool.pressEvent(context, e);
+		}
+
+		@Override
+		public void releaseEvent(IEditContext context, MouseEvent e) {
+			glueTool.releaseEvent(context, e);
+		}
 	};
 
 	private static Point startPoint;
+
+	
 
 	EditMode() {}
 
@@ -200,4 +231,32 @@ enum EditMode {
 	}
 	public void enter(IEditContext context) {}
 	public void exit(IEditContext context) {}
+
+	private static final class SimpleTool {
+		private boolean inAction = false;
+		private final BiConsumer<IEditContext, MouseEvent> func;
+		private SimpleTool(BiConsumer<IEditContext, MouseEvent> func) {
+			this.func = func;
+		}
+
+		private void pressEvent(IEditContext context, MouseEvent e) {
+			boolean left = SwingUtilities.isLeftMouseButton(e);
+			boolean right = SwingUtilities.isRightMouseButton(e);
+			boolean middle = SwingUtilities.isMiddleMouseButton(e);
+			if (left && !right && !middle) {
+				inAction = true;
+				func.accept(context, e);
+			} else {
+				inAction = false;
+				context.selectNoteByPoint(null, 0);
+			}
+		}
+
+		private void releaseEvent(IEditContext context, MouseEvent e) {
+			if (inAction) {
+				context.applyEditNote(false);
+				inAction = false;
+			}
+		}
+	}
 }

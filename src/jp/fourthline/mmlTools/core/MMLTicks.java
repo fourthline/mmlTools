@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2024 たんらる
+ * Copyright (C) 2013-2025 たんらる
  */
 
 package jp.fourthline.mmlTools.core;
@@ -14,7 +14,7 @@ import java.util.Optional;
  */
 public class MMLTicks {
 
-	private static final MMLTickTable tickTable = MMLTickTable.createTickTable();
+	private static final MMLTickTable tickTable = MMLTickTable.getInstance();
 
 	public static int getTick(String gt) throws MMLException {
 		String str = gt;

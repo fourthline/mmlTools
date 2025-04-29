@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2024 たんらる
+ * Copyright (C) 2013-2025 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -107,6 +107,19 @@ public final class MMLEventList implements Serializable, Cloneable {
 			}
 		}
 
+		return null;
+	}
+
+	public MMLNoteEvent searchOnTickOffsetNextNote(long tickOffset) {
+		int n = noteList.size();
+		for (int i = 0; i < n - 1; i++) {
+			var noteEvent = noteList.get(i);
+			if (noteEvent.getTickOffset() <= tickOffset) {
+				if (tickOffset < noteEvent.getEndTick()) {
+					return noteList.get(i+1);
+				}
+			}
+		}
 		return null;
 	}
 

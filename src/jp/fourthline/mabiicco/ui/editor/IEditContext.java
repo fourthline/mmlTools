@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2023 たんらる
+ * Copyright (C) 2014-2025 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.editor;
@@ -23,12 +23,16 @@ interface IEditContext {
 	void detachSelectedMMLNote();
 	void updateSelectedNoteAndTick(Point p, boolean updateNote, boolean alignment);
 	void moveSelectedMMLNote(Point start, Point p, boolean shiftOption, boolean alignment, boolean octaveAlign, boolean showInfo);
+	void editLengthSelectedMMLNote(Point start, Point p, boolean alignment);
 	void cancelEdit();
 	void applyEditNote(boolean select);
 	void setCursor(Cursor cursor);
 	void areaSelectingAction(Point startPoint, Point point);
 	void applyAreaSelect();
-	void selectNoteByPoint(Point point, int selectModifiers);
+	boolean selectNoteByPoint(Point point, int selectModifiers);
 	void showPopupMenu(Point point);
 	boolean canEditStartOffset(Point point);
+
+	void glueAction(Point p);
+	void splitAction(Point p);
 }

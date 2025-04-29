@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 たんらる
+ * Copyright (C) 2022-2025 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
@@ -8,6 +8,7 @@ import static jp.fourthline.mabiicco.AppResource.appText;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.LayoutManager;
 import java.awt.Point;
 import java.awt.RenderingHints;
@@ -24,6 +25,8 @@ import java.util.function.Supplier;
 
 import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -36,6 +39,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
@@ -179,6 +183,27 @@ public final class UIUtils {
 		return list;
 	}
 
+	public static List<JToggleButton> createGroupJToggleButton(JComponent parent, SettingButtonGroupIconItem[] items, SettingButtonGroupIconItem initialItem) {
+		var list = new ArrayList<JToggleButton>();
+		var listener = ActionDispatcher.getInstance();
+		var command = ActionDispatcher.CHANGE_ACTION;
+		var group = new ButtonGroup();
+		for (SettingButtonGroupIconItem item : items) {
+			String name = item.getButtonName();
+			var icon = item.getIcon();
+			var ssIcon = new ImageIcon(icon.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH));
+			var itemButton = new GroupToggleButtonWith<>(name, ssIcon, item);
+			itemButton.setActionCommand(command);
+			itemButton.addActionListener(listener);
+			itemButton.setSelected(item == initialItem);
+			itemButton.setToolTipText(name);
+			parent.add(itemButton);
+			list.add(itemButton);
+			group.add(itemButton);
+		}
+		return list;
+	}
+
 	private static class GroupRadioMenuItemWith<T> extends JRadioButtonMenuItem implements Supplier<T> {
 		private static final long serialVersionUID = -7786833458520626015L;
 		private final T obj;
@@ -197,6 +222,19 @@ public final class UIUtils {
 		private final T obj;
 		private GroupMenuItemWith(String text, T obj) {
 			super(text);
+			this.obj = obj;
+		}
+		@Override
+		public T get() {
+			return obj;
+		}
+	}
+
+	private static class GroupToggleButtonWith<T> extends JToggleButton implements Supplier<T> {
+		private static final long serialVersionUID = 6235718102529165950L;
+		private final T obj;
+		private GroupToggleButtonWith(String text, Icon icon, T obj) {
+			super(icon);
 			this.obj = obj;
 		}
 		@Override

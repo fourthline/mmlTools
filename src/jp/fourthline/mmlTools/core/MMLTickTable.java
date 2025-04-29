@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2024 たんらる
+ * Copyright (C) 2015-2025 たんらる
  */
 
 package jp.fourthline.mmlTools.core;
@@ -23,24 +23,45 @@ public final class MMLTickTable {
 	 */
 	private final IntMap<MMLPatern> tickInvTable;
 
-	public static MMLTickTable createTickTable() {
-		InputStream preTable = null;
-		String preLoadFile = System.getProperty("mabiicco.ticktable");
-		if (preLoadFile != null) {
-			preTable = MMLTickTable.class.getResourceAsStream(preLoadFile);
+	private final IntMap<MMLPatern> tickInvTableForMb;
+
+	private static MMLTickTable obj = null;
+
+	public enum Switch {
+		FULL, MB;
+	}
+
+	private Switch tableSwitch = null;
+	public void tableSwitch(Switch sw) {
+		tableSwitch = sw;
+	}
+
+	public static synchronized MMLTickTable getInstance() {
+		if (obj == null) {
+			InputStream preTable = null;
+			String preLoadFile = System.getProperty("mabiicco.ticktable");
+			if (preLoadFile != null) {
+				preTable = MMLTickTable.class.getResourceAsStream(preLoadFile);
+			}
+			obj = new MMLTickTable(preTable);
 		}
-		return new MMLTickTable(preTable);
+		return obj;
 	}
 
 	MMLTickTable(InputStream inputStream) {
-		NanoTime time = NanoTime.start();
 		generateTickTable();
 		tickInvTable = (inputStream == null) ? generateInvTable() : readFromInputStreamInvTable(inputStream);
-		System.out.println("MMLTickTable " + time.ms() + "ms");
+		tickInvTableForMb = generateInvTable(new String[] { "1", "1.", "2", "2.", "4", "4.", "8", "8.", "16", "16.", "32", "32.", "64", "6", "12", "24", "48" });
 	}
 
 	IntMap<MMLPatern> getInvTable() {
-		return this.tickInvTable;
+		if (tableSwitch != null) {
+			switch (tableSwitch) {
+			case FULL: return tickInvTable;
+			case MB:   return tickInvTableForMb;
+			}
+		}
+		return tickInvTable;
 	}
 
 	public Map<String, Integer> getTable() {
@@ -98,8 +119,13 @@ public final class MMLTickTable {
 	}
 
 	private IntMap<MMLPatern> generateInvTable() {
-		var table = new HashMap<Integer, MMLPatern>(1024);
-		String[] keys = tickTable.keySet().toArray(new String[0]);
+		var keys = tickTable.keySet().toArray(new String[0]);
+		return generateInvTable(keys);
+	}
+
+	private IntMap<MMLPatern> generateInvTable(String keys[]) {
+		var time = NanoTime.start();
+		var table = new HashMap<Integer, MMLPatern>(1024);;
 		int mTick = tickTable.get("1") * 2 - 1;
 		for (int i = 1; i <= COMBN; i++) {
 			List<List<String>> pattern = new Combination<>(keys, i).getArray();
@@ -115,6 +141,7 @@ public final class MMLTickTable {
 				}
 			}
 		}
+		System.out.println("MMLTickTable " + time.ms() + "ms");
 		return new IntMap<>(table);
 	}
 
@@ -124,17 +151,18 @@ public final class MMLTickTable {
 
 	void writeToOutputStreamInvTable(OutputStream outputStream, boolean alt) {
 		PrintStream stream = new PrintStream(outputStream, false, StandardCharsets.UTF_8);
+		var currentTable = getInvTable();
 		stream.println("# Generated Text --- ");
-		stream.println("# registered key: " + tickInvTable.validCount());
+		stream.println("# registered key: " + currentTable.validCount());
 
-		int max = tickInvTable.max();
+		int max = currentTable.max();
 		for (int i = 1; i <= max; i++) {
-			if (tickInvTable.containsKey(i)) {
+			if (currentTable.containsKey(i)) {
 				stream.print(i+"=");
-				tickInvTable.get(i).primary.forEach( s -> stream.print("[" + s + "]"));
+				currentTable.get(i).primary.forEach( s -> stream.print("[" + s + "]"));
 				if (alt) {
 					stream.print("\t");
-					tickInvTable.get(i).alt.forEach( s -> stream.print("[" + s + "]"));
+					currentTable.get(i).alt.forEach( s -> stream.print("[" + s + "]"));
 				}
 				stream.println();
 			} else {

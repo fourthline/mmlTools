@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2024 たんらる
+ * Copyright (C) 2013-2025 たんらる
  */
 
 package jp.fourthline.mabiicco;
@@ -414,10 +414,8 @@ public final class MabiIccoProperties {
 			test_mode = System.getProperty("mabiicco.test_mode") != null;
 			path = ResourceLoader.getAppConfigPath(CONFIG_FILE);
 			if (!test_mode) {
-				try {
-					FileInputStream in = new FileInputStream(path);
+				try (FileInputStream in = new FileInputStream(path)) {
 					super.load(in);
-					in.close();
 				} catch (InvalidPropertiesFormatException e) {
 				} catch (FileNotFoundException e) {
 				} catch (IOException e) {
@@ -428,10 +426,8 @@ public final class MabiIccoProperties {
 
 		private void save() {
 			if (!test_mode) {
-				try {
-					FileOutputStream out = new FileOutputStream(path);
+				try (FileOutputStream out = new FileOutputStream(path)) {
 					store(out, "");
-					out.close();
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 				} catch (IOException e) {

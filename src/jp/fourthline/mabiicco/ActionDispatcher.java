@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2024 たんらる
+ * Copyright (C) 2014-2025 たんらる
  */
 
 package jp.fourthline.mabiicco;
@@ -21,6 +21,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,6 +50,7 @@ import jp.fourthline.mabiicco.ui.PolyphonyMonitor;
 import jp.fourthline.mabiicco.ui.WavoutPanel;
 import jp.fourthline.mabiicco.ui.color.ScaleColor;
 import jp.fourthline.mabiicco.ui.editor.DrumConverter;
+import jp.fourthline.mabiicco.ui.editor.EditTool;
 import jp.fourthline.mabiicco.ui.editor.MMLTranspose;
 import jp.fourthline.mabiicco.ui.editor.MultiTracksVelocityChangeEditor;
 import jp.fourthline.mabiicco.ui.editor.MultiTracksViewEditor;
@@ -363,10 +365,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		}
 		private MMLScore parse() {
 			if (!done) {
-				try {
-					FileInputStream in = new FileInputStream(file);
+				try (FileInputStream in = new FileInputStream(file)) {
 					score = parser.parse(in);
-					in.close();
 				} catch (FileNotFoundException e) {
 					JOptionPane.showMessageDialog(parent,
 							AppResource.appText("error.nofile"),
@@ -465,6 +465,13 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	 */
 	private boolean saveMMLFile(File file) {
 		try {
+			if (!file.exists()) {
+				if (!Utils.isValidFile(file)) {
+					JOptionPane.showMessageDialog(mainFrame, "invalid name: " + file.getName(), "ERROR", JOptionPane.ERROR_MESSAGE);
+					return false;
+				}
+				Files.createFile(file.toPath());
+			}
 			FileOutputStream outputStream = new FileOutputStream(file);
 			new MMLScoreSerializer(mmlSeqView.getMMLScore()).writeToOutputStream(outputStream);
 			mainFrame.setTitleAndFileName(file.getName());
@@ -475,6 +482,9 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			mainFrame.updateFileHistoryMenu();
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(mainFrame, AppResource.appText("fail.saveFile"), "ERROR", JOptionPane.ERROR_MESSAGE);
+			return false;
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(mainFrame, AppResource.appText("fail.saveFile") + "\n" + e.getLocalizedMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 		return true;
@@ -541,6 +551,11 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		int status = fileChooser.showSaveDialog(mainFrame);
 		if (status == JFileChooser.APPROVE_OPTION) {
 			File file = fileChooser.getSelectedFile();
+			if (!Utils.isValidFile(file)) {
+				JOptionPane.showMessageDialog(mainFrame, "invalid name: " + file.getName(), "ERROR", JOptionPane.ERROR_MESSAGE);
+				return null;
+			}
+
 			if ((suffix != null) && (!file.toString().endsWith("."+suffix))) {
 				file = new File(file+"."+suffix);
 			}
@@ -900,6 +915,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 			} else if (o instanceof MMLOptimizeLevel level) {
 				appProperties.mmlOptimizeLevel.set(level);
 				doAction(this, MML_GENERATE);
+			} else if (o instanceof EditTool editTool) {
+				editState.changeEditTool(editTool);
 			} else {
 				System.err.println("changeAction invalid param " + o.getClass().toString());
 			}

@@ -1,10 +1,12 @@
 /*
- * Copyright (C) 2014-2023 たんらる
+ * Copyright (C) 2014-2025 たんらる
  */
 
 package jp.fourthline.mabiicco;
 
 import java.awt.Point;
+
+import jp.fourthline.mabiicco.ui.editor.EditTool;
 
 /**
  * 編集関連の動作インタフェース.
@@ -37,4 +39,7 @@ public interface IEditState {
 	void notesModifyVelocity(Point point, boolean inc);
 
 	void setEditStateObserver(IEditStateObserver observer);
+
+	/** 編集ツールの変更 */
+	void changeEditTool(EditTool tool);
 }
