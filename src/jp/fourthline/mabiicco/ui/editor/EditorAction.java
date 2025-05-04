@@ -96,31 +96,32 @@ public final class EditorAction {
 	 * @param detachedNote
 	 */
 	public void editLengthAction(Point start, Point p, boolean alignment, List<MMLNoteEvent> selectedNote, List<MMLNoteEvent> detachedNote) {
-		var eventList = mmlManager.getActiveMMLPart();
-		pianoRollView.onViewScrollPoint(p);
-		long startTick = pianoRollView.convertXtoTick(start.x);
-		long targetTick = pianoRollView.convertXtoTick(p.x);
-		long tickOffsetDelta = targetTick - startTick;
+		if (prepare(p)) {
+			pianoRollView.onViewScrollPoint(p);
+			long startTick = pianoRollView.convertXtoTick(start.x);
+			long tickOffsetDelta = tickOffset - startTick;
 
-		for (int i = 0; i < selectedNote.size(); i++) {
-			MMLNoteEvent note1 = detachedNote.get(i);
-			MMLNoteEvent note2 = selectedNote.get(i);
-			int newTick = note1.getTick() + (int)tickOffsetDelta;
-			if (alignment) {
-				newTick -= (newTick % mmlEditor.getEditAlign());
-			}
-			// 最小Tick
-			newTick = Math.max(newTick, MMLTicks.minimumTick());
-			// 後続のTickOffsetを超えない
-			var nextNote = eventList.searchOnTickOffsetNextNote(note1.getTickOffset());
-			if (nextNote != null) {
-				newTick = Math.min(newTick, nextNote.getTickOffset() - note1.getTickOffset());
-			}
-			note2.setTick(newTick);
-			if ( (note1.getTickOffset() <= startTick) && (note1.getEndTick() > startTick) ) {
-				// ノート情報表示
-				pianoRollView.setPaintNoteInfo(!alignment ? note2 : null);
-				notePlayer.playNote(note1.getNote(), note1.getVelocity());
+			for (int i = 0; i < selectedNote.size(); i++) {
+				MMLNoteEvent note1 = detachedNote.get(i);
+				MMLNoteEvent note2 = selectedNote.get(i);
+				long newTickOffset = note1.getEndTick() + tickOffsetDelta;
+				if (alignment) {
+					newTickOffset = tickAlignFunc.apply(newTickOffset);
+				}
+				int newTick = (int)newTickOffset - note1.getTickOffset();
+				// 最小Tick
+				newTick = Math.max(newTick, MMLTicks.minimumTick());
+				// 後続のTickOffsetを超えない
+				var nextNote = editEventList.searchOnTickOffsetNextNote(note1.getTickOffset());
+				if (nextNote != null) {
+					newTick = Math.min(newTick, nextNote.getTickOffset() - note1.getTickOffset());
+				}
+				note2.setTick(newTick);
+				if ( (note1.getTickOffset() <= startTick) && (note1.getEndTick() > startTick) ) {
+					// ノート情報表示
+					pianoRollView.setPaintNoteInfo(!alignment ? note2 : null);
+					notePlayer.playNote(note1.getNote(), note1.getVelocity());
+				}
 			}
 		}
 	}
