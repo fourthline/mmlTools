@@ -86,6 +86,7 @@ public final class MidiFileTest extends UseLoadingDLS {
 	public void testParseFormat1_trackSelect1() throws Exception {
 		MidiFile.enableInstPatch();
 		IMMLFileParser parser = IMMLFileParser.getParser(fileSelectF("sample4.mid"));
+		parser.setParseAttribute(MidiFile.PARSE_ALIGN, MidiFile.PARSE_ALIGN_1);
 		var map = parser.getTrackSelectMap();
 		assertEquals("{1=<trackA>, 2=<Track3>, 4=<Track5>, 7=<Piano>}", map.toString());
 
