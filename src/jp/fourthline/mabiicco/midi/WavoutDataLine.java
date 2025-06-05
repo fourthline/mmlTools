@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2024 たんらる
+ * Copyright (C) 2017-2025 たんらる
  */
 
 package jp.fourthline.mabiicco.midi;
@@ -44,10 +44,9 @@ public final class WavoutDataLine implements SourceDataLine, IWavoutState {
 		System.out.println(System.currentTimeMillis() + " flush");
 	}
 
+	private Thread dataLineObserverThread;
 	private final Runnable dataLineObserver = () -> {
 		try {
-			// 初期停止.
-			Thread.sleep(6000);
 			System.out.println("start DataLineAutoFlush.");
 
 			while (true) {
@@ -63,10 +62,6 @@ public final class WavoutDataLine implements SourceDataLine, IWavoutState {
 
 	public WavoutDataLine() throws LineUnavailableException {
 		this.parent = AudioSystem.getSourceDataLine(format);
-
-		if ("true".equals(System.getProperties().get("mabiicco.dlaf"))) {
-			new Thread(dataLineObserver, "DataLine Observer").start();
-		}
 	}
 
 	private long time;
@@ -285,5 +280,17 @@ public final class WavoutDataLine implements SourceDataLine, IWavoutState {
 
 	public void setSoundDataLine(ISoundDataLine soundDataLine) {
 		this.soundDataLine = soundDataLine;
+	}
+
+	@Override
+	public void startDataLine() {
+		synchronized (this) {
+			if ("true".equals(System.getProperties().get("mabiicco.dlaf"))) {
+				if (dataLineObserverThread == null) {
+					dataLineObserverThread = new Thread(dataLineObserver, "DataLine Observer");
+					dataLineObserverThread.start();
+				}
+			}	
+		}
 	}
 }

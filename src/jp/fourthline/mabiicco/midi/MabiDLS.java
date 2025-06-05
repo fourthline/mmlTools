@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2024 たんらる
+ * Copyright (C) 2013-2025 たんらる
  */
 
 package jp.fourthline.mabiicco.midi;
@@ -774,10 +774,6 @@ public final class MabiDLS {
 			}
 		}
 		return midiDeviceList;
-	}
-
-	public void setSoundDataLine(ISoundDataLine soundDataLine) {
-		wavout.setSoundDataLine(soundDataLine);
 	}
 
 	public static void main(String[] args) {

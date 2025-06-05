@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2024 たんらる
+ * Copyright (C) 2014-2025 たんらる
  */
 
 package jp.fourthline.mabiicco;
@@ -111,6 +111,8 @@ public final class MabiIcco {
 		}
 		mainFrame.setVisible(true);
 		splash.dispose();
+
+		dls.getWavout().startDataLine();
 	}
 
 	private void startOpen(ActionDispatcher dispatcher, String s) {

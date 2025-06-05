@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024 たんらる
+ * Copyright (C) 2023-2025 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
@@ -113,7 +113,7 @@ public final class LevelMonitor extends JComponent implements ISoundDataLine {
 		setPreferredSize(new Dimension(46, 20));
 		this.dlsChain = dlsChain;
 		if (dlsChain) {
-			MabiDLS.getInstance().setSoundDataLine(this);
+			MabiDLS.getInstance().getWavout().setSoundDataLine(this);
 		}
 	}
 

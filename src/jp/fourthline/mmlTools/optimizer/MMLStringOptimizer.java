@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2024 たんらる
+ * Copyright (C) 2015-2025 たんらる
  */
 
 package jp.fourthline.mmlTools.optimizer;
@@ -86,13 +86,12 @@ public final class MMLStringOptimizer {
 		return cachedOptimize(optLevel, disableNopt);
 	}
 
-	private String cachedOptimize(int gen, boolean disableNopt) {
-		String key = gen + ":" + disableNopt + ":" + originalMML;
-		String str = mmlCache.get(key);
-		if (str != null) {
-			return str;
-		}
+	public String nonCachedOptimize(int gen) {
+		return nonCachedOptimize(gen, disableNopt);
+	}
 
+	private String nonCachedOptimize(int gen, boolean disableNopt) {
+		String str;
 		if (gen == GEN2) {
 			String mml1 = optimizeGen2();
 			str = (new MMLEventList(mml1).equals(new MMLEventList(originalMML))) ? mml1 : optimize(disableNopt);
@@ -102,6 +101,17 @@ public final class MMLStringOptimizer {
 		} else {
 			str = optimize(disableNopt);
 		}
+		return str;
+	}
+
+	private String cachedOptimize(int gen, boolean disableNopt) {
+		String key = gen + ":" + disableNopt + ":" + originalMML;
+		String str = mmlCache.get(key);
+		if (str != null) {
+			return str;
+		}
+
+		str = nonCachedOptimize(gen, disableNopt);
 
 		mmlCache.put(key, str);
 		return str;

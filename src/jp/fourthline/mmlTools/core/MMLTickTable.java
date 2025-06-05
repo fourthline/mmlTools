@@ -7,6 +7,7 @@ package jp.fourthline.mmlTools.core;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.function.IntFunction;
 
 public final class MMLTickTable {
 
@@ -16,14 +17,14 @@ public final class MMLTickTable {
 	/**
 	 * For MML text -> tick
 	 */
-	private final Map<String, Integer> tickTable = new LinkedHashMap<>(1024);
+	private final Map<String, Integer> tickTable;
 
 	/**
 	 * For tick -> MML text
 	 */
 	private final IntMap<MMLPatern> tickInvTable;
 
-	private final IntMap<MMLPatern> tickInvTableForMb;
+	private IntMap<MMLPatern> tickInvTableForMb;
 
 	private static MMLTickTable obj = null;
 
@@ -31,9 +32,9 @@ public final class MMLTickTable {
 		FULL, MB;
 	}
 
-	private Switch tableSwitch = null;
-	public void tableSwitch(Switch sw) {
-		tableSwitch = sw;
+	private Switch tableInvSwitch = null;
+	public void tableInvSwitch(Switch sw) {
+		tableInvSwitch = sw;
 	}
 
 	public static synchronized MMLTickTable getInstance() {
@@ -49,14 +50,14 @@ public final class MMLTickTable {
 	}
 
 	MMLTickTable(InputStream inputStream) {
-		generateTickTable();
+		tickTable = generateTickTable(TPQN, true);
 		tickInvTable = (inputStream == null) ? generateInvTable() : readFromInputStreamInvTable(inputStream);
-		tickInvTableForMb = generateInvTable(new String[] { "1", "1.", "2", "2.", "4", "4.", "8", "8.", "16", "16.", "32", "32.", "64", "6", "12", "24", "48" });
+		tickInvTableForMb = generateInvTable(new String[] { "1", "1.", "2", "2.", "4", "4.", "8", "8.", "16", "16.", "32", "32.", "64", "64.", "6", "12", "24", "48" });
 	}
 
 	IntMap<MMLPatern> getInvTable() {
-		if (tableSwitch != null) {
-			switch (tableSwitch) {
+		if (tableInvSwitch != null) {
+			switch (tableInvSwitch) {
 			case FULL: return tickInvTable;
 			case MB:   return tickInvTableForMb;
 			}
@@ -65,11 +66,11 @@ public final class MMLTickTable {
 	}
 
 	public Map<String, Integer> getTable() {
-		return this.tickTable;
+		return tickTable;
 	}
 
-	private void add(int l, boolean dot) {
-		int tick = TPQN*4 / l;
+	private static void add(Map<String, Integer> tickTable, int tpqn, int l, boolean dot) {
+		int tick = tpqn * 4 / l;
 		if (dot) {
 			tick += tick / 2;
 		}
@@ -77,13 +78,28 @@ public final class MMLTickTable {
 		tickTable.put(s, tick);
 	}
 
-	private void generateTickTable() {
-		for (int i = 1; i <= 64; i++) {
-			add(i, true);
-			add(i, false);
+	private static void add2(Map<String, Integer> tickTable, int tpqn, int l, boolean dot) {
+		double tick = tpqn * 4.0 / l;
+		if (dot) {
+			tick += tick / 2;
 		}
+		String s = l+(dot?".":"");
+		tickTable.put(s, (int)tick);
 	}
 
+	private static Map<String, Integer> generateTickTable(int tpqn, boolean mabi) {
+		var table = new LinkedHashMap<String, Integer>();
+		for (int i = 1; i <= 64; i++) {
+			if (mabi) {
+				add(table, tpqn, i, true);
+				add(table, tpqn, i, false);
+			} else {
+				add2(table, tpqn, i, true);
+				add2(table, tpqn, i, false);
+			}
+		}
+		return table;
+	}
 
 	static class MMLPatern {
 		List<String> primary = null;
@@ -124,19 +140,26 @@ public final class MMLTickTable {
 	}
 
 	private IntMap<MMLPatern> generateInvTable(String keys[]) {
+		return generateInvTable(keys, tickTable, t->t);
+	}
+
+	private static IntMap<MMLPatern> generateInvTable(String keys[], Map<String, Integer> tickTable, IntFunction<Integer> func) {
 		var time = NanoTime.start();
-		var table = new HashMap<Integer, MMLPatern>(1024);;
+		var table = new HashMap<Integer, MMLPatern>(1024);
 		int mTick = tickTable.get("1") * 2 - 1;
 		for (int i = 1; i <= COMBN; i++) {
 			List<List<String>> pattern = new Combination<>(keys, i).getArray();
 			for (List<String> list : pattern) {
 				int tick = list.stream().mapToInt(tickTable::get).sum();
 				if (tick <= mTick) {
-					var currentList = table.get(tick);
-					if (currentList == null) {
-						table.put(tick, new MMLPatern(list));
-					} else {
-						currentList.put(list);
+					int key = func.apply(tick);
+					if (key > 0) {
+						var currentList = table.get(key);
+						if (currentList == null) {
+							table.put(key, new MMLPatern(list));
+						} else {
+							currentList.put(list);
+						}
 					}
 				}
 			}

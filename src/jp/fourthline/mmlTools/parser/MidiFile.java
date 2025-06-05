@@ -113,10 +113,10 @@ public final class MidiFile extends AbstractMMLParser {
 		}
 
 		// parse attributes
-		parse_align = 1;
-		attrMap.put(PARSE_ALIGN_1, 1);
-		attrMap.put(PARSE_ALIGN_2, 2);
+		parse_align = 6;
 		attrMap.put(PARSE_ALIGN_6, 6);
+		attrMap.put(PARSE_ALIGN_2, 2);
+		attrMap.put(PARSE_ALIGN_1, 1);
 		parseAttributes = new LinkedHashMap<>();
 		parseAttributes.put(PARSE_ALIGN, attrMap.keySet());
 

@@ -10,12 +10,17 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import org.junit.After;
 import org.junit.Test;
 
 import jp.fourthline.FileSelect;
 import jp.fourthline.mmlTools.core.MMLTickTable.Switch;
 
 public final class MMLTickTableTest extends FileSelect {
+	@After
+	public void cleanup() {
+		MMLTickTable.getInstance().tableInvSwitch(null);
+	}
 
 	@Test
 	public void test_writeAndReadInvTable() {
@@ -49,7 +54,7 @@ public final class MMLTickTableTest extends FileSelect {
 		MMLTickTable tickTable2 = new MMLTickTable( fileSelect("tickInvTable_mb.txt") );
 		ByteArrayOutputStream outputStream1 = new ByteArrayOutputStream();
 		ByteArrayOutputStream outputStream2 = new ByteArrayOutputStream();
-		tickTable1.tableSwitch(Switch.MB);
+		tickTable1.tableInvSwitch(Switch.MB);
 		tickTable1.writeToOutputStreamInvTable(outputStream1);
 		tickTable2.writeToOutputStreamInvTable(outputStream2);
 		assertEquals(outputStream2.toString(), outputStream1.toString());
