@@ -41,7 +41,7 @@ public class MMLConverter {
 
 	private String optimize(String mml) {
 		var optimizer = new MMLStringOptimizer(mml).setDisableNopt(!allowNOpt);
-		var r = optimizer.nonCachedOptimize(MMLStringOptimizer.GEN2);
+		var r = optimizer.optimizeGen2();
 		return r;
 	}
 
