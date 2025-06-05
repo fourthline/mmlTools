@@ -5,7 +5,6 @@
 package jp.fourthline.mabiicco.ui.mml;
 
 import java.awt.BorderLayout;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Insets;
@@ -182,7 +181,6 @@ public final class MMLExportPanel extends JPanel implements ActionListener {
 	}
 
 	private void updateText() {
-		setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		var list = table.getCheckedEventList();
 		table.repaint();
 
@@ -208,7 +206,6 @@ public final class MMLExportPanel extends JPanel implements ActionListener {
 			}
 
 			parentFrame.repaint();
-			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
 			// 出力できるものがない場合は出力系ボタンを無効にする
 			boolean b = (outputText.length() > 0) && valid;
