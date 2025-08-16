@@ -1,15 +1,13 @@
 /*
- * Copyright (C) 2014-2023 たんらる
+ * Copyright (C) 2014-2025 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.mml;
 
 import java.awt.Dimension;
 import java.awt.Frame;
-import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.ButtonGroup;
@@ -20,13 +18,11 @@ import javax.swing.JScrollPane;
 
 import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.ui.IMMLManager;
-import jp.fourthline.mabiicco.ui.MMLTrackView;
 import jp.fourthline.mabiicco.ui.UIUtils;
 import jp.fourthline.mabiicco.ui.editor.MMLEditor;
 import jp.fourthline.mmlTools.MMLEventList;
 import jp.fourthline.mmlTools.MMLTrack;
 
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 import javax.swing.border.TitledBorder;
@@ -39,7 +35,7 @@ import java.awt.Color;
  */
 public final class MMLPartChangePanel extends JPanel {
 	private static final long serialVersionUID = 8558159209741558854L;
-	private TrackListTable table;
+	private PartListTable table;
 	private final JDialog dialog;
 	private final JButton applyButton = new JButton(AppResource.appText("part_change.apply"));
 
@@ -52,7 +48,6 @@ public final class MMLPartChangePanel extends JPanel {
 	private JRadioButton radioChange;
 	private JRadioButton radioMove;
 	private JRadioButton radioCopy;
-	private JComboBox<String> partSelectComboBox;
 	private final JLabel selectedRange = new JLabel();
 
 	private final Dimension prefSize = new Dimension(460, 450);
@@ -128,29 +123,13 @@ public final class MMLPartChangePanel extends JPanel {
 		destSelectPanel.setLayout(null);
 		add(destSelectPanel);
 
-		JLabel label1 = new JLabel(AppResource.appText("track"));
-		label1.setBounds(12, 23, 172, 14);
-		destSelectPanel.add(label1);
-
-		JLabel label2 = new JLabel(AppResource.appText("part"));
-		label2.setBounds(12, 209, 64, 14);
-		destSelectPanel.add(label2);
-
-		partSelectComboBox = new JComboBox<>();
-		partSelectComboBox.setBounds(100, 206, 131, 19);
-		partSelectComboBox.addActionListener(t -> updateRange());
-		destSelectPanel.add(partSelectComboBox);
-
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(12, 46, 372, 142);
+		scrollPane.setBounds(12, 23, 372, 200);
 		destSelectPanel.add(scrollPane);
 
-		table = new TrackListTable(trackList);
+		table = new PartListTable(trackList, true, 1, mmlManager.getActiveMMLPart());
 		scrollPane.setViewportView(table);
-		table.setRowSelectionInterval(initialIndex, initialIndex);
-		Point p = scrollPane.getViewport().getViewPosition();
-		p.y = initialIndex * table.getRowHeight();
-		scrollPane.getViewport().setViewPosition(p);
+		table.addPropertyChangeListener(t -> updateView());
 
 		table.addMouseListener(new MouseAdapter() {
 			@Override
@@ -189,26 +168,8 @@ public final class MMLPartChangePanel extends JPanel {
 	}
 
 	private void updateView() {
-		updatePartSelectBox();
+		table.repaint();
 		updateRange();
-	}
-
-	private void updatePartSelectBox() {
-		if (mmlManager == null) {
-			return;
-		}
-		MMLEventList activePart = mmlManager.getActiveMMLPart();
-		if (activePart == null) {
-			return;
-		}
-		int trackIndex = table.getSelectedRow();
-		partSelectComboBox.removeAllItems();
-		MMLTrack selectedTrack = mmlManager.getMMLScore().getTrack(trackIndex);
-		for (int i = 0; i < MMLTrackView.MMLPART_NAME.length; i++) {
-			if (selectedTrack.getMMLEventAtIndex(i) != activePart) {
-				partSelectComboBox.addItem(MMLTrackView.MMLPART_NAME[i]);
-			}
-		}
 	}
 
 	/**
@@ -216,17 +177,11 @@ public final class MMLPartChangePanel extends JPanel {
 	 * @return
 	 */
 	private MMLEventList getToPart() {
-		MMLEventList toPart = null;
-		int trackIndex = table.getSelectedRow();
-		MMLTrack selectedTrack = mmlManager.getMMLScore().getTrack(trackIndex);
-		var selectedPart = partSelectComboBox.getSelectedItem();
-		if (selectedPart != null) {
-			int partIndex = Arrays.asList(MMLTrackView.MMLPART_NAME).indexOf(selectedPart);
-			if (partIndex >= 0) {
-				toPart = selectedTrack.getMMLEventAtIndex(partIndex);
-			}
+		var t = table.getCheckedEventList();
+		if (t.size() == 1) {
+			return t.get(0);
 		}
-		return toPart;
+		return null;
 	}
 
 	/**
@@ -242,6 +197,9 @@ public final class MMLPartChangePanel extends JPanel {
 			if (range != null) { 
 				str = "[ " + score.getBarTextTick(range.start()) + ", " + score.getBarTextTick(range.end()) + " ]";
 			}
+			applyButton.setEnabled(true);
+		} else {
+			applyButton.setEnabled(false);
 		}
 		selectedRange.setText(str);
 	}
