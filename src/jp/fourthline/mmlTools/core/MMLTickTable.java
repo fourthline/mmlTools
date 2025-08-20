@@ -9,6 +9,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.IntFunction;
 
+import jp.fourthline.mabiicco.Utils;
+
 public final class MMLTickTable {
 
 	private static final int COMBN = 3;
@@ -22,9 +24,9 @@ public final class MMLTickTable {
 	/**
 	 * For tick -> MML text
 	 */
-	private final IntMap<MMLPatern> tickInvTable;
+	private final IntMap<MMLPattern> tickInvTable;
 
-	private IntMap<MMLPatern> tickInvTableForMb;
+	private IntMap<MMLPattern> tickInvTableForMb;
 
 	private static MMLTickTable obj = null;
 
@@ -51,11 +53,11 @@ public final class MMLTickTable {
 
 	MMLTickTable(InputStream inputStream) {
 		tickTable = generateTickTable(TPQN, true);
-		tickInvTable = (inputStream == null) ? generateInvTable() : readFromInputStreamInvTable(inputStream);
+		tickInvTable = (inputStream == null) ? generateInvTable() : readFromCompressedInputStreamInvTable(inputStream);
 		tickInvTableForMb = generateInvTable(new String[] { "1", "1.", "2", "2.", "4", "4.", "8", "8.", "16", "16.", "32", "32.", "64", "64.", "6", "12", "24", "48" });
 	}
 
-	IntMap<MMLPatern> getInvTable() {
+	IntMap<MMLPattern> getInvTable() {
 		if (tableInvSwitch != null) {
 			switch (tableInvSwitch) {
 			case FULL: return tickInvTable;
@@ -101,11 +103,11 @@ public final class MMLTickTable {
 		return table;
 	}
 
-	static class MMLPatern {
+	static class MMLPattern {
 		List<String> primary = null;
 		List<List<String>> alt = new ArrayList<>();
 
-		private MMLPatern(List<String> list) {
+		private MMLPattern(List<String> list) {
 			this.primary = list;
 		}
 
@@ -134,18 +136,18 @@ public final class MMLTickTable {
 		}
 	}
 
-	private IntMap<MMLPatern> generateInvTable() {
+	private IntMap<MMLPattern> generateInvTable() {
 		var keys = tickTable.keySet().toArray(new String[0]);
 		return generateInvTable(keys);
 	}
 
-	private IntMap<MMLPatern> generateInvTable(String keys[]) {
+	private IntMap<MMLPattern> generateInvTable(String keys[]) {
 		return generateInvTable(keys, tickTable, t->t);
 	}
 
-	private static IntMap<MMLPatern> generateInvTable(String keys[], Map<String, Integer> tickTable, IntFunction<Integer> func) {
+	private static IntMap<MMLPattern> generateInvTable(String keys[], Map<String, Integer> tickTable, IntFunction<Integer> func) {
 		var time = NanoTime.start();
-		var table = new HashMap<Integer, MMLPatern>(1024);
+		var table = new HashMap<Integer, MMLPattern>(1024);
 		int mTick = tickTable.get("1") * 2 - 1;
 		for (int i = 1; i <= COMBN; i++) {
 			List<List<String>> pattern = new Combination<>(keys, i).getArray();
@@ -156,7 +158,7 @@ public final class MMLTickTable {
 					if (key > 0) {
 						var currentList = table.get(key);
 						if (currentList == null) {
-							table.put(key, new MMLPatern(list));
+							table.put(key, new MMLPattern(list));
 						} else {
 							currentList.put(list);
 						}
@@ -182,10 +184,12 @@ public final class MMLTickTable {
 		for (int i = 1; i <= max; i++) {
 			if (currentTable.containsKey(i)) {
 				stream.print(i+"=");
-				currentTable.get(i).primary.forEach( s -> stream.print("[" + s + "]"));
+				currentTable.get(i).primary.forEach(s -> stream.print("[" + s + "]"));
 				if (alt) {
-					stream.print("\t");
-					currentTable.get(i).alt.forEach( s -> stream.print("[" + s + "]"));
+					currentTable.get(i).alt.forEach(t -> {
+						stream.print('\t');
+						t.forEach(s -> stream.print("[" + s + "]"));
+					});
 				}
 				stream.println();
 			} else {
@@ -194,25 +198,51 @@ public final class MMLTickTable {
 		}
 	}
 
-	private IntMap<MMLPatern> readFromInputStreamInvTable(InputStream inputStream) {
-		var table = new HashMap<Integer, MMLPatern>(1024);
-		InputStreamReader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-		new BufferedReader(reader).lines().forEach(s -> {
+	private IntMap<MMLPattern> readFromCompressedInputStreamInvTable(InputStream inputStream) {
+		try {
+			var db = inputStream.readAllBytes();
+			var ddb = Utils.decompress(new String(db, StandardCharsets.UTF_8));
+			if (ddb != null) {
+				return readFromInputStreamInvTable(new ByteArrayInputStream(ddb));
+			} else {
+				return readFromInputStreamInvTable(new ByteArrayInputStream(db));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	private IntMap<MMLPattern> readFromInputStreamInvTable(InputStream inputStream) {
+		var time = NanoTime.start();
+		var table = new HashMap<Integer, MMLPattern>(1024);
+		var stream = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+		stream.lines().forEach(s -> {
 			if (!s.startsWith("#")) {
 				int keySep = s.indexOf('=');
 				String key = s.substring(0, keySep);
-				String itemList = s.substring(keySep+1);
-				ArrayList<String> valueList = new ArrayList<>();
-				while (itemList.length() > 0) {
-					int itemIndex = itemList.indexOf(']');
-					String item = itemList.substring(1, itemIndex);
-					valueList.add(item);
-					itemList = itemList.substring(itemIndex+1);
+				String itemListArray[] = s.substring(keySep+1).split("\t");
+				MMLPattern p = null;
+				for (int i = 0; i < itemListArray.length; i++) {
+					var itemList = itemListArray[i];
+					List<String> valueList = new ArrayList<>();
+					while (itemList.length() > 0) {
+						int itemIndex = itemList.indexOf(']');
+						String item = itemList.substring(1, itemIndex);
+						valueList.add(item);
+						itemList = itemList.substring(itemIndex+1);
+					}
+					if (i == 0) {
+						table.put(Integer.parseInt(key), p = new MMLPattern(valueList));
+					} else {
+						p.alt.add(valueList);
+					}
 				}
-				table.put(Integer.parseInt(key), new MMLPatern(valueList));
 			}
 		});
-		return new IntMap<>(table);
+		var map = new IntMap<>(table);
+		System.out.println("read tickTable: " + time.ms() + "ms");
+		return map;
 	}
 
 	public final static class IntMap<T> {
@@ -255,8 +285,31 @@ public final class MMLTickTable {
 		writeToOutputStreamInvTable(System.out, true);
 	}
 
+	public boolean verify() {
+		if (tickInvTable == null) return false;
+		var outputStream = new ByteArrayOutputStream();
+		writeToOutputStreamInvTable(outputStream, true);
+		var str = outputStream.toString();
+		str = str.replaceAll("\r\n", "\n");
+		var code = str.hashCode();
+		if (1130216622 == code) return true;
+		return false;
+	}
+
 	public static void main(String[] args) {
 		MMLTickTable tickTable = new MMLTickTable(null);
-		tickTable.printTickList();
+		if (args.length == 0) {
+			tickTable.printTickList();
+			tickTable.verify();
+		} else {
+			try (var stream = new FileOutputStream(args[0])) {
+				var bs = new ByteArrayOutputStream();
+				tickTable.writeToOutputStreamInvTable(bs, true);
+				var s = Utils.compress(bs.toByteArray());
+				stream.write(s.getBytes());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 }

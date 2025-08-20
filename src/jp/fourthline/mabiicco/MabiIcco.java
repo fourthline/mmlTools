@@ -9,17 +9,24 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.DoubleAdder;
+import java.util.function.BooleanSupplier;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.swing.JOptionPane;
 
 import jp.fourthline.mabiicco.midi.InstType;
 import jp.fourthline.mabiicco.midi.MabiDLS;
+import jp.fourthline.mabiicco.ui.DLSSetupDialog;
 import jp.fourthline.mabiicco.ui.MainFrame;
 import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.core.MMLException;
+import jp.fourthline.mmlTools.core.MMLTickTable;
+import jp.fourthline.mmlTools.core.NanoTime;
 import jp.fourthline.mmlTools.parser.MidiFile;
 
+import static jp.fourthline.mabiicco.AppResource.appText;
 
 /**
  * MabiIccoアプリケーションクラス (Main).
@@ -52,7 +59,7 @@ public final class MabiIcco {
 	}
 
 	public void start() throws Exception {
-		splash.updateProgress(AppResource.appText("init.midi"), 10);
+		splash.updateProgress(appText("init.midi"), 10);
 		initialize();
 	}
 
@@ -74,6 +81,10 @@ public final class MabiIcco {
 	}
 
 	private void initialize() throws Exception {
+		// 並列実行
+		CompletableFuture.runAsync(() -> MMLTickTable.getInstance());
+		ActionDispatcher dispatcher = ActionDispatcher.getInstance();
+
 		// initialize
 		dls.initializeMIDI();
 		splash.updateProgress("OK\n", 20);
@@ -84,14 +95,7 @@ public final class MabiIcco {
 		if (appProperties.useDefaultSoundBank.get()) {
 			dls.loadingDefaultSound();
 		} else {
-			// loading DLS
-			splash.updateProgress(AppResource.appText("init.dls"), 20);
-			if ( !tryloadDLSFiles(20, 70) ) {
-				JOptionPane.showMessageDialog(null, AppResource.appText("message.useDefaultSoundbank"), AppResource.getAppTitle(), JOptionPane.INFORMATION_MESSAGE);
-				appProperties.useDefaultSoundBank.set(true);
-				dls.loadingDefaultSound();
-			}
-			splash.updateProgress("OK\n", 90);
+			loadingDLS();
 		}
 
 		if (!appProperties.useDefaultSoundBank.get()) {
@@ -99,8 +103,12 @@ public final class MabiIcco {
 			MidiFile.enableInstPatch();
 		}
 
+		// Tick table verify
+		if (!MMLTickTable.getInstance().verify()) {
+			throw new IllegalTickTableException();
+		}
+
 		// create MainFrame
-		ActionDispatcher dispatcher = ActionDispatcher.getInstance();
 		MainFrame mainFrame = new MainFrame(dispatcher, dispatcher);
 		mainFrame.setTransferHandler(new FileTransferHandler(dispatcher));
 		splash.updateProgress("", 100);
@@ -127,6 +135,43 @@ public final class MabiIcco {
 		dispatcher.checkAndOpenMMLFile(f);
 	}
 
+	private void loadingDLS() {
+		// loading DLS
+		splash.updateProgress(appText("init.dls"), 20);
+		BooleanSupplier doLoadDLS = () -> {
+			try {
+				return tryloadDLSFiles(20, 70);
+			} catch (InvalidMidiDataException | IOException e) {
+				e.printStackTrace();
+			}
+			return false;
+		};
+
+		boolean st = doLoadDLS.getAsBoolean();
+		while (!st) {
+			if (st == false) {
+				// DLS読み込み失敗
+				Object args[] = { appText("start.selectDLS"), appText("start.useInternal"), appText("start.exit") };
+				var ret = JOptionPane.showOptionDialog(null, appText("start.message"), appText("start.title"), JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, args, args[0]);
+				if (ret == 0) {
+					if (new DLSSetupDialog(null).showDialog()) {
+						// DLSが選択されたらロードしなおす
+						st = doLoadDLS.getAsBoolean();
+					}
+				} else if (ret == 1) {
+					// 内蔵音源モードに切り替える
+					appProperties.useDefaultSoundBank.set(true);
+					dls.loadingDefaultSound();
+					st = true;
+				} else if (ret == 2) {
+					// 終了する
+					System.exit(0);
+				}
+			}
+		}
+		splash.updateProgress("OK\n", 90);
+	}
+
 	/**
 	 * DLSファイルのロードを試みます.
 	 * @return 1つ以上のInstrumentをロードできれば true.
@@ -135,12 +180,20 @@ public final class MabiIcco {
 	 */
 	private boolean tryloadDLSFiles(double initialProgress, double endProgress) throws InvalidMidiDataException, IOException {
 		List<File> dlsFiles = appProperties.getDlsFile();
-		double progressStep = (endProgress - initialProgress) / dlsFiles.size();
-		double progress = initialProgress;
-		for (File file : dlsFiles) {
-			dls.loadingDLSFile(file);
-			progress += progressStep;
-			splash.updateProgress("", (int)progress);
+		if (dlsFiles.size() > 0) {
+			double progressStep = (endProgress - initialProgress) / dlsFiles.size();
+			DoubleAdder adder = new DoubleAdder();
+			adder.add(initialProgress);
+			var actList = dls.loadingDLSFiles(dlsFiles, () -> {
+				adder.add(progressStep);
+				splash.updateProgress("", (int)adder.intValue());
+			});
+			if (!dlsFiles.equals(actList)) {
+				System.out.println("Update DLS file list:");
+				System.out.println(" > " + dlsFiles);
+				System.out.println(" > " + actList);
+				appProperties.setDlsFile(actList);
+			}
 		}
 
 		return dls.getAvailableInstByInstType(InstType.MAIN_INST_LIST).length > 0;
@@ -148,6 +201,7 @@ public final class MabiIcco {
 
 	public static void main(String[] args) {
 		try {
+			NanoTime time = NanoTime.start();
 			var properties = MabiIccoProperties.getInstance();
 			if (properties.uiscaleDisable.get()) {
 				System.setProperty("sun.java2d.uiScale.enabled", "false");
@@ -156,9 +210,10 @@ public final class MabiIcco {
 			properties.laf.get().update();
 
 			// MMLエラーのローカライズ設定.
-			MMLException.setLocalizeFunc(t -> AppResource.appText(t));
+			MMLException.setLocalizeFunc(t -> appText(t));
 
 			new MabiIcco(args).start();
+			System.out.println("started " + time.ms() + "ms");
 		} catch (Throwable e) {
 			e.printStackTrace();
 			try {

@@ -124,7 +124,7 @@ public final class About {
 				var t2 = new ListItem(v, exist, getInstIcon(v));
 				t1.add(t2);
 				if (exist) {
-					t2.add(new ListItem(v.getInstrument(), ListItem.B_ICON));
+					t2.add(new ListItem(v.getMidiName(), ListItem.B_ICON));
 					t2.add(new ListItem("transposable: " + v.getType().allowTranspose(), null));
 					for (int i = v.getUpperNote(); i >= v.getLowerNote(); i--) {
 						if (v.isValid(i)) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2023 たんらる
+ * Copyright (C) 2015-2025 たんらる
  */
 
 package jp.fourthline.mabiicco.midi;
@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MetaMessage;
@@ -247,5 +249,47 @@ public class MabiDLSTest extends UseLoadingDLS {
 
 			assertEquals(new String(expectBuf).replaceAll("\r", ""), out.toString().replaceAll("\r", ""));
 		} catch (IOException e) {}
+	}
+
+	@Test
+	public void testGetInstProgramByInst() {
+		var oldInsts = List.copyOf(dls.getAllInst());
+		dls.getAllInst().clear();
+
+		var insts1 = List.of(new InstClass(null, 0, 0, null), new InstClass(null, 0, 1, null), new InstClass(null, 0, 2, null));
+		var insts2 = List.of(new InstClass(null, 2, 0, null), new InstClass(null, 2, 2, null));
+		var insts3 = Stream.of(insts1, insts2).flatMap(List::stream).collect(Collectors.toList());
+
+		// bank:0 and bank:2
+		dls.getAllInst().addAll(insts3);
+		assertEquals(insts1.get(0), dls.getInstByProgram(0));
+		assertEquals(insts1.get(1), dls.getInstByProgram(1));
+		assertEquals(insts1.get(2), dls.getInstByProgram(2));
+		assertEquals(insts2.get(0), dls.getInstByProgram(0x20_0000));
+		assertEquals(insts1.get(1), dls.getInstByProgram(0x20_0001)); // bank2の楽器指定だが、代替でbank0のInstClassが取得できる
+		assertEquals(insts2.get(1), dls.getInstByProgram(0x20_0002));
+		dls.getAllInst().clear();
+
+		// only bank:0
+		dls.getAllInst().addAll(insts1);
+		assertEquals(insts1.get(0), dls.getInstByProgram(0));
+		assertEquals(insts1.get(1), dls.getInstByProgram(1));
+		assertEquals(insts1.get(2), dls.getInstByProgram(2));
+		assertEquals(insts1.get(0), dls.getInstByProgram(0x20_0000)); // bank2の楽器指定だが、代替でbank0のInstClassが取得できる
+		assertEquals(insts1.get(1), dls.getInstByProgram(0x20_0001)); // bank2の楽器指定だが、代替でbank0のInstClassが取得できる
+		assertEquals(insts1.get(2), dls.getInstByProgram(0x20_0002)); // bank2の楽器指定だが、代替でbank0のInstClassが取得できる
+		dls.getAllInst().clear();
+
+		// only bank:2
+		dls.getAllInst().addAll(insts2);
+		assertEquals(insts2.get(0), dls.getInstByProgram(0));         // bank0の楽器指定だが、代替でbank2のInstClassが取得できる
+		assertEquals(null, dls.getInstByProgram(1));
+		assertEquals(insts2.get(1), dls.getInstByProgram(2));         // bank0の楽器指定だが、代替でbank2のInstClassが取得できる
+		assertEquals(insts2.get(0), dls.getInstByProgram(0x20_0000));
+		assertEquals(null, dls.getInstByProgram(0x20_0001));
+		assertEquals(insts2.get(1), dls.getInstByProgram(0x20_0002));
+		dls.getAllInst().clear();
+
+		dls.getAllInst().addAll(oldInsts);
 	}
 }

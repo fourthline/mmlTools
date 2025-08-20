@@ -25,6 +25,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
@@ -42,6 +43,7 @@ import jp.fourthline.mabiicco.midi.MabiDLS;
 import jp.fourthline.mabiicco.midi.SoundEnv;
 import jp.fourthline.mabiicco.ui.About;
 import jp.fourthline.mabiicco.ui.MMLErrView;
+import jp.fourthline.mabiicco.ui.DLSSetupDialog;
 import jp.fourthline.mabiicco.ui.MMLSeqView;
 import jp.fourthline.mabiicco.ui.MainFrame;
 import jp.fourthline.mabiicco.ui.PianoRollScaler.MouseScrollWidth;
@@ -200,7 +202,23 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		updateUIComponents.add(c);
 	}
 
-	private ActionDispatcher() {}
+	private CompletableFuture<Void> initRun;
+	private ActionDispatcher() {
+		initRun = CompletableFuture.runAsync(() -> {
+			initializeFileChooser();
+			initializeActionMap();
+			MabiDLS.getInstance().addTrackEndNotifier(() -> stopAction());
+		});
+	}
+
+	public void initialize() {
+		synchronized (this) {
+			if (initRun != null) {
+				initRun.join();
+			}
+			initRun = null;
+		}
+	}
 
 	public ActionDispatcher setMainFrame(MainFrame mainFrame) {
 		if (this.mainFrame != null) {
@@ -219,12 +237,6 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 
 	public void setTestMode(boolean b) {
 		testMode = b;
-	}
-
-	public void initialize() {
-		initializeFileChooser();
-		initializeActionMap();
-		MabiDLS.getInstance().addTrackEndNotifier(() -> stopAction());
 	}
 
 	private void initializeFileChooser() {
@@ -286,7 +298,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(ABOUT, t -> new About().show(mainFrame));
 		actionMap.put(MIDI_EXPORT, t -> this.midiExportAction());
 		actionMap.put(FILE_IMPORT, t -> this.fileImportAction());
-		actionMap.put(SELECT_DLS, t -> this.selectDLSFile());
+		actionMap.put(SELECT_DLS, t -> this.selectDLSFileAction());
 		actionMap.put(SELECT_ALL, t -> this.selectAction(() -> editState.selectAll()));
 		actionMap.put(SELECT_PREVIOUS_ALL, t -> this.selectAction(() -> editState.selectPreviousAll()));
 		actionMap.put(SELECT_AFTER_ALL, t -> this.selectAction(() -> editState.selectAfterAll()));
@@ -864,18 +876,9 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		}
 	}
 
-	private void selectDLSFile() {
-		JFileChooser fileChooser = new FixFileChooser();
-		fileChooser.setCurrentDirectory(new File("."));
-		FileFilter dlsFilter = new FileNameExtensionFilter(AppResource.appText("file.dls"), "dls");
-		fileChooser.addChoosableFileFilter(dlsFilter);
-		fileChooser.setFileFilter(dlsFilter);
-		fileChooser.setMultiSelectionEnabled(true);
-		fileChooser.setAcceptAllFileFilterUsed(false);
-		int status = fileChooser.showOpenDialog(null);
-		if (status == JFileChooser.APPROVE_OPTION) {
-			appProperties.setDlsFile( fileChooser.getSelectedFiles() );
-			appProperties.useDefaultSoundBank.set(false);
+	private void selectDLSFileAction() {
+		DLSSetupDialog dialog = new DLSSetupDialog(mainFrame);
+		if (dialog.showDialog()) {
 			showAppRestartDialog();
 		}
 	}

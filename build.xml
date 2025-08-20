@@ -64,6 +64,9 @@
 				<include name="**/*.properties" />
 			</fileset>
 		</copy>
+		<java classname="jp.fourthline.mmlTools.core.MMLTickTable" classpath="${dest}">
+			<arg value="${dest}/jp/fourthline/mmlTools/core/tickTable.dat" />
+		</java>
 	</target>
 
 	<!-- compile-test task -->

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 たんらる
+ * Copyright (C) 2022-2025 たんらる
  */
 
 package jp.fourthline.mabiicco;
@@ -36,7 +36,9 @@ public final class Splash2 extends JDialog implements ISplash {
 		splashPanel.progress.setValue(v);
 		if (v == 100) {
 			try {
-				Thread.sleep(2000);
+				while (splashPanel.progress.getValue() != 100) {
+					Thread.sleep(10);
+				}
 			} catch (InterruptedException e) {}
 		}
 	}
@@ -46,7 +48,7 @@ public final class Splash2 extends JDialog implements ISplash {
 		private static final int WIDTH = 318;
 		private static final int HEIGHT = 433; 
 		private final ImageIcon img;
-		private final JProgressBar progress = new JProgressBar();
+		private final JProgressBar progress = new SmoothProgressBar();
 		private final JLabel version = new JLabel("", SwingConstants.RIGHT);
 		private final JTextArea textArea = new JTextArea();
 		private SplashPanel() {

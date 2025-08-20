@@ -1,10 +1,12 @@
 /*
- * Copyright (C) 2013-2023 たんらる
+ * Copyright (C) 2013-2025 たんらる
  */
 
 package jp.fourthline.mabiicco.midi;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -17,6 +19,7 @@ import javax.sound.midi.Instrument;
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
+import javax.sound.midi.Patch;
 import javax.sound.midi.Soundbank;
 
 import com.sun.media.sound.DLSInstrument;
@@ -31,7 +34,6 @@ import jp.fourthline.mmlTools.parser.MMLEventParser;
  */
 public final class InstClass {
 	private final String name;
-	private final int bank;
 	private final int program;
 	private final int lowerNote;
 	private final int upperNote;
@@ -60,12 +62,26 @@ public final class InstClass {
 		if (inst.toString().startsWith("Drumkit: ")) {
 			program += DRUM;
 		}
-		return program;
+
+		int bank = inst.getPatch().getBank();
+		return logicalProgramNum(bank, program);
+	}
+
+	public static int logicalProgramNum(int bank, int program) {
+		bank &= 0x7f;
+		return (bank << 9) + program;
+	}
+
+	public static int toMidiProram(int program) {
+		return program & 0x7f;
+	}
+
+	public static int toMidiBank(int program) {
+		return (program >> 9) & 0x7f;
 	}
 
 	public InstClass(String name, int bank, int program, Instrument inst) {
-		String[] str = name.split(",");
-		this.name = str[0];
+		String[] str = (name != null) ? name.split(",") : new String[] { bank+","+program };
 		this.inst = inst;
 
 		if (str.length > 1) {
@@ -83,8 +99,8 @@ public final class InstClass {
 		this.lowerNote = region.from;
 		this.upperNote = region.to;
 
-		this.bank = bank;
 		this.program = (inst != null) ? logicalProgramNum(inst) : program;
+		this.name = (name != null) && (program >= 0) ? toProgramText(this.program) + ": " + str[0] : str[0];
 
 		this.options = new Options(inst);
 	}
@@ -109,8 +125,7 @@ public final class InstClass {
 
 		int max = Integer.MIN_VALUE;
 		int min = Integer.MAX_VALUE;
-		if (inst instanceof DLSInstrument) {
-			DLSInstrument dlsinst = (DLSInstrument) inst;
+		if (inst instanceof DLSInstrument dlsinst) {
 			for (DLSRegion reg : dlsinst.getRegions()) {
 				min = Math.min(min, reg.getKeyfrom());
 				max = Math.max(max, reg.getKeyto());
@@ -133,13 +148,9 @@ public final class InstClass {
 	public boolean equals(Object o) {
 		if (o instanceof InstClass) {
 			InstClass obj = (InstClass) o;
-			return (bank == obj.bank) && (program == obj.program);
+			return (program == obj.program);
 		}
 		return false;
-	}
-
-	public int getBank() {
-		return this.bank;
 	}
 
 	public int getProgram() {
@@ -164,6 +175,10 @@ public final class InstClass {
 
 	public Instrument getInstrument() {
 		return this.inst;
+	}
+
+	public String getMidiName() {
+		return "Instrument: " + inst.getName() + " bank #" + toMidiBank(program) + " preset #" + toMidiProram(program);
 	}
 
 	private final static class ExcludeRegion {
@@ -205,7 +220,7 @@ public final class InstClass {
 		private final boolean[] validList;
 
 		private Options(Instrument instrument) {
-			if (instrument instanceof DLSInstrument) {
+			if (instrument instanceof DLSInstrument dlsinst) {
 				attentionList = new double[ OPTION_NUM ];
 				overlapList = new boolean[ OPTION_NUM ];
 				validList = new boolean[ OPTION_NUM ];
@@ -217,7 +232,6 @@ public final class InstClass {
 
 				int min = OPTION_NUM;
 				int max = 0;
-				DLSInstrument dlsinst = (DLSInstrument) instrument;
 				for (DLSRegion region : dlsinst.getRegions()) {
 					min = Math.min(min, region.getKeyfrom());
 					max = Math.max(max, region.getKeyto());
@@ -315,12 +329,23 @@ public final class InstClass {
 		throw new AssertionError("Invalid Inst Part Number.");
 	}
 
+	private static String toProgramText(int program) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(toMidiProram(program));
+		int bank = toMidiBank(program);
+		if (bank != 0) {
+			sb.append('.').append(bank);
+		}
+		return sb.toString();
+	}
+
 	private static String instName(Instrument inst, ResourceBundle resource) {
 		if (resource == null) {
 			return inst.getName().trim();
 		}
 		try {
-			String s = resource.getString(""+logicalProgramNum(inst));
+			int program = logicalProgramNum(inst);
+			String s = resource.getString(toProgramText(program));
 			if (s.equals("-")) {
 				return inst.getName().trim();
 			}
@@ -352,7 +377,7 @@ public final class InstClass {
 		String originalName = inst.getName();
 		int bank = inst.getPatch().getBank();
 		int program = inst.getPatch().getProgram();
-		out.printf("%d,%d=%s \"%s\"\n", bank, program, originalName, name);
+		out.printf("%d,%d=%s \"%s\"\n", bank&0x7f, program, originalName, name);
 		if (name != null) {
 			name = ""+program+": "+name;
 		}
@@ -388,33 +413,44 @@ public final class InstClass {
 	}
 
 	public static List<InstClass> loadDLS(File dlsFile) throws InvalidMidiDataException, IOException {
-		try {
-			Soundbank sb = MidiSystem.getSoundbank(dlsFile);
+		try (var stream = new BufferedInputStream(new FileInputStream(dlsFile))) {
+			Soundbank sb = MidiSystem.getSoundbank(stream);
 			return loadSoundBank(sb, true);
 		} catch (Exception e) {
-			MabiIccoProperties.getInstance().setDlsFile(null);
-			throw new IOException("loadDLS: "+dlsFile.getName());
+			e.printStackTrace();
+			throw new IOException("loadDLS: "+dlsFile);
 		}
+	}
+
+	private static Instrument instFix(Instrument inst) {
+		if (inst instanceof DLSInstrument dlsinst) {
+			if (inst.getSoundbank().getName().equals("Fury Sound Pack - Mabinogi Mobile Instrument Set")) {
+				dlsinst.setPatch(new Patch(2, inst.getPatch().getProgram()));
+			}
+			dlsinst.setPatch(new Patch(inst.getPatch().getBank()+MabiDLS.DLS_BANK, inst.getPatch().getProgram()));
+		}
+		return inst;
 	}
 
 	private static List<InstClass> loadSoundBank(Soundbank sb, boolean nameConvert) {
 		ArrayList<InstClass> instArray = new ArrayList<>();
 		for (Instrument inst : sb.getInstruments()) {
+			if (inst.getPatch().getBank() != 0) continue;
+			if (debug) System.out.print(inst.toString() + "\t");
+			inst = InstClass.instFix(inst);
 			String originalName = inst.getName();
 			String name = nameConvert ? instName(inst, instResource) : originalName.trim();
-			int bank = inst.getPatch().getBank();
+			int bank = inst.getPatch().getBank() & 0x7f;
 			int program = inst.getPatch().getProgram();
 			int lProgram = logicalProgramNum(inst);
-//			System.out.printf("%d,%d(%d)=%s \"%s\"\n", bank, program, lProgram ,originalName, name);
-			if (bank != 0) continue;
+			if (debug) System.out.printf("%d,%d(%d)=%s \"%s\"\n", bank, program, lProgram ,originalName, name);
 			if ( (name != null) || (debug) ) {
-				name = ""+lProgram+": "+name;
 				InstClass instc = new InstClass(name,
 						bank,
 						program,
 						inst);
 				instArray.add(instc);
-//				instc.dlsInfoWriteToOutputStream(System.out);
+				//				if (debug) instc.dlsInfoWriteToOutputStream(System.out);
 			}
 		}
 		return instArray;

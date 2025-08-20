@@ -10,6 +10,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.LayoutManager;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
@@ -44,6 +45,9 @@ import javax.swing.JToolBar;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.AncestorEvent;
@@ -291,12 +295,25 @@ public final class UIUtils {
 	}
 
 	public static JPanel createTitledPanel(String title) {
-		return createTitledPanel(title, null);
+		return createTitledPanel(title, null, 0);
 	}
 
 	public static JPanel createTitledPanel(String title, LayoutManager layout) {
+		return createTitledPanel(title, layout, 0);
+	}
+
+	public static JPanel createTitledPanel(String title, int spacing) {
+		return createTitledPanel(title, null, spacing);
+	}
+
+	public static JPanel createTitledPanel(String title, LayoutManager layout, int spacing) {
 		var panel = new JPanel(layout);
-		panel.setBorder(new TitledBorder(new LineBorder(Color.GRAY, 1, true), AppResource.appText(title), TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		Border border = new TitledBorder(new LineBorder(Color.GRAY, 1, true), AppResource.appText(title), TitledBorder.LEADING, TitledBorder.TOP, null, null);
+		if (spacing > 0) {
+			var insets = new Insets(spacing, spacing, spacing, spacing);
+			border = new CompoundBorder(new EmptyBorder(insets), new CompoundBorder(border, new EmptyBorder(insets)));
+		}
+		panel.setBorder(border);
 		return panel;
 	}
 

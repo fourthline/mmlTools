@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.sound.midi.InvalidMidiDataException;
@@ -34,9 +35,11 @@ public abstract class UseLoadingDLS extends FileSelect {
 			MabiDLS midi = MabiDLS.getInstance();
 			if (midi.getAvailableInstByInstType(InstType.MAIN_INST_LIST).length == 0) {
 				midi.initializeMIDI();
+				var fileList = new ArrayList<File>();
 				for (String t : MabiDLS.DEFALUT_DLS_PATH) {
-					midi.loadingDLSFile(new File(t));
+					fileList.add(new File(t));
 				}
+				midi.loadingDLSFiles(fileList, null);
 			}
 		} catch (IOException | MidiUnavailableException | InvalidMidiDataException | LineUnavailableException e) {
 			throw new AssertionError();

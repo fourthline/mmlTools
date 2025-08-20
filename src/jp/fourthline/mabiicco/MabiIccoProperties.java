@@ -42,7 +42,7 @@ public final class MabiIccoProperties {
 	private static final String RECENT_FILE = "app.recent_file";
 
 	/** DLSファイル */
-	public final Property<String> dls_file = new StringProperty("app.dls_file", AppResource.appText("default.dls_file"));
+	private final StringProperty dls_file = new StringProperty("app.dls_file", AppResource.appText("default.dls_file"));
 
 	/** ウィンドウ最大化 */
 	public final Property<Boolean> windowMaximize = new BooleanProperty("window.maximize", false);
@@ -180,24 +180,35 @@ public final class MabiIccoProperties {
 	}
 
 	public List<File> getDlsFile() {
-		String str = dls_file.get();
+		return convertDLSList(dls_file.get());
+	}
+
+	public List<File> getDlsDefaultFile() {
+		return convertDLSList(dls_file.getDefault());
+	}
+
+	private List<File> convertDLSList(String str) {
 		String[] filenames = str.split(",");
 		ArrayList<File> fileArray = new ArrayList<>();
 		for (String filename : filenames) {
-			fileArray.add(new File(filename));
+			if (filename.toLowerCase().endsWith(".dls")) {
+				fileArray.add(new File(filename));
+			}
 		}
 		return fileArray;
 	}
 
-	public void setDlsFile(File[] fileArray) {
-		StringBuilder sb = new StringBuilder();
+	public void setDlsFile(List<File> fileArray) {
 		if (fileArray != null) {
-			for (File file : fileArray) {
-				sb.append(file.getPath()).append(',');
+			StringBuilder sb = new StringBuilder();
+			if (fileArray.size() > 0) {
+				for (File file : fileArray) {
+					sb.append(file.getPath()).append(',');
+				}
+				sb.deleteCharAt(sb.length()-1);
 			}
-			sb.deleteCharAt(sb.length()-1);
+			dls_file.set(sb.toString());
 		}
-		dls_file.set(sb.toString());
 	}
 
 	public Rectangle getWindowRect() {
@@ -310,6 +321,10 @@ public final class MabiIccoProperties {
 			return value;
 		}
 
+		public T getDefault() {
+			return this.defaultValue;
+		}
+
 		abstract protected T parseValue(String str);
 		abstract protected String stringValue(T v);
 	}
@@ -334,7 +349,7 @@ public final class MabiIccoProperties {
 
 		@Override
 		protected String stringValue(String v) {
-			return v;
+			return v == null ? defaultValue : v;
 		}
 	}
 

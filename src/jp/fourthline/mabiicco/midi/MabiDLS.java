@@ -7,14 +7,12 @@ package jp.fourthline.mabiicco.midi;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import javax.sound.midi.*;
 import javax.sound.sampled.LineUnavailableException;
@@ -39,13 +37,14 @@ public final class MabiDLS {
 	private Synthesizer synthesizer;
 	private Sequencer sequencer;
 	private MidiChannel[] channel;
+	private int[] midiChannelProgram;
 	private final ArrayList<MMLNoteEvent[]> playNoteList = new ArrayList<>();
 	public static final int MAX_CHANNEL_PLAY_NOTE = 4;
 	private static final int CHORUS_INDEX = 3;
 	private static final int NUM_CHANNEL_ON_TRACK = 4;
 	private static final int MAX_MIDI_PART = MMLScore.MAX_TRACK * NUM_CHANNEL_ON_TRACK;
 	private final ArrayList<InstClass> insts = new ArrayList<>();
-	private final Map<File, List<InstClass>> instsMap = new TreeMap<>();
+	private final Map<File, List<InstClass>> instsMap = new LinkedHashMap<>();
 	public static final int DLS_BANK = (0x79 << 7);
 	public static final int DRUM_BANK = (0x78 << 7);
 
@@ -210,34 +209,9 @@ public final class MabiDLS {
 		allLoaded = true;
 	}
 
-	public void loadingDLSFile(File file) throws InvalidMidiDataException, IOException {
-		System.out.println("["+file.getName()+"]");
-		if (file.getName().equals("")) {
-			return;
-		}
-		if (!file.exists()) {
-			// 各Rootディレクトリを探索します.
-			for (Path path : FileSystems.getDefault().getRootDirectories()) {
-				File aFile = new File(path.toString() + file.getPath());
-				if (aFile.exists()) {
-					file = aFile;
-					break;
-				}
-			}
-		}
-		if (file.exists()) {
-			ArrayList<InstClass> addList = new ArrayList<>();
-			if (!instsMap.containsKey(file)) {
-				List<InstClass> loadList = InstClass.loadDLS(file);
-				for (InstClass inst : loadList) {
-					if (!insts.contains(inst)) {
-						insts.add(inst);
-						addList.add(inst);
-					}
-				}
-				instsMap.put(file, addList);
-			}
-		}
+	public List<File> loadingDLSFiles(List<File> fileList, Runnable progress) {
+		var loader = new DLSLoader(fileList);
+		return loader.load(progress, insts, instsMap);
 	}
 
 	public Map<File, List<InstClass>> getInstsMap() {
@@ -249,8 +223,8 @@ public final class MabiDLS {
 			return;
 		}
 
-		ArrayList<InstClass> requiredInsts = new ArrayList<>();
-		ArrayList<MMLTrack> trackList = new ArrayList<>(score.getTrackList());
+		List<InstClass> requiredInsts = new ArrayList<>();
+		List<MMLTrack> trackList = new ArrayList<>(score.getTrackList());
 		for (MMLTrack track : trackList) {
 			InstClass inst1 = getInstByProgram( track.getProgram() );
 			InstClass inst2 = getInstByProgram( track.getSongProgram() );
@@ -291,6 +265,7 @@ public final class MabiDLS {
 
 	private void initializeSynthesizer() throws InvalidMidiDataException, IOException, MidiUnavailableException {
 		this.channel = this.synthesizer.getChannels();
+		this.midiChannelProgram = new int[ this.channel.length ];
 		for (int i = 0; i < this.channel.length; i++) {
 			this.playNoteList.add(new MMLNoteEvent[MAX_CHANNEL_PLAY_NOTE]);
 		}
@@ -334,6 +309,13 @@ public final class MabiDLS {
 	public InstClass getInstByProgram(int program) {
 		for (InstClass inst : insts) {
 			if (inst.getProgram() == program) {
+				return inst;
+			}
+		}
+
+		// Bank情報を除去して比較する
+		for (InstClass inst : insts) {
+			if (InstClass.toMidiProram(inst.getProgram()) == InstClass.toMidiProram(program)) {
 				return inst;
 			}
 		}
@@ -403,7 +385,7 @@ public final class MabiDLS {
 		setTrackVolume(trackIndex, MMLTrack.INITIAL_VOLUME);
 		MMLNoteEvent[] playNoteEvents = this.playNoteList.get(channel);
 		MidiChannel midiChannel = this.channel[channel];
-		int program = midiChannel.getProgram();
+		int program = midiChannelProgram[channel];
 
 		for (int i = 0; i < playNoteEvents.length; i++) {
 			MMLNoteEvent note = null;
@@ -443,7 +425,9 @@ public final class MabiDLS {
 	}
 
 	private void changeProgram(int trackIndex, int program, int songProgram) {
-		int bank = DLS_BANK;
+		int midiProgram = InstClass.toMidiProram(program);
+		int bank = InstClass.toMidiBank(program);
+		bank += DLS_BANK;
 
 		if ((program & InstClass.DRUM) != 0) {
 			bank = DRUM_BANK;
@@ -451,7 +435,8 @@ public final class MabiDLS {
 		}
 		int chorusChannel = getChannel(trackIndex, CHORUS_INDEX);
 		for (int i = getChannel(trackIndex, 0); i < chorusChannel; i++) {
-			channel[i].programChange(bank, program);
+			channel[i].programChange(bank, midiProgram);
+			midiChannelProgram[i] = program;
 		}
 
 		channel[chorusChannel].programChange(DLS_BANK, selectSongProgram(program, songProgram));
@@ -784,9 +769,13 @@ public final class MabiDLS {
 			for (MidiDevice.Info info : MidiSystem.getMidiDeviceInfo()) {
 				System.out.println(info);
 			}
-			for (String t : DEFALUT_DLS_PATH) {
-				midi.loadingDLSFile(new File(t));
+			var fileList = new ArrayList<File>();
+//			for (String t : DEFALUT_DLS_PATH) {
+			for (var file : MabiIccoProperties.getInstance().getDlsFile()) {
+				fileList.add(file);
 			}
+			DLSLoader.noParallel = true;
+			midi.loadingDLSFiles(fileList, null);
 			System.exit(0);
 		} catch (Exception e) {
 			e.printStackTrace();

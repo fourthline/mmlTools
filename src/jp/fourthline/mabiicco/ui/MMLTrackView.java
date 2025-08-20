@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2024 たんらる
+ * Copyright (C) 2013-2025 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
@@ -35,6 +35,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
 public final class MMLTrackView extends JPanel implements ActionListener {
 
@@ -218,7 +219,8 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 		soloButton.addActionListener(this);
 		allButton.addActionListener(this);
 	}
-	private static final HashMap<Integer, MMLTrackView> instanceList = new HashMap<>();
+
+	private static final Map<Integer, MMLTrackView> instanceList = new HashMap<>();
 	public static MMLTrackView getInstance(int trackIndex, ActionListener actionListener, IMMLManager mmlManager) {
 		MMLTrackView view;
 		if (instanceList.containsKey(trackIndex)) {
@@ -251,16 +253,13 @@ public final class MMLTrackView extends JPanel implements ActionListener {
 	 * @return 選択中のindex
 	 */
 	public int getSelectedMMLPartIndex() {
-		int index = 0;
-
 		for (int i = 0; i < MMLPART_NAME.length; i++) {
 			if (partButton[i].isSelected()) {
-				index = i;
-				break;
+				return i;
 			}
 		}
 
-		return index;
+		return 0;
 	}
 
 	/**

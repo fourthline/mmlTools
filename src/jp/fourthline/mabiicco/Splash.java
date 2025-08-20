@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2024 たんらる
+ * Copyright (C) 2021-2025 たんらる
  */
 
 package jp.fourthline.mabiicco;
@@ -46,7 +46,7 @@ public final class Splash extends JDialog implements ISplash {
 		private static final int WIDTH = 300;
 		private static final int HEIGHT = 220;
 		private final ImageIcon img;
-		private final JProgressBar progress = new JProgressBar();
+		private final JProgressBar progress = new SmoothProgressBar();
 		private final JLabel version = new JLabel();
 		private final JTextArea textArea = new JTextArea();
 
