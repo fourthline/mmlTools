@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import jp.fourthline.UseLoadingDLS;
 import jp.fourthline.mabiicco.AppResource;
+import jp.fourthline.mabiicco.ui.table.PartListTable;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTrack;
 

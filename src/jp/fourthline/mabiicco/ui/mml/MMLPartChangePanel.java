@@ -23,6 +23,7 @@ import jp.fourthline.mabiicco.ui.IMMLManager;
 import jp.fourthline.mabiicco.ui.MMLTrackView;
 import jp.fourthline.mabiicco.ui.UIUtils;
 import jp.fourthline.mabiicco.ui.editor.MMLEditor;
+import jp.fourthline.mabiicco.ui.table.TrackListTable;
 import jp.fourthline.mmlTools.MMLEventList;
 import jp.fourthline.mmlTools.MMLTrack;
 

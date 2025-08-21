@@ -20,7 +20,7 @@ import javax.swing.JSpinner;
 import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.ui.IMMLManager;
 import jp.fourthline.mabiicco.ui.UIUtils;
-import jp.fourthline.mabiicco.ui.mml.TrackListTable;
+import jp.fourthline.mabiicco.ui.table.TrackListTable;
 import jp.fourthline.mmlTools.MMLNoteEvent;
 import jp.fourthline.mmlTools.MMLTrack;
 

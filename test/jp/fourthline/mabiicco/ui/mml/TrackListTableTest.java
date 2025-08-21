@@ -10,6 +10,7 @@ import java.util.List;
 import org.junit.Test;
 
 import jp.fourthline.UseLoadingDLS;
+import jp.fourthline.mabiicco.ui.table.TrackListTable;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.core.MMLText;

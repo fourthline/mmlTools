@@ -24,6 +24,7 @@ import javax.swing.JScrollPane;
 
 import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.ui.UIUtils;
+import jp.fourthline.mabiicco.ui.table.TrackListTable;
 import jp.fourthline.mmlTools.ComposeRank;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTrack;

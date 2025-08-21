@@ -32,6 +32,7 @@ import javax.swing.border.EmptyBorder;
 import jp.fourthline.mabiicco.ActionDispatcher;
 import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.ui.UIUtils;
+import jp.fourthline.mabiicco.ui.table.PartListTable;
 import jp.fourthline.mmlTools.MMLConverter;
 import jp.fourthline.mmlTools.MMLExceptionList;
 import jp.fourthline.mmlTools.MMLScore;
