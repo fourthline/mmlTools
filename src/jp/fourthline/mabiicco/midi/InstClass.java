@@ -331,7 +331,7 @@ public final class InstClass {
 
 	private static String toProgramText(int program) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(toMidiProram(program));
+		sb.append(program & 0x1ff);    // ドラムフラグがあるので toMidiProgram()を使わない
 		int bank = toMidiBank(program);
 		if (bank != 0) {
 			sb.append('.').append(bank);
