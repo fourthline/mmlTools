@@ -82,10 +82,10 @@ public final class DLSSetupDialogTest {
 
 		// set default
 		dialog.setDefault();
-		assertEquals("[]", dialog.getFileList().toString());    // TODO
+		assertEquals("[C:\\Nexon\\Mabinogi\\mp3\\MSXspirit01.dls, C:\\Nexon\\Mabinogi\\mp3\\MSXspirit02.dls, C:\\Nexon\\Mabinogi\\mp3\\MSXspirit03.dls, C:\\Nexon\\Mabinogi\\mp3\\MSXspirit04.dls]", dialog.getFileList().toString());
 		assertEquals("[a.dls, b.dls, c.dls]", prop.getDlsFile().toString());
 
 		dialog.onOK();
-		assertEquals("[]", prop.getDlsFile().toString());    // TODO
+		assertEquals("[C:\\Nexon\\Mabinogi\\mp3\\MSXspirit01.dls, C:\\Nexon\\Mabinogi\\mp3\\MSXspirit02.dls, C:\\Nexon\\Mabinogi\\mp3\\MSXspirit03.dls, C:\\Nexon\\Mabinogi\\mp3\\MSXspirit04.dls]", prop.getDlsFile().toString());
 	}
 }
