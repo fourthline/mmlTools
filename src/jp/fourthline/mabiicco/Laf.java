@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2023 たんらる
+ * Copyright (C) 2023-2025 たんらる
  */
 package jp.fourthline.mabiicco;
 
 import java.awt.Font;
-import java.util.Collections;
 
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -58,10 +57,10 @@ public enum Laf implements SettingButtonGroupItem {
 		String fontName = AppResource.appText("ui.font");
 		if (!fontName.equals("ui.font")) {
 			var resource = new javax.swing.plaf.FontUIResource(fontName, Font.PLAIN, 11);
-			for (Object key : Collections.list(UIManager.getDefaults().keys())) {
-				Object value = UIManager.get(key);
+			for (var entry : UIManager.getDefaults().entrySet()) {
+				Object value = entry.getValue();
 				if (value instanceof javax.swing.plaf.FontUIResource) {
-					UIManager.put(key, resource);
+					UIManager.put(entry.getKey(), resource);
 				}
 			}
 		}
