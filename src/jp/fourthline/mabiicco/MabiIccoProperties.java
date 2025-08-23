@@ -18,6 +18,7 @@ import java.util.Properties;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import jp.fourthline.mabiicco.midi.DLSLoader;
 import jp.fourthline.mabiicco.midi.MMLMidiTrack.OverlapMode;
 import jp.fourthline.mabiicco.midi.SoundEnv;
 import jp.fourthline.mabiicco.ui.PianoRollScaler.MouseScrollWidth;
@@ -188,7 +189,7 @@ public final class MabiIccoProperties {
 	}
 
 	private List<File> convertDLSList(String str) {
-		String[] filenames = str.split(",");
+		String[] filenames = str.split(",", DLSLoader.DLS_LOAD_LIMIT);
 		ArrayList<File> fileArray = new ArrayList<>();
 		for (String filename : filenames) {
 			if (filename.toLowerCase().endsWith(".dls")) {

@@ -23,6 +23,7 @@ public final class DLSLoader implements Comparator<File> {
 
 	private static final List<String> priorityList = List.of("MSXspirit01.dls", "MSXspirit02.dls", "MSXspirit03.dls", "MSXspirit04.dls");
 	public static boolean noParallel = false;
+	public static final int DLS_LOAD_LIMIT = 64;
 
 	public DLSLoader(List<File> list) {
 		var fileList = new ArrayList<File>();
@@ -30,7 +31,11 @@ public final class DLSLoader implements Comparator<File> {
 			var file = fixFile(f);
 			if (!fileList.contains(file)) {
 				if (file.exists()) {
-					fileList.add(file);
+					if (fileList.size() < DLS_LOAD_LIMIT) {
+						fileList.add(file);
+					} else {
+						break;
+					}
 				}
 			}
 		}

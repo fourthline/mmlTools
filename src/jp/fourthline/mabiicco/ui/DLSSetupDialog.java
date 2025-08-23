@@ -82,7 +82,11 @@ public final class DLSSetupDialog extends JDialog {
 		private void addRow(List<File> fileList) {
 			for (var file : fileList) {
 				if (!this.files.contains(file)) {
-					this.files.add(file);
+					if (this.files.size() < DLSLoader.DLS_LOAD_LIMIT) {
+						this.files.add(file);
+					} else {
+						break;
+					}
 				}
 			}
 			fireTableDataChanged();
