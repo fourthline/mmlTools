@@ -49,4 +49,18 @@ public class DLSLoaderTest {
 		f1.deleteOnExit();
 	}
 
+	@Test
+	public void testLimit() throws IOException {
+		var tempList = new ArrayList<File>();
+		for (int i = 0; i < 65; i++) {
+			var file = File.createTempFile("test"+i, ".dls");
+			tempList.add(file);
+		}
+
+		var loader = new DLSLoader(tempList);
+		assertEquals(65, tempList.size());
+		assertEquals(64, loader.getFileList().size());
+
+		tempList.forEach(f -> f.delete());
+	}
 }
