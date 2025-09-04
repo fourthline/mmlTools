@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.DoubleConsumer;
 
 import javax.sound.midi.*;
 import javax.sound.sampled.LineUnavailableException;
@@ -209,7 +210,7 @@ public final class MabiDLS {
 		allLoaded = true;
 	}
 
-	public List<File> loadingDLSFiles(List<File> fileList, Runnable progress) {
+	public List<File> loadingDLSFiles(List<File> fileList, DoubleConsumer progress) throws IOException {
 		var loader = new DLSLoader(fileList);
 		return loader.load(progress, insts, instsMap);
 	}

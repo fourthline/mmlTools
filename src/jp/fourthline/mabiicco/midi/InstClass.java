@@ -4,10 +4,8 @@
 
 package jp.fourthline.mabiicco.midi;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -16,7 +14,6 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import javax.sound.midi.Instrument;
-import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Patch;
@@ -407,18 +404,18 @@ public final class InstClass {
 		}
 	}
 
-	public static List<InstClass> defaultSoundBank(boolean nameConvert) throws MidiUnavailableException {
+	static List<InstClass> defaultSoundBank(boolean nameConvert) throws MidiUnavailableException {
 		Soundbank sb = MidiSystem.getSynthesizer().getDefaultSoundbank();
 		return loadSoundBank(sb, nameConvert);
 	}
 
-	public static List<InstClass> loadDLS(File dlsFile) throws InvalidMidiDataException, IOException {
-		try (var stream = new BufferedInputStream(new FileInputStream(dlsFile))) {
+	static List<InstClass> loadDLS(InputStream stream, String name) throws IOException {
+		try {
 			Soundbank sb = MidiSystem.getSoundbank(stream);
 			return loadSoundBank(sb, true);
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new IOException("loadDLS: "+dlsFile);
+			throw new IOException("loadDLS: " + name);
 		}
 	}
 

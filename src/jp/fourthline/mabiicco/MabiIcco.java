@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.DoubleAdder;
 import java.util.function.BooleanSupplier;
 
 import javax.sound.midi.InvalidMidiDataException;
@@ -140,8 +139,8 @@ public final class MabiIcco {
 		splash.updateProgress(appText("init.dls"), 20);
 		BooleanSupplier doLoadDLS = () -> {
 			try {
-				return tryloadDLSFiles(20, 70);
-			} catch (InvalidMidiDataException | IOException e) {
+				return tryloadDLSFiles(20, 80);
+			} catch (IOException e) {
 				e.printStackTrace();
 			}
 			return false;
@@ -178,15 +177,13 @@ public final class MabiIcco {
 	 * @throws InvalidMidiDataException
 	 * @throws IOException
 	 */
-	private boolean tryloadDLSFiles(double initialProgress, double endProgress) throws InvalidMidiDataException, IOException {
+	private boolean tryloadDLSFiles(double initialProgress, double endProgress) throws IOException {
 		List<File> dlsFiles = appProperties.getDlsFile();
 		if (dlsFiles.size() > 0) {
-			double progressStep = (endProgress - initialProgress) / dlsFiles.size();
-			DoubleAdder adder = new DoubleAdder();
-			adder.add(initialProgress);
-			var actList = dls.loadingDLSFiles(dlsFiles, () -> {
-				adder.add(progressStep);
-				splash.updateProgress("", (int)adder.intValue());
+			double progressStep = (endProgress - initialProgress);
+			var actList = dls.loadingDLSFiles(dlsFiles, t -> {
+				var newV = progressStep * t + initialProgress;
+				splash.updateProgress("", (int)newV);
 			});
 			if (!dlsFiles.equals(actList)) {
 				System.out.println("Update DLS file list:");
