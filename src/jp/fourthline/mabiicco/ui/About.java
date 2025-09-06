@@ -1,23 +1,33 @@
 /*
- * Copyright (C) 2014-2024 たんらる
+ * Copyright (C) 2014-2025 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -32,6 +42,22 @@ import jp.fourthline.mabiicco.midi.InstType.SongType;
 import jp.fourthline.mabiicco.midi.MabiDLS;
 
 public final class About {
+	private String readNotice() {
+		try {
+			var stream = About.class.getResourceAsStream("/NOTICE");
+			if (stream == null) {
+				stream = new FileInputStream("NOTICE");
+			}
+			var reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
+			var str = reader.lines().collect(Collectors.joining("\n"));
+			stream.close();
+			return str;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return "";
+	}
+
 	public void show(Frame parentFrame) {
 		String title = AppResource.appText("menu.about");
 		StringBuilder sb = new StringBuilder();
@@ -40,6 +66,28 @@ public final class About {
 		JOptionPane.showMessageDialog(parentFrame, sb.toString(), title, JOptionPane.PLAIN_MESSAGE);
 	}
 
+	public void showLicenses(Frame parentFrame) {
+		String title = AppResource.appText("3rd_licenses");
+		JPanel mainPanel = new JPanel(new BorderLayout());
+		JTabbedPane tab = new JTabbedPane();
+		mainPanel.add(tab, BorderLayout.CENTER);
+
+		// NOTICE
+		String notice = readNotice();
+		String[] text = notice.split("================================================================================\n=");
+
+		// libraries
+		for (int i = 1; i < text.length; i++) {
+			String name = text[i].substring(0, text[i].indexOf('\n')).trim();
+			JTextArea textArea = new JTextArea(text[i]);
+			textArea.setEditable(false);
+			textArea.setCaretPosition(0);
+			tab.add(name, new JScrollPane(textArea));
+		}
+
+		mainPanel.setPreferredSize(new Dimension(600, 400));
+		JOptionPane.showMessageDialog(parentFrame, mainPanel, title, JOptionPane.PLAIN_MESSAGE);
+	}
 
 	@SuppressWarnings("deprecation")
 	private String getAccText(List<KeyStroke> accList) {

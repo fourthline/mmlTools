@@ -414,6 +414,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 			createMenuItem(helpMenu, "menu.instList", ActionDispatcher.INST_LIST);
 		}
 		createMenuItem(helpMenu, "menu.polyphonyMonitor", ActionDispatcher.POLYPHONY_MONITOR);
+		createMenuItem(helpMenu, "menu.licenses", ActionDispatcher.SHOW_LICENSES);
 
 		return menuBar;
 	}

@@ -158,6 +158,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 	@Action public static final String MML_X_EXPORT = "mml_x_export";
 	@Action public static final String POLYPHONY_MONITOR = "polyphony_monitor";
 	@Action public static final String MIDI_MABI_DRUM_CONVERT = "midi_mabi_drum_convert";
+	@Action public static final String SHOW_LICENSES = "show_licenses";
 
 	private final HashMap<String, Consumer<Object>> actionMap = new HashMap<>();
 
@@ -296,6 +297,7 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 		actionMap.put(TRACKS_EDIT, t -> new MultiTracksVelocityChangeEditor(mainFrame, mmlSeqView).showDialog());
 		actionMap.put(TRACKS_VIEW, t -> new MultiTracksViewEditor(mainFrame, mmlSeqView).showDialog());
 		actionMap.put(ABOUT, t -> new About().show(mainFrame));
+		actionMap.put(SHOW_LICENSES, t -> new About().showLicenses(mainFrame));
 		actionMap.put(MIDI_EXPORT, t -> this.midiExportAction());
 		actionMap.put(FILE_IMPORT, t -> this.fileImportAction());
 		actionMap.put(SELECT_DLS, t -> this.selectDLSFileAction());

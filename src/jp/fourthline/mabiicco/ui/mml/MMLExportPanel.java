@@ -133,7 +133,7 @@ public final class MMLExportPanel extends JPanel implements ActionListener {
 		table.addPropertyChangeListener(t -> updateText());
 
 		// Option
-		var optionPanel = UIUtils.createTitledPanel(AppResource.appText("mml.export.options"));
+		var optionPanel = UIUtils.createTitledPanel("mml.export.options");
 		optionPanel.setLayout(new BoxLayout(optionPanel, BoxLayout.Y_AXIS));
 		optionPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(2, 20, 2, 20), optionPanel.getBorder()));
 		optionPanel.add(allowNopt);

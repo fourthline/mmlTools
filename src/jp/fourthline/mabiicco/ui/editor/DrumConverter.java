@@ -358,7 +358,7 @@ public final class DrumConverter {
 
 			// combo
 			combo.setEnabled(false);
-			JPanel comboPanel = UIUtils.createTitledPanel(AppResource.appText("drum_convert.map_change"), new BorderLayout());
+			JPanel comboPanel = UIUtils.createTitledPanel("drum_convert.map_change", new BorderLayout());
 			JPanel comboButtonPanel = new JPanel();
 			JButton c1 = new JButton(AppResource.appText("edit.default"));
 			c1.addActionListener(t -> setDefaultMabiKey());
@@ -398,7 +398,7 @@ public final class DrumConverter {
 			// 変換Map
 			JScrollPane scrollPane = new JScrollPane(table);
 			scrollPane.setPreferredSize(new Dimension(600, 400));
-			JPanel convertMapPanel = UIUtils.createTitledPanel(appText("drum_convert.map"), new BorderLayout());
+			JPanel convertMapPanel = UIUtils.createTitledPanel("drum_convert.map", new BorderLayout());
 			convertMapPanel.add(scrollPane, BorderLayout.CENTER);
 			JLabel gmDesc = new JLabel(" * GM: General MIDI");
 			convertMapPanel.add(gmDesc, BorderLayout.SOUTH);
