@@ -1,91 +1,127 @@
 /*
- * Copyright (C) 2023 たんらる
+ * Copyright (C) 2023-2025 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 import jp.fourthline.mabiicco.AppResource;
-import jp.fourthline.mmlTools.MMLExceptionList;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.Measure;
+import jp.fourthline.mmlTools.logger.MMLLogger;
+import jp.fourthline.mmlTools.logger.LogMessage;
+import jp.fourthline.mmlTools.logger.LogMessage.PartMessage;
+import jp.fourthline.mmlTools.logger.LogMessage.TrackMessage;
 
 public final class MMLErrView {
 
-	private final Vector<Vector<String>> dataList;
+	private final Vector<Vector<Object>> dataList;
 
 	public MMLErrView(MMLScore score) {
 		dataList = makeList(score);
 	}
 
-	Vector<Vector<String>> getDataList() {
+	Vector<Vector<Object>> getDataList() {
 		return dataList;
 	}
 
-	private Vector<String> makeData(MMLScore score, MMLTrack track, int trackIndex, int partIndex, int tick, String msg) {
-		var v = new Vector<String>();
-		v.add(Integer.toString(trackIndex+1));
-		v.add(track.getTrackName());
-		if (partIndex >= 0) {
-			v.add(MMLTrackView.MMLPART_NAME[ partIndex ]);
-		} else {
-			v.add("-");
+	private static class DataAttr {
+		private final MMLScore score;
+		private final MMLTrack track;
+		private Stream<Vector<Object>> stream = Stream.empty();
+
+		private DataAttr(MMLScore score, MMLTrack track) {
+			this.score = score;
+			this.track = track;
 		}
-		if (tick >= 0) {
-			v.add(new Measure(score, tick).toString());
-		} else {
-			v.add("-");
+
+		private Stream<Vector<Object>> toStream() {
+			return stream;
 		}
-		v.add(msg);
-		return v;
+
+		private int getTrackIndex() {
+			return score.getTrackList().indexOf(track);
+		}
+
+		private DataAttr makeDataRelationTrack(List<? extends TrackMessage> list) {
+			stream = Stream.concat(stream,
+					list.stream()
+					.filter(t -> track == t.getTrack())
+					.map(item -> makeData(item))
+					);
+			return this;
+		}
+
+		private DataAttr makeDataRelationPart(List<? extends PartMessage> list) {
+			var messageMap = list.stream().collect(Collectors.groupingBy(PartMessage::getRelationPart));
+			stream = Stream.concat(stream,
+					track.getMMLEventList().stream()
+					.map(messageMap::get)
+					.filter(t -> t != null)
+					.flatMap(List::stream)
+					.map(item -> makeData(item))
+					);
+			return this;
+		}
+
+		private Vector<Object> makeData(PartMessage entry) {
+			return makeData(track.getMMLEventList().indexOf(entry.getRelationPart()), entry.getTickOffset(), entry.getLocalizedMessage());
+		}
+
+		private Vector<Object> makeData(LogMessage entry) {
+			return makeData(-1, -1, entry.getLocalizedMessage());
+		}
+
+		private Vector<Object> makeData(int partIndex, int tick, String msg) {
+			var v = new Vector<Object>();
+			v.add(getTrackIndex()+1);
+			v.add(track.getTrackName());
+			if (partIndex >= 0) {
+				v.add(MMLTrackView.MMLPART_NAME[ partIndex ]);
+			} else {
+				v.add("-");
+			}
+			if (tick >= 0) {
+				v.add(new Measure(score, tick).toString());
+			} else {
+				v.add("-");
+			}
+			v.add(msg);
+			return v;
+		}
 	}
 
 	/**
 	 * 表示するデータを作成する.
 	 */
-	private Vector<Vector<String>> makeList(MMLScore score) {
-		Vector<Vector<String>> list = new Vector<>();
+	private Vector<Vector<Object>> makeList(MMLScore score) {
 		var vErrList = score.getVerifyErr();
-		var errList = new ArrayList<>(score.getMMLErr());
-		int trackIndex = 0;
-		for (var track : score.getTrackList()) {
-			int partIndex = 0;
-
-			// for MMLVerifyException
-			for (var item : vErrList) {
-				if (track == item.getTrack()) {
-					list.add(makeData(score, track, trackIndex, -1, -1, item.getLocalizedMessage()));
-				}
-			}
-
-			// for MMLExceptionList
-			for (var part : track.getMMLEventList()) {
-				var eList = new ArrayList<MMLExceptionList.Entry>();  // すでに表示したアイテムを登録するリスト (重複表示しないため)
-				for (var item : errList) {
-					if (part.getMMLNoteEventList().contains(item.getNote()) && !eList.contains(item)) {
-						eList.add(item);
-						list.add(makeData(score, track, trackIndex, partIndex, item.getNote().getTickOffset(), item.getException().getLocalizedMessage()));
-					}
-				}
-				errList.removeAll(eList); // 表示済みのデータを消しておく (他のトラック & パートでみる必要がない)
-				partIndex++;
-			}
-			trackIndex++;
-		}
-		return list;
+		var errList = score.getMMLErr();
+		return score.getTrackList().stream()
+				.flatMap(track -> new DataAttr(score, track)
+						.makeDataRelationTrack(vErrList)              // for MMLVerifyException
+						.makeDataRelationPart(errList)                // for MMLExceptionList
+						.makeDataRelationPart(MMLLogger.logger(track).getEntryList())  // for MMLLogger
+						.toStream()
+						)
+				.collect(Collectors.toCollection(Vector::new));
 	}
 
 	public void showMMLErrList(Frame parentFrame) {
@@ -112,6 +148,7 @@ public final class MMLErrView {
 		table.getColumnModel().getColumn(2).setMaxWidth(100);
 		table.getColumnModel().getColumn(3).setMinWidth(100);
 		table.getColumnModel().getColumn(3).setMaxWidth(100);
+		table.getColumnModel().getColumn(4).setCellRenderer(new TooltipRenderer());
 		table.getTableHeader().setResizingAllowed(false);
 		table.getTableHeader().setReorderingAllowed(false);
 		table.getTableHeader().setRequestFocusEnabled(false);
@@ -126,5 +163,23 @@ public final class MMLErrView {
 		panel.add(scrollPane, BorderLayout.CENTER);
 		panel.add(new JLabel(""+dataList.size()), BorderLayout.SOUTH);
 		JOptionPane.showMessageDialog(parentFrame, panel, title, JOptionPane.PLAIN_MESSAGE);
+	}
+
+	private static class TooltipRenderer extends DefaultTableCellRenderer {
+		private static final long serialVersionUID = 6013889934698748903L;
+
+		@Override
+		public Component getTableCellRendererComponent(
+				JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+			super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+			if (value != null) {
+				String text = value.toString();
+				setToolTipText(text);
+			} else {
+				setToolTipText(null);
+			}
+
+			return this;
+		}
 	}
 }

@@ -45,6 +45,7 @@ import jp.fourthline.mmlTools.MMLTempoEvent;
 import jp.fourthline.mmlTools.Marker;
 import jp.fourthline.mmlTools.TimeSignature;
 import jp.fourthline.mmlTools.core.MMLException;
+import jp.fourthline.mmlTools.logger.MMLLogger;
 
 
 public final class ColumnPanel extends JPanel implements MouseListener, MouseMotionListener, IViewTargetMarker {
@@ -58,6 +59,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 	private static final ColorSet START_COMMON_OFFSET_COLOR = ColorSet.create(new Color(255, 167, 227), Color.decode("#993366"));
 	private static final ColorSet START_OFFSET_COLOR = ColorSet.create(new Color(255, 202, 227), Color.decode("#996666"));
 	private static final ColorSet TEXT_COLOR = ColorSet.create(Color.DARK_GRAY, Color.LIGHT_GRAY);
+	private static final Color WARN_COLOR = Color.decode("#E6B34D");
 	private static final int DRAW_HEIGHT = 32;
 	private static final int DRAW_OFFSET_HEIGHT = 6;
 	private static final int DRAW_HEIGHT_ERR_BAR = 10;
@@ -129,6 +131,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 
 		paintStartOffset(g2);
 		paintErr(g2);
+		paintWarn(g2);
 		paintRuler(g2);
 		paintMarker(g2);
 		paintTempoEvents(g2);
@@ -183,6 +186,20 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 			g.fillRect(x, 1, width, DRAW_HEIGHT_ERR_BAR);
 		}
 	}
+
+	/**
+	 * 警告の表示
+	 */
+	private void paintWarn(Graphics2D g) {
+		g.setColor(WARN_COLOR);
+		mmlManager.getMMLScore().getTrackList().stream()
+		.flatMap(t -> MMLLogger.logger(t).getEntryList().stream())
+		.forEach(t -> {
+			int x = pianoRollView.convertTicktoX(t.getTickOffset());
+			g.fillRect(x-1, 1, 3, DRAW_HEIGHT_ERR_BAR);
+		});
+	}
+
 	/**
 	 * ルーラを表示します。
 	 */

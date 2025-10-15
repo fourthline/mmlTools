@@ -14,6 +14,7 @@ import java.util.function.IntFunction;
 
 import jp.fourthline.mmlTools.core.MMLText;
 import jp.fourthline.mmlTools.core.MMLTicks;
+import jp.fourthline.mmlTools.logger.MMLLogger;
 import jp.fourthline.mmlTools.core.MMLException;
 import jp.fourthline.mmlTools.optimizer.MMLStringOptimizer;
 
@@ -351,6 +352,8 @@ public final class MMLTrack implements Serializable, Cloneable {
 	}
 
 	public MMLTrack generate() throws MMLExceptionList, MMLVerifyException {
+		MMLLogger.logger(this).setEnable(false);
+
 		String mml1 = getOriginalMML();
 		try {
 			originalMML.setMMLText(getMMLStrings(false, false));
@@ -365,6 +368,8 @@ public final class MMLTrack implements Serializable, Cloneable {
 			System.err.println(getOriginalMML());
 			throw new MMLVerifyException(this);
 		}
+
+		MMLLogger.logger(this).setEnable(true);
 		/*
 		 * tailFixはMusicQアップデートで不要になりました. 2017/01/07
 		 */
@@ -394,9 +399,9 @@ public final class MMLTrack implements Serializable, Cloneable {
 				if ( isPrimaryTempoPart ) {
 					// part0 の場合, 1,2のパート情報を渡す
 					List<MMLEventList> relationPart = (i == 0) ? mmlParts.subList(1, 3) : null;
-					mml[i] = MMLBuilder.create(eventList, startOffset, pix).toMMLString(true, mabiTempo, relationPart);
+					mml[i] = MMLBuilder.create(eventList, startOffset, pix).setLogger(MMLLogger.logger(this)).toMMLString(true, mabiTempo, relationPart);
 				} else {
-					mml[i] = MMLBuilder.create(eventList, startOffset, pix).toMMLString();
+					mml[i] = MMLBuilder.create(eventList, startOffset, pix).setLogger(MMLLogger.logger(this)).toMMLString();
 				}
 			} catch (MMLExceptionList e) {
 				errList.addAll(e.getErr());
@@ -475,7 +480,7 @@ public final class MMLTrack implements Serializable, Cloneable {
 			List<MMLEventList> relationPart = ((i < 3) && (allowTempoChord)) ? relationParts.get(i) : null;
 			boolean checkDelta = (i < 2);
 			try {
-				mml[i] = MMLBuilder.create(eventList, getStartOffsetforMabiMML(i), MMLBuilder.INIT_OCT, pix).toMMLStringMusicQ(localTempoList, relationPart, checkDelta);
+				mml[i] = MMLBuilder.create(eventList, getStartOffsetforMabiMML(i), MMLBuilder.INIT_OCT, pix).setLogger(MMLLogger.logger(this)).toMMLStringMusicQ(localTempoList, relationPart, checkDelta);
 			} catch (MMLExceptionList e) {
 				errList.addAll(e.getErr());
 			}

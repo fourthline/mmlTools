@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 たんらる
+ * Copyright (C) 2023-2025 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -7,24 +7,41 @@ package jp.fourthline.mmlTools;
 import java.util.List;
 
 import jp.fourthline.mmlTools.core.MMLException;
+import jp.fourthline.mmlTools.logger.LogMessage.PartMessage;
 
 public final class MMLExceptionList extends Exception {
 	private static final long serialVersionUID = 4585574875842403536L;
 
 	private final List<Entry> errList;
 
-	public static class Entry {
+	public static class Entry implements PartMessage {
+		private final MMLEventList relationPart;
 		private final MMLNoteEvent event;
 		private final MMLException exception;
-		public Entry(MMLNoteEvent event, MMLException exception) {
+		public Entry(MMLEventList relationPart, MMLNoteEvent event, MMLException exception) {
+			this.relationPart = relationPart;
 			this.event = event;
 			this.exception = exception;
+			if (!relationPart.getMMLNoteEventList().contains(event)) {
+				throw new IllegalArgumentException();
+			}
+		}
+		public MMLEventList getRelationPart() {
+			return relationPart;
 		}
 		public MMLNoteEvent getNote() {
 			return event;
 		}
 		public MMLException getException() {
 			return exception;
+		}
+		@Override
+		public int getTickOffset() {
+			return event.getTickOffset();
+		}
+		@Override
+		public String getLocalizedMessage() {
+			return exception.getLocalizedMessage();
 		}
 	}
 

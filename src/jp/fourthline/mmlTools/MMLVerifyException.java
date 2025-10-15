@@ -4,8 +4,9 @@
 
 package jp.fourthline.mmlTools;
 
+import jp.fourthline.mmlTools.logger.LogMessage.TrackMessage;
 
-public final class MMLVerifyException extends Exception {
+public final class MMLVerifyException extends Exception implements TrackMessage {
 	private static final long serialVersionUID = 5820865256091161012L;
 
 	private final MMLTrack track;
