@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2024 たんらる
+ * Copyright (C) 2013-2025 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -9,8 +9,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import jp.fourthline.mmlTools.core.MMLTicks;
@@ -26,6 +28,7 @@ public final class MMLScore implements Cloneable {
 	private final List<MMLTempoEvent> globalTempoList = new ArrayList<>();
 	private final List<Marker> markerList = new ArrayList<>();
 	private final List<TimeSignature> timeSignatureList = new ArrayList<>();
+	private final Map<Integer, BarLineType> barLineTypeMap = new LinkedHashMap<>();
 
 	public static final int MAX_TRACK = 24;
 
@@ -146,6 +149,18 @@ public final class MMLScore implements Cloneable {
 		return timeSignatureList;
 	}
 
+	public Map<Integer, BarLineType> getBarLineTypeMap() {
+		return barLineTypeMap;
+	}
+
+	public void setBarLineType(int measure, BarLineType type) {
+		if ((type == null) || (type == BarLineType.NORMAL)) {
+			barLineTypeMap.remove(measure);
+		} else {
+			barLineTypeMap.put(measure, type);
+		}
+	}
+
 	public void setTitle(String title) {
 		this.title = title;
 	}
@@ -228,7 +243,9 @@ public final class MMLScore implements Cloneable {
 
 		// 拍子
 		if (isMeasure) {
-			TimeSignature.addMeasure(this, Measure.tickToMeasure(this, tickPosition));
+			int measurePosition = Measure.tickToMeasure(this, tickPosition);
+			TimeSignature.addMeasure(this, measurePosition);
+			MMLEvent.updateMapByAddMeasure(barLineTypeMap, measurePosition);
 		}
 	}
 
@@ -252,7 +269,9 @@ public final class MMLScore implements Cloneable {
 
 		// 拍子
 		if (isMeasure) {
-			TimeSignature.removeMeasure(this, Measure.tickToMeasure(this, tickPosition));
+			int measurePosition = Measure.tickToMeasure(this, tickPosition);
+			TimeSignature.removeMeasure(this, measurePosition);
+			MMLEvent.updateMapByRemoveMeasure(barLineTypeMap, measurePosition);
 		}
 	}
 

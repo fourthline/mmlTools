@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 たんらる
+ * Copyright (C) 2022-2025 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.editor;
@@ -7,17 +7,29 @@ package jp.fourthline.mabiicco.ui.editor;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.function.Function;
 
+import javax.swing.AbstractButton;
 import javax.swing.JMenuItem;
 
 public abstract class AbstractColumnEditor implements IMarkerEditor, ActionListener {
 
-	protected abstract void viewTargetMarker(JMenuItem menu, boolean b);
+	protected abstract void viewTargetMarker(AbstractButton menu, boolean b);
 
 	protected JMenuItem newMenuItem(String name, String actionCommand) {
-		JMenuItem menu = new JMenuItem(name);
+		return newMenu(name, actionCommand, JMenuItem::new);
+	}
+
+	protected <T extends AbstractButton> T newMenu(String name, Function<String, T> c) {
+		return newMenu(name, null, c);
+	}
+
+	protected <T extends AbstractButton> T newMenu(String name, String actionCommand, Function<String, T> c) {
+		T menu = c.apply(name);
 		menu.addActionListener(this);
-		menu.setActionCommand(actionCommand);
+		if (actionCommand != null) {
+			menu.setActionCommand(actionCommand);
+		}
 		menu.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseReleased(MouseEvent e) {

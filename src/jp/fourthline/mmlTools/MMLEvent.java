@@ -1,12 +1,14 @@
 /*
- * Copyright (C) 2013-2022 たんらる
+ * Copyright (C) 2013-2025 たんらる
  */
 
 package jp.fourthline.mmlTools;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import jp.fourthline.mmlTools.core.IllegalTickOffsetException;
 import jp.fourthline.mmlTools.core.MMLException;
@@ -85,6 +87,32 @@ public abstract class MMLEvent implements Serializable {
 		for (MMLEvent event : deleteEvent) {
 			list.remove(event);
 		}
+	}
+
+	public static <T> void updateMapByAddMeasure(Map<Integer, T> map, int measurePosition) {
+		var newMap = new LinkedHashMap<Integer, T>();
+		map.forEach((key, value) -> {
+			if (key >= measurePosition) {
+				newMap.put(key + 1, value);
+			} else {
+				newMap.put(key, value);
+			}
+		});
+		map.clear();
+		map.putAll(newMap);
+	}
+
+	public static <T> void updateMapByRemoveMeasure(Map<Integer, T> map, int measurePosition) {
+		var newMap = new LinkedHashMap<Integer, T>();
+		map.forEach((key, value) -> {
+			if (key > measurePosition) {
+				newMap.put(key - 1, value);
+			} else if (key < measurePosition) {
+				newMap.put(key, value);
+			}
+		});
+		map.clear();
+		map.putAll(newMap);
 	}
 
 	@Override

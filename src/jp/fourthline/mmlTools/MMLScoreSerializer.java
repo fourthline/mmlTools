@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 たんらる
+ * Copyright (C) 2022-2025 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -34,6 +34,8 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 	private static final String MARKER_SECTION = "[marker]";
 	// time signature section
 	private static final String TIME_SIGNATURE_SECTION = "[time-signature]";
+	// bar-line-type section
+	private static final String BAR_LINE_TYPE_SECTION = "[bar-line-type]";
 
 	// score element
 	private static final String SCORE_VERSION = "version=1"; 
@@ -103,6 +105,7 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 		score.getTrackList().clear();
 		score.getMarkerList().clear();
 		score.getTimeSignatureList().clear();
+		score.getBarLineTypeMap().clear();
 
 		List<SectionContents> contentsList = SectionContents.makeSectionContentsByInputStream(istream, "UTF-8");
 		if (contentsList.isEmpty()) {
@@ -115,6 +118,8 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 				parseMarker(section.getContents());
 			} else if (section.getName().equals(TIME_SIGNATURE_SECTION)) {
 				parseTimeSignature(section.getContents());
+			} else if (section.getName().equals(BAR_LINE_TYPE_SECTION)) {
+				parseBarLineType(section.getContents());
 			}
 		}
 		return score;
@@ -217,6 +222,33 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 					e.printStackTrace();
 				}
 			}
+		}
+	}
+
+	/**
+	 * parse [bar-line-type] contents
+	 * @param contents
+	 */
+	private void parseBarLineType(String contents) {
+		for (String s : contents.split("\n")) {
+			// <measure>=<type>
+			int index = s.indexOf('=');
+			if (index > 0) {
+				String measure = s.substring(0, index);
+				String type = s.substring(index+1);
+				try {
+					score.setBarLineType(Integer.parseInt(measure), BarLineType.valueOf(type));
+				} catch (IllegalArgumentException e) {}
+			}
+		}
+	}
+
+	private void writeBarLineTypeList(PrintStream stream, String name, Map<Integer, BarLineType> map) {
+		if (!map.isEmpty()) {
+			stream.println(name);
+			map.forEach((key, value) -> {
+				stream.println(key + "=" + value.name());
+			});
 		}
 	}
 
@@ -394,6 +426,7 @@ public final class MMLScoreSerializer extends AbstractMMLParser {
 
 		writeMMLEventList(stream, MARKER_SECTION, score.getMarkerList());
 		writeMMLEventList(stream, TIME_SIGNATURE_SECTION, score.getTimeSignatureList());
+		writeBarLineTypeList(stream, BAR_LINE_TYPE_SECTION, score.getBarLineTypeMap());
 
 		stream.close();
 	}

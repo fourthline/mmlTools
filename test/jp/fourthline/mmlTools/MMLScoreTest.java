@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2024 たんらる
+ * Copyright (C) 2014-2025 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -675,6 +675,24 @@ public class MMLScoreTest extends UseLoadingDLS {
 		assertEquals("MML@t140d,,,t120c;", score.getTrack(0).getMabiMML());
 	}
 
+	@Test
+	public void testAddRemoveTicks_BarLine() {
+		score.addTrack(new MMLTrack().setMML("MML@c1c1c1c1,,;"));
+		score.setBarLineType(1, BarLineType.BOLD);
+		score.setBarLineType(3, BarLineType.DOTTED);
+
+		// add measure check
+		score.addTicks(384*2, true);
+		assertEquals(BarLineType.BOLD, score.getBarLineTypeMap().get(1));
+		assertNull(score.getBarLineTypeMap().get(2));
+		assertEquals(BarLineType.DOTTED, score.getBarLineTypeMap().get(4));
+
+		// remove measure check
+		score.removeTicks(384, true);
+		assertNull(score.getBarLineTypeMap().get(1));
+		assertEquals(BarLineType.DOTTED, score.getBarLineTypeMap().get(3));
+	}
+
 	/**
 	 * addTrack test
 	 * @throws MMLException 
@@ -696,6 +714,19 @@ public class MMLScoreTest extends UseLoadingDLS {
 		score.generateAll();
 		assertEquals("MML@t88f,,,t120c;", score.getTrack(0).getMabiMML());
 		assertEquals("MML@t88g,,;", score.getTrack(1).getMabiMML());
+	}
+
+	@Test
+	public void testMMLFileFormat_BarLine() throws MMLExceptionList, MMLVerifyException {
+		MMLTrack track = new MMLTrack().setMML("MML@c1c1c1c1,,;");
+		track.setTrackName("track1");
+		score.addTrack(track);
+		score.setBarLineType(1, BarLineType.BOLD);
+		score.setBarLineType(2, BarLineType.DOTTED);
+
+		String[] mml = { "MML@l1cccc,,;" };
+
+		checkMMLFileOutput(score.generateAll(), "format_barline.mmi", mml);
 	}
 
 	/**

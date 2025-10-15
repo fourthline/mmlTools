@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 たんらる
+ * Copyright (C) 2022-2025 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.editor;
@@ -8,6 +8,7 @@ import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.util.List;
 
+import javax.swing.AbstractButton;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
@@ -42,7 +43,7 @@ public final class StartOffsetEditor extends AbstractColumnEditor {
 	}
 
 	@Override
-	protected void viewTargetMarker(JMenuItem menu, boolean b) {
+	protected void viewTargetMarker(AbstractButton menu, boolean b) {
 		if (!b || !menu.isEnabled()) {
 			viewTargetMarker.PaintOff();
 		} else {

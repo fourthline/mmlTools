@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2022 たんらる
+ * Copyright (C) 2014-2025 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.editor;
@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.swing.AbstractButton;
 import javax.swing.JMenuItem;
 
 import jp.fourthline.mabiicco.AppResource;
@@ -66,7 +67,7 @@ public abstract class AbstractMarkerEditor<T extends MMLEvent> extends AbstractC
 	}
 
 	@Override
-	protected void viewTargetMarker(JMenuItem menu, boolean b) {
+	protected void viewTargetMarker(AbstractButton menu, boolean b) {
 		if (!b || !menu.isEnabled()) {
 			viewTargetMarker.PaintOff();
 		} else if (targetEvent != null) {

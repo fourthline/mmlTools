@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2024 たんらる
+ * Copyright (C) 2013-2025 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
@@ -31,6 +31,7 @@ import jp.fourthline.mabiicco.midi.MabiDLS;
 import jp.fourthline.mabiicco.ui.color.ColorManager;
 import jp.fourthline.mabiicco.ui.color.ColorSet;
 import jp.fourthline.mabiicco.ui.editor.IEditAlign;
+import jp.fourthline.mabiicco.ui.editor.BarLineEditor;
 import jp.fourthline.mabiicco.ui.editor.IMarkerEditor;
 import jp.fourthline.mabiicco.ui.editor.MMLTempoEditor;
 import jp.fourthline.mabiicco.ui.editor.MarkerEditor;
@@ -85,6 +86,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 		markerEditor.add( tempoEditor );
 		markerEditor.add( new MarkerEditor(parentFrame, mmlManager, editAlign, this) );
 		markerEditor.add( new TimeSignatureEditor(parentFrame, mmlManager, editAlign, this) );
+		markerEditor.add( new BarLineEditor(parentFrame, mmlManager, this) );
 		markerEditor.add( new StartOffsetEditor(parentFrame, mmlManager, editAlign, this) );
 
 		// popupMenu に各MenuItemを登録する.
@@ -95,13 +97,13 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {}
 
 			@Override
-			public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {}
-
-			@Override
-			public void popupMenuCanceled(PopupMenuEvent e) {
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
 				PaintOff();
 				pianoRollView.repaint();
 			}
+
+			@Override
+			public void popupMenuCanceled(PopupMenuEvent e) {}
 		});
 
 		// laf変更反映対応
@@ -199,10 +201,15 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 		if (timeSignature != null) {
 			nextMeasureOffset = timeSignature.getMeasureOffset();
 		}
+		var defaultStroke = g.getStroke();
+
 		while (md < length) {
 			int x = pianoRollView.convertTicktoX(md);
 			int y1 = 0;
+
+			UIUtils.setCurrentBarLine(g, score.getBarLineTypeMap().get(m));
 			g.drawLine(x, y1, x, y2);
+			g.setStroke(defaultStroke);
 			g.drawString(Integer.toString(m), x+2, y1+10);
 
 			if ( (timeSignature != null) && (m >= nextMeasureOffset) ) {

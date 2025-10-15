@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2024 たんらる
+ * Copyright (C) 2013-2025 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
@@ -480,13 +480,16 @@ public final class PianoRollView extends JPanel {
 
 		while (totalTick <= endViewTick) {
 			if (totalTick >= startViewTick-beatTick) {
+				Stroke backup = g.getStroke();
 				if (beatCount%numTime == 0) {
 					g.setColor(darkBarBorder.get());
+					UIUtils.setCurrentBarLine(g, score.getBarLineTypeMap().get(measure.getMeasure()));;
 				} else {
 					g.setColor(barBorder.get());
 				}
 				int x = convertTicktoX(totalTick);
 				g.drawLine(x, 0, x, y);
+				g.setStroke(backup);
 				paintHalfMeasure(g, x, convertTicktoX(beatTick));
 			}
 

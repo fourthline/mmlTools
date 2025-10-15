@@ -1,0 +1,15 @@
+[mml-score]
+version=1
+title=
+author=
+time=4/4
+tempo=
+mml-track=MML@l1cccc,,;
+name=track1
+program=0
+songProgram=-1
+panpot=64
+visible=true
+[bar-line-type]
+1=BOLD
+2=DOTTED
