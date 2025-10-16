@@ -18,7 +18,7 @@ public final class MMLLogEvent implements PartMessage {
 		this.relationPart = relationPart;
 		this.tickOffset = tickOffset;
 		message = prefix + " " + msg;
-		localizedMessage = prefix + " " + AppResource.appText("mml_logger." + msg_code);
+		localizedMessage = prefix + ": " + AppResource.appText("mml_logger." + msg_code);
 	}
 
 	public int getTickOffset() {

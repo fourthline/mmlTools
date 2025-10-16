@@ -42,7 +42,16 @@ public final class MMLErrView {
 		return dataList;
 	}
 
-	private static class DataAttr {
+	private static enum Type {
+		ERROR,
+		WARN;
+		private final String text;
+		private Type() {
+			text = AppResource.appText("mml.err.type." + name().toLowerCase());
+		}
+	}
+
+	private static final class DataAttr {
 		private final MMLScore score;
 		private final MMLTrack track;
 		private Stream<Vector<Object>> stream = Stream.empty();
@@ -60,49 +69,53 @@ public final class MMLErrView {
 			return score.getTrackList().indexOf(track);
 		}
 
-		private DataAttr makeDataRelationTrack(List<? extends TrackMessage> list) {
+		private DataAttr makeDataRelationTrack(Type type, List<? extends TrackMessage> list) {
 			stream = Stream.concat(stream,
 					list.stream()
 					.filter(t -> track == t.getTrack())
-					.map(item -> makeData(item))
+					.map(item -> makeData(type, item))
 					);
 			return this;
 		}
 
-		private DataAttr makeDataRelationPart(List<? extends PartMessage> list) {
+		private DataAttr makeDataRelationPart(Type type, List<? extends PartMessage> list) {
 			var messageMap = list.stream().collect(Collectors.groupingBy(PartMessage::getRelationPart));
 			stream = Stream.concat(stream,
 					track.getMMLEventList().stream()
 					.map(messageMap::get)
 					.filter(t -> t != null)
 					.flatMap(List::stream)
-					.map(item -> makeData(item))
+					.map(item -> makeData(type, item))
 					);
 			return this;
 		}
 
-		private Vector<Object> makeData(PartMessage entry) {
-			return makeData(track.getMMLEventList().indexOf(entry.getRelationPart()), entry.getTickOffset(), entry.getLocalizedMessage());
+		private Vector<Object> makeData(Type type, PartMessage entry) {
+			return makeData(type, track.getMMLEventList().indexOf(entry.getRelationPart()), entry.getTickOffset(), entry.getLocalizedMessage());
 		}
 
-		private Vector<Object> makeData(LogMessage entry) {
-			return makeData(-1, -1, entry.getLocalizedMessage());
+		private Vector<Object> makeData(Type type, LogMessage entry) {
+			return makeData(type, -1, -1, entry.getLocalizedMessage());
 		}
 
-		private Vector<Object> makeData(int partIndex, int tick, String msg) {
+		private Vector<Object> makeData(Type type, int partIndex, int tick, String msg) {
 			var v = new Vector<Object>();
 			v.add(getTrackIndex()+1);
 			v.add(track.getTrackName());
+			// パート
 			if (partIndex >= 0) {
 				v.add(MMLTrackView.MMLPART_NAME[ partIndex ]);
 			} else {
 				v.add("-");
 			}
+			// 位置
 			if (tick >= 0) {
 				v.add(new Measure(score, tick).toString());
 			} else {
 				v.add("-");
 			}
+			// 区分
+			v.add(type.text);
 			v.add(msg);
 			return v;
 		}
@@ -116,9 +129,9 @@ public final class MMLErrView {
 		var errList = score.getMMLErr();
 		return score.getTrackList().stream()
 				.flatMap(track -> new DataAttr(score, track)
-						.makeDataRelationTrack(vErrList)              // for MMLVerifyException
-						.makeDataRelationPart(errList)                // for MMLExceptionList
-						.makeDataRelationPart(MMLLogger.logger(track).getEntryList())  // for MMLLogger
+						.makeDataRelationTrack(Type.ERROR, vErrList)              // for MMLVerifyException
+						.makeDataRelationPart(Type.ERROR, errList)                // for MMLExceptionList
+						.makeDataRelationPart(Type.WARN, MMLLogger.logger(track).getEntryList())  // for MMLLogger
 						.toStream()
 						)
 				.collect(Collectors.toCollection(Vector::new));
@@ -130,6 +143,7 @@ public final class MMLErrView {
 		column.add(AppResource.appText("track"));
 		column.add(AppResource.appText("part"));
 		column.add(AppResource.appText("mml.err.position"));
+		column.add(AppResource.appText("mml.err.type"));
 		column.add(AppResource.appText("mml.err.value"));
 
 		JTable table = new JTable(new DefaultTableModel(dataList, column) {
@@ -144,11 +158,13 @@ public final class MMLErrView {
 		table.getColumnModel().getColumn(0).setMaxWidth(20);
 		table.getColumnModel().getColumn(1).setMinWidth(100);
 		table.getColumnModel().getColumn(1).setMaxWidth(100);
-		table.getColumnModel().getColumn(2).setMinWidth(100);
-		table.getColumnModel().getColumn(2).setMaxWidth(100);
-		table.getColumnModel().getColumn(3).setMinWidth(100);
-		table.getColumnModel().getColumn(3).setMaxWidth(100);
-		table.getColumnModel().getColumn(4).setCellRenderer(new TooltipRenderer());
+		table.getColumnModel().getColumn(2).setMinWidth(80);
+		table.getColumnModel().getColumn(2).setMaxWidth(80);
+		table.getColumnModel().getColumn(3).setMinWidth(80);
+		table.getColumnModel().getColumn(3).setMaxWidth(80);
+		table.getColumnModel().getColumn(4).setMinWidth(60);
+		table.getColumnModel().getColumn(4).setMaxWidth(60);
+		table.getColumnModel().getColumn(5).setCellRenderer(new TooltipRenderer());
 		table.getTableHeader().setResizingAllowed(false);
 		table.getTableHeader().setReorderingAllowed(false);
 		table.getTableHeader().setRequestFocusEnabled(false);
@@ -156,7 +172,7 @@ public final class MMLErrView {
 		table.setRowSelectionAllowed(false);
 
 		JScrollPane scrollPane = new JScrollPane(table);
-		scrollPane.setPreferredSize(new Dimension(600, 400));
+		scrollPane.setPreferredSize(new Dimension(640, 400));
 		String title = AppResource.appText("menu.mmlErrList");
 
 		var panel = new JPanel(new BorderLayout());
