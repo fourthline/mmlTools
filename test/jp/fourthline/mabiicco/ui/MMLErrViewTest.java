@@ -42,11 +42,11 @@ public class MMLErrViewTest {
 
 		var list = new MMLErrView(score).getDataList();
 
-		var expect = new Vector<Vector<String>>();
-		expect.add(new Vector<String>(List.of("1", "track1", "和音2", "0:00:00", "Undefined tick table: 5")));
-		expect.add(new Vector<String>(List.of("1", "track1", "歌", "0:00:50", "Undefined tick table: 2")));
-		expect.add(new Vector<String>(List.of("2", "track2", "メロディー", "0:00:04", "Undefined tick table: 4")));
-		expect.add(new Vector<String>(List.of("2", "track2", "和音1", "0:00:00", "Illegal note: 111")));
+		var expect = new Vector<Vector<Object>>();
+		expect.add(new Vector<>(List.of(1, "track1", "和音2", "0:00:00", "エラー", "Undefined tick table: 5")));
+		expect.add(new Vector<>(List.of(1, "track1", "歌", "0:00:50", "エラー", "Undefined tick table: 2")));
+		expect.add(new Vector<>(List.of(2, "track2", "メロディー", "0:00:04", "エラー", "Undefined tick table: 4")));
+		expect.add(new Vector<>(List.of(2, "track2", "和音1", "0:00:00", "エラー", "Illegal note: 111")));
 
 		assertEquals(expect, list);
 	}

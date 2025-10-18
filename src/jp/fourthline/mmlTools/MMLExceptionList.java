@@ -20,11 +20,8 @@ public final class MMLExceptionList extends Exception {
 		private final MMLException exception;
 		public Entry(MMLEventList relationPart, MMLNoteEvent event, MMLException exception) {
 			this.relationPart = relationPart;
-			this.event = event;
+			this.event = event;            // テンポによって分割される場合もあるので, relationPartに含まれていないものも許容.
 			this.exception = exception;
-			if (!relationPart.getMMLNoteEventList().contains(event)) {
-				throw new IllegalArgumentException();
-			}
 		}
 		public MMLEventList getRelationPart() {
 			return relationPart;
