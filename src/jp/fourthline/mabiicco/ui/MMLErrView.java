@@ -7,12 +7,15 @@ package jp.fourthline.mabiicco.ui;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Frame;
+import java.awt.Insets;
 import java.util.List;
 import java.util.Vector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -22,6 +25,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 import jp.fourthline.mabiicco.AppResource;
+import jp.fourthline.mabiicco.ui.mml.MMLOutputPanel;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.Measure;
@@ -33,9 +37,16 @@ import jp.fourthline.mmlTools.logger.LogMessage.TrackMessage;
 public final class MMLErrView {
 
 	private final Vector<Vector<Object>> dataList;
+	private final Vector<String> column = new Vector<>();
 
 	public MMLErrView(MMLScore score) {
 		dataList = makeList(score);
+		column.add(AppResource.appText("#"));
+		column.add(AppResource.appText("track"));
+		column.add(AppResource.appText("part"));
+		column.add(AppResource.appText("mml.err.position"));
+		column.add(AppResource.appText("mml.err.type"));
+		column.add(AppResource.appText("mml.err.value"));
 	}
 
 	Vector<Vector<Object>> getDataList() {
@@ -138,14 +149,6 @@ public final class MMLErrView {
 	}
 
 	public void showMMLErrList(Frame parentFrame) {
-		Vector<String> column = new Vector<>();
-		column.add(AppResource.appText("#"));
-		column.add(AppResource.appText("track"));
-		column.add(AppResource.appText("part"));
-		column.add(AppResource.appText("mml.err.position"));
-		column.add(AppResource.appText("mml.err.type"));
-		column.add(AppResource.appText("mml.err.value"));
-
 		JTable table = new JTable(new DefaultTableModel(dataList, column) {
 			private static final long serialVersionUID = 5392169416298424707L;
 
@@ -175,10 +178,46 @@ public final class MMLErrView {
 		scrollPane.setPreferredSize(new Dimension(640, 400));
 		String title = AppResource.appText("menu.mmlErrList");
 
+		var buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+		// 項目数表示
+		buttonPanel.add(new JLabel(""+dataList.size()));
+
+		// コピーボタン
+		JButton tableListInfoButton = new JButton(AppResource.getImageIcon("/img/list.png"));
+		tableListInfoButton.setToolTipText(AppResource.appText("mml.output.tableListInfoButton"));
+		tableListInfoButton.setMargin(new Insets(5, 10, 5, 10));
+		tableListInfoButton.setFocusable(false);
+		buttonPanel.add(tableListInfoButton);
+		tableListInfoButton.addActionListener((event) -> tableListOutput(parentFrame));
+		tableListInfoButton.setEnabled(dataList.size() > 0);
+
 		var panel = new JPanel(new BorderLayout());
 		panel.add(scrollPane, BorderLayout.CENTER);
-		panel.add(new JLabel(""+dataList.size()), BorderLayout.SOUTH);
+		panel.add(buttonPanel, BorderLayout.SOUTH);
+
 		JOptionPane.showMessageDialog(parentFrame, panel, title, JOptionPane.PLAIN_MESSAGE);
+	}
+
+	private void vectorToString(StringBuilder sb, Vector<?> data) {
+		int len = data.size();
+		for (int i = 0; i < len; i++) {
+			if (i > 0) {
+				sb.append('\t');
+			}
+			sb.append(data.get(i).toString().replaceAll("[\\n\\r]", ""));
+		}
+		sb.append('\n');
+	}
+
+	private void tableListOutput(Frame parent) {
+		StringBuilder sb = new StringBuilder();
+		vectorToString(sb, column);
+		for (var row : dataList) {
+			vectorToString(sb, row);
+		}
+
+		MMLOutputPanel.copyToClipboard(parent, sb.toString(), AppResource.appText("mml.output.table_list_done"));
 	}
 
 	private static class TooltipRenderer extends DefaultTableCellRenderer {
