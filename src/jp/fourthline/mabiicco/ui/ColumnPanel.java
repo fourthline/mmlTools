@@ -45,7 +45,6 @@ import jp.fourthline.mmlTools.MMLTempoEvent;
 import jp.fourthline.mmlTools.Marker;
 import jp.fourthline.mmlTools.TimeSignature;
 import jp.fourthline.mmlTools.core.MMLException;
-import jp.fourthline.mmlTools.logger.MMLLogger;
 
 
 public final class ColumnPanel extends JPanel implements MouseListener, MouseMotionListener, IViewTargetMarker {
@@ -192,12 +191,12 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 	 */
 	private void paintWarn(Graphics2D g) {
 		g.setColor(WARN_COLOR.get());
-		mmlManager.getMMLScore().getTrackList().stream()
-		.flatMap(t -> MMLLogger.logger(t).getEntryList().stream())
-		.forEach(t -> {
-			int x = pianoRollView.convertTicktoX(t.getTickOffset());
-			g.fillRect(x-1, 1, 3, DRAW_HEIGHT_ERR_BAR);
-		});
+		for (var track : mmlManager.getMMLScore().getTrackList()) {
+			for (var t : track.getLogger().getEntryList()) {
+				int x = pianoRollView.convertTicktoX(t.getTickOffset());
+				g.fillRect(x-1, 1, 3, DRAW_HEIGHT_ERR_BAR);
+			}
+		}
 	}
 
 	/**

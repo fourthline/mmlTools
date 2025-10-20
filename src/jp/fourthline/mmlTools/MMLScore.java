@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Vector;
 
 import jp.fourthline.mmlTools.core.MMLTicks;
-import jp.fourthline.mmlTools.logger.MMLLogger;
 import jp.fourthline.mmlTools.core.MMLException;
 import jp.fourthline.mmlTools.parser.MMSFile;
 
@@ -370,7 +369,6 @@ public final class MMLScore implements Cloneable {
 	public MMLScore generateAll() throws MMLExceptionList, MMLVerifyException {
 		verifyErrStack.clear();
 		mmlErrStack.clear();
-		MMLLogger.prepare(trackList);
 		trackList.parallelStream().forEach(t -> {
 			try {
 				t.setFix64(fix64Tempo);

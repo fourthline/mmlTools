@@ -29,7 +29,6 @@ import jp.fourthline.mabiicco.ui.mml.MMLOutputPanel;
 import jp.fourthline.mmlTools.MMLScore;
 import jp.fourthline.mmlTools.MMLTrack;
 import jp.fourthline.mmlTools.Measure;
-import jp.fourthline.mmlTools.logger.MMLLogger;
 import jp.fourthline.mmlTools.logger.LogMessage;
 import jp.fourthline.mmlTools.logger.LogMessage.PartMessage;
 import jp.fourthline.mmlTools.logger.LogMessage.TrackMessage;
@@ -142,7 +141,7 @@ public final class MMLErrView {
 				.flatMap(track -> new DataAttr(score, track)
 						.makeDataRelationTrack(Type.ERROR, vErrList)              // for MMLVerifyException
 						.makeDataRelationPart(Type.ERROR, errList)                // for MMLExceptionList
-						.makeDataRelationPart(Type.WARN, MMLLogger.logger(track).getEntryList())  // for MMLLogger
+						.makeDataRelationPart(Type.WARN, track.getLogger().getEntryList())  // for MMLLogger
 						.toStream()
 						)
 				.collect(Collectors.toCollection(Vector::new));
