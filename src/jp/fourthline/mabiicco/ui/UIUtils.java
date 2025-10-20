@@ -6,7 +6,6 @@ package jp.fourthline.mabiicco.ui;
 
 import static jp.fourthline.mabiicco.AppResource.appText;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -60,7 +59,6 @@ import javax.swing.table.DefaultTableModel;
 import jp.fourthline.mabiicco.ActionDispatcher;
 import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.MabiIccoProperties.EnumProperty;
-import jp.fourthline.mmlTools.BarLineType;
 
 public final class UIUtils {
 	private UIUtils() {}
@@ -377,17 +375,5 @@ public final class UIUtils {
 			o.setToolTipText(appText(name + ".detail"));
 		}
 		return o;
-	}
-
-	private static final BasicStroke boldStroke = new BasicStroke(2.0f);
-	private static final BasicStroke dottedStroke = new BasicStroke( 2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[] { 4.0f, 2.0f }, 0.0f );
-	public static void setCurrentBarLine(Graphics2D g,BarLineType type) {
-		if (type != null) {
-			if (type.equals(jp.fourthline.mmlTools.BarLineType.BOLD)) {
-				g.setStroke(boldStroke);
-			} else if (type.equals(jp.fourthline.mmlTools.BarLineType.DOTTED)) {
-				g.setStroke(dottedStroke);
-			}
-		}
 	}
 }

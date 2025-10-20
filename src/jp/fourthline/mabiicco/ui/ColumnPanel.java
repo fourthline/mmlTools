@@ -224,8 +224,7 @@ public final class ColumnPanel extends JPanel implements MouseListener, MouseMot
 			int x = pianoRollView.convertTicktoX(md);
 			int y1 = 0;
 
-			UIUtils.setCurrentBarLine(g, score.getBarLineTypeMap().get(m));
-			g.drawLine(x, y1, x, y2);
+			pianoRollView.drawBarLine(g, m, x, y2);
 			g.setStroke(defaultStroke);
 			g.drawString(Integer.toString(m), x+2, y1+10);
 

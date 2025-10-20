@@ -464,6 +464,34 @@ public final class PianoRollView extends JPanel {
 		g.setStroke(oldStroke);
 	}
 
+	private static final BasicStroke boldStroke = new BasicStroke(2.0f);
+	private static final BasicStroke dottedStroke = new BasicStroke( 2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[] { 4.0f, 2.0f }, 0.0f );
+	public void drawBarLine(Graphics2D g, int measure, int x, int height) {
+		var type = mmlManager.getMMLScore().getBarLineTypeMap().get(measure);
+		if (type != null) {
+			switch (type) {
+			case BOLD:
+				g.setStroke(boldStroke);
+				break;
+			case DOTTED:
+				g.setStroke(dottedStroke);
+				break;
+			case DOUBLE:
+				g.drawLine(x-1, 0, x-1, height);
+				x++;
+				break;
+			case FINAL:
+				g.drawLine(x-2, 0, x-2, height);
+				x++;
+				g.setStroke(boldStroke);
+				break;
+			default:
+				break;
+			}
+		}
+		g.drawLine(x, 0, x, height);
+	}
+
 	/**
 	 * メジャーを表示します。
 	 */
@@ -480,15 +508,15 @@ public final class PianoRollView extends JPanel {
 
 		while (totalTick <= endViewTick) {
 			if (totalTick >= startViewTick-beatTick) {
+				int x = convertTicktoX(totalTick);
 				Stroke backup = g.getStroke();
 				if (beatCount%numTime == 0) {
 					g.setColor(darkBarBorder.get());
-					UIUtils.setCurrentBarLine(g, score.getBarLineTypeMap().get(measure.getMeasure()));;
+					drawBarLine(g, measure.getMeasure(), x, y);
 				} else {
 					g.setColor(barBorder.get());
+					g.drawLine(x, 0, x, y);
 				}
-				int x = convertTicktoX(totalTick);
-				g.drawLine(x, 0, x, y);
 				g.setStroke(backup);
 				paintHalfMeasure(g, x, convertTicktoX(beatTick));
 			}
