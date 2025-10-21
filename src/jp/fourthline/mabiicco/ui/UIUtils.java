@@ -45,6 +45,7 @@ import javax.swing.JToolBar;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -86,7 +87,7 @@ public final class UIUtils {
 			@Override
 			public void ancestorAdded(AncestorEvent event) {
 				textField.requestFocusInWindow();
-				textField.selectAll();
+				SwingUtilities.invokeLater(() -> textField.selectAll());
 			}
 		});
 	}
