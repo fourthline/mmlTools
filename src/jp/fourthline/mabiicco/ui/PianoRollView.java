@@ -465,7 +465,7 @@ public final class PianoRollView extends JPanel {
 	}
 
 	private static final BasicStroke boldStroke = new BasicStroke(2.0f);
-	private static final BasicStroke dottedStroke = new BasicStroke( 2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[] { 4.0f, 2.0f }, 0.0f );
+	private static final BasicStroke dottedStroke = new BasicStroke( 1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[] { 4.0f, 2.0f }, 0.0f );
 	void drawBarLine(Graphics2D g, int measure, int x, int height) {
 		var type = mmlManager.getMMLScore().getBarLineTypeMap().get(measure);
 		if (type != null) {
