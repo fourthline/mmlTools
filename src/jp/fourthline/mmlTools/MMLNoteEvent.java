@@ -218,16 +218,14 @@ public final class MMLNoteEvent extends MMLEvent implements Cloneable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof MMLNoteEvent)) {
-			return false;
+		if (obj instanceof MMLNoteEvent noteEvent) {
+			return (this.tick == noteEvent.tick) &&
+					(this.note == noteEvent.note) &&
+					(this.velocity == noteEvent.velocity) &&
+					(super.equals(noteEvent)) &&
+					(Objects.equals(this.tuningBase, noteEvent.tuningBase));
 		}
-
-		MMLNoteEvent noteEvent = (MMLNoteEvent) obj;
-		return (this.tick == noteEvent.tick) &&
-				(this.note == noteEvent.note) &&
-				(this.velocity == noteEvent.velocity) &&
-				(super.equals(noteEvent)) &&
-				(Objects.equals(this.tuningBase, noteEvent.tuningBase));
+		return false;
 	}
 
 	public static String keyToAbsNote(int key) {

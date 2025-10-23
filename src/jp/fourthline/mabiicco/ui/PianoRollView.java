@@ -467,6 +467,7 @@ public final class PianoRollView extends JPanel {
 	private static final BasicStroke boldStroke = new BasicStroke(2.0f);
 	private static final BasicStroke dottedStroke = new BasicStroke( 1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[] { 4.0f, 2.0f }, 0.0f );
 	void drawBarLine(Graphics2D g, int measure, int x, int height) {
+		Stroke backup = g.getStroke();
 		var type = mmlManager.getMMLScore().getBarLineTypeMap().get(measure);
 		if (type != null) {
 			switch (type) {
@@ -490,6 +491,7 @@ public final class PianoRollView extends JPanel {
 			}
 		}
 		g.drawLine(x, 0, x, height);
+		g.setStroke(backup);
 	}
 
 	/**
@@ -509,7 +511,6 @@ public final class PianoRollView extends JPanel {
 		while (totalTick <= endViewTick) {
 			if (totalTick >= startViewTick-beatTick) {
 				int x = convertTicktoX(totalTick);
-				Stroke backup = g.getStroke();
 				if (beatCount%numTime == 0) {
 					g.setColor(darkBarBorder.get());
 					drawBarLine(g, measure.getMeasure(), x, y);
@@ -517,7 +518,6 @@ public final class PianoRollView extends JPanel {
 					g.setColor(barBorder.get());
 					g.drawLine(x, 0, x, y);
 				}
-				g.setStroke(backup);
 				paintHalfMeasure(g, x, convertTicktoX(beatTick));
 			}
 
@@ -613,7 +613,8 @@ public final class PianoRollView extends JPanel {
 		MMLEventList activePart = mmlManager.getActiveMMLPart();
 
 		int colorIndex = 0;
-		for (int i = 0; i < track.getMMLEventList().size(); i++) {
+		int count = track.getMMLEventList().size();
+		for (int i = 0; i < count; i++) {
 			MMLEventList targetPart = track.getMMLEventAtIndex(i);
 			if (targetPart == activePart) {
 				colorIndex++;
@@ -650,7 +651,8 @@ public final class PianoRollView extends JPanel {
 		}
 		if (mmlScore != null) {
 			var activeTrack = mmlManager.getActiveTrack();
-			for (int i = 0; i < mmlScore.getTrackCount(); i++) {
+			int count = mmlScore.getTrackCount();
+			for (int i = 0; i < count; i++) {
 				MMLTrack track = mmlScore.getTrack(i);
 				if (track != activeTrack) {
 					paintMMLTrack(g, i, track);

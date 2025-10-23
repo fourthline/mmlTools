@@ -156,12 +156,10 @@ public final class MMLTempoEvent extends MMLEvent implements Cloneable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof MMLTempoEvent)) {
-			return false;
+		if (obj instanceof MMLTempoEvent tempoEvent) {
+			return (this.tempo == tempoEvent.tempo) &&
+					(super.equals(tempoEvent));
 		}
-
-		MMLTempoEvent tempoEvent = (MMLTempoEvent) obj;
-		return (this.tempo == tempoEvent.tempo) &&
-				(super.equals(tempoEvent));
+		return false;
 	}
 }

@@ -71,7 +71,7 @@ public abstract class MMLEvent implements Serializable {
 	 * @param tick 削除するtick長
 	 */
 	public static void removeTick(List<? extends MMLEvent> list, int startTick, int tick) {
-		ArrayList<MMLEvent> deleteEvent = new ArrayList<>();
+		List<MMLEvent> deleteEvent = new ArrayList<>();
 		for (MMLEvent event : list) {
 			int eventTick = event.getTickOffset();
 			if (eventTick >= startTick) {
@@ -83,10 +83,7 @@ public abstract class MMLEvent implements Serializable {
 				}
 			}
 		}
-
-		for (MMLEvent event : deleteEvent) {
-			list.remove(event);
-		}
+		list.removeAll(deleteEvent);
 	}
 
 	public static <T> void updateMapByAddMeasure(Map<Integer, T> map, int measurePosition) {
@@ -117,11 +114,9 @@ public abstract class MMLEvent implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof MMLEvent)) {
-			return false;
+		if (obj instanceof MMLEvent event) {
+			return this.tickOffset == event.tickOffset;
 		}
-
-		MMLEvent event = (MMLEvent) obj;
-		return this.tickOffset == event.tickOffset;
+		return false;
 	}
 }

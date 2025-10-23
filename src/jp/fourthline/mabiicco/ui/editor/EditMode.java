@@ -204,10 +204,6 @@ enum EditMode {
 
 	private static Point startPoint;
 
-	
-
-	EditMode() {}
-
 	public void pressEvent(IEditContext context, MouseEvent e) {}
 	public void executeEvent(IEditContext context, MouseEvent e) {}
 	public void releaseEvent(IEditContext context, MouseEvent e) {
