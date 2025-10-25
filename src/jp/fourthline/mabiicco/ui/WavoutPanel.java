@@ -87,7 +87,7 @@ public final class WavoutPanel extends JPanel {
 		parentFrame.disableNoplayItems();
 		var dls = MabiDLS.getInstance();
 		try {
-			dls.startWavout(mmlManager.getMMLScore(), file, this::stopWavout);
+			dls.startWavout(mmlManager.getMMLScore(), file, this::stopWavout, (int)totalBytes);
 		} catch (IOException e) {
 			dls.stopWavout();
 			JOptionPane.showMessageDialog(parentFrame, e.getLocalizedMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);

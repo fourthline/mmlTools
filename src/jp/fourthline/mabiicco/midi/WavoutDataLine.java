@@ -4,9 +4,9 @@
 
 package jp.fourthline.mabiicco.midi;
 
-import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -32,8 +32,7 @@ public final class WavoutDataLine implements SourceDataLine, IWavoutState {
 
 	private boolean rec = false;
 	private OutputStream outputStream = null;
-	private File tempFile = null;
-	private OutputStream tempOutputStream = null;
+	private ByteArrayOutputStream tempOutputStream = null;
 	private Runnable endNotify;
 	private ISoundDataLine soundDataLine = null;
 
@@ -73,11 +72,11 @@ public final class WavoutDataLine implements SourceDataLine, IWavoutState {
 	@Override
 	public long getLen() { return curLen; }
 
-	public void startRec(File outFile, Runnable endNotify) throws IOException {
+	public void startRec(File outFile, Runnable endNotify, int bufSizeHint) throws IOException {
+		int bufSize = bufSizeHint + 1024*1024;
+		System.out.println("startRec:" + bufSize);
 		try {
-			tempFile = File.createTempFile("wavout_", ".tmp", outFile.getParentFile());
-			System.out.println("startRec:" + tempFile);
-			tempOutputStream = new BufferedOutputStream(new FileOutputStream(tempFile), 65536);
+			tempOutputStream = new ByteArrayOutputStream(bufSize);
 			this.rec = true;
 			this.outputStream = new FileOutputStream(outFile);
 			this.endNotify = endNotify;
@@ -87,10 +86,6 @@ public final class WavoutDataLine implements SourceDataLine, IWavoutState {
 			if (tempOutputStream != null) {
 				tempOutputStream.close();
 				tempOutputStream = null;
-			}
-			if (tempFile != null) {
-				tempFile.delete();
-				tempFile = null;
 			}
 			throw e;
 		}
@@ -229,20 +224,17 @@ public final class WavoutDataLine implements SourceDataLine, IWavoutState {
 		parent.open(format);
 	}
 
-	private synchronized void createWavFile() {
-		if (tempFile.exists()) {
-			try {
-				var time = NanoTime.start();
-				long size = tempFile.length();
-				AudioInputStream in = new AudioInputStream(new FileInputStream(tempFile), format, size/format.getFrameSize());
-				AudioSystem.write(in, AudioFileFormat.Type.WAVE, outputStream);
-				in.close();
-				outputStream.close();
-				System.out.println("stopRec: "+size + "  " + time.ms() + "ms");
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			tempFile.delete();
+	private synchronized void createWavFile(byte[] data) {
+		try {
+			var time = NanoTime.start();
+			long size = data.length;
+			AudioInputStream in = new AudioInputStream(new ByteArrayInputStream(data), format, size/format.getFrameSize());
+			AudioSystem.write(in, AudioFileFormat.Type.WAVE, outputStream);
+			in.close();
+			outputStream.close();
+			System.out.println("stopRec: "+size + "  " + time.ms() + "ms");
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -256,7 +248,8 @@ public final class WavoutDataLine implements SourceDataLine, IWavoutState {
 				}
 			}
 			if (stop) {
-				new Thread(this::createWavFile).start();
+				var data = tempOutputStream.toByteArray();
+				new Thread(() -> this.createWavFile(data)).start();
 				tempOutputStream = null;
 			}
 		}
@@ -268,11 +261,7 @@ public final class WavoutDataLine implements SourceDataLine, IWavoutState {
 		if (tempOutputStream != null) {
 			NanoTime time = NanoTime.start();
 			curLen += len;
-			try {
-				tempOutputStream.write(b, off, len);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			tempOutputStream.write(b, off, len);
 			this.time += time.ms();
 		}
 

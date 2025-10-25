@@ -158,9 +158,9 @@ public final class MabiDLS {
 		return wavout;
 	}
 
-	public void startWavout(MMLScore mmlScore, File outFile, Runnable endNotify) throws IOException {
+	public void startWavout(MMLScore mmlScore, File outFile, Runnable endNotify, int bufSizeHint) throws IOException {
 		createSequenceAndStandby(mmlScore, 0);
-		wavout.startRec(outFile, endNotify);
+		wavout.startRec(outFile, endNotify, bufSizeHint);
 		sequenceStart();
 	}
 
