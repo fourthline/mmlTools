@@ -83,7 +83,11 @@ public abstract class MMLEvent implements Serializable {
 				}
 			}
 		}
-		list.removeAll(deleteEvent);
+
+		// removeAllだとうまくいかないので注意.
+		for (MMLEvent event : deleteEvent) {
+			list.remove(event);
+		}
 	}
 
 	public static <T> void updateMapByAddMeasure(Map<Integer, T> map, int measurePosition) {
