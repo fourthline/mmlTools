@@ -400,7 +400,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		// DLSに関わる設定
 		//		createGroupMenu(settingMenu, "menu.overlap_mode", appProperties.overlapMode);  // 2023/04/19 のアップデートにより、重複音が問題なくできるようになったので固定値へ変更
 		UIUtils.createGroupMenu(settingMenu, "menu.sound_env", appProperties.soundEnv);
-		createCheckMenu(settingMenu, "menu.useDefaultSoundbank", appProperties.useDefaultSoundBank, ActionDispatcher.USE_DEFAULT_SOUNDBANK, true);
+		createCheckMenu(settingMenu, "menu.useDefaultSoundbank", appProperties.useDefaultSoundBank, ActionDispatcher.SHOW_RESTART_DIALOG, true);
 		createMenuItem(settingMenu, "menu.select_dls", ActionDispatcher.SELECT_DLS, true);
 
 		/************************* Help Menu *************************/

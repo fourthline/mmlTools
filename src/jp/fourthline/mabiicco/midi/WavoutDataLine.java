@@ -229,6 +229,23 @@ public final class WavoutDataLine implements SourceDataLine, IWavoutState {
 		parent.open(format);
 	}
 
+	private synchronized void createWavFile() {
+		if (tempFile.exists()) {
+			try {
+				var time = NanoTime.start();
+				long size = tempFile.length();
+				AudioInputStream in = new AudioInputStream(new FileInputStream(tempFile), format, size/format.getFrameSize());
+				AudioSystem.write(in, AudioFileFormat.Type.WAVE, outputStream);
+				in.close();
+				outputStream.close();
+				System.out.println("stopRec: "+size + "  " + time.ms() + "ms");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			tempFile.delete();
+		}
+	}
+
 	private void wavoutEndCheck(byte[] b, int off, int len) {
 		if (!rec && (tempOutputStream != null)) {
 			boolean stop = true;
@@ -239,18 +256,7 @@ public final class WavoutDataLine implements SourceDataLine, IWavoutState {
 				}
 			}
 			if (stop) {
-				try {
-					tempOutputStream.close();
-					long size = tempFile.length();
-					AudioInputStream in = new AudioInputStream(new FileInputStream(tempFile), format, size/format.getFrameSize());
-					AudioSystem.write(in, AudioFileFormat.Type.WAVE, outputStream);
-					in.close();
-					outputStream.close();
-					System.out.println("stopRec: "+size);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				tempFile.delete();
+				new Thread(this::createWavFile).start();
 				tempOutputStream = null;
 			}
 		}
@@ -290,7 +296,7 @@ public final class WavoutDataLine implements SourceDataLine, IWavoutState {
 					dataLineObserverThread = new Thread(dataLineObserver, "DataLine Observer");
 					dataLineObserverThread.start();
 				}
-			}	
+			}
 		}
 	}
 }

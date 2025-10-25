@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2022 たんらる
+ * Copyright (C) 2017-2025 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
@@ -36,7 +36,7 @@ public final class WavoutPanel extends JPanel {
 	private final JButton cancelButton = new JButton(appText("wavout.cancel"));
 	private final JProgressBar progress = new JProgressBar();
 
-	private boolean run = false;
+	private volatile boolean run = false;
 	private final long totalTime;
 	private final long totalBytes;
 
@@ -76,6 +76,7 @@ public final class WavoutPanel extends JPanel {
 	private void updateProgress(int now) {
 		progress.setValue(now);
 		var f = NumberFormat.getInstance();
+		now = Math.min(now, (int)totalBytes);
 		progress.setString(f.format(now>>10) + "/" + f.format(totalBytes>>10));
 	}
 
