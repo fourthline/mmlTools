@@ -40,6 +40,8 @@ public final class WavoutPanel extends JPanel {
 	private final long totalTime;
 	private final long totalBytes;
 
+	private final long MAX_SIZE = 128 * 1024 * 1024;
+
 	public WavoutPanel(MainFrame parentFrame, IMMLManager mmlManager, File file) {
 		this.dialog = new JDialog(parentFrame, appText("wavout"), true);
 		this.parentFrame = parentFrame;
@@ -71,6 +73,10 @@ public final class WavoutPanel extends JPanel {
 
 		add(p1, BorderLayout.NORTH);
 		add(p2, BorderLayout.SOUTH);
+
+		if (totalBytes > MAX_SIZE) {
+			startButton.setEnabled(false);
+		}
 	}
 
 	private void updateProgress(int now) {
