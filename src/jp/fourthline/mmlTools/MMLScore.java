@@ -445,7 +445,8 @@ public final class MMLScore implements Cloneable {
 	}
 
 	public void addTimeSignature(TimeSignature ts) {
-		timeSignatureList.removeAll(timeSignatureList.stream().filter(t -> t.getMeasureOffset() == ts.getMeasureOffset()).toList());
+		var offset = ts.getMeasureOffset();
+		timeSignatureList.removeIf(t -> t.getMeasureOffset() == offset);
 		timeSignatureList.add(ts);
 		TimeSignature.recalcTimeSignatureList(this);
 	}
