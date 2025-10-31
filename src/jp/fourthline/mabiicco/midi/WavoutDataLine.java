@@ -19,6 +19,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Control;
 import javax.sound.sampled.Control.Type;
 
+import jp.fourthline.mabiicco.MabiIccoExecutor;
 import jp.fourthline.mmlTools.core.NanoTime;
 
 import javax.sound.sampled.LineListener;
@@ -42,22 +43,6 @@ public final class WavoutDataLine implements SourceDataLine, IWavoutState {
 		parent.flush();
 		System.out.println(System.currentTimeMillis() + " flush");
 	}
-
-	private Thread dataLineObserverThread;
-	private final Runnable dataLineObserver = () -> {
-		try {
-			System.out.println("start DataLineAutoFlush.");
-
-			while (true) {
-				Thread.sleep(100);
-				if (lineStallCounter.incrementAndGet() > 3) {
-					reconnect();
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	};
 
 	public WavoutDataLine() throws LineUnavailableException {
 		this.parent = AudioSystem.getSourceDataLine(format);
@@ -249,7 +234,7 @@ public final class WavoutDataLine implements SourceDataLine, IWavoutState {
 			}
 			if (stop) {
 				var data = tempOutputStream.toByteArray();
-				new Thread(() -> this.createWavFile(data)).start();
+				MabiIccoExecutor.getInstance().submit(() -> this.createWavFile(data));
 				tempOutputStream = null;
 			}
 		}
@@ -281,10 +266,12 @@ public final class WavoutDataLine implements SourceDataLine, IWavoutState {
 	public void startDataLine() {
 		synchronized (this) {
 			if ("true".equals(System.getProperties().get("mabiicco.dlaf"))) {
-				if (dataLineObserverThread == null) {
-					dataLineObserverThread = new Thread(dataLineObserver, "DataLine Observer");
-					dataLineObserverThread.start();
-				}
+				System.out.println("start DataLineAutoFlush.");
+				MabiIccoExecutor.getInstance().scheduleWithFixedDelay(() -> {
+					if (lineStallCounter.incrementAndGet() > 3) {
+						reconnect();
+					}
+				}, 100);
 			}
 		}
 	}

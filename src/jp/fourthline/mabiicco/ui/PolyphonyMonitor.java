@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 たんらる
+ * Copyright (C) 2024-2025 たんらる
  */
 package jp.fourthline.mabiicco.ui;
 
@@ -18,8 +18,10 @@ import javax.swing.JTextField;
 import jp.fourthline.mabiicco.ActionDispatcher;
 import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.midi.MabiDLS;
+import jp.fourthline.mabiicco.MabiIccoExecutor;
 
-public final class PolyphonyMonitor implements Runnable {
+
+public final class PolyphonyMonitor {
 	private static final int BAR_W = 3;
 	private static final int MAX_V = 256;
 	private static final int M_HEIGHT = 80;
@@ -35,7 +37,7 @@ public final class PolyphonyMonitor implements Runnable {
 		if (instance == null) {
 			instance = new PolyphonyMonitor();
 			ActionDispatcher.getInstance().addUpdateUIComponent(instance.dialog);
-			new Thread(instance, "PolyphonyMonitor").start();
+			MabiIccoExecutor.getInstance().scheduleWithFixedDelay(instance::update, 100);
 		}
 		return instance;
 	}
@@ -156,15 +158,5 @@ public final class PolyphonyMonitor implements Runnable {
 	private void reset() {
 		max = 0;
 		mainPanel.repaint();
-	}
-
-	@Override
-	public void run() {
-		while (true) {
-			try {
-				update();
-				Thread.sleep(100);
-			} catch (Exception e) {}
-		}
 	}
 }

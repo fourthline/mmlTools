@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.concurrent.Future;
 
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -19,6 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
 import jp.fourthline.mabiicco.ActionDispatcher;
+import jp.fourthline.mabiicco.MabiIccoExecutor;
 import jp.fourthline.mabiicco.midi.MabiDLS;
 
 import javax.swing.BoxLayout;
@@ -36,7 +38,7 @@ public final class WavoutPanel extends JPanel {
 	private final JButton cancelButton = new JButton(appText("wavout.cancel"));
 	private final JProgressBar progress = new JProgressBar();
 
-	private volatile boolean run = false;
+	private Future<?> future;
 	private final long totalTime;
 	private final long totalBytes;
 
@@ -88,7 +90,6 @@ public final class WavoutPanel extends JPanel {
 
 	private void startWavout() {
 		System.out.println("startWavout(): "+totalBytes);
-		run = true;
 		startButton.setEnabled(false);
 		parentFrame.disableNoplayItems();
 		var dls = MabiDLS.getInstance();
@@ -99,17 +100,10 @@ public final class WavoutPanel extends JPanel {
 			JOptionPane.showMessageDialog(parentFrame, e.getLocalizedMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		new Thread(() -> {
-			while (run) {
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				int len = (int) dls.getWavout().getLen();
-				updateProgress(len);
-			}
-		}).start();
+		future = MabiIccoExecutor.getInstance().scheduleWithFixedDelay(() -> {
+			int len = (int) dls.getWavout().getLen();
+			updateProgress(len);
+		}, 100);
 	}
 
 	/**
@@ -127,9 +121,10 @@ public final class WavoutPanel extends JPanel {
 		parentFrame.enableNoplayItems();
 		MabiDLS.getInstance().stopWavout();
 		dialog.setVisible(false);
-		if (run) {
+		if (future != null) {
 			ActionDispatcher.getInstance().showTime("wavout", MabiDLS.getInstance().getWavout().getTime());
+			future.cancel(false);
+			future = null;
 		}
-		run = false;
 	}
 }

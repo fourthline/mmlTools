@@ -19,7 +19,10 @@ import jp.fourthline.mmlTools.MMLTempoEvent;
 /**
  * 時間表示
  */
-public final class TimeBox extends JComboBox<StringBuffer> implements Runnable {
+import jp.fourthline.mabiicco.MabiIccoExecutor;
+
+
+public final class TimeBox extends JComboBox<StringBuffer> {
 	private static final long serialVersionUID = 6907274508888816165L;
 	private static final int UPDATE_TIME = 200;
 	private static final int RUNNING_UPDATE_TIME = 25;
@@ -42,7 +45,9 @@ public final class TimeBox extends JComboBox<StringBuffer> implements Runnable {
 		addItem(time1);
 		addItem(time2);
 		sequencer = MabiDLS.getInstance().getSequencer();
-		new Thread(this, "TimeBox Thread").start();
+		MabiIccoExecutor.getInstance().scheduleWithDelay(
+				() -> update(mmlManager.getSequencePosition()),
+				() -> sequencer.isRunning() ? RUNNING_UPDATE_TIME : UPDATE_TIME);
 	}
 
 	/**
@@ -74,18 +79,6 @@ public final class TimeBox extends JComboBox<StringBuffer> implements Runnable {
 		}
 		if (repaint) {
 			repaint();
-		}
-	}
-
-	@Override
-	public void run() {
-		while (true) {
-			try {
-				update(mmlManager.getSequencePosition());
-				Thread.sleep(sequencer.isRunning() ? RUNNING_UPDATE_TIME : UPDATE_TIME);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
 		}
 	}
 

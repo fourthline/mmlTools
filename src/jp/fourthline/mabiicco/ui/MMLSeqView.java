@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2024 たんらる
+ * Copyright (C) 2013-2025 たんらる
  */
 
 package jp.fourthline.mabiicco.ui;
@@ -52,9 +52,8 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.LinkedList;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.function.IntConsumer;
+import jp.fourthline.mabiicco.MabiIccoExecutor;
 
 /**
  * 主表示部.
@@ -94,7 +93,6 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 	private final VelocityEditor velocityEditor;
 
 	private final JPanel panel;
-	private final ScheduledThreadPoolExecutor scheduledExecutor = new ScheduledThreadPoolExecutor(4);
 
 	private final Frame parentFrame;
 
@@ -325,12 +323,12 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 	 * 再生スタート（現在のシーケンス位置を使用）
 	 */
 	public void startSequence() {
-		new Thread(() -> {
+		MabiIccoExecutor.getInstance().submit(() -> {
 			NanoTime time = NanoTime.start();
 			long startTick = pianoRollView.getSequencePosition();
 			MabiDLS.getInstance().createSequenceAndStart(mmlScore, startTick);
 			ActionDispatcher.getInstance().showTime("play", time);
-		}).start();
+		});
 	}
 
 	/**
@@ -777,13 +775,13 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 
 	// PianoRoll, Sequence系の描画を行うスレッドを開始します.
 	private void startSequenceThread() {
-		scheduledExecutor.scheduleWithFixedDelay(() -> {
+		MabiIccoExecutor.getInstance().scheduleWithFixedDelay(() -> {
 			if (MabiDLS.getInstance().getSequencer().isRunning()) {
 				EventQueue.invokeLater(() -> {
 					updatePianoRollView(true);
 				});
 			}
-		}, 500, 25, TimeUnit.MILLISECONDS);
+		}, 500, 25);
 	}
 
 	@Override
@@ -864,7 +862,7 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 	}
 
 	private void updateProgramSelect() {
-		scheduledExecutor.submit(() -> MabiDLS.getInstance().loadRequiredInstruments(mmlScore));
+		MabiIccoExecutor.getInstance().submit(() -> MabiDLS.getInstance().loadRequiredInstruments(mmlScore));
 	}
 
 	public void showKeyboardInput() {
