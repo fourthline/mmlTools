@@ -378,6 +378,7 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		createCheckMenu(settingMenu, "view.velocity", appProperties.viewVelocityLine);
 		UIUtils.createGroupMenu(settingMenu, "ui.laf", appProperties.laf);
 		createCheckMenu(settingMenu, "ui.scale_disable", appProperties.uiscaleDisable);
+		UIUtils.createGroupMenu(settingMenu, "ui.scroll_follow_mode", appProperties.scrollFollowMode);
 		settingMenu.add(new JSeparator());
 		// 機能に関わる設定
 		createCheckMenu(settingMenu, "edit.enable", appProperties.enableEdit);

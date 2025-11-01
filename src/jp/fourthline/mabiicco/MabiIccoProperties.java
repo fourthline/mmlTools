@@ -23,6 +23,7 @@ import jp.fourthline.mabiicco.midi.MMLMidiTrack.OverlapMode;
 import jp.fourthline.mabiicco.midi.SoundEnv;
 import jp.fourthline.mabiicco.ui.PianoRollScaler.MouseScrollWidth;
 import jp.fourthline.mabiicco.ui.PianoRollView;
+import jp.fourthline.mabiicco.ui.MMLSeqView.ScrollFollowMode;
 import jp.fourthline.mabiicco.ui.TimeBox;
 import jp.fourthline.mabiicco.ui.color.ColorSet;
 import jp.fourthline.mabiicco.ui.color.ScaleColor;
@@ -67,7 +68,7 @@ public final class MabiIccoProperties {
 	public final EnumProperty<TimeBox.Type> timebox = new EnumProperty<>("view.timeBox", TimeBox.Type.values(), TimeBox.Type.MEASURE);
 
 	/** 音源設定 Index */
-	public final EnumProperty<SoundEnv> soundEnv = new EnumProperty<SoundEnv>("function.sound_env", SoundEnv.values(), SoundEnv.MABINOGI);
+	public final EnumProperty<SoundEnv> soundEnv = new EnumProperty<>("function.sound_env", SoundEnv.values(), SoundEnv.MABINOGI);
 
 	/** クリック再生機能の有効/無効 */
 	public final Property<Boolean> enableClickPlay = new BooleanProperty("function.enable_click_play", true);
@@ -106,7 +107,7 @@ public final class MabiIccoProperties {
 	public final Property<String> midiInputDevice = new StringProperty("midi.input_device");
 
 	/** Scale color */
-	public final EnumProperty<ScaleColor> scaleColor = new EnumProperty<ScaleColor>("scale.color", ScaleColor.values(), ScaleColor.C_MAJOR);
+	public final EnumProperty<ScaleColor> scaleColor = new EnumProperty<>("scale.color", ScaleColor.values(), ScaleColor.C_MAJOR);
 
 	/** Midi キーボード 和音入力 */
 	public final Property<Boolean> midiChordInput = new BooleanProperty("midi.chord_input", false);
@@ -158,10 +159,13 @@ public final class MabiIccoProperties {
 	public final Property<Boolean> velocityEditor = new BooleanProperty("function.velocityEditor", false);
 
 	/** Velocity bar width */
-	public final EnumProperty<VelocityWidth> velocityWidth = new EnumProperty<VelocityWidth>("function.velocityEditor.velocity_width", VelocityWidth.values(), VelocityWidth.W4);
+	public final EnumProperty<VelocityWidth> velocityWidth = new EnumProperty<>("function.velocityEditor.velocity_width", VelocityWidth.values(), VelocityWidth.W4);
 
 	/** DrumConverter: custom map */
 	public final Property<String> drumConvertCustomMap = new StringProperty("function.drum_convert_custom_map");
+
+	/** 再生時のスクロール追従モード */
+	public final EnumProperty<ScrollFollowMode> scrollFollowMode = new EnumProperty<>("function.scroll_follow_mode", ScrollFollowMode.values(), ScrollFollowMode.NORMAL);
 
 	public static MabiIccoProperties getInstance() {
 		return instance;

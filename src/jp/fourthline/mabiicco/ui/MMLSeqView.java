@@ -11,6 +11,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JViewport;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -777,9 +778,7 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 	private void startSequenceThread() {
 		MabiIccoExecutor.getInstance().scheduleWithFixedDelay(() -> {
 			if (MabiDLS.getInstance().getSequencer().isRunning()) {
-				EventQueue.invokeLater(() -> {
-					updatePianoRollView(true);
-				});
+				updatePianoRollView(true);
 			}
 		}, 500, 25);
 	}
@@ -801,48 +800,73 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 		updatePianoRollView(note, false);
 	}
 
-	private void updatePianoRollView(int note, boolean updateSequenceBar) {
-		pianoRollView.updateRunningSequencePosition();
-		int curPositionTick = (int) pianoRollView.getSequencePlayPosition();
-		int curPositionX = pianoRollView.convertTicktoX(curPositionTick);
-		var measure = new Measure(mmlScore, curPositionTick);
-		int measuredPositionX = pianoRollView.convertTicktoX(measure.measuredTick());
-		JViewport viewport = scrollPane.getViewport();
-		Point point = viewport.getViewPosition();
-		Dimension dim = viewport.getExtentSize();
-		int x1 = point.x;
-		int positionX = point.x;
-		int x2 = pianoRollView.convertTicktoX(Measure.measuredTick(mmlScore, (int)pianoRollView.convertXtoTick(x1 + dim.width) - measure.getMeasureTick()));
-		if ( (x1 > curPositionX) || (x1 + dim.width < curPositionX) ) {
-			positionX = curPositionX;
-		} else if (measuredPositionX > x2) {
-			if (dim.width > pianoRollView.convertTicktoX(measure.getMeasureTick())) {
-				if (pianoRollView.getWidth() - dim.width > x1) {
-					positionX = measuredPositionX;
+	public enum ScrollFollowMode implements SettingButtonGroupItem {
+		NORMAL {
+			@Override
+			protected int nextPosition(MMLSeqView p, Point point, int curPositionTick, int curPositionX, Dimension dim) {
+				int positionX = point.x;
+				int x1 = point.x;
+				var measure = new Measure(p.mmlScore, curPositionTick);
+				int measuredPositionX = p.pianoRollView.convertTicktoX(measure.measuredTick());
+				int x2 = p.pianoRollView.convertTicktoX(Measure.measuredTick(p.mmlScore, (int)p.pianoRollView.convertXtoTick(x1 + dim.width) - measure.getMeasureTick()));
+				if ( (x1 > curPositionX) || (x1 + dim.width < curPositionX) ) {
+					positionX = curPositionX;
+				} else if (measuredPositionX > x2) {
+					if (dim.width > p.pianoRollView.convertTicktoX(measure.getMeasureTick())) {
+						if (p.pianoRollView.getWidth() - dim.width > x1) {
+							positionX = measuredPositionX;
+						}
+					}
 				}
+				return positionX;
 			}
+		},
+		FIX {
+			@Override
+			protected int nextPosition(MMLSeqView p, Point point, int curPositionTick, int curPositionX, Dimension dim) {
+				return Math.min(Math.max(0, curPositionX - dim.width / 5), p.pianoRollView.getWidth() - dim.width);
+			}
+		};
+		@Override
+		public String getButtonName() {
+			return name().toLowerCase();
 		}
+		protected abstract int nextPosition(MMLSeqView p, Point point, int curPositionTick, int curPositionX, Dimension dim);
+	}
 
-		long positionY = pianoRollView.convertNote2Y(note);
-		int y1 = point.y;
-		int y2 = y1 + dim.height - pianoRollView.getNoteHeight() * 2;
-		if (positionY < y1) {
-		} else if (positionY > y2) {
-			positionY -= dim.height;
-			positionY += pianoRollView.getNoteHeight() * 2;
-		} else {
-			positionY = point.y;
-		}
-		point.setLocation(positionX, positionY);
-		viewport.setViewPosition(point);
-		UIUtils.viewportSetPositionWorkaround(viewport, point);
+	private void updatePianoRollView(int note, boolean updateSequenceBar) {
+		SwingUtilities.invokeLater(() -> {
+			if (updateSequenceBar) {
+				// シーケンスバー更新のときは必要なコンポーネントだけをrepaintする
+				scrollPane.repaint();
+			} else {
+				mainPanel.repaint();
+			}
 
-		if (updateSequenceBar) {
-			// シーケンスバー更新のときは必要なコンポーネントだけをrepaintする
-			scrollPane.repaint();
-		} else {
-			mainPanel.repaint();
-		}
+			pianoRollView.updateRunningSequencePosition();
+			int curPositionTick = (int) pianoRollView.getSequencePlayPosition();
+			int curPositionX = pianoRollView.convertTicktoX(curPositionTick);
+			JViewport viewport = scrollPane.getViewport();
+			Point point = viewport.getViewPosition();
+			Dimension dim = viewport.getExtentSize();
+
+			// 次の移動位置
+			int positionX = MabiIccoProperties.getInstance().scrollFollowMode.get().nextPosition(this, point, curPositionTick, curPositionX, dim);
+
+			long positionY = pianoRollView.convertNote2Y(note);
+			int y1 = point.y;
+			int y2 = y1 + dim.height - pianoRollView.getNoteHeight() * 2;
+			if (positionY < y1) {
+			} else if (positionY > y2) {
+				positionY -= dim.height;
+				positionY += pianoRollView.getNoteHeight() * 2;
+			} else {
+				positionY = point.y;
+			}
+			point.setLocation(positionX, positionY);
+			viewport.setViewPosition(point);
+			UIUtils.viewportSetPositionWorkaround(viewport, point);
+		});
 	}
 
 	@Override

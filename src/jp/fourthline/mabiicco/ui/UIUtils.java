@@ -149,7 +149,16 @@ public final class UIUtils {
 		ButtonGroup group = new ButtonGroup();
 		var defaultValue = prop.getDefault();
 		for (SettingButtonGroupItem item : prop.getValues()) {
-			String name = appText(item.getButtonName());
+			var buttonName = item.getButtonName();
+			String name = appText(buttonName);
+			if (name.equals(buttonName)) {
+				// <menuName>.<buttonName> の形式でさがす
+				var altName = menuName + "." + buttonName;
+				var str = appText(altName);
+				if (!str.equals(altName)) {
+					name = str;
+				}
+			}
 			if (item == defaultValue) {
 				name += " (default)";
 			}

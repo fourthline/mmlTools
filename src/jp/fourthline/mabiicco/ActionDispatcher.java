@@ -49,6 +49,7 @@ import jp.fourthline.mabiicco.ui.MainFrame;
 import jp.fourthline.mabiicco.ui.PianoRollScaler.MouseScrollWidth;
 import jp.fourthline.mabiicco.ui.PianoRollView;
 import jp.fourthline.mabiicco.ui.PolyphonyMonitor;
+import jp.fourthline.mabiicco.ui.MMLSeqView.ScrollFollowMode;
 import jp.fourthline.mabiicco.ui.WavoutPanel;
 import jp.fourthline.mabiicco.ui.color.ScaleColor;
 import jp.fourthline.mabiicco.ui.editor.DrumConverter;
@@ -922,6 +923,8 @@ public final class ActionDispatcher implements ActionListener, IFileStateObserve
 				doAction(this, MML_GENERATE);
 			} else if (o instanceof EditTool editTool) {
 				editState.changeEditTool(editTool);
+			} else if (o instanceof ScrollFollowMode mode) {
+				appProperties.scrollFollowMode.set(mode);
 			} else {
 				System.err.println("changeAction invalid param " + o.getClass().toString());
 			}
