@@ -11,16 +11,15 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.concurrent.Future;
 
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.Timer;
 
 import jp.fourthline.mabiicco.ActionDispatcher;
-import jp.fourthline.mabiicco.MabiIccoExecutor;
 import jp.fourthline.mabiicco.midi.MabiDLS;
 
 import javax.swing.BoxLayout;
@@ -38,7 +37,7 @@ public final class WavoutPanel extends JPanel {
 	private final JButton cancelButton = new JButton(appText("wavout.cancel"));
 	private final JProgressBar progress = new JProgressBar();
 
-	private Future<?> future;
+	private Timer timer;
 	private final long totalTime;
 	private final long totalBytes;
 
@@ -100,10 +99,11 @@ public final class WavoutPanel extends JPanel {
 			JOptionPane.showMessageDialog(parentFrame, e.getLocalizedMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		future = MabiIccoExecutor.getInstance().scheduleWithFixedDelay(() -> {
+		timer = new Timer(100, t -> {
 			int len = (int) dls.getWavout().getLen();
 			updateProgress(len);
-		}, 100);
+		});
+		timer.start();
 	}
 
 	/**
@@ -121,10 +121,10 @@ public final class WavoutPanel extends JPanel {
 		parentFrame.enableNoplayItems();
 		MabiDLS.getInstance().stopWavout();
 		dialog.setVisible(false);
-		if (future != null) {
+		if (timer != null) {
 			ActionDispatcher.getInstance().showTime("wavout", MabiDLS.getInstance().getWavout().getTime());
-			future.cancel(false);
-			future = null;
+			timer.stop();
+			timer = null;
 		}
 	}
 }

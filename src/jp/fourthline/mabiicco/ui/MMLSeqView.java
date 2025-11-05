@@ -11,7 +11,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JViewport;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -776,11 +776,13 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 
 	// PianoRoll, Sequence系の描画を行うスレッドを開始します.
 	private void startSequenceThread() {
-		MabiIccoExecutor.getInstance().scheduleWithFixedDelay(() -> {
+		Timer timer = new Timer(25, (t) -> {
 			if (MabiDLS.getInstance().getSequencer().isRunning()) {
 				updatePianoRollView(true);
 			}
-		}, 500, 25);
+		});
+		timer.setInitialDelay(500);
+		timer.start();
 	}
 
 	@Override
@@ -835,38 +837,36 @@ public final class MMLSeqView extends AbstractMMLManager implements ChangeListen
 	}
 
 	private void updatePianoRollView(int note, boolean updateSequenceBar) {
-		SwingUtilities.invokeLater(() -> {
-			if (updateSequenceBar) {
-				// シーケンスバー更新のときは必要なコンポーネントだけをrepaintする
-				scrollPane.repaint();
-			} else {
-				mainPanel.repaint();
-			}
+		if (updateSequenceBar) {
+			// シーケンスバー更新のときは必要なコンポーネントだけをrepaintする
+			scrollPane.repaint();
+		} else {
+			mainPanel.repaint();
+		}
 
-			pianoRollView.updateRunningSequencePosition();
-			int curPositionTick = (int) pianoRollView.getSequencePlayPosition();
-			int curPositionX = pianoRollView.convertTicktoX(curPositionTick);
-			JViewport viewport = scrollPane.getViewport();
-			Point point = viewport.getViewPosition();
-			Dimension dim = viewport.getExtentSize();
+		pianoRollView.updateRunningSequencePosition();
+		int curPositionTick = (int) pianoRollView.getSequencePlayPosition();
+		int curPositionX = pianoRollView.convertTicktoX(curPositionTick);
+		JViewport viewport = scrollPane.getViewport();
+		Point point = viewport.getViewPosition();
+		Dimension dim = viewport.getExtentSize();
 
-			// 次の移動位置
-			int positionX = MabiIccoProperties.getInstance().scrollFollowMode.get().nextPosition(this, point, curPositionTick, curPositionX, dim);
+		// 次の移動位置
+		int positionX = MabiIccoProperties.getInstance().scrollFollowMode.get().nextPosition(this, point, curPositionTick, curPositionX, dim);
 
-			long positionY = pianoRollView.convertNote2Y(note);
-			int y1 = point.y;
-			int y2 = y1 + dim.height - pianoRollView.getNoteHeight() * 2;
-			if (positionY < y1) {
-			} else if (positionY > y2) {
-				positionY -= dim.height;
-				positionY += pianoRollView.getNoteHeight() * 2;
-			} else {
-				positionY = point.y;
-			}
-			point.setLocation(positionX, positionY);
-			viewport.setViewPosition(point);
-			UIUtils.viewportSetPositionWorkaround(viewport, point);
-		});
+		long positionY = pianoRollView.convertNote2Y(note);
+		int y1 = point.y;
+		int y2 = y1 + dim.height - pianoRollView.getNoteHeight() * 2;
+		if (positionY < y1) {
+		} else if (positionY > y2) {
+			positionY -= dim.height;
+			positionY += pianoRollView.getNoteHeight() * 2;
+		} else {
+			positionY = point.y;
+		}
+		point.setLocation(positionX, positionY);
+		viewport.setViewPosition(point);
+		UIUtils.viewportSetPositionWorkaround(viewport, point);
 	}
 
 	@Override

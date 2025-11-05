@@ -17,8 +17,8 @@ import javax.swing.JTextField;
 
 import jp.fourthline.mabiicco.ActionDispatcher;
 import jp.fourthline.mabiicco.AppResource;
-import jp.fourthline.mabiicco.midi.MabiDLS;
 import jp.fourthline.mabiicco.MabiIccoExecutor;
+import jp.fourthline.mabiicco.midi.MabiDLS;
 
 
 public final class PolyphonyMonitor {
