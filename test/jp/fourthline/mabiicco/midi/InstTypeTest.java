@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2023 たんらる
+ * Copyright (C) 2015-2025 たんらる
  */
 
 package jp.fourthline.mabiicco.midi;
@@ -45,11 +45,13 @@ public final class InstTypeTest extends UseLoadingDLS {
 		checktInstType(InstType.VOICE,  true, false, songPart,  normalVelocity);
 		checktInstType(InstType.CHORUS, true, false, songPart,  normalVelocity);
 		checktInstType(InstType.DRUMS, false, true, threePart,  normalVelocity);
+		checktInstType(InstType.PERCUSSION_MOBILE, false, false, onePart, normalVelocity);
 	}
 
 	@Test
 	public void testStrInst() {
 		assertEquals(InstType.PERCUSSION, InstType.getInstType("P"));
+		assertEquals(InstType.PERCUSSION_MOBILE, InstType.getInstType("M"));
 		assertEquals(InstType.DRUMS, InstType.getInstType("D"));
 		assertEquals(InstType.NORMAL, InstType.getInstType("N"));
 		assertEquals(InstType.NONE, InstType.getInstType("0"));

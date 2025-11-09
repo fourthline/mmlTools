@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2023 たんらる
+ * Copyright (C) 2014-2025 たんらる
  */
 
 package jp.fourthline.mabiicco.midi;
@@ -35,10 +35,20 @@ public interface InstType {
 	int convertVelocityMML2Midi(int mml_velocity);
 
 	/**
+	 * mmlのNoteからMidiのNote変換する.
+	 * @param mml_note
+	 * @param option
+	 * @return
+	 */
+	int convertNoteMML2Midi(int mml_note, InstClass.Options option);
+
+	/**
 	 * 歌パートを除外するオプションを許可するか.
 	 * @return
 	 */
 	boolean allowExcludeSongPart();
+
+	List<String> getFeature();
 
 	/** 使用不可な楽器 */
 	InstType NONE = new NoneType();
@@ -52,6 +62,9 @@ public interface InstType {
 	/** 打楽器楽器 [ melody ], 移調できる. (シロフォン) */
 	InstType KPUR = new PercussionType(true);
 
+	/** 打楽器楽器 [ melody ], 移調できない, MML->MIDI変換が乱数. */
+	InstType PERCUSSION_MOBILE = new PercussionMobileType();
+
 	/** 歌 [ song ]. */
 	InstType VOICE = new SongType();
 
@@ -64,7 +77,7 @@ public interface InstType {
 	/**
 	 * 単独で使用可能なメインの楽器のリスト.
 	 */
-	List<InstType> MAIN_INST_LIST = Arrays.asList(NORMAL, PERCUSSION, KPUR, VOICE, DRUMS);
+	List<InstType> MAIN_INST_LIST = Arrays.asList(NORMAL, PERCUSSION, KPUR, VOICE, DRUMS, PERCUSSION_MOBILE);
 
 	/**
 	 * 単独で使用不能なサブの楽器のリスト.
@@ -80,6 +93,7 @@ public interface InstType {
 		case "C": return CHORUS;
 		case "K": return KPUR;
 		case "D": return DRUMS;
+		case "M": return PERCUSSION_MOBILE;
 		default : throw new AssertionError();
 		}
 	}
@@ -152,6 +166,16 @@ public interface InstType {
 		public boolean allowExcludeSongPart() {
 			return allowExcludeSongPart;
 		}
+
+		@Override
+		public int convertNoteMML2Midi(int mml_note, InstClass.Options option) {
+			return (mml_note + 12);
+		}
+
+		@Override
+		public List<String> getFeature() {
+			return List.of("NORMAL");
+		}
 	}
 
 	/**
@@ -161,6 +185,11 @@ public interface InstType {
 		private SongType() {
 			super(NormalType.SONG_PART, true, false, false);
 		}
+
+		@Override
+		public List<String> getFeature() {
+			return List.of("SONG PART");
+		}
 	}
 
 	/**
@@ -169,6 +198,11 @@ public interface InstType {
 	public static class DrumsType extends NormalType {
 		private DrumsType() {
 			super(NormalType.THREE_PART, false, true, true);
+		}
+
+		@Override
+		public List<String> getFeature() {
+			return List.of("DRUMS");
 		}
 	}
 
@@ -181,6 +215,11 @@ public interface InstType {
 		}
 
 		@Override
+		public List<String> getFeature() {
+			return List.of("SINGLE PART", "VELOCITY CONVERT");
+		}
+
+		@Override
 		public int convertVelocityMML2Midi(int mml_velocity) {
 			// 打楽器系の楽器はv11がMAX.
 			if (mml_velocity > 11) {
@@ -189,6 +228,29 @@ public interface InstType {
 				mml_velocity = 0;
 			}
 			return (mml_velocity * 11);
+		}
+	}
+
+	/**
+	 * モバイル打楽器楽器 [ melody ], 移調できない, MML->MIDI変換が乱数.
+	 */
+	public static class PercussionMobileType extends NormalType {
+		private PercussionMobileType() {
+			super(NormalType.ONE_PART, false, false, true);
+		}
+
+		@Override
+		public List<String> getFeature() {
+			return List.of("SINGLE PART", "RANDOM");
+		}
+
+		@Override
+		public int convertNoteMML2Midi(int mml_note, InstClass.Options option) {
+			if (option.validNoteList.length > 0) {
+				int r = (int)(Math.random() * option.validNoteList.length);
+				return option.validNoteList[r];
+			}
+			return super.convertNoteMML2Midi(mml_note, option);
 		}
 	}
 }

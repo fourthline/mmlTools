@@ -39,12 +39,13 @@ public final class MabiDLS {
 	private Sequencer sequencer;
 	private MidiChannel[] channel;
 	private int[] midiChannelProgram;
-	private final ArrayList<MMLNoteEvent[]> playNoteList = new ArrayList<>();
+	private final List<MMLNoteEvent[]> playNoteList = new ArrayList<>();
+	private final List<int[]> playMidiNoteList = new ArrayList<>();
 	public static final int MAX_CHANNEL_PLAY_NOTE = 4;
 	private static final int CHORUS_INDEX = 3;
 	private static final int NUM_CHANNEL_ON_TRACK = 4;
 	private static final int MAX_MIDI_PART = MMLScore.MAX_TRACK * NUM_CHANNEL_ON_TRACK;
-	private final ArrayList<InstClass> insts = new ArrayList<>();
+	private final List<InstClass> insts = new ArrayList<>();
 	private final Map<File, List<InstClass>> instsMap = new LinkedHashMap<>();
 	public static final int DLS_BANK = (0x79 << 7);
 	public static final int DRUM_BANK = (0x78 << 7);
@@ -269,6 +270,7 @@ public final class MabiDLS {
 		this.midiChannelProgram = new int[ this.channel.length ];
 		for (int i = 0; i < this.channel.length; i++) {
 			this.playNoteList.add(new MMLNoteEvent[MAX_CHANNEL_PLAY_NOTE]);
+			this.playMidiNoteList.add(new int[MAX_CHANNEL_PLAY_NOTE]);
 		}
 
 		for (MidiChannel ch : this.channel) {
@@ -360,7 +362,7 @@ public final class MabiDLS {
 		midiChannel.controlChange(7, 100);
 		midiChannel.programChange(bank, program);
 		if (note >= 0) {
-			midiChannel.noteOn(isMidi ? note : convertNoteMML2Midi(note), velocity);
+			midiChannel.noteOn(isMidi ? note : getInstByProgram(program).convertNoteMML2Midi(note), velocity);
 		} else {
 			midiChannel.allNotesOff();
 		}
@@ -385,8 +387,10 @@ public final class MabiDLS {
 		setTrackPanpot(trackIndex, 64);
 		setTrackVolume(trackIndex, MMLTrack.INITIAL_VOLUME);
 		MMLNoteEvent[] playNoteEvents = this.playNoteList.get(channel);
+		int[] playMidiNote = this.playMidiNoteList.get(channel);
 		MidiChannel midiChannel = this.channel[channel];
 		int program = midiChannelProgram[channel];
+		var instClass = getInstByProgram(program);
 
 		for (int i = 0; i < playNoteEvents.length; i++) {
 			MMLNoteEvent note = null;
@@ -395,18 +399,18 @@ public final class MabiDLS {
 			}
 			if ( (note == null) || (!note.equals(playNoteEvents[i])) ) {
 				if (playNoteEvents[i] != null) {
-					midiChannel.noteOff( convertNoteMML2Midi(playNoteEvents[i].getNote()) );
+					midiChannel.noteOff( playMidiNote[i] );
 					playNoteEvents[i] = null;
 				}
 			}
 			if ( (note != null) && (!note.equals(playNoteEvents[i]))) {
-				InstClass instClass = getInstByProgram(program);
 				int velocity = convertVelocityOnAtt(instClass, note.getNote(), note.getVelocity());
-				int midiNote = convertNoteMML2Midi(note.getNote());
+				int midiNote = instClass.convertNoteMML2Midi(note.getNote());
 				if (midiNote >= 0) {
 					midiChannel.noteOn(midiNote, velocity);
 				}
 				playNoteEvents[i] = note;
+				playMidiNote[i] = midiNote;
 			}
 		}
 	}
@@ -704,27 +708,24 @@ public final class MabiDLS {
 			}
 
 			try {
+				int midiNote = inst.convertNoteMML2Midi(note);
 				// ON イベント作成
 				MidiMessage message1 = new ExtendMessage(ShortMessage.NOTE_ON, 
 						channel,
-						convertNoteMML2Midi(note), 
+						midiNote,
 						velocity);
 				track.add(new MidiEvent(message1, tickOffset));
 
 				// Off イベント作成
 				MidiMessage message2 = new ExtendMessage(ShortMessage.NOTE_OFF,
 						channel, 
-						convertNoteMML2Midi(note),
+						midiNote,
 						0);
 				track.add(new MidiEvent(message2, endTickOffset));
 			} catch (InvalidMidiDataException e) {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	private int convertNoteMML2Midi(int mml_note) {
-		return (mml_note + 12);
 	}
 
 	/**

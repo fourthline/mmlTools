@@ -215,6 +215,7 @@ public final class InstClass {
 		private final double[] attentionList;
 		private final boolean[] overlapList;
 		private final boolean[] validList;
+		public final int[] validNoteList;
 
 		private Options(Instrument instrument) {
 			if (instrument instanceof DLSInstrument dlsinst) {
@@ -248,16 +249,20 @@ public final class InstClass {
 						}
 					}
 				}
+				var validNote = new ArrayList<Integer>();
+				for (int i = 0; i < validList.length; i++) {
+					if (validList[i]) {
+						validNote.add(i);
+					}
+				}
+				validNoteList = validNote.stream().mapToInt(Integer::intValue).toArray();
 			} else {
 				attentionList = null;
 				overlapList = null;
 				validList = null;
+				validNoteList = null;
 			}
 		}
-	}
-
-	private int convertNoteMML2Midi(int mml_note) {
-		return (mml_note + 12);
 	}
 
 	public double getAttention(int note) {
@@ -265,7 +270,7 @@ public final class InstClass {
 			return 0;
 		}
 		try {
-			note = convertNoteMML2Midi(note);
+			note = type.convertNoteMML2Midi(note, options);
 			return options.attentionList[note];
 		} catch (IndexOutOfBoundsException e) {
 			return 0;
@@ -277,7 +282,7 @@ public final class InstClass {
 			return false;
 		}
 		try {
-			note = convertNoteMML2Midi(note);
+			note = type.convertNoteMML2Midi(note, options);
 			return options.overlapList[note];
 		} catch (IndexOutOfBoundsException e) {
 			return false;
@@ -289,11 +294,15 @@ public final class InstClass {
 			return false;
 		}
 		try {
-			note = convertNoteMML2Midi(note);
+			note = type.convertNoteMML2Midi(note, options);
 			return options.validList[note];
 		} catch (IndexOutOfBoundsException e) {
 			return false;
 		}
+	}
+
+	public int convertNoteMML2Midi(int note) {
+		return type.convertNoteMML2Midi(note, options);
 	}
 
 	/**
@@ -430,7 +439,7 @@ public final class InstClass {
 	}
 
 	private static List<InstClass> loadSoundBank(Soundbank sb, boolean nameConvert) {
-		ArrayList<InstClass> instArray = new ArrayList<>();
+		List<InstClass> instArray = new ArrayList<>();
 		for (Instrument inst : sb.getInstruments()) {
 			if (inst.getPatch().getBank() != 0) continue;
 			if (debug) System.out.print(inst.toString() + "\t");

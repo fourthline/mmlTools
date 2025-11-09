@@ -37,6 +37,7 @@ import jp.fourthline.mabiicco.AppResource;
 import jp.fourthline.mabiicco.midi.InstClass;
 import jp.fourthline.mabiicco.midi.InstType.DrumsType;
 import jp.fourthline.mabiicco.midi.InstType.NormalType;
+import jp.fourthline.mabiicco.midi.InstType.PercussionMobileType;
 import jp.fourthline.mabiicco.midi.InstType.PercussionType;
 import jp.fourthline.mabiicco.midi.InstType.SongType;
 import jp.fourthline.mabiicco.midi.MabiDLS;
@@ -151,6 +152,8 @@ public final class About {
 			return ListItem.D_ICON;
 		} else if (type instanceof PercussionType) {
 			return ListItem.P_ICON;
+		} else if (type instanceof PercussionMobileType) {
+			return ListItem.M_ICON;
 		} else if (type instanceof NormalType) {
 			return ListItem.N_ICON;
 		}
@@ -173,7 +176,8 @@ public final class About {
 				t1.add(t2);
 				if (exist) {
 					t2.add(new ListItem(v.getMidiName(), ListItem.B_ICON));
-					t2.add(new ListItem("transposable: " + v.getType().allowTranspose(), null));
+					t2.add(new ListItem("Transposable: " + v.getType().allowTranspose(), null));
+					t2.add(new ListItem("Feature: " + String.join(", ", v.getType().getFeature()), null));
 					for (int i = v.getUpperNote(); i >= v.getLowerNote(); i--) {
 						if (v.isValid(i)) {
 							t2.add(new ListItem(String.format("%s: %s%s", i, v.getAttention(i), v.isOverlap(i)?", overlap":""), null));
@@ -214,6 +218,7 @@ public final class About {
 		private static final Icon P_ICON = new CircleIcon(8, Color.ORANGE);
 		private static final Icon S_ICON = new CircleIcon(8, Color.GREEN);
 		private static final Icon D_ICON = new CircleIcon(8, Color.MAGENTA);
+		private static final Icon M_ICON = new CircleIcon(8, Color.RED);
 		private static final Icon B_ICON = new CircleIcon(8, Color.WHITE, Color.GRAY);
 		private static final Icon DLS_ICON = AppResource.getImageIcon("/img/dls_icon.png");
 		private final Icon icon;
