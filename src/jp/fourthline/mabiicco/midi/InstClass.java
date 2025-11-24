@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.function.IntBinaryOperator;
 
 import javax.sound.midi.Instrument;
 import javax.sound.midi.MidiSystem;
@@ -77,6 +78,13 @@ public final class InstClass {
 		return (program >> 9) & 0x7f;
 	}
 
+	private static int parseRegionNote(IntBinaryOperator func, String str, int value) {
+		if (str.startsWith("!")) {
+			return MMLEventParser.firstNoteNumber(str.substring(1));
+		}
+		return func.applyAsInt(value, MMLEventParser.firstNoteNumber(str));
+	}
+
 	public InstClass(String name, int bank, int program, Instrument inst) {
 		String[] str = (name != null) ? name.split(",") : new String[] { bank+","+program };
 		this.inst = inst;
@@ -88,10 +96,10 @@ public final class InstClass {
 		}
 		KeyRegion region = regionFromTo(inst);
 		if (str.length > 2) {
-			region.from = Math.max(region.from, MMLEventParser.firstNoteNumber(str[2]));
+			region.from = parseRegionNote(Math::max, str[2], region.from);
 		}
 		if (str.length > 3) {
-			region.to = Math.min(region.to, MMLEventParser.firstNoteNumber(str[3]));
+			region.to = parseRegionNote(Math::min, str[3], region.to);
 		}
 		this.lowerNote = region.from;
 		this.upperNote = region.to;
@@ -210,12 +218,20 @@ public final class InstClass {
 	/**
 	 * DLSの情報に基づくOptions
 	 */
-	public static final class Options {
+	static final class Options {
 		public final static int OPTION_NUM = 256;
 		private final double[] attentionList;
 		private final boolean[] overlapList;
-		private final boolean[] validList;
-		public final int[] validNoteList;
+		final boolean[] validList;
+		final int[] validNoteList;
+
+		// テストデータ作成用
+		Options(boolean[] validList) {
+			this.validList = validList;
+			validNoteList = makeValidNoteList(validList);
+			attentionList = new double[validList.length];
+			overlapList = new boolean[validList.length];
+		}
 
 		private Options(Instrument instrument) {
 			if (instrument instanceof DLSInstrument dlsinst) {
@@ -249,19 +265,23 @@ public final class InstClass {
 						}
 					}
 				}
-				var validNote = new ArrayList<Integer>();
-				for (int i = 0; i < validList.length; i++) {
-					if (validList[i]) {
-						validNote.add(i);
-					}
-				}
-				validNoteList = validNote.stream().mapToInt(Integer::intValue).toArray();
+				validNoteList = makeValidNoteList(validList);
 			} else {
 				attentionList = null;
 				overlapList = null;
 				validList = null;
 				validNoteList = null;
 			}
+		}
+
+		private static int[] makeValidNoteList(boolean[] validList) {
+			var validNote = new ArrayList<Integer>();
+			for (int i = 0; i < validList.length; i++) {
+				if (validList[i]) {
+					validNote.add(i);
+				}
+			}
+			return validNote.stream().mapToInt(Integer::intValue).toArray();
 		}
 	}
 
@@ -270,7 +290,7 @@ public final class InstClass {
 			return 0;
 		}
 		try {
-			note = type.convertNoteMML2Midi(note, options);
+			note = type.convertNote2ValidIndex(note);
 			return options.attentionList[note];
 		} catch (IndexOutOfBoundsException e) {
 			return 0;
@@ -282,23 +302,40 @@ public final class InstClass {
 			return false;
 		}
 		try {
-			note = type.convertNoteMML2Midi(note, options);
+			note = type.convertNote2ValidIndex(note);
 			return options.overlapList[note];
 		} catch (IndexOutOfBoundsException e) {
 			return false;
 		}
 	}
 
-	public boolean isValid(int note) {
+	/**
+	 * DLS表示用のValidチェック
+	 * @param note
+	 * @return
+	 */
+	public boolean isValid4DLS(int note) {
 		if (options.overlapList == null) {
 			return false;
 		}
 		try {
-			note = type.convertNoteMML2Midi(note, options);
+			note = type.convertNote2ValidIndex(note);
 			return options.validList[note];
 		} catch (IndexOutOfBoundsException e) {
 			return false;
 		}
+	}
+
+	/**
+	 * ピアノロール用のValidチェック
+	 * @param note
+	 * @return
+	 */
+	public boolean isValid(int note) {
+		if (options.overlapList == null) {
+			return false;
+		}
+		return type.isValidNote(note, options);
 	}
 
 	public int convertNoteMML2Midi(int note) {

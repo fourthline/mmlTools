@@ -179,7 +179,7 @@ public final class About {
 					t2.add(new ListItem("Transposable: " + v.getType().allowTranspose(), null));
 					t2.add(new ListItem("Feature: " + String.join(", ", v.getType().getFeature()), null));
 					for (int i = v.getUpperNote(); i >= v.getLowerNote(); i--) {
-						if (v.isValid(i)) {
+						if (v.isValid4DLS(i)) {
 							t2.add(new ListItem(String.format("%s: %s%s", i, v.getAttention(i), v.isOverlap(i)?", overlap":""), null));
 						}
 					}

@@ -4,8 +4,9 @@
 
 package jp.fourthline.mabiicco.midi;
 
-import java.util.Arrays;
 import java.util.List;
+
+import jp.fourthline.mabiicco.midi.InstClass.Options;
 
 /**
  * 楽器種別
@@ -34,6 +35,8 @@ public interface InstType {
 	 */
 	int convertVelocityMML2Midi(int mml_velocity);
 
+	int convertNote2ValidIndex(int mml_note);
+
 	/**
 	 * mmlのNoteからMidiのNote変換する.
 	 * @param mml_note
@@ -41,6 +44,14 @@ public interface InstType {
 	 * @return
 	 */
 	int convertNoteMML2Midi(int mml_note, InstClass.Options option);
+
+	/**
+	 * 表示用のNoteチェック
+	 * @param mml_note
+	 * @param option
+	 * @return
+	 */
+	boolean isValidNote(int mml_note, InstClass.Options option);
 
 	/**
 	 * 歌パートを除外するオプションを許可するか.
@@ -77,7 +88,7 @@ public interface InstType {
 	/**
 	 * 単独で使用可能なメインの楽器のリスト.
 	 */
-	List<InstType> MAIN_INST_LIST = Arrays.asList(NORMAL, PERCUSSION, KPUR, VOICE, DRUMS, PERCUSSION_MOBILE);
+	List<InstType> MAIN_INST_LIST = List.of(NORMAL, PERCUSSION, KPUR, VOICE, DRUMS, PERCUSSION_MOBILE);
 
 	/**
 	 * 単独で使用不能なサブの楽器のリスト.
@@ -176,6 +187,20 @@ public interface InstType {
 		public List<String> getFeature() {
 			return List.of("NORMAL");
 		}
+
+		@Override
+		public int convertNote2ValidIndex(int mml_note) {
+			return (mml_note + 12);
+		}
+
+		@Override
+		public boolean isValidNote(int mml_note, Options option) {
+			var note = convertNoteMML2Midi(mml_note, option);
+			if ((note >= 0) && (note < option.validList.length)) {
+				return option.validList[note];
+			}
+			return false;
+		}
 	}
 
 	/**
@@ -246,11 +271,19 @@ public interface InstType {
 
 		@Override
 		public int convertNoteMML2Midi(int mml_note, InstClass.Options option) {
+			if (mml_note < 0) {
+				return mml_note;
+			}
 			if (option.validNoteList.length > 0) {
 				int r = (int)(Math.random() * option.validNoteList.length);
 				return option.validNoteList[r];
 			}
 			return super.convertNoteMML2Midi(mml_note, option);
+		}
+
+		@Override
+		public boolean isValidNote(int mml_note, Options option) {
+			return mml_note >= 0;
 		}
 	}
 }

@@ -86,4 +86,49 @@ public final class InstTypeTest extends UseLoadingDLS {
 		List.of(mainList).forEach(t -> assertTrue(allList.contains(t)));
 		List.of(subList).forEach(t -> assertTrue(allList.contains(t)));
 	}
+
+	@Test
+	public void testAPI1() {
+		var type = InstType.NORMAL;
+		var option = new InstClass.Options(new boolean[] {false, true, false, true, false});
+
+		// ノート変換
+		assertEquals(0, type.convertNoteMML2Midi(-12, option));
+		assertEquals(12, type.convertNoteMML2Midi(0, option));
+
+		// ノートインデックス
+		assertEquals(0, type.convertNote2ValidIndex(-12));
+		assertEquals(12, type.convertNote2ValidIndex(0));
+
+		// ノートValid
+		assertEquals(false, type.isValidNote(-12, option));
+		assertEquals(true,  type.isValidNote(-11, option));
+		assertEquals(false, type.isValidNote(-10, option));
+		assertEquals(true,  type.isValidNote(-9, option));
+		assertEquals(false, type.isValidNote(-8, option));
+		assertEquals(false, type.isValidNote(-7, option));
+		assertEquals(false, type.isValidNote(0, option));
+	}
+
+	@Test
+	public void testAPI2() {
+		var type = InstType.PERCUSSION_MOBILE;
+		var option = new InstClass.Options(new boolean[] {false, true, false, true, false});
+
+		// ノート変換
+		var note1 = type.convertNoteMML2Midi(0, option);
+		var note2 = type.convertNoteMML2Midi(0, option);
+		var note3 = type.convertNoteMML2Midi(0, option);
+		assertFalse( (note1 == note2) && (note2 == note3) );  // ランダム値なので全部一致はありえない
+
+		// ノートインデックス
+		assertEquals(0, type.convertNote2ValidIndex(-12));
+		assertEquals(12, type.convertNote2ValidIndex(0));
+
+		// ノートValid
+		assertEquals(false, type.isValidNote(-1, option));
+		assertEquals(true,  type.isValidNote(0, option));
+		assertEquals(true,  type.isValidNote(1, option));
+	}
+
 }
