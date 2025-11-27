@@ -113,7 +113,7 @@ public final class InstTypeTest extends UseLoadingDLS {
 	@Test
 	public void testAPI2() {
 		var type = InstType.PERCUSSION_MOBILE;
-		var option = new InstClass.Options(new boolean[] {false, true, false, true, false});
+		var option = new InstClass.Options(new boolean[] {false, true, false, true, false, true, true, true, true, true});
 
 		// ノート変換
 		var note1 = type.convertNoteMML2Midi(0, option);
