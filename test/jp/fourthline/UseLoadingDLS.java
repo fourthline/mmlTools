@@ -37,6 +37,10 @@ public abstract class UseLoadingDLS extends FileSelect {
 				midi.initializeMIDI();
 				var fileList = new ArrayList<File>();
 				for (String t : MabiDLS.DEFALUT_DLS_PATH) {
+					String os = System.getProperty("os.name").toLowerCase();
+					if (os.contains("linux")) {
+						t = System.getProperty("user.dir") + "/" + t;
+					}
 					fileList.add(new File(t));
 				}
 				midi.loadingDLSFiles(fileList, null);
