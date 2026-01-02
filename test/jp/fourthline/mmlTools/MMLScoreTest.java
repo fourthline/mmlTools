@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2025 たんらる
+ * Copyright (C) 2014-2026 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -315,7 +315,7 @@ public class MMLScoreTest extends UseLoadingDLS {
 							System.err.println(rank1 + " -> " + rank2 + ", " + rank3);
 						}
 						System.out.println(rank1 + " -> " + rank2 + ", " + rank3);
-//						assertTrue(mml1.getText(0).length() >= mml2.getText(0).length()*0.97);
+						// assertTrue(mml1.getText(0).length() >= mml2.getText(0).length()*0.97);
 						assertTrue(mml1.getText(1).length() >= mml2.getText(1).length()*0.97);
 						assertTrue(mml1.getText(2).length() >= mml2.getText(2).length()*0.97);
 						assertTrue(mml1.getText(3).length() >= mml2.getText(3).length()*0.97);
@@ -339,8 +339,8 @@ public class MMLScoreTest extends UseLoadingDLS {
 						String re1 = new MMLTrack().setMML(mabiMMLoptGen1).generate().getMabiMML();
 						String re2 = new MMLTrack().setMML(mabiMMLoptGen2).generate().getMabiMML();
 						String re3 = new MMLTrack().setMML(mabiMMLoptGen3).generate().getMabiMML();
-//						assertEquals(re1, re2);
-//						assertEquals(re1, re3);
+						// assertEquals(re1, re2);
+						// assertEquals(re1, re3);
 						assertTrue(new MMLTrack().setMML(re1).equals(new MMLTrack().setMML(re2)));
 						assertTrue(new MMLTrack().setMML(re1).equals(new MMLTrack().setMML(re3)));
 
@@ -673,6 +673,53 @@ public class MMLScoreTest extends UseLoadingDLS {
 		score.getTempoEventList().add(new MMLTempoEvent(120, 96));
 		score.generateAll();
 		assertEquals("MML@t140d,,,t120c;", score.getTrack(0).getMabiMML());
+	}
+
+	@Test
+	public void testAddRemoveTick() throws MMLException, MMLExceptionList, MMLVerifyException {
+		score.addTrack(new MMLTrack().setMML("MML@,c1c1c1,,;"));
+		score.addTrack(new MMLTrack().setMML("MML@,c2c1c1,c2.c1.,;"));  // 区間またぎ
+		score.addTimeSignature(new TimeSignature(score, 384, 6, 8));
+		score.getMarkerList().add(new Marker("A", 384-96));
+		score.getMarkerList().add(new Marker("B", 384));
+		score.getMarkerList().add(new Marker("C", 384+96));
+		score.getTempoEventList().add(new MMLTempoEvent(50, 384-96));
+		score.getTempoEventList().add(new MMLTempoEvent(60, 384));
+		score.getTempoEventList().add(new MMLTempoEvent(70, 384+96));
+
+		assertEquals("[288=A, 384=B, 480=C]", score.getMarkerList().toString());
+		assertEquals("[288T50, 384T60, 480T70]", score.getTempoEventList().toString());
+		assertEquals("[384=6/8]", score.getTimeSignatureList().toString());
+
+		// １小節挿入
+		score.addTicks(384, true);
+		score.generateAll();
+
+		assertEquals("[288=A, 672=B, 768=C]", score.getMarkerList().toString());
+		assertEquals("[288T50, 672T60, 768T70]", score.getTempoEventList().toString());
+		assertEquals("[384=6/8]", score.getTimeSignatureList().toString());  // 拍子は移動しない
+		assertEquals("MML@r2.t50r1t60rt70,l1cr2.cc,;", score.getTrack(0).getOriginalMML());
+		assertEquals("MML@r2.t50r1t60rt70,c2cl1&c.c,l2.cc1.&c;", score.getTrack(1).getOriginalMML());
+
+		// もとにもどした
+		score.removeTicks(384, true);
+		score.generateAll();
+
+		assertEquals("[288=A, 384=B, 480=C]", score.getMarkerList().toString());
+		assertEquals("[288T50, 384T60, 480T70]", score.getTempoEventList().toString());
+		assertEquals("[384=6/8]", score.getTimeSignatureList().toString());
+		assertEquals("MML@r2.t50rt60rt70,l1ccc,;", score.getTrack(0).getOriginalMML());
+		assertEquals("MML@r2.t50rt60rt70,c2l1cc,c2.c1.;", score.getTrack(1).getOriginalMML());
+
+		// １小節削除
+		score.removeTicks(384, true);
+		score.generateAll();
+
+		assertEquals("[288=A]", score.getMarkerList().toString());
+		assertEquals("[288T50]", score.getTempoEventList().toString());
+		assertEquals("[384=6/8]", score.getTimeSignatureList().toString());
+		assertEquals("MML@r2.t50,c1cc1,;", score.getTrack(0).getOriginalMML());
+		assertEquals("MML@r2.t50,l2ccc.,l2.cc;", score.getTrack(1).getOriginalMML());
 	}
 
 	@Test

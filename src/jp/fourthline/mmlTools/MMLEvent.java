@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2025 たんらる
+ * Copyright (C) 2013-2026 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -48,18 +48,54 @@ public abstract class MMLEvent implements Serializable {
 
 	public abstract String toMMLString() throws MMLException;
 
+	/**
+	 * 挿入位置に基づいてTick位置を変換する
+	 */
+	private static int shiftForInsert(int pos, int start, int tick) {
+		if (pos >= start) {
+			return pos + tick;
+		}
+		return pos;
+	}
 
 	/**
-	 * tick長の空白を挿入します.
-	 * @param list 空白を挿入するMMLEventリスト. MMLEventList以外のList構造も可.
-	 * @param startTick 挿入する位置
-	 * @param tick 挿入するtick長
+	 * 削除区間に基づいてTick位置を変換する
+	 */
+	private static int shiftForRemove(int pos, int start, int end, int tick) {
+		if (pos >= end) {
+			return pos - tick;
+		} else if (pos > start) {
+			return start;
+		}
+		return pos;
+	}
+
+	/**
+	 * tick長分を挿入する
+	 * @param list
+	 * @param startTick
+	 * @param tick
 	 */
 	public static void insertTick(List<? extends MMLEvent> list, int startTick, int tick) {
 		for (MMLEvent event : list) {
-			int noteTick = event.getTickOffset();
-			if (noteTick >= startTick) {
-				event.setTickOffset(noteTick + tick);
+			int oldStart = event.getTickOffset();
+
+			if (event instanceof MMLNoteEvent note) {
+				if (oldStart + note.getTick() <= startTick) continue;
+			} else {
+				if (oldStart < startTick) continue;
+			}
+
+			int newStart = shiftForInsert(oldStart, startTick, tick);
+
+			if (event instanceof MMLNoteEvent note) {
+				int oldEnd = oldStart + note.getTick();
+				int newEnd = shiftForInsert(oldEnd, startTick, tick);
+
+				note.setTickOffset(newStart);
+				note.setTick(newEnd - newStart);
+			} else {
+				event.setTickOffset(newStart);
 			}
 		}
 	}
@@ -71,15 +107,36 @@ public abstract class MMLEvent implements Serializable {
 	 * @param tick 削除するtick長
 	 */
 	public static void removeTick(List<? extends MMLEvent> list, int startTick, int tick) {
+		int endTick = startTick + tick;
 		List<MMLEvent> deleteEvent = new ArrayList<>();
+
 		for (MMLEvent event : list) {
-			int eventTick = event.getTickOffset();
-			if (eventTick >= startTick) {
-				if (eventTick < startTick+tick) {
-					// 削除リストに加えておく.
+			int oldStart = event.getTickOffset();
+
+			if (event instanceof MMLNoteEvent note) {
+				if (oldStart + note.getTick() <= startTick) continue;
+			} else {
+				if (oldStart < startTick) continue;
+			}
+
+			int newStart = shiftForRemove(oldStart, startTick, endTick, tick);
+
+			if (event instanceof MMLNoteEvent note) {
+				int oldEnd = oldStart + note.getTick();
+				int newEnd = shiftForRemove(oldEnd, startTick, endTick, tick);
+
+				int newTick = newEnd - newStart;
+				if (newTick <= 0) {
+					deleteEvent.add(note);
+				} else {
+					note.setTickOffset(newStart);
+					note.setTick(newTick);
+				}
+			} else {
+				if (oldStart < endTick) {
 					deleteEvent.add(event);
 				} else {
-					event.setTickOffset(eventTick - tick);
+					event.setTickOffset(newStart);
 				}
 			}
 		}
