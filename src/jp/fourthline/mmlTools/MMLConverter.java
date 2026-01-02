@@ -1,11 +1,10 @@
 /*
- * Copyright (C) 2025 たんらる
+ * Copyright (C) 2025-2026 たんらる
  */
 
 package jp.fourthline.mmlTools;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import jp.fourthline.mmlTools.core.MMLTickTable;
@@ -14,15 +13,13 @@ import jp.fourthline.mmlTools.optimizer.MMLStringOptimizer;
 
 public class MMLConverter {
 	private final Switch useTable;
-	private boolean allTempoPart = false;
 	private boolean allowNOpt = false;
 
 	public MMLConverter(Switch useTable) {
 		this.useTable = useTable;
 	}
 
-	public void setOption(boolean allTempoPart, boolean allowNOpt) {
-		this.allTempoPart = allTempoPart;
+	public void setOption(boolean allowNOpt) {
 		this.allowNOpt = allowNOpt;
 	}
 
@@ -58,6 +55,15 @@ public class MMLConverter {
 		return r;
 	}
 
+	private List<MMLEventList> makeRelationPart(List<MMLEventList> eventList, int index) {
+		var list = new ArrayList<MMLEventList>();
+		int n = eventList.size();
+		for (int i = 1; i < n; i++) {
+			list.add(eventList.get((index + i) % n));
+		}
+		return list;
+	}
+
 	/**
 	 * 最適化済みのMML列を取得する.
 	 * @return
@@ -66,18 +72,12 @@ public class MMLConverter {
 	private String getGenericMMLStrings(List<MMLEventList> eventList) throws MMLExceptionList {
 		StringBuilder sb = new StringBuilder();
 		var errList = new ArrayList<MMLExceptionList.Entry>();
-		var emptyTempo = new LinkedList<MMLTempoEvent>();
+		List<MMLTempoEvent> localTempoList = !eventList.isEmpty() ? new ArrayList<>(eventList.get(0).getGlobalTempoList()) : List.of();
 
 		try {
 			for (int i = 0; i < eventList.size(); i++) {
 				var t = eventList.get(i);
-				LinkedList<MMLTempoEvent> localTempoList;
-				if (allTempoPart || i == 0) {
-					localTempoList = new LinkedList<>(t.getGlobalTempoList());
-				} else {
-					localTempoList = emptyTempo;
-				}
-				var mml = MMLBuilder.create(t, 0, MMLBuilder.INIT_OCT).toMMLStringMusicQ(localTempoList, null);
+				var mml = MMLBuilder.create(t, 0, MMLBuilder.INIT_OCT).setNoTempoVZeroCombine().toMMLStringMusicQ(localTempoList, makeRelationPart(eventList, i));
 				mml = optimize(mml);
 
 				// verify

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 たんらる
+ * Copyright (C) 2025-2026 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -35,7 +35,7 @@ public final class MMLConverterTest {
 		try {
 			MMLTrack track = new MMLTrack().setMML(mml);
 			track.generate();
-			String result = exporter.convertMML(track.getMMLEventList());
+			String result = exporter.convertMML(track.getMMLEventList().subList(0, 3));
 			assertEquals(expect1, track.getMabiMML());
 			assertEquals(expect2, result);
 		} catch (MMLExceptionList | MMLVerifyException e) {
@@ -98,8 +98,8 @@ public final class MMLConverterTest {
 		track.generate();
 		assertEquals("MML@r2.t150r2.ccc,r1.rd,o1cco7do1ccc;", exporter.convertMML(track.getMMLEventList()));
 
-		exporter.setOption(true, true);
-		assertEquals("MML@r2.t150r2.ccc,r2.t150r1d,o1ccn86t150ccc;", exporter.convertMML(track.getMMLEventList()));
+		exporter.setOption(true);
+		assertEquals("MML@r2.t150r2.ccc,r1.rd,o1ccn86ccc;", exporter.convertMML(track.getMMLEventList()));
 	}
 
 	@Test
@@ -111,5 +111,33 @@ public final class MMLConverterTest {
 		list.addMMLNoteEvent(new MMLNoteEvent(34, 6, 828));
 		String mml = exporter.convertMML(List.of(list));
 		assertEquals("MML@r1.r2r16l64rr.<<a+rr.a+;", mml);
+	}
+
+	@Test
+	public void testTempoCombine1() throws Exception {
+		String mml = "MML@l1rt90<<b.&b.t40b&b,r1<<f+f+f+f+t120f+f+f+f+t180f+f+f+f+2f+f+f+t100f+f+f+f+,l1r<<d.&dd.&d;";
+		var expect1 = "MML@l1rt90<<b.&b.t40b&b,r1<<f+f+f+f+t120f+f+f+f+t180f+f+f+f+2f+f+f+t100f+f+f+f+,l1r<<d.&dd.&d;";
+		var expect2 = "MML@l1rt90<<b.&b.t40b&b,r1<<f+f+f+f+t120f+f+f+f+t180f+f+f+f+2f+f+f+t100f+f+f+f+,l1r<<d.&dd.&d;";
+		test(mml, expect1, expect2);
+	}
+
+	@Test
+	public void testTempoCombine2() throws Exception {
+		String mml = "MML@c2t111c2.c2ct141&c,r1t121rd1,r1.t131re2;";
+		var expect1 = "MML@c2t111c2.c2ct141v0cv8,r1t121rd1,r1.t131re2;";
+		var expect2 = "MML@c2t111c2.c2ct141&c,r1t121rd1,r1.t131re2;";
+		test(mml, expect1, expect2);
+	}
+
+	// マビノギMMLでは休符の和音パートにテンポ出力しない。エクスポートでは和音の休符にもテンポ出力許可する
+	@Test
+	public void testTempoCombine3() throws Exception {
+		String mml = "MML@<ar2.t90l1rt120rt180rt40rt100,l1.rrrr1l4r<g,l1.rrrr1l4r<f;";
+		var expect1 = "MML@<ar2.t90l1rt120rt180rt40rt100,l1.rrrr1l4r<g,l1.rrrr1l4r<f;";
+		var expect2 = "MML@<ar2.t90l1rt120rt180rt40rt100,l1.rrrr1l4r<g,l1.rrrr1l4r<f;";
+
+		// 和音の休符にテンポ出力するスペースもあるが、マビノギではメロディのほうに文字数が多くなるようにしている。エクスポートもおなじとする。
+		// var expect2 = "MML@<a,l1rt90rt120rt180rt40rt100r2.<g4,l1.rrrr1l4r<f;";
+		test(mml, expect1, expect2);
 	}
 }

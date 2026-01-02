@@ -33,6 +33,8 @@ public final class MMLBuilder {
 	private final boolean percussionMotionFix;
 	private int currentTempo = MMLTempoEvent.INITIAL_TEMPO;
 
+	private boolean tempoVZeroCombine = true;
+
 	private MMLLogger logger;
 	public MMLBuilder setLogger(MMLLogger logger) {
 		this.logger = logger;
@@ -320,7 +322,11 @@ public final class MMLBuilder {
 			divNoteEvent.setTick(divNoteEvent.getTick() - tick);
 			divNoteEvent.setTickOffset(divNoteEvent.getTickOffset() + tick);
 			prevNoteEvent = partNoteEvent;
-			divNoteEvent.setVelocity(0);
+			if (tempoVZeroCombine) {
+				divNoteEvent.setVelocity(0);
+			} else {
+				sb.append('&');
+			}
 		}
 
 		if (divNoteEvent.getTick() > 0) {
@@ -478,5 +484,13 @@ public final class MMLBuilder {
 		}
 
 		return sb.toString();
+	}
+
+	/**
+	 * テンポをまたぐノートの連結にV0連結しなくする。単純にタイ連結となる。
+	 */
+	public MMLBuilder setNoTempoVZeroCombine() {
+		this.tempoVZeroCombine = false;
+		return this;
 	}
 }

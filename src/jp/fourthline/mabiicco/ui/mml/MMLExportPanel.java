@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 たんらる
+ * Copyright (C) 2022-2026 たんらる
  */
 
 package jp.fourthline.mabiicco.ui.mml;
@@ -57,7 +57,6 @@ public final class MMLExportPanel extends JPanel implements ActionListener {
 	private final JButton errDetailButton = new JButton(AppResource.appText("Err Detail"));
 
 	private final JCheckBox allowNopt = new JCheckBox(AppResource.appText("mml.export.options.allowNopt"));
-	private final JCheckBox allTempoPart = new JCheckBox(AppResource.appText("mml.export.options.allTempoPart"));
 
 	/**
 	 * エクスポートパネルを生成する
@@ -137,11 +136,8 @@ public final class MMLExportPanel extends JPanel implements ActionListener {
 		optionPanel.setLayout(new BoxLayout(optionPanel, BoxLayout.Y_AXIS));
 		optionPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(2, 20, 2, 20), optionPanel.getBorder()));
 		optionPanel.add(allowNopt);
-		optionPanel.add(allTempoPart);
 		allowNopt.setFocusable(false);
-		allTempoPart.setFocusable(false);
 		allowNopt.addActionListener(t -> updateText());
-		allTempoPart.addActionListener(t -> updateText());
 		var wP = new JPanel(new BorderLayout());
 		wP.add(formatPanel, BorderLayout.CENTER);
 		wP.add(optionPanel, BorderLayout.SOUTH);
@@ -187,7 +183,7 @@ public final class MMLExportPanel extends JPanel implements ActionListener {
 
 		if (sup != null) {
 			MMLConverter export = sup.converter.get();
-			export.setOption(allTempoPart.isSelected(), allowNopt.isSelected());
+			export.setOption(allowNopt.isSelected());
 			boolean valid = true;
 			errDetailButton.setEnabled(false);
 			outputText = "";
@@ -196,7 +192,7 @@ public final class MMLExportPanel extends JPanel implements ActionListener {
 				outputText = export.convertMML(list);
 				if (outputText == null) {
 					outputText = "";
-					outputTextCountLabel.setText("Verify Error");
+					outputTextCountLabel.setText("Convert Error");
 				} else {
 					outputTextCountLabel.setText(lengthText(outputText));
 				}
