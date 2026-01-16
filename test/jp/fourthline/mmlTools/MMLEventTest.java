@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 たんらる
+ * Copyright (C) 2014-2026 たんらる
  */
 
 package jp.fourthline.mmlTools;
@@ -35,7 +35,7 @@ public class MMLEventTest {
 	@Test
 	public void testRemoveTick0() throws MMLExceptionList, MMLException {
 		MMLEventList eventList1 = new MMLEventList("aac1bb");
-		MMLEventList eventList2 = new MMLEventList("aar8r9b");
+		MMLEventList eventList2 = new MMLEventList("a4a4b8&b9b4");
 
 		MMLEvent.removeTick(eventList1.getMMLNoteEventList(), MMLTicks.getTick("2"), MMLTicks.getTick("1")+MMLTicks.getTick("64"));
 
@@ -50,7 +50,7 @@ public class MMLEventTest {
 	@Test
 	public void testRemoveTick1() throws MMLExceptionList, MMLException {
 		MMLEventList eventList1 = new MMLEventList("aac1bb");
-		MMLEventList eventList2 = new MMLEventList("aabb");
+		MMLEventList eventList2 = new MMLEventList("a4a8&a9c64b4b4");
 
 		MMLEvent.removeTick(eventList1.getMMLNoteEventList(), MMLTicks.getTick("2")-MMLTicks.getTick("64"), MMLTicks.getTick("1"));
 
