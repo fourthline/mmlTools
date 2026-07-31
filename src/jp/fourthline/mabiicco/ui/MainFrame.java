@@ -10,6 +10,7 @@ import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -222,20 +223,21 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 
 	private JMenuBar createMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
+		int shortcutMaskKey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 
 		/************************* File Menu *************************/
 		JMenu fileMenu = new JMenu(appText("menu.file"));
 		menuBar.add(fileMenu);
 
 		createMenuItem(fileMenu, "menu.newFile", ActionDispatcher.NEW_FILE, true,
-				KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_N, shortcutMaskKey));
 		createMenuItem(fileMenu, "menu.openFile", ActionDispatcher.FILE_OPEN, true,
-				KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_O, shortcutMaskKey));
 		reloadMenuItem = createMenuItem(fileMenu, "menu.reloadFile", ActionDispatcher.RELOAD_FILE, true);
 		saveMenuItem = createMenuItem(fileMenu, "menu.saveFile", ActionDispatcher.SAVE_FILE,
-				KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_S, shortcutMaskKey));
 		createMenuItem(fileMenu, "menu.saveAsFile", ActionDispatcher.SAVEAS_FILE,
-				KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_S, shortcutMaskKey | InputEvent.SHIFT_DOWN_MASK));
 
 		fileMenu.add(new JSeparator());
 
@@ -262,25 +264,25 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		menuBar.add(editMenu);
 
 		undoMenu = createMenuItem(editMenu, "menu.undo", ActionDispatcher.UNDO,
-				KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_Z, shortcutMaskKey));
 		redoMenu = createMenuItem(editMenu, "menu.redo", ActionDispatcher.REDO,
-				KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_Y, shortcutMaskKey));
 
 		editMenu.add(new JSeparator());	
 
 		cutMenu = createMenuItem(editMenu, "menu.cut", ActionDispatcher.CUT,
-				KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_X, shortcutMaskKey));
 		copyMenu = createMenuItem(editMenu, "menu.copy", ActionDispatcher.COPY,
-				KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_C, shortcutMaskKey));
 		pasteMenu = createMenuItem(editMenu, "menu.paste", ActionDispatcher.PASTE,
-				KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_V, shortcutMaskKey));
 		deleteMenu = createMenuItem(editMenu, "menu.delete", ActionDispatcher.DELETE,
 				KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
 
 		editMenu.add(new JSeparator());
 
 		createMenuItem(editMenu, "menu.selectAll", ActionDispatcher.SELECT_ALL,
-				KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_A, shortcutMaskKey));
 
 		editMenu.add(new JSeparator());
 
@@ -308,24 +310,24 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		editMenu.add(new JSeparator());
 
 		createMenuItem(editMenu, "view.setUserViewMeasure", ActionDispatcher.SET_USER_VIEW_MEASURE, true, 
-				KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_DOWN_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_L, shortcutMaskKey));
 		createMenuItem(editMenu, "edit.allClearTempo", ActionDispatcher.ALL_CLEAR_TEMPO, true);
 		createMenuItem(editMenu, "mml.generate", ActionDispatcher.MML_GENERATE, true);
 		createMenuItem(editMenu, "edit.keyboard.input", ActionDispatcher.KEYBOARD_INPUT, true,
-				KeyStroke.getKeyStroke(KeyEvent.VK_K, InputEvent.CTRL_DOWN_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_K, shortcutMaskKey));
 		createMenuItem(editMenu, "mml.text_edit", ActionDispatcher.MML_TEXT_EDIT, true,
-				KeyStroke.getKeyStroke(KeyEvent.VK_J, InputEvent.CTRL_DOWN_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_J, shortcutMaskKey));
 
 		/************************* Track Menu *************************/
 		JMenu trackMenu = new JMenu(appText("menu.track"));
 		menuBar.add(trackMenu);
 
 		createMenuItem(trackMenu, "menu.addTrack", ActionDispatcher.ADD_TRACK, true,
-				KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_T, shortcutMaskKey));
 		createMenuItem(trackMenu, "menu.removeTrack", ActionDispatcher.REMOVE_TRACK, true,
-				KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_T, shortcutMaskKey | InputEvent.SHIFT_DOWN_MASK));
 		createMenuItem(trackMenu, "menu.duplicateTrack", ActionDispatcher.DUPLICATE_TRACK, true,
-				KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_D, shortcutMaskKey));
 
 		trackMenu.add(new JSeparator());
 
@@ -336,9 +338,9 @@ public final class MainFrame extends JFrame implements ComponentListener, Action
 		trackMenu.add(new JSeparator());
 
 		createMenuItem(trackMenu, "menu.mml_import", ActionDispatcher.MML_IMPORT, true,
-				KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_V, shortcutMaskKey | InputEvent.SHIFT_DOWN_MASK));
 		createMenuItem(trackMenu, "menu.mml_export", ActionDispatcher.MML_EXPORT,
-				KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+				KeyStroke.getKeyStroke(KeyEvent.VK_C, shortcutMaskKey | InputEvent.SHIFT_DOWN_MASK));
 
 		trackMenu.add(new JSeparator());
 

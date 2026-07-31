@@ -265,7 +265,8 @@ public final class MMLEditor implements MouseInputListener, IEditState, IEditCon
 				selectMultipleNote(selectedNote.get(0), noteEvent, false, false);
 				return false;
 			} else {
-				return selectNote(noteEvent, ((selectModifiers & InputEvent.CTRL_DOWN_MASK) != 0));
+				int shortcutMaskKey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
+				return selectNote(noteEvent, ((selectModifiers & shortcutMaskKey) != 0));
 			}
 		}
 	}
