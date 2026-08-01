@@ -81,6 +81,7 @@ public final class MabiDLS {
 		info.put("large mode", "true");
 		//		info.put("load default soundbank", "false");
 		info.put("max polyphony", "256");
+		info.put("jitter correction", "false");
 		((SoftSynthesizer)this.synthesizer).open(wavout = new WavoutDataLine(), info);
 		addTrackEndNotifier(() -> wavout.stopRec());
 
