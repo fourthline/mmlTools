@@ -208,6 +208,7 @@ public final class PianoRollScaler implements MouseWheelListener {
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		int rotation = e.getWheelRotation();
+		if (rotation == 0) return;
 
 		if (e.getSource() instanceof JScrollPane sc) {
 			int x = e.getX() - sc.getViewport().getBounds().x;
